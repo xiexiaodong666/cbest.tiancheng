@@ -15,7 +15,7 @@ spring:
       suffix: .html
     static-path-pattern: /xx/**
   application:
-    name: e-welfare
+    name: e-welfare-merchant
 
 ---
 spring:
@@ -34,9 +34,9 @@ logging:
   level:
     root: info
   file:
-    path: /home/finance/Logs/e-welfare.e-cbest.lotest
+    path: /home/finance/Logs/e-welfare-merchant.e-cbest.lotest
 encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare.e-cbest.lotest/config-test.properties}
+  file: ${config.file:file:/home/finance/Config/e-welfare-merchant.e-cbest.lotest/config-test.properties}
 ---
 spring:
   profiles: online
@@ -44,6 +44,6 @@ logging:
   level:
     root: info
   file:
-    path: /home/honour/Logs/e-welfare.e-cbest.lo
+    path: /home/honour/Logs/e-welfare-merchant.e-cbest.lo
 encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare.e-cbest.lo/config.properties}
+  file: ${config.file:file:/home/finance/Config/e-welfare-merchant.e-cbest.lo/config.properties}

@@ -16,6 +16,7 @@ spring:
     static-path-pattern: /xx/**
   application:
     name: e-welfare
+
 ---
 spring:
   profiles: dev
@@ -24,6 +25,8 @@ logging:
     path: ./logs
   level:
     root: info
+encrypt:
+  file: ${config.file:classpath:config/config.properties}
 ---
 spring:
   profiles: test
@@ -31,8 +34,9 @@ logging:
   level:
     root: info
   file:
-    path: /home/finance/Logs/e-welfare.e-cbest.lotest
-
+    path: /home/finance/Logs/e-welfare-account.e-cbest.lotest
+encrypt:
+  file: ${config.file:file:/home/finance/Config/e-welfare-account.e-cbest.lotest/config-test.properties}
 ---
 spring:
   profiles: online
@@ -40,4 +44,6 @@ logging:
   level:
     root: info
   file:
-    path: /home/honour/Logs/e-welfare.e-cbest.lo
+    path: /home/honour/Logs/e-welfare-account.e-cbest.lo
+encrypt:
+  file: ${config.file:file:/home/finance/Config/e-welfare-account.e-cbest.lo/config.properties}

@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,6 +40,23 @@ public class AccountController implements IController {
                                       @RequestParam(required = false) @ApiParam("商户编码") String merCode,
                                       @RequestParam(required = false) @ApiParam("账号状态") Integer accountStatus,
                                       @RequestParam(required = false) @ApiParam("删除标记") Boolean flag){
-        return null;
+        Page<Account> page = new Page(currentPage,pageSize);
+
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+        if(Strings.isNotEmpty(accountName)){
+            queryWrapper.eq(Account.ACCOUNT_NAME,accountName);
+        }
+        if(Strings.isNotEmpty(accountName)){
+            queryWrapper.eq(Account.MER_CODE,merCode);
+        }
+        if(Strings.isNotEmpty(accountName)){
+            queryWrapper.eq(Account.ACCOUNT_STATUS,accountStatus);
+        }
+        if(Strings.isNotEmpty(accountName)){
+            queryWrapper.eq(Account.FLAG,flag);
+        }
+
+        Page<Account> accountPage = accountService.pageQuery(page, queryWrapper);
+        return success(accountPage);
     }
 }

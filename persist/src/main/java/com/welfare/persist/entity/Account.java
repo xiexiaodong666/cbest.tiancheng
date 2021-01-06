@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
  * 账户信息(account)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -112,7 +112,7 @@ public class Account extends Model<Account> implements Serializable {
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
     /**
      * 版本
      */
@@ -123,5 +123,80 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("手机号")  
     private String phone;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 员工名称
+    */
+    public static final String ACCOUNT_NAME = "account_name";
+    /**
+    * 员工账号
+    */
+    public static final String ACCOUNT_CODE = "account_code";
+    /**
+    * 员工类型编码
+    */
+    public static final String ACCOUNT_TYPE_CODE = "account_type_code";
+    /**
+    * 所属商户
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 所属部门
+    */
+    public static final String STORE_CODE = "store_code";
+    /**
+    * 账号状态
+    */
+    public static final String ACCOUNT_STATUS = "account_status";
+    /**
+    * 员工状态
+    */
+    public static final String STAFF_STATUS = "staff_status";
+    /**
+    * 是否激活
+    */
+    public static final String ACTIVE = "active";
+    /**
+    * 是否绑卡
+    */
+    public static final String BINDING = "binding";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建时间
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 账户余额
+    */
+    public static final String ACCOUNT_BALANCE = "account_balance";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
+    /**
+    * 手机号
+    */
+    public static final String PHONE = "phone";
 
 }

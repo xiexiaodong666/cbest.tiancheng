@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
  * 地址信息(merchant_address)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -92,5 +92,56 @@ public class MerchantAddress extends Model<MerchantAddress> implements Serializa
      */
     @ApiModelProperty("关联id")  
     private Long relatedId;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 地址名称
+    */
+    public static final String ADDRESS_NAME = "address_name";
+    /**
+    * 详细地址
+    */
+    public static final String ADDRESS = "address";
+    /**
+    * 地址类型
+    */
+    public static final String ADDRESS_TYPE = "address_type";
+    /**
+    * 状态
+    */
+    public static final String STATUS = "status";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建日期
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新日期
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
+    /**
+    * 关联类型
+    */
+    public static final String RELATED_TYPE = "related_type";
+    /**
+    * 关联id
+    */
+    public static final String RELATED_ID = "related_id";
 
 }

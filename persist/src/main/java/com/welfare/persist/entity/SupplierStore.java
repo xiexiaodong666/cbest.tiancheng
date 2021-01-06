@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
  * 供应商门店(supplier_store)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -80,7 +80,7 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
     /**
      * 创建人
      */
@@ -112,5 +112,72 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 商户代码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 门店代码
+    */
+    public static final String STORE_CODE = "store_code";
+    /**
+    * 门店名称
+    */
+    public static final String STORE_NAME = "store_name";
+    /**
+    * 门店层级
+    */
+    public static final String STORE_LEVEL = "store_level";
+    /**
+    * 父级门店
+    */
+    public static final String STORE_PARENT = "store_parent";
+    /**
+    * 门店路径
+    */
+    public static final String STORE_PATH = "store_path";
+    /**
+    * 备注
+    */
+    public static final String REMARK = "remark";
+    /**
+    * 消费方式
+    */
+    public static final String CONSUM_TYPE = "consum_type";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建日期
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新日期
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 外部编码
+    */
+    public static final String EXTERNAL_CODE = "external_code";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
 
 }

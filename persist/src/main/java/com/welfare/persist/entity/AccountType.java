@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
  * 员工类型(account_type)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -60,7 +60,7 @@ public class AccountType extends Model<AccountType> implements Serializable {
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
     /**
      * 创建人
      */
@@ -87,5 +87,52 @@ public class AccountType extends Model<AccountType> implements Serializable {
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 商户代码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 类型编码
+    */
+    public static final String TYPE_CODE = "type_code";
+    /**
+    * 类型名称
+    */
+    public static final String TYPE_NAME = "type_name";
+    /**
+    * 备注
+    */
+    public static final String REMARK = "remark";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建时间
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
 
 }

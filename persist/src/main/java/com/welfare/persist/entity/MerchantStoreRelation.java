@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
  * 商户消费场景配置(merchant_store_relation)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -80,7 +80,7 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
     /**
      * 创建人
      */
@@ -107,5 +107,68 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 商户代码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 门店编码
+    */
+    public static final String STORE_CODE = "store_code";
+    /**
+    * 消费方式
+    */
+    public static final String CONSUM_TYPE = "consum_type";
+    /**
+    * 门店别名
+    */
+    public static final String STORE_ALIAS = "store_alias";
+    /**
+    * 是否返利
+    */
+    public static final String IS_REBATE = "is_rebate";
+    /**
+    * 返利类型
+    */
+    public static final String REBATE_TYPE = "rebate_type";
+    /**
+    * 返利比率
+    */
+    public static final String REBATE_RATIO = "rebate_ratio";
+    /**
+    * 备注
+    */
+    public static final String RAMARK = "ramark";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建时间
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
 
 }

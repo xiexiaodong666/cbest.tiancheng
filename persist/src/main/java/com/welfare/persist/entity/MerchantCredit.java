@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
  * 商户额度信(merchant_credit)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -92,11 +92,66 @@ public class MerchantCredit extends Model<MerchantCredit> implements Serializabl
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
     /**
      * 版本
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 商户代码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 充值额度
+    */
+    public static final String RECHARGE_LIMIT = "recharge_limit";
+    /**
+    * 目前余额
+    */
+    public static final String CURRENT_BALANCE = "current_balance";
+    /**
+    * 信用额度
+    */
+    public static final String CREDIT_LIMIT = "credit_limit";
+    /**
+    * 剩余信用额度
+    */
+    public static final String REMAINING_LIMIT = "remaining_limit";
+    /**
+    * 返利余额
+    */
+    public static final String REBATE_LIMIT = "rebate_limit";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建时间
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
 
 }

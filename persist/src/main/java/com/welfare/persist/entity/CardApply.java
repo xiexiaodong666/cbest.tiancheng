@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
  * 制卡信息(card_apply)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -106,6 +106,69 @@ public class CardApply extends Model<CardApply> implements Serializable {
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 制卡申请号
+    */
+    public static final String APPLY_CODE = "apply_code";
+    /**
+    * 商户代码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 卡片名称
+    */
+    public static final String CARD_NAME = "card_name";
+    /**
+    * 卡片类型
+    */
+    public static final String CARD_TYPE = "card_type";
+    /**
+    * 卡片介质
+    */
+    public static final String CARD_MEDIUM = "card_medium";
+    /**
+    * 卡片数量
+    */
+    public static final String CARD_NUM = "card_num";
+    /**
+    * 识别码方法
+    */
+    public static final String IDENTIFICATION_CODE = "identification_code";
+    /**
+    * 识别码长度
+    */
+    public static final String IDENTIFICATION_LENGTH = "identification_length";
+    /**
+    * 备注
+    */
+    public static final String REMARK = "remark";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建时间
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
 
 }

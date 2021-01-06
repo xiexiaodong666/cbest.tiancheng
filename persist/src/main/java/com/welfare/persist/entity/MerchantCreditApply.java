@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
  * 商户金额申请(merchant_credit_apply)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -76,7 +76,7 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
     /**
      * 创建人
      */
@@ -123,5 +123,80 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 申请编码
+    */
+    public static final String APPLY_CODE = "apply_code";
+    /**
+    * 商户编码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 申请类型
+    */
+    public static final String APPLY_TYPE = "apply_type";
+    /**
+    * 金额
+    */
+    public static final String BALANCE = "balance";
+    /**
+    * 描述
+    */
+    public static final String DESCRIBE = "describe";
+    /**
+    * 备注
+    */
+    public static final String REMARK = "remark";
+    /**
+    * 附件
+    */
+    public static final String ENCLOSURE = "enclosure";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建时间
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 审批状态
+    */
+    public static final String APPROVAL_STATUS = "approval_status";
+    /**
+    * 审批人
+    */
+    public static final String APPROVAL_USER = "approval_user";
+    /**
+    * 审批时间
+    */
+    public static final String APPROVAL_TIME = "approval_time";
+    /**
+    * 审批备注
+    */
+    public static final String APPROVAL_REMARK = "approval_remark";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
 
 }

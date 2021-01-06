@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
  * 字典(dict)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -58,6 +58,33 @@ public class Dict extends Model<Dict> implements Serializable {
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 码表类型
+    */
+    public static final String DICT_TYPE = "dict_type";
+    /**
+    * 编码
+    */
+    public static final String DICT_CODE = "dict_code";
+    /**
+    * 名称
+    */
+    public static final String DICT_NAME = "dict_name";
+    /**
+    * 状态
+    */
+    public static final String STATUS = "status";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
 
 }

@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
  * 月度结算账单(month_settle)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -97,6 +97,61 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 账单编号
+    */
+    public static final String SETTLE_NO = "settle_no";
+    /**
+    * 账单月
+    */
+    public static final String SETTLE_MONTH = "settle_month";
+    /**
+    * 商户代码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 结算金额
+    */
+    public static final String AMOUNT = "amount";
+    /**
+    * 交易笔数
+    */
+    public static final String ORDER_NUM = "order_num";
+    /**
+    * 对账状态
+    */
+    public static final String REC_STATUS = "rec_status";
+    /**
+    * 结算状态
+    */
+    public static final String SETTLE_STATUS = "settle_status";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建时间
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPPDATE_USER = "uppdate_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
 
 }

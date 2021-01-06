@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
  * 卡信息(card_info)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -60,7 +60,7 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Boolean flag;
+    private Integer flag;
     /**
      * 创建人
      */
@@ -92,5 +92,56 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 申请编码
+    */
+    public static final String APPLY_CODE = "apply_code";
+    /**
+    * 卡号
+    */
+    public static final String CARD_ID = "card_id";
+    /**
+    * 卡类型
+    */
+    public static final String CARD_TYPE = "card_type";
+    /**
+    * 卡状态
+    */
+    public static final String CARD_STATUS = "card_status";
+    /**
+    * 删除标志
+    */
+    public static final String FLAG = "flag";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建时间
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 员工账号
+    */
+    public static final String ACCOUNT_ID = "account_id";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
 
 }

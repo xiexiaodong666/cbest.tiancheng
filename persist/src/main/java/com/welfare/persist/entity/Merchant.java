@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
  * 商户信息(merchant)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-01-06 16:35:13
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -97,5 +97,60 @@ public class Merchant extends Model<Merchant> implements Serializable {
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
+
+//以下为列明常量
+
+    /**
+    * id
+    */
+    public static final String ID = "id";
+    /**
+    * 商户名称
+    */
+    public static final String MER_NAME = "mer_name";
+    /**
+    * 商户代码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 商户类型
+    */
+    public static final String MER_TYPE = "mer_type";
+    /**
+    * 身份属性
+    */
+    public static final String MER_IDENTITY = "mer_identity";
+    /**
+    * 合作方式
+    */
+    public static final String MER_COOPERATION_MODE = "mer_cooperation_mode";
+    /**
+    * 备注
+    */
+    public static final String REMARK = "remark";
+    /**
+    * 创建人
+    */
+    public static final String CREATE_USER = "create_user";
+    /**
+    * 创建日期
+    */
+    public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新日期
+    */
+    public static final String UPDATE_TIME = "update_time";
+    /**
+    * 状态
+    */
+    public static final String STATUS = "status";
+    /**
+    * 版本
+    */
+    public static final String VERSION = "version";
 
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.MerchantCreditMapper">
+    <sql id="tableName">
+        merchant_credit
+    </sql>
+
+    <sql id="baseColumn">
+        id,mer_code,recharge_limit,current_balance,credit_limit,remaining_limit,rebate_limit,create_user,create_time,update_user,update_time,flag,version
+    </sql>
+
+</mapper>

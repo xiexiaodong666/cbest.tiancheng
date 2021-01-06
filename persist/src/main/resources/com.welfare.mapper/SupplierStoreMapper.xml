@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.SupplierStoreMapper">
+    <sql id="tableName">
+        supplier_store
+    </sql>
+
+    <sql id="baseColumn">
+        id,mer_code,store_code,store_name,store_level,store_parent,store_path,remark,consum_type,flag,create_user,create_time,update_user,update_time,external_code,version
+    </sql>
+
+</mapper>

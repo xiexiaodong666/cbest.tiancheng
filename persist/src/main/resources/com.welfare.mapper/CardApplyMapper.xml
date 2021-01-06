@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.CardApplyMapper">
+    <sql id="tableName">
+        card_apply
+    </sql>
+
+    <sql id="baseColumn">
+        id,apply_code,mer_code,card_name,card_type,card_medium,card_num,identification_code,identification_length,remark,create_user,create_time,update_user,update_time,flag
+    </sql>
+
+</mapper>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.AccountMapper">
+    <sql id="tableName">
+        account
+    </sql>
+
+    <sql id="baseColumn">
+        id,account_name,account_code,account_type_code,mer_code,store_code,account_status,staff_status,active,binding,create_user,create_time,update_user,update_time,account_balance,flag,version,phone
+    </sql>
+
+</mapper>

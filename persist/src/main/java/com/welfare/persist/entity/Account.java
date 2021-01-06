@@ -1,0 +1,127 @@
+package com.welfare.persist.entity;
+
+import java.io.Serializable;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import java.math.BigDecimal;
+import java.util.Date;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+/**
+ * 账户信息(account)实体类
+ *
+ * @author Yuxiang Li
+ * @since 2021-01-06 13:49:25
+ * @description 由 Mybatisplus Code Generator 创建
+ */
+@Data
+@NoArgsConstructor
+@Accessors(chain = true)
+@TableName("account")
+@ApiModel("账户信息")
+public class Account extends Model<Account> implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * id
+     */
+    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @TableId
+	private Long id;
+    /**
+     * 员工名称
+     */
+    @ApiModelProperty("员工名称")  
+    private String accountName;
+    /**
+     * 员工账号
+     */
+    @ApiModelProperty("员工账号")  
+    private String accountCode;
+    /**
+     * 员工类型编码
+     */
+    @ApiModelProperty("员工类型编码")  
+    private String accountTypeCode;
+    /**
+     * 所属商户
+     */
+    @ApiModelProperty("所属商户")  
+    private String merCode;
+    /**
+     * 所属部门
+     */
+    @ApiModelProperty("所属部门")  
+    private String storeCode;
+    /**
+     * 账号状态
+     */
+    @ApiModelProperty("账号状态")  
+    private String accountStatus;
+    /**
+     * 员工状态
+     */
+    @ApiModelProperty("员工状态")  
+    private String staffStatus;
+    /**
+     * 是否激活
+     */
+    @ApiModelProperty("是否激活")  
+    private Integer active;
+    /**
+     * 是否绑卡
+     */
+    @ApiModelProperty("是否绑卡")  
+    private Integer binding;
+    /**
+     * 创建人
+     */
+    @ApiModelProperty("创建人")  
+    private String createUser;
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty("创建时间")  
+    private Date createTime;
+    /**
+     * 更新人
+     */
+    @ApiModelProperty("更新人")  
+    private String updateUser;
+    /**
+     * 更新时间
+     */
+    @ApiModelProperty("更新时间")  
+    @TableField(update = "now()")
+	private Date updateTime;
+    /**
+     * 账户余额
+     */
+    @ApiModelProperty("账户余额")  
+    private BigDecimal accountBalance;
+    /**
+     * 删除标志
+     */
+    @ApiModelProperty("删除标志")  
+    private Integer flag;
+    /**
+     * 版本
+     */
+    @ApiModelProperty("版本") @Version 
+    private Integer version;
+    /**
+     * 手机号
+     */
+    @ApiModelProperty("手机号")  
+    private String phone;
+
+}

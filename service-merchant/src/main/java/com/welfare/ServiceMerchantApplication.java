@@ -1,18 +1,17 @@
-package com.welfare.serviceaccount;
+package com.welfare;
 
-import org.springframework.boot.Banner;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 @SpringBootApplication
-public class Main {
+public class ServiceMerchantApplication {
 
     private static  final String PROFILES = "spring.profiles.active";
     private static String env = null;
 
     public static void main(String[] args) {
-        SpringApplication application = new SpringApplication(Main.class);
+        SpringApplication application = new SpringApplication(ServiceMerchantApplication.class);
         application.setBannerMode(Banner.Mode.OFF);
         SimpleCommandLinePropertySource commandLineArgs = new SimpleCommandLinePropertySource(args);
         env = commandLineArgs.getProperty(PROFILES);

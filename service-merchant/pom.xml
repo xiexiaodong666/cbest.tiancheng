@@ -39,31 +39,6 @@
             <version>1.14</version>
         </dependency>
 
-
-
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>3.6.1</version>
-        </dependency>
-
-
-<!--        <dependency>
-            <groupId>org.apereo.cas</groupId>
-            <artifactId>cas-server-support-ldap</artifactId>
-            <version>6.3.0-RC4</version>
-        </dependency>-->
-
-        <dependency>
-            <groupId>org.jasig.cas</groupId>
-            <artifactId>cas-server-support-ldap</artifactId>
-            <version>4.2.7</version>
-            <scope>runtime</scope>
-        </dependency>
-
-
-
-
     </dependencies>
 
     <build>

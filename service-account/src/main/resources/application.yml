@@ -1,0 +1,43 @@
+server:
+  port: ${tomcat.port:8888}
+spring:
+  profiles:
+    include:
+     - persist
+  resources:
+    static-locations:
+      - classpath:/static/
+      - classpath:/templates/
+
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
+    static-path-pattern: /xx/**
+  application:
+    name: e-welfare
+---
+spring:
+  profiles: dev
+logging:
+  file:
+    path: ./logs
+  level:
+    root: info
+---
+spring:
+  profiles: test
+logging:
+  level:
+    root: info
+  file:
+    path: /home/finance/Logs/e-welfare.e-cbest.lotest
+
+---
+spring:
+  profiles: online
+logging:
+  level:
+    root: info
+  file:
+    path: /home/honour/Logs/e-welfare.e-cbest.lo

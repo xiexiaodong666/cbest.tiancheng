@@ -1,0 +1,9 @@
+spring:
+  profiles: test
+logging:
+  level:
+    root: info
+  file:
+    path: /home/finance/Logs/e-welfare-account.e-cbest.lotest
+encrypt:
+  file: ${config.file:file:/home/finance/Config/e-welfare-account.e-cbest.lotest/config-test.properties}

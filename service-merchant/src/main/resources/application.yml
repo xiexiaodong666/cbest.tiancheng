@@ -2,8 +2,7 @@ server:
   port: ${tomcat.port:8888}
 spring:
   profiles:
-    include:
-     - persist
+    active: persist,dev
   resources:
     static-locations:
       - classpath:/static/
@@ -16,34 +15,3 @@ spring:
     static-path-pattern: /xx/**
   application:
     name: e-welfare-merchant
-
----
-spring:
-  profiles: dev
-logging:
-  file:
-    path: ./logs
-  level:
-    root: info
-encrypt:
-  file: ${config.file:classpath:config/config.properties}
----
-spring:
-  profiles: test
-logging:
-  level:
-    root: info
-  file:
-    path: /home/finance/Logs/e-welfare-merchant.e-cbest.lotest
-encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare-merchant.e-cbest.lotest/config-test.properties}
----
-spring:
-  profiles: online
-logging:
-  level:
-    root: info
-  file:
-    path: /home/honour/Logs/e-welfare-merchant.e-cbest.lo
-encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare-merchant.e-cbest.lo/config.properties}

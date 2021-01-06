@@ -19,11 +19,6 @@
         </dependency>
         <dependency>
             <groupId>e-welfare</groupId>
-            <artifactId>busi</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>e-welfare</groupId>
             <artifactId>common</artifactId>
             <version>1.0</version>
         </dependency>
@@ -41,7 +36,18 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.14</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-boot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
 
     </dependencies>

@@ -3,15 +3,5 @@ server:
 spring:
   profiles:
     active: persist,dev
-  resources:
-    static-locations:
-      - classpath:/static/
-      - classpath:/templates/
-
-  mvc:
-    view:
-      prefix: /templates/
-      suffix: .html
-    static-path-pattern: /xx/**
   application:
     name: e-welfare-merchant

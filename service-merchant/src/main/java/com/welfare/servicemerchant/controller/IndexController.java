@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ public class IndexController {
 
     @RequestMapping("/errortest")
     @ResponseBody
+    @ApiOperation("错误测试")
     public String errtest(PageRequest pageRequest) {
         ObjectMapper om = new ObjectMapper();
         try {

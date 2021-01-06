@@ -1,9 +1,9 @@
-package com.welfare.serviceaccount;
+package com.welfare;
 
-import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.env.SimpleCommandLinePropertySource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class ServiceAccountApplication {
@@ -11,4 +11,5 @@ public class ServiceAccountApplication {
     public static void main(String[] args) {
         SpringApplication.run(ServiceAccountApplication.class);
     }
+
 }

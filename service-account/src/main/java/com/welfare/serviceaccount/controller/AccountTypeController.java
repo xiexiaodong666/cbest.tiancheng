@@ -1,4 +1,4 @@
-package com.welfare.controller;
+package com.welfare.serviceaccount.controller;
 
 import com.welfare.service.AccountTypeService;
 import lombok.RequiredArgsConstructor;

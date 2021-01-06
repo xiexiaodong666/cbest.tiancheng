@@ -1,4 +1,4 @@
-package com.welfare.controller;
+package com.welfare.servicemerchant.controller;
 
 import com.welfare.service.MerchantService;
 import lombok.RequiredArgsConstructor;

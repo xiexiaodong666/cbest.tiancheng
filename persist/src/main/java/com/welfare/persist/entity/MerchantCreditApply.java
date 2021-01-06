@@ -76,7 +76,7 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Integer flag;
+    private Boolean flag;
     /**
      * 创建人
      */

@@ -29,7 +29,7 @@ public class Swagger2Config implements WebMvcConfigurer {
                 .useDefaultResponseMessages(false)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.welfare.servicemerchant.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.welfare.serviceaccount.controller"))
                 .paths(PathSelectors.any())
                 .build();
 

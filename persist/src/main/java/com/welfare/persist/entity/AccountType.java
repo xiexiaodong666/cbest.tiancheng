@@ -60,7 +60,7 @@ public class AccountType extends Model<AccountType> implements Serializable {
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Integer flag;
+    private Boolean flag;
     /**
      * 创建人
      */

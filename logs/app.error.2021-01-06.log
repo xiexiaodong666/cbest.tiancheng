@@ -147,3 +147,9 @@ Consider defining a bean of type 'com.welfare.service.AccountBillDetailService' 
 2021-01-06 15:53:34 [http-nio-8888-exec-1] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/doc.html error status:404
 2021-01-06 15:55:56 [http-nio-8888-exec-6] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/ error status:404
 2021-01-06 16:00:12 [http-nio-8888-exec-1] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/doc.html error status:404
+2021-01-06 16:03:39 [http-nio-8888-exec-2] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/robots.txt error status:404
+2021-01-06 16:03:39 [http-nio-8888-exec-3] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/manifest.json error status:404
+2021-01-06 16:03:39 [http-nio-8888-exec-1] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/index.html error status:404
+2021-01-06 16:13:15 [http-nio-8888-exec-9] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/robots.txt error status:404
+2021-01-06 16:13:15 [http-nio-8888-exec-6] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/index.html error status:404
+2021-01-06 16:13:15 [http-nio-8888-exec-7] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/manifest.json error status:404

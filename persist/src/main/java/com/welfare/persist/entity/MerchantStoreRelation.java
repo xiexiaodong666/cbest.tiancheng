@@ -80,7 +80,7 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Integer flag;
+    private Boolean flag;
     /**
      * 创建人
      */

@@ -1,6 +1,6 @@
 package com.welfare.controller;
 
-import com.cbest.employee.card.service.AccountDepositApplyDetailService;
+import com.welfare.service.AccountDepositApplyDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;

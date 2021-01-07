@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.domain;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ import lombok.Data;
  * @date 1/7/2021
  */
 @Data
+@ApiModel("退款请求")
 public class RefundRequest {
     @ApiModelProperty("请求id")
     private String requestId;

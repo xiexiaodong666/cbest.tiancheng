@@ -52,7 +52,7 @@ public class PaymentController implements IController {
 
 
     @PostMapping("/refund")
-    @ApiOperation("支付")
+    @ApiOperation("退款")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "header", dataType = "String", name = "Signature",
                     value = "验签算法为md5(hmac1(originalStr)),规则为按照SignatureFields所示字段取值拼接"

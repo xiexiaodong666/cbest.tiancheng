@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import net.dreamlu.mica.core.utils.BeanUtil;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -45,6 +44,13 @@ public class PaymentController implements IController {
         return success(paymentRequest);
     }
 
+    @GetMapping
+    @ApiOperation("查询支付结果")
+    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String paymentId) {
+        return success(null);
+    }
+
+
     @PostMapping("/refund")
     @ApiOperation("支付")
     @ApiImplicitParams({
@@ -63,12 +69,16 @@ public class PaymentController implements IController {
         return success(refundRequest);
     }
 
+    @GetMapping
+    @ApiOperation("查询退款结果")
+    public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String paymentId) {
+        return success(null);
+    }
+
     @GetMapping("/barcode")
     public R<PaymentBarcode> getPaymentBarcode(@RequestParam String accountCode,@RequestParam String cardNo){
         PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode,"null",cardNo);
         return success(paymentBarcode);
     }
-
-
 
 }

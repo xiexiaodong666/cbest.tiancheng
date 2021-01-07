@@ -1,11 +1,16 @@
 package com.welfare.serviceaccount.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.serviceaccount.domain.Deposit;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import net.dreamlu.mica.core.result.R;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Description:
@@ -21,4 +26,21 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "充值相关接口")
 public class DepositController implements IController {
 
+    @PostMapping
+    @ApiOperation("发起充值")
+    public R<Deposit> newDeposit(@RequestBody Deposit deposit){
+        return null;
+    }
+
+    @PostMapping("/batch")
+    @ApiOperation("批量充值")
+    public R<List<Deposit>> newDepositBatch(@RequestBody List<Deposit> deposits){
+        return null;
+    }
+
+    @GetMapping("/singleQuery")
+    @ApiOperation("根据requestId查询充值结果")
+    public R<Deposit> getByRequestId(@PathVariable String requestId){
+        return null;
+    }
 }

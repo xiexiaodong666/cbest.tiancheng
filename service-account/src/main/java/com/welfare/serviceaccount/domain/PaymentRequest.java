@@ -21,8 +21,8 @@ import java.math.BigDecimal;
 public class PaymentRequest {
     @ApiModelProperty("支付请求id")
     private String requestId;
-    @ApiModelProperty("重百付支付流水id")
-    private String paymentId;
+    @ApiModelProperty("重百付支付流水号")
+    private String transNo;
     @ApiModelProperty("门店号")
     private String storeNumber;
     @ApiModelProperty("支付机器号")

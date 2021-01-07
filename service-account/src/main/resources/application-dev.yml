@@ -6,7 +6,7 @@ spring:
     password: mysql@123
 logging:
   file:
-    path: D:/dev/logs
+    path: /home/finance/Logs/e-welfare-account.e-cbest.lotest
   level:
     root: info
 encrypt:

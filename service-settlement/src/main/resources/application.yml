@@ -4,4 +4,4 @@ spring:
   profiles:
     active: persist,dev
   application:
-    name: e-welfare-merchant
+    name: e-welfare-settlement

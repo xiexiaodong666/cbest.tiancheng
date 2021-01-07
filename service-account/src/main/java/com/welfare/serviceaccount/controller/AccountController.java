@@ -7,7 +7,10 @@ import com.welfare.serviceaccount.dto.AccountDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 账户信息服务控制器
@@ -98,9 +102,26 @@ public class AccountController implements IController {
     return null;
   }
 
+  @ApiOperation("员工账号导出")
+  @GetMapping(value="/exportAccount")
+  public void exportAccount(@RequestParam @ApiParam("当前页") Integer currentPage,
+      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam(required = false) @ApiParam("商户编码") String merCode,
+      @RequestParam(required = false) @ApiParam("员工姓名") String accountName,
+      @RequestParam(required = false) @ApiParam("所属部门") String storeCode,
+      @RequestParam(required = false) @ApiParam("账号状态") Integer accountStatus,
+      @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeCode){
+  }
 
-
-
-
+  @ApiOperation("批量新增员工账号")
+  @PostMapping(value = "/uploadAccount")
+  public R<Boolean> uploadAccount(@RequestParam(name = "file") MultipartFile multipartFile) {
+    return null;
+  }
+  @ApiOperation("批量绑卡")
+  @PostMapping(value = "/batchBindCard")
+  public R<Boolean> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
+    return null;
+  }
 
 }

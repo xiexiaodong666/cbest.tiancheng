@@ -1,0 +1,15 @@
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: mysql@123
+    driverClassName: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+logging:
+  file:
+    path: D:/dev/logs
+  level:
+    root: info
+encrypt:
+  file: ${config.file:classpath:config/config.properties}

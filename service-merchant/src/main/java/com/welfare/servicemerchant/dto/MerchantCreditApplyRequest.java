@@ -37,6 +37,12 @@ public class MerchantCreditApplyRequest {
   private BigDecimal balance;
 
   /**
+   * 申请人
+   */
+  @ApiModelProperty("申请人")
+  private String applyUser;
+
+  /**
    * 备注
    */
   @ApiModelProperty("备注")

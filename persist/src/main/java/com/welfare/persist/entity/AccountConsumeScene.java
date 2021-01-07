@@ -62,6 +62,11 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
     @ApiModelProperty("备注")  
     private String remark;
     /**
+     * 状态
+     */
+    @ApiModelProperty("状态")
+    private Integer status;
+    /**
      * 创建人
      */
     @ApiModelProperty("创建人")  

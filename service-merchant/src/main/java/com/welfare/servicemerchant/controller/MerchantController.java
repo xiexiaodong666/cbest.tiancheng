@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.welfare.service.MerchantService;
 import com.welfare.servicemerchant.dto.MerchantInfo;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/merchant")
+@Api(tags = "商户相关接口")
 public class MerchantController implements IController {
     private final MerchantService merchantService;
     @GetMapping("/list")

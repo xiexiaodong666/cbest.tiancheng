@@ -8,7 +8,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
 logging:
   file:
-    path: ./logs
+    path: D:/dev/logs
   level:
     root: info
 encrypt:

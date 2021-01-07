@@ -103,7 +103,7 @@ public class AccountController implements IController {
 
   @PostMapping("/active/{id}")
   @ApiOperation("激活员工账号")
-  public R<Boolean> active(@PathVariable Integer id){
+  public R<Boolean> active(@PathVariable Integer id,@RequestParam @ApiParam("状态") Integer state){
     return null;
   }
 

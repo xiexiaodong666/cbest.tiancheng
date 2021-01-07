@@ -29,7 +29,7 @@ public class FieldObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        log.debug("ready to fill on insert operation ....");
+        log.debug("ready to fill on update operation ....");
         //todo 获取用户信息
         this.setFieldValByName(UPDATER,"todo",metaObject);
         this.setFieldValByName(UPDATE_TIME, Calendar.getInstance().getTime(),metaObject);

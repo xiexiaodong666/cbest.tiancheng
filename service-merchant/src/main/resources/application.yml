@@ -3,3 +3,5 @@ spring:
     active: persist,dev
   application:
     name: e-welfare-merchant
+server:
+  port: 10016

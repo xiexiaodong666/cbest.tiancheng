@@ -3,6 +3,7 @@ package com.welfare.servicemerchant.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -15,35 +16,18 @@ import java.math.BigDecimal;
  */
 @Data
 @ApiModel("账号余额申请")
+@NoArgsConstructor
 public class AccountDepositRequest {
 
   /**
    * 员工账号
    */
-  @ApiModelProperty("员工账号")
+  @ApiModelProperty(name = "员工账号", required = true)
   private String accountCode;
-
-  /**
-   * 商户代码
-   */
-  @ApiModelProperty("商户代码")
-  private String merCode;
 
   /**
    * 申请充值总额
    */
   @ApiModelProperty("申请充值金额")
   private BigDecimal rechargeAmount;
-
-  /**
-   * 申请备注
-   */
-  @ApiModelProperty("申请备注")
-  private String applyRemark;
-
-  /**
-   * 创建人
-   */
-  @ApiModelProperty("创建人")
-  private String createUser;
 }

@@ -1,7 +1,7 @@
 package com.welfare.servicemerchant.converter;
 
 import com.welfare.persist.entity.Account;
-import com.welfare.servicemerchant.dto.AccountInfo;
+import com.welfare.servicemerchant.dto.AccountDepositApplyInfo;
 import org.mapstruct.Mapper;
 
 /**
@@ -13,6 +13,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface AccountConverter {
 
-  AccountInfo toInfo(Account account);
+  AccountDepositApplyInfo toInfo(Account account);
 
 }

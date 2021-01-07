@@ -1,7 +1,7 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.servicemerchant.dto.AccountInfo;
+import com.welfare.servicemerchant.dto.AccountDepositApplyInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,10 +30,10 @@ public class AccountController implements IController {
 
   @GetMapping("/incremental-page")
   @ApiOperation("增量查询账户(支持离线消费场景)")
-  public R<Page<AccountInfo>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
-                                        @RequestParam @ApiParam("单页大小") Integer pageSize,
-                                        @RequestParam(required = true) @ApiParam("门店编码") String storeCode,
-                                        @RequestParam(required = true) @ApiParam("查询开始的id > 0)") Long startId){
+  public R<Page<AccountDepositApplyInfo>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
+                                                    @RequestParam @ApiParam("单页大小") Integer pageSize,
+                                                    @RequestParam(required = true) @ApiParam("门店编码") String storeCode,
+                                                    @RequestParam(required = true) @ApiParam("查询开始的id > 0)") Long startId){
     return null;
   }
 }

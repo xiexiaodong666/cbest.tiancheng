@@ -1,4 +1,4 @@
-package com.welfare.serviceaccount.dto;
+package com.welfare.servicemerchant.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;

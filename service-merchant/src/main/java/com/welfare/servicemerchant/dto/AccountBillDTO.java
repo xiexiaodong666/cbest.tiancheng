@@ -1,4 +1,4 @@
-package com.welfare.serviceaccount.dto;
+package com.welfare.servicemerchant.dto;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.ApiModel;

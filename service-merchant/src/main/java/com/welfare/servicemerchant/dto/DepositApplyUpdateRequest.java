@@ -11,40 +11,28 @@ import java.util.List;
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/7  5:18 PM
+ * @date 2021/1/7  7:06 PM
  */
 @Data
 @NoArgsConstructor
-@ApiModel("批量导入账号申请请求")
-public class BatchDepositApplyRequest {
+@ApiModel("修改账号申请请求")
+public class DepositApplyUpdateRequest {
 
 
   @ApiModelProperty("请求id（用于幂等处理）")
   private String requestId;
 
   /**
-   * 商户代码
+   * 申请id
    */
-  @ApiModelProperty("商户代码")
-  private String merCode;
+  @ApiModelProperty("申请id")
+  private Long id;
 
   /**
    * 申请备注
    */
   @ApiModelProperty("申请备注")
   private String applyRemark;
-
-  /**
-   * 申请人
-   */
-  @ApiModelProperty("申请人")
-  private String applyUser;
-
-  /**
-   * 余额类型
-   */
-  @ApiModelProperty("余额类型（待定义）")
-  private String balanceType;
 
   @ApiModelProperty("申请员工额度信息")
   private List<AccountDepositRequest> items;

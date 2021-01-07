@@ -97,7 +97,7 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Integer flag;
+    private Boolean deleted;
 
 //以下为列明常量
 
@@ -152,6 +152,6 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     /**
     * 删除标志
     */
-    public static final String FLAG = "flag";
+    public static final String DELETED = "deleted";
 
 }

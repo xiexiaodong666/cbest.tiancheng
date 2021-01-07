@@ -82,7 +82,7 @@ public class MerchantCreditApplyDetail extends Model<MerchantCreditApplyDetail> 
      * 删除标志
      */
     @ApiModelProperty("删除标志")  
-    private Integer flag;
+    private Boolean deleted;
     /**
      * 版本
      */
@@ -130,7 +130,7 @@ public class MerchantCreditApplyDetail extends Model<MerchantCreditApplyDetail> 
     /**
     * 删除标志
     */
-    public static final String FLAG = "flag";
+    public static final String DELETED = "deleted";
     /**
     * 版本
     */

@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.domain;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 /**
@@ -10,6 +11,7 @@ import lombok.Data;
  * @date 1/7/2021
  */
 @Data
+@ApiModel("支付条码")
 public class PaymentBarcode {
     private String barcode;
 

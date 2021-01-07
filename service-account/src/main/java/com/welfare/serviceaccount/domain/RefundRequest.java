@@ -18,4 +18,6 @@ public class RefundRequest {
     private String paymentId;
     @ApiModelProperty("重百付正向支付流水id")
     private String originalPaymentId;
+    @ApiModelProperty(value = "退款处理状态",notes = "1:新增, 2:处理中, 3:处理成功 -1:处理失败")
+    private Integer refundStatus;
 }

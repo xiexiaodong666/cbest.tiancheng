@@ -82,11 +82,12 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      */
     @ApiModelProperty("更新日期")  
     @TableField(update = "now()")
-	private Date updateTime;
+	  private Date updateTime;
     /**
      * 版本
      */
-    @ApiModelProperty("版本") @Version 
+    @ApiModelProperty("版本")
+    @Version
     private Integer version;
     /**
      * 审批状态
@@ -113,6 +114,11 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      */
     @ApiModelProperty("删除标志")  
     private Integer flag;
+    /**
+     * 申请备注
+     */
+    @ApiModelProperty("申请备注")
+    private String applyRemark;
 
 //以下为列明常量
 
@@ -180,5 +186,9 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     * 删除标志
     */
     public static final String FLAG = "flag";
+    /**
+     * 申请备注
+     */
+    public static final String APPLY_REMARK = "apply_remark";
 
 }

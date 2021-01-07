@@ -1,10 +1,4 @@
 package com.welfare.serviceaccount.dto;
-
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -34,28 +28,28 @@ public class AccountConsumeSceneDTO implements Serializable {
   @ApiModelProperty("员工类型名称")
   private String accountTypeName;
   /**
-   * 配置门店
+   * 消费配置配置门店
    */
   @ApiModelProperty("配置门店")
-  private List<String> storeCodeName;
+  private List<SupplierStoreDTO> supplierStoreDTOList;
+  /**
+   * 员工类型消费方式
+   */
+  @ApiModelProperty("员工类型消费方式")
+  private String consumType;
   /**
    * 使用状态
    */
   @ApiModelProperty("使用状态")
   private Integer status;
   /**
-   * 备注
-   */
-  @ApiModelProperty("备注")
-  private String remark;
-  /**
    * 创建时间
    */
   @ApiModelProperty("创建时间")
   private Date createTime;
   /**
-   * 删除标志
+   * 备注
    */
-  @ApiModelProperty("删除标志")
-  private Integer flag;
+  @ApiModelProperty("备注")
+  private String remark;
 }

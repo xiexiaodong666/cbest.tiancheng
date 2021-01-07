@@ -9,6 +9,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.util.Date;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -56,21 +59,40 @@ public class AccountConsumeSceneController implements IController {
 
     @PostMapping("/save")
     @ApiOperation("新增员工消费配置")
-    public R<AccountConsumeScene> save(@RequestBody AccountConsumeScene accountType){
+    public R<AccountConsumeScene> save(@RequestBody List<AccountConsumeScene> accountConsumeSceneList){
         return null;
     }
 
     @PostMapping("/update")
     @ApiOperation("修改员工消费配置")
-    public R<AccountConsumeScene> update(@RequestBody AccountConsumeScene accountType){
+    public R<AccountConsumeScene> update(@RequestBody List<AccountConsumeScene> accountConsumeSceneList){
+        return null;
+    }
+
+    @PostMapping("/updateStatus/{id}")
+    @ApiOperation("激活")
+    public R<AccountConsumeScene> updateStatus(@PathVariable Long id,@RequestParam(required = false) @ApiParam("使用状态") Integer status){
         return null;
     }
 
     @PostMapping("/delete/{id}")
     @ApiOperation("删除员工消费配置")
-    public R<Boolean> delete(@PathVariable Integer id){
+    public R<Boolean> delete(@PathVariable Long id){
         return null;
     }
 
+
+    @ApiOperation("员工消费配置导出")
+    @GetMapping(value="/exportAccountConsumeScene")
+    public R<String> exportAccountConsumeScene(HttpServletResponse response,
+        @RequestParam @ApiParam("当前页") Integer currentPage,
+        @RequestParam @ApiParam("单页大小") Integer pageSize,
+        @RequestParam(required = false) @ApiParam("商户代码") String merCode,
+        @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeId,
+        @RequestParam(required = false) @ApiParam("使用状态") Integer status,
+        @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+        @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
+        return null;
+    }
 
 }

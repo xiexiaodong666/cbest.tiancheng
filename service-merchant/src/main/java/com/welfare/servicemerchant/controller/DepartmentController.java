@@ -29,7 +29,7 @@ public class DepartmentController implements IController {
     private final MerchantService merchantService;
     @GetMapping("/list")
     @ApiOperation("根据商户代码查询商户部门列表（不分页）")
-    public R<List<DepartmentInfo>> list(@RequestParam(required = true) @ApiParam("商户代码") String merCode,
+    public R<List<DepartmentInfo>> list(@RequestParam(required = true) @ApiParam(name="商户代码",required = true) String merCode,
                                         @RequestParam @ApiParam("部门父级") String departmentParent,
                                         @RequestParam @ApiParam("部门层级") String departmentLevel){
         return null;

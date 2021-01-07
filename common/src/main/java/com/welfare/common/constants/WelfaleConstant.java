@@ -41,4 +41,23 @@ public class WelfaleConstant {
             return this.desc;
         }
     }
+
+    public enum Header{
+        SOURCE("Source","请求来源");
+
+        private String code;
+        private String desc;
+
+        Header(String code,String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
 }

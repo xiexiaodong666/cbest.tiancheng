@@ -33,6 +33,8 @@ public class PaymentRequest {
     private String paymentScene;
     @ApiModelProperty("金额")
     private BigDecimal amount = BigDecimal.ZERO;
+    @ApiModelProperty(value = "支付状态",notes = "1:新增, 2:处理中, 3:处理成功 -1:处理失败")
+    private Integer paymentStatus;
 
     public String chargePaymentScene(){
         if (!StringUtil.isStartWithNumber(storeNumber)) {

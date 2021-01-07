@@ -57,7 +57,7 @@ public class AccountDepositApplyInfo {
    * 创建日期
    */
   @ApiModelProperty("申请时间")
-  private Date createTime;
+  private Date applyTime;
 
   /**
    * 申请备注

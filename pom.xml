@@ -21,6 +21,7 @@
         <module>common</module>
         <module>service-merchant</module>
         <module>service-account</module>
+        <module>service-settlement</module>
 
     </modules>
     <packaging>pom</packaging>

@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,17 +11,30 @@ import java.util.Date;
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/7  4:55 PM
+ * @date 2021/1/7  7:56 PM
  */
 @Data
 @NoArgsConstructor
-public class AccountDepositApplyQuery {
+@ApiModel("商户额度申请审批查询")
+public class MerchantCreditApplyQuery {
+
+  /**
+   * 商户名称
+   */
+  @ApiModelProperty("商户名称")
+  private String merName;
+
+  /**
+   * 申请类型
+   */
+  @ApiModelProperty("商户额度申请类型（待定）")
+  private String applyType;
 
   /**
    * 申请人
    */
   @ApiModelProperty("申请人")
-  private String applyUser;
+  private String createUser;
 
   /**
    * 审批状态
@@ -57,4 +71,5 @@ public class AccountDepositApplyQuery {
    */
   @ApiModelProperty("审批结束时间")
   private Date approvalTimeEnd;
+
 }

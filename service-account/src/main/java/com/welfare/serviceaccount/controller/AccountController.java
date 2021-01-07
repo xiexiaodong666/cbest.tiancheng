@@ -1,18 +1,21 @@
 package com.welfare.serviceaccount.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
+import com.welfare.serviceaccount.dto.AccountDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
  * 账户信息服务控制器
  *
  * @author Yuxiang Li
- * @since 2021-01-06 11:08:59
  * @description 由 Mybatisplus Code Generator 创建
+ * @since 2021-01-06 11:08:59
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -30,17 +33,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/account")
 @Api(tags = "员工账号管理")
 public class AccountController implements IController {
-    private final AccountService accountService;
 
-    @GetMapping("/page")
-    @ApiOperation("分页查询账户")
-    public R<Page<Account>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
-                                      @RequestParam @ApiParam("单页大小") Integer pageSize,
-                                      @RequestParam(required = false) @ApiParam("员工姓名") String accountName,
-                                      @RequestParam(required = false) @ApiParam("商户编码") String merCode,
-                                      @RequestParam(required = false) @ApiParam("账号状态") Integer accountStatus,
-                                      @RequestParam(required = false) @ApiParam("删除标记") Boolean flag){
-        Page<Account> page = new Page(currentPage,pageSize);
+  private final AccountService accountService;
+
+  @GetMapping("/page")
+  @ApiOperation("分页查询账户")
+  public R<Page<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
+      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam(required = false) @ApiParam("商户编码") String merCode,
+      @RequestParam(required = false) @ApiParam("员工姓名") String accountName,
+      @RequestParam(required = false) @ApiParam("所属部门") String storeCode,
+      @RequestParam(required = false) @ApiParam("账号状态") Integer accountStatus,
+      @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeCode) {
+       /* Page<AccountDTO> page = new Page(currentPage,pageSize);
 
         QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
         if(Strings.isNotEmpty(accountName)){
@@ -57,6 +62,45 @@ public class AccountController implements IController {
         }
 
         Page<Account> accountPage = accountService.pageQuery(page, queryWrapper);
-        return success(accountPage);
-    }
+        return success(accountPage);*/
+    return null;
+  }
+
+  @GetMapping("/{id}")
+  @ApiOperation("员工账号详情")
+  public R<AccountDTO> detail(@PathVariable Long id){
+    return null;
+  }
+
+  @PostMapping("/save")
+  @ApiOperation("新增员工账号")
+  public R<AccountDTO> save(@RequestBody Account account){
+    return null;
+  }
+
+
+  @PostMapping("/update")
+  @ApiOperation("修改员工账号")
+  public R<AccountDTO> update(@RequestBody Account account){
+    return null;
+  }
+
+  @PostMapping("/delete/{id}")
+  @ApiOperation("删除员工账号")
+  public R<Boolean> delete(@PathVariable Integer id){
+    return null;
+  }
+
+
+  @PostMapping("/active/{id}")
+  @ApiOperation("激活员工账号")
+  public R<Boolean> active(@PathVariable Integer id){
+    return null;
+  }
+
+
+
+
+
+
 }

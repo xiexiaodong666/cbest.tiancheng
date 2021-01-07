@@ -3,6 +3,7 @@ package com.welfare.serviceaccount.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
+import com.welfare.serviceaccount.dto.AccountBillDTO;
 import com.welfare.serviceaccount.dto.AccountDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -121,6 +122,28 @@ public class AccountController implements IController {
   @ApiOperation("批量绑卡")
   @PostMapping(value = "/batchBindCard")
   public R<Boolean> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
+    return null;
+  }
+
+
+  @GetMapping("/account/bill")
+  @ApiOperation("员工账号消费汇总")
+  public R<Page<AccountBillDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
+      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+      @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
+    return null;
+  }
+
+
+  @GetMapping("/account/bill/export")
+  @ApiOperation("员工账号消费汇总导出")
+  public R<String> exportAccountBill(@RequestParam @ApiParam("当前页") Integer currentPage,
+      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+      @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
     return null;
   }
 

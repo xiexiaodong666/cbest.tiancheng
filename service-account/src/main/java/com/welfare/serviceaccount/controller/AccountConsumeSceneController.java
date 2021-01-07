@@ -84,7 +84,7 @@ public class AccountConsumeSceneController implements IController {
 
     @ApiOperation("员工消费配置导出")
     @GetMapping(value="/exportAccountConsumeScene")
-    public void exportAccountConsumeScene(HttpServletResponse response,
+    public R<String> exportAccountConsumeScene(HttpServletResponse response,
         @RequestParam @ApiParam("当前页") Integer currentPage,
         @RequestParam @ApiParam("单页大小") Integer pageSize,
         @RequestParam(required = false) @ApiParam("商户代码") String merCode,
@@ -92,7 +92,7 @@ public class AccountConsumeSceneController implements IController {
         @RequestParam(required = false) @ApiParam("使用状态") Integer status,
         @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
         @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-
+        return null;
     }
 
 }

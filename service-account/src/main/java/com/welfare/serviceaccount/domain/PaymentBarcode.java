@@ -15,8 +15,18 @@ public class PaymentBarcode {
 
     public static PaymentBarcode of(String accountCode,String key,String cardNo){
         PaymentBarcode paymentBarcode = new PaymentBarcode();
-        //todo 修改生成条码算法
-        paymentBarcode.setBarcode(accountCode + key + cardNo);
+        paymentBarcode.setBarcode(generateBarcode(accountCode,key,cardNo));
         return paymentBarcode;
+    }
+
+    /**
+     * 修改生成条码算法 todo
+      * @param accountCode
+     * @param key
+     * @param cardNo
+     * @return
+     */
+    private static String generateBarcode(String accountCode,String key,String cardNo){
+        return accountCode + key + cardNo;
     }
 }

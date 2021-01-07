@@ -34,8 +34,8 @@ public class PaymentController implements IController {
             ),
             @ApiImplicitParam(paramType = "header", dataType = "String", name = "SignatureFields",
                     value = "用来生成签名的属性，从paymentRequest中取值." +
-                            "requestId,paymentId,amount表明按照requestId,paymentId,amount的顺序进行拼接作为验签源",
-                    example = "requestId,paymentId,amount"
+                            "requestId,transNo,amount表明按照requestId,transNo,amount的顺序进行拼接作为验签源",
+                    example = "requestId,transNo,amount"
             )
     })
     public R<PaymentRequest> newPaymentRequest(@RequestHeader("Signature") String signature,
@@ -46,7 +46,7 @@ public class PaymentController implements IController {
 
     @GetMapping
     @ApiOperation("查询支付结果")
-    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String paymentId) {
+    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
         return success(null);
     }
 
@@ -59,8 +59,8 @@ public class PaymentController implements IController {
             ),
             @ApiImplicitParam(paramType = "header", dataType = "String", name = "SignatureFields",
                     value = "用来生成签名的属性，从refundRequest中取值." +
-                            "requestId,paymentId,amount表明按照requestId,paymentId,amount的顺序进行拼接作为验签源",
-                    example = "requestId,paymentId,amount"
+                            "requestId,transNo,amount表明按照requestId,transNo,amount的顺序进行拼接作为验签源",
+                    example = "requestId,transNo,amount"
             )
     })
     public R<RefundRequest> newPaymentRequest(@RequestHeader("Signature") String signature,
@@ -71,11 +71,12 @@ public class PaymentController implements IController {
 
     @GetMapping("/refund")
     @ApiOperation("查询退款结果")
-    public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String paymentId) {
+    public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
         return success(null);
     }
 
     @GetMapping("/barcode")
+    @ApiOperation("获取支付条码")
     public R<PaymentBarcode> getPaymentBarcode(@RequestParam String accountCode,@RequestParam String cardNo){
         PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode,"null",cardNo);
         return success(paymentBarcode);

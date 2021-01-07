@@ -1,6 +1,8 @@
 package com.welfare.servicemerchant.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,6 +13,8 @@ import java.util.Date;
  * @description
  * @date 2021/1/7  6:58 PM
  */
+@Data
+@NoArgsConstructor
 public class MerchantCreditApplyInfo {
 
   /**
@@ -62,10 +66,10 @@ public class MerchantCreditApplyInfo {
   private String enclosure;
 
   /**
-   * 创建时间
+   * 申请时间
    */
   @ApiModelProperty("申请时间")
-  private Date createTime;
+  private Date applyTime;
 
   /**
    * 审批状态

@@ -52,13 +52,13 @@ public class MerchantCreditApplyQuery {
    * 申请开始时间
    */
   @ApiModelProperty("申请开始时间")
-  private Date createTimeStart;
+  private Date applyTimeStart;
 
   /**
    * 申请结束时间
    */
   @ApiModelProperty("申请结束时间")
-  private Date createTimeEnd;
+  private Date applyTimeEnd;
 
   /**
    * 审批开始时间

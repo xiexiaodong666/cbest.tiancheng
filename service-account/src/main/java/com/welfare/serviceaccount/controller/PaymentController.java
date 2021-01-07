@@ -69,7 +69,7 @@ public class PaymentController implements IController {
         return success(refundRequest);
     }
 
-    @GetMapping
+    @GetMapping("/refund")
     @ApiOperation("查询退款结果")
     public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String paymentId) {
         return success(null);

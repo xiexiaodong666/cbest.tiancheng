@@ -25,7 +25,7 @@ public class AccountDepositApplyDetailInfo {
    * 充值申请主数据
    */
   @ApiModelProperty("充值申请主数据")
-  private AccountDepositApplyInfo applyInfo;
+  private AccountDepositApplyInfo mainInfo;
 
   @ApiModelProperty("充值员工")
   private List<AccountDepositApplyItem> items;

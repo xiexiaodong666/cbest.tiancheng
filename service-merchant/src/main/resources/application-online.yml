@@ -7,3 +7,11 @@ logging:
     path: /home/honour/Logs/e-welfare-merchant.e-cbest.lo
 encrypt:
   file: ${config.file:file:/home/finance/Config/e-welfare-merchant.e-cbest.lo/config.properties}
+
+cbest:
+  oss:
+    config:
+      bucket: sjgo-img
+
+cdn:
+  server: http://img.sjgo365.com

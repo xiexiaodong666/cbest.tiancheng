@@ -19,15 +19,9 @@ import java.math.BigDecimal;
 public class MerchantCreditApplyRequest {
 
   /**
-   * 商户编码
-   */
-  @ApiModelProperty("商户编码")
-  private String merCode;
-
-  /**
    * 申请类型
    */
-  @ApiModelProperty("申请类型")
+  @ApiModelProperty("商户额度申请类型（充值额度：RECHARGE_LIMIT，余额：BALANCE, 剩余信用额度:REMAINING_LIMIT，信用额度S:CREDIT_LIMIT，消耗返点:REBATE_LIMIT）")
   private String applyType;
 
   /**

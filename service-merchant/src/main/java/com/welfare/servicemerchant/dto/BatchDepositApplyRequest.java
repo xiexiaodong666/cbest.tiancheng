@@ -4,20 +4,18 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/7  5:18 PM
+ * @date 2021/1/8  9:33 AM
  */
 @Data
 @NoArgsConstructor
 @ApiModel("批量导入账号申请请求")
 public class BatchDepositApplyRequest {
-
 
   @ApiModelProperty("请求id（用于幂等处理）")
   private String requestId;
@@ -46,6 +44,9 @@ public class BatchDepositApplyRequest {
   @ApiModelProperty("余额类型（待定义）")
   private String balanceType;
 
-  @ApiModelProperty("申请员工额度信息")
-  private List<AccountDepositRequest> items;
+  /**
+   * 审批类型
+   */
+  @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")
+  private String approvalType;
 }

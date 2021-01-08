@@ -1,9 +1,18 @@
 spring:
   profiles: test
+  datasource:
+    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: mysql@123
+  logging:
+    file:
+      path: /home/finance/Logs/e-welfare-merchant.e-cbest.lotest
+    level:
+      root: info
 logging:
   level:
     root: info
   file:
-    path: /home/finance/Logs/e-welfare-merchant.e-cbest.lotest
-encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare-merchant.e-cbest.lotest/config-test.properties}
+    path: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest
+#encrypt:
+#  file: ${config.file:file:/home/finance/Config/e-welfare-settlement.e-cbest.lotest/config-test.properties}

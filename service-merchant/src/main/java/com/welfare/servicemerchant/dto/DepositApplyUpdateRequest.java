@@ -35,5 +35,5 @@ public class DepositApplyUpdateRequest {
   private String applyRemark;
 
   @ApiModelProperty("申请员工额度信息")
-  private List<AccountDepositRequest> items;
+  private AccountDepositRequest info;
 }

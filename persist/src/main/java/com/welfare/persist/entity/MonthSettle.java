@@ -4,6 +4,7 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -20,7 +21,7 @@ import lombok.experimental.Accessors;
  * 月度结算账单(month_settle)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 16:35:13
+ * @since 2021-01-08 11:23:04
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -34,70 +35,70 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * 账单编号
      */
-    @ApiModelProperty("账单编号")  
+    @ApiModelProperty("账单编号")   
     private String settleNo;
     /**
      * 账单月
      */
-    @ApiModelProperty("账单月")  
+    @ApiModelProperty("账单月")   
     private String settleMonth;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")  
+    @ApiModelProperty("商户代码")   
     private String merCode;
     /**
      * 结算金额
      */
-    @ApiModelProperty("结算金额")  
+    @ApiModelProperty("结算金额")   
     private BigDecimal amount;
     /**
      * 交易笔数
      */
-    @ApiModelProperty("交易笔数")  
+    @ApiModelProperty("交易笔数")   
     private Integer orderNum;
     /**
      * 对账状态
      */
-    @ApiModelProperty("对账状态")  
+    @ApiModelProperty("对账状态")   
     private String recStatus;
     /**
      * 结算状态
      */
-    @ApiModelProperty("结算状态")  
+    @ApiModelProperty("结算状态")   
     private String settleStatus;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")  
+    @ApiModelProperty("创建人")   
     private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")  
+    @ApiModelProperty("创建时间")   
     private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")  
+    @ApiModelProperty("更新人")   
     private String uppdateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")  
+    @ApiModelProperty("更新时间")   
     @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志")  
-    private Integer flag;
+    @ApiModelProperty("删除标志") @TableLogic  
+    private Boolean deleted;
 
 //以下为列明常量
 
@@ -152,6 +153,6 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     /**
     * 删除标志
     */
-    public static final String FLAG = "flag";
+    public static final String DELETED = "deleted";
 
 }

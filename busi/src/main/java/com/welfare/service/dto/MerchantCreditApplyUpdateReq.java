@@ -1,4 +1,4 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,13 +11,20 @@ import java.math.BigDecimal;
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/7  6:57 PM
+ * @date 2021/1/7  7:29 PM
  */
 @Data
 @NoArgsConstructor
-@ApiModel("商户额度申请请求")
-public class MerchantCreditApplyRequest {
+@ApiModel("修改商户额度申请审批请求")
+public class MerchantCreditApplyUpdateReq {
 
+  /**
+   * 申请id
+   */
+  @ApiModelProperty("申请id")
+  private Long id;
+
+  /**
   /**
    * 申请类型
    */
@@ -42,3 +49,4 @@ public class MerchantCreditApplyRequest {
   @ApiModelProperty("附件")
   private String enclosure;
 }
+

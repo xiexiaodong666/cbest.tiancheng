@@ -20,6 +20,6 @@ public interface MerchantStoreRelationService {
   Page<MerchantStoreRelation> pageQuery(Page<MerchantStoreRelation> page,
       QueryWrapper<MerchantStoreRelation> queryWrapper);
 
-  IPage<MerchantStoreRelationDTO> searchMerchantStoreRelations(Page<MerchantStoreRelation> page,
+  Page<MerchantStoreRelationDTO> searchMerchantStoreRelations(Page<MerchantStoreRelation> page,
       String merName, String status);
 }

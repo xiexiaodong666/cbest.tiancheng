@@ -1,6 +1,8 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.MerchantCreditApply;
+
 /**
  * 商户金额申请服务接口
  *
@@ -9,5 +11,12 @@ package com.welfare.service;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface MerchantCreditApplyService {
+
+  /**
+   * 新增员工额度申请
+   * @param apply
+   * @return
+   */
+  Long save(MerchantCreditApply apply);
 
 }

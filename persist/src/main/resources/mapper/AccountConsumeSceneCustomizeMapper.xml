@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper">
+  <sql id="tableName">
+        account_consume_scene
+    </sql>
+
+  <sql id="baseColumn">
+        id,mer_code,account_type_id,store_code,consum_type,remark,create_user,create_time,update_user,update_time,flag,version
+    </sql>
+
+
+  <select id ="getPageDTO" resultType="com.welfare.persist.dto.AccountConsumeScenePageDTO" >
+    SELECT
+	GROUP_CONCAT( CONCAT( ss.store_name, "-", ss.store_code ) ) AS storeInfo,
+	act.type_name AS accountTypeName,
+	acs.id,
+	acs.STATUS,
+	acs.create_time AS createTime,
+	acs.remark
+FROM
+	account_consume_scene acs
+	LEFT JOIN supplier_store ss ON acs.store_code = ss.store_code
+	AND acs.mer_code = ss.mer_code
+	LEFT JOIN account_type act ON act.id = acs.account_type_id
+		where acs.deleted =0
+			<if test=" merCode !='' and merCode != null " >
+				 and acs.mer_code = #{merCode}
+			</if>
+			<if test="accountTypeId != null " >
+				and acs.account_type_id = #{accountTypeId}
+			</if>
+			<if test="status != null " >
+				and acs.status = #{status}
+			</if>
+			<if test="createTimeStart != null " >
+				and acs.create_time <![CDATA[>=]]> #{createTimeStart}
+			</if>
+			<if test="createTimeEnd != null " >
+				and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
+			</if>
+		GROUP BY acs.account_type_id
+  </select>
+
+</mapper>

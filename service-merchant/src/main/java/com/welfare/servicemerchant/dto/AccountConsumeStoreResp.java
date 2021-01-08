@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel("供应商门店DTO")
-public class SupplierStoreDTO implements Serializable {
+public class AccountConsumeStoreResp implements Serializable {
   private Long id;
   /**
    * 商户代码
@@ -50,8 +50,14 @@ public class SupplierStoreDTO implements Serializable {
   @ApiModelProperty("备注")
   private String remark;
   /**
-   * 消费方式
+   * 门店可支持消费方式
    */
-  @ApiModelProperty("消费方式")
+  @ApiModelProperty("门店可支持消费方式")
   private String consumType;
+
+  /**
+   * 员工选择的该门店消费方式
+   */
+  @ApiModelProperty("员工选择的该门店消费方式")
+  private String selectConsumType;
 }

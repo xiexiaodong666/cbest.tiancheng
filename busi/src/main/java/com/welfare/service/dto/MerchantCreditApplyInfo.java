@@ -1,10 +1,6 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,47 +9,59 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 员工账号额度申请详情
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/6  5:28 PM
+ * @date 2021/1/7  6:58 PM
  */
 @Data
 @NoArgsConstructor
-@ApiModel("员工账号充值申请信息")
-public class AccountDepositApplyInfo {
+public class MerchantCreditApplyInfo {
 
   /**
    * 申请id
    */
   @ApiModelProperty("申请id")
   @ExcelProperty("编号")
-  private Integer id;
+  private Long id;
 
   /**
-   * 充值账户个数
+   * 申请类型
    */
-  @ApiModelProperty("充值账户个数")
-  @ExcelProperty("数量")
-  private Integer rechargeNum;
+  @ApiModelProperty("商户额度申请类型（充值额度：RECHARGE_LIMIT，余额：BALANCE, 剩余信用额度:REMAINING_LIMIT，信用额度S:CREDIT_LIMIT，消耗返点:REBATE_LIMIT）")
+  @ExcelProperty("申请类型")
+  private String applyType;
 
   /**
-   * 申请充值总额
+   * 商户名称
    */
-  @ApiModelProperty("申请充值总额")
-  @ExcelProperty("数申请充值总额量")
-  private BigDecimal rechargeAmount;
+  @ApiModelProperty("商户名称")
+  @ExcelProperty("商户")
+  private String merName;
+
+  /**
+   * 合作方式
+   */
+  @ApiModelProperty("合作方式（待定）")
+  @ExcelProperty("合作方式")
+  private String merCooperationMode;
+
+  /**
+   * 金额
+   */
+  @ApiModelProperty("金额")
+  @ExcelProperty("金额")
+  private BigDecimal balance;
 
   /**
    * 申请人
    */
   @ApiModelProperty("申请人")
   @ExcelProperty("申请人")
-  private String applyUser;
+  private Date applyUser;
 
   /**
-   * 创建日期
+   * 申请时间
    */
   @ApiModelProperty("申请时间")
   @ExcelProperty("申请时间")
@@ -64,7 +72,7 @@ public class AccountDepositApplyInfo {
    */
   @ApiModelProperty("申请备注")
   @ExcelProperty("备注")
-  private String applyRemark;
+  private String remark;
 
   /**
    * 审批状态
@@ -95,14 +103,15 @@ public class AccountDepositApplyInfo {
   private String approvalRemark;
 
   /**
-   * 申请人
+   * 商户编码
    */
-  @ApiModelProperty("余额类型（待定义）")
-  private String balanceType;
+  @ApiModelProperty("商户编码")
+  @ExcelProperty("编号")
+  private String merCode;
 
   /**
-   * 审批类型
+   * 附件
    */
-  @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")
-  private String approvalType;
+  @ApiModelProperty("附件")
+  private String enclosure;
 }

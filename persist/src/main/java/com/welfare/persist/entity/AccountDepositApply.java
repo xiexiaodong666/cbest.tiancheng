@@ -139,6 +139,11 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      */
     @ApiModelProperty("approvalType")   
     private String approvalType;
+    /**
+     * requestId
+     */
+    @ApiModelProperty("requestId")
+    private String requestId;
 
 //以下为列明常量
 
@@ -223,8 +228,12 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     */
     public static final String APPLY_TIME = "apply_time";
     /**
-    * 
+    *  审批类型
     */
     public static final String APPROVAL_TYPE = "approval_type";
+    /**
+     * request_id
+     */
+    public static final String REQUEST_ID = "request_id";
 
 }

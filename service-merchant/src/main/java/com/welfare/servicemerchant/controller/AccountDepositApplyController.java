@@ -2,7 +2,8 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
-import com.welfare.servicemerchant.dto.*;
+import com.welfare.service.AccountDepositApplyService;
+import com.welfare.service.dto.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/account-deposit-apply")
 @Api(tags = "员工账号存款管理")
 public class AccountDepositApplyController implements IController {
+
+  @Autowired
+  private AccountDepositApplyService depositApplyService;
 
   @GetMapping("/page")
   @ApiOperation("分页账号额度申请列表")
@@ -75,6 +80,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("新增额度申请(单个)")
   @MerchantUser
   public R<Long> save(@RequestBody DepositApplyRequest request){
+
     return null;
   }
 

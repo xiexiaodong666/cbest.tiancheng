@@ -1,8 +1,15 @@
 package com.welfare.servicemerchant.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.AccountConsumeScenePageDTO;
+import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
-import com.welfare.servicemerchant.dto.AccountConsumeSceneDTO;
+import com.welfare.service.AccountConsumeSceneService;
+import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
+import com.welfare.servicemerchant.dto.AccountConsumePageReq;
+import com.welfare.servicemerchant.dto.AccountConsumeSceneReq;
+import com.welfare.servicemerchant.dto.AccountConsumeSceneResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -11,7 +18,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,47 +40,53 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/accountConsumeScene")
 @Api(tags = "员工消费配置管理")
-public class AccountConsumeSceneController {
+public class AccountConsumeSceneController implements IController {
+  @Autowired
+  private AccountConsumeSceneService accountConsumeSceneService;
+  @Autowired
+  private AccountConsumeSceneConverter accountConsumeSceneConverter;
   @GetMapping("/page")
   @ApiOperation("分页查询员工消费配置列表")
-  public R<Page<AccountConsumeSceneDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("商户代码") String merCode,
-      @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeId,
-      @RequestParam(required = false) @ApiParam("使用状态") Integer status,
-      @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
-      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    return null;
+  public R<Page<AccountConsumeScenePageDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
+      @RequestParam @ApiParam("单页大小") Integer pageSize, AccountConsumePageReq accountConsumePageReq){
+    Page<AccountConsumeScenePageDTO> page = new Page(currentPage,pageSize);
+    AccountConsumePageQuery accountConsumePageQuery = new AccountConsumePageQuery();
+    BeanUtils.copyProperties(accountConsumePageReq,accountConsumePageQuery);
+    IPage<AccountConsumeScenePageDTO> result = accountConsumeSceneService.getPageDTO(page,accountConsumePageQuery);
+
+    return success(accountConsumeSceneConverter.toD(result));
   }
 
   @GetMapping("/{id}")
   @ApiOperation("员工消费配置详情")
-  public R<AccountConsumeSceneDTO> detail(@PathVariable Long id){
+  public R<AccountConsumeSceneResp> detail(@PathVariable Long id){
     return null;
   }
 
   @PostMapping("/save")
   @ApiOperation("新增员工消费配置")
-  public R<AccountConsumeScene> save(@RequestBody List<AccountConsumeScene> accountConsumeSceneList){
-    return null;
+  public R<Boolean> saveList(@RequestBody List<AccountConsumeSceneReq> accountConsumeSceneReqList){
+    List<AccountConsumeScene> accountConsumeSceneList = accountConsumeSceneConverter.toEntityList(accountConsumeSceneReqList);
+    return success(accountConsumeSceneService.saveList(accountConsumeSceneList));
   }
 
   @PostMapping("/update")
   @ApiOperation("修改员工消费配置")
-  public R<AccountConsumeScene> update(@RequestBody List<AccountConsumeScene> accountConsumeSceneList){
-    return null;
+  public R<Boolean> updateList(@RequestBody List<AccountConsumeSceneReq> accountConsumeSceneReqList){
+    List<AccountConsumeScene> accountConsumeSceneList = accountConsumeSceneConverter.toEntityList(accountConsumeSceneReqList);
+    return success(accountConsumeSceneService.updateList(accountConsumeSceneList));
   }
 
   @PostMapping("/updateStatus/{id}")
   @ApiOperation("激活")
-  public R<AccountConsumeScene> updateStatus(@PathVariable Long id,@RequestParam(required = false) @ApiParam("使用状态") Integer status){
-    return null;
+  public R<Boolean> updateStatus(@PathVariable Long id,@RequestParam(required = false) @ApiParam("使用状态") Integer status){
+    return success(accountConsumeSceneService.updateStatus(id,status));
   }
 
   @PostMapping("/delete/{id}")
   @ApiOperation("删除员工消费配置")
   public R<Boolean> delete(@PathVariable Long id){
-    return null;
+    return success(accountConsumeSceneService.delete(id));
   }
 
 
@@ -78,12 +94,7 @@ public class AccountConsumeSceneController {
   @GetMapping(value="/exportAccountConsumeScene")
   public R<String> exportAccountConsumeScene(HttpServletResponse response,
       @RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("商户代码") String merCode,
-      @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeId,
-      @RequestParam(required = false) @ApiParam("使用状态") Integer status,
-      @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
-      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
+      @RequestParam @ApiParam("单页大小") Integer pageSize,AccountConsumePageReq accountConsumePageReq){
     return null;
   }
 }

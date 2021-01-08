@@ -1,11 +1,17 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import  com.welfare.persist.dao.AccountConsumeSceneDao;
+import com.welfare.persist.dto.AccountConsumeScenePageDTO;
+import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
+import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountConsumeSceneService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,6 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneService {
     private final AccountConsumeSceneDao accountConsumeSceneDao;
+    private final AccountConsumeSceneCustomizeMapper accountConsumeSceneCustomizeMapper;
 
     @Override
     public AccountConsumeScene getAccountConsumeScene(Long id) {
@@ -32,6 +39,16 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     }
 
     @Override
+    public Boolean saveList(List<AccountConsumeScene> accountConsumeSceneList) {
+        return accountConsumeSceneDao.saveBatch(accountConsumeSceneList);
+    }
+
+    @Override
+    public Boolean updateList(List<AccountConsumeScene> accountConsumeSceneList) {
+        return accountConsumeSceneDao.saveOrUpdateBatch(accountConsumeSceneList);
+    }
+
+    @Override
     public Boolean update(AccountConsumeScene accountConsumeScene) {
         return accountConsumeSceneDao.updateById(accountConsumeScene);
     }
@@ -40,8 +57,25 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     public Boolean delete(Long id) {
         UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
         updateWrapper.eq(AccountConsumeScene.ID,id);
-        AccountConsumeScene accountType = new AccountConsumeScene();
-        accountType.setDeleted(true);
-        return accountConsumeSceneDao.update(accountType,updateWrapper);
+        AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
+        accountConsumeScene.setDeleted(true);
+        return accountConsumeSceneDao.update(accountConsumeScene,updateWrapper);
+    }
+
+    @Override
+    public Boolean updateStatus(Long id, Integer status) {
+        UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
+        updateWrapper.eq(AccountConsumeScene.ID,id);
+        AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
+        accountConsumeScene.setStatus(status);
+        return accountConsumeSceneDao.update(accountConsumeScene,updateWrapper);
+    }
+
+    @Override
+    public IPage<AccountConsumeScenePageDTO> getPageDTO(Page<AccountConsumeScenePageDTO> page,
+        AccountConsumePageQuery accountConsumePageReq) {
+        return accountConsumeSceneCustomizeMapper.getPageDTO(page,accountConsumePageReq.getMerCode(),
+            accountConsumePageReq.getAccountTypeId(),accountConsumePageReq.getStatus(),
+            accountConsumePageReq.getCreateTimeStart(),accountConsumePageReq.getCreateTimeEnd());
     }
 }

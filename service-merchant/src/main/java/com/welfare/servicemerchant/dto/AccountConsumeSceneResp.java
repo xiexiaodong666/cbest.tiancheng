@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel("员工消费场景配置")
-public class AccountConsumeSceneDTO implements Serializable {
+public class AccountConsumeSceneResp implements Serializable {
 
   @ApiModelProperty("编号")
   private Long id;
@@ -31,12 +31,8 @@ public class AccountConsumeSceneDTO implements Serializable {
    * 消费配置配置门店
    */
   @ApiModelProperty("配置门店")
-  private List<SupplierStoreDTO> supplierStoreDTOList;
-  /**
-   * 员工类型消费方式
-   */
-  @ApiModelProperty("员工类型消费方式")
-  private String consumType;
+  private List<AccountConsumeStoreResp> accountConsumeStoreRespList;
+
   /**
    * 使用状态
    */

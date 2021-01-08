@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.service.AccountTypeService;
+import com.welfare.servicemerchant.converter.AccountTypeConverter;
+import com.welfare.servicemerchant.dto.AccountTypeReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -36,6 +38,8 @@ public class AccountTypeController implements IController {
 
   @Autowired
   private AccountTypeService accountTypeService;
+  @Autowired
+  private AccountTypeConverter accountTypeConverter;
 
   @GetMapping("/page")
   @ApiOperation("分页员工类型列表")
@@ -78,13 +82,15 @@ public class AccountTypeController implements IController {
 
   @PostMapping("/save")
   @ApiOperation("新增员工类型")
-  public R<Boolean> save(@RequestBody AccountType accountType){
+  public R<Boolean> save(@RequestBody AccountTypeReq accountTypeReq){
+    AccountType accountType = accountTypeConverter.toEntity(accountTypeReq);
     return success(accountTypeService.save(accountType));
   }
 
   @PostMapping("/update")
   @ApiOperation("修改员工类型")
-  public R<Boolean> update(@RequestBody AccountType accountType){
+  public R<Boolean> update(@RequestBody AccountTypeReq accountTypeReq){
+    AccountType accountType = accountTypeConverter.toEntity(accountTypeReq);
     return success(accountTypeService.update(accountType));
   }
 

@@ -77,8 +77,8 @@ public class PaymentController implements IController {
 
     @GetMapping("/barcode")
     @ApiOperation("获取支付条码")
-    public R<PaymentBarcode> getPaymentBarcode(@RequestParam String accountCode,@RequestParam String cardNo){
-        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode,"null",cardNo);
+    public R<PaymentBarcode> getPaymentBarcode(@RequestParam Long accountCode){
+        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode,12345678L);
         return success(paymentBarcode);
     }
 

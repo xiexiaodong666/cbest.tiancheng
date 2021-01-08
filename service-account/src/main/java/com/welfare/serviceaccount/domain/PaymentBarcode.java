@@ -1,6 +1,7 @@
 package com.welfare.serviceaccount.domain;
 
 import io.swagger.annotations.ApiModel;
+import jodd.util.MathUtil;
 import lombok.Data;
 
 /**
@@ -15,20 +16,23 @@ import lombok.Data;
 public class PaymentBarcode {
     private String barcode;
 
-    public static PaymentBarcode of(String accountCode,String key,String cardNo){
+    public static PaymentBarcode of(Long accountCode,Long secretKey){
         PaymentBarcode paymentBarcode = new PaymentBarcode();
-        paymentBarcode.setBarcode(generateBarcode(accountCode,key,cardNo));
+        paymentBarcode.setBarcode(generateBarcode(accountCode,secretKey));
         return paymentBarcode;
     }
 
     /**
-     * 修改生成条码算法 todo
+     * 修改生成条码算法
       * @param accountCode
-     * @param key
-     * @param cardNo
      * @return
      */
-    private static String generateBarcode(String accountCode,String key,String cardNo){
-        return accountCode + key + cardNo;
+    private static String generateBarcode(Long accountCode,Long secretKey){
+        Long x = accountCode + secretKey;
+        long firstRand = MathUtil.randomLong(100, 999);
+        long secondRand = MathUtil.randomLong(100, 999);
+        long mod = x % firstRand;
+        long l = x / firstRand * secondRand;
+        return accountCode.toString();
     }
 }

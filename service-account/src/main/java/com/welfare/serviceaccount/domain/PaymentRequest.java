@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Description:
@@ -19,6 +20,8 @@ import java.math.BigDecimal;
 @ApiModel("支付请求")
 @Data
 public class PaymentRequest {
+    private static transient final String ONLINE_MACHINE_NO = "";
+
     @ApiModelProperty("支付请求id")
     private String requestId;
     @ApiModelProperty("重百付支付流水号")
@@ -40,7 +43,7 @@ public class PaymentRequest {
         if (!StringUtil.startsWithNumber(storeNumber)) {
             //非数字开头的门店，供应商线下消费
             this.paymentScene = WelfareConstant.PaymentScene.OFFLINE_SUPPLIER.code();
-        } else if(StringUtils.equals(machineNumber,"")){
+        } else if(ONLINE_MACHINE_NO.equals(machineNumber)){
             //特殊支付机器号，重百线上
             this.paymentScene = WelfareConstant.PaymentScene.ONLINE_STORE.code();
         } else {

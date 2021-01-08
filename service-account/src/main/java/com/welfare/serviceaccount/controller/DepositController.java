@@ -27,8 +27,6 @@ import java.util.List;
 @RequestMapping("/deposit")
 @Api(tags = "充值相关接口")
 public class DepositController implements IController {
-    private final RedisTemplate<String,String> redisTemplate;
-    private final RedissonClient redissonClient;
     @PostMapping
     @ApiOperation("发起充值")
     public R<Deposit> newDeposit(@RequestBody Deposit deposit){
@@ -44,11 +42,6 @@ public class DepositController implements IController {
     @GetMapping("/singleQuery/{requestId}")
     @ApiOperation("根据requestId查询充值结果")
     public R<Deposit> getByRequestId(@PathVariable String requestId){
-        redisTemplate.opsForValue().set("liyx-test","liyx");
-        redisTemplate.opsForValue().get("liyx-test");
-        RLock lock = redissonClient.getLock("liyx");
-        lock.lock();
-        lock.unlock();
         return null;
     }
 }

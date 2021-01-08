@@ -1,6 +1,6 @@
 package com.welfare.common.util;
 
-import com.welfare.common.domain.MerchantUser;
+import com.welfare.common.domain.MerchantUserInfo;
 
 
 /**
@@ -11,13 +11,13 @@ import com.welfare.common.domain.MerchantUser;
  */
 public class MerchantUserHolder {
 
-  private static final ThreadLocal<MerchantUser> DEPT_ID_LOCAL = new ThreadLocal<>();
+  private static final ThreadLocal<MerchantUserInfo> DEPT_ID_LOCAL = new ThreadLocal<>();
 
-  public static MerchantUser getDeptIds() {
+  public static MerchantUserInfo getDeptIds() {
     return DEPT_ID_LOCAL.get();
   }
 
-  public static void setDeptIds(MerchantUser merchantUser) {
+  public static void setDeptIds(MerchantUserInfo merchantUser) {
     DEPT_ID_LOCAL.set(merchantUser);
   }
 

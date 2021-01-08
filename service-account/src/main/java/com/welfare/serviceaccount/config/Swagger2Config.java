@@ -45,7 +45,7 @@ public class Swagger2Config implements WebMvcConfigurer {
                 .description("商户请求用户信息")
                 .modelRef(new ModelRef("string"))
                 .parameterType("header")
-                .required(true)
+                .required(false)
                 .build());
         return  new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)

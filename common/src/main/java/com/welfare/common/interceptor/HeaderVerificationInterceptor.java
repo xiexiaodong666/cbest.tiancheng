@@ -6,6 +6,7 @@ import com.welfare.common.constants.WelfaleConstant;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
  * @email yuxiang.li@sjgo365.com
  * @date 1/7/2021
  */
+@Slf4j
 public class HeaderVerificationInterceptor implements HandlerInterceptor {
 
     @Override
@@ -34,6 +36,15 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
         }
         //todo 需要优化Source校验逻辑
         return true;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        try {
+            MerchantUserHolder.release();
+        } catch (Exception e) {
+            log.error("MerchantUserHolder.release error.", e);
+        }
     }
 
     /**

@@ -7,8 +7,8 @@ package com.welfare.common.constants;
  * @email yuxiang.li@sjgo365.com
  * @date 1/7/2021
  */
-public class WelfaleConstant {
-    private WelfaleConstant(){
+public class WelfareConstant {
+    private WelfareConstant(){
 
     }
 

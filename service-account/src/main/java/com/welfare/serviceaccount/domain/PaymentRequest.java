@@ -37,7 +37,7 @@ public class PaymentRequest {
     private Integer paymentStatus;
 
     public String chargePaymentScene(){
-        if (!StringUtil.isStartWithNumber(storeNumber)) {
+        if (!StringUtil.startsWithNumber(storeNumber)) {
             //非数字开头的门店，供应商线下消费
             this.paymentScene = WelfaleConstant.PaymentScene.OFFLINE_SUPPLIER.code();
         } else if(StringUtils.equals(machineNumber,"")){

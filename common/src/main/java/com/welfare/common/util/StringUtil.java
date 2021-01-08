@@ -16,7 +16,7 @@ public class StringUtil {
     }
     static final Pattern START_WITH_NUMBER_PATTERN = Pattern.compile("[0-9].*");
 
-    public static boolean isStartWithNumber(String str) {
+    public static boolean startsWithNumber(String str) {
         Matcher isNum = START_WITH_NUMBER_PATTERN.matcher(str.charAt(0)+"");
         if (!isNum.matches()) {
             return false;

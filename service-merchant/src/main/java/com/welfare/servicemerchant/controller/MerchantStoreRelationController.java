@@ -44,7 +44,7 @@ public class MerchantStoreRelationController implements IController {
     QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
 
     queryWrapper.eq(MerchantStoreRelation.MER_CODE, merCode);
-    queryWrapper.ne(MerchantStoreRelation.FLAG, 1);
+    queryWrapper.ne(MerchantStoreRelation.DELETED, 1);
 
     Page<MerchantStoreRelation> accountPage = merchantStoreRelationService.pageQuery(
         page, queryWrapper);

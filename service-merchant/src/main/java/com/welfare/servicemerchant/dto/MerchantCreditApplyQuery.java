@@ -31,12 +31,6 @@ public class MerchantCreditApplyQuery {
   private String applyType;
 
   /**
-   * 申请人
-   */
-  @ApiModelProperty("申请人")
-  private String createUser;
-
-  /**
    * 审批状态
    */
   @ApiModelProperty("审批状态(通过：AUDIT_SUCCESS， 不通过：AUDIT_FAILED, 待审核：AUDITING)")

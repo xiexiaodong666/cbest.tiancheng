@@ -48,8 +48,8 @@ public class DepositController implements IController {
     public R<Deposit> getByRequestId(@PathVariable String requestId){
         redisTemplate.opsForValue().set("liyx-test","liyx");
         redisTemplate.opsForValue().get("liyx-test");
-        String lockId = RedisDistributeLock.lock("liyxtestlock01", 200);
-        boolean b = RedisDistributeLock.unLock("liyxtestlock01", lockId);
+        String lockId = RedisDistributeLock.lock("liyxtestlock02", 2000);
+        boolean b = RedisDistributeLock.unLock("liyxtestlock02", lockId);
         return null;
     }
 }

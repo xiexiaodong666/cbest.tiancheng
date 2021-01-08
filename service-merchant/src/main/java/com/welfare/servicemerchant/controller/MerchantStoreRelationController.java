@@ -41,7 +41,7 @@ public class MerchantStoreRelationController implements IController {
 
   private final MerchantStoreRelationService merchantStoreRelationService;
 
-  @GetMapping("/api/store")
+  @GetMapping("/api/list")
   @ApiOperation("api分页查询消费门店配置列表")
   public R<Page<MerchantStoreRelation>> apiPageQuery(
       @RequestParam @ApiParam("当前页") Integer currentPage,
@@ -62,7 +62,7 @@ public class MerchantStoreRelationController implements IController {
     return success(merchantStoreRelationPage);
   }
 
-  @GetMapping("/admin/store")
+  @GetMapping("/admin/list")
   @ApiOperation("后台分页查询消费门店配置列表")
   public R<Page<AdminMerchantStoreRelationDTO>> adminPageQuery(
       @RequestParam @ApiParam("当前页") Integer currentPage,
@@ -81,16 +81,24 @@ public class MerchantStoreRelationController implements IController {
     return success(mapPage);
   }
 
-  @PostMapping("/admin/store")
-  @ApiOperation("新增消费门店配置")
-  public R<Page<AdminMerchantStoreRelationDTO>> addMerchantStore() {
+  @GetMapping("/detail")
+  @ApiOperation("后台查询消费门店详情")
+  public R<MerchantStoreRelation> detail(
+      @RequestParam(required = false) @ApiParam("消费场景门店id") Long id) {
 
     return null;
   }
 
-  @PutMapping("/admin/store")
+  @PostMapping
+  @ApiOperation("新增消费门店配置")
+  public R<Boolean> addMerchantStore() {
+
+    return null;
+  }
+
+  @PutMapping
   @ApiOperation("修改消费门店配置")
-  public R<Page<AdminMerchantStoreRelationDTO>> updateMerchantStore() {
+  public R<Boolean> updateMerchantStore() {
 
     return null;
   }
@@ -109,8 +117,6 @@ public class MerchantStoreRelationController implements IController {
 
   /**
    * convert MerchantStoreRelationDTO to AdminMerchantStoreRelationDTO
-   * @param merchantStoreRelationDTOList
-   * @return
    */
   private List<AdminMerchantStoreRelationDTO> convertAdminMerchantStoreRelationDTOs(
       List<MerchantStoreRelationDTO> merchantStoreRelationDTOList) {

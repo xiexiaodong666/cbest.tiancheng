@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.DepartmentService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete(String  departmentCode) {
         QueryWrapper<Department> queryWrapper=new QueryWrapper();
         queryWrapper.eq("department_code",departmentCode);

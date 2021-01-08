@@ -49,8 +49,4 @@ public class BatchDepositApplyRequest {
    */
   @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")
   private String approvalType;
-
-
-  @ApiModelProperty("Excel二级制(MultipartFile)")
-  private MultipartFile file;
 }

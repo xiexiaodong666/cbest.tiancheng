@@ -3,7 +3,6 @@ package com.welfare.servicemerchant.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author duanhy
@@ -29,7 +28,4 @@ public class BatchDepositApplyUpdateRequest {
    */
   @ApiModelProperty("申请备注")
   private String applyRemark;
-
-  @ApiModelProperty("Excel二级制(MultipartFile)")
-  private MultipartFile file;
 }

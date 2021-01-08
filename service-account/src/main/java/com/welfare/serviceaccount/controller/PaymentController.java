@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.serviceaccount.domain.BarcodeSalt;
 import com.welfare.serviceaccount.domain.PaymentBarcode;
 import com.welfare.serviceaccount.domain.PaymentRequest;
 import com.welfare.serviceaccount.domain.RefundRequest;
@@ -11,6 +12,7 @@ import net.dreamlu.mica.core.result.R;
 import net.dreamlu.mica.core.utils.BeanUtil;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -76,10 +78,16 @@ public class PaymentController implements IController {
     }
 
     @GetMapping("/barcode")
-    @ApiOperation("获取支付条码")
-    public R<PaymentBarcode> getPaymentBarcode(@RequestParam Long accountCode){
+    @ApiOperation("用户获取支付条码")
+    public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode){
         PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode,12345678L);
         return success(paymentBarcode);
+    }
+
+    @GetMapping("/barcode-salts")
+    @ApiOperation("支付条码加盐参数列表获取")
+    public R<List<BarcodeSalt>> getBarcodeSalts(){
+        return success(null);
     }
 
 }

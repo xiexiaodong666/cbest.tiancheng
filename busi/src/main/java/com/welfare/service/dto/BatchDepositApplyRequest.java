@@ -33,7 +33,7 @@ public class BatchDepositApplyRequest {
    * 福利类型
    */
   @ApiModelProperty("福利类型")
-  @NotEmpty(message = "余额类型为空")
+  @NotEmpty(message = "福利类型为空")
   private String merAccountTypeCode;
 
   /**

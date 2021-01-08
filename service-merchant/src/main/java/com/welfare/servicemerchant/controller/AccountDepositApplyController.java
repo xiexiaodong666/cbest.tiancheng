@@ -58,7 +58,10 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/batch-update")
   @ApiOperation("修改账号额度申请(批量)")
   @MerchantUser
-  public R<Long> batchUpdate(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file,@RequestParam BatchDepositApplyUpdateRequest requst){
+  public R<Long> batchUpdate(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file,
+                             @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId,
+                             @RequestParam @ApiParam("申请备注") String applyRemark,
+                             @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode) {
     return null;
   }
 
@@ -87,7 +90,12 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/batch-save")
   @ApiOperation("新增额度申请(批量)")
   @MerchantUser
-  public R<Long> batchSave(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file, @RequestParam BatchDepositApplyRequest request){
+  public R<Long> batchSave(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file,
+                           @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId,
+                           @RequestParam @ApiParam("申请备注") String applyRemark,
+                           @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
+                           @RequestParam @ApiParam(name = "审批类型（单个：SINGLE，批量：BATCH）",required = true) String approvalType
+                           ){
     return null;
   }
 }

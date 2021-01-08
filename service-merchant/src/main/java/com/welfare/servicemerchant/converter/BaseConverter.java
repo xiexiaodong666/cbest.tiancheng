@@ -1,5 +1,7 @@
 package com.welfare.servicemerchant.converter;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import java.util.List;
 
 /**
@@ -26,4 +28,9 @@ public interface BaseConverter<D, E> {
    * Entity集合转DTO集合
    */
   List<D> toD(List<E> entityList);
+
+  /**
+   * Entity集合转DTO集合
+   */
+  Page<D> toD(Page<E> entityList);
 }

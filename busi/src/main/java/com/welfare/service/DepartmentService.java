@@ -1,6 +1,11 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.Department;
+import com.welfare.service.dto.DepartmentReq;
+
+import java.util.List;
+
 /**
  * 商户部门服务接口
  *
@@ -9,5 +14,35 @@ package com.welfare.service;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface DepartmentService {
+    /**
+     * 根据商户代码查询商户部门列表（不分页）
+     * @param req
+     * @return
+     */
+    List<Department> list(DepartmentReq req);
 
+    /**
+     * 查询商户详情
+     * @param id
+     * @return
+     */
+    Department detail( Long id);
+
+    /**
+     * 新增商户
+     * @param department 实体
+     */
+    boolean add(Department department);
+
+    /**
+     * 批量新增
+     * @param list 批量实体
+     */
+    boolean batchAdd(List<Department> list);
+
+    /**
+     * 删除子机构
+     * @param departmentCode
+     */
+    boolean delete(String  departmentCode);
 }

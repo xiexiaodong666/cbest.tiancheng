@@ -26,3 +26,8 @@ encrypt:
 e-welfare:
   distributed-lock:
     enabled: true
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0

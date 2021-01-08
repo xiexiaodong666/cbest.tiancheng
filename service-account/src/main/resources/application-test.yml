@@ -10,3 +10,11 @@ logging:
     root: info
 #encrypt:
   #file: ${config.file:file:/home/finance/Config/e-welfare-account.e-cbest.lotest/config-test.properties}
+e-welfare:
+  distributed-lock:
+    enabled: true
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0

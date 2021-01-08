@@ -4,6 +4,7 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -17,7 +18,7 @@ import lombok.experimental.Accessors;
  * 字典(dict)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 16:35:13
+ * @since 2021-01-08 11:23:04
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -31,33 +32,33 @@ public class Dict extends Model<Dict> implements Serializable {
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * 码表类型
      */
-    @ApiModelProperty("码表类型")  
+    @ApiModelProperty("码表类型")   
     private String dictType;
     /**
      * 编码
      */
-    @ApiModelProperty("编码")  
+    @ApiModelProperty("编码")   
     private String dictCode;
     /**
      * 名称
      */
-    @ApiModelProperty("名称")  
+    @ApiModelProperty("名称")   
     private String dictName;
     /**
      * 状态
      */
-    @ApiModelProperty("状态")  
+    @ApiModelProperty("状态")   
     private Integer status;
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志")  
+    @ApiModelProperty("删除标志") @TableLogic  
     private Boolean deleted;
 
 //以下为列明常量

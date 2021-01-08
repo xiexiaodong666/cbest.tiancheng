@@ -1,4 +1,4 @@
-package welfare.servicesettlement.dto;
+package com.welfare.servicesettlement.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -36,8 +36,8 @@ public class OrderReqDto implements Serializable {
     private String endDateTime;
     @ApiModelProperty(value = "门店编码" , required = false)
     private String storeCode;
-    @ApiModelProperty(value = "页面" , required = false)
+    @ApiModelProperty(value = "页面" , required = true)
     private Integer pageNo;
-    @ApiModelProperty(value = "页数据" , required = false)
+    @ApiModelProperty(value = "页数据" , required = true)
     private Integer pageSize;
 }

@@ -1,4 +1,4 @@
-package welfare.servicesettlement.dto;
+package com.welfare.servicesettlement.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 

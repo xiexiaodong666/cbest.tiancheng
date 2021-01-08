@@ -1,7 +1,10 @@
-package welfare.servicesettlement.controller;
+package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.servicesettlement.dto.OrderReqDto;
+import com.welfare.servicesettlement.dto.OrderRespDto;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -10,9 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import welfare.servicesettlement.dto.BillRespDto;
-import welfare.servicesettlement.dto.OrderReqDto;
-import welfare.servicesettlement.dto.OrderRespDto;
 
 /**
  * @ProjectName: e-welfare
@@ -31,8 +31,9 @@ import welfare.servicesettlement.dto.OrderRespDto;
 @Api(tags = "线下订单管理")
 public class OrderController implements IController {
 
-    @GetMapping("selectPage")
-    public R<Page<OrderRespDto>> selectByPage(@RequestBody OrderReqDto orderReqDto){
+    @ApiOperation("分页查看线下订单")
+    @GetMapping("page")
+    public R<Page<OrderRespDto>> selectByPage(OrderReqDto orderReqDto){
         Page<OrderRespDto> accountPage = null;
         //TODO 查询商户的配置门店表
         //TODO 拼装条件查询

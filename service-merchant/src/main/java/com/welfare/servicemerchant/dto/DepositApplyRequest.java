@@ -4,18 +4,20 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/8  9:33 AM
+ * @date 2021/1/7  5:18 PM
  */
 @Data
 @NoArgsConstructor
-@ApiModel("批量导入账号申请请求")
-public class BatchDepositApplyRequest {
+@ApiModel("账号申请请求")
+public class DepositApplyRequest {
+
 
   @ApiModelProperty("请求id（用于幂等处理）")
   private String requestId;
@@ -51,6 +53,7 @@ public class BatchDepositApplyRequest {
   private String approvalType;
 
 
-  @ApiModelProperty("Excel二级制流")
-  private MultipartFile file;
+
+  @ApiModelProperty("申请员工额度信息")
+  private AccountDepositRequest info;
 }

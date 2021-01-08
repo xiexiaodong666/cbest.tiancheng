@@ -1,23 +1,19 @@
 package com.welfare.servicemerchant.dto;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/7  7:06 PM
+ * @date 2021/1/8  9:37 AM
  */
 @Data
 @NoArgsConstructor
-@ApiModel("修改账号申请请求")
-public class DepositApplyUpdateRequest {
-
+public class BatchDepositApplyUpdateRequest {
 
   @ApiModelProperty("请求id（用于幂等处理）")
   private String requestId;
@@ -34,6 +30,6 @@ public class DepositApplyUpdateRequest {
   @ApiModelProperty("申请备注")
   private String applyRemark;
 
-  @ApiModelProperty("申请员工额度信息")
-  private AccountDepositRequest info;
+  @ApiModelProperty("Excel二级制流")
+  private MultipartFile file;
 }

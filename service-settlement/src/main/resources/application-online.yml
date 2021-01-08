@@ -1,9 +1,57 @@
 spring:
   profiles: online
+  datasource:
+    mysql:
+      driverClassName: com.mysql.jdbc.Driver
+      url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+      username: root
+      password: mysql@123
+      type: com.alibaba.druid.pool.DruidDataSource
+      maxActive: 20
+      minIdle: 1
+      testOnBorrow: true
+      testOnReturn: false
+      validationQuery: SELECT 1
+    presto:
+      driverClassName: io.prestosql.jdbc.PrestoDriver
+      url: jdbc:presto://192.1.30.239:8080/hive
+      username: rptmprd
+      password:
+      type: com.alibaba.druid.pool.DruidDataSource
+      maxActive: 5
+      minIdle: 1
+      testOnBorrow: true
+      testOnReturn: false
+      validationQuery: SELECT 1
+  redis:
+    lettuce:
+      pool:
+        max-idle: 30
+        max-active: 8
+        min-idle: 2
+        max-wait: 1000
+    timeout: 5000
+    cluster:
+      nodes:
+        - 192.1.30.186:7000
+        - 192.1.30.186:7001
+        - 192.1.30.186:7002
+        - 192.1.30.186:7003
+        - 192.1.30.186:7004
+        - 192.1.30.186:7005
+    database: 0
 logging:
+  file:
+    path: D:/home/finance/Logs/e-welfare-account.e-cbest.lotest
   level:
     root: info
-  file:
-    path: /home/honour/Logs/e-welfare-settlement.e-cbest.lo
 encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare-settlement.e-cbest.lo/config.properties}
+  file: ${config.file:classpath:config/config.properties}
+e-welfare:
+  distributed-lock:
+    enabled: true
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0

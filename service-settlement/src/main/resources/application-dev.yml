@@ -23,10 +23,35 @@ spring:
       testOnBorrow: true
       testOnReturn: false
       validationQuery: SELECT 1
+  redis:
+    lettuce:
+      pool:
+        max-idle: 30
+        max-active: 8
+        min-idle: 2
+        max-wait: 1000
+    timeout: 5000
+    cluster:
+      nodes:
+        - 192.1.30.186:7000
+        - 192.1.30.186:7001
+        - 192.1.30.186:7002
+        - 192.1.30.186:7003
+        - 192.1.30.186:7004
+        - 192.1.30.186:7005
+    database: 0
 logging:
   file:
-    path: D:/dev/logs
+    path: D:/home/finance/Logs/e-welfare-account.e-cbest.lotest
   level:
     root: info
 encrypt:
   file: ${config.file:classpath:config/config.properties}
+e-welfare:
+  distributed-lock:
+    enabled: true
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0

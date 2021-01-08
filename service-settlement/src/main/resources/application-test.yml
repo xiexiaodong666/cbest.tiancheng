@@ -4,6 +4,6 @@ logging:
   level:
     root: info
   file:
-    path: /home/finance/Logs/e-welfare-merchant.e-cbest.lotest
+    path: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest
 encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare-merchant.e-cbest.lotest/config-test.properties}
+  file: ${config.file:file:/home/finance/Config/e-welfare-settlement.e-cbest.lotest/config-test.properties}

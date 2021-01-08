@@ -51,6 +51,6 @@ public class BatchDepositApplyRequest {
   private String approvalType;
 
 
-  @ApiModelProperty("Excel二级制流")
+  @ApiModelProperty("Excel二级制(MultipartFile)")
   private MultipartFile file;
 }

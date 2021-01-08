@@ -2,8 +2,11 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import java.util.Map;
 
 /**
  * 商户消费场景配置服务接口
@@ -17,4 +20,6 @@ public interface MerchantStoreRelationService {
   Page<MerchantStoreRelation> pageQuery(Page<MerchantStoreRelation> page,
       QueryWrapper<MerchantStoreRelation> queryWrapper);
 
+  IPage<MerchantStoreRelationDTO> searchMerchantStoreRelations(Page<MerchantStoreRelation> page,
+      String merName, String status);
 }

@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.MerchantStoreRelationMapper">
-    <sql id="tableName">
+  <sql id="tableName">
         merchant_store_relation
     </sql>
 
-    <sql id="baseColumn">
-        id,mer_code,store_code,consum_type,store_alias,is_rebate,rebate_type,rebate_ratio,ramark,flag,create_user,create_time,update_user,update_time,version
+  <sql id="baseColumn">
+        id,mer_code,store_code,consum_type,store_alias,is_rebate,rebate_type,rebate_ratio,ramark,flag,create_user,create_time,update_user,update_time,version,status
     </sql>
 
+  <select id="searchMerchantStoreRelations" resultType="com.welfare.persist.dto.MerchantStoreRelationDTO">
+    SELECT
+    m.STATUS as status,
+    m.create_time as createTime,
+    msr.ramark as ramark,
+    msr.mer_code as merCode,
+    group_concat( msr.store_code ) as storeCode,
+    group_concat( msr.store_alias ) as storeAlias,
+    m.mer_name as merName
+    FROM
+    merchant_store_relation msr
+    LEFT JOIN merchant m ON m.mer_code = msr.mer_code
+    where
+    msr.deleted != 1
+    <if test="status != null and status !='' ">and msr.status = #{status}
+    </if>
+    <if test="merName != null and merName !='' ">and m.mer_name = #{merName}
+    </if>
+    GROUP BY
+    mer_code
+  </select>
 </mapper>

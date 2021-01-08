@@ -112,7 +112,7 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic  
+    @ApiModelProperty("删除标志  1-删除、0-未删除")
     private Boolean deleted;
     /**
      * 申请备注
@@ -145,6 +145,11 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     @ApiModelProperty("requestId")
     private String requestId;
 
+    /**
+     * 福利余额类型
+     */
+    @ApiModelProperty("merAccountTypeCode")
+    private String merAccountTypeCode;
 //以下为列明常量
 
     /**
@@ -235,5 +240,9 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      * request_id
      */
     public static final String REQUEST_ID = "request_id";
+    /**
+     * 福利余额类型
+     */
+    public static final String MER_ACCOUNT_TYPE_CODE = "mer_account_type_code";
 
 }

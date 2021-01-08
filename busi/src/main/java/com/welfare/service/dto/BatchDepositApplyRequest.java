@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotEmpty;
+
 /**
  * @author duanhy
  * @version 1.0.0
@@ -39,10 +41,11 @@ public class BatchDepositApplyRequest {
   private String applyUser;
 
   /**
-   * 余额类型
+   * 福利类型
    */
-  @ApiModelProperty("余额类型（待定义）")
-  private String balanceType;
+  @ApiModelProperty("福利类型")
+  @NotEmpty(message = "余额类型为空")
+  private String merAccountTypeCode;
 
   /**
    * 审批类型

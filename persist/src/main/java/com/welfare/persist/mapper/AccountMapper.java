@@ -3,6 +3,9 @@ package com.welfare.persist.mapper;
 import com.welfare.persist.entity.Account;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.math.BigDecimal;
 
 /**
  * 账户信息(account)数据Mapper
@@ -14,4 +17,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AccountMapper extends BaseMapper<Account> {
 
+  int increaseAccountBalance(@Param("increaseBalance")BigDecimal increaseBalance, @Param("updateUser")String updateUser,
+                             @Param("accountCode")String accountCode);
 }

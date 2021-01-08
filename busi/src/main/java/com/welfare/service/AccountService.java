@@ -4,6 +4,9 @@ package com.welfare.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.Account;
+import org.apache.ibatis.annotations.Param;
+
+import java.math.BigDecimal;
 
 /**
  * 账户信息服务接口
@@ -20,4 +23,13 @@ public interface AccountService {
      * @return
      */
     Page<Account> pageQuery(Page<Account> page,QueryWrapper<Account> queryWrapper);
+
+    /**
+     * 增加员工账号余额
+     * @param increaseBalance
+     * @param updateUser
+     * @param accountCode
+     * @return
+     */
+    int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode);
 }

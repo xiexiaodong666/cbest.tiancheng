@@ -16,9 +16,9 @@ public class RedisKeyConstant {
   public static final String ACCOUNT_DEPOSIT_APPLY_SAVE_REQUEST_ID = "account_deposit_apply:save:request_id:";
 
   /**
-   *  审批员工账号申请request id
+   *  员工账号申请key
    */
-  public static final String ACCOUNT_DEPOSIT_APPLY_APPROVAL_REQUEST_ID = "account_deposit_apply:approval:request_id:";
+  public static final String ACCOUNT_DEPOSIT_APPLY__ID = "account_deposit_apply:id:";
 
   public static String buidKey(String perfix, String... part) {
     return StringUtils.removeEnd(perfix, ":").concat(":").concat(StringUtils.join(part, ":"));

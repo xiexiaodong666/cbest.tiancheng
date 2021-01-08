@@ -1,10 +1,15 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import  com.welfare.persist.dao.AccountDepositApplyDetailDao;
+import com.welfare.persist.entity.AccountDepositApplyDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountDepositApplyDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 充值申请明细服务接口实现
@@ -17,6 +22,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class AccountDepositApplyDetailServiceImpl implements AccountDepositApplyDetailService {
-    private final AccountDepositApplyDetailDao accountDepositApplyDetailDao;
 
+    @Autowired
+    private AccountDepositApplyDetailDao accountDepositApplyDetailDao;
+
+    @Override
+    public List<AccountDepositApplyDetail> listByApplyCode(String applyCode) {
+        QueryWrapper<AccountDepositApplyDetail> query = new QueryWrapper<>();
+        query.eq(AccountDepositApplyDetail.APPLY_CODE, applyCode);
+        return accountDepositApplyDetailDao.list(query);
+    }
 }

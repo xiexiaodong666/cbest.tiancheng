@@ -1,6 +1,11 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.MerchantCredit;
+import org.apache.ibatis.annotations.Param;
+
+import java.math.BigDecimal;
+
 /**
  * 商户额度信服务接口
  *
@@ -9,5 +14,21 @@ package com.welfare.service;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface MerchantCreditService {
+
+  /**
+   * 减少申请充值额度
+   * 当前额度小于减少的额度 返回 0
+   * @param increaseLimit
+   * @param id
+   * @return
+   */
+  int decreaseRechargeLimit(BigDecimal increaseLimit, Long id);
+
+  /**
+   * 通过商户编码查询额度信息
+   * @param merCode
+   * @return
+   */
+  MerchantCredit getByMerCode(String merCode);
 
 }

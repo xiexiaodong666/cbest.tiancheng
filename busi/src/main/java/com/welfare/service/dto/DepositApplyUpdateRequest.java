@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+
 /**
  * @author duanhy
  * @version 1.0.0
@@ -31,6 +33,13 @@ public class DepositApplyUpdateRequest {
    */
   @ApiModelProperty("申请备注")
   private String applyRemark;
+
+  /**
+   * 福利类型
+   */
+  @ApiModelProperty("福利类型")
+  @NotEmpty(message = "余额类型为空")
+  private String merAccountTypeCode;
 
   @ApiModelProperty("申请员工额度信息")
   private AccountDepositRequest info;

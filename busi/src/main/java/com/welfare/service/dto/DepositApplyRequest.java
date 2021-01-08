@@ -39,11 +39,11 @@ public class DepositApplyRequest {
   private String applyUser;
 
   /**
-   * 余额类型
+   * 福利类型
    */
-  @ApiModelProperty("余额类型（待定义）")
+  @ApiModelProperty("福利类型")
   @NotEmpty(message = "余额类型为空")
-  private String balanceType;
+  private String merAccountTypeCode;
 
   /**
    * 审批类型

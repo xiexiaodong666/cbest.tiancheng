@@ -82,7 +82,7 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic  
+    @ApiModelProperty("删除标志")
     private Boolean deleted;
     /**
      * 版本

@@ -3,6 +3,9 @@ package com.welfare.persist.mapper;
 import com.welfare.persist.entity.MerchantCredit;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.math.BigDecimal;
 
 /**
  * 商户额度信(merchant_credit)数据Mapper
@@ -13,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface MerchantCreditMapper extends BaseMapper<MerchantCredit> {
+
+  int decreaseRechargeLimit(@Param("increaseLimit")BigDecimal increaseLimit, @Param("id")Long id);
 
 }

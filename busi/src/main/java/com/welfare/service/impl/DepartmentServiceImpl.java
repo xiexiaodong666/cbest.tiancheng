@@ -1,6 +1,8 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.util.EmptyChecker;
+import com.welfare.common.util.MerchantUserHolder;
 import  com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.entity.Department;
 import com.welfare.service.dto.DepartmentReq;
@@ -27,6 +29,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public List<Department> list(DepartmentReq req) {
+        if(EmptyChecker.isEmpty(req.getMerCode())){
+            req.setMerCode(MerchantUserHolder.getDeptIds().getMerchantCode());
+        }
         return departmentDao.list(QueryHelper.getWrapper(req));
     }
 

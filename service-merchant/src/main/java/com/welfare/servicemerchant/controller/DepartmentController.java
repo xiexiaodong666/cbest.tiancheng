@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.controller;
 
+import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.entity.Department;
@@ -40,6 +41,7 @@ public class DepartmentController implements IController {
     private final DepartmentConverter departmentConverter;
     @GetMapping("/list")
     @ApiOperation("根据商户代码查询商户部门列表（不分页）")
+    @MerchantUser
     public R<List<DepartmentInfo>> list(@Valid DepartmentReq req){
         return R.success(departmentConverter.toD(departmentService.list(req)));
     }

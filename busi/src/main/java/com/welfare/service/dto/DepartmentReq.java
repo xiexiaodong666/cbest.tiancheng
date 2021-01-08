@@ -14,8 +14,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class DepartmentReq {
     @Query(type = Query.Type.EQUAL)
-    @ApiModelProperty("商户代码")
-    @NotBlank
+    @ApiModelProperty("商户代码(不传则默认从header取)")
     private String merCode;
     @Query(type = Query.Type.EQUAL)
     @ApiModelProperty("部门父级")

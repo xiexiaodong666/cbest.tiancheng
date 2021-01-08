@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class MerchantUser {
+public class MerchantUserInfo {
 
   /**
    * 商户编码

@@ -18,6 +18,8 @@ cbest:
   oss:
     config:
       bucket: sjgo-img-test
-
+      accessKey: lF3iXaqMbr9f3GEdPJeN
+      secretKey: KqMaYYENOqD8JBZUhqgBhOddVYc5Y1Pd1pAJRoA2
+      keyPrefix: e-welfare/
 cdn:
   server: http://img-test.sjgo365.com

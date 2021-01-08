@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 月度结算账单(month_settle)实体类
+ * (account_amount_type)实体类
  *
  * @author Yuxiang Li
  * @since 2021-01-08 11:23:04
@@ -27,52 +27,37 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("month_settle")
-@ApiModel("月度结算账单")
-public class MonthSettle extends Model<MonthSettle> implements Serializable {
+@TableName("account_amount_type")
+@ApiModel("")
+public class AccountAmountType extends Model<AccountAmountType> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * 自增id
      */
-    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("自增id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Long id;
+	private Integer id;
     /**
-     * 账单编号
+     * 账户编码
      */
-    @ApiModelProperty("账单编号")   
-    private String settleNo;
+    @ApiModelProperty("账户编码")   
+    private String accountCode;
     /**
-     * 账单月
+     * 商家账户类型
      */
-    @ApiModelProperty("账单月")   
-    private String settleMonth;
+    @ApiModelProperty("商家账户类型")   
+    private String merAccountTypeCode;
     /**
-     * 商户代码
+     * 余额
      */
-    @ApiModelProperty("商户代码")   
-    private String merCode;
+    @ApiModelProperty("余额")   
+    private BigDecimal accountBalance;
     /**
-     * 结算金额
+     * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("结算金额")   
-    private BigDecimal amount;
-    /**
-     * 交易笔数
-     */
-    @ApiModelProperty("交易笔数")   
-    private Integer orderNum;
-    /**
-     * 对账状态
-     */
-    @ApiModelProperty("对账状态")   
-    private String recStatus;
-    /**
-     * 结算状态
-     */
-    @ApiModelProperty("结算状态")   
-    private String settleStatus;
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic  
+    private Boolean deleted;
     /**
      * 创建人
      */
@@ -87,7 +72,7 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String uppdateUser;
+    private String updateUser;
     /**
      * 更新时间
      */
@@ -95,45 +80,33 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     @TableField(update = "now()")
 	private Date updateTime;
     /**
-     * 删除标志
+     * 版本
      */
-    @ApiModelProperty("删除标志") @TableLogic  
-    private Boolean deleted;
+    @ApiModelProperty("版本")  @Version 
+    private Integer version;
 
 //以下为列明常量
 
     /**
-    * id
+    * 自增id
     */
     public static final String ID = "id";
     /**
-    * 账单编号
+    * 账户编码
     */
-    public static final String SETTLE_NO = "settle_no";
+    public static final String ACCOUNT_CODE = "account_code";
     /**
-    * 账单月
+    * 商家账户类型
     */
-    public static final String SETTLE_MONTH = "settle_month";
+    public static final String MER_ACCOUNT_TYPE_CODE = "mer_account_type_code";
     /**
-    * 商户代码
+    * 余额
     */
-    public static final String MER_CODE = "mer_code";
+    public static final String ACCOUNT_BALANCE = "account_balance";
     /**
-    * 结算金额
+    * 删除标志  1-删除、0-未删除
     */
-    public static final String AMOUNT = "amount";
-    /**
-    * 交易笔数
-    */
-    public static final String ORDER_NUM = "order_num";
-    /**
-    * 对账状态
-    */
-    public static final String REC_STATUS = "rec_status";
-    /**
-    * 结算状态
-    */
-    public static final String SETTLE_STATUS = "settle_status";
+    public static final String DELETED = "deleted";
     /**
     * 创建人
     */
@@ -145,14 +118,14 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     /**
     * 更新人
     */
-    public static final String UPPDATE_USER = "uppdate_user";
+    public static final String UPDATE_USER = "update_user";
     /**
     * 更新时间
     */
     public static final String UPDATE_TIME = "update_time";
     /**
-    * 删除标志
+    * 版本
     */
-    public static final String DELETED = "deleted";
+    public static final String VERSION = "version";
 
 }

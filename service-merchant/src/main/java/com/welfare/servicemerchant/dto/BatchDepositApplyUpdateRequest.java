@@ -30,6 +30,6 @@ public class BatchDepositApplyUpdateRequest {
   @ApiModelProperty("申请备注")
   private String applyRemark;
 
-  @ApiModelProperty("Excel二级制流")
+  @ApiModelProperty("Excel二级制(MultipartFile)")
   private MultipartFile file;
 }

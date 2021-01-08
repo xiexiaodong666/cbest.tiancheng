@@ -15,6 +15,18 @@ cbest:
   oss:
     config:
       bucket: sjgo-img-test
+      accessKey: lF3iXaqMbr9f3GEdPJeN
+      secretKey: KqMaYYENOqD8JBZUhqgBhOddVYc5Y1Pd1pAJRoA2
+      keyPrefix: e-welfare/
 
 cdn:
   server: http://img-test.sjgo365.com
+
+e-welfare:
+  distributed-lock:
+    enabled: true
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0

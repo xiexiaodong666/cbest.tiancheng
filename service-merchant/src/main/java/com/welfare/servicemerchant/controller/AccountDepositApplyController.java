@@ -40,13 +40,13 @@ public class AccountDepositApplyController implements IController {
   }
 
   @PostMapping("/update")
-  @ApiOperation("修改账号额度申请")
+  @ApiOperation("修改账号额度申请(单个)")
   public R<Long> update(@RequestBody DepositApplyUpdateRequest requst){
     return null;
   }
 
   @PostMapping("/batch-update")
-  @ApiOperation("修改账号额度申请")
+  @ApiOperation("修改账号额度申请(批量)")
   public R<Long> batchUpdate(@RequestBody BatchDepositApplyUpdateRequest requst){
     return null;
   }

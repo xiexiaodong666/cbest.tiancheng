@@ -11,14 +11,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 月度结算账单(month_settle)实体类
+ * (merchant_account_type)实体类
  *
  * @author Yuxiang Li
  * @since 2021-01-08 11:23:04
@@ -27,52 +26,37 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("month_settle")
-@ApiModel("月度结算账单")
-public class MonthSettle extends Model<MonthSettle> implements Serializable {
+@TableName("merchant_account_type")
+@ApiModel("")
+public class MerchantAccountType extends Model<MerchantAccountType> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * 自增id
      */
-    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("自增id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Long id;
-    /**
-     * 账单编号
-     */
-    @ApiModelProperty("账单编号")   
-    private String settleNo;
-    /**
-     * 账单月
-     */
-    @ApiModelProperty("账单月")   
-    private String settleMonth;
+	private Integer id;
     /**
      * 商户代码
      */
     @ApiModelProperty("商户代码")   
     private String merCode;
     /**
-     * 结算金额
+     * 商户账户类型编码
      */
-    @ApiModelProperty("结算金额")   
-    private BigDecimal amount;
+    @ApiModelProperty("商户账户类型编码")   
+    private String merAccountTypeCode;
     /**
-     * 交易笔数
+     * 商户账户类型名称
      */
-    @ApiModelProperty("交易笔数")   
-    private Integer orderNum;
+    @ApiModelProperty("商户账户类型名称")   
+    private String merAccountTypeName;
     /**
-     * 对账状态
+     * 删除标识
      */
-    @ApiModelProperty("对账状态")   
-    private String recStatus;
-    /**
-     * 结算状态
-     */
-    @ApiModelProperty("结算状态")   
-    private String settleStatus;
+    @ApiModelProperty("删除标识")   
+    private Boolean flag;
     /**
      * 创建人
      */
@@ -87,7 +71,7 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String uppdateUser;
+    private String updateUser;
     /**
      * 更新时间
      */
@@ -95,45 +79,33 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     @TableField(update = "now()")
 	private Date updateTime;
     /**
-     * 删除标志
+     * 版本
      */
-    @ApiModelProperty("删除标志") @TableLogic  
-    private Boolean deleted;
+    @ApiModelProperty("版本")  @Version 
+    private Integer version;
 
 //以下为列明常量
 
     /**
-    * id
+    * 自增id
     */
     public static final String ID = "id";
-    /**
-    * 账单编号
-    */
-    public static final String SETTLE_NO = "settle_no";
-    /**
-    * 账单月
-    */
-    public static final String SETTLE_MONTH = "settle_month";
     /**
     * 商户代码
     */
     public static final String MER_CODE = "mer_code";
     /**
-    * 结算金额
+    * 商户账户类型编码
     */
-    public static final String AMOUNT = "amount";
+    public static final String MER_ACCOUNT_TYPE_CODE = "mer_account_type_code";
     /**
-    * 交易笔数
+    * 商户账户类型名称
     */
-    public static final String ORDER_NUM = "order_num";
+    public static final String MER_ACCOUNT_TYPE_NAME = "mer_account_type_name";
     /**
-    * 对账状态
+    * 删除标识
     */
-    public static final String REC_STATUS = "rec_status";
-    /**
-    * 结算状态
-    */
-    public static final String SETTLE_STATUS = "settle_status";
+    public static final String FLAG = "flag";
     /**
     * 创建人
     */
@@ -145,14 +117,14 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     /**
     * 更新人
     */
-    public static final String UPPDATE_USER = "uppdate_user";
+    public static final String UPDATE_USER = "update_user";
     /**
     * 更新时间
     */
     public static final String UPDATE_TIME = "update_time";
     /**
-    * 删除标志
+    * 版本
     */
-    public static final String DELETED = "deleted";
+    public static final String VERSION = "version";
 
 }

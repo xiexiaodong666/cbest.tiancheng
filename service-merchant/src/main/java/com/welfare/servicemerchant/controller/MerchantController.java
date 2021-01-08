@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * 商户信息服务控制器
  *
- * @author Yuxiang Li
+ * @author hao.yin
  * @since 2021-01-06 13:49:25
  * @description 由 Mybatisplus Code Generator 创建
  */

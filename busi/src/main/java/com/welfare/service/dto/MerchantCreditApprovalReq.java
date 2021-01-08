@@ -1,4 +1,4 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,12 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @ApiModel("商户额度申请审批请求")
 public class MerchantCreditApprovalReq {
-
-  /**
-   * 请求id（用于幂等处理）
-   */
-  @ApiModelProperty("请求id（用于幂等处理）")
-  private String requestId;
 
 
   @ApiModelProperty("申请id")

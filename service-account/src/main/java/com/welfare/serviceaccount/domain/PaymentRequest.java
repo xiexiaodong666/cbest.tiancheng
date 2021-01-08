@@ -1,7 +1,7 @@
 package com.welfare.serviceaccount.domain;
 
 import com.alibaba.druid.util.StringUtils;
-import com.welfare.common.constants.WelfaleConstant;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -39,13 +39,13 @@ public class PaymentRequest {
     public String chargePaymentScene(){
         if (!StringUtil.startsWithNumber(storeNumber)) {
             //非数字开头的门店，供应商线下消费
-            this.paymentScene = WelfaleConstant.PaymentScene.OFFLINE_SUPPLIER.code();
+            this.paymentScene = WelfareConstant.PaymentScene.OFFLINE_SUPPLIER.code();
         } else if(StringUtils.equals(machineNumber,"")){
             //特殊支付机器号，重百线上
-            this.paymentScene = WelfaleConstant.PaymentScene.ONLINE_STORE.code();
+            this.paymentScene = WelfareConstant.PaymentScene.ONLINE_STORE.code();
         } else {
             //其余情况，重百线下
-            this.paymentScene = WelfaleConstant.PaymentScene.OFFLINE_CBEST.code();
+            this.paymentScene = WelfareConstant.PaymentScene.OFFLINE_CBEST.code();
         }
         return this.paymentScene;
     }

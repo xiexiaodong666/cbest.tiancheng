@@ -1,7 +1,7 @@
 package com.welfare.servicesettlement.config;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
-import com.welfare.common.constants.WelfaleConstant;
+import com.welfare.common.constants.WelfareConstant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -32,7 +32,7 @@ public class Swagger2Config {
     public Docket createRestApi() {
         List<Parameter> parameters = new ArrayList<>();
         parameters.add(new ParameterBuilder()
-                .name(WelfaleConstant.Header.SOURCE.code())
+                .name(WelfareConstant.Header.SOURCE.code())
                 .description("请求来源,需要找e-welfare申请")
                 .modelRef(new ModelRef("string"))
                 .parameterType("header")

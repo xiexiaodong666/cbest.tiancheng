@@ -1,6 +1,8 @@
 package com.welfare.serviceaccount.controller;
 
-import com.welfare.serviceaccount.domain.BarcodeSalt;
+import com.welfare.persist.entity.BarcodeSalt;
+import com.welfare.service.BarcodeSaltService;
+import com.welfare.serviceaccount.domain.BarcodeSaltDO;
 import com.welfare.serviceaccount.domain.PaymentBarcode;
 import com.welfare.serviceaccount.domain.PaymentRequest;
 import com.welfare.serviceaccount.domain.RefundRequest;
@@ -12,8 +14,13 @@ import net.dreamlu.mica.core.result.R;
 import net.dreamlu.mica.core.utils.BeanUtil;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Description:
@@ -28,6 +35,7 @@ import java.util.Map;
 @RequestMapping("/payment")
 @Api(tags = "支付接口")
 public class PaymentController implements IController {
+    private final BarcodeSaltService barcodeSaltService;
     @PostMapping
     @ApiOperation("支付")
     @ApiImplicitParams({
@@ -86,8 +94,16 @@ public class PaymentController implements IController {
 
     @GetMapping("/barcode-salts")
     @ApiOperation("支付条码加盐参数列表获取")
-    public R<List<BarcodeSalt>> getBarcodeSalts(){
-        return success(null);
+    public R<List<BarcodeSaltDO>> getBarcodeSalts(){
+        Date currentDate = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String dayStr = dateFormat.format(currentDate);
+        List<BarcodeSalt> barcodeSalts = barcodeSaltService.query(Long.valueOf(dayStr));
+        return success(
+                barcodeSalts.stream()
+                        .map(BarcodeSaltDO::of)
+                        .collect(Collectors.toList())
+        );
     }
 
 }

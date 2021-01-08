@@ -1,23 +1,17 @@
-package welfare.servicesettlement.controller;
+package com.welfare.servicesettlement.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.entity.Account;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import welfare.servicesettlement.dto.BillDetailReqDto;
-import welfare.servicesettlement.dto.BillDetailRespDto;
-import welfare.servicesettlement.dto.BillReqDto;
-import welfare.servicesettlement.dto.BillRespDto;
+import com.welfare.servicesettlement.dto.BillDetailReqDto;
+import com.welfare.servicesettlement.dto.BillDetailRespDto;
+import com.welfare.servicesettlement.dto.BillReqDto;
+import com.welfare.servicesettlement.dto.BillRespDto;
 
 import java.io.File;
 import java.util.List;
@@ -26,7 +20,7 @@ import java.util.List;
  * @author qiang.deng
  * @version 1.0.0
  * @date 2021/1/7 4:37 下午
- * @desc 结算管理接口
+ * @desc 结算账单管理接口
  */
 @Slf4j
 @RequiredArgsConstructor

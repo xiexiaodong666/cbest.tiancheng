@@ -1,6 +1,7 @@
-package welfare.servicesettlement.dto;
+package com.welfare.servicesettlement.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.util.Date;
 
@@ -10,6 +11,7 @@ import java.util.Date;
  * @date 2021/1/7 4:48 下午
  * @desc 账单明细请求dto
  */
+@Data
 public class BillDetailRespDto {
     @ApiModelProperty(value = "交易流水号")
     private String transNo;

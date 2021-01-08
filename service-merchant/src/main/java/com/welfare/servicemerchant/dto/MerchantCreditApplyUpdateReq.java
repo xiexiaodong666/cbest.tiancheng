@@ -25,11 +25,6 @@ public class MerchantCreditApplyUpdateReq {
   private Long id;
 
   /**
-   * 商户编码
-   */
-  @ApiModelProperty("商户编码")
-  private String merCode;
-
   /**
    * 申请类型
    */

@@ -43,7 +43,8 @@ public class WelfaleConstant {
     }
 
     public enum Header{
-        SOURCE("Source","请求来源");
+        SOURCE("Source","请求来源"),
+        MERCHANT_USER("merchantUser","商户请求用户");
 
         private String code;
         private String desc;

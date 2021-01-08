@@ -2,7 +2,6 @@ package com.welfare.service.helper;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.base.CaseFormat;
-import com.sun.org.apache.xml.internal.security.utils.ElementCheckerImpl;
 import com.welfare.common.annotation.Query;
 import com.welfare.common.util.EmptyChecker;
 import lombok.extern.slf4j.Slf4j;

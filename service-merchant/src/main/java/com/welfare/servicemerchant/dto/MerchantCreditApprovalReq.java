@@ -43,5 +43,4 @@ public class MerchantCreditApprovalReq {
    */
   @ApiModelProperty("审批人")
   private String approvalUser;
-
 }

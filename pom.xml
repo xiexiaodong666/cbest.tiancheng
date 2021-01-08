@@ -43,6 +43,7 @@
         <alibaba.easyexcel.version>2.1.4</alibaba.easyexcel.version>
         <cbest-oss.version>1.0.0</cbest-oss.version>
         <guava.version>22.0</guava.version>
+        <fastjson.version>1.2.58</fastjson.version>
     </properties>
 
     <dependencies>
@@ -180,6 +181,11 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.redisson</groupId>

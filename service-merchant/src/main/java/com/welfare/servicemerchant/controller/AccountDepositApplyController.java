@@ -58,8 +58,14 @@ public class AccountDepositApplyController implements IController {
   }
 
   @PostMapping("/save")
-  @ApiOperation("新增额度申请(单个/批量)")
+  @ApiOperation("新增额度申请(单个)")
   public R<Long> save(@RequestBody BatchDepositApplyRequest request){
+    return null;
+  }
+
+  @PostMapping("/save")
+  @ApiOperation("新增额度申请(批量)")
+  public R<Long> batchSave(@RequestBody BatchDepositApplyRequest request){
     return null;
   }
 }

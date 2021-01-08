@@ -10,3 +10,11 @@ logging:
     root: info
 #encrypt:
   #file: ${config.file:classpath:config/config.properties}
+
+cbest:
+  oss:
+    config:
+      bucket: sjgo-img-test
+
+cdn:
+  server: http://img-test.sjgo365.com

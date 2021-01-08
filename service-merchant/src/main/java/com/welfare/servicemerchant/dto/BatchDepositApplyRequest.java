@@ -46,6 +46,14 @@ public class BatchDepositApplyRequest {
   @ApiModelProperty("余额类型（待定义）")
   private String balanceType;
 
+  /**
+   * 审批类型
+   */
+  @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")
+  private String approvalType;
+
+
+
   @ApiModelProperty("申请员工额度信息")
   private List<AccountDepositRequest> items;
 }

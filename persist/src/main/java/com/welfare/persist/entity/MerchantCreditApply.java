@@ -123,7 +123,16 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
-
+    /**
+     * 申请人
+     */
+    @ApiModelProperty("申请人")
+    private String applyUser;
+    /**
+     * 申请时间
+     */
+    @ApiModelProperty("申请时间")
+    private Date applyTime;
 //以下为列明常量
 
     /**
@@ -198,5 +207,13 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
     * 版本
     */
     public static final String VERSION = "version";
+    /**
+     * 申请人
+     */
+    public static final String APPLY_USER = "apply_user";
+    /**
+     * 申请时间
+     */
+    public static final String APPLY_TIME = "apply_time";
 
 }

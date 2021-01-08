@@ -10,7 +10,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>service-merchant</artifactId>
-
+    <!--本地私服地址-->
+    <repositories>
+        <repository>
+            <id>public</id>
+            <url>http://172.30.37.60:8081/repository/maven-public/</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>e-welfare</groupId>
@@ -63,6 +69,16 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>${alibaba.easyexcel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cbest.boot</groupId>
+            <artifactId>oss-spring-boot-starter</artifactId>
+            <version>${cbest-oss.version}</version>
         </dependency>
     </dependencies>
 

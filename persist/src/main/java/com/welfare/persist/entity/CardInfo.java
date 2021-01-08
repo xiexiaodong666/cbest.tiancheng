@@ -85,13 +85,19 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
     /**
      * 员工账号
      */
-    @ApiModelProperty("员工账号")  
-    private String accountId;
+    @ApiModelProperty("员工账号")
+    private String accountCode;
     /**
      * 版本
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
+    /**
+     * 磁条号
+     */
+    @ApiModelProperty("磁条号")
+    private String magneticStripe;
+
 
 //以下为列明常量
 
@@ -136,12 +142,15 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
     */
     public static final String UPDATE_TIME = "update_time";
     /**
-    * 员工账号
-    */
-    public static final String ACCOUNT_ID = "account_id";
+     * 员工账号
+     */
+    public static final String ACCOUNT_CODE = "account_code";
     /**
     * 版本
     */
     public static final String VERSION = "version";
-
+    /**
+     * 磁条号
+     */
+    public static final String MAGNETIC_STRIPE = "magnetic_stripe";
 }

@@ -19,26 +19,15 @@ import javax.validation.constraints.NotEmpty;
 @ApiModel("批量导入账号申请请求")
 public class BatchDepositApplyRequest {
 
-  @ApiModelProperty("请求id（用于幂等处理）")
+  @ApiModelProperty("请求id（用于幂等处理，UUID即可）")
+  @NotEmpty(message = "requestId为空")
   private String requestId;
-
-  /**
-   * 商户代码
-   */
-  @ApiModelProperty("商户代码")
-  private String merCode;
 
   /**
    * 申请备注
    */
   @ApiModelProperty("申请备注")
   private String applyRemark;
-
-  /**
-   * 申请人
-   */
-  @ApiModelProperty("申请人")
-  private String applyUser;
 
   /**
    * 福利类型

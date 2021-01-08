@@ -16,9 +16,6 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 public class BatchDepositApplyUpdateRequest {
 
-  @ApiModelProperty("请求id（用于幂等处理）")
-  private String requestId;
-
   /**
    * 申请id
    */

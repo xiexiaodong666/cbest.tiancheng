@@ -15,12 +15,8 @@ import javax.validation.constraints.NotEmpty;
  */
 @Data
 @NoArgsConstructor
-@ApiModel("修改账号申请请求")
+@ApiModel("修改账号存款申请请求")
 public class DepositApplyUpdateRequest {
-
-
-  @ApiModelProperty("请求id（用于幂等处理）")
-  private String requestId;
 
   /**
    * 申请id

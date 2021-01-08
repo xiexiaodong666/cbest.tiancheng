@@ -19,8 +19,8 @@ import lombok.experimental.Accessors;
 /**
  * 供应商门店(supplier_store)实体类
  *
- * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @author hao.yin
+ * @since 2021-01-08 15:46:08
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -77,6 +77,11 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
      */
     @ApiModelProperty("消费方式")   
     private String consumType;
+    /**
+     * 状态
+     */
+    @ApiModelProperty("状态")   
+    private Integer status;
     /**
      * 删除标志
      */
@@ -152,6 +157,10 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     * 消费方式
     */
     public static final String CONSUM_TYPE = "consum_type";
+    /**
+    * 状态
+    */
+    public static final String STATUS = "status";
     /**
     * 删除标志
     */

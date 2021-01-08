@@ -26,6 +26,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
         if(StringUtils.isEmpty(source)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Source required for http header");
         }
+        //todo 需要优化Source校验逻辑
         return true;
     }
 }

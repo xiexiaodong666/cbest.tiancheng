@@ -4,6 +4,7 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -19,7 +20,7 @@ import lombok.experimental.Accessors;
  * 商户信息(merchant)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 16:35:13
+ * @since 2021-01-08 11:23:04
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -33,69 +34,69 @@ public class Merchant extends Model<Merchant> implements Serializable {
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * 商户名称
      */
-    @ApiModelProperty("商户名称")  
+    @ApiModelProperty("商户名称")   
     private String merName;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")  
+    @ApiModelProperty("商户代码")   
     private String merCode;
     /**
      * 商户类型
      */
-    @ApiModelProperty("商户类型")  
+    @ApiModelProperty("商户类型")   
     private String merType;
     /**
      * 身份属性
      */
-    @ApiModelProperty("身份属性")  
+    @ApiModelProperty("身份属性")   
     private String merIdentity;
     /**
      * 合作方式
      */
-    @ApiModelProperty("合作方式")  
+    @ApiModelProperty("合作方式")   
     private String merCooperationMode;
     /**
      * 备注
      */
-    @ApiModelProperty("备注")  
+    @ApiModelProperty("备注")   
     private String remark;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")  
+    @ApiModelProperty("创建人")   
     private String createUser;
     /**
      * 创建日期
      */
-    @ApiModelProperty("创建日期")  
+    @ApiModelProperty("创建日期")   
     private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")  
+    @ApiModelProperty("更新人")   
     private String updateUser;
     /**
      * 更新日期
      */
-    @ApiModelProperty("更新日期")  
+    @ApiModelProperty("更新日期")   
     @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 状态
      */
-    @ApiModelProperty("状态")  
+    @ApiModelProperty("状态")   
     private Integer status;
     /**
      * 版本
      */
-    @ApiModelProperty("版本") @Version 
+    @ApiModelProperty("版本")  @Version 
     private Integer version;
 
 //以下为列明常量

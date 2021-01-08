@@ -4,6 +4,7 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -20,7 +21,7 @@ import lombok.experimental.Accessors;
  * 商户明细记录(merchant_credit_apply_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-06 16:35:13
+ * @since 2021-01-08 11:23:04
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -34,59 +35,59 @@ public class MerchantCreditApplyDetail extends Model<MerchantCreditApplyDetail> 
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * 申请编码
      */
-    @ApiModelProperty("申请编码")  
+    @ApiModelProperty("申请编码")   
     private String applyCode;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")  
+    @ApiModelProperty("商户代码")   
     private String merCode;
     /**
      * 变动类型
      */
-    @ApiModelProperty("变动类型")  
+    @ApiModelProperty("变动类型")   
     private String type;
     /**
      * 金额
      */
-    @ApiModelProperty("金额")  
+    @ApiModelProperty("金额")   
     private BigDecimal amount;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")  
+    @ApiModelProperty("创建人")   
     private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")  
+    @ApiModelProperty("创建时间")   
     private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")  
+    @ApiModelProperty("更新人")   
     private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")  
+    @ApiModelProperty("更新时间")   
     @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志")  
+    @ApiModelProperty("删除标志") @TableLogic  
     private Boolean deleted;
     /**
      * 版本
      */
-    @ApiModelProperty("版本") @Version 
+    @ApiModelProperty("版本")  @Version 
     private Integer version;
 
 //以下为列明常量

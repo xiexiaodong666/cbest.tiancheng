@@ -18,7 +18,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface MerchantStoreRelationMapper extends BaseMapper<MerchantStoreRelation> {
 
-  IPage<MerchantStoreRelationDTO> searchMerchantStoreRelations(
+  Page<MerchantStoreRelationDTO> searchMerchantStoreRelations(
       Page<MerchantStoreRelation> page,
       @Param("merName")String merName, @Param("status") String status);
 }

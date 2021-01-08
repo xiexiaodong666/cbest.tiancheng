@@ -37,7 +37,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     }
 
     @Override
-    public IPage<MerchantStoreRelationDTO> searchMerchantStoreRelations(
+    public Page<MerchantStoreRelationDTO> searchMerchantStoreRelations(
         Page<MerchantStoreRelation> page,
         String merName, String status) {
 

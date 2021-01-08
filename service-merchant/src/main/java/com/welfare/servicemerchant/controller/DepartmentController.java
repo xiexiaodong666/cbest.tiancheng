@@ -1,6 +1,11 @@
 package com.welfare.servicemerchant.controller;
 
-import com.welfare.service.MerchantService;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.EmptyChecker;
+import com.welfare.persist.entity.Department;
+import com.welfare.service.DepartmentService;
+import com.welfare.service.dto.DepartmentReq;
+import com.welfare.servicemerchant.converter.DepartmentConverter;
 import com.welfare.servicemerchant.dto.DepartmentInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,10 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -26,12 +36,35 @@ import java.util.List;
 @RequestMapping("/department")
 @Api(tags = "商户部门相关接口")
 public class DepartmentController implements IController {
-    private final MerchantService merchantService;
+    private final DepartmentService departmentService;
+    private final DepartmentConverter departmentConverter;
     @GetMapping("/list")
     @ApiOperation("根据商户代码查询商户部门列表（不分页）")
-    public R<List<DepartmentInfo>> list(@RequestParam(required = true) @ApiParam(value="商户代码",required = true) String merCode,
-                                        @RequestParam @ApiParam("部门父级") String departmentParent,
-                                        @RequestParam @ApiParam("部门层级") String departmentLevel){
-        return null;
+    public R<List<DepartmentInfo>> list(@Valid DepartmentReq req){
+        return R.success(departmentConverter.toD(departmentService.list(req)));
+    }
+
+    @GetMapping("/detail")
+    @ApiOperation("查询商户详情）")
+    public R<DepartmentInfo> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+        return R.success(departmentConverter.toD(departmentService.detail(id)));
+    }
+
+    @PostMapping("/add")
+    @ApiOperation("新增商户")
+    public R add(@RequestBody Department department){
+        return R.status(departmentService.add(department),"新增失败");
+    }
+    @PostMapping("/batch-add")
+    @ApiOperation("批量新增子机构")
+    public R batchAdd(@RequestBody List<Department> list){
+        return R.status(departmentService.batchAdd(list),"批量新增失败");
+
+    }
+
+    @PostMapping("/delete/{id}")
+    @ApiOperation("删除子机构")
+    public R delete(@PathVariable @NotBlank String  departmentCode){
+        return R.status(departmentService.delete(departmentCode),"删除失败");
     }
 }

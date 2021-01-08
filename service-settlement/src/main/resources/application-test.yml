@@ -42,7 +42,7 @@ spring:
     database: 0
 logging:
   file:
-    path: D:/home/finance/Logs/e-welfare-account.e-cbest.lotest
+    path: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest
   level:
     root: info
 encrypt:

@@ -29,6 +29,6 @@
     <if test="merName != null and merName !='' ">and m.mer_name = #{merName}
     </if>
     GROUP BY
-    mer_code
+    msr.mer_code
   </select>
 </mapper>

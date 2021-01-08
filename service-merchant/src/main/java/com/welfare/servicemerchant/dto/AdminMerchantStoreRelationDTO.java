@@ -27,12 +27,6 @@ public class AdminMerchantStoreRelationDTO {
   @ApiModelProperty("商户名称")
   private String merName;
 
-  /**
-   * 门店编码
-   */
-  @ApiModelProperty("门店编码")
-  private String storeCode;
-
 
   /**
    * 创建时间
@@ -51,22 +45,6 @@ public class AdminMerchantStoreRelationDTO {
    * 配置门店
    */
   @ApiModelProperty("备注")
-  private List<MerchantStore> merchantStores;
+  private List<AdminMerchantStore> merchantStores;
 }
 
-@Data
-class MerchantStore{
-
-  /**
-   * 门店编码
-   */
-  @ApiModelProperty("门店编码")
-  private String storeCode;
-
-  /**
-   * 门店别名
-   */
-  @ApiModelProperty("门店别名")
-  private String storeAlias;
-
-}

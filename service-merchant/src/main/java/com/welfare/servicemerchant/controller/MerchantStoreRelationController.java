@@ -8,6 +8,7 @@ import com.welfare.persist.dto.AdminMerchantStore;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.MerchantStoreRelationDetailDTO;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
+import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.service.MerchantService;
@@ -109,7 +110,8 @@ public class MerchantStoreRelationController implements IController {
     List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService
         .getMerchantStoreRelationListByMerCode(queryWrapper);
 
-    MerchantStoreRelationDetailDTO merchantStoreRelationDetailDTO = convertMerchantStoreRelationDetailDTO(merchantStoreRelationList);
+    MerchantStoreRelationDetailDTO merchantStoreRelationDetailDTO = convertMerchantStoreRelationDetailDTO(
+        merchantStoreRelationList);
     merchantStoreRelationDetailDTO.setMerName(merchant.getMerName());
     merchantStoreRelationDetailDTO.setMerCode(merchantStoreRelation.getMerCode());
     merchantStoreRelationDetailDTO.setRamark(merchantStoreRelation.getRamark());
@@ -122,15 +124,25 @@ public class MerchantStoreRelationController implements IController {
   @ApiUser
   public R<Boolean> addMerchantStore(@RequestBody MerchantStoreRelationAddReq relationAddReq) {
 
-
     return success(merchantStoreRelationService.add(relationAddReq));
   }
 
   @PutMapping
   @ApiOperation("修改消费门店配置")
-  public R<Boolean> updateMerchantStore() {
+  public R<Boolean> updateMerchantStore(
+      @RequestBody MerchantStoreRelationUpdateReq relationUpadateReq) {
 
-    return null;
+    return success(merchantStoreRelationService.update(relationUpadateReq));
+  }
+
+  @PutMapping("/status")
+  @ApiOperation("删除/禁用/启动门店配置")
+  public R<Boolean> updateMerchantStoreStatus(
+      @RequestParam(required = true) @ApiParam("消费场景门店id") Long id,
+      @RequestParam(required = false) @ApiParam("1删除") Integer delete,
+      @RequestParam(required = false) @ApiParam("状态 0 正常,1 禁用") Integer status) {
+
+    return success(merchantStoreRelationService.updateStatus(id, delete, status));
   }
 
   @PostMapping("/export")
@@ -145,9 +157,10 @@ public class MerchantStoreRelationController implements IController {
   }
 
 
-  private MerchantStoreRelationDetailDTO convertMerchantStoreRelationDetailDTO(List<MerchantStoreRelation> merchantStoreRelationList) {
+  private MerchantStoreRelationDetailDTO convertMerchantStoreRelationDetailDTO(
+      List<MerchantStoreRelation> merchantStoreRelationList) {
     MerchantStoreRelationDetailDTO merchantStoreRelationDetailDTO = new MerchantStoreRelationDetailDTO();
-    if(CollectionUtils.isEmpty(merchantStoreRelationList)) {
+    if (CollectionUtils.isEmpty(merchantStoreRelationList)) {
       return merchantStoreRelationDetailDTO;
     }
     List<AdminMerchantStore> adminMerchantStoreList = new ArrayList<>();
@@ -163,10 +176,12 @@ public class MerchantStoreRelationController implements IController {
       adminMerchantStore.setIsRebate(m.getIsRebate());
       adminMerchantStore.setRebateType(m.getRebateType());
       adminMerchantStore.setRebateRatio(m.getRebateRatio());
+      adminMerchantStore.setMerchantStoreId(String.valueOf(m.getId()));
       adminMerchantStoreList.add(adminMerchantStore);
     }
     return merchantStoreRelationDetailDTO;
   }
+
   /**
    * convert MerchantStoreRelationDTO to AdminMerchantStoreRelationDTO
    */
@@ -178,10 +193,12 @@ public class MerchantStoreRelationController implements IController {
     for (MerchantStoreRelationDTO merchantStoreRelationDTO :
         merchantStoreRelationDTOList) {
       AdminMerchantStoreRelationDTO adminMerchantStoreRelationDTO = new AdminMerchantStoreRelationDTO();
+      adminMerchantStoreRelationDTO.setId(String.valueOf(merchantStoreRelationDTO.getId()));
       adminMerchantStoreRelationDTO.setCreateTime(merchantStoreRelationDTO.getCreateTime());
       adminMerchantStoreRelationDTO.setMerCode(merchantStoreRelationDTO.getMerCode());
       adminMerchantStoreRelationDTO.setMerName(merchantStoreRelationDTO.getMerName());
       adminMerchantStoreRelationDTO.setRamark(merchantStoreRelationDTO.getRamark());
+      adminMerchantStoreRelationDTO.setStatus(merchantStoreRelationDTO.getStatus());
 
       String storeCodes = merchantStoreRelationDTO.getStoreCode();
       String storeAlias = merchantStoreRelationDTO.getStoreAlias();

@@ -61,4 +61,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         queryWrapper.eq("department_parent",departmentCode);
         return departmentDao.remove(queryWrapper)&&departmentDao.remove(queryWrapper2);
     }
+
+    @Override
+    public Department getByDepartmentCode(String departmentCode) {
+        QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Department.DEPARTMENT_CODE, departmentCode);
+        return departmentDao.getOne(queryWrapper);
+    }
 }

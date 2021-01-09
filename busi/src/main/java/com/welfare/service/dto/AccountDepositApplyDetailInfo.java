@@ -25,6 +25,6 @@ public class AccountDepositApplyDetailInfo {
   @ApiModelProperty("充值申请主数据")
   private AccountDepositApplyInfo mainInfo;
 
-  @ApiModelProperty("充值员工")
+  @ApiModelProperty("充值员工(批量申请需要单独调用分页接口)")
   private List<AccountDepositApplyItem> items;
 }

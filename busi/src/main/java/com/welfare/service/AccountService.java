@@ -32,4 +32,6 @@ public interface AccountService {
      * @return
      */
     int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode);
+
+    Account getByAccountCode(String accountCode);
 }

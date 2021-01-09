@@ -35,7 +35,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/merchant")
+@RequestMapping("/merchant-account-type")
 @Api(tags = "商户相关接口")
 public class MerchantAccountTypeController implements IController {
     private final MerchantAccountTypeService merchantAccountTypeService;

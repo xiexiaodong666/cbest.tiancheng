@@ -12,6 +12,12 @@ import lombok.Data;
 public class AdminMerchantStore {
 
   /**
+   * merchantStoreId
+   */
+  @ApiModelProperty("merchantStoreId")
+  private String merchantStoreId;
+
+  /**
    * 门店编码
    */
   @ApiModelProperty("门店编码")

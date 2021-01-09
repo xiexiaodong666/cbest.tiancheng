@@ -7,8 +7,6 @@ import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.entity.AccountConsumeScene;
 import java.util.Date;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 
 public interface AccountConsumeSceneCustomizeMapper extends BaseMapper<AccountConsumeScene> {
@@ -21,9 +19,4 @@ public interface AccountConsumeSceneCustomizeMapper extends BaseMapper<AccountCo
 
   AccountConsumeSceneMapperDTO queryAccountConsumerScene4Detail(@Param("id")Long id);
 
-
-  @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
-  @Insert("insert  into  account_consume_scene ( id,`mer_code`, `account_type_id`, `remark`, `status`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`) "
-      + " values (#{id},#{merCode},#{accountTypeId},#{remark},#{status},#{createUser},#{createTime},#{updateUser},#{updateTime},#{deleted},#{version})")
-  int insert(AccountConsumeScene accountConsumeScene);
 }

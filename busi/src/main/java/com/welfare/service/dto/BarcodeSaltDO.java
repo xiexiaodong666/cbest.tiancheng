@@ -1,4 +1,4 @@
-package com.welfare.serviceaccount.domain;
+package com.welfare.service.dto;
 
 import com.welfare.persist.entity.BarcodeSalt;
 import io.swagger.annotations.ApiModel;

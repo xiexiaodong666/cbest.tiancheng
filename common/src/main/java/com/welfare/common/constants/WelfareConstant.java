@@ -62,4 +62,11 @@ public class WelfareConstant {
             return this.desc;
         }
     }
+
+    /**
+     * 充值来源，用以标记
+     */
+    public enum DepositSource{
+
+    }
 }

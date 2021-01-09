@@ -101,6 +101,19 @@ public class BarcodeSaltServiceImpl implements BarcodeSaltService {
         }
     }
 
+    @Override
+    public BarcodeSalt queryCurrentPeriodSaltValue() {
+        Long period = BarcodeUtil.currentAsPeriod();
+        return queryByPeriodNumeric(period);
+    }
+
+    @Override
+    public BarcodeSalt queryByPeriodNumeric(Long period) {
+        QueryWrapper<BarcodeSalt> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(BarcodeSalt.VALID_PERIOD, period);
+        return barcodeSaltDao.getOne(queryWrapper);
+    }
+
     private BarcodeSalt getTheLatestInDb() {
         Long currentPeriod = BarcodeUtil.currentAsPeriod();
         QueryWrapper<BarcodeSalt> queryWrapper = new QueryWrapper<>();

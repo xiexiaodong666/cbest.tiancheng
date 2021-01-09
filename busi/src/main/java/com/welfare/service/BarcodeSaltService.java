@@ -30,4 +30,17 @@ public interface BarcodeSaltService {
      * 批量生成缺失的period
      */
     void batchGenerate();
+
+    /**
+     * 获取当前周期的saltValue
+     * @return
+     */
+    BarcodeSalt queryCurrentPeriodSaltValue();
+
+    /**
+     * 根据period查询单条barcodeSalt
+     * @param period
+     * @return
+     */
+    BarcodeSalt queryByPeriodNumeric(Long period);
 }

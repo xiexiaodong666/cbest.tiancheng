@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountDepositApply;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
 import io.swagger.annotations.ApiModel;
@@ -28,6 +29,8 @@ public class Deposit {
     private String cardNo;
     @ApiModelProperty("充值金额")
     private BigDecimal amount;
+    @ApiModelProperty("商户编码")
+    private String merchantCode;
     @ApiModelProperty(value = "充值目标,对应充到哪个账户下(烤火费、自主等)")
     private String merAccountTypeCode;
     @ApiModelProperty(value = "充值状态",notes = "1:新增, 2:处理中, 3:处理成功 -1:处理失败")
@@ -38,6 +41,7 @@ public class Deposit {
         deposit.setAccountCode(accountDepositApplyDetail.getAccountCode());
         deposit.setMerAccountTypeCode(accountDepositApply.getMerAccountTypeCode());
         deposit.setAmount(accountDepositApplyDetail.getRechargeAmount());
+        deposit.setMerchantCode(accountDepositApply.getMerCode());
         return deposit;
     }
 
@@ -45,5 +49,13 @@ public class Deposit {
         return accountDepositApplyDetails.stream()
                 .map(detail -> Deposit.of(accountDepositApply, detail))
                 .collect(Collectors.toList());
+    }
+
+    public AccountAmountType toNewAccountAmountType(){
+        AccountAmountType accountAmountType = new AccountAmountType();
+        accountAmountType.setAccountBalance(BigDecimal.ZERO);
+        accountAmountType.setAccountCode(accountCode);
+        accountAmountType.setMerAccountTypeCode(merAccountTypeCode);
+        return accountAmountType;
     }
 }

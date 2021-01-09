@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.entity.MerchantAccountType;
@@ -59,5 +60,20 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     @Override
     public boolean moveDeductionsOrder() {
         return false;
+    }
+
+    @Override
+    public MerchantAccountType queryOneByCode(String merCode, String merchantAccountTypeCode) {
+        QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(MerchantAccountType.MER_ACCOUNT_TYPE_CODE,merchantAccountTypeCode)
+                .eq(MerchantAccountType.MER_CODE,merCode);
+        return merchantAccountTypeDao.getOne(queryWrapper);
+    }
+
+    @Override
+    public List<MerchantAccountType> queryByMerCode(String merCode) {
+        QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(MerchantAccountType.MER_CODE,merCode);
+        return merchantAccountTypeDao.list(queryWrapper);
     }
 }

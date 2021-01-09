@@ -1,16 +1,40 @@
 package com.welfare.common.exception;
 
+/**
+ *
+ * @author liyx1
+ */
 public enum ExceptionCode {
+    /**
+     * 成功
+     */
     SUCCESS(0),
-    UNKNOWON_EXCEPTION(0xffffffff),    //未知异常
+    /**
+     * 未知异常
+     */
+    UNKNOWON_EXCEPTION(0xffffffff),
 
     //----------系统异常-----------
+    /**
+     * 参数校验异常
+     */
     ILLEGALITY_ARGURMENTS(0x00010000), //参数校验异常
     DATA_BASE_ERROR(0x00020000), //数据库访问异常
 
     //----------业务异常-----------
     BUSI_ERROR_LOGIN_FAILED(0x00000001),  //登录失败
-    BUSI_ERROR_NO_PERMISSION(0x00000002); //无权限
+    /**
+     * 无权限
+     */
+    BUSI_ERROR_NO_PERMISSION(0x00000002),
+
+    //---------资金相关异常----
+    /**
+     * 达到商户充值限额
+     */
+    MERCHANT_RECHARGE_LIMIT_EXCEED(0x00000101);
+
+
 
 
 

@@ -57,4 +57,19 @@ public interface MerchantAccountTypeService {
      * @return
      */
     boolean moveDeductionsOrder();
+
+    /**
+     * 根据编码查询单条
+     * @param merCode
+     * @param merchantAccountTypeCode
+     * @return
+     */
+    MerchantAccountType queryOneByCode(String merCode, String merchantAccountTypeCode);
+
+    /**
+     * 查询商户下的所有MerchantAccountType
+     * @param merCode
+     * @return
+     */
+    List<MerchantAccountType> queryByMerCode(String merCode);
 }

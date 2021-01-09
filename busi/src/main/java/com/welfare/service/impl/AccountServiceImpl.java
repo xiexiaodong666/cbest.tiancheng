@@ -5,15 +5,19 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import  com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.dto.AccountDetailMapperDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.service.converter.AccountConverter;
+import com.welfare.service.dto.AccountBillDTO;
+import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountService;
@@ -98,5 +102,25 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean update(Account account) {
         return accountDao.updateById(account);
+    }
+
+    @Override
+    public Page<AccountBillDetailDTO> queryAccountBillDetail(Integer currentPage,Integer pageSize,
+        String accountCode, Date createTimeStart, Date createTimeEnd) {
+        Page<AccountBillDetailMapperDTO> page = new Page<>(currentPage,pageSize);
+        IPage<AccountBillDetailMapperDTO> iPage = accountCustomizeMapper.queryAccountBillDetail(page,accountCode,createTimeStart,createTimeEnd);
+        return accountConverter.toBillDetailPage(iPage);
+    }
+
+    @Override
+    public AccountBillDTO quertBill(String accountCode, Date createTimeStart, Date createTimeEnd) {
+        AccountBillDTO accountBillDTO = new AccountBillDTO();
+        QueryWrapper<Account> queryWrapper = new QueryWrapper();
+        queryWrapper.eq(Account.ACCOUNT_CODE,accountCode);
+        Account account = accountDao.getOne(queryWrapper);
+        accountBillDTO.setAccountBalance(account.getAccountBalance());
+        //TODO 账单笔数以及 账单总金额
+
+        return accountBillDTO;
     }
 }

@@ -74,4 +74,24 @@ WHERE
 	AND a.id = #{id}
   </select>
 
+	<select id="queryAccountBillDetail" resultType="com.welfare.persist.dto.AccountBillDetailMapperDTO">
+		SELECT
+	ss.store_name AS storeName,
+	abd.trans_type AS transType,
+	abd.trans_amount AS transAmount,
+	abd.create_time AS createTime,
+	abd.account_balance AS accountBalance
+FROM
+	account_bill_detail abd
+	LEFT JOIN supplier_store ss ON ss.store_code = abd.store_code
+WHERE
+	abd.account_code = #{accountCode}
+		<if test="createTimeStart != null ">
+			and acs.create_time <![CDATA[>=]]> #{createTimeStart}
+		</if>
+		<if test="createTimeEnd != null ">
+			and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
+		</if>
+	</select>
+
 </mapper>

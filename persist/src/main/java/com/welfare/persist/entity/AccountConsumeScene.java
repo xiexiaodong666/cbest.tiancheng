@@ -1,5 +1,6 @@
 package com.welfare.persist.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -80,7 +81,7 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic @TableField  
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic @TableField
     private Boolean deleted;
     /**
      * 版本

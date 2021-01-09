@@ -1,5 +1,6 @@
 package com.welfare.persist.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -58,7 +59,7 @@ public class Dict extends Model<Dict> implements Serializable {
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic @TableField  
+    @ApiModelProperty("删除标志") @TableLogic @TableField
     private Boolean deleted;
 
 //以下为列明常量

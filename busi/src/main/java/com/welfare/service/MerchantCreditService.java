@@ -38,6 +38,6 @@ public interface MerchantCreditService {
    * @param merchantCredit
    * @param amount
    */
-  void updateMerchantCredit(MerchantCredit merchantCredit,BigDecimal amount);
+  void updateMerchantRechargeCredit(MerchantCredit merchantCredit, BigDecimal amount);
 
 }

@@ -1,9 +1,6 @@
 package com.welfare.service.impl;
 
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountAmountTypeDao;
-import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.AccountAmountTypeService;
@@ -42,7 +39,7 @@ public class DepositServiceImpl implements DepositService {
         BigDecimal amount = deposit.getAmount();
 
         MerchantCredit merchantCredit = merchantCreditService.getByMerCode(deposit.getMerchantCode());
-        merchantCreditService.updateMerchantCredit(merchantCredit,amount);
+        merchantCreditService.updateMerchantRechargeCredit(merchantCredit,amount);
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(deposit.getAccountCode(),
                 deposit.getMerAccountTypeCode());
 
@@ -73,7 +70,7 @@ public class DepositServiceImpl implements DepositService {
 
                     MerchantCredit credit = merchantCreditService.getByMerCode(merCode);
 
-                    merchantCreditService.updateMerchantCredit(credit,totalAmountToDeposit);
+                    merchantCreditService.updateMerchantRechargeCredit(credit,totalAmountToDeposit);
 
                 });
     }

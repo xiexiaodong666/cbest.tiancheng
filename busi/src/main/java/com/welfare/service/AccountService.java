@@ -1,18 +1,16 @@
 package com.welfare.service;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
+import com.welfare.service.dto.AccountBillDTO;
+import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
-import com.welfare.service.dto.AccountReq;
-import org.apache.ibatis.annotations.Param;
-
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 账户信息服务接口
@@ -22,7 +20,7 @@ import java.math.BigDecimal;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface AccountService {
-    public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
+    Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
         AccountPageReq accountPageReq);
 
     /**
@@ -44,4 +42,9 @@ public interface AccountService {
 
     Boolean save(Account account);
     Boolean update(Account account);
+
+    Page<AccountBillDetailDTO> queryAccountBillDetail(Integer currentPage,Integer pageSize,
+        String accountCode, Date createTimeStart,Date createTimeEnd);
+
+    AccountBillDTO quertBill(String accountCode, Date createTimeStart,Date createTimeEnd);
 }

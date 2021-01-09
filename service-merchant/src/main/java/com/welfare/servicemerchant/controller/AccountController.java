@@ -4,12 +4,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
+import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountReq;
-import com.welfare.servicemerchant.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDepositApplyInfo;
+import com.welfare.service.dto.AccountBillDetailDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -124,14 +125,22 @@ public class AccountController implements IController {
   }
 
 
-  @GetMapping("/account/bill")
+  @GetMapping("/account/bill/page")
   @ApiOperation("员工账号消费汇总")
-  public R<Page<AccountBillDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
+  public R<Page<AccountBillDetailDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+      @RequestParam @ApiParam("accountCode") String accountCode,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    return null;
+    Page<AccountBillDetailDTO> result = accountService.queryAccountBillDetail(currentPage,pageSize,accountCode,createTimeStart,createTimeEnd);
+    return success(result);
+  }
+
+  @GetMapping("/account/bill")
+  public R<AccountBillDTO> quertBill(@RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+      @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
+    return success(accountService.quertBill(accountCode,createTimeStart,createTimeEnd));
   }
 
 

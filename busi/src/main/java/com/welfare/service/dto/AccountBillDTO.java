@@ -1,6 +1,7 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.AccountBillDetailDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -32,9 +33,4 @@ public class AccountBillDTO implements Serializable {
   @ApiModelProperty("目前余额")
   private BigDecimal accountBalance;
 
-  /**
-   * 账单明细
-   */
-  @ApiModelProperty("账单明细")
-  private Page<AccountBillDetailDTO> accountBillDetailDTOPage;
 }

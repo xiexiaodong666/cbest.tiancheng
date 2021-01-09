@@ -1,9 +1,10 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import lombok.Data;
 
 /**
  * @author yaoxiao
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
  * @date 2021/1/7 18:09
  */
 @ApiModel("用户流水明细DTO")
+@Data
 public class AccountBillDetailDTO implements Serializable {
   /**
    * 消费门店名称
@@ -19,10 +21,16 @@ public class AccountBillDetailDTO implements Serializable {
   private String storeName;
 
   /**
+   * 交易类型
+   */
+  @ApiModelProperty("交易类型")
+  private String transType;
+
+  /**
    * 交易总金额
    */
   @ApiModelProperty("交易总金额")
-  private BigDecimal transAllAmount;
+  private BigDecimal transAmount;
 
   /**
    * 账户余额

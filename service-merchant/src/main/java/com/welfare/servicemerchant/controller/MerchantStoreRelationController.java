@@ -8,6 +8,8 @@ import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.servicemerchant.dto.AdminMerchantStore;
 import com.welfare.servicemerchant.dto.AdminMerchantStoreRelationDTO;
+import com.welfare.servicemerchant.dto.MerchantStoreRelationAddReq;
+import com.welfare.servicemerchant.dto.MerchantStoreRelationDetailDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,6 +23,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -83,7 +86,7 @@ public class MerchantStoreRelationController implements IController {
 
   @GetMapping("/detail")
   @ApiOperation("后台查询消费门店详情")
-  public R<MerchantStoreRelation> detail(
+  public R<MerchantStoreRelationDetailDTO> detail(
       @RequestParam(required = false) @ApiParam("消费场景门店id") Long id) {
 
     return null;
@@ -91,7 +94,7 @@ public class MerchantStoreRelationController implements IController {
 
   @PostMapping
   @ApiOperation("新增消费门店配置")
-  public R<Boolean> addMerchantStore() {
+  public R<Boolean> addMerchantStore(@RequestBody MerchantStoreRelationAddReq relationAddReq) {
 
     return null;
   }

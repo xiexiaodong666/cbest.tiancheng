@@ -22,4 +22,15 @@ public class AdminMerchantStore {
    */
   @ApiModelProperty("门店别名")
   private String storeAlias;
+
+  /**
+   * 消费方式
+   */
+  @ApiModelProperty("消费方式,json"
+      + "{"
+      + "  \"o2o\": true,"
+      + "  \"onlineMall\": true,"
+      + "  \"shopShopping\": false"
+      + "}")
+  private String consumType;
 }

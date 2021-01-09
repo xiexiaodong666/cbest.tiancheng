@@ -73,7 +73,7 @@ public class AccountDepositApplyController implements IController {
                              @RequestParam @ApiParam(name = "文件id",required = true) String fileId,
                              @RequestParam @ApiParam("申请备注") String applyRemark,
                              @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
-                             @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeName) {
+                             @RequestParam @ApiParam(name = "福利类型名称",required = true) String merAccountTypeName) {
     DepositApplyUpdateRequest requst = new DepositApplyUpdateRequest();
     requst.setId(id);
     requst.setApplyRemark(applyRemark);

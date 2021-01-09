@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 用户交易流水明细表(account_deduction_detail)实体类
+ * (settle_detail)实体类
  *
  * @author Yuxiang Li
  * @since 2021-01-09 14:52:38
@@ -27,9 +27,9 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("account_deduction_detail")
-@ApiModel("用户交易流水明细表")
-public class AccountDeductionDetail extends Model<AccountDeductionDetail> implements Serializable {
+@TableName("settle_detail")
+@ApiModel("")
+public class SettleDetail extends Model<SettleDetail> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -37,77 +37,117 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Long id;
+	private Integer id;
     /**
-     * 员工账号
+     * 订单编码
      */
-    @ApiModelProperty("员工账号")   
-    private String accountCode;
-    /**
-     * 卡号
-     */
-    @ApiModelProperty("卡号")   
-    private String cardId;
+    @ApiModelProperty("订单编码")   
+    private Integer orderId;
     /**
      * 交易流水号
      */
     @ApiModelProperty("交易流水号")   
-    private String transNo;
+    private Integer transNo;
     /**
-     * 消费门店
+     * 账户
      */
-    @ApiModelProperty("消费门店")   
+    @ApiModelProperty("账户")   
+    private String accountCode;
+    /**
+     * 账户名称
+     */
+    @ApiModelProperty("账户名称")   
+    private String accountName;
+    /**
+     * 卡号
+     */
+    @ApiModelProperty("卡号")   
+    private Integer cardId;
+    /**
+     * 商户代码
+     */
+    @ApiModelProperty("商户代码")   
+    private String merCode;
+    /**
+     * 商户名称
+     */
+    @ApiModelProperty("商户名称")   
+    private String merName;
+    /**
+     * 门店编码
+     */
+    @ApiModelProperty("门店编码")   
     private String storeCode;
     /**
-     * 交易类型(消费、退款、充值等)
+     * 门店名称
      */
-    @ApiModelProperty("交易类型(消费、退款、充值等)")   
-    private BigDecimal transType;
-    /**
-     * pos标识
-     */
-    @ApiModelProperty("pos标识")   
-    private String pos;
-    /**
-     * 交易总金额
-     */
-    @ApiModelProperty("交易总金额")   
-    private BigDecimal transAmount;
+    @ApiModelProperty("门店名称")   
+    private String stroeName;
     /**
      * 交易时间
      */
     @ApiModelProperty("交易时间")   
     private Date transTime;
     /**
+     * pos机器编码
+     */
+    @ApiModelProperty("pos机器编码")   
+    private String pos;
+    /**
      * 支付编码
      */
     @ApiModelProperty("支付编码")   
     private String payCode;
     /**
-     * 子账户类型(例如餐费、交通费等)
+     * 支付名称
      */
-    @ApiModelProperty("子账户类型(例如餐费、交通费等)")   
-    private BigDecimal merAccountType;
+    @ApiModelProperty("支付名称")   
+    private String payName;
+    /**
+     * 交易类型
+     */
+    @ApiModelProperty("交易类型")   
+    private String transType;
+    /**
+     * 交易类型名
+     */
+    @ApiModelProperty("交易类型名")   
+    private String transTypeName;
+    /**
+     * 交易金额
+     */
+    @ApiModelProperty("交易金额")   
+    private BigDecimal transAmount;
+    /**
+     * 福利类型(餐费、交通费等)
+     */
+    @ApiModelProperty("福利类型(餐费、交通费等)")   
+    private String merAccountType;
+    /**
+     * 福利类型(餐费、交通费等)
+     */
+    @ApiModelProperty("福利类型(餐费、交通费等)")   
+    private String merAccountTypeName;
     /**
      * 子账户扣款金额
      */
     @ApiModelProperty("子账户扣款金额")   
-    private BigDecimal accountDeductionAmount;
+    private BigDecimal accountAmount;
     /**
-     * 子账户剩余金额
+     * 子账户余额
      */
-    @ApiModelProperty("子账户剩余金额")   
-    private BigDecimal accountDeductionBalance;
+    @ApiModelProperty("子账户余额")   
+    private BigDecimal accountBalance;
     /**
      * 商户余额扣款金额
      */
     @ApiModelProperty("商户余额扣款金额")   
     private BigDecimal merDeductionAmount;
     /**
-     * 商户额度扣款金额
+     * 商户信用扣款金额
      */
-    @ApiModelProperty("商户额度扣款金额")   
-    private BigDecimal merDeductionCreditAmount;
+    @ApiModelProperty("商户信用扣款金额")   
+    private BigDecimal merCreditDeductionAmount;
     /**
      * 自费扣款金额
      */
@@ -135,11 +175,6 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     @TableField(update = "now()")
 	private Date updateTime;
     /**
-     * 删除标志  1-删除、0-未删除
-     */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic @TableField  
-    private Boolean deleted;
-    /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
@@ -148,65 +183,97 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
 //以下为列明常量
 
     /**
-    * id
+    * 
     */
     public static final String ID = "id";
     /**
-    * 员工账号
+    * 订单编码
     */
-    public static final String ACCOUNT_CODE = "account_code";
-    /**
-    * 卡号
-    */
-    public static final String CARD_ID = "card_id";
+    public static final String ORDER_ID = "order_id";
     /**
     * 交易流水号
     */
     public static final String TRANS_NO = "trans_no";
     /**
-    * 消费门店
+    * 账户
+    */
+    public static final String ACCOUNT_CODE = "account_code";
+    /**
+    * 账户名称
+    */
+    public static final String ACCOUNT_NAME = "account_name";
+    /**
+    * 卡号
+    */
+    public static final String CARD_ID = "card_id";
+    /**
+    * 商户代码
+    */
+    public static final String MER_CODE = "mer_code";
+    /**
+    * 商户名称
+    */
+    public static final String MER_NAME = "mer_name";
+    /**
+    * 门店编码
     */
     public static final String STORE_CODE = "store_code";
     /**
-    * 交易类型(消费、退款、充值等)
+    * 门店名称
     */
-    public static final String TRANS_TYPE = "trans_type";
-    /**
-    * pos标识
-    */
-    public static final String POS = "pos";
-    /**
-    * 交易总金额
-    */
-    public static final String TRANS_AMOUNT = "trans_amount";
+    public static final String STROE_NAME = "stroe_name";
     /**
     * 交易时间
     */
     public static final String TRANS_TIME = "trans_time";
     /**
+    * pos机器编码
+    */
+    public static final String POS = "pos";
+    /**
     * 支付编码
     */
     public static final String PAY_CODE = "pay_code";
     /**
-    * 子账户类型(例如餐费、交通费等)
+    * 支付名称
+    */
+    public static final String PAY_NAME = "pay_name";
+    /**
+    * 交易类型
+    */
+    public static final String TRANS_TYPE = "trans_type";
+    /**
+    * 交易类型名
+    */
+    public static final String TRANS_TYPE_NAME = "trans_type_name";
+    /**
+    * 交易金额
+    */
+    public static final String TRANS_AMOUNT = "trans_amount";
+    /**
+    * 福利类型(餐费、交通费等)
     */
     public static final String MER_ACCOUNT_TYPE = "mer_account_type";
     /**
+    * 福利类型(餐费、交通费等)
+    */
+    public static final String MER_ACCOUNT_TYPE_NAME = "mer_account_type_name";
+    /**
     * 子账户扣款金额
     */
-    public static final String ACCOUNT_DEDUCTION_AMOUNT = "account_deduction_amount";
+    public static final String ACCOUNT_AMOUNT = "account_amount";
     /**
-    * 子账户剩余金额
+    * 子账户余额
     */
-    public static final String ACCOUNT_DEDUCTION_BALANCE = "account_deduction_balance";
+    public static final String ACCOUNT_BALANCE = "account_balance";
     /**
     * 商户余额扣款金额
     */
     public static final String MER_DEDUCTION_AMOUNT = "mer_deduction_amount";
     /**
-    * 商户额度扣款金额
+    * 商户信用扣款金额
     */
-    public static final String MER_DEDUCTION_CREDIT_AMOUNT = "mer_deduction_credit_amount";
+    public static final String MER_CREDIT_DEDUCTION_AMOUNT = "mer_credit_deduction_amount";
     /**
     * 自费扣款金额
     */
@@ -227,10 +294,6 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     * 更新时间
     */
     public static final String UPDATE_TIME = "update_time";
-    /**
-    * 删除标志  1-删除、0-未删除
-    */
-    public static final String DELETED = "deleted";
     /**
     * 版本
     */

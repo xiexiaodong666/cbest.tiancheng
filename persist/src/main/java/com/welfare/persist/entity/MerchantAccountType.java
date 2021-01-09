@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -21,7 +20,7 @@ import lombok.experimental.Accessors;
  * 商户福利类型(merchant_account_type)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 14:23:38
+ * @since 2021-01-09 14:52:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data

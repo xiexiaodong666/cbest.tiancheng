@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -21,7 +20,7 @@ import lombok.experimental.Accessors;
  * 商户消费场景配置(merchant_store_relation)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 14:23:39
+ * @since 2021-01-09 14:52:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -51,12 +50,7 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
     /**
      * 消费方式
      */
-    @ApiModelProperty("消费方式,json"
-        + "{"
-        + "  \"o2o\": true,"
-        + "  \"onlineMall\": true,"
-        + "  \"shopShopping\": false"
-        + "}")
+    @ApiModelProperty("消费方式")   
     private String consumType;
     /**
      * 门店别名

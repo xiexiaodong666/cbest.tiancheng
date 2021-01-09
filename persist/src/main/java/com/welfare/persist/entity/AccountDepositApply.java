@@ -150,6 +150,13 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      */
     @ApiModelProperty("merAccountTypeCode")
     private String merAccountTypeCode;
+
+
+    /**
+     * 福利余额名称
+     */
+    @ApiModelProperty("merAccountTypeName")
+    private String merAccountTypeName;
 //以下为列明常量
 
     /**
@@ -244,5 +251,9 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      * 福利余额类型
      */
     public static final String MER_ACCOUNT_TYPE_CODE = "mer_account_type_code";
+    /**
+     * 福利余额名称
+     */
+    public static final String MER_ACCOUNT_TYPE_NAM = "mer_account_type_name";
 
 }

@@ -17,4 +17,5 @@ public interface AccountDepositApplyDetailService {
 
   List<AccountDepositApplyDetail> listByApplyCode(String applyCode);
 
+  Boolean delByApplyCode(String applyCode);
 }

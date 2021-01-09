@@ -32,4 +32,11 @@ public class AccountDepositApplyDetailServiceImpl implements AccountDepositApply
         query.eq(AccountDepositApplyDetail.APPLY_CODE, applyCode);
         return accountDepositApplyDetailDao.list(query);
     }
+
+    @Override
+    public Boolean delByApplyCode(String applyCode) {
+        QueryWrapper<AccountDepositApplyDetail> query = new QueryWrapper<>();
+        query.eq(AccountDepositApplyDetail.APPLY_CODE, applyCode);
+        return accountDepositApplyDetailDao.remove(query);
+    }
 }

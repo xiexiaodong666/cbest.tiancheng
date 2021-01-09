@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.TempAccountDepositApplyMapper">
+    <sql id="tableName">
+        temp_account_deposit_apply
+    </sql>
+
+    <sql id="baseColumn">
+        id,file_id,account_code,recharge_amount,request_id
+    </sql>
+
+    <resultMap id="tempAccountDepositApplyDTO" type="com.welfare.persist.dto.TempAccountDepositApplyDTO">
+        <id property="id" column="id" />
+        <result property="accountCode" column="account_code"/>
+        <result property="accountName" column="account_name"/>
+        <result property="rechargeAmount" column="recharge_amount"/>
+        <result property="departmentCode" column="store_code"/>
+        <result property="departmentName" column="department_name"/>
+    </resultMap>
+
+    <select id="pageByFileId" resultMap="tempAccountDepositApplyDTO">
+        SELECT
+         t.id,
+         a.account_name,
+         t.account_code,
+         t.recharge_amount,
+         a.store_code,
+         de.department_name
+        from temp_account_deposit_apply t
+            LEFT JOIN account a ON t.account_code = a.account_code
+            LEFT JOIN department de ON de.department_code = a.store_code
+        where file_id = #{fileId}
+    </select>
+</mapper>

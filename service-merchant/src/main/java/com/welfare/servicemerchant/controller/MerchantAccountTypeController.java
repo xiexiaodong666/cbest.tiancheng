@@ -5,7 +5,7 @@ import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.dto.MerchantAccountTypePageReq;
 import com.welfare.service.dto.MerchantAccountTypeReq;
-import com.welfare.service.dto.MerchantPageReq;
+import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.servicemerchant.converter.MerchantAccountTypeConverter;
 import com.welfare.servicemerchant.dto.MerchantAccountTypeInfo;
 import io.swagger.annotations.Api;

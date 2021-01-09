@@ -76,11 +76,13 @@ public class FileUploadService {
    * @return path
    * @throws IOException
    */
-  public String uploadExcelFile(List<Object> list, Class cla, String fileName) throws IOException {
+  public String uploadExcelFile(List list, Class cla, String fileName) throws IOException {
     String path = null;
     ByteArrayOutputStream outputStream = null;
     try {
-      fileName = fileName + ".xlsx";
+      Date date = new Date();
+      SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmssS");
+      fileName = fileName + "-" + format.format(date) +  ".xlsx";
       outputStream = new ByteArrayOutputStream();
       EasyExcel.write(outputStream, cla).sheet().doWrite(list);
       ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());

@@ -37,6 +37,13 @@ public class DepositApplyUpdateRequest {
   @NotEmpty(message = "余额类型为空")
   private String merAccountTypeCode;
 
+  /**
+   * 福利类型名称
+   */
+  @ApiModelProperty("福利类型名称")
+  @NotEmpty(message = "余额类型名称为空")
+  private String merAccountTypeName;
+
   @ApiModelProperty("申请员工额度信息")
   private AccountDepositRequest info;
 }

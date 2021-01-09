@@ -1,11 +1,10 @@
 package com.welfare.servicemerchant.controller;
 
 import com.welfare.common.annotation.MerchantUser;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.entity.Department;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.dto.DepartmentReq;
+import com.welfare.service.dto.DepartmentTree;
 import com.welfare.servicemerchant.converter.DepartmentConverter;
 import com.welfare.servicemerchant.dto.DepartmentInfo;
 import io.swagger.annotations.Api;
@@ -44,6 +43,12 @@ public class DepartmentController implements IController {
     @MerchantUser
     public R<List<DepartmentInfo>> list(@Valid DepartmentReq req){
         return R.success(departmentConverter.toD(departmentService.list(req)));
+    }
+
+    @GetMapping("/tree")
+    @ApiOperation("根据商户代码查询商户部门列表（树形）")
+    public R<List<DepartmentTree>> tree(String merCode){
+        return R.success(departmentService.tree(merCode));
     }
 
     @GetMapping("/detail")

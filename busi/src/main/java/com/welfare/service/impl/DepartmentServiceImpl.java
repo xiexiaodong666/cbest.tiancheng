@@ -5,8 +5,11 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.MerchantUserHolder;
 import  com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.entity.Department;
+import com.welfare.service.converter.DepartmentTreeConverter;
 import com.welfare.service.dto.DepartmentReq;
+import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.helper.QueryHelper;
+import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.DepartmentService;
@@ -27,6 +30,7 @@ import java.util.List;
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentDao departmentDao;
+    private final DepartmentTreeConverter departmentTreeConverter;
 
     @Override
     public List<Department> list(DepartmentReq req) {
@@ -68,4 +72,19 @@ public class DepartmentServiceImpl implements DepartmentService {
         queryWrapper.eq(Department.DEPARTMENT_CODE, departmentCode);
         return departmentDao.getOne(queryWrapper);
     }
+
+    @Override
+    public List<DepartmentTree> tree(String merCode) {
+        DepartmentReq req=new DepartmentReq();
+        req.setMerCode(merCode);
+        List<DepartmentTree> treeDTOList=departmentTreeConverter.toD(this.list(req));
+        treeDTOList.forEach(item-> {
+            item.setCode(item.getDepartmentCode());
+            item.setParentCode(item.getDepartmentParent());
+
+        });
+        TreeUtil treeUtil=new TreeUtil(treeDTOList,"0");
+        return treeUtil.getTree();
+    }
+
 }

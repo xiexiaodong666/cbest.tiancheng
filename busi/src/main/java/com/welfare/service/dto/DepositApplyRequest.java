@@ -39,7 +39,7 @@ public class DepositApplyRequest {
   private String merAccountTypeCode;
 
   /**
-   * 福利类型
+   * 福利类型名称
    */
   @ApiModelProperty("福利类型名称")
   @NotEmpty(message = "余额类型名称为空")

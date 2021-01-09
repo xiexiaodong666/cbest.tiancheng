@@ -32,6 +32,25 @@ public interface AccountDepositApplyService {
   Long save(DepositApplyRequest request, List<AccountDepositRequest> accountAmounts,
             MerchantUserInfo merchantUserInfo, ApprovalType approvalType);
 
+
+  /**
+   * 新增员工账号充值申请
+   * @param request
+   * @param merchantUserInfo
+   * @return
+   */
+  Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUserInfo);
+
+  /**
+   * 新增员工账号充值申请
+   * @param request 申请基础信息
+   * @param fileId fileId
+   * @param merchantUserInfo 商户信息
+   * @return
+   */
+  Long saveBatch(DepositApplyRequest request, String fileId, MerchantUserInfo merchantUserInfo);
+
+
   /**
    * 修改员工账号充值申请
    * @param request 修改申请基础信息

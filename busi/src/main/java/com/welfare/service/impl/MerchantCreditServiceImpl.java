@@ -46,7 +46,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService {
     }
 
     @Override
-    public void updateMerchantRechargeCredit(String merCode, BigDecimal amount) {
+    public void decreaseRechargeCredit(String merCode, BigDecimal amount) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
@@ -60,6 +60,18 @@ public class MerchantCreditServiceImpl implements MerchantCreditService {
         } finally {
             lock.unlock();
         }
+    }
 
+    @Override
+    public void increaseRechargeCredit(String merCode, BigDecimal amount) {
+        RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
+        lock.lock();
+        try{
+            MerchantCredit merchantCredit = this.getByMerCode(merCode);
+            merchantCredit.setRechargeLimit(merchantCredit.getRechargeLimit().subtract(amount));
+            merchantCreditDao.updateById(merchantCredit);
+        } finally {
+            lock.unlock();
+        }
     }
 }

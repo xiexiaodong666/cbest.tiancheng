@@ -31,10 +31,17 @@ public interface MerchantCreditService {
   MerchantCredit getByMerCode(String merCode);
 
   /**
-   * 更新充值额度
+   * 扣减充值额度
    * @param merCode
    * @param amount
    */
-  void updateMerchantRechargeCredit(String merCode, BigDecimal amount);
+  void decreaseRechargeCredit(String merCode, BigDecimal amount);
+
+  /**
+   * 增加充值额度
+   * @param merCode
+   * @param amount
+   */
+  void increaseRechargeCredit(String merCode, BigDecimal amount);
 
 }

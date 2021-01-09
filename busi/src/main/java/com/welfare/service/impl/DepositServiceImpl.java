@@ -2,7 +2,6 @@ package com.welfare.service.impl;
 
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.DepositService;
 import com.welfare.service.MerchantCreditService;
@@ -37,7 +36,7 @@ public class DepositServiceImpl implements DepositService {
     @Transactional(rollbackFor = Exception.class)
     public void deposit(Deposit deposit) {
         BigDecimal amount = deposit.getAmount();
-        merchantCreditService.updateMerchantRechargeCredit(deposit.getMerchantCode(),amount);
+        merchantCreditService.decreaseRechargeCredit(deposit.getMerchantCode(),amount);
         updateAccountAmountType(deposit);
 
     }
@@ -48,6 +47,7 @@ public class DepositServiceImpl implements DepositService {
 
         if(Objects.isNull(accountAmountType)){
             accountAmountType = deposit.toNewAccountAmountType();
+            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()))
             accountAmountTypeDao.save(accountAmountType);
         }else{
             accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
@@ -69,7 +69,7 @@ public class DepositServiceImpl implements DepositService {
                             .map(Deposit::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
                     String merCode = entry.getKey();
-                    merchantCreditService.updateMerchantRechargeCredit(merCode,totalAmountToDeposit);
+                    merchantCreditService.decreaseRechargeCredit(merCode,totalAmountToDeposit);
                     singleMerDeposits.stream().forEach(deposit -> updateAccountAmountType(deposit));
                 });
     }

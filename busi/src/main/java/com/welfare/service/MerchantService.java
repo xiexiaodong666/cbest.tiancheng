@@ -1,6 +1,7 @@
 package com.welfare.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.service.dto.MerchantPageReq;
@@ -62,4 +63,13 @@ public interface MerchantService {
      * @return
      */
     String exportList(MerchantPageReq merchantPageReq);
+
+
+    /**
+     * 根据MerCode查询商户详情
+     * @param queryWrapper
+     * @return
+     */
+    Merchant getMerchantByMerCode(QueryWrapper<Merchant> queryWrapper);
+
 }

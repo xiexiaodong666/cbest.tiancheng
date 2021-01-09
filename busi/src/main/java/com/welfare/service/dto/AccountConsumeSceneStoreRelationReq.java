@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.Date;
+import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 
 /**
@@ -28,11 +29,13 @@ public class AccountConsumeSceneStoreRelationReq implements Serializable {
    * 门店编码
    */
   @ApiModelProperty("门店编码")
+  @NotEmpty(message = "门店编码编码为空")
   private String storeCode;
   /**
    * 消费方式
    */
   @ApiModelProperty("消费方式")
+  @NotEmpty(message = "消费方式编码为空")
   private String sceneConsumType;
   /**
    * 创建人

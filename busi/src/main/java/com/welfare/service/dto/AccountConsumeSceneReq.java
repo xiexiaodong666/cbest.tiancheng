@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.List;
+import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -26,11 +27,13 @@ public class AccountConsumeSceneReq implements Serializable {
    * 商户代码
    */
   @ApiModelProperty("商户代码")
+  @NotEmpty(message = "商户代码为空")
   private String merCode;
   /**
    * 员工类型编码
    */
   @ApiModelProperty("员工类型编码")
+  @NotEmpty(message = "员工类型编码为空")
   private Long accountTypeId;
 
   /**

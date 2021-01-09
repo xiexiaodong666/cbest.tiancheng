@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
@@ -13,7 +14,6 @@ import com.welfare.servicemerchant.dto.AccountConsumeSceneResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -59,8 +59,9 @@ public class AccountConsumeSceneController implements IController {
 
   @GetMapping("/{id}")
   @ApiOperation("员工消费配置详情")
-  public R<AccountConsumeSceneResp> detail(@PathVariable Long id){
-    return null;
+  public R<AccountConsumeSceneDTO> detail(@PathVariable Long id){
+    AccountConsumeSceneDTO accountConsumeSceneDTO = accountConsumeSceneService.findAccountConsumeSceneDTOById(id);
+    return success(accountConsumeSceneDTO);
   }
 
   @PostMapping("/save")

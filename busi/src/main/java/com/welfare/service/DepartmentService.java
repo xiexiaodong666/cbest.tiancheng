@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.welfare.persist.entity.Department;
 import com.welfare.service.dto.DepartmentReq;
+import com.welfare.service.dto.DepartmentTree;
 
 import java.util.List;
 
@@ -20,6 +21,13 @@ public interface DepartmentService {
      * @return
      */
     List<Department> list(DepartmentReq req);
+
+    /**
+     * 转换树形结构
+     * @param merCode
+     * @return
+     */
+    List<DepartmentTree> tree(String merCode);
 
     /**
      * 查询商户详情

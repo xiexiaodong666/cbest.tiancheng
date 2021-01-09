@@ -1,9 +1,7 @@
-package com.welfare.serviceaccount.domain;
+package com.welfare.service.dto;
 
 import com.welfare.common.util.BarcodeUtil;
 import io.swagger.annotations.ApiModel;
-import jodd.util.MathUtil;
-import jodd.util.StringUtil;
 import lombok.Data;
 
 import java.util.Calendar;

@@ -1,9 +1,12 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
+import com.welfare.service.AccountService;
+import com.welfare.service.dto.AccountPageReq;
 import com.welfare.servicemerchant.dto.AccountBillDTO;
-import com.welfare.servicemerchant.dto.AccountDTO;
+import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDepositApplyInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +39,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(tags = "员工账号管理")
 public class AccountController implements IController {
 
+  @Autowired
+  private AccountService accountService;
+
 
   @GetMapping("/incremental-page")
   @ApiOperation("增量查询账户(支持离线消费场景)")
@@ -49,30 +56,10 @@ public class AccountController implements IController {
   @ApiOperation("分页查询账户")
   public R<Page<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("商户编码") String merCode,
-      @RequestParam(required = false) @ApiParam("员工姓名") String accountName,
-      @RequestParam(required = false) @ApiParam("所属部门") String storeCode,
-      @RequestParam(required = false) @ApiParam("账号状态") Integer accountStatus,
-      @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeCode) {
-       /* Page<AccountDTO> page = new Page(currentPage,pageSize);
-
-        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-        if(Strings.isNotEmpty(accountName)){
-            queryWrapper.eq(Account.ACCOUNT_NAME,accountName);
-        }
-        if(Strings.isNotEmpty(accountName)){
-            queryWrapper.eq(Account.MER_CODE,merCode);
-        }
-        if(Strings.isNotEmpty(accountName)){
-            queryWrapper.eq(Account.ACCOUNT_STATUS,accountStatus);
-        }
-        if(Strings.isNotEmpty(accountName)){
-            queryWrapper.eq(Account.FLAG,flag);
-        }
-
-        Page<Account> accountPage = accountService.pageQuery(page, queryWrapper);
-        return success(accountPage);*/
-    return null;
+      AccountPageReq accountPageReq) {
+       Page<AccountPageDTO> page = new Page(currentPage,pageSize);
+        Page<AccountDTO> accountPage = accountService.getPageDTO(page,accountPageReq);
+        return success(accountPage);
   }
 
   @GetMapping("/{id}")
@@ -96,15 +83,15 @@ public class AccountController implements IController {
 
   @PostMapping("/delete/{id}")
   @ApiOperation("删除员工账号")
-  public R<Boolean> delete(@PathVariable Integer id){
-    return null;
+  public R<Boolean> delete(@PathVariable Long id){
+    return success(accountService.delete(id));
   }
 
 
   @PostMapping("/active/{id}")
-  @ApiOperation("激活员工账号")
-  public R<Boolean> active(@PathVariable Integer id,@RequestParam @ApiParam("状态") Integer state){
-    return null;
+  @ApiOperation("激活或锁定账号")
+  public R<Boolean> active(@PathVariable Long id,@RequestParam @ApiParam("状态") Integer active){
+    return success(accountService.active(id,active));
   }
 
   @ApiOperation("员工账号导出")

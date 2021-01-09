@@ -1,4 +1,4 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -17,22 +17,19 @@ import lombok.Data;
 @Data
 @ApiModel("账户信息")
 public class AccountDTO implements Serializable {
+
+
+
+
+
+
   /**
    * id
    */
   @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
   @TableId
   private Long id;
-  /**
-   * 所属商户
-   */
-  @ApiModelProperty("所属商户")
-  private String merCode;
-  /**
-   * 商户名称
-   */
-  @ApiModelProperty("商户名称")
-  private String merName;
+
   /**
    * 员工名称
    */
@@ -43,11 +40,7 @@ public class AccountDTO implements Serializable {
    */
   @ApiModelProperty("员工账号")
   private String accountCode;
-  /**
-   * 员工状态
-   */
-  @ApiModelProperty("员工状态")
-  private String staffStatus;
+
   /**
    * 账号状态
    */
@@ -56,38 +49,41 @@ public class AccountDTO implements Serializable {
   /**
    * 所属部门
    */
-  @ApiModelProperty("所属部门")
-  private String storeCode;
+  @ApiModelProperty("所属部门Code")
+  private String departmentCode;
   /**
-   * 员工类型编码
+   * 所属部门
    */
-  @ApiModelProperty("员工类型编码")
-  private String accountTypeCode;
+  @ApiModelProperty("所属部门")
+  private String departmentName;
   /**
    * 员工类型编码名称
    */
   @ApiModelProperty("员工类型编码名称")
   private String accountTypeName;
+
   /**
-   * 是否绑卡
+   * 最大授权额度
    */
-  @ApiModelProperty("是否绑卡")
-  private Integer binding;
+  @ApiModelProperty("最大授权额度")
+  private BigDecimal maxQuota;
+  /**
+   * 剩余授权额度
+   */
+  @ApiModelProperty("剩余授权额度")
+  private BigDecimal surplusQuota;
   /**
    * 员工卡号
    */
   @ApiModelProperty("员工卡号(如果存在多个逗号分隔)")
-  private String cardInfo;
+  private String cardId;
+
   /**
    * 账户余额
    */
   @ApiModelProperty("账户余额")
   private BigDecimal accountBalance;
-  /**
-   * 手机号
-   */
-  @ApiModelProperty("手机号")
-  private String phone;
+
   /**
    * 是否激活
    */

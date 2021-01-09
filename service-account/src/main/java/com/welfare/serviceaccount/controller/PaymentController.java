@@ -39,18 +39,7 @@ public class PaymentController implements IController {
     private final BarcodeSaltService barcodeSaltService;
     @PostMapping
     @ApiOperation("支付")
-    @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "header", dataType = "String", name = "Signature",
-                    value = "验签算法为md5(hmac1(originalStr)),规则为按照SignatureFields所示字段取值拼接"
-            ),
-            @ApiImplicitParam(paramType = "header", dataType = "String", name = "SignatureFields",
-                    value = "用来生成签名的属性，从paymentRequest中取值." +
-                            "requestId,transNo,amount表明按照requestId,transNo,amount的顺序进行拼接作为验签源",
-                    example = "requestId,transNo,amount"
-            )
-    })
-    public R<PaymentRequest> newPaymentRequest(@RequestHeader("Signature") String signature,
-                                               @RequestBody PaymentRequest paymentRequest) {
+    public R<PaymentRequest> newPaymentRequest(@RequestBody PaymentRequest paymentRequest) {
         Map<String, Object> map = BeanUtil.toMap(paymentRequest);
         return success(paymentRequest);
     }
@@ -64,18 +53,7 @@ public class PaymentController implements IController {
 
     @PostMapping("/refund")
     @ApiOperation("退款")
-    @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "header", dataType = "String", name = "Signature",
-                    value = "验签算法为md5(hmac1(originalStr)),规则为按照SignatureFields所示字段取值拼接"
-            ),
-            @ApiImplicitParam(paramType = "header", dataType = "String", name = "SignatureFields",
-                    value = "用来生成签名的属性，从refundRequest中取值." +
-                            "requestId,transNo,amount表明按照requestId,transNo,amount的顺序进行拼接作为验签源",
-                    example = "requestId,transNo,amount"
-            )
-    })
-    public R<RefundRequest> newPaymentRequest(@RequestHeader("Signature") String signature,
-                                               @RequestBody RefundRequest refundRequest) {
+    public R<RefundRequest> newPaymentRequest(@RequestBody RefundRequest refundRequest) {
         Map<String, Object> map = BeanUtil.toMap(refundRequest);
         return success(refundRequest);
     }

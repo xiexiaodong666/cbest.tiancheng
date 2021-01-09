@@ -53,9 +53,9 @@ public class BarcodeSaltServiceImpl implements BarcodeSaltService {
     private void generateIfNeeded(List<BarcodeSalt> barcodeSalts) {
         if(barcodeSalts.size() < MAX_PERIOD_GENERATE){
             //全局只能有一个线程在执行生成逻辑
-            RLock lock = redissonClient.getLock(RedisKeyConstant.GENERATE_BARCODE_SALT_LOCK);
+            RLock lock = redissonClient.getFairLock(RedisKeyConstant.GENERATE_BARCODE_SALT_LOCK);
+            lock.lock();
             try{
-                lock.lock();
                 //让事务生效,直接this调用没有aop织入事务
                 BarcodeSaltService bean = SpringBeanUtils.getBean(BarcodeSaltService.class);
                 bean.batchGenerate();

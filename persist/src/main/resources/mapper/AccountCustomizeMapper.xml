@@ -46,4 +46,32 @@ FROM
     GROUP BY a.account_code
   </select>
 
+  <select id ="queryDetail" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
+    SELECT
+	a.id,
+	a.account_name AS accountName,
+	a.account_code AS accountCode,
+	a.account_status AS accountStatus,
+	a.active,
+	AT.type_name AS accountTypeName,
+	d.department_code AS departmentCode,
+	d.department_name AS departmentName,
+	m.mer_code AS merCode,
+	m.mer_name AS merName,
+	a.max_quota AS maxQuota,
+	a.surplus_quota AS surplusQuota,
+	a.account_balance AS accountBalance,
+	a.remark
+FROM
+	account a
+	INNER JOIN department d ON a.store_code = d.department_code
+	INNER JOIN merchant m ON a.mer_code = m.mer_code
+	LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
+WHERE
+	a.deleted = 0
+	AND d.deleted = 0
+	AND AT.deleted = 0
+	AND a.id = #{id}
+  </select>
+
 </mapper>

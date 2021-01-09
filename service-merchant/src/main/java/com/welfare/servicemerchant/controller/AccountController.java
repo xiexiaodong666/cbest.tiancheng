@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
+import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
+import com.welfare.service.dto.AccountReq;
 import com.welfare.servicemerchant.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDepositApplyInfo;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,21 +67,25 @@ public class AccountController implements IController {
 
   @GetMapping("/{id}")
   @ApiOperation("员工账号详情")
-  public R<AccountDTO> detail(@PathVariable Long id){
-    return null;
+  public R<AccountDetailDTO> detail(@PathVariable Long id){
+    return success(accountService.queryDetail(id));
   }
 
   @PostMapping("/save")
   @ApiOperation("新增员工账号")
-  public R<AccountDTO> save(@RequestBody Account account){
-    return null;
+  public R<Boolean> save(@RequestBody AccountReq accountReq){
+    Account account = new Account();
+    BeanUtils.copyProperties(accountReq,account);
+    return success(accountService.save(account));
   }
 
 
   @PostMapping("/update")
   @ApiOperation("修改员工账号")
-  public R<AccountDTO> update(@RequestBody Account account){
-    return null;
+  public R<Boolean> update(@RequestBody AccountReq accountReq){
+    Account account = new Account();
+    BeanUtils.copyProperties(accountReq,account);
+    return success(accountService.update(account));
   }
 
   @PostMapping("/delete/{id}")

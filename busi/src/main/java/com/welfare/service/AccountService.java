@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.dto.AccountDTO;
+import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
+import com.welfare.service.dto.AccountReq;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -37,4 +39,9 @@ public interface AccountService {
     Boolean delete(Long id);
 
     Boolean active(Long id,Integer active);
+
+    AccountDetailDTO queryDetail(Long id);
+
+    Boolean save(Account account);
+    Boolean update(Account account);
 }

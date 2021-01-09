@@ -5,20 +5,24 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import  com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.dto.AccountDetailMapperDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.service.converter.AccountConverter;
 import com.welfare.service.dto.AccountDTO;
+import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 账户信息服务接口实现
@@ -57,6 +61,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean delete(Long id) {
         UpdateWrapper<Account> updateWrapper = new UpdateWrapper();
         updateWrapper.eq(Account.ID,id);
@@ -66,11 +71,32 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean active(Long id, Integer active) {
         UpdateWrapper<Account> updateWrapper = new UpdateWrapper();
         updateWrapper.eq(Account.ID,id);
         Account account = new Account();
         account.setActive(active);
         return accountDao.update(updateWrapper);
+    }
+
+    @Override
+    public AccountDetailDTO queryDetail(Long id) {
+        AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetail(id);
+        AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
+        BeanUtils.copyProperties(accountDetailMapperDTO,accountDetailDTO);
+        return accountDetailDTO;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean save(Account account) {
+        return accountDao.save(account);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean update(Account account) {
+        return accountDao.updateById(account);
     }
 }

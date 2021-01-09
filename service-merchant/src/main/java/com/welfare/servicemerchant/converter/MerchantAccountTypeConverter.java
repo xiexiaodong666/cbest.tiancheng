@@ -1,6 +1,7 @@
 package com.welfare.servicemerchant.converter;
 
 import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.service.converter.BaseConverter;
 import com.welfare.servicemerchant.dto.MerchantAccountTypeInfo;
 import org.mapstruct.Mapper;
 

@@ -19,7 +19,7 @@ public interface DepositService {
     void deposit(Deposit deposit);
 
     /**
-     * 充值
+     * 充值 批量
      * @param deposits
      */
     void deposit(List<Deposit> deposits);

@@ -5,6 +5,7 @@ import com.welfare.service.dto.Deposit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,11 +22,13 @@ import java.util.List;
 public class DepositServiceImpl implements DepositService {
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deposit(Deposit deposit) {
 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deposit(List<Deposit> deposits) {
 
     }

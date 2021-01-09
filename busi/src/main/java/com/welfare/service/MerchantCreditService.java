@@ -1,10 +1,7 @@
 package com.welfare.service;
 
 
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
-import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 
@@ -35,9 +32,9 @@ public interface MerchantCreditService {
 
   /**
    * 更新充值额度
-   * @param merchantCredit
+   * @param merCode
    * @param amount
    */
-  void updateMerchantRechargeCredit(MerchantCredit merchantCredit, BigDecimal amount);
+  void updateMerchantRechargeCredit(String merCode, BigDecimal amount);
 
 }

@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantCreditService;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -47,10 +46,11 @@ public class MerchantCreditServiceImpl implements MerchantCreditService {
     }
 
     @Override
-    public void updateMerchantRechargeCredit(MerchantCredit merchantCredit, BigDecimal amount) {
-        RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merchantCredit.getMerCode());
+    public void updateMerchantRechargeCredit(String merCode, BigDecimal amount) {
+        RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
+            MerchantCredit merchantCredit = this.getByMerCode(merCode);
             BigDecimal rechargeLimit = merchantCredit.getRechargeLimit();
             if (rechargeLimit.subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
                 throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "充值额度不足", null);

@@ -37,9 +37,12 @@ public class DepositServiceImpl implements DepositService {
     @Transactional(rollbackFor = Exception.class)
     public void deposit(Deposit deposit) {
         BigDecimal amount = deposit.getAmount();
+        merchantCreditService.updateMerchantRechargeCredit(deposit.getMerchantCode(),amount);
+        updateAccountAmountType(deposit);
 
-        MerchantCredit merchantCredit = merchantCreditService.getByMerCode(deposit.getMerchantCode());
-        merchantCreditService.updateMerchantRechargeCredit(merchantCredit,amount);
+    }
+
+    private void updateAccountAmountType(Deposit deposit) {
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(deposit.getAccountCode(),
                 deposit.getMerAccountTypeCode());
 
@@ -47,10 +50,9 @@ public class DepositServiceImpl implements DepositService {
             accountAmountType = deposit.toNewAccountAmountType();
             accountAmountTypeDao.save(accountAmountType);
         }else{
-            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(amount));
+            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
             accountAmountTypeDao.updateById(accountAmountType);
         }
-
     }
 
 
@@ -67,11 +69,8 @@ public class DepositServiceImpl implements DepositService {
                             .map(Deposit::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
                     String merCode = entry.getKey();
-
-                    MerchantCredit credit = merchantCreditService.getByMerCode(merCode);
-
-                    merchantCreditService.updateMerchantRechargeCredit(credit,totalAmountToDeposit);
-
+                    merchantCreditService.updateMerchantRechargeCredit(merCode,totalAmountToDeposit);
+                    singleMerDeposits.stream().forEach(deposit -> updateAccountAmountType(deposit));
                 });
     }
 }

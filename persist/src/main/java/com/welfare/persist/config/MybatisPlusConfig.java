@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.welfare.persist.interceptor.FieldObjectHandler;
+import com.welfare.persist.interceptor.CommonFieldObjectHandler;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,8 +37,8 @@ public class MybatisPlusConfig {
     }
 
     @Bean
-    public FieldObjectHandler fieldObjectHandler(){
-        FieldObjectHandler fieldObjectHandler = new FieldObjectHandler();
-        return fieldObjectHandler;
+    public CommonFieldObjectHandler commonFieldObjectHandler(){
+        CommonFieldObjectHandler commonFieldObjectHandler = new CommonFieldObjectHandler();
+        return commonFieldObjectHandler;
     }
 }

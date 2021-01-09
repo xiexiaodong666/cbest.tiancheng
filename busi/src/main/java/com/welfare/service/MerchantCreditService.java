@@ -1,6 +1,8 @@
 package com.welfare.service;
 
 
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,5 +32,12 @@ public interface MerchantCreditService {
    * @return
    */
   MerchantCredit getByMerCode(String merCode);
+
+  /**
+   * 更新充值额度
+   * @param merchantCredit
+   * @param amount
+   */
+  void updateMerchantCredit(MerchantCredit merchantCredit,BigDecimal amount);
 
 }

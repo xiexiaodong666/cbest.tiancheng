@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import  com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;

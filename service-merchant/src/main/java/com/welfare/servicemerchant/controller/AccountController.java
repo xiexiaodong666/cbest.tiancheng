@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.Account;
 import com.welfare.servicemerchant.dto.AccountBillDTO;
 import com.welfare.servicemerchant.dto.AccountDTO;
-import com.welfare.servicemerchant.dto.AccountDepositApplyInfo;
+import com.welfare.service.dto.AccountDepositApplyInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

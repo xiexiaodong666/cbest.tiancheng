@@ -1,11 +1,13 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author duanhy
@@ -19,14 +21,9 @@ import java.util.List;
 public class DepositApplyRequest {
 
 
-  @ApiModelProperty("请求id（用于幂等处理）")
+  @ApiModelProperty("请求id（用于幂等处理，UUID即可）")
+  @NotEmpty(message = "requestId为空")
   private String requestId;
-
-  /**
-   * 商户代码
-   */
-  @ApiModelProperty("商户代码")
-  private String merCode;
 
   /**
    * 申请备注
@@ -35,25 +32,20 @@ public class DepositApplyRequest {
   private String applyRemark;
 
   /**
-   * 申请人
+   * 福利类型
    */
-  @ApiModelProperty("申请人")
-  private String applyUser;
-
-  /**
-   * 余额类型
-   */
-  @ApiModelProperty("余额类型（待定义）")
-  private String balanceType;
+  @ApiModelProperty("福利类型")
+  @NotEmpty(message = "余额类型为空")
+  private String merAccountTypeCode;
 
   /**
    * 审批类型
    */
   @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")
+  @NotEmpty(message = "审批类型为空")
   private String approvalType;
 
-
-
   @ApiModelProperty("申请员工额度信息")
+  @NotNull(message = "申请员工额度信息为空")
   private AccountDepositRequest info;
 }

@@ -1,7 +1,7 @@
 package com.welfare.servicemerchant.converter;
 
 import com.welfare.persist.entity.Account;
-import com.welfare.servicemerchant.dto.AccountDepositApplyInfo;
+import com.welfare.service.dto.AccountDepositApplyInfo;
 import org.mapstruct.Mapper;
 
 /**

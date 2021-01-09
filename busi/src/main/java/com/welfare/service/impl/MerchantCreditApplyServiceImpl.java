@@ -1,9 +1,11 @@
 package com.welfare.service.impl;
 
 import  com.welfare.persist.dao.MerchantCreditApplyDao;
+import com.welfare.persist.entity.MerchantCreditApply;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantCreditApplyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,6 +19,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyService {
-    private final MerchantCreditApplyDao merchantCreditApplyDao;
 
+    @Autowired
+    private MerchantCreditApplyDao merchantCreditApplyDao;
+
+
+    @Override
+    public Long save(MerchantCreditApply creditApply) {
+        //merchantCreditApplyDao.save()
+        return null;
+    }
 }

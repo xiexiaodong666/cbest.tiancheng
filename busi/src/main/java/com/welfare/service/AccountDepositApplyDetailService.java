@@ -1,6 +1,10 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.AccountDepositApplyDetail;
+
+import java.util.List;
+
 /**
  * 充值申请明细服务接口
  *
@@ -9,5 +13,8 @@ package com.welfare.service;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface AccountDepositApplyDetailService {
+
+
+  List<AccountDepositApplyDetail> listByApplyCode(String applyCode);
 
 }

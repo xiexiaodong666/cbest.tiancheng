@@ -1,8 +1,10 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotEmpty;
 
 /**
  * @author duanhy
@@ -13,9 +15,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BatchDepositApplyUpdateRequest {
-
-  @ApiModelProperty("请求id（用于幂等处理）")
-  private String requestId;
 
   /**
    * 申请id
@@ -28,4 +27,11 @@ public class BatchDepositApplyUpdateRequest {
    */
   @ApiModelProperty("申请备注")
   private String applyRemark;
+
+  /**
+   * 福利类型
+   */
+  @ApiModelProperty("福利类型")
+  @NotEmpty(message = "余额类型为空")
+  private String merAccountTypeCode;
 }

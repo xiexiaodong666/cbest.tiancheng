@@ -9,4 +9,9 @@
         id,account_name,account_code,account_type_code,mer_code,store_code,account_status,staff_status,active,binding,create_user,create_time,update_user,update_time,account_balance,flag,version,phone
     </sql>
 
+    <update id="increaseAccountBalance">
+      UPDATE <include refid="tableName"/> set account_balance = account_balance + #{increaseBalance}, update_user = #{updateUser},update_time = now(),version = version + 1 where account_code = #{accountCode}
+    </update>
+
+
 </mapper>

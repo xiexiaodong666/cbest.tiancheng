@@ -8,6 +8,8 @@ import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.servicemerchant.dto.AdminMerchantStore;
 import com.welfare.servicemerchant.dto.AdminMerchantStoreRelationDTO;
+import com.welfare.servicemerchant.dto.MerchantStoreRelationAddReq;
+import com.welfare.servicemerchant.dto.MerchantStoreRelationDetailDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,6 +23,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +44,7 @@ public class MerchantStoreRelationController implements IController {
 
   private final MerchantStoreRelationService merchantStoreRelationService;
 
-  @GetMapping("/api/store")
+  @GetMapping("/api/list")
   @ApiOperation("api分页查询消费门店配置列表")
   public R<Page<MerchantStoreRelation>> apiPageQuery(
       @RequestParam @ApiParam("当前页") Integer currentPage,
@@ -62,7 +65,7 @@ public class MerchantStoreRelationController implements IController {
     return success(merchantStoreRelationPage);
   }
 
-  @GetMapping("/admin/store")
+  @GetMapping("/admin/list")
   @ApiOperation("后台分页查询消费门店配置列表")
   public R<Page<AdminMerchantStoreRelationDTO>> adminPageQuery(
       @RequestParam @ApiParam("当前页") Integer currentPage,
@@ -81,16 +84,24 @@ public class MerchantStoreRelationController implements IController {
     return success(mapPage);
   }
 
-  @PostMapping("/admin/store")
-  @ApiOperation("新增消费门店配置")
-  public R<Page<AdminMerchantStoreRelationDTO>> addMerchantStore() {
+  @GetMapping("/detail")
+  @ApiOperation("后台查询消费门店详情")
+  public R<MerchantStoreRelationDetailDTO> detail(
+      @RequestParam(required = false) @ApiParam("消费场景门店id") Long id) {
 
     return null;
   }
 
-  @PutMapping("/admin/store")
+  @PostMapping
+  @ApiOperation("新增消费门店配置")
+  public R<Boolean> addMerchantStore(@RequestBody MerchantStoreRelationAddReq relationAddReq) {
+
+    return null;
+  }
+
+  @PutMapping
   @ApiOperation("修改消费门店配置")
-  public R<Page<AdminMerchantStoreRelationDTO>> updateMerchantStore() {
+  public R<Boolean> updateMerchantStore() {
 
     return null;
   }
@@ -109,8 +120,6 @@ public class MerchantStoreRelationController implements IController {
 
   /**
    * convert MerchantStoreRelationDTO to AdminMerchantStoreRelationDTO
-   * @param merchantStoreRelationDTOList
-   * @return
    */
   private List<AdminMerchantStoreRelationDTO> convertAdminMerchantStoreRelationDTOs(
       List<MerchantStoreRelationDTO> merchantStoreRelationDTOList) {

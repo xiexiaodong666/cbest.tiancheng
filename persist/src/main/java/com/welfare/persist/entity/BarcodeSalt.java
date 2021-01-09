@@ -18,46 +18,41 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 充值申请明细(account_deposit_apply_detail)实体类
+ * 条码加盐信息(barcode_salt)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-08 18:06:33
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("account_deposit_apply_detail")
-@ApiModel("充值申请明细")
-public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> implements Serializable {
+@TableName("barcode_salt")
+@ApiModel("条码加盐信息")
+public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * pk
      */
-    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("pk")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
-     * 申请编码
+     * 有效期
      */
-    @ApiModelProperty("申请编码")   
-    private String applyCode;
+    @ApiModelProperty("有效期")   
+    private String validPeriod;
     /**
-     * 员工账户
+     * 有效期数字表示
      */
-    @ApiModelProperty("员工账户")   
-    private String accountCode;
+    @ApiModelProperty("有效期数字表示")
+    private Long validPeriodNumeric;
     /**
-     * 充值金额
+     * 加盐值
      */
-    @ApiModelProperty("充值金额")   
-    private BigDecimal rechargeAmount;
-    /**
-     * 充值状态
-     */
-    @ApiModelProperty("充值状态")   
-    private Integer rechargeStatus;
+    @ApiModelProperty("加盐值")   
+    private Long saltValue;
     /**
      * 创建人
      */
@@ -74,15 +69,20 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
     @ApiModelProperty("更新人")   
     private String updateUser;
     /**
-     * 更新日期
+     * 更新时间
      */
-    @ApiModelProperty("更新日期")   
+    @ApiModelProperty("更新时间")   
     @TableField(update = "now()")
 	private Date updateTime;
     /**
+     * 账户余额
+     */
+    @ApiModelProperty("账户余额")   
+    private BigDecimal accountBalance;
+    /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志")
+    @ApiModelProperty("删除标志") @TableLogic  
     private Boolean deleted;
     /**
      * 版本
@@ -93,25 +93,21 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
 //以下为列明常量
 
     /**
-    * id
+    * pk
     */
     public static final String ID = "id";
     /**
-    * 申请编码
+    * 有效期
     */
-    public static final String APPLY_CODE = "apply_code";
+    public static final String VALID_PERIOD = "valid_period";
     /**
-    * 员工账户
-    */
-    public static final String ACCOUNT_CODE = "account_code";
+     * 有效期
+     */
+    public static final String VALID_PERIOD_NUMERIC = "valid_period_numeric";
     /**
-    * 充值金额
+    * 加盐值
     */
-    public static final String RECHARGE_AMOUNT = "recharge_amount";
-    /**
-    * 充值状态
-    */
-    public static final String RECHARGE_STATUS = "recharge_status";
+    public static final String SALT_VALUE = "salt_value";
     /**
     * 创建人
     */
@@ -125,9 +121,13 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
     */
     public static final String UPDATE_USER = "update_user";
     /**
-    * 更新日期
+    * 更新时间
     */
     public static final String UPDATE_TIME = "update_time";
+    /**
+    * 账户余额
+    */
+    public static final String ACCOUNT_BALANCE = "account_balance";
     /**
     * 删除标志
     */

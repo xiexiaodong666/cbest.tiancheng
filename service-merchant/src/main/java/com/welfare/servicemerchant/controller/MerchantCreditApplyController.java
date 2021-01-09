@@ -3,7 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.service.MerchantCreditApplyService;
-import com.welfare.servicemerchant.dto.*;
+import com.welfare.service.dto.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -26,8 +27,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/merchant-credit-apply")
 @Api(tags = "商户额度申请管理")
 public class MerchantCreditApplyController implements IController {
-    private final MerchantCreditApplyService merchantCreditApplyService;
 
+    @Autowired
+    private MerchantCreditApplyService applyService;
 
     @GetMapping("/page")
     @ApiOperation("分页商户额度申请列表")

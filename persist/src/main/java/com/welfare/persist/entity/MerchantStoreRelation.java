@@ -50,7 +50,12 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
     /**
      * 消费方式
      */
-    @ApiModelProperty("消费方式")   
+    @ApiModelProperty("消费方式,json"
+        + "{"
+        + "  \"o2o\": true,"
+        + "  \"onlineMall\": true,"
+        + "  \"shopShopping\": false"
+        + "}")
     private String consumType;
     /**
      * 门店别名

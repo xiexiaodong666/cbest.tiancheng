@@ -2,7 +2,8 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
-import com.welfare.servicemerchant.dto.*;
+import com.welfare.service.AccountDepositApplyService;
+import com.welfare.service.dto.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/account-deposit-apply")
 @Api(tags = "员工账号存款管理")
 public class AccountDepositApplyController implements IController {
+
+  @Autowired
+  private AccountDepositApplyService depositApplyService;
 
   @GetMapping("/page")
   @ApiOperation("分页账号额度申请列表")
@@ -53,7 +58,10 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/batch-update")
   @ApiOperation("修改账号额度申请(批量)")
   @MerchantUser
-  public R<Long> batchUpdate(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file,@RequestParam BatchDepositApplyUpdateRequest requst){
+  public R<Long> batchUpdate(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file,
+                             @RequestParam @ApiParam(name = "申请id）",required = true) Long id,
+                             @RequestParam @ApiParam("申请备注") String applyRemark,
+                             @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode) {
     return null;
   }
 
@@ -75,13 +83,19 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("新增额度申请(单个)")
   @MerchantUser
   public R<Long> save(@RequestBody DepositApplyRequest request){
+
     return null;
   }
 
   @PostMapping("/batch-save")
   @ApiOperation("新增额度申请(批量)")
   @MerchantUser
-  public R<Long> batchSave(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file, @RequestParam BatchDepositApplyRequest request){
+  public R<Long> batchSave(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file,
+                           @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId,
+                           @RequestParam @ApiParam("申请备注") String applyRemark,
+                           @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
+                           @RequestParam @ApiParam(name = "审批类型（单个：SINGLE，批量：BATCH）",required = true) String approvalType
+                           ){
     return null;
   }
 }

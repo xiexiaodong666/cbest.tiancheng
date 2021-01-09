@@ -47,7 +47,7 @@ public class DepositServiceImpl implements DepositService {
 
         if(Objects.isNull(accountAmountType)){
             accountAmountType = deposit.toNewAccountAmountType();
-            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()))
+            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
             accountAmountTypeDao.save(accountAmountType);
         }else{
             accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));

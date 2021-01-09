@@ -21,4 +21,12 @@ public interface AccountAmountTypeService {
    * @return
    */
   int batchSaveOrUpdate(List<AccountAmountType> list);
+
+  /**
+   * 获取唯一一条accountAmountType
+   * @param accountCode
+   * @param merAccountTypeCode
+   * @return
+   */
+  AccountAmountType queryOne(String accountCode,String merAccountTypeCode);
 }

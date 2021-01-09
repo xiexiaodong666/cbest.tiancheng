@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.common.util.BarcodeUtil;
 import com.welfare.persist.entity.BarcodeSalt;
 import com.welfare.service.BarcodeSaltService;
 import com.welfare.serviceaccount.domain.BarcodeSaltDO;
@@ -88,8 +89,15 @@ public class PaymentController implements IController {
     @GetMapping("/barcode")
     @ApiOperation("用户获取支付条码")
     public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode){
-        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode,12345678L);
+        BarcodeSalt barcodeSalt =  barcodeSaltService.queryCurrentPeriodSaltValue();
+        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue());
         return success(paymentBarcode);
+    }
+
+    @GetMapping("/test-barcode-parse")
+    public R<String> testBarcodeParse(@RequestParam String barcode){
+        Long saltValue = barcodeSaltService.queryCurrentPeriodSaltValue().getSaltValue();
+        return success(BarcodeUtil.calculateAccount("699048259340405130242", saltValue).toString());
     }
 
     @GetMapping("/barcode-salts")
@@ -99,7 +107,6 @@ public class PaymentController implements IController {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String dayStr = dateFormat.format(currentDate);
         List<BarcodeSalt> barcodeSalts = barcodeSaltService.query(Long.valueOf(dayStr));
-        barcodeSaltService.batchGenerate();
         return success(
                 barcodeSalts.stream()
                         .map(BarcodeSaltDO::of)

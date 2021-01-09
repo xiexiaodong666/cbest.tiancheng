@@ -1,8 +1,10 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import  com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
+import com.welfare.persist.entity.TempAccountDepositApply;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountDepositApplyDetailService;
@@ -38,5 +40,15 @@ public class AccountDepositApplyDetailServiceImpl implements AccountDepositApply
         QueryWrapper<AccountDepositApplyDetail> query = new QueryWrapper<>();
         query.eq(AccountDepositApplyDetail.APPLY_CODE, applyCode);
         return accountDepositApplyDetailDao.remove(query);
+    }
+
+    @Override
+    public Page<AccountDepositApplyDetail> pageByApplyCode(String applyCode, int current, int size) {
+        Page<AccountDepositApplyDetail> page = new Page<>();
+        page.setCurrent(current);
+        page.setSize(size);
+        QueryWrapper<AccountDepositApplyDetail> query = new QueryWrapper<>();
+        query.eq(AccountDepositApplyDetail.APPLY_CODE, applyCode);
+        return accountDepositApplyDetailDao.page(page, query);
     }
 }

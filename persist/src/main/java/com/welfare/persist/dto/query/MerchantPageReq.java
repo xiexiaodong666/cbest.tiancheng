@@ -1,11 +1,9 @@
-package com.welfare.service.dto;
+package com.welfare.persist.dto.query;
 
-import com.welfare.common.annotation.Query;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 /**
@@ -14,27 +12,21 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 public class MerchantPageReq {
-    @Query(type = Query.Type.EQUAL)
     @ApiModelProperty("商户代码")
     private String merCode;
 
-    @Query(type = Query.Type.INNER_LIKE)
     @ApiModelProperty("商户名称")
     private String merName;
 
-    @Query(type = Query.Type.EQUAL)
     @ApiModelProperty("商户类型")
     private String merType;
 
-    @Query(type = Query.Type.EQUAL)
     @ApiModelProperty("合作方式")
     private String merCooperationMode;
 
-    @Query(type = Query.Type.GREATER_THAN,propName = "createTime")
     @ApiModelProperty("开始时间")
     private Date startTime;
 
-    @Query(type = Query.Type.LESS_THAN,propName = "createTime")
     @ApiModelProperty("结束时间")
     private Date endTime;
 }

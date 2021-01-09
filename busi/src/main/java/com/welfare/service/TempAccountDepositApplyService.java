@@ -19,4 +19,7 @@ public interface TempAccountDepositApplyService {
   Boolean delByFileId(String fileId);
 
   Page<TempAccountDepositApplyDTO> pageByFileId(int current, int size, String fileId);
+
+  List<TempAccountDepositApply> getAllByFileId(String fileId);
+
 }

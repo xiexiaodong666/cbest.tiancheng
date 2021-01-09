@@ -1,14 +1,10 @@
 package com.welfare.service;
 
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.persist.entity.AccountDepositApply;
 import com.welfare.service.dto.*;
-import com.welfare.service.enums.ApprovalType;
-import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -23,18 +19,6 @@ public interface AccountDepositApplyService {
 
   /**
    * 新增员工账号充值申请
-   * @param request 申请基础信息
-   * @param accountAmounts 员工充值金额
-   * @param merchantUserInfo 商户信息
-   * @param approvalType 批量/单个
-   * @return
-   */
-  Long save(DepositApplyRequest request, List<AccountDepositRequest> accountAmounts,
-            MerchantUserInfo merchantUserInfo, ApprovalType approvalType);
-
-
-  /**
-   * 新增员工账号充值申请
    * @param request
    * @param merchantUserInfo
    * @return
@@ -42,7 +26,7 @@ public interface AccountDepositApplyService {
   Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUserInfo);
 
   /**
-   * 新增员工账号充值申请
+   * 批量新增员工账号充值申请
    * @param request 申请基础信息
    * @param fileId fileId
    * @param merchantUserInfo 商户信息
@@ -50,15 +34,22 @@ public interface AccountDepositApplyService {
    */
   Long saveBatch(DepositApplyRequest request, String fileId, MerchantUserInfo merchantUserInfo);
 
-
   /**
    * 修改员工账号充值申请
    * @param request 修改申请基础信息
-   * @param accountAmounts 员工充值金额
    * @param merchantUserInfo 商户信息
    * @return
    */
-  Long update(DepositApplyUpdateRequest request, List<AccountDepositRequest> accountAmounts, MerchantUserInfo merchantUserInfo);
+  Long updateOne(DepositApplyUpdateRequest request,MerchantUserInfo merchantUserInfo);
+
+  /**
+   * 批量修改员工账号充值申请
+   * @param request 修改申请基础信息
+   * @param fileId fileId
+   * @param merchantUserInfo 商户信息
+   * @return
+   */
+  Long updateBatch(DepositApplyUpdateRequest request, String fileId, MerchantUserInfo merchantUserInfo);
 
   /**
    * 通过requestId查询申请信息
@@ -82,11 +73,18 @@ public interface AccountDepositApplyService {
    * @return
    */
   Page<AccountDepositApplyInfo> page(Integer currentPage, Integer pageSize, AccountDepositApplyQuery query);
-//
-//  /**
-//          * 查询详情
-//   * @param id
-//   * @return
-//           */
-//  AccountDepositApplyDetailInfo detail(Long id);
+
+  /**
+   * 查询申请(不分页)
+   * @param query
+   * @return
+   */
+  List list(AccountDepositApplyQuery query);
+
+  /**
+   * 查询详情
+   * @param id
+   * @return
+   */
+  AccountDepositApplyDetailInfo detail(Integer id);
 }

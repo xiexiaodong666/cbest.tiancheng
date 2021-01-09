@@ -46,4 +46,11 @@ public class AccountServiceImpl implements AccountService {
     public int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode) {
         return accountMapper.increaseAccountBalance(increaseBalance, updateUser, accountCode);
     }
+
+    @Override
+    public Account getByAccountCode(String accountCode) {
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Account.ACCOUNT_CODE, accountCode);
+        return accountDao.getOne(queryWrapper);
+    }
 }

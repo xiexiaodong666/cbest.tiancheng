@@ -1,4 +1,4 @@
-package com.welfare.servicemerchant.converter;
+package com.welfare.service.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 

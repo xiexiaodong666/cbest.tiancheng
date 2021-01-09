@@ -12,6 +12,11 @@ import lombok.Data;
 public class MerchantStoreRelationDTO {
 
   /**
+   * id
+   */
+  private Long id;
+
+  /**
    * 商户代码
    */
   private String merCode;

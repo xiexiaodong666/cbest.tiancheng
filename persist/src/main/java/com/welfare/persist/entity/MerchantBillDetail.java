@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * (merchant_bill_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 14:52:38
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -64,25 +65,48 @@ public class MerchantBillDetail extends Model<MerchantBillDetail> implements Ser
     @ApiModelProperty("交易金额")   
     private BigDecimal transAmount;
     /**
-     * 交易之后余额
+     * 充值额度
      */
-    @ApiModelProperty("交易之后余额")   
-    private BigDecimal balance;
+    @ApiModelProperty("充值额度")   
+    private BigDecimal rechargeLimit;
+    /**
+     * 当前余额
+     */
+    @ApiModelProperty("当前余额")   
+    private BigDecimal currentBalance;
+    /**
+     * 最高信用额度
+     */
+    @ApiModelProperty("最高信用额度")   
+    private BigDecimal creditLimit;
+    /**
+     * 剩余信用额度
+     */
+    @ApiModelProperty("剩余信用额度")   
+    private BigDecimal remainingLimit;
+    /**
+     * 返利额度
+     */
+    @ApiModelProperty("返利额度")   
+    private BigDecimal rebateLimit;
     /**
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
@@ -93,7 +117,8 @@ public class MerchantBillDetail extends Model<MerchantBillDetail> implements Ser
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
 
 //以下为列明常量
 
@@ -122,9 +147,25 @@ public class MerchantBillDetail extends Model<MerchantBillDetail> implements Ser
     */
     public static final String TRANS_AMOUNT = "trans_amount";
     /**
-    * 交易之后余额
+    * 充值额度
     */
-    public static final String BALANCE = "balance";
+    public static final String RECHARGE_LIMIT = "recharge_limit";
+    /**
+    * 当前余额
+    */
+    public static final String CURRENT_BALANCE = "current_balance";
+    /**
+    * 最高信用额度
+    */
+    public static final String CREDIT_LIMIT = "credit_limit";
+    /**
+    * 剩余信用额度
+    */
+    public static final String REMAINING_LIMIT = "remaining_limit";
+    /**
+    * 返利额度
+    */
+    public static final String REBATE_LIMIT = "rebate_limit";
     /**
     * 创建人
     */

@@ -4,7 +4,6 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -17,76 +16,71 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 员工消费场景配置(account_consume_scene)实体类
+ * 员工消费场景关联门店(account_consume_scene_store_relation)实体类
  *
- * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @author yaox
+ * @since 2021-01-09 11:01:12
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("account_consume_scene")
-@ApiModel("员工消费场景配置")
-public class AccountConsumeScene extends Model<AccountConsumeScene> implements Serializable {
+@TableName("account_consume_scene_store_relation")
+@ApiModel("员工消费场景关联门店")
+public class AccountConsumeSceneStoreRelation extends Model<AccountConsumeSceneStoreRelation> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
-     * 商户代码
+     * accountConsumeSceneId
      */
-    @ApiModelProperty("商户代码")   
-    private String merCode;
+    @ApiModelProperty("accountConsumeSceneId")  
+    private Long accountConsumeSceneId;
     /**
-     * 员工类型编码
+     * 门店编码
      */
-    @ApiModelProperty("员工类型编码")   
-    private String accountTypeId;
+    @ApiModelProperty("门店编码")  
+    private String storeCode;
     /**
-     * 备注
+     * 消费方式
      */
-    @ApiModelProperty("备注")   
-    private String remark;
-    /**
-     * 状态
-     */
-    @ApiModelProperty("状态")   
-    private Integer status;
+    @ApiModelProperty("消费方式")  
+    private String sceneConsumType;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")   
+    @ApiModelProperty("创建人")  
     private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")   
+    @ApiModelProperty("创建时间")  
     private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")   
+    @ApiModelProperty("更新人")  
     private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")   
+    @ApiModelProperty("更新时间")  
     @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic  
-    private Boolean deleted;
+    @ApiModelProperty("删除标志  1-删除、0-未删除")  
+    private Integer deleted;
     /**
      * 版本
      */
-    @ApiModelProperty("版本")  @Version 
+    @ApiModelProperty("版本") @Version 
     private Integer version;
 
 //以下为列明常量
@@ -96,13 +90,9 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
     */
     public static final String ID = "id";
     /**
-    * 商户代码
+    * 
     */
-    public static final String MER_CODE = "mer_code";
-    /**
-    * 员工类型编码
-    */
-    public static final String ACCOUNT_TYPE_ID = "account_type_id";
+    public static final String ACCOUNT_CONSUME_SCENE_ID = "account_consume_scene_id";
     /**
     * 门店编码
     */
@@ -110,15 +100,7 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
     /**
     * 消费方式
     */
-    public static final String CONSUM_TYPE = "consum_type";
-    /**
-    * 备注
-    */
-    public static final String REMARK = "remark";
-    /**
-    * 状态
-    */
-    public static final String STATUS = "status";
+    public static final String SCENE_CONSUM_TYPE = "scene_consum_type";
     /**
     * 创建人
     */

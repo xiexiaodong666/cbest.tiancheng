@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper">
+
+
   <sql id="tableName">
         account_consume_scene
     </sql>
@@ -10,36 +13,81 @@
     </sql>
 
 
-  <select id ="getPageDTO" resultType="com.welfare.persist.dto.AccountConsumeScenePageDTO" >
+  <select id="getPageDTO" resultType="com.welfare.persist.dto.AccountConsumeScenePageDTO">
     SELECT
-	GROUP_CONCAT( CONCAT( ss.store_name, "-", ss.store_code ) ) AS storeInfo,
-	act.type_name AS accountTypeName,
+    GROUP_CONCAT( CONCAT( ss.store_name, "-", ss.store_code ) ) AS storeInfo,
+    act.type_name AS accountTypeName,
+    acs.id,
+    acs.STATUS,
+    acs.create_time AS createTime,
+    acs.remark
+    FROM
+    account_consume_scene acs
+    inner join account_consume_scene_store_relation acstr on acs.id = acstr.account_consume_scene_id
+    inner JOIN supplier_store ss ON acstr.store_code = ss.store_code
+    AND acs.mer_code = ss.mer_code
+    inner JOIN account_type act ON act.id = acs.account_type_id
+    where acs.deleted =0
+    <if test=" merCode !='' and merCode != null ">
+      and acs.mer_code = #{merCode}
+    </if>
+    <if test="accountTypeId != null ">
+      and acs.account_type_id = #{accountTypeId}
+    </if>
+    <if test="status != null ">
+      and acs.status = #{status}
+    </if>
+    <if test="createTimeStart != null ">
+      and acs.create_time <![CDATA[>=]]> #{createTimeStart}
+    </if>
+    <if test="createTimeEnd != null ">
+      and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
+    </if>
+    GROUP BY acs.account_type_id
+  </select>
+
+
+  <resultMap type="com.welfare.persist.dto.AccountConsumeSceneMapperDTO" id="detailMap">
+    <id property="id" column="id"/>
+    <result property="merCode" column="merCode"/>
+    <result property="accountTypeId" column="accountTypeId"/>
+    <result property="accountTypeName" column="accountTypeName"/>
+    <result property="remark" column="remark"/>
+    <result property="status" column="STATUS"/>
+    <result property="createTime" column="createTime"/>
+    <result property="deleted" column="deleted"/>
+    <collection property="accountConsumeStoreRelationDTOListDTOList" ofType="com.welfare.persist.dto.AccountConsumeStoreRelationDTO">
+      <id property="id" column="acstrId"/>
+      <result property="storeCode" column="storeCode"/>
+      <result property="storeName" column="storeName"/>
+      <result property="consumType" column="consumType"/>
+      <result property="sceneConsumType" column="sceneConsumType"/>
+    </collection>
+  </resultMap>
+
+  <select id="queryAccountConsumerScene4Detail"
+    resultMap="detailMap">
+		SELECT
 	acs.id,
-	acs.STATUS,
+	acs.mer_code AS merCode,
+	acs.account_type_id AS accountTypeId,
+	act.type_name AS accountTypeName,
+	acs.remark,
+	acs.STATUS as status,
 	acs.create_time AS createTime,
-	acs.remark
+	acs.deleted,
+	acstr.id as acstrId,
+	acstr.store_code AS storeCode,
+	ss.store_name AS storeName,
+	ss.consum_type AS consumType,
+	acstr.scene_consum_type AS sceneConsumType
 FROM
 	account_consume_scene acs
-	LEFT JOIN supplier_store ss ON acs.store_code = ss.store_code
-	AND acs.mer_code = ss.mer_code
-	LEFT JOIN account_type act ON act.id = acs.account_type_id
-		where acs.deleted =0
-			<if test=" merCode !='' and merCode != null " >
-				 and acs.mer_code = #{merCode}
-			</if>
-			<if test="accountTypeId != null " >
-				and acs.account_type_id = #{accountTypeId}
-			</if>
-			<if test="status != null " >
-				and acs.status = #{status}
-			</if>
-			<if test="createTimeStart != null " >
-				and acs.create_time <![CDATA[>=]]> #{createTimeStart}
-			</if>
-			<if test="createTimeEnd != null " >
-				and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
-			</if>
-		GROUP BY acs.account_type_id
-  </select>
+	inner JOIN account_consume_scene_store_relation acstr ON acs.id = acstr.account_consume_scene_id
+	inner JOIN supplier_store ss ON acstr.store_code = ss.store_code
+	inner JOIN account_type act ON act.id = acs.account_type_id
+WHERE
+	acs.id = #{id}
+	</select>
 
 </mapper>

@@ -1,4 +1,4 @@
-package com.welfare.persist.dto;
+package com.welfare.service.dto;
 
 import lombok.Data;
 
@@ -9,7 +9,8 @@ import lombok.Data;
  */
 @Data
 public class AccountConsumeStoreDTO {
-  private Long id;
+
+  private Long accountConsumeSceneId;
   /**
    * 商户代码
    */
@@ -23,26 +24,9 @@ public class AccountConsumeStoreDTO {
    */
   private String storeName;
   /**
-   * 门店层级
-   */
-  private Integer storeLevel;
-  /**
-   * 父级门店
-   */
-  private String storeParent;
-  /**
-   * 门店路径
-   */
-  private String storePath;
-  /**
-   * 备注
-   */
-  private String remark;
-  /**
    * 门店可支持消费方式
    */
   private String consumType;
-
   /**
    * 员工选择的该门店消费方式
    */

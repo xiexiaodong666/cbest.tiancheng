@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
@@ -27,4 +28,6 @@ public interface AccountConsumeSceneService {
 
   public IPage<AccountConsumeScenePageDTO> getPageDTO(Page<AccountConsumeScenePageDTO> page,
       AccountConsumePageQuery accountConsumePageReq);
+
+  public AccountConsumeSceneDTO findAccountConsumeSceneDTOById(Long id);
 }

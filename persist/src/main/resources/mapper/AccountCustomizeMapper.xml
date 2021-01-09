@@ -94,4 +94,36 @@ WHERE
 		</if>
 	</select>
 
+	<select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">
+		SELECT
+		abd.account_code AS accountCode,
+		SUM(
+		CASE
+
+		WHEN abd.trans_type = 1 THEN
+		trans_amount
+		WHEN abd.trans_type = 2 THEN
+		trans_amount * ( - 1 )
+		WHEN abd.trans_type = 3 THEN
+		trans_amount
+		WHEN abd.trans_type = 4 THEN
+		trans_amount * ( - 1 )
+		END
+		) AS accountTotalAmount,
+		COUNT( abd.id ) AS tradeNum,
+		a.account_balance AS accountBalance
+		FROM
+		account_bill_detail abd
+		LEFT JOIN account a ON a.account_code = abd.account_code
+		WHERE
+		abd.account_code = #{accountCode}
+		<if test="createTimeStart != null ">
+			and acs.create_time <![CDATA[>=]]> #{createTimeStart}
+		</if>
+		<if test="createTimeEnd != null ">
+			and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
+		</if>
+
+	</select>
+
 </mapper>

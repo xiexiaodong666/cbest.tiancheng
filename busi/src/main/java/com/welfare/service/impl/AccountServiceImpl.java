@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import  com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dto.AccountBillDetailMapperDTO;
+import com.welfare.persist.dto.AccountBillMapperDTO;
 import com.welfare.persist.dto.AccountDetailMapperDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
@@ -115,12 +116,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountBillDTO quertBill(String accountCode, Date createTimeStart, Date createTimeEnd) {
         AccountBillDTO accountBillDTO = new AccountBillDTO();
-        QueryWrapper<Account> queryWrapper = new QueryWrapper();
-        queryWrapper.eq(Account.ACCOUNT_CODE,accountCode);
-        Account account = accountDao.getOne(queryWrapper);
-        accountBillDTO.setAccountBalance(account.getAccountBalance());
-        //TODO 账单笔数以及 账单总金额
-
+        AccountBillMapperDTO accountBillMapperDTO =accountCustomizeMapper.queryBill(accountCode,createTimeStart,createTimeEnd);
+        BeanUtils.copyProperties(accountBillMapperDTO,accountBillDTO);
         return accountBillDTO;
     }
 }

@@ -83,15 +83,15 @@ public class AccountController implements IController {
 
   @PostMapping("/delete/{id}")
   @ApiOperation("删除员工账号")
-  public R<Boolean> delete(@PathVariable Integer id){
-    return null;
+  public R<Boolean> delete(@PathVariable Long id){
+    return success(accountService.delete(id));
   }
 
 
   @PostMapping("/active/{id}")
-  @ApiOperation("激活员工账号")
-  public R<Boolean> active(@PathVariable Integer id,@RequestParam @ApiParam("状态") Integer state){
-    return null;
+  @ApiOperation("激活或锁定账号")
+  public R<Boolean> active(@PathVariable Long id,@RequestParam @ApiParam("状态") Integer active){
+    return success(accountService.active(id,active));
   }
 
   @ApiOperation("员工账号导出")

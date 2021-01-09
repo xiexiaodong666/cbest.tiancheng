@@ -31,6 +31,10 @@ public interface AccountService {
      * @return
      */
     int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode);
-    
+
     Account getByAccountCode(String accountCode);
+
+    Boolean delete(Long id);
+
+    Boolean active(Long id,Integer active);
 }

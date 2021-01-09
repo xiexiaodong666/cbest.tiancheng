@@ -7,6 +7,7 @@ import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public interface MerchantStoreRelationService {
       QueryWrapper<MerchantStoreRelation> queryWrapper);
 
   Page<MerchantStoreRelationDTO> searchMerchantStoreRelations(Page<MerchantStoreRelation> page,
-      String merName, String status);
+      String merName, String status, Date startTime,Date endTime);
 
   MerchantStoreRelation getMerchantStoreRelationById(
       QueryWrapper<MerchantStoreRelation> queryWrapper);

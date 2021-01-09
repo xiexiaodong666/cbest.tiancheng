@@ -12,6 +12,7 @@ import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.MerchantStoreRelationService;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -46,9 +47,9 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   @Override
   public Page<MerchantStoreRelationDTO> searchMerchantStoreRelations(
       Page<MerchantStoreRelation> page,
-      String merName, String status) {
+      String merName, String status, Date startTime, Date endTime) {
 
-    return merchantStoreRelationMapper.searchMerchantStoreRelations(page, merName, status);
+    return merchantStoreRelationMapper.searchMerchantStoreRelations(page, merName, status, startTime, endTime);
   }
 
   @Override

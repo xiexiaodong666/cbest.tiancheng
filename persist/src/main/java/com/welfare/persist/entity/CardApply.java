@@ -1,5 +1,6 @@
 package com.welfare.persist.entity;
 
+import java.beans.Transient;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -48,6 +49,13 @@ public class CardApply extends Model<CardApply> implements Serializable {
      */
     @ApiModelProperty("商户代码")   
     private String merCode;
+
+    /**
+     * 商户名称
+     */
+    @ApiModelProperty("商户名称")
+    private String merName;
+
     /**
      * 卡片名称
      */

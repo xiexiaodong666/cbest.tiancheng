@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 用户交易流水明细表(account_bill_detail)实体类
+ * 用户交易流水明细表(account_deduction_detail)实体类
  *
  * @author Yuxiang Li
  * @since 2021-01-09 14:23:38
@@ -28,9 +28,9 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("account_bill_detail")
+@TableName("account_deduction_detail")
 @ApiModel("用户交易流水明细表")
-public class AccountBillDetail extends Model<AccountBillDetail> implements Serializable {
+public class AccountDeductionDetail extends Model<AccountDeductionDetail> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -80,15 +80,40 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     @ApiModelProperty("交易时间")   
     private Date transTime;
     /**
-     * 账户余额
+     * 支付编码
      */
-    @ApiModelProperty("账户余额")   
-    private BigDecimal accountBalance;
+    @ApiModelProperty("支付编码")   
+    private String payCode;
     /**
-     * 授信余额
+     * 子账户类型(例如餐费、交通费等)
      */
-    @ApiModelProperty("授信余额")   
-    private BigDecimal surplusQuota;
+    @ApiModelProperty("子账户类型(例如餐费、交通费等)")   
+    private BigDecimal merAccountType;
+    /**
+     * 子账户扣款金额
+     */
+    @ApiModelProperty("子账户扣款金额")   
+    private BigDecimal accountDeductionAmount;
+    /**
+     * 子账户剩余金额
+     */
+    @ApiModelProperty("子账户剩余金额")   
+    private BigDecimal accountDeductionBalance;
+    /**
+     * 商户余额扣款金额
+     */
+    @ApiModelProperty("商户余额扣款金额")   
+    private BigDecimal merDeductionAmount;
+    /**
+     * 商户额度扣款金额
+     */
+    @ApiModelProperty("商户额度扣款金额")   
+    private BigDecimal merDeductionCreditAmount;
+    /**
+     * 自费扣款金额
+     */
+    @ApiModelProperty("自费扣款金额")   
+    private BigDecimal selfDeductionAmount;
     /**
      * 创建人
      */
@@ -160,13 +185,33 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     */
     public static final String TRANS_TIME = "trans_time";
     /**
-    * 账户余额
+    * 支付编码
     */
-    public static final String ACCOUNT_BALANCE = "account_balance";
+    public static final String PAY_CODE = "pay_code";
     /**
-    * 授信余额
+    * 子账户类型(例如餐费、交通费等)
     */
-    public static final String SURPLUS_QUOTA = "surplus_quota";
+    public static final String MER_ACCOUNT_TYPE = "mer_account_type";
+    /**
+    * 子账户扣款金额
+    */
+    public static final String ACCOUNT_DEDUCTION_AMOUNT = "account_deduction_amount";
+    /**
+    * 子账户剩余金额
+    */
+    public static final String ACCOUNT_DEDUCTION_BALANCE = "account_deduction_balance";
+    /**
+    * 商户余额扣款金额
+    */
+    public static final String MER_DEDUCTION_AMOUNT = "mer_deduction_amount";
+    /**
+    * 商户额度扣款金额
+    */
+    public static final String MER_DEDUCTION_CREDIT_AMOUNT = "mer_deduction_credit_amount";
+    /**
+    * 自费扣款金额
+    */
+    public static final String SELF_DEDUCTION_AMOUNT = "self_deduction_amount";
     /**
     * 创建人
     */

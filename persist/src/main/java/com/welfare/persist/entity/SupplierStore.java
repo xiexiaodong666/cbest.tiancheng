@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -19,8 +20,8 @@ import lombok.experimental.Accessors;
 /**
  * 供应商门店(supplier_store)实体类
  *
- * @author hao.yin
- * @since 2021-01-08 15:46:08
+ * @author Yuxiang Li
+ * @since 2021-01-09 14:23:39
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -85,7 +86,7 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic  
+    @ApiModelProperty("删除标志") @TableLogic @TableField  
     private Boolean deleted;
     /**
      * 创建人

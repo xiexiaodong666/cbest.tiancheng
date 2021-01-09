@@ -12,13 +12,14 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 制卡信息(card_apply)实体类
+ * (merchant_bill_detail)实体类
  *
  * @author Yuxiang Li
  * @since 2021-01-09 14:23:38
@@ -27,9 +28,9 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("card_apply")
-@ApiModel("制卡信息")
-public class CardApply extends Model<CardApply> implements Serializable {
+@TableName("merchant_bill_detail")
+@ApiModel("")
+public class MerchantBillDetail extends Model<MerchantBillDetail> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -37,52 +38,37 @@ public class CardApply extends Model<CardApply> implements Serializable {
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Long id;
-    /**
-     * 制卡申请号
-     */
-    @ApiModelProperty("制卡申请号")   
-    private String applyCode;
+	private Integer id;
     /**
      * 商户代码
      */
     @ApiModelProperty("商户代码")   
     private String merCode;
     /**
-     * 卡片名称
+     * 交易流水号
      */
-    @ApiModelProperty("卡片名称")   
-    private String cardName;
+    @ApiModelProperty("交易流水号")   
+    private Integer transNo;
     /**
-     * 卡片类型
+     * 交易类型(消费、退款、添加余额、添加额度等)
      */
-    @ApiModelProperty("卡片类型")   
-    private String cardType;
+    @ApiModelProperty("交易类型(消费、退款、添加余额、添加额度等)")   
+    private String transType;
     /**
-     * 卡片介质
+     * 余额类型(余额、可用信用额度、最大额度、充值额度)
      */
-    @ApiModelProperty("卡片介质")   
-    private String cardMedium;
+    @ApiModelProperty("余额类型(余额、可用信用额度、最大额度、充值额度)")   
+    private String balanceType;
     /**
-     * 卡片数量
+     * 交易金额
      */
-    @ApiModelProperty("卡片数量")   
-    private Integer cardNum;
+    @ApiModelProperty("交易金额")   
+    private BigDecimal transAmount;
     /**
-     * 识别码方法
+     * 交易之后余额
      */
-    @ApiModelProperty("识别码方法")   
-    private String identificationCode;
-    /**
-     * 识别码长度
-     */
-    @ApiModelProperty("识别码长度")   
-    private Integer identificationLength;
-    /**
-     * 备注
-     */
-    @ApiModelProperty("备注")   
-    private String remark;
+    @ApiModelProperty("交易之后余额")   
+    private BigDecimal balance;
     /**
      * 创建人
      */
@@ -105,58 +91,41 @@ public class CardApply extends Model<CardApply> implements Serializable {
     @TableField(update = "now()")
 	private Date updateTime;
     /**
-     * 删除标志
+     * 版本
      */
-    @ApiModelProperty("删除标志") @TableLogic @TableField  
-    private Boolean deleted;
-    /**
-     * 状态: 锁定、激活
-     */
-    @ApiModelProperty("状态: 锁定、激活")   
-    private Integer status;
+    @ApiModelProperty("版本")  @Version 
+    private Integer version;
 
 //以下为列明常量
 
     /**
-    * id
+    * 
     */
     public static final String ID = "id";
-    /**
-    * 制卡申请号
-    */
-    public static final String APPLY_CODE = "apply_code";
     /**
     * 商户代码
     */
     public static final String MER_CODE = "mer_code";
     /**
-    * 卡片名称
+    * 交易流水号
     */
-    public static final String CARD_NAME = "card_name";
+    public static final String TRANS_NO = "trans_no";
     /**
-    * 卡片类型
+    * 交易类型(消费、退款、添加余额、添加额度等)
     */
-    public static final String CARD_TYPE = "card_type";
+    public static final String TRANS_TYPE = "trans_type";
     /**
-    * 卡片介质
+    * 余额类型(余额、可用信用额度、最大额度、充值额度)
     */
-    public static final String CARD_MEDIUM = "card_medium";
+    public static final String BALANCE_TYPE = "balance_type";
     /**
-    * 卡片数量
+    * 交易金额
     */
-    public static final String CARD_NUM = "card_num";
+    public static final String TRANS_AMOUNT = "trans_amount";
     /**
-    * 识别码方法
+    * 交易之后余额
     */
-    public static final String IDENTIFICATION_CODE = "identification_code";
-    /**
-    * 识别码长度
-    */
-    public static final String IDENTIFICATION_LENGTH = "identification_length";
-    /**
-    * 备注
-    */
-    public static final String REMARK = "remark";
+    public static final String BALANCE = "balance";
     /**
     * 创建人
     */
@@ -174,12 +143,8 @@ public class CardApply extends Model<CardApply> implements Serializable {
     */
     public static final String UPDATE_TIME = "update_time";
     /**
-    * 删除标志
+    * 版本
     */
-    public static final String DELETED = "deleted";
-    /**
-    * 状态: 锁定、激活
-    */
-    public static final String STATUS = "status";
+    public static final String VERSION = "version";
 
 }

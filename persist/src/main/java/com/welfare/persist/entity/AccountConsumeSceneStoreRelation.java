@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 制卡信息(card_apply)实体类
+ * 员工消费场景关联门店(account_consume_scene_store_relation)实体类
  *
  * @author Yuxiang Li
  * @since 2021-01-09 14:23:38
@@ -27,9 +27,9 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("card_apply")
-@ApiModel("制卡信息")
-public class CardApply extends Model<CardApply> implements Serializable {
+@TableName("account_consume_scene_store_relation")
+@ApiModel("员工消费场景关联门店")
+public class AccountConsumeSceneStoreRelation extends Model<AccountConsumeSceneStoreRelation> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -39,50 +39,20 @@ public class CardApply extends Model<CardApply> implements Serializable {
     @TableId
 	private Long id;
     /**
-     * 制卡申请号
+     * accountConsumeSceneId
      */
-    @ApiModelProperty("制卡申请号")   
-    private String applyCode;
+    @ApiModelProperty("accountConsumeSceneId")   
+    private Long accountConsumeSceneId;
     /**
-     * 商户代码
+     * 门店编码
      */
-    @ApiModelProperty("商户代码")   
-    private String merCode;
+    @ApiModelProperty("门店编码")   
+    private String storeCode;
     /**
-     * 卡片名称
+     * 消费方式
      */
-    @ApiModelProperty("卡片名称")   
-    private String cardName;
-    /**
-     * 卡片类型
-     */
-    @ApiModelProperty("卡片类型")   
-    private String cardType;
-    /**
-     * 卡片介质
-     */
-    @ApiModelProperty("卡片介质")   
-    private String cardMedium;
-    /**
-     * 卡片数量
-     */
-    @ApiModelProperty("卡片数量")   
-    private Integer cardNum;
-    /**
-     * 识别码方法
-     */
-    @ApiModelProperty("识别码方法")   
-    private String identificationCode;
-    /**
-     * 识别码长度
-     */
-    @ApiModelProperty("识别码长度")   
-    private Integer identificationLength;
-    /**
-     * 备注
-     */
-    @ApiModelProperty("备注")   
-    private String remark;
+    @ApiModelProperty("消费方式")   
+    private String sceneConsumType;
     /**
      * 创建人
      */
@@ -105,15 +75,15 @@ public class CardApply extends Model<CardApply> implements Serializable {
     @TableField(update = "now()")
 	private Date updateTime;
     /**
-     * 删除标志
+     * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志") @TableLogic @TableField  
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic @TableField  
     private Boolean deleted;
     /**
-     * 状态: 锁定、激活
+     * 版本
      */
-    @ApiModelProperty("状态: 锁定、激活")   
-    private Integer status;
+    @ApiModelProperty("版本")  @Version 
+    private Integer version;
 
 //以下为列明常量
 
@@ -122,41 +92,17 @@ public class CardApply extends Model<CardApply> implements Serializable {
     */
     public static final String ID = "id";
     /**
-    * 制卡申请号
+    * 
     */
-    public static final String APPLY_CODE = "apply_code";
+    public static final String ACCOUNT_CONSUME_SCENE_ID = "account_consume_scene_id";
     /**
-    * 商户代码
+    * 门店编码
     */
-    public static final String MER_CODE = "mer_code";
+    public static final String STORE_CODE = "store_code";
     /**
-    * 卡片名称
+    * 消费方式
     */
-    public static final String CARD_NAME = "card_name";
-    /**
-    * 卡片类型
-    */
-    public static final String CARD_TYPE = "card_type";
-    /**
-    * 卡片介质
-    */
-    public static final String CARD_MEDIUM = "card_medium";
-    /**
-    * 卡片数量
-    */
-    public static final String CARD_NUM = "card_num";
-    /**
-    * 识别码方法
-    */
-    public static final String IDENTIFICATION_CODE = "identification_code";
-    /**
-    * 识别码长度
-    */
-    public static final String IDENTIFICATION_LENGTH = "identification_length";
-    /**
-    * 备注
-    */
-    public static final String REMARK = "remark";
+    public static final String SCENE_CONSUM_TYPE = "scene_consum_type";
     /**
     * 创建人
     */
@@ -174,12 +120,12 @@ public class CardApply extends Model<CardApply> implements Serializable {
     */
     public static final String UPDATE_TIME = "update_time";
     /**
-    * 删除标志
+    * 删除标志  1-删除、0-未删除
     */
     public static final String DELETED = "deleted";
     /**
-    * 状态: 锁定、激活
+    * 版本
     */
-    public static final String STATUS = "status";
+    public static final String VERSION = "version";
 
 }

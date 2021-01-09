@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -17,17 +18,17 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * (merchant_account_type)实体类
+ * 商户福利类型(merchant_account_type)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 14:23:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("merchant_account_type")
-@ApiModel("")
+@ApiModel("商户福利类型")
 public class MerchantAccountType extends Model<MerchantAccountType> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -53,10 +54,20 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
     @ApiModelProperty("商户账户类型名称")   
     private String merAccountTypeName;
     /**
+     * 扣款序号
+     */
+    @ApiModelProperty("扣款序号")   
+    private Integer deductionOrder;
+    /**
      * 删除标识
      */
     @ApiModelProperty("删除标识")   
     private Boolean flag;
+    /**
+     * 备注
+     */
+    @ApiModelProperty("备注")   
+    private String remark;
     /**
      * 创建人
      */
@@ -103,9 +114,17 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
     */
     public static final String MER_ACCOUNT_TYPE_NAME = "mer_account_type_name";
     /**
+    * 扣款序号
+    */
+    public static final String DEDUCTION_ORDER = "deduction_order";
+    /**
     * 删除标识
     */
     public static final String FLAG = "flag";
+    /**
+    * 备注
+    */
+    public static final String REMARK = "remark";
     /**
     * 创建人
     */

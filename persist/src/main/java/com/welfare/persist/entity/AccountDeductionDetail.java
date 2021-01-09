@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 用户交易流水明细表(account_deduction_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 14:52:38
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -68,6 +69,11 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      */
     @ApiModelProperty("pos标识")   
     private String pos;
+    /**
+     * 渠道(自主充值需要显示来源:支付宝、微信)
+     */
+    @ApiModelProperty("渠道(自主充值需要显示来源:支付宝、微信)")   
+    private String chanel;
     /**
      * 交易总金额
      */
@@ -117,17 +123,20 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
@@ -137,13 +146,15 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic @TableField  
-    private Boolean deleted;
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
 
 //以下为列明常量
 
@@ -175,6 +186,10 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     * pos标识
     */
     public static final String POS = "pos";
+    /**
+    * 渠道(自主充值需要显示来源:支付宝、微信)
+    */
+    public static final String CHANEL = "chanel";
     /**
     * 交易总金额
     */

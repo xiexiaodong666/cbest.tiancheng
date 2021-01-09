@@ -45,4 +45,11 @@ public interface DepartmentService {
      * @param departmentCode
      */
     boolean delete(String  departmentCode);
+
+    /**
+     * 根据机构代码查询机构
+     * @param departmentCode
+     * @return
+     */
+    Department getByDepartmentCode(String departmentCode);
 }

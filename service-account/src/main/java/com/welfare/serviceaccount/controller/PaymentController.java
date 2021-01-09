@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.common.util.BarcodeUtil;
 import com.welfare.persist.entity.BarcodeSalt;
 import com.welfare.service.BarcodeSaltService;
 import com.welfare.serviceaccount.domain.BarcodeSaltDO;
@@ -99,7 +100,6 @@ public class PaymentController implements IController {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String dayStr = dateFormat.format(currentDate);
         List<BarcodeSalt> barcodeSalts = barcodeSaltService.query(Long.valueOf(dayStr));
-        barcodeSaltService.batchGenerate();
         return success(
                 barcodeSalts.stream()
                         .map(BarcodeSaltDO::of)

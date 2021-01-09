@@ -1,21 +1,22 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.util.BarcodeUtil;
+import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.BarcodeSaltDao;
 import com.welfare.persist.entity.BarcodeSalt;
 import com.welfare.service.BarcodeSaltService;
-import jodd.util.MathUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Period;
-import java.time.temporal.TemporalUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -36,14 +37,32 @@ public class BarcodeSaltServiceImpl implements BarcodeSaltService {
      * 最多生成多少period的saltValue
      */
     private static final Long MAX_PERIOD_GENERATE = 30L;
-    public static final int MILL_SEC_A_DAY = (86400 * 1000);
+    private static final int MILL_SEC_A_DAY = (86400 * 1000);
 
     private final BarcodeSaltDao barcodeSaltDao;
+    private final RedissonClient redissonClient;
     @Override
     public List<BarcodeSalt> query(Long fromValidPeriodNumeric) {
         QueryWrapper<BarcodeSalt> queryWrapper = new QueryWrapper<>();
         queryWrapper.ge(BarcodeSalt.VALID_PERIOD_NUMERIC,fromValidPeriodNumeric);
-        return barcodeSaltDao.list(queryWrapper);
+        List<BarcodeSalt> barcodeSalts = barcodeSaltDao.list(queryWrapper);
+        generateIfNeeded(barcodeSalts);
+        return barcodeSalts;
+    }
+
+    private void generateIfNeeded(List<BarcodeSalt> barcodeSalts) {
+        if(barcodeSalts.size() < MAX_PERIOD_GENERATE){
+            //全局只能有一个线程在执行生成逻辑
+            RLock lock = redissonClient.getLock(RedisKeyConstant.GENERATE_BARCODE_SALT_LOCK);
+            try{
+                lock.lock();
+                //让事务生效,直接this调用没有aop织入事务
+                BarcodeSaltService bean = SpringBeanUtils.getBean(BarcodeSaltService.class);
+                bean.batchGenerate();
+            }finally {
+                lock.unlock();
+            }
+        }
     }
 
     @Override
@@ -66,6 +85,7 @@ public class BarcodeSaltServiceImpl implements BarcodeSaltService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void batchGenerate(){
         BarcodeSalt maxPeriodBarcodeSalt = getTheLatestInDb();
         Date maxPeriod = BarcodeUtil.parsePeriodToDate(maxPeriodBarcodeSalt.getValidPeriod());

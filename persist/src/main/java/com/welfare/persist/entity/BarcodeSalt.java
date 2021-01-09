@@ -78,11 +78,7 @@ public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
     @ApiModelProperty("更新时间")   
     @TableField(update = "now()")
 	private Date updateTime;
-    /**
-     * 账户余额
-     */
-    @ApiModelProperty("账户余额")   
-    private BigDecimal accountBalance;
+
     /**
      * 删除标志
      */

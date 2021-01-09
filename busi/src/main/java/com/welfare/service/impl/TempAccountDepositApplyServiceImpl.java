@@ -49,4 +49,11 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
     page.setSize(size);
     return tempAccountDepositApplyMapper.pageByFileId(page, fileId);
   }
+
+  @Override
+  public List<TempAccountDepositApply> getAllByFileId(String fileId) {
+    QueryWrapper<TempAccountDepositApply> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(TempAccountDepositApply.FILE_ID, fileId);
+    return tempAccountDepositApplyDao.getBaseMapper().selectList(queryWrapper);
+  }
 }

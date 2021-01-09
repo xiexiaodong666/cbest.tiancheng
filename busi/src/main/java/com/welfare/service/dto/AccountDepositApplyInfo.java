@@ -47,6 +47,14 @@ public class AccountDepositApplyInfo {
   private BigDecimal rechargeAmount;
 
   /**
+   * 福利类型名称
+   */
+  @ApiModelProperty("福利类型名称")
+  @NotEmpty(message = "余额类型名称为空")
+  @ExcelProperty("福利类型")
+  private String merAccountTypeName;
+
+  /**
    * 申请人
    */
   @ApiModelProperty("申请人")
@@ -102,12 +110,6 @@ public class AccountDepositApplyInfo {
   @NotEmpty(message = "余额类型为空")
   private String merAccountTypeCode;
 
-  /**
-   * 福利类型名称
-   */
-  @ApiModelProperty("福利类型名称")
-  @NotEmpty(message = "余额类型名称为空")
-  private String merAccountTypeName;
 
   /**
    * 审批类型

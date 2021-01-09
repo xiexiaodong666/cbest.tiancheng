@@ -20,6 +20,7 @@ public class RedisKeyConstant {
    */
   public static final String ACCOUNT_DEPOSIT_APPLY__ID = "account_deposit_apply:id:";
 
+  public static final String GENERATE_BARCODE_SALT_LOCK = "e-welfare_barcode_salt_lock";
   public static String buidKey(String perfix, String... part) {
     return StringUtils.removeEnd(perfix, ":").concat(":").concat(StringUtils.join(part, ":"));
   }

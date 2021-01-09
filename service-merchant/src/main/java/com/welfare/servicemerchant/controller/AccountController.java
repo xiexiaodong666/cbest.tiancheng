@@ -125,8 +125,8 @@ public class AccountController implements IController {
   }
 
 
-  @GetMapping("/account/bill/page")
-  @ApiOperation("员工账号消费汇总")
+  @GetMapping("/billDetail/page")
+  @ApiOperation("员工账号消费明细")
   public R<Page<AccountBillDetailDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
       @RequestParam @ApiParam("accountCode") String accountCode,
@@ -136,7 +136,8 @@ public class AccountController implements IController {
     return success(result);
   }
 
-  @GetMapping("/account/bill")
+  @GetMapping("/bill")
+  @ApiOperation("员工账号消费汇总")
   public R<AccountBillDTO> quertBill(@RequestParam(required = false) @ApiParam("accountCode") String accountCode,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){

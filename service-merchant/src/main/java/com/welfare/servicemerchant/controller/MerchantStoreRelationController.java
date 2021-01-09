@@ -2,14 +2,17 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.persist.dto.AdminMerchantStore;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
+import com.welfare.persist.dto.MerchantStoreRelationDetailDTO;
+import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import com.welfare.service.MerchantService;
 import com.welfare.service.MerchantStoreRelationService;
-import com.welfare.servicemerchant.dto.AdminMerchantStore;
 import com.welfare.servicemerchant.dto.AdminMerchantStoreRelationDTO;
-import com.welfare.servicemerchant.dto.MerchantStoreRelationAddReq;
-import com.welfare.servicemerchant.dto.MerchantStoreRelationDetailDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MerchantStoreRelationController implements IController {
 
   private final MerchantStoreRelationService merchantStoreRelationService;
+  private final MerchantService merchantService;
 
   @GetMapping("/api/list")
   @ApiOperation("api分页查询消费门店配置列表")
@@ -87,16 +92,38 @@ public class MerchantStoreRelationController implements IController {
   @GetMapping("/detail")
   @ApiOperation("后台查询消费门店详情")
   public R<MerchantStoreRelationDetailDTO> detail(
-      @RequestParam(required = false) @ApiParam("消费场景门店id") Long id) {
+      @RequestParam(required = true) @ApiParam("消费场景门店id") Long id) {
 
-    return null;
+    QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(MerchantStoreRelation.ID, id);
+
+    MerchantStoreRelation merchantStoreRelation = merchantStoreRelationService
+        .getMerchantStoreRelationById(queryWrapper);
+
+    QueryWrapper<Merchant> merchantQueryWrapper = new QueryWrapper<>();
+    merchantQueryWrapper.eq(Merchant.MER_CODE, merchantStoreRelation.getMerCode());
+    Merchant merchant = merchantService.getMerchantByMerCode(merchantQueryWrapper);
+
+    queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(MerchantStoreRelation.MER_CODE, merchantStoreRelation.getMerCode());
+    List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService
+        .getMerchantStoreRelationListByMerCode(queryWrapper);
+
+    MerchantStoreRelationDetailDTO merchantStoreRelationDetailDTO = convertMerchantStoreRelationDetailDTO(merchantStoreRelationList);
+    merchantStoreRelationDetailDTO.setMerName(merchant.getMerName());
+    merchantStoreRelationDetailDTO.setMerCode(merchantStoreRelation.getMerCode());
+    merchantStoreRelationDetailDTO.setRamark(merchantStoreRelation.getRamark());
+
+    return success(merchantStoreRelationDetailDTO);
   }
 
   @PostMapping
   @ApiOperation("新增消费门店配置")
+  @ApiUser
   public R<Boolean> addMerchantStore(@RequestBody MerchantStoreRelationAddReq relationAddReq) {
 
-    return null;
+
+    return success(merchantStoreRelationService.add(relationAddReq));
   }
 
   @PutMapping
@@ -118,6 +145,28 @@ public class MerchantStoreRelationController implements IController {
   }
 
 
+  private MerchantStoreRelationDetailDTO convertMerchantStoreRelationDetailDTO(List<MerchantStoreRelation> merchantStoreRelationList) {
+    MerchantStoreRelationDetailDTO merchantStoreRelationDetailDTO = new MerchantStoreRelationDetailDTO();
+    if(CollectionUtils.isEmpty(merchantStoreRelationList)) {
+      return merchantStoreRelationDetailDTO;
+    }
+    List<AdminMerchantStore> adminMerchantStoreList = new ArrayList<>();
+    merchantStoreRelationDetailDTO.setAdminMerchantStoreList(adminMerchantStoreList);
+
+    for (MerchantStoreRelation m :
+        merchantStoreRelationList) {
+
+      AdminMerchantStore adminMerchantStore = new AdminMerchantStore();
+      adminMerchantStore.setStoreCode(m.getStoreCode());
+      adminMerchantStore.setStoreAlias(m.getStoreAlias());
+      adminMerchantStore.setConsumType(m.getConsumType());
+      adminMerchantStore.setIsRebate(m.getIsRebate());
+      adminMerchantStore.setRebateType(m.getRebateType());
+      adminMerchantStore.setRebateRatio(m.getRebateRatio());
+      adminMerchantStoreList.add(adminMerchantStore);
+    }
+    return merchantStoreRelationDetailDTO;
+  }
   /**
    * convert MerchantStoreRelationDTO to AdminMerchantStoreRelationDTO
    */

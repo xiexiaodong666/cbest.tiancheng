@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 账户信息(account)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 14:23:35
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -112,7 +113,7 @@ public class Account extends Model<Account> implements Serializable {
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic  
+    @ApiModelProperty("删除标志") @TableLogic @TableField  
     private Boolean deleted;
     /**
      * 版本
@@ -124,6 +125,16 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("手机号")   
     private String phone;
+    /**
+     * 最大授权额度
+     */
+    @ApiModelProperty("最大授权额度")   
+    private BigDecimal maxQuota;
+    /**
+     * 剩余授权额度
+     */
+    @ApiModelProperty("剩余授权额度")   
+    private BigDecimal surplusQuota;
 
 //以下为列明常量
 
@@ -199,5 +210,13 @@ public class Account extends Model<Account> implements Serializable {
     * 手机号
     */
     public static final String PHONE = "phone";
+    /**
+    * 最大授权额度
+    */
+    public static final String MAX_QUOTA = "max_quota";
+    /**
+    * 剩余授权额度
+    */
+    public static final String SURPLUS_QUOTA = "surplus_quota";
 
 }

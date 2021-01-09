@@ -99,6 +99,7 @@ public class PaymentController implements IController {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String dayStr = dateFormat.format(currentDate);
         List<BarcodeSalt> barcodeSalts = barcodeSaltService.query(Long.valueOf(dayStr));
+        barcodeSaltService.batchGenerate();
         return success(
                 barcodeSalts.stream()
                         .map(BarcodeSaltDO::of)

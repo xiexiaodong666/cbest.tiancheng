@@ -1,4 +1,4 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -33,4 +33,22 @@ public class AdminMerchantStore {
       + "  \"shopShopping\": false"
       + "}")
   private String consumType;
+
+  /**
+   * 是否返利
+   */
+  @ApiModelProperty("是否返利")
+  private Integer isRebate;
+
+  /**
+   * 返利类型
+   */
+  @ApiModelProperty("返利类型")
+  private String rebateType;
+  /**
+   * 返利比率
+   */
+  @ApiModelProperty("返利比率")
+  private Integer rebateRatio;
+
 }

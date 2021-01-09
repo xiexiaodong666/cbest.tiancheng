@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 月度结算账单(month_settle)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 14:23:39
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -64,15 +65,30 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     @ApiModelProperty("交易笔数")   
     private Integer orderNum;
     /**
-     * 对账状态
+     * 对账状态（待确认-unconfirmed；已确认-confirmed）
      */
-    @ApiModelProperty("对账状态")   
+    @ApiModelProperty("对账状态（待确认-unconfirmed；已确认-confirmed）")   
     private String recStatus;
     /**
-     * 结算状态
+     * 结算状态（待结算-unsettled；已结算-settled）
      */
-    @ApiModelProperty("结算状态")   
+    @ApiModelProperty("结算状态（待结算-unsettled；已结算-settled）")   
     private String settleStatus;
+    /**
+     * 发送状态（待发送-unsended；已发送-sended）
+     */
+    @ApiModelProperty("发送状态（待发送-unsended；已发送-sended）")   
+    private String sendStatus;
+    /**
+     * 发送时间
+     */
+    @ApiModelProperty("发送时间")   
+    private Date sendTime;
+    /**
+     * 确定时间
+     */
+    @ApiModelProperty("确定时间")   
+    private Date confirmTime;
     /**
      * 创建人
      */
@@ -97,7 +113,7 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic  
+    @ApiModelProperty("删除标志") @TableLogic @TableField  
     private Boolean deleted;
 
 //以下为列明常量
@@ -127,13 +143,25 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     */
     public static final String ORDER_NUM = "order_num";
     /**
-    * 对账状态
+    * 对账状态（待确认-unconfirmed；已确认-confirmed）
     */
     public static final String REC_STATUS = "rec_status";
     /**
-    * 结算状态
+    * 结算状态（待结算-unsettled；已结算-settled）
     */
     public static final String SETTLE_STATUS = "settle_status";
+    /**
+    * 发送状态（待发送-unsended；已发送-sended）
+    */
+    public static final String SEND_STATUS = "send_status";
+    /**
+    * 发送时间
+    */
+    public static final String SEND_TIME = "send_time";
+    /**
+    * 确定时间
+    */
+    public static final String CONFIRM_TIME = "confirm_time";
     /**
     * 创建人
     */

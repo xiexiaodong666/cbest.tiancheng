@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 商户明细记录(merchant_credit_apply_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 14:23:39
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -82,7 +83,7 @@ public class MerchantCreditApplyDetail extends Model<MerchantCreditApplyDetail> 
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic  
+    @ApiModelProperty("删除标志") @TableLogic @TableField  
     private Boolean deleted;
     /**
      * 版本

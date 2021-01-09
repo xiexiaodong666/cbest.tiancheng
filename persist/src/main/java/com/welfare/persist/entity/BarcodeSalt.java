@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 条码加盐信息(barcode_salt)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 18:06:33
+ * @since 2021-01-09 14:23:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -46,7 +47,7 @@ public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
     /**
      * 有效期数字表示
      */
-    @ApiModelProperty("有效期数字表示")
+    @ApiModelProperty("有效期数字表示")   
     private Long validPeriodNumeric;
     /**
      * 加盐值
@@ -82,7 +83,7 @@ public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic  
+    @ApiModelProperty("删除标志") @TableLogic @TableField  
     private Boolean deleted;
     /**
      * 版本
@@ -101,8 +102,8 @@ public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
     */
     public static final String VALID_PERIOD = "valid_period";
     /**
-     * 有效期
-     */
+    * 有效期数字表示
+    */
     public static final String VALID_PERIOD_NUMERIC = "valid_period_numeric";
     /**
     * 加盐值

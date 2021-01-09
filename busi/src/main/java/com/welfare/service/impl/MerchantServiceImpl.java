@@ -58,4 +58,11 @@ public class MerchantServiceImpl implements MerchantService {
     public String exportList(MerchantPageReq merchantPageReq) {
         return null;
     }
+
+    @Override
+    public Merchant getMerchantByMerCode(QueryWrapper<Merchant> queryWrapper) {
+        return merchantDao.getOne(queryWrapper);
+    }
+
+
 }

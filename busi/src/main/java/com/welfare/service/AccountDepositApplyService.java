@@ -1,13 +1,14 @@
 package com.welfare.service;
 
 
+import com.baomidou.mybatisplus.extension.api.R;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.persist.entity.AccountDepositApply;
-import com.welfare.service.dto.AccountDepositApprovalRequest;
-import com.welfare.service.dto.AccountDepositRequest;
-import com.welfare.service.dto.DepositApplyRequest;
-import com.welfare.service.dto.MerchantCreditApprovalReq;
+import com.welfare.service.dto.*;
 import com.welfare.service.enums.ApprovalType;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -31,6 +32,34 @@ public interface AccountDepositApplyService {
   Long save(DepositApplyRequest request, List<AccountDepositRequest> accountAmounts,
             MerchantUserInfo merchantUserInfo, ApprovalType approvalType);
 
+
+  /**
+   * 新增员工账号充值申请
+   * @param request
+   * @param merchantUserInfo
+   * @return
+   */
+  Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUserInfo);
+
+  /**
+   * 新增员工账号充值申请
+   * @param request 申请基础信息
+   * @param fileId fileId
+   * @param merchantUserInfo 商户信息
+   * @return
+   */
+  Long saveBatch(DepositApplyRequest request, String fileId, MerchantUserInfo merchantUserInfo);
+
+
+  /**
+   * 修改员工账号充值申请
+   * @param request 修改申请基础信息
+   * @param accountAmounts 员工充值金额
+   * @param merchantUserInfo 商户信息
+   * @return
+   */
+  Long update(DepositApplyUpdateRequest request, List<AccountDepositRequest> accountAmounts, MerchantUserInfo merchantUserInfo);
+
   /**
    * 通过requestId查询申请信息
    * @param requestId
@@ -44,4 +73,20 @@ public interface AccountDepositApplyService {
    * @return
    */
   Long approval(AccountDepositApprovalRequest req);
+
+  /**
+   * 分页查询申请
+   * @param currentPage
+   * @param pageSize
+   * @param query
+   * @return
+   */
+  Page<AccountDepositApplyInfo> page(Integer currentPage, Integer pageSize, AccountDepositApplyQuery query);
+//
+//  /**
+//          * 查询详情
+//   * @param id
+//   * @return
+//           */
+//  AccountDepositApplyDetailInfo detail(Long id);
 }

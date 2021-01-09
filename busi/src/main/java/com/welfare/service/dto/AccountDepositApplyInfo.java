@@ -103,6 +103,13 @@ public class AccountDepositApplyInfo {
   private String merAccountTypeCode;
 
   /**
+   * 福利类型名称
+   */
+  @ApiModelProperty("福利类型名称")
+  @NotEmpty(message = "余额类型名称为空")
+  private String merAccountTypeName;
+
+  /**
    * 审批类型
    */
   @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")

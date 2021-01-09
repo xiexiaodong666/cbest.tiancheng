@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -20,7 +21,7 @@ import lombok.experimental.Accessors;
  * 商户信息(merchant)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 14:23:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -62,6 +63,11 @@ public class Merchant extends Model<Merchant> implements Serializable {
      */
     @ApiModelProperty("合作方式")   
     private String merCooperationMode;
+    /**
+     * 员工自主充值
+     */
+    @ApiModelProperty("员工自主充值")   
+    private Integer selfRecharge;
     /**
      * 备注
      */
@@ -125,6 +131,10 @@ public class Merchant extends Model<Merchant> implements Serializable {
     * 合作方式
     */
     public static final String MER_COOPERATION_MODE = "mer_cooperation_mode";
+    /**
+    * 员工自主充值
+    */
+    public static final String SELF_RECHARGE = "self_recharge";
     /**
     * 备注
     */

@@ -18,4 +18,16 @@ public interface BarcodeSaltService {
      * @return
      */
     List<BarcodeSalt> query(Long fromValidPeriodNumeric);
+
+    /**
+     * 生成指定有效期的加盐参数
+     * @param targetValidPeriod
+     * @return 生成的盐值，或者目标日期已经存在的盐值
+     */
+    BarcodeSalt generateSalt(Long targetValidPeriod);
+
+    /**
+     * 批量生成缺失的period
+     */
+    void batchGenerate();
 }

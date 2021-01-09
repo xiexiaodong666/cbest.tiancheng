@@ -41,6 +41,12 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final MerchantCreditMapper merchantCreditMapper;
     private final MerchantCreditDao merchantCreditDao;
 
+    private final CreditLimitOperator creditLimitOperator;
+    private final CurrentBalanceOperator currentBalanceOperator;
+    private final RechargeLimitOperator rechargeLimitOperator;
+    private final RemainingLimitOperator remainingLimitOperator;
+    private final RebateLimitOperator rebateLimitOperator;
+
     private final Map<MerCreditType, MerAccountTypeOperator> operatorMap = new HashMap<>();
 
 
@@ -92,11 +98,11 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        operatorMap.put(CREDIT_LIMIT, SpringBeanUtils.getBean(CreditLimitOperator.class));
-        operatorMap.put(CURRENT_BALANCE, SpringBeanUtils.getBean(CurrentBalanceOperator.class));
-        operatorMap.put(RECHARGE_LIMIT, SpringBeanUtils.getBean(RechargeLimitOperator.class));
-        operatorMap.put(REMAINING_LIMIT, SpringBeanUtils.getBean(RemainingLimitOperator.class));
-        operatorMap.put(REBATE_LIMIT, SpringBeanUtils.getBean(RebateLimitOperator.class));
+    public void afterPropertiesSet() {
+        operatorMap.put(CREDIT_LIMIT, creditLimitOperator);
+        operatorMap.put(CURRENT_BALANCE, currentBalanceOperator);
+        operatorMap.put(RECHARGE_LIMIT, rechargeLimitOperator);
+        operatorMap.put(REMAINING_LIMIT, remainingLimitOperator);
+        operatorMap.put(REBATE_LIMIT, rebateLimitOperator);
     }
 }

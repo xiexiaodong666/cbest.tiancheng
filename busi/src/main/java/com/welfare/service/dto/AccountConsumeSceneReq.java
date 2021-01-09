@@ -1,11 +1,13 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.util.List;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author yaoxiao
@@ -13,11 +15,12 @@ import lombok.Data;
  * @date 2021/1/8 11:49
  */
 @Data
+@NoArgsConstructor
 public class AccountConsumeSceneReq implements Serializable {
   /**
-   * id
+   * 场景ID
    */
-  @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+  @ApiModelProperty("id")
   private Long id;
   /**
    * 商户代码
@@ -28,17 +31,13 @@ public class AccountConsumeSceneReq implements Serializable {
    * 员工类型编码
    */
   @ApiModelProperty("员工类型编码")
-  private String accountTypeId;
+  private Long accountTypeId;
+
   /**
-   * 门店编码
+   * 员工类型编码
    */
-  @ApiModelProperty("门店编码")
-  private String storeCode;
-  /**
-   * 消费方式
-   */
-  @ApiModelProperty("消费方式")
-  private String consumType;
+  @ApiModelProperty("对应门店")
+  private List<AccountConsumeSceneStoreRelationReq> accountConsumeSceneStoreRelationReqList;
   /**
    * 备注
    */

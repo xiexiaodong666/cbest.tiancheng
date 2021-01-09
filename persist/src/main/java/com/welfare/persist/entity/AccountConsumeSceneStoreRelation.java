@@ -4,8 +4,10 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,8 +20,8 @@ import lombok.experimental.Accessors;
 /**
  * 员工消费场景关联门店(account_consume_scene_store_relation)实体类
  *
- * @author yaox
- * @since 2021-01-09 11:01:12
+ * @author Yuxiang Li
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -33,55 +35,60 @@ public class AccountConsumeSceneStoreRelation extends Model<AccountConsumeSceneS
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * accountConsumeSceneId
      */
-    @ApiModelProperty("accountConsumeSceneId")  
+    @ApiModelProperty("accountConsumeSceneId")   
     private Long accountConsumeSceneId;
     /**
      * 门店编码
      */
-    @ApiModelProperty("门店编码")  
+    @ApiModelProperty("门店编码")   
     private String storeCode;
     /**
      * 消费方式
      */
-    @ApiModelProperty("消费方式")  
+    @ApiModelProperty("消费方式")   
     private String sceneConsumType;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")  
-    private String createUser;
+    @ApiModelProperty("创建人")   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")  
-    private Date createTime;
+    @ApiModelProperty("创建时间")   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")  
-    private String updateUser;
+    @ApiModelProperty("更新人")   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")  
+    @ApiModelProperty("更新时间")   
     @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除")  
-    private Integer deleted;
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Boolean deleted;
     /**
      * 版本
      */
-    @ApiModelProperty("版本") @Version 
-    private Integer version;
+    @ApiModelProperty("版本")  @Version 
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
 
 //以下为列明常量
 

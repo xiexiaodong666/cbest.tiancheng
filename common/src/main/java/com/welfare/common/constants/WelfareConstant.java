@@ -44,7 +44,8 @@ public class WelfareConstant {
 
     public enum Header{
         SOURCE("Source","请求来源"),
-        MERCHANT_USER("merchantUser","商户请求用户");
+        MERCHANT_USER("merchantUser","商户请求用户"),
+        API_USER("apiUser","平台api请求用户");
 
         private String code;
         private String desc;

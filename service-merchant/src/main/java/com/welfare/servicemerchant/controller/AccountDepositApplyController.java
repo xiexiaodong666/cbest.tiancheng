@@ -61,7 +61,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("修改账号额度申请(批量)")
   @MerchantUser
   public R<Long> batchUpdate(@RequestParam @ApiParam(name = "申请id）",required = true) Long id,
-                             @RequestParam @ApiParam("文件id") String fileId,
+                             @RequestParam @ApiParam(name = "文件id",required = true) String fileId,
                              @RequestParam @ApiParam("申请备注") String applyRemark,
                              @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode) {
     return null;
@@ -93,7 +93,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("新增额度申请(批量)")
   @MerchantUser
   public R<Long> batchSave(@RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId,
-                           @RequestParam @ApiParam("文件id")String fileId,
+                           @RequestParam @ApiParam(name = "文件id",required = true)String fileId,
                            @RequestParam @ApiParam("申请备注") String applyRemark,
                            @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode
                            ){
@@ -102,7 +102,8 @@ public class AccountDepositApplyController implements IController {
 
   @PostMapping("/upload")
   @ApiOperation("上传申请excel文件(上传后返回fileId)")
-  public R<String> upload(@RequestParam(name = "file")@ApiParam("file")MultipartFile multipartFile) {
+  public R<String> upload(@RequestPart(name = "file")@ApiParam(name = "file",required = true)MultipartFile multipartFile,
+                          @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId) {
     return null;
   }
 

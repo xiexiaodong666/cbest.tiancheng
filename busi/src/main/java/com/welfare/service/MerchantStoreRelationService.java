@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
+import com.welfare.persist.dto.MerchantStoreRelationDetailDTO;
+import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,4 +25,10 @@ public interface MerchantStoreRelationService {
 
   Page<MerchantStoreRelationDTO> searchMerchantStoreRelations(Page<MerchantStoreRelation> page,
       String merName, String status);
+
+  MerchantStoreRelation getMerchantStoreRelationById(QueryWrapper<MerchantStoreRelation> queryWrapper);
+
+  List<MerchantStoreRelation> getMerchantStoreRelationListByMerCode(QueryWrapper<MerchantStoreRelation> queryWrapper);
+
+  boolean add(MerchantStoreRelationAddReq relationAddReq);
 }

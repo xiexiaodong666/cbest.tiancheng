@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 账户充值申请(account_deposit_apply)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -67,17 +68,20 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建日期
      */
     @ApiModelProperty("创建日期")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新日期
      */
@@ -88,7 +92,8 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
     /**
      * 审批状态
      */
@@ -112,8 +117,9 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除")
-    private Boolean deleted;
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Boolean deleted;
     /**
      * 申请备注
      */
@@ -135,28 +141,26 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     @ApiModelProperty("申请时间")   
     private Date applyTime;
     /**
-     * approvalType
+     * 请求类型
      */
-    @ApiModelProperty("approvalType")   
+    @ApiModelProperty("请求类型")   
     private String approvalType;
     /**
      * requestId
      */
-    @ApiModelProperty("requestId")
+    @ApiModelProperty("requestId")   
     private String requestId;
-
     /**
-     * 福利余额类型
+     * merAccountTypeCode
      */
-    @ApiModelProperty("merAccountTypeCode")
+    @ApiModelProperty("merAccountTypeCode")   
     private String merAccountTypeCode;
-
-
     /**
-     * 福利余额名称
+     * merAccountTypeCode
      */
     @ApiModelProperty("merAccountTypeName")
     private String merAccountTypeName;
+
 //以下为列明常量
 
     /**
@@ -240,20 +244,16 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     */
     public static final String APPLY_TIME = "apply_time";
     /**
-    *  审批类型
+    * 请求类型
     */
     public static final String APPROVAL_TYPE = "approval_type";
     /**
-     * request_id
-     */
+    * 
+    */
     public static final String REQUEST_ID = "request_id";
     /**
-     * 福利余额类型
-     */
+    * 
+    */
     public static final String MER_ACCOUNT_TYPE_CODE = "mer_account_type_code";
-    /**
-     * 福利余额名称
-     */
-    public static final String MER_ACCOUNT_TYPE_NAM = "mer_account_type_name";
 
 }

@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 用户交易流水明细表(account_bill_detail)实体类
+ * 用户交易流水明细表(account_deduction_detail)实体类
  *
  * @author Yuxiang Li
  * @since 2021-01-09 15:13:38
@@ -28,9 +28,9 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("account_bill_detail")
+@TableName("account_deduction_detail")
 @ApiModel("用户交易流水明细表")
-public class AccountBillDetail extends Model<AccountBillDetail> implements Serializable {
+public class AccountDeductionDetail extends Model<AccountDeductionDetail> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -63,17 +63,17 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
      * 交易类型(消费、退款、充值等)
      */
     @ApiModelProperty("交易类型(消费、退款、充值等)")   
-    private String transType;
+    private BigDecimal transType;
     /**
      * pos标识
      */
     @ApiModelProperty("pos标识")   
     private String pos;
     /**
-     * 充值渠道(第三方充值需要体现:支付宝或者微信)
+     * 渠道(自主充值需要显示来源:支付宝、微信)
      */
-    @ApiModelProperty("充值渠道(第三方充值需要体现:支付宝或者微信)")   
-    private String channel;
+    @ApiModelProperty("渠道(自主充值需要显示来源:支付宝、微信)")   
+    private String chanel;
     /**
      * 交易总金额
      */
@@ -85,15 +85,40 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     @ApiModelProperty("交易时间")   
     private Date transTime;
     /**
-     * 账户余额
+     * 支付编码
      */
-    @ApiModelProperty("账户余额")   
-    private BigDecimal accountBalance;
+    @ApiModelProperty("支付编码")   
+    private String payCode;
     /**
-     * 授信余额
+     * 子账户类型(例如餐费、交通费等)
      */
-    @ApiModelProperty("授信余额")   
-    private BigDecimal surplusQuotaBalance;
+    @ApiModelProperty("子账户类型(例如餐费、交通费等)")   
+    private BigDecimal merAccountType;
+    /**
+     * 子账户扣款金额
+     */
+    @ApiModelProperty("子账户扣款金额")   
+    private BigDecimal accountDeductionAmount;
+    /**
+     * 子账户剩余金额
+     */
+    @ApiModelProperty("子账户剩余金额")   
+    private BigDecimal accountDeductionBalance;
+    /**
+     * 商户余额扣款金额
+     */
+    @ApiModelProperty("商户余额扣款金额")   
+    private BigDecimal merDeductionAmount;
+    /**
+     * 商户额度扣款金额
+     */
+    @ApiModelProperty("商户额度扣款金额")   
+    private BigDecimal merDeductionCreditAmount;
+    /**
+     * 自费扣款金额
+     */
+    @ApiModelProperty("自费扣款金额")   
+    private BigDecimal selfDeductionAmount;
     /**
      * 创建人
      */
@@ -162,9 +187,9 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     */
     public static final String POS = "pos";
     /**
-    * 充值渠道(第三方充值需要体现:支付宝或者微信)
+    * 渠道(自主充值需要显示来源:支付宝、微信)
     */
-    public static final String CHANNEL = "channel";
+    public static final String CHANEL = "chanel";
     /**
     * 交易总金额
     */
@@ -174,13 +199,33 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     */
     public static final String TRANS_TIME = "trans_time";
     /**
-    * 账户余额
+    * 支付编码
     */
-    public static final String ACCOUNT_BALANCE = "account_balance";
+    public static final String PAY_CODE = "pay_code";
     /**
-    * 授信余额
+    * 子账户类型(例如餐费、交通费等)
     */
-    public static final String SURPLUS_QUOTA_BALANCE = "surplus_quota_balance";
+    public static final String MER_ACCOUNT_TYPE = "mer_account_type";
+    /**
+    * 子账户扣款金额
+    */
+    public static final String ACCOUNT_DEDUCTION_AMOUNT = "account_deduction_amount";
+    /**
+    * 子账户剩余金额
+    */
+    public static final String ACCOUNT_DEDUCTION_BALANCE = "account_deduction_balance";
+    /**
+    * 商户余额扣款金额
+    */
+    public static final String MER_DEDUCTION_AMOUNT = "mer_deduction_amount";
+    /**
+    * 商户额度扣款金额
+    */
+    public static final String MER_DEDUCTION_CREDIT_AMOUNT = "mer_deduction_credit_amount";
+    /**
+    * 自费扣款金额
+    */
+    public static final String SELF_DEDUCTION_AMOUNT = "self_deduction_amount";
     /**
     * 创建人
     */

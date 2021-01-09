@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.dto;
 
+import com.welfare.persist.dto.AdminMerchantStore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;

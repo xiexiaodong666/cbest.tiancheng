@@ -2,25 +2,26 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
-import  com.welfare.persist.dao.AccountConsumeSceneDao;
-import com.welfare.service.dto.AccountConsumeSceneDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dao.AccountConsumeSceneDao;
+import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
-import com.welfare.service.dto.AccountConsumeStoreDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
+import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
+import com.welfare.service.AccountConsumeSceneService;
+import com.welfare.service.dto.AccountConsumeSceneDTO;
+import com.welfare.service.dto.AccountConsumeSceneReq;
+import com.welfare.service.dto.AccountConsumeSceneStoreRelationReq;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.welfare.service.AccountConsumeSceneService;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 员工消费场景配置服务接口实现
@@ -35,6 +36,7 @@ import org.springframework.util.CollectionUtils;
 public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneService {
     private final AccountConsumeSceneDao accountConsumeSceneDao;
     private final AccountConsumeSceneCustomizeMapper accountConsumeSceneCustomizeMapper;
+    private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
 
     @Override
     public AccountConsumeScene getAccountConsumeScene(Long id) {
@@ -42,26 +44,44 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     }
 
     @Override
-    public Boolean save(AccountConsumeScene accountConsumeScene) {
-        return accountConsumeSceneDao.save(accountConsumeScene);
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean save(AccountConsumeSceneReq accountConsumeSceneReq) {
+        AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
+        BeanUtils.copyProperties(accountConsumeSceneReq,accountConsumeScene);
+        accountConsumeSceneDao.save(accountConsumeScene);
+
+        List<AccountConsumeSceneStoreRelationReq> accountConsumeSceneStoreRelationReqList = accountConsumeSceneReq.getAccountConsumeSceneStoreRelationReqList();
+        List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = new ArrayList<>(accountConsumeSceneStoreRelationReqList.size());
+        accountConsumeSceneStoreRelationReqList.forEach(accountConsumeSceneStoreRelationReq -> {
+            AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation = new AccountConsumeSceneStoreRelation();
+            BeanUtils.copyProperties(accountConsumeSceneStoreRelationReq,accountConsumeSceneStoreRelation);
+            accountConsumeSceneStoreRelation.setAccountConsumeSceneId(accountConsumeScene.getId());
+            accountConsumeSceneStoreRelationList.add(accountConsumeSceneStoreRelation);
+        });
+        accountConsumeSceneStoreRelationDao.saveBatch(accountConsumeSceneStoreRelationList);
+        return true;
     }
 
-    @Override
-    public Boolean saveList(List<AccountConsumeScene> accountConsumeSceneList) {
-        return accountConsumeSceneDao.saveBatch(accountConsumeSceneList);
-    }
 
     @Override
-    public Boolean updateList(List<AccountConsumeScene> accountConsumeSceneList) {
-        return accountConsumeSceneDao.saveOrUpdateBatch(accountConsumeSceneList);
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq) {
+        AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
+        BeanUtils.copyProperties(accountConsumeSceneReq,accountConsumeScene);
+        accountConsumeSceneDao.updateById(accountConsumeScene);
+        List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = new ArrayList<>();
+        accountConsumeSceneReq.getAccountConsumeSceneStoreRelationReqList().stream().forEach(accountConsumeSceneStoreRelationReq -> {
+            AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation = new AccountConsumeSceneStoreRelation();
+            BeanUtils.copyProperties(accountConsumeSceneStoreRelationReq,accountConsumeSceneStoreRelation);
+            accountConsumeSceneStoreRelationList.add(accountConsumeSceneStoreRelation);
+        });
+        accountConsumeSceneStoreRelationDao.updateBatchById(accountConsumeSceneStoreRelationList);
+        return true;
     }
 
-    @Override
-    public Boolean update(AccountConsumeScene accountConsumeScene) {
-        return accountConsumeSceneDao.updateById(accountConsumeScene);
-    }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean delete(Long id) {
         UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
         updateWrapper.eq(AccountConsumeScene.ID,id);
@@ -71,6 +91,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean updateStatus(Long id, Integer status) {
         UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
         updateWrapper.eq(AccountConsumeScene.ID,id);

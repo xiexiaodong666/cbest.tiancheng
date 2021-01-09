@@ -12,13 +12,14 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 商户部门(department)实体类
+ * (merchant_bill_detail)实体类
  *
  * @author Yuxiang Li
  * @since 2021-01-09 15:13:38
@@ -27,9 +28,9 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("department")
-@ApiModel("商户部门")
-public class Department extends Model<Department> implements Serializable {
+@TableName("merchant_bill_detail")
+@ApiModel("")
+public class MerchantBillDetail extends Model<MerchantBillDetail> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -37,43 +38,57 @@ public class Department extends Model<Department> implements Serializable {
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Long id;
+	private Integer id;
     /**
      * 商户代码
      */
     @ApiModelProperty("商户代码")   
     private String merCode;
     /**
-     * 部门名称
+     * 交易流水号
      */
-    @ApiModelProperty("部门名称")   
-    private String departmentName;
+    @ApiModelProperty("交易流水号")   
+    private Integer transNo;
     /**
-     * 部门编码
+     * 交易类型(消费、退款、添加余额、添加额度等)
      */
-    @ApiModelProperty("部门编码")   
-    private String departmentCode;
+    @ApiModelProperty("交易类型(消费、退款、添加余额、添加额度等)")   
+    private String transType;
     /**
-     * 部门父级
+     * 余额类型(余额、可用信用额度、最大额度、充值额度)
      */
-    @ApiModelProperty("部门父级")   
-    private String departmentParent;
+    @ApiModelProperty("余额类型(余额、可用信用额度、最大额度、充值额度)")   
+    private String balanceType;
     /**
-     * 部门层级
+     * 交易金额
      */
-    @ApiModelProperty("部门层级")   
-    private Integer departmentLevel;
+    @ApiModelProperty("交易金额")   
+    private BigDecimal transAmount;
     /**
-     * 部门路径
+     * 充值额度
      */
-    @ApiModelProperty("部门路径")   
-    private String departmentPath;
+    @ApiModelProperty("充值额度")   
+    private BigDecimal rechargeLimit;
     /**
-     * 删除标志
+     * 当前余额
      */
-    @ApiModelProperty("删除标志") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Boolean deleted;
+    @ApiModelProperty("当前余额")   
+    private BigDecimal currentBalance;
+    /**
+     * 最高信用额度
+     */
+    @ApiModelProperty("最高信用额度")   
+    private BigDecimal creditLimit;
+    /**
+     * 剩余信用额度
+     */
+    @ApiModelProperty("剩余信用额度")   
+    private BigDecimal remainingLimit;
+    /**
+     * 返利额度
+     */
+    @ApiModelProperty("返利额度")   
+    private BigDecimal rebateLimit;
     /**
      * 创建人
      */
@@ -104,16 +119,11 @@ public class Department extends Model<Department> implements Serializable {
     @ApiModelProperty("版本")  @Version 
     @TableField(fill = FieldFill.INSERT_UPDATE)
 	private Integer version;
-    /**
-     * 外部编码
-     */
-    @ApiModelProperty("外部编码")   
-    private String externalCode;
 
 //以下为列明常量
 
     /**
-    * id
+    * 
     */
     public static final String ID = "id";
     /**
@@ -121,29 +131,41 @@ public class Department extends Model<Department> implements Serializable {
     */
     public static final String MER_CODE = "mer_code";
     /**
-    * 部门名称
+    * 交易流水号
     */
-    public static final String DEPARTMENT_NAME = "department_name";
+    public static final String TRANS_NO = "trans_no";
     /**
-    * 部门编码
+    * 交易类型(消费、退款、添加余额、添加额度等)
     */
-    public static final String DEPARTMENT_CODE = "department_code";
+    public static final String TRANS_TYPE = "trans_type";
     /**
-    * 部门父级
+    * 余额类型(余额、可用信用额度、最大额度、充值额度)
     */
-    public static final String DEPARTMENT_PARENT = "department_parent";
+    public static final String BALANCE_TYPE = "balance_type";
     /**
-    * 部门层级
+    * 交易金额
     */
-    public static final String DEPARTMENT_LEVEL = "department_level";
+    public static final String TRANS_AMOUNT = "trans_amount";
     /**
-    * 部门路径
+    * 充值额度
     */
-    public static final String DEPARTMENT_PATH = "department_path";
+    public static final String RECHARGE_LIMIT = "recharge_limit";
     /**
-    * 删除标志
+    * 当前余额
     */
-    public static final String DELETED = "deleted";
+    public static final String CURRENT_BALANCE = "current_balance";
+    /**
+    * 最高信用额度
+    */
+    public static final String CREDIT_LIMIT = "credit_limit";
+    /**
+    * 剩余信用额度
+    */
+    public static final String REMAINING_LIMIT = "remaining_limit";
+    /**
+    * 返利额度
+    */
+    public static final String REBATE_LIMIT = "rebate_limit";
     /**
     * 创建人
     */
@@ -164,9 +186,5 @@ public class Department extends Model<Department> implements Serializable {
     * 版本
     */
     public static final String VERSION = "version";
-    /**
-    * 外部编码
-    */
-    public static final String EXTERNAL_CODE = "external_code";
 
 }

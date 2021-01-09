@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 条码加盐信息(barcode_salt)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 18:06:33
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -46,7 +47,7 @@ public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
     /**
      * 有效期数字表示
      */
-    @ApiModelProperty("有效期数字表示")
+    @ApiModelProperty("有效期数字表示")   
     private Long validPeriodNumeric;
     /**
      * 加盐值
@@ -57,17 +58,20 @@ public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
@@ -82,13 +86,15 @@ public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic  
-    private Boolean deleted;
+    @ApiModelProperty("删除标志") @TableLogic   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
 
 //以下为列明常量
 
@@ -101,8 +107,8 @@ public class BarcodeSalt extends Model<BarcodeSalt> implements Serializable {
     */
     public static final String VALID_PERIOD = "valid_period";
     /**
-     * 有效期
-     */
+    * 有效期数字表示
+    */
     public static final String VALID_PERIOD_NUMERIC = "valid_period_numeric";
     /**
     * 加盐值

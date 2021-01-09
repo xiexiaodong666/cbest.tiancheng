@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.entity.AccountConsumeScene;
-import com.welfare.servicemerchant.dto.AccountConsumeSceneReq;
+import com.welfare.service.dto.AccountConsumeSceneReq;
 import com.welfare.servicemerchant.dto.AccountConsumeSceneResp;
 import java.util.List;
 import org.mapstruct.Mapper;

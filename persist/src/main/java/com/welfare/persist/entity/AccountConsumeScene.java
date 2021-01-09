@@ -46,7 +46,7 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
      * 员工类型编码
      */
     @ApiModelProperty("员工类型编码")   
-    private String accountTypeId;
+    private Long accountTypeId;
     /**
      * 备注
      */
@@ -103,14 +103,6 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
     * 员工类型编码
     */
     public static final String ACCOUNT_TYPE_ID = "account_type_id";
-    /**
-    * 门店编码
-    */
-    public static final String STORE_CODE = "store_code";
-    /**
-    * 消费方式
-    */
-    public static final String CONSUM_TYPE = "consum_type";
     /**
     * 备注
     */

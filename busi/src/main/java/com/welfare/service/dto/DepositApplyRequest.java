@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 public class DepositApplyRequest {
 
 
-  @ApiModelProperty("请求id（用于幂等处理）")
+  @ApiModelProperty("请求id（用于幂等处理，UUID即可）")
   @NotEmpty(message = "requestId为空")
   private String requestId;
 
@@ -32,18 +32,18 @@ public class DepositApplyRequest {
   private String applyRemark;
 
   /**
-   * 申请人
+   * 福利类型
    */
-  @ApiModelProperty("申请人")
-  @NotEmpty(message = "申请人为空")
-  private String applyUser;
+  @ApiModelProperty("福利类型")
+  @NotEmpty(message = "余额类型为空")
+  private String merAccountTypeCode;
 
   /**
-   * 余额类型
+   * 福利类型名称
    */
-  @ApiModelProperty("余额类型（待定义）")
-  @NotEmpty(message = "余额类型为空")
-  private String balanceType;
+  @ApiModelProperty("福利类型名称")
+  @NotEmpty(message = "余额类型名称为空")
+  private String merAccountTypeName;
 
   /**
    * 审批类型

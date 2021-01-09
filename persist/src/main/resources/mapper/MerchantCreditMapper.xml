@@ -8,5 +8,8 @@
     <sql id="baseColumn">
         id,mer_code,recharge_limit,current_balance,credit_limit,remaining_limit,rebate_limit,create_user,create_time,update_user,update_time,flag,version
     </sql>
-
+    
+    <update id="decreaseRechargeLimit">
+        UPDATE <include refid="tableName"/> set recharge_limit = recharge_limit - #{increaseLimit},update_time = now(),version = version + 1 where id = #{id} and recharge_limit > #{increaseLimit}
+    </update>
 </mapper>

@@ -15,8 +15,12 @@ import lombok.Data;
 @ApiModel("员工消费场景配置")
 public class AccountConsumeSceneResp implements Serializable {
 
-  @ApiModelProperty("编号")
-  private Long id;
+  /**
+   * 员工类型编号
+   */
+  @ApiModelProperty("员工类型编号")
+  private Long accountTypeId;
+
   /**
    * 商户代码
    */

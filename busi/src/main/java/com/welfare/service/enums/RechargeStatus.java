@@ -10,8 +10,8 @@ package com.welfare.service.enums;
 public enum RechargeStatus {
 
   SUCCESS("SUCCESS","充值成功"),
-  FAIL("FAIL","充值失败"),
-  NO("NO","还未充值");
+  NO("NO","审批未通过不充值"),
+  INIT("INIT","还未充值");
 
   private String code;
   private String value;

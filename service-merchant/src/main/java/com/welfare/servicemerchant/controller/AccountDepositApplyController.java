@@ -2,9 +2,11 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.service.AccountDepositApplyService;
 import com.welfare.service.dto.*;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +37,8 @@ public class AccountDepositApplyController implements IController {
   @GetMapping("/page")
   @ApiOperation("分页账号额度申请列表")
   @MerchantUser
-  public R<Page<AccountDepositApplyInfo>> page(@RequestParam @ApiParam("当前页") Integer currentPage,
-                                               @RequestParam @ApiParam("单页大小") Integer pageSize,
+  public R<Page<AccountDepositApplyInfo>> page(@RequestParam @ApiParam("当前页（从1开始）") Integer current,
+                                               @RequestParam @ApiParam("单页大小") Integer size,
                                                AccountDepositApplyQuery query){
     return null;
   }
@@ -58,7 +60,10 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/batch-update")
   @ApiOperation("修改账号额度申请(批量)")
   @MerchantUser
-  public R<Long> batchUpdate(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file,@RequestParam BatchDepositApplyUpdateRequest requst){
+  public R<Long> batchUpdate(@RequestParam @ApiParam(name = "申请id）",required = true) Long id,
+                             @RequestParam @ApiParam(name = "文件id",required = true) String fileId,
+                             @RequestParam @ApiParam("申请备注") String applyRemark,
+                             @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode) {
     return null;
   }
 
@@ -87,7 +92,26 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/batch-save")
   @ApiOperation("新增额度申请(批量)")
   @MerchantUser
-  public R<Long> batchSave(@ApiParam("MultipartFile")@RequestPart("file") MultipartFile file, @RequestParam BatchDepositApplyRequest request){
+  public R<Long> batchSave(@RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId,
+                           @RequestParam @ApiParam(name = "文件id",required = true)String fileId,
+                           @RequestParam @ApiParam("申请备注") String applyRemark,
+                           @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode
+                           ){
+    return null;
+  }
+
+  @PostMapping("/upload")
+  @ApiOperation("上传申请excel文件(上传后返回fileId)")
+  public R<String> upload(@RequestPart(name = "file")@ApiParam(name = "file",required = true)MultipartFile multipartFile,
+                          @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId) {
+    return null;
+  }
+
+  @GetMapping("/upload/page")
+  @ApiOperation("分页查询上传excel的数据")
+  public R<Page<TempAccountDepositApplyDTO>> uploadData(@RequestParam @ApiParam("当前页(从1开始)") Integer current,
+                                                        @RequestParam @ApiParam("单页大小") Integer size,
+                                                        @RequestParam @ApiParam("文件id")String fileId) {
     return null;
   }
 }

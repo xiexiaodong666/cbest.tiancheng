@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotEmpty;
+
 /**
  * @author duanhy
  * @version 1.0.0
@@ -17,14 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 @ApiModel("批量导入账号申请请求")
 public class BatchDepositApplyRequest {
 
-  @ApiModelProperty("请求id（用于幂等处理）")
+  @ApiModelProperty("请求id（用于幂等处理，UUID即可）")
+  @NotEmpty(message = "requestId为空")
   private String requestId;
-
-  /**
-   * 商户代码
-   */
-  @ApiModelProperty("商户代码")
-  private String merCode;
 
   /**
    * 申请备注
@@ -33,16 +30,11 @@ public class BatchDepositApplyRequest {
   private String applyRemark;
 
   /**
-   * 申请人
+   * 福利类型
    */
-  @ApiModelProperty("申请人")
-  private String applyUser;
-
-  /**
-   * 余额类型
-   */
-  @ApiModelProperty("余额类型（待定义）")
-  private String balanceType;
+  @ApiModelProperty("福利类型")
+  @NotEmpty(message = "福利类型为空")
+  private String merAccountTypeCode;
 
   /**
    * 审批类型

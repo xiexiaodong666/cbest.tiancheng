@@ -1,6 +1,10 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.AccountDepositApplyDetail;
+
+import java.util.List;
+
 /**
  * 充值申请明细服务接口
  *
@@ -10,4 +14,8 @@ package com.welfare.service;
  */
 public interface AccountDepositApplyDetailService {
 
+
+  List<AccountDepositApplyDetail> listByApplyCode(String applyCode);
+
+  Boolean delByApplyCode(String applyCode);
 }

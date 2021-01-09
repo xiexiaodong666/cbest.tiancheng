@@ -1,6 +1,6 @@
-package com.welfare.persist.dto;
+package com.welfare.service.dto;
 
-import java.util.Date;
+import com.welfare.persist.dto.AccountConsumeStoreRelationDTO;
 import java.util.List;
 import lombok.Data;
 
@@ -11,7 +11,6 @@ import lombok.Data;
  */
 @Data
 public class AccountConsumeSceneDTO {
-  private Long id;
   /**
    * 商户代码
    */
@@ -19,7 +18,7 @@ public class AccountConsumeSceneDTO {
   /**
    * 员工类型ID
    */
-  private String accountTypeId;
+  private Long accountTypeId;
   /**
    * 员工类型名称
    */
@@ -27,20 +26,10 @@ public class AccountConsumeSceneDTO {
   /**
    * 消费配置配置门店
    */
-  private List<AccountConsumeStoreDTO> accountConsumeStoreDTOList;
+  private List<AccountConsumeStoreRelationDTO> accountConsumeStoreRelationDTOListDTOList;
 
-  /**
-   * 使用状态
-   */
-  private Integer status;
-  /**
-   * 创建时间
-   */
-  private Date createTime;
   /**
    * 备注
    */
   private String remark;
-
-  private byte deleted;
 }

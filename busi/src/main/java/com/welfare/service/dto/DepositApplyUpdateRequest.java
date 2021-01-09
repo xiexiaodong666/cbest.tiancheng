@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+
 /**
  * @author duanhy
  * @version 1.0.0
@@ -13,12 +15,8 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@ApiModel("修改账号申请请求")
+@ApiModel("修改账号存款申请请求")
 public class DepositApplyUpdateRequest {
-
-
-  @ApiModelProperty("请求id（用于幂等处理）")
-  private String requestId;
 
   /**
    * 申请id
@@ -31,6 +29,13 @@ public class DepositApplyUpdateRequest {
    */
   @ApiModelProperty("申请备注")
   private String applyRemark;
+
+  /**
+   * 福利类型
+   */
+  @ApiModelProperty("福利类型")
+  @NotEmpty(message = "余额类型为空")
+  private String merAccountTypeCode;
 
   @ApiModelProperty("申请员工额度信息")
   private AccountDepositRequest info;

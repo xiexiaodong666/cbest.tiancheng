@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -95,10 +96,18 @@ public class AccountDepositApplyInfo {
   private String approvalRemark;
 
   /**
-   * 申请人
+   * 福利类型
    */
-  @ApiModelProperty("余额类型（待定义）")
-  private String balanceType;
+  @ApiModelProperty("福利类型")
+  @NotEmpty(message = "余额类型为空")
+  private String merAccountTypeCode;
+
+  /**
+   * 福利类型名称
+   */
+  @ApiModelProperty("福利类型名称")
+  @NotEmpty(message = "余额类型名称为空")
+  private String merAccountTypeName;
 
   /**
    * 审批类型

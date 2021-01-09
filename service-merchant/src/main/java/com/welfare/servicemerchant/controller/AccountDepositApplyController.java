@@ -102,7 +102,8 @@ public class AccountDepositApplyController implements IController {
 
   @PostMapping("/upload")
   @ApiOperation("上传申请excel文件(上传后返回fileId)")
-  public R<String> upload(@RequestParam(name = "file")@ApiParam("file")MultipartFile multipartFile) {
+  public R<String> upload(@RequestPart(name = "file")@ApiParam("file")MultipartFile multipartFile,
+                          @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId) {
     return null;
   }
 

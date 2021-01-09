@@ -7,6 +7,7 @@ import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
+import com.welfare.service.dto.AccountConsumeSceneReq;
 import java.util.List;
 
 /**
@@ -18,10 +19,8 @@ import java.util.List;
  */
 public interface AccountConsumeSceneService {
   public AccountConsumeScene getAccountConsumeScene(Long id);
-  public Boolean save(AccountConsumeScene accountConsumeScene);
-  public Boolean saveList(List<AccountConsumeScene> accountConsumeSceneList);
-  public Boolean update(AccountConsumeScene accountConsumeScene);
-  public Boolean updateList(List<AccountConsumeScene> accountConsumeSceneList);
+  public Boolean save(AccountConsumeSceneReq accountConsumeSceneReq);
+  public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq);
   public Boolean delete(Long id);
 
   public Boolean updateStatus(Long id ,Integer status);

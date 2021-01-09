@@ -5,16 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
-import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.service.AccountConsumeSceneService;
 import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
 import com.welfare.servicemerchant.dto.AccountConsumePageReq;
-import com.welfare.servicemerchant.dto.AccountConsumeSceneReq;
-import com.welfare.servicemerchant.dto.AccountConsumeSceneResp;
+import com.welfare.service.dto.AccountConsumeSceneReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,16 +63,14 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/save")
   @ApiOperation("新增员工消费配置")
-  public R<Boolean> saveList(@RequestBody List<AccountConsumeSceneReq> accountConsumeSceneReqList){
-    List<AccountConsumeScene> accountConsumeSceneList = accountConsumeSceneConverter.toEntityList(accountConsumeSceneReqList);
-    return success(accountConsumeSceneService.saveList(accountConsumeSceneList));
+  public R<Boolean> save(@RequestBody AccountConsumeSceneReq accountConsumeSceneReq){
+    return success(accountConsumeSceneService.save(accountConsumeSceneReq));
   }
 
   @PostMapping("/update")
   @ApiOperation("修改员工消费配置")
-  public R<Boolean> updateList(@RequestBody List<AccountConsumeSceneReq> accountConsumeSceneReqList){
-    List<AccountConsumeScene> accountConsumeSceneList = accountConsumeSceneConverter.toEntityList(accountConsumeSceneReqList);
-    return success(accountConsumeSceneService.updateList(accountConsumeSceneList));
+  public R<Boolean> update(@RequestBody AccountConsumeSceneReq accountConsumeSceneReq){
+    return success(accountConsumeSceneService.update(accountConsumeSceneReq));
   }
 
   @PostMapping("/updateStatus/{id}")

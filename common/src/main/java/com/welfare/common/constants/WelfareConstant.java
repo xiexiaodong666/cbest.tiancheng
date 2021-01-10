@@ -87,5 +87,14 @@ public class WelfareConstant {
         public String desc(){
             return this.desc;
         }
+
+        public static MerCreditType findByCode(String code){
+            for (MerCreditType type : MerCreditType.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的MerCreditType类型");
+        }
     }
 }

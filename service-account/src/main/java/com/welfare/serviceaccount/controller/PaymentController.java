@@ -78,6 +78,13 @@ public class PaymentController implements IController {
         return success(BarcodeUtil.calculateAccount("699048259340405130242", saltValue).toString());
     }
 
+    @GetMapping("/barcode/parse-account")
+    @ApiOperation("")
+    public R<String> parseAccount(@RequestParam String barcode ){
+        Long saltValue = barcodeSaltService.queryCurrentPeriodSaltValue().getSaltValue();
+        return success(BarcodeUtil.calculateAccount(barcode, saltValue).toString());
+    }
+
     @GetMapping("/barcode-salts")
     @ApiOperation("支付条码加盐参数列表获取")
     public R<List<BarcodeSaltDO>> getBarcodeSalts(){

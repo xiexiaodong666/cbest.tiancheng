@@ -1,6 +1,5 @@
 package com.welfare.service.dto;
 
-import com.alibaba.druid.util.StringUtils;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
@@ -8,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 /**
  * Description:
@@ -27,23 +25,27 @@ public class PaymentRequest {
     @ApiModelProperty("重百付支付流水号")
     private String transNo;
     @ApiModelProperty("门店号")
-    private String storeNumber;
+    private String storeNo;
     @ApiModelProperty("支付机器号")
-    private String machineNumber;
+    private String machineNo;
     @ApiModelProperty("账户编码")
     private String accountCode;
     @ApiModelProperty("支付场景")
     private String paymentScene;
-    @ApiModelProperty("金额")
+    @ApiModelProperty("支付方式. ACCOUNT:账户支付,BARCODE:扫码支付,CARD:刷卡支付")
+    private String paidBy;
+    @ApiModelProperty("支付方式附加信息(条码、卡介质号)")
+    private String paidByInfo;
+    @ApiModelProperty("金额(元)")
     private BigDecimal amount = BigDecimal.ZERO;
-    @ApiModelProperty(value = "支付状态",notes = "1:新增, 2:处理中, 3:处理成功 -1:处理失败")
+    @ApiModelProperty(value = "支付状态,1:新增, 2:处理中, 3:处理成功 -1:处理失败",notes = "1:新增, 2:处理中, 3:处理成功 -1:处理失败")
     private Integer paymentStatus;
 
     public String chargePaymentScene(){
-        if (!StringUtil.startsWithNumber(storeNumber)) {
+        if (!StringUtil.startsWithNumber(storeNo)) {
             //非数字开头的门店，供应商线下消费
             this.paymentScene = WelfareConstant.PaymentScene.OFFLINE_SUPPLIER.code();
-        } else if(ONLINE_MACHINE_NO.equals(machineNumber)){
+        } else if(ONLINE_MACHINE_NO.equals(machineNo)){
             //特殊支付机器号，重百线上
             this.paymentScene = WelfareConstant.PaymentScene.ONLINE_STORE.code();
         } else {

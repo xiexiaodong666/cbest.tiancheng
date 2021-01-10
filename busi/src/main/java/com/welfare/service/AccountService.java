@@ -11,6 +11,7 @@ import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 账户信息服务接口
@@ -47,4 +48,6 @@ public interface AccountService {
         String accountCode, Date createTimeStart,Date createTimeEnd);
 
     AccountBillDTO quertBill(String accountCode, Date createTimeStart,Date createTimeEnd);
+
+    List<String> getAccountCodeList(List<String> accountCodes);
 }

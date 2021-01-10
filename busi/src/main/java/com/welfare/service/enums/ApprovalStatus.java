@@ -1,5 +1,7 @@
 package com.welfare.service.enums;
 
+import com.welfare.common.exception.BusiException;
+
 /**
  *
  * @author duanhy
@@ -11,7 +13,7 @@ public enum  ApprovalStatus {
 
   AUDIT_SUCCESS("AUDIT_SUCCESS","通过"),
   AUDIT_FAILED("AUDIT_FAILED","不通过"),
-  AUDITING("AUDIT_FAILED","待审核");
+  AUDITING("AUDITING","待审核");
 
   private String code;
   private String value;
@@ -26,7 +28,7 @@ public enum  ApprovalStatus {
         return genderEnum;
       }
     }
-    return null;
+    throw new RuntimeException("ApprovalStatus不存在");
   };
   public String getCode() {
     return code;

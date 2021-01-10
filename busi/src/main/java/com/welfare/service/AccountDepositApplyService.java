@@ -86,5 +86,5 @@ public interface AccountDepositApplyService {
    * @param id
    * @return
    */
-  AccountDepositApplyDetailInfo detail(Integer id);
+  AccountDepositApplyDetailInfo detail(Long id);
 }

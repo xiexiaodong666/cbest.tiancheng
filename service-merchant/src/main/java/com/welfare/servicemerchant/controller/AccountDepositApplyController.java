@@ -1,9 +1,13 @@
 package com.welfare.servicemerchant.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
+import com.welfare.service.AccountDepositApplyDetailService;
 import com.welfare.service.AccountDepositApplyService;
 import com.welfare.service.TempAccountDepositApplyService;
 import com.welfare.service.dto.*;
@@ -16,12 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 员工账号存款管理
@@ -41,10 +48,17 @@ public class AccountDepositApplyController implements IController {
   private AccountDepositApplyService depositApplyService;
 
   @Autowired
+  private AccountDepositApplyDetailService detailService;
+
+  @Autowired
   private FileUploadService fileUploadService;
 
   @Autowired
   private TempAccountDepositApplyService tempAccountDepositApplyService;
+
+  @Autowired
+  @Qualifier("accountApplySaveExecutor")
+  private ThreadPoolExecutor executor;
 
   @GetMapping("/page")
   @ApiOperation("分页账号额度申请列表")
@@ -58,8 +72,17 @@ public class AccountDepositApplyController implements IController {
   @GetMapping("/detail")
   @ApiOperation("查询账号额度申请详情")
   @MerchantUser
-  public R<AccountDepositApplyDetailInfo> detail(@RequestParam @ApiParam(name = "申请id", required = true) Integer id){
+  public R<AccountDepositApplyDetailInfo> detail(@RequestParam @ApiParam(name = "申请id", required = true) Long id){
     return success(depositApplyService.detail(id));
+  }
+
+  @GetMapping("/batch-item")
+  @ApiOperation("分页查询批量额度申请明细")
+  @MerchantUser
+  public R<Page<TempAccountDepositApplyDTO>> batchtem(@RequestParam @ApiParam("当前页（从1开始）") Integer current,
+                                                      @RequestParam @ApiParam("单页大小") Integer size,
+                                                      @RequestParam @ApiParam(name = "申请id", required = true) Long id){
+    return success(detailService.pageByApplyCode(id, current, size));
   }
 
   @PostMapping("/update")
@@ -120,7 +143,7 @@ public class AccountDepositApplyController implements IController {
     request.setRequestId(requestId);
     request.setApplyRemark(applyRemark);
     request.setMerAccountTypeCode(merAccountTypeCode);
-    request.setMerAccountTypeCode(merAccountTypeName);
+    request.setMerAccountTypeName(merAccountTypeName);
     return success(depositApplyService.saveBatch(request, fileId, MerchantUserHolder.getDeptIds()));
   }
 
@@ -128,7 +151,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("上传申请excel文件(上传后返回fileId)")
   public R<String> upload(@RequestPart(name = "file")@ApiParam(name = "file",required = true)MultipartFile multipartFile,
                           @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId) throws IOException {
-    return success(tempAccountDepositApplyService.upload(multipartFile, requestId));
+    return success(tempAccountDepositApplyService.upload(multipartFile, requestId, executor));
   }
 
   @GetMapping("/upload/page")
@@ -136,6 +159,6 @@ public class AccountDepositApplyController implements IController {
   public R<Page<TempAccountDepositApplyDTO>> uploadData(@RequestParam @ApiParam("当前页(从1开始)") Integer current,
                                                         @RequestParam @ApiParam("单页大小") Integer size,
                                                         @RequestParam @ApiParam("文件id")String fileId) {
-    return success(tempAccountDepositApplyService.pageByFileId(current, size, fileId));
+    return success(tempAccountDepositApplyService.pageByFileIdByExistAccount(current, size, fileId));
   }
 }

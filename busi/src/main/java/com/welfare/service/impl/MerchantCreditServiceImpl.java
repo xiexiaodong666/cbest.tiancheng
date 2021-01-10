@@ -59,7 +59,18 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     public MerchantCredit getByMerCode(String merCode) {
         QueryWrapper<MerchantCredit> query = new QueryWrapper<>();
         query.eq(MerchantCredit.MER_CODE, merCode);
-        return  merchantCreditDao.getOne(query);
+        MerchantCredit credit = merchantCreditDao.getOne(query);
+        if (credit == null) {
+            credit = new MerchantCredit();
+            credit.setMerCode(merCode);
+            credit.setRechargeLimit(BigDecimal.ZERO);
+            credit.setCurrentBalance(BigDecimal.ZERO);
+            credit.setCreditLimit(BigDecimal.ZERO);
+            credit.setRemainingLimit(BigDecimal.ZERO);
+            credit.setRebateLimit(BigDecimal.ZERO);
+            merchantCreditDao.save(credit);
+        }
+        return credit;
     }
 
 

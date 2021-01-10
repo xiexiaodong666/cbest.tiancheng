@@ -124,7 +124,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setRemark(request.getRemark());
                 apply.setEnclosure(request.getEnclosure());
                 apply.setApplyUser(user.getUserName());
-                merchantCreditApplyDao.save(apply);
+                merchantCreditApplyDao.saveOrUpdate(apply);
                 return apply.getId();
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
@@ -163,7 +163,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setApprovalRemark(request.getApplyRemark());
                 apply.setApplyUser(request.getApprovalUser());
                 apply.setApprovalStatus(request.getApprovalStatus().getCode());
-                merchantCreditApplyDao.save(apply);
+                merchantCreditApplyDao.saveOrUpdate(apply);
                 if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
                     // 审批通过修改金额
                     WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyCode());

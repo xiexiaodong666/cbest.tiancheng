@@ -6,6 +6,7 @@ import com.welfare.persist.entity.TempAccountDepositApply;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author duanhy
@@ -19,7 +20,9 @@ public interface TempAccountDepositApplyService {
 
   Boolean delByFileId(String fileId);
 
-  Page<TempAccountDepositApplyDTO> pageByFileId(int current, int size, String fileId);
+  Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(int current, int size, String fileId);
+
+  List<TempAccountDepositApplyDTO> listByFileIdExistAccount(String fileId);
 
   List<TempAccountDepositApply> getAllByFileId(String fileId);
 
@@ -29,7 +32,7 @@ public interface TempAccountDepositApplyService {
    * @param requestId
    * @return
    */
-  String upload(MultipartFile multipartFile, String requestId);
+  String upload(MultipartFile multipartFile, String requestId, ThreadPoolExecutor executor);
 
   /**
    * 通过requestId获取上传文件的fileId
@@ -37,4 +40,7 @@ public interface TempAccountDepositApplyService {
    * @return
    */
   String getFileIdByRequestId(String requestId);
+
+
+
 }

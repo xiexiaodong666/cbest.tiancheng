@@ -2,6 +2,7 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
 
 import java.util.List;
@@ -20,5 +21,8 @@ public interface AccountDepositApplyDetailService {
 
   Boolean delByApplyCode(String applyCode);
 
-  Page<AccountDepositApplyDetail> pageByApplyCode(String applyCode, int current, int size);
+  Page<TempAccountDepositApplyDTO> pageByApplyCode(Long id, int current, int size);
+
+  List<AccountDepositApplyDetail> listByApplyCodeIfAccountExist(String applyCode);
+
 }

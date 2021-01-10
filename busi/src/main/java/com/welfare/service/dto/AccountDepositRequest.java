@@ -25,7 +25,6 @@ public class AccountDepositRequest {
    * 员工账号
    */
   @ApiModelProperty(name = "员工账号", required = true)
-  @NotEmpty(message = "员工账号为空")
   private String accountCode;
 
   /**

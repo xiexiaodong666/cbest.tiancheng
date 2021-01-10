@@ -7,6 +7,8 @@ import com.welfare.persist.entity.TempAccountDepositApply;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 
 /**
  * (temp_account_deposit_apply)数据Mapper
@@ -18,5 +20,8 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface TempAccountDepositApplyMapper extends BaseMapper<TempAccountDepositApply> {
 
-  Page<TempAccountDepositApplyDTO> pageByFileId(@Param("page") Page<TempAccountDepositApply> page, @Param("fileId") String fileId);
+  Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(@Param("page") Page<TempAccountDepositApply> page, @Param("fileId") String fileId);
+
+  List<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(@Param("fileId") String fileId);
+
 }

@@ -10,6 +10,7 @@ import com.welfare.persist.dao.TempAccountDepositApplyDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.TempAccountDepositApply;
 import com.welfare.persist.mapper.TempAccountDepositApplyMapper;
+import com.welfare.service.AccountService;
 import com.welfare.service.TempAccountDepositApplyService;
 import com.welfare.service.dto.AccountDepositRequest;
 import com.welfare.service.listener.DepositApplyUploadListener;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,6 +47,9 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   @Autowired
   private RedissonClient redissonClient;
 
+  @Autowired
+  private AccountService accountService;
+
   @Override
   public Boolean saveAll(List<TempAccountDepositApply> applys) {
     return tempAccountDepositApplyDao.saveBatch(applys);
@@ -58,11 +63,16 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   }
 
   @Override
-  public Page<TempAccountDepositApplyDTO> pageByFileId(int current, int size, String fileId) {
+  public Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(int current, int size, String fileId) {
     Page<TempAccountDepositApply> page = new Page<>();
     page.setCurrent(current);
     page.setSize(size);
-    return tempAccountDepositApplyMapper.pageByFileId(page, fileId);
+    return tempAccountDepositApplyMapper.pageByFileIdByExistAccount(page, fileId);
+  }
+
+  @Override
+  public List<TempAccountDepositApplyDTO> listByFileIdExistAccount(String fileId) {
+    return tempAccountDepositApplyMapper.pageByFileIdByExistAccount(fileId);
   }
 
   @Override
@@ -73,7 +83,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   }
 
   @Override
-  public String upload(MultipartFile multipartFile, String requestId) {
+  public String upload(MultipartFile multipartFile, String requestId, ThreadPoolExecutor executor) {
     String fileId = getFileIdByRequestId(requestId);
     if (StringUtils.isNotBlank(fileId)) {
       return fileId;
@@ -88,9 +98,15 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
           return fileId;
         }
         fileId = UUID.randomUUID().toString();
-        DepositApplyUploadListener listener = new DepositApplyUploadListener(this, requestId , fileId);
+        DepositApplyUploadListener listener = new DepositApplyUploadListener(this, requestId ,
+                fileId, accountService, executor);
         EasyExcel.read(multipartFile.getInputStream(), AccountDepositRequest.class, listener).sheet().doRead();
         log.info("批量导入员工账号存储申请完成. requestId:{} fileId:{}", requestId, fileId);
+        Page<TempAccountDepositApplyDTO> page = pageByFileIdByExistAccount(1 , 1, fileId);
+        if (page == null || CollectionUtils.isEmpty(page.getRecords())) {
+          delByFileId(fileId);
+          throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工！", null);
+        }
         return fileId;
       } else {
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);

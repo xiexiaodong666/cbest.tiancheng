@@ -141,6 +141,12 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
     @ApiModelProperty("申请时间")   
     private Date applyTime;
 
+    /**
+     * requestId
+     */
+    @ApiModelProperty("requestId")
+    private String requestId;
+
 //以下为列明常量
 
     /**
@@ -224,4 +230,8 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
     */
     public static final String APPLY_TIME = "apply_time";
 
+    /**
+     * 请求id
+     */
+    public static final String REQUEST_ID = "request_id";
 }

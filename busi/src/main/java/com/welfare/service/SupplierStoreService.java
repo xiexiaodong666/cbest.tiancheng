@@ -30,6 +30,13 @@ public interface SupplierStoreService {
     SupplierStore detail(Long id);
 
     /**
+     * 查询供应商门店详情
+     * @param storeCode
+     * @return
+     */
+    SupplierStore getSupplierStoreByStoreCode(String storeCode);
+
+    /**
      * 新增供应商门店
      * @param supplierStore
      * @return
@@ -71,4 +78,9 @@ public interface SupplierStoreService {
      * @return
      */
     String exportList(SupplierStorePageReq req);
+
+    /**
+     * 同步门店消费能力数据
+     */
+    boolean syncConsumeType(String storeCode, String consumeType);
 }

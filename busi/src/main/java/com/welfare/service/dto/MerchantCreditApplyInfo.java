@@ -40,6 +40,12 @@ public class MerchantCreditApplyInfo {
   private String merName;
 
   /**
+   * 商户编码
+   */
+  @ApiModelProperty("商户编码")
+  private String merCode;
+
+  /**
    * 合作方式
    */
   @ApiModelProperty("合作方式（待定）")
@@ -101,13 +107,6 @@ public class MerchantCreditApplyInfo {
   @ApiModelProperty("审批备注")
   @ExcelProperty("审批备注")
   private String approvalRemark;
-
-  /**
-   * 商户编码
-   */
-  @ApiModelProperty("商户编码")
-  @ExcelProperty("编号")
-  private String merCode;
 
   /**
    * 附件

@@ -5,10 +5,10 @@ import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.service.AccountDepositApplyService;
+import com.welfare.service.TempAccountDepositApplyService;
 import com.welfare.service.dto.*;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
@@ -43,12 +43,15 @@ public class AccountDepositApplyController implements IController {
   @Autowired
   private FileUploadService fileUploadService;
 
+  @Autowired
+  private TempAccountDepositApplyService tempAccountDepositApplyService;
+
   @GetMapping("/page")
   @ApiOperation("分页账号额度申请列表")
   @MerchantUser
   public R<Page<AccountDepositApplyInfo>> page(@RequestParam @ApiParam("当前页（从1开始）") Integer current,
                                                @RequestParam @ApiParam("单页大小") Integer size,
-                                               AccountDepositApplyQuery query){
+                                               @Validated AccountDepositApplyQuery query){
     return success(depositApplyService.page(current, size, query));
   }
 
@@ -62,7 +65,7 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/update")
   @ApiOperation("修改账号额度申请(单个)")
   @MerchantUser
-  public R<Long> update(@RequestBody DepositApplyUpdateRequest requst){
+  public R<Long> update(@Validated @RequestBody DepositApplyUpdateRequest requst){
     return success(depositApplyService.updateOne(requst, MerchantUserHolder.getDeptIds()));
   }
 
@@ -85,7 +88,7 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/export")
   @ApiOperation("导出账号额度申请(返回文件下载地址)")
   @MerchantUser
-  public R<String> export(@RequestBody AccountDepositApplyQuery query) throws IOException {
+  public R<String> export(@Validated@RequestBody AccountDepositApplyQuery query) throws IOException {
     List<AccountDepositApplyInfo> list = depositApplyService.list(query);
     return success(fileUploadService.uploadExcelFile(list, AccountDepositApplyInfo.class, "员工额度申请"));
   }
@@ -93,14 +96,14 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/approval")
   @ApiOperation("审批账号额度申请")
   @MerchantUser
-  public R<Long> approval(@RequestBody AccountDepositApprovalRequest request){
+  public R<Long> approval(@Validated@RequestBody AccountDepositApprovalRequest request){
     return success(depositApplyService.approval(request));
   }
 
   @PostMapping("/save")
   @ApiOperation("新增额度申请(单个)")
   @MerchantUser
-  public R<Long> save(@RequestBody DepositApplyRequest request){
+  public R<Long> save(@Validated@RequestBody DepositApplyRequest request){
     return success(depositApplyService.saveOne(request, MerchantUserHolder.getDeptIds()));
   }
 
@@ -124,8 +127,8 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/upload")
   @ApiOperation("上传申请excel文件(上传后返回fileId)")
   public R<String> upload(@RequestPart(name = "file")@ApiParam(name = "file",required = true)MultipartFile multipartFile,
-                          @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId) {
-    return null;
+                          @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId) throws IOException {
+    return success(tempAccountDepositApplyService.upload(multipartFile, requestId));
   }
 
   @GetMapping("/upload/page")
@@ -133,6 +136,6 @@ public class AccountDepositApplyController implements IController {
   public R<Page<TempAccountDepositApplyDTO>> uploadData(@RequestParam @ApiParam("当前页(从1开始)") Integer current,
                                                         @RequestParam @ApiParam("单页大小") Integer size,
                                                         @RequestParam @ApiParam("文件id")String fileId) {
-    return null;
+    return success(tempAccountDepositApplyService.pageByFileId(current, size, fileId));
   }
 }

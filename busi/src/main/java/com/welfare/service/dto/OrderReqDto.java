@@ -1,4 +1,4 @@
-package com.welfare.servicesettlement.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,8 +28,8 @@ public class OrderReqDto implements Serializable {
     private BigDecimal lowPrice;
     @ApiModelProperty(value = "最高价格" , required = false)
     private BigDecimal hightPrice;
-    @ApiModelProperty(value = "门店类型" , required = false)
-    private String storeType;
+    @ApiModelProperty(value = "商户编码" , required = false)
+    private String merchantCode;
     @ApiModelProperty(value = "开始时间" , required = false)
     private String startDateTime;
     @ApiModelProperty(value = "结束时间" , required = false)

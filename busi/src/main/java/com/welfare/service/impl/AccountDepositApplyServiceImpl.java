@@ -81,6 +81,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     @Autowired
     private DepartmentService departmentService;
 
+    @Autowired
+    private DepositService depositService;
+
     @Override
     public Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUser) {
 
@@ -360,7 +363,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                         detail.setUpdateUser(request.getApprovalUser());
                     });
                     // 如果审批通过，需要给员工增加余额；减少商户充值额度；保存商户充值额度变动明细
-                    incrBalanceAndReduceRechargeLimit(details, apply);
+                    depositService.deposit(Deposit.of(apply, details));
                 }
                 if (apply.getApprovalStatus().equals(ApprovalStatus.AUDIT_FAILED.getCode())) {
                     details.stream().forEach(detail -> {
@@ -450,25 +453,25 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
      * @param details
      * @param apply
      */
-    private void incrBalanceAndReduceRechargeLimit(List<AccountDepositApplyDetail> details, AccountDepositApply apply) {
-        if (CollectionUtils.isNotEmpty(details)) {
-            MerchantCredit merchantCredit = merchantCreditService.getByMerCode(apply.getMerCode());
-            if (merchantCredit == null) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度不存在", null);
-            }
-            // 判断充值额度是否超过商户充值额度,减少商户充值额度
-            double sumAmount = details.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
-            int success = merchantCreditService.decreaseRechargeLimit(new BigDecimal(sumAmount), merchantCredit.getId());
-            if (success > 0) {
-                // 增加员工福利余额及总余额
-                List<AccountAmountType> list = assemblyAccountAmountTypeList(details, apply);
-                accountAmountTypeService.batchSaveOrUpdate(list);
-                list.forEach(accountAmountType -> {
-                    accountService.increaseAccountBalance(accountAmountType.getAccountBalance(),apply.getApprovalUser(), accountAmountType.getAccountCode());
-                });
-            }
-        }
-    }
+//    private void incrBalanceAndReduceRechargeLimit(List<AccountDepositApplyDetail> details, AccountDepositApply apply) {
+//        if (CollectionUtils.isNotEmpty(details)) {
+//            MerchantCredit merchantCredit = merchantCreditService.getByMerCode(apply.getMerCode());
+//            if (merchantCredit == null) {
+//                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度不存在", null);
+//            }
+//            // 判断充值额度是否超过商户充值额度,减少商户充值额度
+//            double sumAmount = details.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
+//            int success = merchantCreditService.decreaseRechargeLimit(new BigDecimal(sumAmount), merchantCredit.getId());
+//            if (success > 0) {
+//                // 增加员工福利余额及总余额
+//                List<AccountAmountType> list = assemblyAccountAmountTypeList(details, apply);
+//                accountAmountTypeService.batchSaveOrUpdate(list);
+//                list.forEach(accountAmountType -> {
+//                    accountService.increaseAccountBalance(accountAmountType.getAccountBalance(),apply.getApprovalUser(), accountAmountType.getAccountCode());
+//                });
+//            }
+//        }
+//    }
 
     private List<AccountAmountType> assemblyAccountAmountTypeList(List<AccountDepositApplyDetail> details, AccountDepositApply apply){
         List<AccountAmountType> list = new ArrayList<>();

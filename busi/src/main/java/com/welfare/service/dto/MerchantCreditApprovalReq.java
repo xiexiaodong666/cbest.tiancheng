@@ -1,9 +1,15 @@
 package com.welfare.service.dto;
 
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.service.enums.ApprovalStatus;
+import com.welfare.service.enums.MerchantCreditApplyType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author duanhy
@@ -18,13 +24,15 @@ public class MerchantCreditApprovalReq {
 
 
   @ApiModelProperty("申请id")
+  @NotNull(message = "申请id为空")
   private Long id;
 
   /**
    * 审批状态
    */
   @ApiModelProperty("审批状态(通过：AUDIT_SUCCESS， 不通过：AUDIT_FAILED)")
-  private String approvalStatus;
+  @NotEmpty(message = "审批状态为空")
+  private ApprovalStatus approvalStatus;
 
   /**
    * 申请备注

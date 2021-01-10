@@ -66,5 +66,12 @@ public class MerchantServiceImpl implements MerchantService {
         return merchantDao.getOne(queryWrapper);
     }
 
+    @Override
+    public Merchant detailByMerCode(String merCode) {
+        QueryWrapper<Merchant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Merchant.MER_CODE, merCode);
+        return merchantDao.getOne(queryWrapper);
+    }
+
 
 }

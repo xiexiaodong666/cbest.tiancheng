@@ -33,9 +33,9 @@ public class PaymentRequest {
     @ApiModelProperty("支付场景")
     private String paymentScene;
     @ApiModelProperty("支付方式. ACCOUNT:账户支付,BARCODE:扫码支付,CARD:刷卡支付")
-    private String paidBy;
+    private String paymentMethod;
     @ApiModelProperty("支付方式附加信息(条码、卡介质号)")
-    private String paidByInfo;
+    private String paymentMethodInfo;
     @ApiModelProperty("金额(元)")
     private BigDecimal amount = BigDecimal.ZERO;
     @ApiModelProperty(value = "支付状态,1:新增, 2:处理中, 3:处理成功 -1:处理失败",notes = "1:新增, 2:处理中, 3:处理成功 -1:处理失败")

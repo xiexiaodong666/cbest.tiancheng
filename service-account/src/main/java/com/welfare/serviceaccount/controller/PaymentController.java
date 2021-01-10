@@ -79,7 +79,8 @@ public class PaymentController implements IController {
     }
 
     @GetMapping("/barcode/parse-account")
-    @ApiOperation("")
+    @ApiOperation("根据条码查询支付账户")
+    @ApiModelProperty("支付账号, AccountNo")
     public R<String> parseAccount(@RequestParam String barcode ){
         Long saltValue = barcodeSaltService.queryCurrentPeriodSaltValue().getSaltValue();
         return success(BarcodeUtil.calculateAccount(barcode, saltValue).toString());

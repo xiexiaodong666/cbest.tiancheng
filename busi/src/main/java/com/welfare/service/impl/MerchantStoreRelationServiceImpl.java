@@ -2,6 +2,11 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ApiUserHolder;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dto.AdminMerchantStore;
@@ -9,11 +14,14 @@ import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.MerchantStoreRelationService;
+import com.welfare.service.SupplierStoreService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +44,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
   private final MerchantStoreRelationDao merchantStoreRelationDao;
   private final MerchantStoreRelationMapper merchantStoreRelationMapper;
+  private final SupplierStoreService supplierStoreService;
+  private final ObjectMapper mapper;
 
   @Override
   public Page<MerchantStoreRelation> pageQuery(Page<MerchantStoreRelation> page,
@@ -49,7 +59,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       Page<MerchantStoreRelation> page,
       String merName, String status, Date startTime, Date endTime) {
 
-    return merchantStoreRelationMapper.searchMerchantStoreRelations(page, merName, status, startTime, endTime);
+    return merchantStoreRelationMapper.searchMerchantStoreRelations(
+        page, merName, status, startTime, endTime);
   }
 
   @Override
@@ -66,6 +77,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
   @Override
   public boolean add(MerchantStoreRelationAddReq relationAddReq) {
+    // 防止门店，消费门店  消费方法不一致
+    if (!validateConsumeType(relationAddReq.getAdminMerchantStoreList())) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
+    }
+
     List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
     List<AdminMerchantStore> adminMerchantStoreList = relationAddReq.getAdminMerchantStoreList();
 
@@ -96,6 +112,12 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   @Override
   @Transactional(rollbackFor = {Exception.class})
   public boolean update(MerchantStoreRelationUpdateReq relationUpdateReq) {
+
+    // 防止门店，消费门店  消费方法不一致
+    if (!validateConsumeType(relationUpdateReq.getAdminMerchantStoreList())) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
+    }
+
     QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(MerchantStoreRelation.ID, relationUpdateReq.getId());
     MerchantStoreRelation merchantStoreRelation = merchantStoreRelationDao.getOne(queryWrapper);
@@ -174,7 +196,6 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
     }
 
-    // TODO 同步门店消费能力
     return remove && updateBatch && saveBath;
   }
 
@@ -205,5 +226,48 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     }
 
     return merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelations);
+  }
+
+  private boolean validateConsumeType(List<AdminMerchantStore> merchantStoreList) {
+
+    boolean validate = true;
+    for (AdminMerchantStore merchantStore :
+        merchantStoreList) {
+      SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(
+          merchantStore.getStoreCode());
+      try {
+        Map<String, Boolean> consumeTypeMap = mapper.readValue(
+            supplierStore.getConsumType(), Map.class);
+
+        Map<String, Boolean> merchantStoreConsumeTypeMap = mapper.readValue(
+            merchantStore.getConsumType(), Map.class);
+        boolean isSelectO2O = consumeTypeMap.get(ConsumeTypeEnum.O2O.getCode());
+        if (!isSelectO2O && merchantStoreConsumeTypeMap.containsKey(
+            ConsumeTypeEnum.O2O.getCode())) {
+          validate = false;
+          break;
+        }
+        boolean isSelectOnlineMall =
+            consumeTypeMap.get(ConsumeTypeEnum.ONLINE_MALL.getCode());
+        if (!isSelectOnlineMall && merchantStoreConsumeTypeMap.containsKey(
+            ConsumeTypeEnum.ONLINE_MALL.getCode())) {
+          validate = false;
+          break;
+        }
+        boolean isSelectShopShopping =
+            consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+        if (!isSelectShopShopping && merchantStoreConsumeTypeMap.containsKey(
+            ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+          validate = false;
+          break;
+        }
+
+      } catch (JsonProcessingException e) {
+        validate = false;
+        log.error("[syncConsumeType] json convert error", e.getMessage());
+      }
+    }
+
+    return validate;
   }
 }

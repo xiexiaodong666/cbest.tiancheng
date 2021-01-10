@@ -3,6 +3,7 @@ package com.welfare.persist.mapper;
 import com.welfare.persist.entity.CardInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 卡信息(card_info)数据Mapper
@@ -14,4 +15,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CardInfoMapper extends BaseMapper<CardInfo> {
 
+  public String getCardId(@Param("merCode") String merCode);
 }

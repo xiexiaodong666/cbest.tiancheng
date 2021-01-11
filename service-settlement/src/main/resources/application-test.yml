@@ -55,3 +55,15 @@ mybatis-plus:
     db-config:
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+xxl:
+  job:
+    admin:
+      addresses: http://172.30.37.35:8180/
+    executor:
+      appname: e-welfare-settlement
+      ip:
+      port: 9888
+      logpath: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest/jobhandler/
+      logretentiondays: 30
+    accessToken:

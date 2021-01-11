@@ -1,9 +1,9 @@
-package com.welfare.servicesettlement.dto;
+package com.welfare.service.dto;
 
+import com.welfare.common.base.RequestPage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.lang.reflect.Type;
 import java.util.Date;
 
 /**
@@ -13,7 +13,7 @@ import java.util.Date;
  * @desc 账单明细响应dto
  */
 @Data
-public class BillDetailReqDto{
+public class MonthSettleDetailReq extends RequestPage {
     @ApiModelProperty(value = "订单编号")
     private String orderNo;
 
@@ -28,4 +28,7 @@ public class BillDetailReqDto{
 
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
+
+    @ApiModelProperty(value = "福利类型")
+    private String welfareTypeCode;
 }

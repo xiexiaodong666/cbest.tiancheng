@@ -1,9 +1,8 @@
-package com.welfare.servicesettlement.dto;
+package com.welfare.service.dto;
 
+import com.welfare.common.base.RequestPage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * @author qiang.deng
@@ -12,7 +11,7 @@ import java.util.Date;
  * @desc 账单明细请求dto
  */
 @Data
-public class BillDetailRespDto {
+public class MonthSettleDetailResp extends RequestPage {
     @ApiModelProperty(value = "交易流水号")
     private String transNo;
 
@@ -36,6 +35,12 @@ public class BillDetailRespDto {
 
     @ApiModelProperty(value = "类型")
     private String type;
+
+    @ApiModelProperty(value = "福利类型")
+    private String welfareTypeCode;
+
+    @ApiModelProperty(value = "福利类型名称")
+    private String welfareTypeName;
 
     @ApiModelProperty(value = "实际付款金额")
     private String payAmount;

@@ -37,12 +37,12 @@ public class PlatformUserController {
   PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
       @RequestParam int pageSize,
       @RequestParam int page,
-      @RequestParam String merchat_code,
+      @RequestParam String merchant_code,
       @RequestParam(required = false) Date start_create_time,
       @RequestParam(required = false) Date end_create_time
   ) {
     return platformUserFeignClient.getPlatformUserList(
-        pageSize, page, merchat_code, start_create_time, end_create_time);
+        pageSize, page, merchant_code, start_create_time, end_create_time);
   }
 
   /**
@@ -69,7 +69,7 @@ public class PlatformUserController {
   /**
    * 详情
    */
-  @RequestMapping(value = "/detail", method = RequestMethod.GET, consumes = "application/json")
+  @RequestMapping(value = "/detail", method = RequestMethod.GET)
   @ApiOperation("详情")
   PlatformUserResponse<PlatformUser> getPlatformUserDetail(
       @RequestParam("id") Long id) {

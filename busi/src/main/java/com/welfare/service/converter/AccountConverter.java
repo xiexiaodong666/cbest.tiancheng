@@ -8,6 +8,7 @@ import com.welfare.persist.entity.Account;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDepositApplyInfo;
+import java.util.List;
 import org.mapstruct.Mapper;
 
 /**
@@ -18,9 +19,13 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface AccountConverter {
 
+  List<AccountDTO> toAccountDTOList(List<AccountPageDTO> accountPageDTOList);
+
   Page<AccountDTO> toPage(IPage<AccountPageDTO> entityList);
 
   Page<AccountBillDetailDTO> toBillDetailPage(IPage<AccountBillDetailMapperDTO> entityList);
+
+  List<AccountBillDetailDTO> toAccountBillDetailDTOList(List<AccountBillDetailMapperDTO> accountBillDetailMapperDTOList);
 
   AccountDepositApplyInfo toInfo(Account account);
 }

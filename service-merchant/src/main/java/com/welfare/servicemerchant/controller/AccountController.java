@@ -11,10 +11,13 @@ import com.welfare.service.dto.AccountReq;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDepositApplyInfo;
 import com.welfare.service.dto.AccountBillDetailDTO;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -45,6 +48,8 @@ public class AccountController implements IController {
 
   @Autowired
   private AccountService accountService;
+  @Autowired
+  private FileUploadService fileUploadService;
 
 
   @GetMapping("/incremental-page")
@@ -104,13 +109,9 @@ public class AccountController implements IController {
 
   @ApiOperation("员工账号导出")
   @GetMapping(value="/exportAccount")
-  public void exportAccount(@RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("商户编码") String merCode,
-      @RequestParam(required = false) @ApiParam("员工姓名") String accountName,
-      @RequestParam(required = false) @ApiParam("所属部门") String storeCode,
-      @RequestParam(required = false) @ApiParam("账号状态") Integer accountStatus,
-      @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeCode){
+  public R<String> exportAccount(AccountPageReq accountPageReq) throws IOException {
+    List<AccountDTO>  accountDTOList = accountService.export(accountPageReq);
+    return success(fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号"));
   }
 
   @ApiOperation("批量新增员工账号")
@@ -122,6 +123,14 @@ public class AccountController implements IController {
   @PostMapping(value = "/batchBindCard")
   public R<Boolean> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
     return null;
+  }
+
+  @GetMapping("/bill")
+  @ApiOperation("员工账号消费汇总")
+  public R<AccountBillDTO> quertBill(@RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+      @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
+    return success(accountService.quertBill(accountCode,createTimeStart,createTimeEnd));
   }
 
 
@@ -136,22 +145,12 @@ public class AccountController implements IController {
     return success(result);
   }
 
-  @GetMapping("/bill")
-  @ApiOperation("员工账号消费汇总")
-  public R<AccountBillDTO> quertBill(@RequestParam(required = false) @ApiParam("accountCode") String accountCode,
-      @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
-      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    return success(accountService.quertBill(accountCode,createTimeStart,createTimeEnd));
-  }
-
-
   @GetMapping("/account/bill/export")
   @ApiOperation("员工账号消费汇总导出")
-  public R<String> exportAccountBill(@RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+  public R<String> exportAccountBill(@RequestParam @ApiParam("accountCode") String accountCode,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
-      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    return null;
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) throws IOException{
+    List<AccountBillDetailDTO> exportList = accountService.exportBillDetail(accountCode,createTimeStart,createTimeEnd);
+    return success(fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细"));
   }
 }

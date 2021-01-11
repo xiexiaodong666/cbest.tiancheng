@@ -23,6 +23,7 @@ import java.util.List;
 public interface AccountService {
     Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
         AccountPageReq accountPageReq);
+    List<AccountDTO> export(AccountPageReq accountPageReq);
 
     /**
      * 增加员工账号余额
@@ -46,6 +47,8 @@ public interface AccountService {
 
     Page<AccountBillDetailDTO> queryAccountBillDetail(Integer currentPage,Integer pageSize,
         String accountCode, Date createTimeStart,Date createTimeEnd);
+
+    List<AccountBillDetailDTO> exportBillDetail(String accountCode, Date createTimeStart,Date createTimeEnd);
 
     AccountBillDTO quertBill(String accountCode, Date createTimeStart,Date createTimeEnd);
 

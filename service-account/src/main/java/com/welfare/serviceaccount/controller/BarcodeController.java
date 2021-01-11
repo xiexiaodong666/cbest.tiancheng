@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 public class BarcodeController implements IController {
     private final BarcodeSaltService barcodeSaltService;
 
-    @GetMapping("/barcode")
+    @GetMapping
     @ApiOperation("用户获取支付条码")
     public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode){
         BarcodeSalt barcodeSalt =  barcodeSaltService.queryCurrentPeriodSaltValue();

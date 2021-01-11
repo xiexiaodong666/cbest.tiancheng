@@ -1,5 +1,7 @@
 package com.welfare.common.constants;
 
+import lombok.EqualsAndHashCode;
+
 /**
  * Description:
  *
@@ -66,7 +68,10 @@ public class WelfareConstant {
     /**
      * 充值来源，用以标记
      */
-    public enum MerCreditType{
+    public enum MerCreditType {
+        /**
+         *
+         */
         RECHARGE_LIMIT("rechargeLimit","充值额度"),
         CURRENT_BALANCE("currentBalance","目前余额"),
         CREDIT_LIMIT("creditLimit","信用额度"),

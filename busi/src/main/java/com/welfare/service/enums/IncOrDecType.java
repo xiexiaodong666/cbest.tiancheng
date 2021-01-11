@@ -1,13 +1,13 @@
 package com.welfare.service.enums;
 
 /**
- * Description: 账户金额操作类型
+ * Description: 金额加减类型
  *
  * @author Yuxiang Li
  * @email yuxiang.li@sjgo365.com
  * @date 1/11/2021
  */
-public enum IncreaseOrDecrease {
+public enum IncOrDecType {
     /**
      * 操作类型
      */
@@ -17,7 +17,7 @@ public enum IncreaseOrDecrease {
     String code;
     String desc;
 
-    IncreaseOrDecrease(String code, String desc){
+    IncOrDecType(String code, String desc){
         this.code = code;
         this.desc = desc;
     }

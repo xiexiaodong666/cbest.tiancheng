@@ -1,4 +1,4 @@
-package com.welfare.service.operator.merchant;
+package com.welfare.service.operator.merchant.domain;
 
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.service.enums.IncOrDecType;

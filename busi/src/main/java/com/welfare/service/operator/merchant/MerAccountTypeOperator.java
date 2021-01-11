@@ -1,8 +1,13 @@
 package com.welfare.service.operator.merchant;
 
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Description:
@@ -11,7 +16,10 @@ import java.math.BigDecimal;
  * @email kobe663@gmail.com
  * @date 1/9/2021 10:36 PM
  */
-public interface MerAccountTypeOperator {
+public abstract class MerAccountTypeOperator {
+
+    private Optional<MerAccountTypeOperator> next = Optional.empty();
+
 
     /**
      * 扣减
@@ -19,7 +27,7 @@ public interface MerAccountTypeOperator {
      * @param amount
      * @return 实际操作金额
      */
-    default BigDecimal decrease(MerchantCredit merchantCredit, BigDecimal amount){
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount){
         throw new RuntimeException("not supported method");
     }
 
@@ -29,7 +37,29 @@ public interface MerAccountTypeOperator {
      * @param amount
      * @return 实际操作金额
      */
-    default BigDecimal increase(MerchantCredit merchantCredit, BigDecimal amount){
+    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount){
         throw new RuntimeException("not supported method");
+    }
+
+    /**
+     * 下一个MerAccountTypeOperator，用于构建operator的链表
+     * @param merAccountTypeOperator
+     */
+    public void putNext(MerAccountTypeOperator merAccountTypeOperator){
+        this.next = Optional.of(merAccountTypeOperator);
+    }
+
+    protected Optional<MerAccountTypeOperator> getNext(){
+        return next;
+    }
+
+    /**
+     * 默认抛出余额不足异常,子类可以自定义其他操作
+     * @param merchantCredit
+     * @param amountLeftToBeDecrease
+     * @return
+     */
+    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease){
+        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
     }
 }

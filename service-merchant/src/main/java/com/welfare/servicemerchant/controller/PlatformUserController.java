@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiOperation;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/merchantStoreRelation")
+@RequestMapping("/platformUser")
 @Api(tags = "商户用户接口接口")
 public class PlatformUserController {
 
@@ -33,25 +32,25 @@ public class PlatformUserController {
   /**
    * 获取商户用户列表
    */
-  @RequestMapping(value = "/api/platform/user/list", method = RequestMethod.GET)
+  @RequestMapping(value = "/list", method = RequestMethod.GET)
   @ApiOperation("获取商户用户列表")
   PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
-      @RequestParam("pageSize") int pageSize,
-      @RequestParam("page") int page,
-      @RequestParam("merchat_id") Long merchat_id,
-      @RequestParam("start_create_time") Date start_create_time,
-      @RequestParam("end_create_time") Date end_create_time
+      @RequestParam int pageSize,
+      @RequestParam int page,
+      @RequestParam String merchant_code,
+      @RequestParam(required = false) Date start_create_time,
+      @RequestParam(required = false) Date end_create_time
   ) {
     return platformUserFeignClient.getPlatformUserList(
-        pageSize, page, merchat_id, start_create_time, end_create_time);
+        pageSize, page, merchant_code, start_create_time, end_create_time);
   }
 
   /**
    * 新增商户用户
    */
-  @RequestMapping(value = "/api/platform/user/create", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("新增商户用户")
-  PlatformUserResponse<PlatformUser> addPlatformUser(@RequestBody PlatformUser platformUser) {
+  PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.addPlatformUser(platformUser);
   }
@@ -59,9 +58,9 @@ public class PlatformUserController {
   /**
    * 修改商户用户
    */
-  @RequestMapping(value = "/api/platform/user/update", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("修改商户用户")
-  PlatformUserResponse<PlatformUser> updatePlatformUser(@RequestBody PlatformUser platformUser) {
+  PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUser(platformUser);
   }
@@ -70,7 +69,7 @@ public class PlatformUserController {
   /**
    * 详情
    */
-  @RequestMapping(value = "/api/platform/user/detail", method = RequestMethod.GET, consumes = "application/json")
+  @RequestMapping(value = "/detail", method = RequestMethod.GET)
   @ApiOperation("详情")
   PlatformUserResponse<PlatformUser> getPlatformUserDetail(
       @RequestParam("id") Long id) {
@@ -81,9 +80,9 @@ public class PlatformUserController {
   /**
    * 锁定/解锁
    */
-  @RequestMapping(value = "/api/platform/user/update-status", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/update-status", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("锁定/解锁")
-  PlatformUserResponse<PlatformUser> updatePlatformUserStatus(
+  PlatformUserResponse<Boolean> updatePlatformUserStatus(
       @RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUserStatus(platformUser);

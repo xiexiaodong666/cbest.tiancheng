@@ -1,5 +1,6 @@
 package com.welfare.persist.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -83,42 +84,12 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("是否绑卡")
     private Integer binding;
-    /**
-     * 创建人
-     */
-    @ApiModelProperty("创建人")
-    private String createUser;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty("创建时间")
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty("更新人")
-    private String updateUser;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty("更新时间")
-    @TableField(update = "now()")
-    private Date updateTime;
+
     /**
      * 账户余额
      */
     @ApiModelProperty("账户余额")
     private BigDecimal accountBalance;
-    /**
-     * 删除标志
-     */
-    @ApiModelProperty("删除标志") @TableLogic
-    private Boolean deleted;
-    /**
-     * 版本
-     */
-    @ApiModelProperty("版本")  @Version
-    private Integer version;
     /**
      * 手机号
      */
@@ -139,6 +110,43 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("备注")
     private String remark;
+
+    /**
+     * 创建人
+     */
+    @ApiModelProperty("创建人")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private String createUser;
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty("创建时间")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Date createTime;
+    /**
+     * 更新人
+     */
+    @ApiModelProperty("更新人")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private String updateUser;
+    /**
+     * 更新时间
+     */
+    @ApiModelProperty("更新时间")
+    @TableField(update = "now()")
+    private Date updateTime;
+    /**
+     * 删除标志  1-删除、0-未删除
+     */
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Boolean deleted;
+    /**
+     * 版本
+     */
+    @ApiModelProperty("版本")  @Version
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Integer version;
 
 //以下为列明常量
 

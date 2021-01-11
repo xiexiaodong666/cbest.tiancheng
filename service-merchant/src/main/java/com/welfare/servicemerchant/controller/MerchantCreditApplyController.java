@@ -68,7 +68,8 @@ public class MerchantCreditApplyController implements IController {
     @ApiUser
     public R<String> export(@Validated @RequestBody MerchantCreditApplyQuery query) throws IOException {
         List<MerchantCreditApplyInfo> list = applyService.list(query, ApiUserHolder.getUserInfo());
-        return success(fileUploadService.uploadExcelFile(list, MerchantCreditApplyInfo.class, "商户额度申请"));
+        String path = fileUploadService.uploadExcelFile(list, MerchantCreditApplyInfo.class, "商户额度申请");
+        return success(fileUploadService.getFileServerUrl(path));
     }
 
     @PostMapping("/approval")

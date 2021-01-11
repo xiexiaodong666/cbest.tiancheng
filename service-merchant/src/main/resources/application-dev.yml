@@ -57,4 +57,4 @@ mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
 
 platformUser:
-  url:
+  url: http://test-welfare-app.sjgo365.com/shop-api/tc/store

@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.ApiUserInfo;
+import com.welfare.common.enums.MerCooperationModeEnum;
+import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import  com.welfare.persist.dao.MerchantCreditApplyDao;
+import com.welfare.persist.dao.MerchantCreditApplyDao;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantCreditApply;
+import com.welfare.service.MerchantCreditApplyService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
@@ -20,14 +23,13 @@ import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.utils.PageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.welfare.service.MerchantCreditApplyService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -66,9 +68,12 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 if (apply != null) {
                     return apply.getId();
                 }
+                validationParmas(request.getApplyType(), request.getMerCode());
                 apply = creditApplyConverter.toApply(request);
+                apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
                 apply.setApplyCode(UUID.randomUUID().toString());
                 apply.setApplyUser(user.getUserName());
+                apply.setApplyTime(new Date());
                 merchantCreditApplyDao.save(apply);
                 return apply.getId();
             } else {
@@ -79,6 +84,28 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
+            }
+        }
+    }
+
+    public void validationParmas(String typeStr, String merCode){
+        Merchant merchant = merchantService.detailByMerCode(merCode);
+        if (merchant == null) {
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
+        }
+        WelfareConstant.MerCreditType type = WelfareConstant.MerCreditType.findByCode(typeStr);
+        if (!merchant.getMerIdentity().equals(MerIdentityEnum.customer.getCode())) {
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持[客户]充值", null);
+        }
+        if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payFirt.getCode())) {
+            if (WelfareConstant.MerCreditType.CREDIT_LIMIT == type
+                    || WelfareConstant.MerCreditType.REMAINING_LIMIT == type) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("不能充值[%s]类型",type.desc()), null);
+            }
+        }
+        if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payed.getCode())) {
+            if (WelfareConstant.MerCreditType.CURRENT_BALANCE == type) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("不能充值[%s]类型",type.desc()), null);
             }
         }
     }
@@ -111,7 +138,8 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
                 }
-                apply.setApplyType(request.getApplyType().code());
+                validationParmas(request.getApplyType(), apply.getMerCode());
+                apply.setApplyType(request.getApplyType());
                 apply.setBalance(request.getBalance());
                 apply.setRemark(request.getRemark());
                 apply.setEnclosure(request.getEnclosure());
@@ -152,6 +180,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
                 }
+                validationParmas(apply.getApplyType(), apply.getMerCode());
                 apply.setApprovalRemark(request.getApplyRemark());
                 apply.setApplyUser(request.getApprovalUser());
                 apply.setApprovalStatus(request.getApprovalStatus().getCode());
@@ -209,14 +238,16 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
 
     @Override
     public List<MerchantCreditApplyInfo> list(MerchantCreditApplyQuery query, ApiUserInfo user) {
-        List<MerchantCreditApplyInfo> result =  merchantCreditApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
-        if (CollectionUtils.isNotEmpty(result)) {
-            result.forEach(info -> {
+        List<MerchantCreditApply> result =  merchantCreditApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
+        List<MerchantCreditApplyInfo> infos = creditApplyConverter.toInfoList(result);
+        if (CollectionUtils.isNotEmpty(infos)) {
+            infos.forEach(info -> {
                 Merchant merchant = merchantService.detailByMerCode(info.getMerCode());
+                info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());
                 info.setMerName(merchant.getMerName());
                 info.setMerCooperationMode(merchant.getMerCooperationMode());
             });
         }
-        return result;
+        return infos;
     }
 }

@@ -24,6 +24,11 @@ public class MerchantWithCreditDTO {
   @ApiModelProperty("商户名称")
   private String merName;
   /**
+   * 员工自主充值
+   */
+  @ApiModelProperty("员工自主充值")
+  private String selfRecharge;
+  /**
    * 商户代码
    */
   @ApiModelProperty("商户代码")

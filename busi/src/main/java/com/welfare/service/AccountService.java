@@ -12,6 +12,7 @@ import com.welfare.service.dto.AccountPageReq;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 账户信息服务接口
@@ -24,6 +25,9 @@ public interface AccountService {
     Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
         AccountPageReq accountPageReq);
     List<AccountDTO> export(AccountPageReq accountPageReq);
+
+    String uploadAccount(MultipartFile multipartFile);
+    String accountBatchBindCard(MultipartFile multipartFile);
 
     /**
      * 增加员工账号余额
@@ -43,6 +47,7 @@ public interface AccountService {
     AccountDetailDTO queryDetail(Long id);
 
     Boolean save(Account account);
+    Boolean batchSave(List<Account> accountList);
     Boolean update(Account account);
 
     Page<AccountBillDetailDTO> queryAccountBillDetail(Integer currentPage,Integer pageSize,

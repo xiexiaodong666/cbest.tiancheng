@@ -137,8 +137,8 @@ public class CardApplyServiceImpl implements CardApplyService {
     }
 
     // TODO 批量修改 cardInfo
-    cardApplyDao.saveOrUpdate(cardApply);
-    return false;
+
+    return cardApplyDao.saveOrUpdate(cardApply);
   }
 
   @Override

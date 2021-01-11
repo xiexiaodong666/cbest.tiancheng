@@ -67,7 +67,7 @@ public class Merchant extends Model<Merchant> implements Serializable {
      * 员工自主充值
      */
     @ApiModelProperty("员工自主充值")   
-    private Integer selfRecharge;
+    private String selfRecharge;
     /**
      * 备注
      */

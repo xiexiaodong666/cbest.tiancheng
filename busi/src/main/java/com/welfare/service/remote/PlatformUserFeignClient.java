@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "platform_user", url = "${platformUser.url}", fallbackFactory = PlatformUserFallback.class)
+@FeignClient(value = "platformUser", url = "${platformUser.url}", fallbackFactory = PlatformUserFallback.class)
 public interface PlatformUserFeignClient {
 
   /**

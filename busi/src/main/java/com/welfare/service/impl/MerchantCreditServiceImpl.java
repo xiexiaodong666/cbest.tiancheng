@@ -82,8 +82,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             MerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            List<MerchantAccountOperation> decrease = merAccountTypeOperator.decrease(merchantCredit, amount);
-
+            merAccountTypeOperator.decrease(merchantCredit, amount);
             merchantCreditDao.updateById(merchantCredit);
         } finally {
             lock.unlock();

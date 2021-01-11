@@ -10,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Description:
@@ -52,9 +54,10 @@ public class CurrentBalanceOperator extends MerAccountTypeOperator implements In
 
     @Override
     protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease) {
-        MerAccountTypeOperator nextOperator = getNext().orElseThrow(
-                ()->new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null)
-        );
+        MerAccountTypeOperator nextOperator = getNext();
+        if(Objects.isNull(nextOperator)){
+            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
+        }
         merchantCredit.setCurrentBalance(BigDecimal.ZERO);
         MerchantAccountOperation operation = MerchantAccountOperation.of(
                 merCreditType,

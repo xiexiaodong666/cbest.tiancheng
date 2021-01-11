@@ -18,7 +18,7 @@ import java.util.Optional;
  */
 public abstract class MerAccountTypeOperator {
 
-    private Optional<MerAccountTypeOperator> next = Optional.empty();
+    private MerAccountTypeOperator next;
 
 
     /**
@@ -46,10 +46,10 @@ public abstract class MerAccountTypeOperator {
      * @param merAccountTypeOperator
      */
     public void putNext(MerAccountTypeOperator merAccountTypeOperator){
-        this.next = Optional.of(merAccountTypeOperator);
+        this.next = merAccountTypeOperator;
     }
 
-    protected Optional<MerAccountTypeOperator> getNext(){
+    protected MerAccountTypeOperator getNext(){
         return next;
     }
 

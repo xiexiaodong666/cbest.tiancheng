@@ -1,9 +1,10 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
+import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.SupplierStoreService;
-import com.welfare.service.dto.SupplierStorePageReq;
 import com.welfare.servicemerchant.converter.SupplierStoreConverter;
 import com.welfare.servicemerchant.dto.SupplierStoreInfo;
 import io.swagger.annotations.Api;
@@ -38,8 +39,8 @@ public class SupplierStoreController implements IController {
     private final SupplierStoreConverter supplierStoreConverter;
     @GetMapping("/page")
     @ApiOperation("查询供应商门店列表（分页））")
-    public R<Page<SupplierStoreInfo>> page(Page<SupplierStore>page, SupplierStorePageReq req){
-        return R.success(supplierStoreConverter.toD(supplierStoreService.page(page,req)));
+    public R<Page<SupplierStoreWithMerchantDTO>> page(Page page, StorePageReq req){
+        return R.success(supplierStoreService.page(page,req));
     }
     @GetMapping("/detail")
     @ApiOperation("查询供应商门店详情）")
@@ -78,7 +79,7 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/export-list")
     @ApiOperation("导出供应商门店列表")
-    public R exportList(SupplierStorePageReq req){
+    public R exportList(StorePageReq req){
         return R.success(supplierStoreService.exportList(req));
 
     }

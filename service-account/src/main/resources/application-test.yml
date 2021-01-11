@@ -35,3 +35,12 @@ mybatis-plus:
     db-config:
       logic-delete-value: 1
       logic-not-delete-value: 0
+platformUser:
+  url:
+
+cbest:
+  pay:
+    url: http://192.1.30.71:9999/gateway
+    appId: yufu
+    appKey: e4716980da4382e1f4cc6ee4bb640277
+    notifyUrl: http://xxx/accountDepositRecord/payNotify

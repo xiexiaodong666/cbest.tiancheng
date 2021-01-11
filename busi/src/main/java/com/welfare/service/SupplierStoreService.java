@@ -2,8 +2,9 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
+import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
-import com.welfare.service.dto.SupplierStorePageReq;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface SupplierStoreService {
      * @param req
      * @return
      */
-    Page<SupplierStore> page(Page<SupplierStore>page,SupplierStorePageReq req);
+    Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req);
 
     /**
      * 查询供应商门店详情
@@ -77,7 +78,7 @@ public interface SupplierStoreService {
      * @param req
      * @return
      */
-    String exportList(SupplierStorePageReq req);
+    String exportList(StorePageReq req);
 
     /**
      * 同步门店消费能力数据

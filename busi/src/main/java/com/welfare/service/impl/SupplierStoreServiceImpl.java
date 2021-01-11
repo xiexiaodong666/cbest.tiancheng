@@ -5,14 +5,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
+import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
+import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.entity.SupplierStore;
+import com.welfare.persist.mapper.SupplierStoreExMapper;
 import com.welfare.service.SupplierStoreService;
-import com.welfare.service.dto.SupplierStorePageReq;
 import com.welfare.service.helper.QueryHelper;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -37,11 +39,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   private final MerchantStoreRelationDao merchantStoreRelationDao;
 
+  private final SupplierStoreExMapper supplierStoreExMapper;
+
   private final ObjectMapper mapper;
 
   @Override
-  public Page<SupplierStore> page(Page<SupplierStore> page, SupplierStorePageReq req) {
-    return supplierStoreDao.page(page, QueryHelper.getWrapper(req));
+  public Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req) {
+    Page<SupplierStoreWithMerchantDTO> pageResult=supplierStoreExMapper.listWithMerchant(page, req);
+    return pageResult;
   }
 
   @Override
@@ -81,11 +86,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   public boolean update(SupplierStore supplierStore) {
+    if(EmptyChecker.notEmpty(supplierStore.getConsumType())){
+      this.syncConsumeType(supplierStore.getStoreCode(),supplierStore.getStoreCode());
+    }
     return supplierStoreDao.updateById(supplierStore);
   }
 
   @Override
-  public String exportList(SupplierStorePageReq req) {
+  public String exportList(StorePageReq req) {
     return null;
   }
 

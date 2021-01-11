@@ -1,26 +1,23 @@
-package com.welfare.service.dto;
+package com.welfare.service.dto.payment;
 
-import com.alibaba.druid.util.StringUtils;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.StringUtil;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 /**
  * Description:
  *
  * @author Yuxiang Li
  * @email yuxiang.li@sjgo365.com
- * @date 1/6/2021
+ * @date 1/11/2021
  */
-@ApiModel("支付请求")
 @Data
-public class PaymentRequest {
+public class AbstractPaymentRequest {
     private static transient final String ONLINE_MACHINE_NO = "";
+
 
     @ApiModelProperty("支付请求id")
     private String requestId;
@@ -30,26 +27,19 @@ public class PaymentRequest {
     private String storeNumber;
     @ApiModelProperty("支付机器号")
     private String machineNumber;
-    @ApiModelProperty("账户编码")
-    private String accountCode;
-    @ApiModelProperty("支付场景")
-    private String paymentScene;
     @ApiModelProperty("金额")
     private BigDecimal amount = BigDecimal.ZERO;
-    @ApiModelProperty(value = "支付状态",notes = "1:新增, 2:处理中, 3:处理成功 -1:处理失败")
-    private Integer paymentStatus;
 
     public String chargePaymentScene(){
         if (!StringUtil.startsWithNumber(storeNumber)) {
             //非数字开头的门店，供应商线下消费
-            this.paymentScene = WelfareConstant.PaymentScene.OFFLINE_SUPPLIER.code();
+            return WelfareConstant.PaymentScene.OFFLINE_SUPPLIER.code();
         } else if(ONLINE_MACHINE_NO.equals(machineNumber)){
             //特殊支付机器号，重百线上
-            this.paymentScene = WelfareConstant.PaymentScene.ONLINE_STORE.code();
+            return WelfareConstant.PaymentScene.ONLINE_STORE.code();
         } else {
             //其余情况，重百线下
-            this.paymentScene = WelfareConstant.PaymentScene.OFFLINE_CBEST.code();
+            return WelfareConstant.PaymentScene.OFFLINE_CBEST.code();
         }
-        return this.paymentScene;
     }
 }

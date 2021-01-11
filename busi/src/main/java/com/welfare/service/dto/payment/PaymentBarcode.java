@@ -1,7 +1,8 @@
-package com.welfare.service.dto;
+package com.welfare.service.dto.payment;
 
 import com.welfare.common.util.BarcodeUtil;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Calendar;
@@ -17,12 +18,14 @@ import java.util.Date;
 @Data
 @ApiModel("支付条码")
 public class PaymentBarcode {
+    @ApiModelProperty("条码值")
     private String barcode;
-    private Date generatedDate;
+    @ApiModelProperty("扫描日期")
+    private Date scanDate;
     public static PaymentBarcode of(Long accountCode,Long secretKey){
         PaymentBarcode paymentBarcode = new PaymentBarcode();
         paymentBarcode.setBarcode(BarcodeUtil.generateBarcode(accountCode,secretKey));
-        paymentBarcode.setGeneratedDate(Calendar.getInstance().getTime());
+        paymentBarcode.setScanDate(Calendar.getInstance().getTime());
         return paymentBarcode;
     }
 }

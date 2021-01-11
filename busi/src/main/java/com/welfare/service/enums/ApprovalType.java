@@ -26,7 +26,7 @@ public enum ApprovalType {
         return genderEnum;
       }
     }
-    return null;
+    throw new RuntimeException("ApprovalType不存在");
   };
   public String getCode() {
     return code;

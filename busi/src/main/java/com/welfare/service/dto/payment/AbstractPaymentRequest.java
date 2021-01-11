@@ -29,6 +29,8 @@ public class AbstractPaymentRequest {
     private String machineNumber;
     @ApiModelProperty("金额")
     private BigDecimal amount = BigDecimal.ZERO;
+    @ApiModelProperty("是否离线，用于区分是离线支付还是在线支付")
+    private Boolean offLine;
 
     public String chargePaymentScene(){
         if (!StringUtil.startsWithNumber(storeNumber)) {

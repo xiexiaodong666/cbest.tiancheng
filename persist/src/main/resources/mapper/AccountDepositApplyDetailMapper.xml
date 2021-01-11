@@ -9,4 +9,45 @@
         id,apply_code,account_code,recharge_amount,recharge_status,create_user,create_time,update_user,update_time,flag,version
     </sql>
 
+    <resultMap id="tempAccountDepositApplyDTO" type="com.welfare.persist.dto.TempAccountDepositApplyDTO">
+        <id property="id" column="id" />
+        <result property="accountCode" column="account_code"/>
+        <result property="accountName" column="account_name"/>
+        <result property="rechargeAmount" column="recharge_amount"/>
+        <result property="departmentCode" column="store_code"/>
+        <result property="departmentName" column="department_name"/>
+    </resultMap>
+
+    <resultMap id="accountDepositApplyDetail" type="com.welfare.persist.entity.AccountDepositApplyDetail">
+        <id property="id" column="id" />
+        <result property="id" column="id"/>
+        <result property="applyCode" column="apply_code"/>
+        <result property="accountCode" column="account_code"/>
+        <result property="rechargeStatus" column="recharge_status"/>
+        <result property="accountName" column="account_name"/>
+        <result property="rechargeAmount" column="recharge_amount"/>
+    </resultMap>
+
+
+    <select id="listByApplyCodeIfAccountExist" resultMap="accountDepositApplyDetail">
+        SELECT
+        ad.*
+        from account ac LEFT JOIN account_deposit_apply_detail ad
+        on ac.account_code = ad.account_code
+        where ad.apply_code = #{applyCode} and ac.deleted = 0
+    </select>
+
+    <select id="listByApplyCodeIfAccountExist2" resultMap="tempAccountDepositApplyDTO">
+        SELECT
+         ad.id,
+         ac.account_name,
+         ad.account_code,
+         ad.recharge_amount,
+         ac.store_code,
+         de.department_name
+        from account ac LEFT JOIN account_deposit_apply_detail ad
+        on ac.account_code = ad.account_code
+        LEFT JOIN department de ON de.department_code = ac.store_code
+        where ad.apply_code = #{applyCode} and ac.deleted = 0
+    </select>
 </mapper>

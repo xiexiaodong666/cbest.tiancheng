@@ -4,8 +4,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author duanhy
@@ -22,6 +25,7 @@ public class DepositApplyUpdateRequest {
    * 申请id
    */
   @ApiModelProperty("申请id")
+  @NotNull(message = "id为空")
   private Long id;
 
   /**
@@ -34,16 +38,15 @@ public class DepositApplyUpdateRequest {
    * 福利类型
    */
   @ApiModelProperty("福利类型")
-  @NotEmpty(message = "余额类型为空")
   private String merAccountTypeCode;
 
   /**
    * 福利类型名称
    */
   @ApiModelProperty("福利类型名称")
-  @NotEmpty(message = "余额类型名称为空")
   private String merAccountTypeName;
 
   @ApiModelProperty("申请员工额度信息")
+  @Valid
   private AccountDepositRequest info;
 }

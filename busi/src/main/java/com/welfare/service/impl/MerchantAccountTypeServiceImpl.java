@@ -2,10 +2,13 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sun.org.apache.regexp.internal.RE;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
+import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
+import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.MerchantAccountTypeService;
-import com.welfare.service.dto.MerchantAccountTypePageReq;
 import com.welfare.service.dto.MerchantAccountTypeReq;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ import java.util.List;
 @Service
 public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
+    private final MerchantAccountTypeExMapper merchantAccountTypeExMapper;
 
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
@@ -38,8 +42,8 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public Page<MerchantAccountType> page(Page page, MerchantAccountTypePageReq pageReq) {
-        return null;
+    public Page<MerchantAccountTypeWithMerchantDTO> page(Page page, MerchantAccountTypePageReq req) {
+        return merchantAccountTypeExMapper.listWithMerchant(page, req);
     }
 
     @Override

@@ -18,15 +18,21 @@ import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
+
+import java.util.ArrayList;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -53,7 +59,13 @@ public class AccountServiceImpl implements AccountService {
         return accountConverter.toPage(iPage);
     }
 
-    @Override
+  @Override
+  public List<AccountDTO> export(AccountPageReq accountPageReq) {
+      List<AccountPageDTO> list = accountCustomizeMapper.queryPageDTO(accountPageReq.getMerCode(),accountPageReq.getAccountName(),accountPageReq.getDepartmentCode(),accountPageReq.getAccountStatus(),accountPageReq.getAccountTypeCode());
+    return accountConverter.toAccountDTOList(list);
+  }
+
+  @Override
     public int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode) {
         return accountMapper.increaseAccountBalance(increaseBalance, updateUser, accountCode);
     }
@@ -113,11 +125,30 @@ public class AccountServiceImpl implements AccountService {
         return accountConverter.toBillDetailPage(iPage);
     }
 
-    @Override
+  @Override
+  public List<AccountBillDetailDTO> exportBillDetail(String accountCode, Date createTimeStart,
+      Date createTimeEnd) {
+      List<AccountBillDetailMapperDTO> accountBillDetailMapperDTOList= accountCustomizeMapper.queryAccountBillDetail(accountCode,createTimeStart,createTimeEnd);
+    return accountConverter.toAccountBillDetailDTOList(accountBillDetailMapperDTOList);
+  }
+
+  @Override
     public AccountBillDTO quertBill(String accountCode, Date createTimeStart, Date createTimeEnd) {
         AccountBillDTO accountBillDTO = new AccountBillDTO();
         AccountBillMapperDTO accountBillMapperDTO =accountCustomizeMapper.queryBill(accountCode,createTimeStart,createTimeEnd);
         BeanUtils.copyProperties(accountBillMapperDTO,accountBillDTO);
         return accountBillDTO;
+    }
+
+    @Override
+    public List<String> getAccountCodeList(List<String> accountCodes) {
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(Account.ACCOUNT_CODE, accountCodes);
+        List<Account> accounts = accountDao.list(queryWrapper);
+        List<String> codes = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(accounts)) {
+            codes = accounts.stream().map(Account::getAccountCode).collect(Collectors.toList());
+        }
+        return codes;
     }
 }

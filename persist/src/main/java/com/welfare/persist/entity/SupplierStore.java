@@ -76,7 +76,7 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     /**
      * 消费方式
      */
-    @ApiModelProperty("消费方式")   
+    @ApiModelProperty("消费方式{  \"o2o\": true,  \"onlineMall\": true,  \"shopShopping\": false}")
     private String consumType;
     /**
      * 状态

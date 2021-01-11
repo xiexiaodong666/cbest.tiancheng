@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -54,5 +55,6 @@ public class DepositApplyRequest {
 
   @ApiModelProperty("申请员工额度信息")
   @NotNull(message = "申请员工额度信息为空")
+  @Valid
   private AccountDepositRequest info;
 }

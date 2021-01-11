@@ -37,7 +37,7 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
      */
     @ApiModelProperty("自增id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Integer id;
+	private Long id;
     /**
      * 商户代码
      */

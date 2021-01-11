@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.CardInfoMapper">
-    <sql id="tableName">
+  <sql id="tableName">
         card_info
     </sql>
 
-    <sql id="baseColumn">
+  <sql id="baseColumn">
         id,apply_code,card_id,card_type,card_status,flag,create_user,create_time,update_user,update_time,account_id,version
     </sql>
+
+
+  <select id="getCardId" resultType="java.lang.String">
+   SELECT
+    IFNULL(( select card_id  from card_info
+    where card_id=(select card_id from card_info where card_id like  concat('%',#{merCode}, '%')  order by card_id desc limit 1)),concat('TC01', #{merCode},'100000000'))
+    </select>
 
 </mapper>

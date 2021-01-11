@@ -1,12 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.CardApplyMapper">
-    <sql id="tableName">
+  <sql id="tableName">
         card_apply
     </sql>
 
-    <sql id="baseColumn">
+  <sql id="baseColumn">
         id,apply_code,mer_code,card_name,card_type,card_medium,card_num,identification_code,identification_length,remark,create_user,create_time,update_user,update_time,flag
     </sql>
 
+  <select id="searchCardApplys" resultType="com.welfare.persist.entity.CardApply">
+    SELECT
+    ca.id as id,
+    ca.card_name as cardName ,
+    ca.card_type as cardType,
+    ca.mer_code as merCode,
+    ca.card_medium as cardMedium,
+    ca.card_num as cardNum,
+    ca.STATUS as status,
+    ca.create_time as createTime,
+    m.mer_name as merName
+    FROM
+    card_apply ca
+    LEFT JOIN merchant m ON m.mer_code = ca.mer_code
+    where
+    ca.deleted != 1
+    <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
+    </if>
+    <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
+    </if>
+    <if test="cardType != null and cardType !='' ">and ca.card_type = #{cardType}
+    </if>
+    <if test="cardMedium != null and cardMedium !='' ">and ca.card_medium = #{cardMedium}
+    </if>
+    <if test="status != null and status !='' ">and ca.status = #{status}
+    </if>
+    <if test="startTime != null ">and msr.create_time &gt;= #{startTime}</if>
+    <if test="endTime != null ">and msr.create_time &lt;= #{endTime}</if>
+
+  </select>
 </mapper>

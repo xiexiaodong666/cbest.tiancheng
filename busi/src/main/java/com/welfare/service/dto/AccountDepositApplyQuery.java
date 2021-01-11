@@ -41,28 +41,28 @@ public class AccountDepositApplyQuery {
   /**
    * 申请开始时间
    */
-  @ApiModelProperty("申请开始时间")
-  @Query(type = Query.Type.GREATER_THAN)
+  @ApiModelProperty("申请开始时间(yyyy-MM-dd HH:mm:ss)")
+  @Query(type = Query.Type.GREATER_THAN, propName = "applyTime")
   private Date applyTimeStart;
 
   /**
    * 申请结束时间
    */
-  @ApiModelProperty("申请结束时间")
-  @Query(type = Query.Type.LESS_THAN)
+  @ApiModelProperty("申请结束时间(yyyy-MM-dd HH:mm:ss)")
+  @Query(type = Query.Type.LESS_THAN, propName = "applyTime")
   private Date applyTimeEnd;
 
   /**
    * 审批开始时间
    */
-  @ApiModelProperty("审批开始时间")
-  @Query(type = Query.Type.GREATER_THAN)
+  @ApiModelProperty("审批开始时间(yyyy-MM-dd HH:mm:ss)")
+  @Query(type = Query.Type.GREATER_THAN, propName = "approvalTime")
   private Date approvalTimeStart;
 
   /**
    * 审批结束时间
    */
-  @ApiModelProperty("审批结束时间")
-  @Query(type = Query.Type.LESS_THAN)
+  @ApiModelProperty("审批结束时间(yyyy-MM-dd HH:mm:ss)")
+  @Query(type = Query.Type.LESS_THAN, propName = "approvalTime")
   private Date approvalTimeEnd;
 }

@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.service.AccountAmountTypeService;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.welfare.common.constants.WelfareConstant.MerCreditType.RECHARGE_LIMIT;
 
 /**
  * Description:
@@ -36,7 +39,7 @@ public class DepositServiceImpl implements DepositService {
     @Transactional(rollbackFor = Exception.class)
     public void deposit(Deposit deposit) {
         BigDecimal amount = deposit.getAmount();
-        merchantCreditService.decreaseRechargeCredit(deposit.getMerchantCode(),amount);
+        merchantCreditService.decreaseAccountType(deposit.getMerchantCode(), RECHARGE_LIMIT, amount);
         updateAccountAmountType(deposit);
 
     }
@@ -45,11 +48,11 @@ public class DepositServiceImpl implements DepositService {
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(deposit.getAccountCode(),
                 deposit.getMerAccountTypeCode());
 
-        if(Objects.isNull(accountAmountType)){
+        if (Objects.isNull(accountAmountType)) {
             accountAmountType = deposit.toNewAccountAmountType();
             accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
             accountAmountTypeDao.save(accountAmountType);
-        }else{
+        } else {
             accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
             accountAmountTypeDao.updateById(accountAmountType);
         }
@@ -69,8 +72,10 @@ public class DepositServiceImpl implements DepositService {
                             .map(Deposit::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
                     String merCode = entry.getKey();
-                    merchantCreditService.decreaseRechargeCredit(merCode,totalAmountToDeposit);
+                    merchantCreditService.decreaseAccountType(merCode, RECHARGE_LIMIT, totalAmountToDeposit);
                     singleMerDeposits.stream().forEach(deposit -> updateAccountAmountType(deposit));
                 });
     }
+
+
 }

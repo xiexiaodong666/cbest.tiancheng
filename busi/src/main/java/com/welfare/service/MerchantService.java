@@ -67,4 +67,11 @@ public interface MerchantService {
      */
     Merchant getMerchantByMerCode(QueryWrapper<Merchant> queryWrapper);
 
+    /**
+     * 通过merCode查询商户详情
+     * @param merCode
+     * @return
+     */
+    Merchant detailByMerCode(String merCode);
+
 }

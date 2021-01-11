@@ -64,7 +64,7 @@ public class AccountDepositApplyInfo {
   /**
    * 创建日期
    */
-  @ApiModelProperty("申请时间")
+  @ApiModelProperty("申请时间(yyyy-MM-dd HH:mm:ss)")
   @ExcelProperty("申请时间")
   private Date applyTime;
 
@@ -92,7 +92,7 @@ public class AccountDepositApplyInfo {
   /**
    * 审批时间
    */
-  @ApiModelProperty("审批时间")
+  @ApiModelProperty("审批时间(yyyy-MM-dd HH:mm:ss)")
   @ExcelProperty("审批时间")
   private Date approvalTime;
 

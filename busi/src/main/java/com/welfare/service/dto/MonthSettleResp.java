@@ -1,4 +1,4 @@
-package com.welfare.servicesettlement.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.Data;
  * @desc 账单列表响应dto
  */
 @Data
-public class BillRespDto {
+public class MonthSettleResp {
 
     @ApiModelProperty(value = "账单编号")
     private String settleNo;
@@ -33,11 +33,14 @@ public class BillRespDto {
     @ApiModelProperty(value = "合作方式")
     private String merCooperationMode;
 
-    @ApiModelProperty(value = "对账状态")
+    @ApiModelProperty(value = "对账状态:待确认-unconfirmed 已确认-confirmed")
     private String recStatus;
 
-    @ApiModelProperty(value = "结算状态")
+    @ApiModelProperty(value = "结算状态:待结算-unsettled 已结算-settled")
     private String settleStatus;
+
+    @ApiModelProperty(value = "发送状态:待发送-unsended 已发送-sended")
+    private String sendStatus;
 
     @ApiModelProperty(value = "账单发送时间")
     private String sendTime;

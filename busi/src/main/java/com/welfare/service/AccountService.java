@@ -11,6 +11,7 @@ import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 账户信息服务接口
@@ -22,6 +23,7 @@ import java.util.Date;
 public interface AccountService {
     Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
         AccountPageReq accountPageReq);
+    List<AccountDTO> export(AccountPageReq accountPageReq);
 
     /**
      * 增加员工账号余额
@@ -46,5 +48,9 @@ public interface AccountService {
     Page<AccountBillDetailDTO> queryAccountBillDetail(Integer currentPage,Integer pageSize,
         String accountCode, Date createTimeStart,Date createTimeEnd);
 
+    List<AccountBillDetailDTO> exportBillDetail(String accountCode, Date createTimeStart,Date createTimeEnd);
+
     AccountBillDTO quertBill(String accountCode, Date createTimeStart,Date createTimeEnd);
+
+    List<String> getAccountCodeList(List<String> accountCodes);
 }

@@ -26,7 +26,7 @@ public enum RechargeStatus {
         return genderEnum;
       }
     }
-    return null;
+    throw new RuntimeException("RechargeStatus不存在");
   };
   public String getCode() {
     return code;

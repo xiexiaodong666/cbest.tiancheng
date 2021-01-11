@@ -1,6 +1,15 @@
 package com.welfare.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.query.CardApplyAddReq;
+import com.welfare.persist.dto.query.CardApplyUpdateReq;
+import com.welfare.persist.entity.CardApply;
+import com.welfare.persist.entity.MerchantStoreRelation;
+import io.swagger.models.auth.In;
+import java.util.Date;
+
 /**
  * 制卡信息服务接口
  *
@@ -9,5 +18,17 @@ package com.welfare.service;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface CardApplyService {
+
+  Page<CardApply> pageQuery(Page<CardApply> page,String cardName,String merCode, String cardType, String cardMedium,
+      Integer status, Date startTime,Date endTime);
+
+  CardApply getMerchantStoreRelationById(
+      QueryWrapper<CardApply> queryWrapper);
+
+  boolean add(CardApplyAddReq cardApplyAddReq);
+
+  boolean update(CardApplyUpdateReq cardApplyUpdateReq);
+
+  boolean updateStatus(Long id, Integer delete, Integer status);
 
 }

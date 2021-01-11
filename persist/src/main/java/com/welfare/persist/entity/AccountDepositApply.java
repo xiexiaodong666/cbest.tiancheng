@@ -38,7 +38,7 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Integer id;
+	private Long id;
     /**
      * 申请编码
      */
@@ -155,11 +155,6 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      */
     @ApiModelProperty("merAccountTypeCode")   
     private String merAccountTypeCode;
-    /**
-     * merAccountTypeCode
-     */
-    @ApiModelProperty("merAccountTypeName")
-    private String merAccountTypeName;
 
 //以下为列明常量
 

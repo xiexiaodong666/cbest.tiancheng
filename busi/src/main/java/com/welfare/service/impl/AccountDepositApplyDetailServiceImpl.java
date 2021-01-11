@@ -2,9 +2,13 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dao.AccountDepositApplyDao;
 import  com.welfare.persist.dao.AccountDepositApplyDetailDao;
+import com.welfare.persist.dto.TempAccountDepositApplyDTO;
+import com.welfare.persist.entity.AccountDepositApply;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
 import com.welfare.persist.entity.TempAccountDepositApply;
+import com.welfare.persist.mapper.AccountDepositApplyDetailMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountDepositApplyDetailService;
@@ -28,6 +32,10 @@ public class AccountDepositApplyDetailServiceImpl implements AccountDepositApply
     @Autowired
     private AccountDepositApplyDetailDao accountDepositApplyDetailDao;
 
+
+    @Autowired
+    private AccountDepositApplyDao accountDepositApplyDao;
+
     @Override
     public List<AccountDepositApplyDetail> listByApplyCode(String applyCode) {
         QueryWrapper<AccountDepositApplyDetail> query = new QueryWrapper<>();
@@ -43,12 +51,16 @@ public class AccountDepositApplyDetailServiceImpl implements AccountDepositApply
     }
 
     @Override
-    public Page<AccountDepositApplyDetail> pageByApplyCode(String applyCode, int current, int size) {
+    public Page<TempAccountDepositApplyDTO> pageByApplyCode(Long id, int current, int size) {
         Page<AccountDepositApplyDetail> page = new Page<>();
         page.setCurrent(current);
         page.setSize(size);
-        QueryWrapper<AccountDepositApplyDetail> query = new QueryWrapper<>();
-        query.eq(AccountDepositApplyDetail.APPLY_CODE, applyCode);
-        return accountDepositApplyDetailDao.page(page, query);
+        AccountDepositApply apply = accountDepositApplyDao.getById(id);
+        return accountDepositApplyDetailDao.getBaseMapper().listByApplyCodeIfAccountExist2(page, apply.getApplyCode());
+    }
+
+    @Override
+    public List<AccountDepositApplyDetail> listByApplyCodeIfAccountExist(String applyCode) {
+        return accountDepositApplyDetailDao.getBaseMapper().listByApplyCodeIfAccountExist(applyCode);
     }
 }

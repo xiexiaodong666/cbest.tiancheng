@@ -18,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,12 +78,14 @@ public class MerchantStoreRelationController implements IController {
       @RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
       @RequestParam(required = false) @ApiParam("商户名称") String merName,
-      @RequestParam(required = false) @ApiParam("使用状态") String status
+      @RequestParam(required = false) @ApiParam("使用状态") String status,
+      @RequestParam(required = false) @ApiParam("起始时间") Date startTime,
+      @RequestParam(required = false) @ApiParam("结束时间") Date endTime
   ) {
 
     Page<MerchantStoreRelation> page = new Page(currentPage, pageSize);
     Page mapPage = merchantStoreRelationService
-        .searchMerchantStoreRelations(page, merName, status);
+        .searchMerchantStoreRelations(page, merName, status, startTime, endTime);
 
     List<MerchantStoreRelationDTO> merchantStoreRelationDTOList = mapPage.getRecords();
     mapPage.setRecords(convertAdminMerchantStoreRelationDTOs(merchantStoreRelationDTOList));

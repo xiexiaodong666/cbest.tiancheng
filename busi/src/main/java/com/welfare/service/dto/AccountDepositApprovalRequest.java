@@ -5,6 +5,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 /**
  * @author duanhy
  * @version 1.0.0
@@ -18,12 +21,14 @@ public class AccountDepositApprovalRequest {
 
 
   @ApiModelProperty("申请id")
+  @NotNull(message = "id不能为空")
   private Long id;
 
   /**
    * 审批状态
    */
   @ApiModelProperty("审批状态(通过：AUDIT_SUCCESS， 不通过：AUDIT_FAILED)")
+  @NotEmpty(message = "审批状态不能为空")
   private String approvalStatus;
 
   /**
@@ -36,6 +41,7 @@ public class AccountDepositApprovalRequest {
    * 审批人
    */
   @ApiModelProperty("审批人")
+  @NotEmpty(message = "审批人不能为空")
   private String approvalUser;
 
   /**

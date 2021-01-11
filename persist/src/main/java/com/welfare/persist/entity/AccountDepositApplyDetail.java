@@ -58,7 +58,7 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
      * 充值状态
      */
     @ApiModelProperty("充值状态")   
-    private Integer rechargeStatus;
+    private String rechargeStatus;
     /**
      * 创建人
      */

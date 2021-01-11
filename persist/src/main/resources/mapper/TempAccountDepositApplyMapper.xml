@@ -18,7 +18,7 @@
         <result property="departmentName" column="department_name"/>
     </resultMap>
 
-    <select id="pageByFileId" resultMap="tempAccountDepositApplyDTO">
+    <select id="pageByFileIdByExistAccount" resultMap="tempAccountDepositApplyDTO">
         SELECT
          t.id,
          a.account_name,
@@ -29,6 +29,6 @@
         from temp_account_deposit_apply t
             LEFT JOIN account a ON t.account_code = a.account_code
             LEFT JOIN department de ON de.department_code = a.store_code
-        where file_id = #{fileId}
+        where file_id = #{fileId} and a.deleted = 0
     </select>
 </mapper>

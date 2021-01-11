@@ -11,7 +11,7 @@ import lombok.Data;
  * @email yuxiang.li@sjgo365.com
  * @date 1/6/2021
  */
-@ApiModel("支付请求")
+@ApiModel("线上支付请求")
 @Data
 public class OnlinePaymentRequest extends AbstractPaymentRequest {
 

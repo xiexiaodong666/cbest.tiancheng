@@ -29,159 +29,156 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("settle_detail")
-@ApiModel("")
+@ApiModel("结算明细")
 public class SettleDetail extends Model<SettleDetail> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Integer id;
     /**
      * 订单编码
      */
-    @ApiModelProperty("订单编码")   
+    @ApiModelProperty("订单编码")
     private Integer orderId;
     /**
      * 交易流水号
      */
-    @ApiModelProperty("交易流水号")   
+    @ApiModelProperty("交易流水号")
     private Integer transNo;
     /**
      * 账户
      */
-    @ApiModelProperty("账户")   
+    @ApiModelProperty("账户")
     private String accountCode;
     /**
      * 账户名称
      */
-    @ApiModelProperty("账户名称")   
+    @ApiModelProperty("账户名称")
     private String accountName;
     /**
      * 卡号
      */
-    @ApiModelProperty("卡号")   
+    @ApiModelProperty("卡号")
     private Integer cardId;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")   
+    @ApiModelProperty("商户代码")
     private String merCode;
     /**
      * 商户名称
      */
-    @ApiModelProperty("商户名称")   
+    @ApiModelProperty("商户名称")
     private String merName;
     /**
      * 门店编码
      */
-    @ApiModelProperty("门店编码")   
+    @ApiModelProperty("门店编码")
     private String storeCode;
     /**
      * 门店名称
      */
-    @ApiModelProperty("门店名称")   
+    @ApiModelProperty("门店名称")
     private String stroeName;
     /**
      * 交易时间
      */
-    @ApiModelProperty("交易时间")   
+    @ApiModelProperty("交易时间")
     private Date transTime;
     /**
      * pos机器编码
      */
-    @ApiModelProperty("pos机器编码")   
+    @ApiModelProperty("pos机器编码")
     private String pos;
     /**
      * 支付编码
      */
-    @ApiModelProperty("支付编码")   
+    @ApiModelProperty("支付编码")
     private String payCode;
     /**
      * 支付名称
      */
-    @ApiModelProperty("支付名称")   
+    @ApiModelProperty("支付名称")
     private String payName;
     /**
      * 交易类型
      */
-    @ApiModelProperty("交易类型")   
+    @ApiModelProperty("交易类型")
     private String transType;
     /**
      * 交易类型名
      */
-    @ApiModelProperty("交易类型名")   
+    @ApiModelProperty("交易类型名")
     private String transTypeName;
     /**
      * 交易金额
      */
-    @ApiModelProperty("交易金额")   
+    @ApiModelProperty("交易金额")
     private BigDecimal transAmount;
     /**
      * 福利类型(餐费、交通费等)
      */
-    @ApiModelProperty("福利类型(餐费、交通费等)")   
+    @ApiModelProperty("福利类型(餐费、交通费等)")
     private String merAccountType;
     /**
      * 福利类型(餐费、交通费等)
      */
-    @ApiModelProperty("福利类型(餐费、交通费等)")   
+    @ApiModelProperty("福利类型(餐费、交通费等)")
     private String merAccountTypeName;
     /**
      * 子账户扣款金额
      */
-    @ApiModelProperty("子账户扣款金额")   
+    @ApiModelProperty("子账户扣款金额")
     private BigDecimal accountAmount;
     /**
      * 子账户余额
      */
-    @ApiModelProperty("子账户余额")   
+    @ApiModelProperty("子账户余额")
     private BigDecimal accountBalance;
     /**
      * 商户余额扣款金额
      */
-    @ApiModelProperty("商户余额扣款金额")   
+    @ApiModelProperty("商户余额扣款金额")
     private BigDecimal merDeductionAmount;
     /**
      * 商户信用扣款金额
      */
-    @ApiModelProperty("商户信用扣款金额")   
+    @ApiModelProperty("商户信用扣款金额")
     private BigDecimal merCreditDeductionAmount;
     /**
      * 自费扣款金额
      */
-    @ApiModelProperty("自费扣款金额")   
+    @ApiModelProperty("自费扣款金额")
     private BigDecimal selfDeductionAmount;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-	private String createUser;
+    @ApiModelProperty("创建人")
+    private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Date createTime;
+    @ApiModelProperty("创建时间")
+    private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-	private String updateUser;
+    @ApiModelProperty("更新人")
+    private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")   
+    @ApiModelProperty("更新时间")
     @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 版本
      */
-    @ApiModelProperty("版本")  @Version 
+    @ApiModelProperty("版本")  @Version
     @TableField(fill = FieldFill.INSERT_UPDATE)
 	private Integer version;
 

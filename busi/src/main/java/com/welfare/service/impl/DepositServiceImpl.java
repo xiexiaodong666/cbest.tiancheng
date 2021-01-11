@@ -3,9 +3,11 @@ package com.welfare.service.impl;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.DepositService;
 import com.welfare.service.MerchantCreditService;
+import com.welfare.service.SequenceService;
 import com.welfare.service.dto.Deposit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,29 +36,18 @@ public class DepositServiceImpl implements DepositService {
     private final MerchantCreditService merchantCreditService;
     private final AccountAmountTypeService accountAmountTypeService;
     private final AccountAmountTypeDao accountAmountTypeDao;
+    private final SequenceService sequenceService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deposit(Deposit deposit) {
         BigDecimal amount = deposit.getAmount();
-        merchantCreditService.decreaseAccountType(deposit.getMerchantCode(), RECHARGE_LIMIT, amount);
-        updateAccountAmountType(deposit);
+        Long transNo = sequenceService.next(WelfareConstant.SequenceType.DEPOSIT.code());
+        merchantCreditService.decreaseAccountType(deposit.getMerchantCode(), RECHARGE_LIMIT, amount, transNo.toString());
+        accountAmountTypeService.updateAccountAmountType(deposit);
 
     }
 
-    private void updateAccountAmountType(Deposit deposit) {
-        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(deposit.getAccountCode(),
-                deposit.getMerAccountTypeCode());
-
-        if (Objects.isNull(accountAmountType)) {
-            accountAmountType = deposit.toNewAccountAmountType();
-            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
-            accountAmountTypeDao.save(accountAmountType);
-        } else {
-            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
-            accountAmountTypeDao.updateById(accountAmountType);
-        }
-    }
 
 
     @Override
@@ -68,12 +59,7 @@ public class DepositServiceImpl implements DepositService {
                 .stream()
                 .forEach(entry -> {
                     List<Deposit> singleMerDeposits = entry.getValue();
-                    BigDecimal totalAmountToDeposit = singleMerDeposits.stream()
-                            .map(Deposit::getAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-                    String merCode = entry.getKey();
-                    merchantCreditService.decreaseAccountType(merCode, RECHARGE_LIMIT, totalAmountToDeposit);
-                    singleMerDeposits.stream().forEach(deposit -> updateAccountAmountType(deposit));
+                    singleMerDeposits.stream().forEach(deposit -> deposit(deposit));
                 });
     }
 

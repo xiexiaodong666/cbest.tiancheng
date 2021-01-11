@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 public class Deposit {
     @ApiModelProperty("请求id")
     private String requestId;
+    @ApiModelProperty("交易号")
+    private String transNo;
     @ApiModelProperty("账户")
     private String accountCode;
     @ApiModelProperty("充值卡号")
@@ -35,6 +37,8 @@ public class Deposit {
     private String merAccountTypeCode;
     @ApiModelProperty(value = "充值状态",notes = "1:新增, 2:处理中, 3:处理成功 -1:处理失败")
     private Integer depositStatus;
+    @ApiModelProperty("渠道,wechat,alipay")
+    private String channel;
 
     public static Deposit of(AccountDepositApply accountDepositApply,AccountDepositApplyDetail accountDepositApplyDetail){
         Deposit deposit = new Deposit();

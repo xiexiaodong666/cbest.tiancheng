@@ -2,7 +2,6 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.ApiUserInfo;
@@ -13,6 +12,7 @@ import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantCreditApply;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.MerchantService;
+import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantCreditApplyConverter;
 import com.welfare.service.dto.*;
 import com.welfare.service.enums.ApprovalStatus;
@@ -44,20 +44,12 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyService {
 
-    @Autowired
-    private MerchantCreditApplyDao merchantCreditApplyDao;
-
-    @Autowired
-    private MerchantCreditApplyConverter creditApplyConverter;
-
-    @Autowired
-    private RedissonClient redissonClient;
-
-    @Autowired
-    private MerchantCreditService merchantCreditService;
-
-    @Autowired
-    private MerchantService merchantService;
+    private final MerchantCreditApplyDao merchantCreditApplyDao;
+    private final SequenceService sequenceService;
+    private final MerchantCreditApplyConverter creditApplyConverter;
+    private final RedissonClient redissonClient;
+    private final MerchantCreditService merchantCreditService;
+    private final MerchantService merchantService;
 
     @Override
     public Long save(MerchantCreditApplyRequest request, ApiUserInfo user) {
@@ -167,7 +159,8 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
                     // 审批通过修改金额
                     WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyCode());
-                    merchantCreditService.increaseAccountType(apply.getMerCode(),type,apply.getBalance());
+                    Long transNo = sequenceService.next(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
+                    merchantCreditService.increaseAccountType(apply.getMerCode(),type,apply.getBalance(), transNo.toString());
                 }
                 return apply.getId();
             } else {

@@ -1,6 +1,7 @@
 package com.welfare.service;
 
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.service.dto.Deposit;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -25,8 +26,21 @@ public interface AccountAmountTypeService {
   /**
    * 获取唯一一条accountAmountType
    * @param accountCode
-   * @param merAccountTypeCode
+   * @param accountTypeCode
    * @return
    */
-  AccountAmountType queryOne(String accountCode,String merAccountTypeCode);
+  AccountAmountType queryOne(String accountCode,String accountTypeCode);
+
+  /**
+   * 更新账户accountAmountType
+   * @param deposit
+   */
+  void updateAccountAmountType(Deposit deposit);
+
+  /**
+   * 查询指定account的授信额度
+   * @param accountCode
+   * @return
+   */
+  AccountAmountType querySurplusQuota(String accountCode);
 }

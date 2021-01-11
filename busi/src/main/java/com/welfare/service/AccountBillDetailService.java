@@ -1,6 +1,11 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.service.dto.Deposit;
+
+import java.math.BigDecimal;
+
 /**
  * 用户流水明细服务接口
  *
@@ -9,5 +14,10 @@ package com.welfare.service;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface AccountBillDetailService {
-
+    /**
+     * 保存新的AccountBillDetail
+     * @param deposit
+     * @param accountAmountType
+     */
+    void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType);
 }

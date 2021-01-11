@@ -1,7 +1,6 @@
 package com.welfare.service;
 
 
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.persist.entity.MerchantCredit;
 
@@ -16,14 +15,6 @@ import java.math.BigDecimal;
  */
 public interface MerchantCreditService {
 
-  /**
-   * 减少申请充值额度
-   * 当前额度小于减少的额度 返回 0
-   * @param increaseLimit
-   * @param id
-   * @return
-   */
-  int decreaseRechargeLimit(BigDecimal increaseLimit, Long id);
 
   /**
    * 通过商户编码查询额度信息
@@ -39,14 +30,16 @@ public interface MerchantCreditService {
    * @param merCode
    * @param merCreditType
    * @param amount
+   * @param transNo
    */
-  void decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount);
+  void decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
 
   /**
    * 增加额度
    * @param merCode
    * @param merCreditType
-   * @param Account
+   * @param amount
+   * @param transNo
    */
-  void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal Account);
+  void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
 }

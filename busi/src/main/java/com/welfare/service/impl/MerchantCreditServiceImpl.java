@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
@@ -49,10 +48,6 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final Map<MerCreditType, MerAccountTypeOperator> operatorMap = new HashMap<>();
 
 
-    @Override
-    public int decreaseRechargeLimit(BigDecimal increaseLimit, Long id) {
-        return merchantCreditMapper.decreaseRechargeLimit(increaseLimit, id);
-    }
 
     @Override
     public MerchantCredit getByMerCode(String merCode) {
@@ -76,27 +71,28 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount) {
+    public void decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             MerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            merAccountTypeOperator.decrease(merchantCredit, amount);
+            merAccountTypeOperator.decrease(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
+
         } finally {
             lock.unlock();
         }
     }
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount) {
+    public void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             MerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            merAccountTypeOperator.increase(merchantCredit, amount);
+            MerchantAccountOperation increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
         } finally {
             lock.unlock();

@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,52 +28,59 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 public class CurrentBalanceOperator extends MerAccountTypeOperator implements InitializingBean {
-    private MerCreditType  merCreditType = MerCreditType.CURRENT_BALANCE;
+    private MerCreditType merCreditType = MerCreditType.CURRENT_BALANCE;
 
     private final RemainingLimitOperator remainingLimitOperator;
+
     @Override
-    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount){
-        log.info("ready to decrease merchantCredit.currentBalance for {}",amount.toString());
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+        log.info("ready to decrease merchantCredit.currentBalance for {}", amount.toString());
         BigDecimal currentBalance = merchantCredit.getCurrentBalance();
         BigDecimal subtract = currentBalance.subtract(amount);
-        if(subtract.compareTo(BigDecimal.ZERO) < 0){
+        if (subtract.compareTo(BigDecimal.ZERO) < 0) {
             BigDecimal amountLeftToBeDecrease = subtract.negate();
-            List<MerchantAccountOperation> operations = doWhenNotEnough(merchantCredit, amountLeftToBeDecrease);
+            List<MerchantAccountOperation> operations = doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, transNo);
             return operations;
-        }else{
+        } else {
             merchantCredit.setCurrentBalance(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     merCreditType,
                     subtract,
-                    IncOrDecType.DECREASE);
+                    IncOrDecType.DECREASE,
+                    merchantCredit,
+                    transNo
+            );
             return Arrays.asList(operation);
         }
 
     }
 
     @Override
-    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease) {
+    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, String transNo) {
         MerAccountTypeOperator nextOperator = getNext();
-        if(Objects.isNull(nextOperator)){
+        if (Objects.isNull(nextOperator)) {
             throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
         }
         merchantCredit.setCurrentBalance(BigDecimal.ZERO);
         MerchantAccountOperation operation = MerchantAccountOperation.of(
                 merCreditType,
                 merchantCredit.getCurrentBalance(),
-                IncOrDecType.DECREASE);
+                IncOrDecType.DECREASE,
+                merchantCredit,
+                transNo
+        );
         List<MerchantAccountOperation> operations = new ArrayList<>();
         operations.add(operation);
-        List<MerchantAccountOperation> moreOperations = nextOperator.decrease(merchantCredit, amountLeftToBeDecrease);
+        List<MerchantAccountOperation> moreOperations = nextOperator.decrease(merchantCredit, amountLeftToBeDecrease,transNo);
         operations.addAll(moreOperations);
         return operations;
     }
 
     @Override
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount){
-        log.info("ready to increase merchantCredit.currentBalance for {}",amount.toString());
+    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+        log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setCurrentBalance(merchantCredit.getCurrentBalance().add(amount));
-        return MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE);
+        return MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit,transNo );
     }
 
     @Override

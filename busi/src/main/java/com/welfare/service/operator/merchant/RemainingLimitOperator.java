@@ -25,27 +25,27 @@ import java.util.List;
 public class RemainingLimitOperator extends MerAccountTypeOperator {
     private MerCreditType merCreditType = MerCreditType.REMAINING_LIMIT;
     @Override
-    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount) {
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to decrease merchantCredit.currentRemainingLimit for {}", amount.toString());
         BigDecimal currentRemainingLimit = merchantCredit.getRemainingLimit();
         BigDecimal subtract = currentRemainingLimit.subtract(amount);
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
-            return doWhenNotEnough(merchantCredit,subtract.negate());
-         } else {
+            return doWhenNotEnough(merchantCredit,subtract.negate(), transNo);
+        } else {
             merchantCredit.setRemainingLimit(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     merCreditType,
                     subtract,
-                    IncOrDecType.DECREASE);
+                    IncOrDecType.DECREASE, merchantCredit,transNo );
             return Arrays.asList(operation);
         }
 
     }
 
     @Override
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount) {
+    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setRemainingLimit(merchantCredit.getRemainingLimit().add(amount));
-        return MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE);
+        return MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo);
     }
 }

@@ -28,27 +28,28 @@ public class RebateLimitOperator extends MerAccountTypeOperator {
     private final MerchantCreditDao merchantCreditDao;
 
     @Override
-    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount){
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
         log.info("ready to decrease merchantCredit.rebateLimit for {}",amount.toString());
         BigDecimal currentBalance = merchantCredit.getRechargeLimit();
         BigDecimal subtract = currentBalance.subtract(amount);
         if(subtract.compareTo(BigDecimal.ZERO) < 0){
-            return doWhenNotEnough(merchantCredit,subtract.negate());
+            return doWhenNotEnough(merchantCredit,subtract.negate(), transNo);
         }else{
             merchantCredit.setRebateLimit(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     merCreditType,
                     amount,
-                    IncOrDecType.DECREASE
-            );
+                    IncOrDecType.DECREASE,
+                    merchantCredit,
+                    transNo);
             return Arrays.asList(operation);
         }
 
     }
     @Override
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount){
+    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
         log.info("ready to increase merchantCredit.rebateLimit for {}",amount.toString());
         merchantCredit.setRebateLimit(merchantCredit.getRebateLimit().add(amount));
-        return MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE);
+        return MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE,merchantCredit,transNo );
     }
 }

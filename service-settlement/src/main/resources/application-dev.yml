@@ -67,3 +67,12 @@ xxl:
       logpath: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest/jobhandler/
       logretentiondays: 30
     accessToken:
+platformUser:
+  url:
+
+cbest:
+  pay:
+    url: http://192.1.30.71:9999/gateway
+    appId: yufu
+    appKey: e4716980da4382e1f4cc6ee4bb640277
+    notifyUrl: http://xxx/accountDepositRecord/payNotify

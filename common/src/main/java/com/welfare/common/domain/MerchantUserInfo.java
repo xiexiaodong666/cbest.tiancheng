@@ -22,4 +22,9 @@ public class MerchantUserInfo {
    * 商户用户名称
    */
   private String username;
+
+  /**
+   * 商户用户账号
+   */
+  private String userCode;
 }

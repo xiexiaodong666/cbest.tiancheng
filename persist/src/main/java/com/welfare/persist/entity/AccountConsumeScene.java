@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,7 +21,7 @@ import lombok.experimental.Accessors;
  * 员工消费场景配置(account_consume_scene)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -46,17 +47,7 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
      * 员工类型编码
      */
     @ApiModelProperty("员工类型编码")   
-    private String accountTypeId;
-    /**
-     * 门店编码
-     */
-    @ApiModelProperty("门店编码")   
-    private String storeCode;
-    /**
-     * 消费方式
-     */
-    @ApiModelProperty("消费方式")   
-    private String consumType;
+    private Long accountTypeId;
     /**
      * 备注
      */
@@ -71,17 +62,20 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
@@ -91,13 +85,15 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic  
-    private Boolean deleted;
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
 
 //以下为列明常量
 
@@ -113,14 +109,6 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
     * 员工类型编码
     */
     public static final String ACCOUNT_TYPE_ID = "account_type_id";
-    /**
-    * 门店编码
-    */
-    public static final String STORE_CODE = "store_code";
-    /**
-    * 消费方式
-    */
-    public static final String CONSUM_TYPE = "consum_type";
     /**
     * 备注
     */

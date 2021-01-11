@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -17,17 +18,17 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * (merchant_account_type)实体类
+ * 商户福利类型(merchant_account_type)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("merchant_account_type")
-@ApiModel("")
+@ApiModel("商户福利类型")
 public class MerchantAccountType extends Model<MerchantAccountType> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -36,7 +37,7 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
      */
     @ApiModelProperty("自增id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Integer id;
+	private Long id;
     /**
      * 商户代码
      */
@@ -53,25 +54,38 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
     @ApiModelProperty("商户账户类型名称")   
     private String merAccountTypeName;
     /**
+     * 扣款序号
+     */
+    @ApiModelProperty("扣款序号")   
+    private Integer deductionOrder;
+    /**
      * 删除标识
      */
     @ApiModelProperty("删除标识")   
     private Boolean flag;
     /**
+     * 备注
+     */
+    @ApiModelProperty("备注")   
+    private String remark;
+    /**
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
@@ -82,7 +96,8 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
 
 //以下为列明常量
 
@@ -103,9 +118,17 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
     */
     public static final String MER_ACCOUNT_TYPE_NAME = "mer_account_type_name";
     /**
+    * 扣款序号
+    */
+    public static final String DEDUCTION_ORDER = "deduction_order";
+    /**
     * 删除标识
     */
     public static final String FLAG = "flag";
+    /**
+    * 备注
+    */
+    public static final String REMARK = "remark";
     /**
     * 创建人
     */

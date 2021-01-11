@@ -1,18 +1,29 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
-import com.welfare.servicemerchant.dto.AccountBillDTO;
-import com.welfare.servicemerchant.dto.AccountDTO;
-import com.welfare.servicemerchant.dto.AccountDepositApplyInfo;
+import com.welfare.service.AccountService;
+import com.welfare.service.dto.AccountBillDTO;
+import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountPageReq;
+import com.welfare.service.dto.AccountReq;
+import com.welfare.service.dto.AccountDTO;
+import com.welfare.service.dto.AccountDepositApplyInfo;
+import com.welfare.service.dto.AccountBillDetailDTO;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +46,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(tags = "员工账号管理")
 public class AccountController implements IController {
 
+  @Autowired
+  private AccountService accountService;
+  @Autowired
+  private FileUploadService fileUploadService;
+
 
   @GetMapping("/incremental-page")
   @ApiOperation("增量查询账户(支持离线消费场景)")
@@ -49,73 +65,53 @@ public class AccountController implements IController {
   @ApiOperation("分页查询账户")
   public R<Page<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("商户编码") String merCode,
-      @RequestParam(required = false) @ApiParam("员工姓名") String accountName,
-      @RequestParam(required = false) @ApiParam("所属部门") String storeCode,
-      @RequestParam(required = false) @ApiParam("账号状态") Integer accountStatus,
-      @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeCode) {
-       /* Page<AccountDTO> page = new Page(currentPage,pageSize);
-
-        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-        if(Strings.isNotEmpty(accountName)){
-            queryWrapper.eq(Account.ACCOUNT_NAME,accountName);
-        }
-        if(Strings.isNotEmpty(accountName)){
-            queryWrapper.eq(Account.MER_CODE,merCode);
-        }
-        if(Strings.isNotEmpty(accountName)){
-            queryWrapper.eq(Account.ACCOUNT_STATUS,accountStatus);
-        }
-        if(Strings.isNotEmpty(accountName)){
-            queryWrapper.eq(Account.FLAG,flag);
-        }
-
-        Page<Account> accountPage = accountService.pageQuery(page, queryWrapper);
-        return success(accountPage);*/
-    return null;
+      AccountPageReq accountPageReq) {
+       Page<AccountPageDTO> page = new Page(currentPage,pageSize);
+        Page<AccountDTO> accountPage = accountService.getPageDTO(page,accountPageReq);
+        return success(accountPage);
   }
 
   @GetMapping("/{id}")
   @ApiOperation("员工账号详情")
-  public R<AccountDTO> detail(@PathVariable Long id){
-    return null;
+  public R<AccountDetailDTO> detail(@PathVariable Long id){
+    return success(accountService.queryDetail(id));
   }
 
   @PostMapping("/save")
   @ApiOperation("新增员工账号")
-  public R<AccountDTO> save(@RequestBody Account account){
-    return null;
+  public R<Boolean> save(@RequestBody AccountReq accountReq){
+    Account account = new Account();
+    BeanUtils.copyProperties(accountReq,account);
+    return success(accountService.save(account));
   }
 
 
   @PostMapping("/update")
   @ApiOperation("修改员工账号")
-  public R<AccountDTO> update(@RequestBody Account account){
-    return null;
+  public R<Boolean> update(@RequestBody AccountReq accountReq){
+    Account account = new Account();
+    BeanUtils.copyProperties(accountReq,account);
+    return success(accountService.update(account));
   }
 
   @PostMapping("/delete/{id}")
   @ApiOperation("删除员工账号")
-  public R<Boolean> delete(@PathVariable Integer id){
-    return null;
+  public R<Boolean> delete(@PathVariable Long id){
+    return success(accountService.delete(id));
   }
 
 
   @PostMapping("/active/{id}")
-  @ApiOperation("激活员工账号")
-  public R<Boolean> active(@PathVariable Integer id,@RequestParam @ApiParam("状态") Integer state){
-    return null;
+  @ApiOperation("激活或锁定账号")
+  public R<Boolean> active(@PathVariable Long id,@RequestParam @ApiParam("状态") Integer active){
+    return success(accountService.active(id,active));
   }
 
   @ApiOperation("员工账号导出")
   @GetMapping(value="/exportAccount")
-  public void exportAccount(@RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("商户编码") String merCode,
-      @RequestParam(required = false) @ApiParam("员工姓名") String accountName,
-      @RequestParam(required = false) @ApiParam("所属部门") String storeCode,
-      @RequestParam(required = false) @ApiParam("账号状态") Integer accountStatus,
-      @RequestParam(required = false) @ApiParam("员工类型编码") String accountTypeCode){
+  public R<String> exportAccount(AccountPageReq accountPageReq) throws IOException {
+    List<AccountDTO>  accountDTOList = accountService.export(accountPageReq);
+    return success(fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号"));
   }
 
   @ApiOperation("批量新增员工账号")
@@ -129,25 +125,32 @@ public class AccountController implements IController {
     return null;
   }
 
-
-  @GetMapping("/account/bill")
+  @GetMapping("/bill")
   @ApiOperation("员工账号消费汇总")
-  public R<Page<AccountBillDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+  public R<AccountBillDTO> quertBill(@RequestParam(required = false) @ApiParam("accountCode") String accountCode,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    return null;
+    return success(accountService.quertBill(accountCode,createTimeStart,createTimeEnd));
   }
 
 
-  @GetMapping("/account/bill/export")
-  @ApiOperation("员工账号消费汇总导出")
-  public R<String> exportAccountBill(@RequestParam @ApiParam("当前页") Integer currentPage,
+  @GetMapping("/billDetail/page")
+  @ApiOperation("员工账号消费明细")
+  public R<Page<AccountBillDetailDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
-      @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+      @RequestParam @ApiParam("accountCode") String accountCode,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    return null;
+    Page<AccountBillDetailDTO> result = accountService.queryAccountBillDetail(currentPage,pageSize,accountCode,createTimeStart,createTimeEnd);
+    return success(result);
+  }
+
+  @GetMapping("/account/bill/export")
+  @ApiOperation("员工账号消费汇总导出")
+  public R<String> exportAccountBill(@RequestParam @ApiParam("accountCode") String accountCode,
+      @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) throws IOException{
+    List<AccountBillDetailDTO> exportList = accountService.exportBillDetail(accountCode,createTimeStart,createTimeEnd);
+    return success(fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细"));
   }
 }

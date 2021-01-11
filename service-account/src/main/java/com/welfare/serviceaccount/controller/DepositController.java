@@ -1,15 +1,12 @@
 package com.welfare.serviceaccount.controller;
 
-import com.welfare.serviceaccount.domain.Deposit;
+import com.welfare.service.dto.Deposit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

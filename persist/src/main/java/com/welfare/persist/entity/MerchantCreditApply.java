@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 商户金额申请(merchant_credit_apply)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -76,23 +77,27 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic  
-    private Boolean deleted;
+    @ApiModelProperty("删除标志") @TableLogic   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Boolean deleted;
     /**
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
@@ -123,7 +128,8 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
     /**
      * 申请人
      */
@@ -134,6 +140,12 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      */
     @ApiModelProperty("申请时间")   
     private Date applyTime;
+
+    /**
+     * requestId
+     */
+    @ApiModelProperty("requestId")
+    private String requestId;
 
 //以下为列明常量
 
@@ -218,4 +230,8 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
     */
     public static final String APPLY_TIME = "apply_time";
 
+    /**
+     * 请求id
+     */
+    public static final String REQUEST_ID = "request_id";
 }

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 员工类型服务接口实现
@@ -37,16 +38,19 @@ public class AccountTypeServiceImpl implements AccountTypeService {
         return accountTypeDao.getById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Boolean save(AccountType accountType){
         return accountTypeDao.save(accountType);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean update(AccountType accountType) {
         return accountTypeDao.updateById(accountType);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean delete(Long id) {
         UpdateWrapper<AccountType> updateWrapper = new UpdateWrapper();
         updateWrapper.eq(AccountType.ID,id);

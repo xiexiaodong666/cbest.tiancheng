@@ -6,6 +6,7 @@
         <artifactId>e-welfare</artifactId>
         <groupId>e-welfare</groupId>
         <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -44,6 +45,7 @@
         <dependency>
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-boot</artifactId>
+            <version>${mica-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

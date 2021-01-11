@@ -1,12 +1,12 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import  com.welfare.persist.dao.MerchantDao;
+import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.MerchantStoreRelation;
-import com.welfare.service.dto.MerchantPageReq;
+import com.welfare.persist.dto.query.MerchantPageReq;
+import com.welfare.persist.mapper.MerchantExMapper;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +28,8 @@ import java.util.List;
 @Service
 public class MerchantServiceImpl implements MerchantService {
     private final MerchantDao merchantDao;
+    private final MerchantExMapper merchantExMapper;
+
 
     @Override
     public List<Merchant> list(MerchantReq req) {
@@ -40,8 +42,8 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public Page<Merchant> page(Page<Merchant> page,MerchantPageReq merchantPageReq) {
-        return merchantDao.page(page,QueryHelper.getWrapper(merchantPageReq));
+    public Page<MerchantWithCreditDTO> page(Page<Merchant> page, MerchantPageReq merchantPageReq) {
+        return merchantExMapper.listWithCredit(page,merchantPageReq);
     }
 
     @Override
@@ -58,4 +60,18 @@ public class MerchantServiceImpl implements MerchantService {
     public String exportList(MerchantPageReq merchantPageReq) {
         return null;
     }
+
+    @Override
+    public Merchant getMerchantByMerCode(QueryWrapper<Merchant> queryWrapper) {
+        return merchantDao.getOne(queryWrapper);
+    }
+
+    @Override
+    public Merchant detailByMerCode(String merCode) {
+        QueryWrapper<Merchant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Merchant.MER_CODE, merCode);
+        return merchantDao.getOne(queryWrapper);
+    }
+
+
 }

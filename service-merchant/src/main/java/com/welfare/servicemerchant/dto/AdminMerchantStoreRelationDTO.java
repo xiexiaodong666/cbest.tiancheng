@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.dto;
 
+import com.welfare.persist.dto.AdminMerchantStore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -14,6 +15,12 @@ import lombok.Data;
 @Data
 @ApiModel("商户消费场景配置")
 public class AdminMerchantStoreRelationDTO {
+  /**
+   * id
+   */
+  @ApiModelProperty("id")
+  private String id;
+
 
   /**
    * 商户代码
@@ -39,6 +46,12 @@ public class AdminMerchantStoreRelationDTO {
    */
   @ApiModelProperty("备注")
   private String ramark;
+
+  /**
+   * 状态
+   */
+  @ApiModelProperty("状态 0 正常,1 禁用")
+  private String status;
 
 
   /**

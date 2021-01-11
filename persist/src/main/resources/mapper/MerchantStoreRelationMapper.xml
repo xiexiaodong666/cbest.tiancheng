@@ -12,7 +12,8 @@
 
   <select id="searchMerchantStoreRelations" resultType="com.welfare.persist.dto.MerchantStoreRelationDTO">
     SELECT
-    m.STATUS as status,
+    msr.id as id,
+    msr.STATUS as status,
     m.create_time as createTime,
     msr.ramark as ramark,
     msr.mer_code as merCode,
@@ -28,6 +29,8 @@
     </if>
     <if test="merName != null and merName !='' ">and m.mer_name = #{merName}
     </if>
+    <if test="startTime != null ">and msr.create_time &gt;= #{startTime}</if>
+    <if test="endTime != null ">and msr.create_time &lt;= #{endTime}</if>
     GROUP BY
     msr.mer_code
   </select>

@@ -1,9 +1,14 @@
 package com.welfare.service;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.AccountConsumeSceneDTO;
+import com.welfare.persist.dto.AccountConsumeScenePageDTO;
+import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
+import com.welfare.service.dto.AccountConsumeSceneReq;
+import java.util.List;
 
 /**
  * 员工消费场景配置服务接口
@@ -14,7 +19,16 @@ import com.welfare.persist.entity.AccountConsumeScene;
  */
 public interface AccountConsumeSceneService {
   public AccountConsumeScene getAccountConsumeScene(Long id);
-  public Boolean save(AccountConsumeScene accountConsumeScene);
-  public Boolean update(AccountConsumeScene accountConsumeScene);
+  public Boolean save(AccountConsumeSceneReq accountConsumeSceneReq);
+  public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq);
   public Boolean delete(Long id);
+
+  public Boolean updateStatus(Long id ,Integer status);
+
+  public IPage<AccountConsumeScenePageDTO> getPageDTO(Page<AccountConsumeScenePageDTO> page,
+      AccountConsumePageQuery accountConsumePageReq);
+
+  public List<AccountConsumeScenePageDTO> export(AccountConsumePageQuery accountConsumePageReq);
+
+  public AccountConsumeSceneDTO findAccountConsumeSceneDTOById(Long id);
 }

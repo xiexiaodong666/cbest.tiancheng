@@ -1,17 +1,13 @@
 package com.welfare.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.service.dto.MerchantPageReq;
+import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.service.dto.MerchantReq;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -40,7 +36,7 @@ public interface MerchantService {
      * @param merchantPageReq
      * @return
      */
-    Page<Merchant> page(Page<Merchant> page,MerchantPageReq merchantPageReq);
+    Page<MerchantWithCreditDTO> page(Page<Merchant> page, MerchantPageReq merchantPageReq);
 
     /**
      * 新增商户
@@ -62,4 +58,20 @@ public interface MerchantService {
      * @return
      */
     String exportList(MerchantPageReq merchantPageReq);
+
+
+    /**
+     * 根据MerCode查询商户详情
+     * @param queryWrapper
+     * @return
+     */
+    Merchant getMerchantByMerCode(QueryWrapper<Merchant> queryWrapper);
+
+    /**
+     * 通过merCode查询商户详情
+     * @param merCode
+     * @return
+     */
+    Merchant detailByMerCode(String merCode);
+
 }

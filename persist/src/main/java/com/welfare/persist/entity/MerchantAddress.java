@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,7 +21,7 @@ import lombok.experimental.Accessors;
  * 地址信息(merchant_address)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -61,17 +62,20 @@ public class MerchantAddress extends Model<MerchantAddress> implements Serializa
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建日期
      */
     @ApiModelProperty("创建日期")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新日期
      */
@@ -82,7 +86,8 @@ public class MerchantAddress extends Model<MerchantAddress> implements Serializa
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
     /**
      * 关联类型
      */

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
  * 用户交易流水明细表(account_bill_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-08 11:23:04
+ * @since 2021-01-09 15:13:38
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -54,95 +55,63 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     @ApiModelProperty("交易流水号")   
     private String transNo;
     /**
-     * 交易总金额
-     */
-    @ApiModelProperty("交易总金额")   
-    private BigDecimal transAllAmount;
-    /**
-     * 交易商户信用额度
-     */
-    @ApiModelProperty("交易商户信用额度")   
-    private BigDecimal transAmountCredit;
-    /**
-     * 交易自费额度
-     */
-    @ApiModelProperty("交易自费额度")   
-    private BigDecimal transAmountSelf;
-    /**
-     * 交易商户余额
-     */
-    @ApiModelProperty("交易商户余额")   
-    private BigDecimal transAmountBalance;
-    /**
-     * 交易时间
-     */
-    @ApiModelProperty("交易时间")   
-    private Date transTime;
-    /**
      * 消费门店
      */
     @ApiModelProperty("消费门店")   
     private String storeCode;
     /**
-     * 账户余额
+     * 交易类型(消费、退款、充值等)
      */
-    @ApiModelProperty("账户余额")   
-    private BigDecimal accountBalance;
-    /**
-     * 账户自费余额
-     */
-    @ApiModelProperty("账户自费余额")   
-    private BigDecimal accountSelfBalance;
-    /**
-     * 账户福利余额
-     */
-    @ApiModelProperty("账户福利余额")   
-    private BigDecimal accountWelfareBalance;
+    @ApiModelProperty("交易类型(消费、退款、充值等)")   
+    private String transType;
     /**
      * pos标识
      */
     @ApiModelProperty("pos标识")   
     private String pos;
     /**
-     * 交易类型
+     * 充值渠道(第三方充值需要体现:支付宝或者微信)
      */
-    @ApiModelProperty("交易类型")   
-    private BigDecimal transType;
+    @ApiModelProperty("充值渠道(第三方充值需要体现:支付宝或者微信)")   
+    private String channel;
     /**
-     * 支付ID
+     * 交易总金额
      */
-    @ApiModelProperty("支付ID")   
-    private String paymentId;
+    @ApiModelProperty("交易总金额")   
+    private BigDecimal transAmount;
     /**
-     * 订单ID
+     * 交易时间
      */
-    @ApiModelProperty("订单ID")   
-    private String orderId;
+    @ApiModelProperty("交易时间")   
+    private Date transTime;
     /**
-     * 支付类型代码
+     * 账户余额
      */
-    @ApiModelProperty("支付类型代码")   
-    private String paymentTypeCode;
+    @ApiModelProperty("账户余额")   
+    private BigDecimal accountBalance;
     /**
-     * 支付类型名称
+     * 授信余额
      */
-    @ApiModelProperty("支付类型名称")   
-    private String paymentTypeName;
+    @ApiModelProperty("授信余额")   
+    private BigDecimal surplusQuotaBalance;
     /**
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String updateUser;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
@@ -152,13 +121,15 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic  
-    private Boolean deleted;
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    private Integer version;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+	private Integer version;
 
 //以下为列明常量
 
@@ -179,65 +150,37 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     */
     public static final String TRANS_NO = "trans_no";
     /**
-    * 交易总金额
-    */
-    public static final String TRANS_ALL_AMOUNT = "trans_all_amount";
-    /**
-    * 交易商户信用额度
-    */
-    public static final String TRANS_AMOUNT_CREDIT = "trans_amount_credit";
-    /**
-    * 交易自费额度
-    */
-    public static final String TRANS_AMOUNT_SELF = "trans_amount_self";
-    /**
-    * 交易商户余额
-    */
-    public static final String TRANS_AMOUNT_BALANCE = "trans_amount_balance";
-    /**
-    * 交易时间
-    */
-    public static final String TRANS_TIME = "trans_time";
-    /**
     * 消费门店
     */
     public static final String STORE_CODE = "store_code";
     /**
-    * 账户余额
+    * 交易类型(消费、退款、充值等)
     */
-    public static final String ACCOUNT_BALANCE = "account_balance";
-    /**
-    * 账户自费余额
-    */
-    public static final String ACCOUNT_SELF_BALANCE = "account_self_balance";
-    /**
-    * 账户福利余额
-    */
-    public static final String ACCOUNT_WELFARE_BALANCE = "account_welfare_balance";
+    public static final String TRANS_TYPE = "trans_type";
     /**
     * pos标识
     */
     public static final String POS = "pos";
     /**
-    * 交易类型
+    * 充值渠道(第三方充值需要体现:支付宝或者微信)
     */
-    public static final String TRANS_TYPE = "trans_type";
+    public static final String CHANNEL = "channel";
     /**
-    * 支付ID
+    * 交易总金额
     */
-    public static final String PAYMENT_ID = "payment_id";
+    public static final String TRANS_AMOUNT = "trans_amount";
     /**
-    * 订单ID
+    * 交易时间
     */
-    public static final String ORDER_ID = "order_id";
+    public static final String TRANS_TIME = "trans_time";
     /**
-    * 支付类型代码
+    * 账户余额
     */
-    public static final String PAYMENT_TYPE_CODE = "payment_type_code";
+    public static final String ACCOUNT_BALANCE = "account_balance";
     /**
-    * 支付类型名称
+    * 授信余额
     */
-    public static final String PAYMENT_TYPE_NAME = "payment_type_name";
+    public static final String SURPLUS_QUOTA_BALANCE = "surplus_quota_balance";
     /**
     * 创建人
     */

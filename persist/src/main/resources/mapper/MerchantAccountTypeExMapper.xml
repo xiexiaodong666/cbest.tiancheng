@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.MerchantAccountTypeExMapper">
+    <select id="listWithMerchant" resultType="com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO">
+        SELECT
+        m.mer_name AS merName,
+        mat.mer_code AS merCode,
+        count( mat.mer_account_type_code ) count,
+        GROUP_CONCAT( mer_account_type_name ) merAccountTypeName,
+        mat.remark,
+        mat.create_time
+        FROM
+        merchant_account_type mat
+        LEFT JOIN merchant m ON mat.mer_code = m.mer_code
+        GROUP BY
+        mat.mer_code
+        <where>
+            <if test="req.merCode!=null and req.merCode!=''">
+                and mat.mer_code=#{req.merCode}
+            </if>
+            <if test="req.merName!=null and req.merName!=''">
+                and m.mer_mame like concat('%',#{req.merName},'%')
+            </if>
+            <if test="req.startTime!=null">
+                and mat.create_time &gt;= #{req.startTime}
+            </if>
+            <if test="req.endTime!=null">
+                and mat.create_time &lt;= #{req.endTime}
+            </if>
+        </where>
+    </select>
+</mapper>

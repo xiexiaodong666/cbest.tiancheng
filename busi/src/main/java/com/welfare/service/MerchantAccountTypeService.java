@@ -2,8 +2,9 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
+import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
-import com.welfare.service.dto.MerchantAccountTypePageReq;
 import com.welfare.service.dto.MerchantAccountTypeReq;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public interface MerchantAccountTypeService {
     /**
      * 查询商户列表（分页））
      */
-    Page<MerchantAccountType> page(Page page, MerchantAccountTypePageReq pageReq);
+    Page<MerchantAccountTypeWithMerchantDTO> page(Page page, MerchantAccountTypePageReq pageReq);
 
     /**
      * 新增商户

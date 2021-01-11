@@ -1,9 +1,10 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
+import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.MerchantAccountTypeService;
-import com.welfare.service.dto.MerchantAccountTypePageReq;
 import com.welfare.service.dto.MerchantAccountTypeReq;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.servicemerchant.converter.MerchantAccountTypeConverter;
@@ -53,8 +54,8 @@ public class MerchantAccountTypeController implements IController {
 
     @GetMapping("/page")
     @ApiOperation("查询商户列表（分页））")
-    public R<Page<MerchantAccountTypeInfo>> page(Page page, MerchantAccountTypePageReq pageReq){
-        return R.success(merchantAccountTypeConverter.toD(merchantAccountTypeService.page(page,pageReq)));
+    public R<Page<MerchantAccountTypeWithMerchantDTO>> page(Page page, MerchantAccountTypePageReq pageReq){
+        return R.success(merchantAccountTypeService.page(page,pageReq));
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")

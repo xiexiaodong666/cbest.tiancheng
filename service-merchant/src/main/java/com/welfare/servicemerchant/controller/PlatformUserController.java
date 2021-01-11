@@ -37,12 +37,12 @@ public class PlatformUserController {
   PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
       @RequestParam int pageSize,
       @RequestParam int page,
-      @RequestParam Long merchat_id,
+      @RequestParam String merchat_code,
       @RequestParam(required = false) Date start_create_time,
       @RequestParam(required = false) Date end_create_time
   ) {
     return platformUserFeignClient.getPlatformUserList(
-        pageSize, page, merchat_id, start_create_time, end_create_time);
+        pageSize, page, merchat_code, start_create_time, end_create_time);
   }
 
   /**
@@ -50,7 +50,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("新增商户用户")
-  PlatformUserResponse<PlatformUser> addPlatformUser(@RequestBody PlatformUser platformUser) {
+  PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.addPlatformUser(platformUser);
   }
@@ -60,7 +60,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("修改商户用户")
-  PlatformUserResponse<PlatformUser> updatePlatformUser(@RequestBody PlatformUser platformUser) {
+  PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUser(platformUser);
   }
@@ -82,7 +82,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/update-status", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("锁定/解锁")
-  PlatformUserResponse<PlatformUser> updatePlatformUserStatus(
+  PlatformUserResponse<Boolean> updatePlatformUserStatus(
       @RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUserStatus(platformUser);

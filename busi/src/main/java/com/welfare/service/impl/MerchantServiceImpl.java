@@ -7,6 +7,7 @@ import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.persist.mapper.MerchantExMapper;
+import com.welfare.service.DictService;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.helper.QueryHelper;
@@ -30,11 +31,14 @@ import java.util.List;
 public class MerchantServiceImpl implements MerchantService {
     private final MerchantDao merchantDao;
     private final MerchantExMapper merchantExMapper;
+    private final DictService dictService;
 
 
     @Override
     public List<Merchant> list(MerchantReq req) {
-        return merchantDao.list(QueryHelper.getWrapper(req));
+        List<Merchant> list=merchantDao.list(QueryHelper.getWrapper(req));
+        dictService.trans(Merchant.class,null,false,list);
+        return list;
     }
 
     @Override
@@ -45,7 +49,9 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public Page<MerchantWithCreditDTO> page(Page<Merchant> page, MerchantPageReq merchantPageReq) {
-        return merchantExMapper.listWithCredit(page,merchantPageReq);
+        Page<MerchantWithCreditDTO> pageResult=merchantExMapper.listWithCredit(page,merchantPageReq);
+        dictService.trans(MerchantWithCreditDTO.class,Merchant.class.getSimpleName(),false,pageResult.getRecords());
+        return pageResult;
     }
 
     @Override

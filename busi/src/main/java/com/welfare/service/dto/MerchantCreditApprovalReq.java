@@ -31,7 +31,7 @@ public class MerchantCreditApprovalReq {
    * 审批状态
    */
   @ApiModelProperty("审批状态(通过：AUDIT_SUCCESS， 不通过：AUDIT_FAILED)")
-  @NotEmpty(message = "审批状态为空")
+  @NotNull(message = "审批状态为空")
   private ApprovalStatus approvalStatus;
 
   /**

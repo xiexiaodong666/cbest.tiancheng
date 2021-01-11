@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
+@ExcelIgnoreUnannotated
 public class MerchantCreditApplyInfo {
 
   /**

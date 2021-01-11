@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@ControllerAdvice("com.welfare.controller")
+@ControllerAdvice(value = {"com.welfare.controller","com.welfare.servicemerchant.controller"})
 public class ExceptionController {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionController.class);
 

@@ -1,6 +1,7 @@
 package com.welfare.servicemerchant.service;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSON;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -81,8 +82,7 @@ public class FileUploadService {
     ByteArrayOutputStream outputStream = null;
     try {
       Date date = new Date();
-      SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmssS");
-      fileName = fileName + "-" + format.format(date) +  ".xlsx";
+      fileName = fileName + ".xlsx";
       outputStream = new ByteArrayOutputStream();
       EasyExcel.write(outputStream, cla).sheet().doWrite(list);
       ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());

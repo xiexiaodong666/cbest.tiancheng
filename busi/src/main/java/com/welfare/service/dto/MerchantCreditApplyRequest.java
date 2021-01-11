@@ -35,9 +35,9 @@ public class MerchantCreditApplyRequest {
   /**
    * 申请类型
    */
-  @ApiModelProperty("商户额度申请类型（充值额度：rechargeLimit，余额：currentBalance, 剩余信用额度:remainingLimit，信用额度:creditLimit，消耗返点:rebateLimit）")
+  @ApiModelProperty("商户额度申请类型（充值额度：RECHARGE_LIMIT，余额：CURRENT_BALANCE, 剩余信用额度:REMAINING_LIMIT，信用额度:CREDIT_LIMIT，消耗返点:REBATE_LIMIT）")
   @NotEmpty(message = "商户额度申请类型为空")
-  private WelfareConstant.MerCreditType applyType;
+  private String applyType;
 
   /**
    * 金额

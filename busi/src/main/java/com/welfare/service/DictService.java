@@ -1,6 +1,11 @@
 package com.welfare.service;
 
 
+import com.welfare.service.dto.DictDTO;
+import com.welfare.service.dto.DictReq;
+
+import java.util.List;
+
 /**
  * 字典服务接口
  *
@@ -9,5 +14,7 @@ package com.welfare.service;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface DictService {
+
+    List<DictDTO> getByType(DictReq dictType);
 
 }

@@ -11,6 +11,23 @@
   <sql id="baseColumn">
         id,mer_code,account_type_id,remark,create_user,create_time,update_user,update_time,flag,version
     </sql>
+  <sql id="pageAndExport">
+     SELECT
+    GROUP_CONCAT( CONCAT( ss.store_name, "-", ss.store_code ) ) AS storeInfo,
+    act.type_name AS accountTypeName,
+    acs.id,
+    acs.STATUS,
+    acs.create_time AS createTime,
+    acs.remark,
+    acs.mer_code as merCode
+    FROM
+    account_consume_scene acs
+    inner join account_consume_scene_store_relation acstr on acs.id = acstr.account_consume_scene_id
+    inner JOIN supplier_store ss ON acstr.store_code = ss.store_code
+    AND acs.mer_code = ss.mer_code
+    inner JOIN account_type act ON act.id = acs.account_type_id
+    where acs.deleted =0 and acstr.deleted= 0 and ss.deleted = 0
+  </sql>
 
 
   <select id="getPageDTO" resultType="com.welfare.persist.dto.AccountConsumeScenePageDTO">

@@ -109,6 +109,13 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     }
 
     @Override
+    public List<AccountConsumeScenePageDTO> export(AccountConsumePageQuery accountConsumePageReq) {
+        return accountConsumeSceneCustomizeMapper.getPageDTO(accountConsumePageReq.getMerCode(),
+            accountConsumePageReq.getAccountTypeId(),accountConsumePageReq.getStatus(),
+            accountConsumePageReq.getCreateTimeStart(),accountConsumePageReq.getCreateTimeEnd());
+    }
+
+    @Override
     public AccountConsumeSceneDTO findAccountConsumeSceneDTOById(Long id) {
         AccountConsumeSceneDTO accountConsumeSceneDTO = new AccountConsumeSceneDTO();
         AccountConsumeSceneMapperDTO accountConsumeSceneMapperDTO = accountConsumeSceneCustomizeMapper.queryAccountConsumerScene4Detail(id);

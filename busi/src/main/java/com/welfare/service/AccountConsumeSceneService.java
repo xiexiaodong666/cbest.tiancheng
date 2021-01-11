@@ -28,5 +28,7 @@ public interface AccountConsumeSceneService {
   public IPage<AccountConsumeScenePageDTO> getPageDTO(Page<AccountConsumeScenePageDTO> page,
       AccountConsumePageQuery accountConsumePageReq);
 
+  public List<AccountConsumeScenePageDTO> export(AccountConsumePageQuery accountConsumePageReq);
+
   public AccountConsumeSceneDTO findAccountConsumeSceneDTOById(Long id);
 }

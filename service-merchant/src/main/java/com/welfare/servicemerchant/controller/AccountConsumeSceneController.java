@@ -9,10 +9,12 @@ import com.welfare.service.AccountConsumeSceneService;
 import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
 import com.welfare.servicemerchant.dto.AccountConsumePageReq;
 import com.welfare.service.dto.AccountConsumeSceneReq;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -42,6 +44,8 @@ public class AccountConsumeSceneController implements IController {
   private AccountConsumeSceneService accountConsumeSceneService;
   @Autowired
   private AccountConsumeSceneConverter accountConsumeSceneConverter;
+  @Autowired
+  private FileUploadService fileUploadService;
   @GetMapping("/page")
   @ApiOperation("分页查询员工消费配置列表")
   public R<Page<AccountConsumeScenePageDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
@@ -88,9 +92,10 @@ public class AccountConsumeSceneController implements IController {
 
   @ApiOperation("员工消费配置导出")
   @GetMapping(value="/exportAccountConsumeScene")
-  public R<String> exportAccountConsumeScene(HttpServletResponse response,
-      @RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,AccountConsumePageReq accountConsumePageReq){
-    return null;
+  public R<String> exportAccountConsumeScene(AccountConsumePageReq accountConsumePageReq)throws IOException {
+    AccountConsumePageQuery accountConsumePageQuery = new AccountConsumePageQuery();
+    BeanUtils.copyProperties(accountConsumePageReq,accountConsumePageQuery);
+    List<AccountConsumeScenePageDTO> list = accountConsumeSceneService.export(accountConsumePageQuery);
+    return success(fileUploadService.uploadExcelFile(list, AccountConsumeScenePageDTO.class, "员工消费配置"));
   }
 }

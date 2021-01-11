@@ -59,7 +59,13 @@ public class AccountServiceImpl implements AccountService {
         return accountConverter.toPage(iPage);
     }
 
-    @Override
+  @Override
+  public List<AccountDTO> export(AccountPageReq accountPageReq) {
+      List<AccountPageDTO> list = accountCustomizeMapper.queryPageDTO(accountPageReq.getMerCode(),accountPageReq.getAccountName(),accountPageReq.getDepartmentCode(),accountPageReq.getAccountStatus(),accountPageReq.getAccountTypeCode());
+    return accountConverter.toAccountDTOList(list);
+  }
+
+  @Override
     public int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode) {
         return accountMapper.increaseAccountBalance(increaseBalance, updateUser, accountCode);
     }
@@ -119,7 +125,14 @@ public class AccountServiceImpl implements AccountService {
         return accountConverter.toBillDetailPage(iPage);
     }
 
-    @Override
+  @Override
+  public List<AccountBillDetailDTO> exportBillDetail(String accountCode, Date createTimeStart,
+      Date createTimeEnd) {
+      List<AccountBillDetailMapperDTO> accountBillDetailMapperDTOList= accountCustomizeMapper.queryAccountBillDetail(accountCode,createTimeStart,createTimeEnd);
+    return accountConverter.toAccountBillDetailDTOList(accountBillDetailMapperDTOList);
+  }
+
+  @Override
     public AccountBillDTO quertBill(String accountCode, Date createTimeStart, Date createTimeEnd) {
         AccountBillDTO accountBillDTO = new AccountBillDTO();
         AccountBillMapperDTO accountBillMapperDTO =accountCustomizeMapper.queryBill(accountCode,createTimeStart,createTimeEnd);

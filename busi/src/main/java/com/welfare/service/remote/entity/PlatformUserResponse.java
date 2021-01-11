@@ -1,6 +1,7 @@
 package com.welfare.service.remote.entity;
 
 import java.util.List;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -15,10 +16,14 @@ public class PlatformUserResponse<T> {
   private String msg;
   private T data;
 
+  @Builder
   public PlatformUserResponse(Integer code, String msg, T data) {
     this.code = code;
     this.msg = msg;
     this.data = data;
+  }
+  public PlatformUserResponse(){
+
   }
 
 }

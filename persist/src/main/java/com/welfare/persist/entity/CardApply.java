@@ -54,6 +54,7 @@ public class CardApply extends Model<CardApply> implements Serializable {
      * 商户名称
      */
     @ApiModelProperty("商户名称")
+    @TableField(exist = false)
     private String merName;
 
     /**

@@ -24,21 +24,21 @@ public class PlatformUserFallback implements FallbackFactory<PlatformUserFeignCl
 
       @Override
       public PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
-          int pageSize, int page, Long merchat_id, Date start_create_time, Date end_create_time) {
+          int pageSize, int page, String merchat_code, Date start_create_time, Date end_create_time) {
         log.error("获取商户用户失败",cause);
         PlatformUserResponse response= new PlatformUserResponse(500,cause.getMessage(),null);
         return response;
       }
 
       @Override
-      public PlatformUserResponse<PlatformUser> addPlatformUser(PlatformUser platformUser) {
+      public PlatformUserResponse<Boolean> addPlatformUser(PlatformUser platformUser) {
         log.error("新增商户用户失败",cause);
         PlatformUserResponse response= new PlatformUserResponse(500,cause.getMessage(),null);
         return response;
       }
 
       @Override
-      public PlatformUserResponse<PlatformUser> updatePlatformUser(PlatformUser platformUser) {
+      public PlatformUserResponse<Boolean> updatePlatformUser(PlatformUser platformUser) {
         log.error("修改商户用户失败",cause);
         PlatformUserResponse response= new PlatformUserResponse(500,cause.getMessage(),null);
         return response;
@@ -52,7 +52,7 @@ public class PlatformUserFallback implements FallbackFactory<PlatformUserFeignCl
       }
 
       @Override
-      public PlatformUserResponse<PlatformUser> updatePlatformUserStatus(
+      public PlatformUserResponse<Boolean> updatePlatformUserStatus(
           PlatformUser platformUser) {
         log.error("获取商户用户状态失败",cause);
         PlatformUserResponse response= new PlatformUserResponse(500,cause.getMessage(),null);

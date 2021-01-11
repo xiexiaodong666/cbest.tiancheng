@@ -26,7 +26,7 @@ public interface PlatformUserFeignClient {
   PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
       @RequestParam("pageSize") int pageSize,
       @RequestParam("page") int page,
-      @RequestParam("merchat_id") Long merchat_id,
+      @RequestParam("merchant_code") String merchant_code,
       @RequestParam("start_create_time") Date start_create_time,
       @RequestParam("end_create_time") Date end_create_time
   );
@@ -35,13 +35,13 @@ public interface PlatformUserFeignClient {
    * 新增商户用户
    */
   @RequestMapping(value = "/api/platform/user/create", method = RequestMethod.POST, consumes = "application/json")
-  PlatformUserResponse<PlatformUser> addPlatformUser(@RequestBody PlatformUser platformUser);
+  PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser);
 
   /**
    * 修改商户用户
    */
   @RequestMapping(value = "/api/platform/user/update", method = RequestMethod.POST, consumes = "application/json")
-  PlatformUserResponse<PlatformUser> updatePlatformUser(@RequestBody PlatformUser platformUser);
+  PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser);
 
 
   /**
@@ -55,7 +55,7 @@ public interface PlatformUserFeignClient {
    * 锁定/解锁
    */
   @RequestMapping(value = "/api/platform/user/update-status", method = RequestMethod.POST, consumes = "application/json")
-  PlatformUserResponse<PlatformUser> updatePlatformUserStatus(@RequestBody PlatformUser platformUser);
+  PlatformUserResponse<Boolean> updatePlatformUserStatus(@RequestBody PlatformUser platformUser);
 
 
 

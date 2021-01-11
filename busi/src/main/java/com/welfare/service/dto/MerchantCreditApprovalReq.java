@@ -1,8 +1,6 @@
 package com.welfare.service.dto;
 
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.enums.ApprovalStatus;
-import com.welfare.service.enums.MerchantCreditApplyType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

@@ -5,6 +5,7 @@ import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.service.MerchantService;
 import com.welfare.persist.dto.query.MerchantPageReq;
+import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.servicemerchant.converter.MerchantConverter;
 import com.welfare.servicemerchant.dto.MerchantInfo;
@@ -47,8 +48,8 @@ public class MerchantController implements IController {
     }
     @GetMapping("/detail")
     @ApiOperation("查询商户详情）")
-    public R<MerchantInfo> detail(@RequestParam(required = true) @ApiParam("id") Long id){
-        return R.success(merchantConverter.toD(merchantService.detail(id)));
+    public R<MerchantDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+        return R.success(merchantService.detail(id));
     }
 
     @GetMapping("/page")
@@ -58,12 +59,12 @@ public class MerchantController implements IController {
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")
-    public R add(@RequestBody Merchant merchant){
+    public R add(@RequestBody MerchantDetailDTO merchant){
         return R.status(merchantService.add(merchant),"新增失败");
     }
     @PostMapping("/update")
     @ApiOperation("编辑商户")
-    public R update(@RequestBody Merchant merchant){
+    public R update(@RequestBody MerchantDetailDTO merchant){
         return R.status(merchantService.update(merchant),"更新失败");
     }
     @PostMapping("/export-list")

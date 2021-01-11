@@ -1,4 +1,4 @@
-package com.welfare.persist.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author hao.yin
@@ -14,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-public class MerchantWithCreditDTO {
+public class MerchantDetailDTO {
 
   @ApiModelProperty("id")
   private Long id;
@@ -50,6 +51,9 @@ public class MerchantWithCreditDTO {
   @ApiModelProperty("信用额度")
   private BigDecimal creditLimit;
 
+  @ApiModelProperty("充值额度")
+  private BigDecimal rechargeLimit;
+
   /**
    * 剩余信用额度
    */
@@ -61,10 +65,15 @@ public class MerchantWithCreditDTO {
    */
   @ApiModelProperty("目前余额")
   private BigDecimal currentBalance;
+  @ApiModelProperty("返利余额")
+  private BigDecimal rebateLimit;
   /**
    * 创建日期
    */
   @ApiModelProperty("创建日期")
   private Date createTime;
 
+  @ApiModelProperty("备注")
+  private String remark;
+  List<MerchantAddressDTO> addressList;
 }

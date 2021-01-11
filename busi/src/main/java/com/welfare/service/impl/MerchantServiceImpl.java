@@ -7,6 +7,7 @@ import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.persist.mapper.MerchantExMapper;
+import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +38,9 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public Merchant detail(Long id) {
-        return merchantDao.getById(id);
+    public MerchantDetailDTO detail(Long id) {
+//        return merchantDao.getById(id);
+        return null;
     }
 
     @Override
@@ -47,13 +49,16 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public boolean add(Merchant merchant) {
-        return merchantDao.save(merchant);
+    public boolean add(MerchantDetailDTO merchant) {
+//         merchantDao.save(merchant);
+        return true;
     }
 
     @Override
-    public boolean update(Merchant merchant) {
-        return merchantDao.updateById(merchant);
+    public boolean update(MerchantDetailDTO merchant) {
+//        return merchantDao.updateById(merchant);
+        return true;
+
     }
 
     @Override

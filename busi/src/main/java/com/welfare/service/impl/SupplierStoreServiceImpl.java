@@ -14,6 +14,7 @@ import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.SupplierStoreExMapper;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.helper.QueryHelper;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +51,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
-  public SupplierStore detail(Long id) {
-    return supplierStoreDao.getById(id);
+  public SupplierStoreDetailDTO detail(Long id) {
+//    return supplierStoreDao.getById(id);
+    return null;
   }
 
   @Override
@@ -62,8 +64,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
-  public boolean add(SupplierStore supplierStore) {
-    return supplierStoreDao.save(supplierStore);
+  public boolean add(SupplierStoreDetailDTO supplierStore) {
+//    return supplierStoreDao.save(supplierStore);
+    return true;
   }
 
   @Override
@@ -75,8 +78,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
-  public boolean batchAdd(List<SupplierStore> list) {
-    return supplierStoreDao.saveBatch(list);
+  public boolean batchAdd(List<SupplierStoreDetailDTO> list) {
+    return true;
+//    return supplierStoreDao.saveBatch(list);
   }
 
   @Override
@@ -85,11 +89,12 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
-  public boolean update(SupplierStore supplierStore) {
-    if(EmptyChecker.notEmpty(supplierStore.getConsumType())){
-      this.syncConsumeType(supplierStore.getStoreCode(),supplierStore.getStoreCode());
-    }
-    return supplierStoreDao.updateById(supplierStore);
+  public boolean update(SupplierStoreDetailDTO supplierStore) {
+    return true;
+//    if(EmptyChecker.notEmpty(supplierStore.getConsumType())){
+//      this.syncConsumeType(supplierStore.getStoreCode(),supplierStore.getStoreCode());
+//    }
+//    return supplierStoreDao.updateById(supplierStore);
   }
 
   @Override

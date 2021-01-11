@@ -5,6 +5,7 @@ import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.servicemerchant.converter.SupplierStoreConverter;
 import com.welfare.servicemerchant.dto.SupplierStoreInfo;
 import io.swagger.annotations.Api;
@@ -44,13 +45,13 @@ public class SupplierStoreController implements IController {
     }
     @GetMapping("/detail")
     @ApiOperation("查询供应商门店详情）")
-    public R<SupplierStoreInfo> detail(@RequestParam(required = true) @ApiParam("id") Long id){
-        return R.success(supplierStoreConverter.toD(supplierStoreService.detail(id)));
+    public R<SupplierStoreDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+        return R.success(supplierStoreService.detail(id));
     }
 
     @PostMapping("/add")
     @ApiOperation("新增供应商门店")
-    public R<SupplierStoreInfo> add(@RequestBody SupplierStore supplierStore){
+    public R add(@RequestBody SupplierStoreDetailDTO supplierStore){
         return R.status(supplierStoreService.add(supplierStore),"新增失败");
     }
 
@@ -61,7 +62,7 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/batch-add")
     @ApiOperation("批量新增供应商门店")
-    public R batchAdd(@RequestBody List<SupplierStore> list){
+    public R batchAdd(@RequestBody List<SupplierStoreDetailDTO> list){
         return R.status(supplierStoreService.batchAdd(list),"批量新增失败");
     }
 
@@ -72,7 +73,7 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/update")
     @ApiOperation("编辑供应商门店")
-    public R update(@RequestBody SupplierStore supplierStore){
+    public R update(@RequestBody SupplierStoreDetailDTO supplierStore){
         // TODO green.gao 消费能力变更后,同步修改到消费门店的消费能力字段。
         return R.status(supplierStoreService.add(supplierStore),"编辑失败失败");
 

@@ -10,6 +10,7 @@ import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.MerchantAccountTypeService;
+import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
 import com.welfare.service.dto.MerchantAccountTypeSortReq;
 import com.welfare.service.helper.QueryHelper;
@@ -40,8 +41,9 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public MerchantAccountType detail(Long id) {
-        return merchantAccountTypeDao.getById(id);
+    public MerchantAccountTypeDetailDTO detail(Long id) {
+//        return merchantAccountTypeDao.getById(id);
+        return null;
     }
 
     @Override
@@ -50,13 +52,15 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public boolean add(MerchantAccountType merchantAccountType) {
-        return merchantAccountTypeDao.save(merchantAccountType);
+    public boolean add(MerchantAccountTypeDetailDTO merchantAccountType) {
+//        return merchantAccountTypeDao.save(merchantAccountType);
+        return true;
     }
 
     @Override
-    public boolean update(MerchantAccountType merchantAccountType) {
-        return merchantAccountTypeDao.updateById(merchantAccountType);
+    public boolean update(MerchantAccountTypeDetailDTO merchantAccountType) {
+        return true;
+//        return merchantAccountTypeDao.updateById(merchantAccountType);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.MerchantAccountTypeService;
+import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
 import com.welfare.service.dto.MerchantAccountTypeSortReq;
 import com.welfare.servicemerchant.converter.MerchantAccountTypeConverter;
@@ -48,8 +49,8 @@ public class MerchantAccountTypeController implements IController {
     }
     @GetMapping("/detail")
     @ApiOperation("查询商户详情）")
-    public R<MerchantAccountTypeInfo> detail(@RequestParam(required = true) @ApiParam("id") Long id){
-        return R.success(merchantAccountTypeConverter.toD(merchantAccountTypeService.detail(id)));
+    public R<MerchantAccountTypeDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+        return R.success(merchantAccountTypeService.detail(id));
     }
 
     @GetMapping("/page")
@@ -59,12 +60,12 @@ public class MerchantAccountTypeController implements IController {
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")
-    public R add(@RequestBody MerchantAccountType merchantAccountType){
+    public R add(@RequestBody MerchantAccountTypeDetailDTO merchantAccountType){
         return R.status(merchantAccountTypeService.add(merchantAccountType),"新增失败");
     }
     @PostMapping("/update")
     @ApiOperation("编辑商户")
-    public R update(@RequestBody MerchantAccountType merchantAccountType){
+    public R update(@RequestBody MerchantAccountTypeDetailDTO merchantAccountType){
         return R.status(merchantAccountTypeService.update(merchantAccountType),"更新失败");
     }
     @PostMapping("/export-list")

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
 import com.welfare.service.dto.MerchantAccountTypeSortReq;
 
@@ -29,7 +30,7 @@ public interface MerchantAccountTypeService {
      * @param id
      * @return
      */
-    MerchantAccountType detail(Long id);
+    MerchantAccountTypeDetailDTO detail(Long id);
 
     /**
      * 查询商户列表（分页））
@@ -40,13 +41,13 @@ public interface MerchantAccountTypeService {
      * 新增商户
      * @return
      */
-    boolean add(MerchantAccountType merchantAccountType);
+    boolean add(MerchantAccountTypeDetailDTO merchantAccountType);
 
     /**
      * 编辑商户
      * @return
      */
-    boolean update(MerchantAccountType merchantAccountType);
+    boolean update(MerchantAccountTypeDetailDTO merchantAccountType);
 
     /**
      * 导出商户列表

@@ -120,6 +120,12 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
     @ApiModelProperty("状态")   
     private Integer status;
 
+    /**
+     * 状态
+     */
+    @ApiModelProperty("状态")
+    private Integer syncStatus;
+
 //以下为列明常量
 
     /**
@@ -186,5 +192,10 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
     * 状态
     */
     public static final String STATUS = "status";
+
+    /**
+     * 状态
+     */
+    public static final String SYNC_STATUS = "sync_status";
 
 }

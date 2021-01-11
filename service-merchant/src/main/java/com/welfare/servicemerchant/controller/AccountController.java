@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -116,13 +117,13 @@ public class AccountController implements IController {
 
   @ApiOperation("批量新增员工账号")
   @PostMapping(value = "/uploadAccount")
-  public R<Boolean> uploadAccount(@RequestParam(name = "file") MultipartFile multipartFile) {
-    return null;
+  public R<String> uploadAccount(@RequestPart(name = "file")@ApiParam(name = "file",required = true)MultipartFile multipartFile) {
+    return success(accountService.uploadAccount(multipartFile));
   }
   @ApiOperation("批量绑卡")
   @PostMapping(value = "/batchBindCard")
-  public R<Boolean> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
-    return null;
+  public R<String> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
+    return success(accountService.accountBatchBindCard(multipartFile));
   }
 
   @GetMapping("/bill")

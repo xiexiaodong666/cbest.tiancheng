@@ -15,4 +15,8 @@ public class MerchantAccountTypeReq {
     @ApiModelProperty("商户代码")
     private String merCode;
 
+    @Query(type = Query.Type.EQUAL)
+    @ApiModelProperty("扣款序号")
+    private Integer deductionOrder;
+
 }

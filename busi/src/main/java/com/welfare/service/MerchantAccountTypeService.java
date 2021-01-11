@@ -6,6 +6,7 @@ import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.dto.MerchantAccountTypeReq;
+import com.welfare.service.dto.MerchantAccountTypeSortReq;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public interface MerchantAccountTypeService {
      * 移动扣款顺序
      * @return
      */
-    boolean moveDeductionsOrder();
+    boolean moveDeductionsOrder(MerchantAccountTypeSortReq merchantAccountTypeSortReq);
 
     /**
      * 根据编码查询单条

@@ -1,4 +1,4 @@
-package com.welfare.persist.dto.query;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

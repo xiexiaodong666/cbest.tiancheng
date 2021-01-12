@@ -9,7 +9,6 @@ import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountReq;
 import com.welfare.service.dto.AccountDTO;
-import com.welfare.service.dto.AccountDepositApplyInfo;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
@@ -53,14 +52,14 @@ public class AccountController implements IController {
   private FileUploadService fileUploadService;
 
 
-  @GetMapping("/incremental-page")
+  /*@GetMapping("/incremental-page")
   @ApiOperation("增量查询账户(支持离线消费场景)")
   public R<Page<AccountDepositApplyInfo>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
                                                     @RequestParam @ApiParam("单页大小") Integer pageSize,
                                                     @RequestParam(required = true) @ApiParam("门店编码") String storeCode,
                                                     @RequestParam(required = true) @ApiParam("查询开始的id > 0)") Long startId){
     return null;
-  }
+  }*/
 
   @GetMapping("/page")
   @ApiOperation("分页查询账户")

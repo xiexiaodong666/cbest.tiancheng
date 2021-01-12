@@ -3,13 +3,12 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
-import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
-import com.welfare.service.dto.MerchantAccountTypeSortReq;
 import com.welfare.servicemerchant.converter.MerchantAccountTypeConverter;
 import com.welfare.servicemerchant.dto.MerchantAccountTypeInfo;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -42,6 +42,8 @@ import java.util.List;
 public class MerchantAccountTypeController implements IController {
     private final MerchantAccountTypeService merchantAccountTypeService;
     private final MerchantAccountTypeConverter merchantAccountTypeConverter;
+    private final FileUploadService fileUploadService;
+
     @GetMapping("/list")
     @ApiOperation("查询商户列表（不分页）")
     public R<List<MerchantAccountTypeInfo>> list(@Valid MerchantAccountTypeReq req){
@@ -70,13 +72,9 @@ public class MerchantAccountTypeController implements IController {
     }
     @PostMapping("/export-list")
     @ApiOperation("导出商户列表")
-    public R exportList(@RequestBody MerchantAccountTypePageReq pageReq){
-        return null;
+    public R<String> exportList(@RequestBody MerchantAccountTypePageReq pageReq)throws IOException {
+        return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(merchantAccountTypeService.exportList(pageReq), MerchantAccountTypeWithMerchantDTO.class,"福利类型导出")));
+
     }
 
-//    @PostMapping("/move-deductions-order")
-//    @ApiOperation("移动商户福利类型扣款顺序")
-//    public R moveDeductionsOrder(@RequestBody@Valid MerchantAccountTypeSortReq merchantAccountTypeSortReq){
-//        return R.status(merchantAccountTypeService.moveDeductionsOrder(merchantAccountTypeSortReq),"移动扣款顺序失败");
-//    }
 }

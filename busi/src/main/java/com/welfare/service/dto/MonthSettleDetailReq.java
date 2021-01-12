@@ -31,4 +31,7 @@ public class MonthSettleDetailReq extends RequestPage {
 
     @ApiModelProperty(value = "福利类型")
     private String welfareTypeCode;
+
+    @ApiModelProperty(value = "门店类型 自营：self，第三方：third")
+    private String storeType;
 }

@@ -17,5 +17,4 @@ import org.apache.ibatis.annotations.Param;
 public interface MerchantAccountTypeExMapper {
     Page<MerchantAccountTypeWithMerchantDTO> listWithMerchant(
             Page page,@Param("req") MerchantAccountTypePageReq req);
-    String getMaxCode(@Param("merCode")String merCode);
 }

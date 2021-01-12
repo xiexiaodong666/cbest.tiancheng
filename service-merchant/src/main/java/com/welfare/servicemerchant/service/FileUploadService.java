@@ -1,6 +1,7 @@
 package com.welfare.servicemerchant.service;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.alibaba.fastjson.JSON;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -38,9 +39,6 @@ public class FileUploadService {
 
   @Value("${cbest.oss.config.bucket}")
   private String bucketName;
-
-  @Value("${cdn.server}")
-  private String cndServer;
 
   /**
    * 上传文件到oss
@@ -84,7 +82,7 @@ public class FileUploadService {
       Date date = new Date();
       fileName = fileName + ".xlsx";
       outputStream = new ByteArrayOutputStream();
-      EasyExcel.write(outputStream, cla).sheet().doWrite(list);
+      EasyExcel.write(outputStream, cla).registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).sheet().doWrite(list);
       ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
       path = uploadFile(fileName, inputStream, "application/vnd.ms-excel", outputStream.size());
     } catch (Exception e) {

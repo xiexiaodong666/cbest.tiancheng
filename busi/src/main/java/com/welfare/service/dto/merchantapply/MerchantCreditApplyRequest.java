@@ -1,4 +1,4 @@
-package com.welfare.service.dto;
+package com.welfare.service.dto.merchantapply;
 
 import com.welfare.common.constants.WelfareConstant;
 import io.swagger.annotations.ApiModel;

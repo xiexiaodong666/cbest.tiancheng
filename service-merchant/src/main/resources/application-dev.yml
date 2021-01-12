@@ -34,9 +34,7 @@ cbest:
   oss:
     config:
       bucket: sjgo-img-test
-      accessKey: lF3iXaqMbr9f3GEdPJeN
-      secretKey: KqMaYYENOqD8JBZUhqgBhOddVYc5Y1Pd1pAJRoA2
-      keyPrefix: e-welfare/
+
   pay:
       url: http://192.1.30.71:9999/gateway
       appId: yufu

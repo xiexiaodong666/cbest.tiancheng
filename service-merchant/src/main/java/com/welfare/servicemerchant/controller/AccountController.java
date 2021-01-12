@@ -112,7 +112,8 @@ public class AccountController implements IController {
   @GetMapping(value="/exportAccount")
   public R<String> exportAccount(AccountPageReq accountPageReq) throws IOException {
     List<AccountDTO>  accountDTOList = accountService.export(accountPageReq);
-    return success(fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号"));
+    String path = fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号");
+    return success(fileUploadService.getFileServerUrl(path));
   }
 
   @ApiOperation("批量新增员工账号")
@@ -152,6 +153,7 @@ public class AccountController implements IController {
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) throws IOException{
     List<AccountBillDetailDTO> exportList = accountService.exportBillDetail(accountCode,createTimeStart,createTimeEnd);
-    return success(fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细"));
+    String path =fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细");
+    return success(fileUploadService.getFileServerUrl(path));
   }
 }

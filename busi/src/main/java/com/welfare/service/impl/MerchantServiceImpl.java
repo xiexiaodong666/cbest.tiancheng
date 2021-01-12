@@ -2,8 +2,10 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.MerchantConstant;
 import com.welfare.common.util.EmptyChecker;
-import  com.welfare.persist.dao.MerchantDao;
+import com.welfare.common.util.StringUtil;
+import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +34,8 @@ import java.util.List;
  * 商户信息服务接口实现
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
  * @description 由 Mybatisplus Code Generator 创建
+ * @since 2021-01-06 13:49:25
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -41,59 +44,80 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantDao merchantDao;
     private final MerchantExMapper merchantExMapper;
     private final DictService dictService;
-    private final MerchantAddressService  merchantAddressService;
+    private final MerchantAddressService merchantAddressService;
     private final MerchantCreditService merchantCreditService;
     private final MerchantDetailConverter merchantDetailConverter;
 
 
     @Override
     public List<Merchant> list(MerchantReq req) {
-        List<Merchant> list=merchantDao.list(QueryHelper.getWrapper(req));
+        List<Merchant> list = merchantDao.list(QueryHelper.getWrapper(req));
         return list;
     }
 
     @Override
     public MerchantDetailDTO detail(Long id) {
         //商户详情
-        MerchantDetailDTO merchantDetailDTO=merchantDetailConverter.toD(merchantDao.getById(id));
-        MerchantAddressReq merchantAddressReq =new MerchantAddressReq();
+        MerchantDetailDTO merchantDetailDTO = merchantDetailConverter.toD(merchantDao.getById(id));
+        MerchantAddressReq merchantAddressReq = new MerchantAddressReq();
         merchantAddressReq.setRelatedType(Merchant.class.getSimpleName());
         merchantAddressReq.setRelatedId(merchantDetailDTO.getId());
         //收获地址
-        List<MerchantAddressDTO>  addressDTOLis=merchantAddressService.list(merchantAddressReq);
-        dictService.trans(MerchantAddressDTO.class,MerchantAddress.class.getSimpleName(),false,addressDTOLis);
+        List<MerchantAddressDTO> addressDTOLis = merchantAddressService.list(merchantAddressReq);
+        dictService.trans(MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), false, addressDTOLis);
         merchantDetailDTO.setAddressList(addressDTOLis);
 
-        MerchantCredit merchantCredit=merchantCreditService.getByMerCode(merchantDetailDTO.getMerCode());
-        if(EmptyChecker.notEmpty(merchantCredit)){
+        MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantDetailDTO.getMerCode());
+        if (EmptyChecker.notEmpty(merchantCredit)) {
             merchantDetailDTO.setRechargeLimit(merchantCredit.getRechargeLimit());
             merchantDetailDTO.setCurrentBalance(merchantCredit.getCurrentBalance());
             merchantDetailDTO.setRebateLimit(merchantCredit.getRebateLimit());
             merchantDetailDTO.setCreditLimit(merchantCredit.getCreditLimit());
             merchantDetailDTO.setRemainingLimit(merchantCredit.getRemainingLimit());
         }
-        List<MerchantDetailDTO> list=new ArrayList<>();
+        List<MerchantDetailDTO> list = new ArrayList<>();
         list.add(merchantDetailDTO);
-        dictService.trans(MerchantDetailDTO.class,Merchant.class.getSimpleName(),false,list);
+        dictService.trans(MerchantDetailDTO.class, Merchant.class.getSimpleName(), false, list);
         return list.get(0);
     }
 
     @Override
     public Page<MerchantWithCreditDTO> page(Page<Merchant> page, MerchantPageReq merchantPageReq) {
-        Page<MerchantWithCreditDTO> pageResult=merchantExMapper.listWithCredit(page,merchantPageReq);
-        dictService.trans(MerchantWithCreditDTO.class,Merchant.class.getSimpleName(),false,pageResult.getRecords());
+        Page<MerchantWithCreditDTO> pageResult = merchantExMapper.listWithCredit(page, merchantPageReq);
+        dictService.trans(MerchantWithCreditDTO.class, Merchant.class.getSimpleName(), false, pageResult.getRecords());
         return pageResult;
     }
 
     @Override
+    @Transactional
     public boolean add(MerchantDetailDTO merchant) {
-//         merchantDao.save(merchant);
+        merchant.setMerCode(nextMaxCode());
+        merchantDao.save(merchantDetailConverter.toE(merchant));
+        merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
         return true;
     }
+    private String nextMaxCode(){
+        String maxCode=merchantExMapper.getMaxMerCode();
+        if(EmptyChecker.isEmpty(maxCode)){
+            return MerchantConstant.INIT_MER_CODE;
+        }
+        String first=String.valueOf(maxCode.charAt(0));
+        Integer second=Integer.parseInt(maxCode.substring(1));
+        if(MerchantConstant.MAX_MER_CODE_SECOND.equals(second)){
+            second=MerchantConstant.INIT_MER_CODE_SECOND;
+            first= StringUtil.getNextUpEn(first);
+
+        }else{
+            second=second+1;
+        }
+        return first+second;
+    }
+
 
     @Override
     public boolean update(MerchantDetailDTO merchant) {
-//        return merchantDao.updateById(merchant);
+        merchantDao.updateById(merchantDetailConverter.toE(merchant));
+        merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
         return true;
 
     }

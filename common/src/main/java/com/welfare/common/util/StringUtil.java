@@ -23,4 +23,26 @@ public class StringUtil {
         }
         return true;
     }
+
+    /**
+     * 获取下一个英文字母
+     * @param en
+     * @return
+     */
+    public static String getNextUpEn(String en){
+        if(en==null || en.equals(""))
+            return "A";
+        char lastE = 'Z';
+        int lastEnglish = (int)lastE;
+        char[] c = en.toCharArray();
+        if(c.length>1){
+            return null;
+        }else{
+            int now = (int)c[0];
+            if(now >= lastEnglish)
+                return null;
+            char uppercase = (char)(now+1);
+            return String.valueOf(uppercase);
+        }
+    }
 }

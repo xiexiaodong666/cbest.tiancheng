@@ -17,4 +17,5 @@ public class GenerateCodeUtil {
     }
     return machineId + String.format("%015d", hashCodeV);
   }
+
 }

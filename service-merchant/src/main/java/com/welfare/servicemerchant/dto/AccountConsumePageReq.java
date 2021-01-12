@@ -23,10 +23,10 @@ public class AccountConsumePageReq implements Serializable {
   @ApiModelProperty("商户代码")
   private String merCode;
   /**
-   * 员工类型编码
+   * 员工类型名称
    */
-  @ApiModelProperty("员工类型编码")
-  private String accountTypeId;
+  @ApiModelProperty("员工类型名称")
+  private String accountTypeName;
   /**
    * 使用状态
    */

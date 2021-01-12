@@ -272,4 +272,32 @@ public class WelfareConstant {
             return this.desc;
         }
     }
+
+    /**
+     * 渠道
+     */
+    public enum Channel {
+        /**
+         * 请求头的KEY
+         */
+        ALIPAY("alipay", "支付宝"),
+        WECHAT("wechat", "微信"),
+        PLATFORM("platform", "平台");
+
+        private String code;
+        private String desc;
+
+        Channel(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+    }
 }

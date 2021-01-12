@@ -9,4 +9,65 @@
         id,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,stroe_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,create_user,create_time,update_user,update_time,version
     </sql>
 
+    <resultMap id="monthSettleDetailDTO" type="com.welfare.persist.dto.MonthSettleDetailDTO">
+        <result property="transNo" column="trans_no"/>
+        <result property="orderNO" column="order_no"/>
+        <result property="transTime" column="trans_time"/>
+        <result property="storeCode" column="store_code"/>
+        <result property="storeName" column="store_name"/>
+        <result property="merCode" column="mer_code"/>
+        <result property="merName" column="mer_name"/>
+        <result property="type" column="type"/>
+        <result property="welfareTypeCode" column="welfare_type_code"/>
+        <result property="welfareTypeName" column="welfare_type_name"/>
+        <result property="payAmount" column="pay_amount"/>
+        <result property="refundAmount" column="refund_amount"/>
+        <result property="realAmount" column="real_amount"/>
+        <result property="settleAmount" column="settle_amount"/>
+    </resultMap>
+
+    <select id="selectMonthSettleDetail" resultMap="monthSettleDetailDTO" parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
+        select
+            trans_no,
+            order_id as order_no,
+            trans_time,
+            store_code,
+            store_name,
+            mer_code,
+            mer_name,
+            pos as pos,
+            mer_account_type as welfare_type_code,
+            mer_account_type_name as welfare_type_name,
+            trans_amount as pay_amount,
+            trans_amount as refund_amount,
+            trans_amount as real_amount,
+            trans_amount*0.1 as settle_amount
+        from settle_detail t1
+        left join t2
+        <where>
+            <if test="orderNo!=null and orderNo!=''">
+                and order_id = #{orderNo}
+            </if>
+            <if test="storeName!=null and storeName!=''">
+                and store_name = #{storeName}
+            </if>
+            <if test="storeCode!=null and storeCode!=''">
+                and store_code = #{storeCode}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                and trans_time &lt;=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and trans_time &lt;=#{endTime}
+            </if>
+            <if test="welfareTypeCode!=null and welfareTypeCode!=''">
+                and mer_account_type = #{welfareTypeCode}
+            </if>
+            <if test="merCode!=null and merCode!=''">
+                and mer_code = #{merCode}
+            </if>
+
+        </where>
+    </select>
+
 </mapper>

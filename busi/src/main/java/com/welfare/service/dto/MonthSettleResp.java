@@ -24,14 +24,20 @@ public class MonthSettleResp {
     @ApiModelProperty(value = "商户名称")
     private String merName;
 
+    @ApiModelProperty(value = "账单实际金额")
+    private String transAmount;
+
     @ApiModelProperty(value = "结算金额")
-    private String amount;
+    private String settleAmount;
 
     @ApiModelProperty(value = "交易笔数")
     private String orderNum;
 
     @ApiModelProperty(value = "合作方式")
     private String merCooperationMode;
+
+    @ApiModelProperty(value = "合作方式名称")
+    private String merCooperationModeName;
 
     @ApiModelProperty(value = "对账状态:待确认-unconfirmed 已确认-confirmed")
     private String recStatus;
@@ -53,7 +59,4 @@ public class MonthSettleResp {
 
     @ApiModelProperty(value = "账单返利比例")
     private String rebate;
-
-    @ApiModelProperty(value = "账单实际金额")
-    private String realAmount;
 }

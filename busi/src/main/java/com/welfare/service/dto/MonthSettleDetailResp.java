@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.welfare.common.base.RequestPage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,45 +13,59 @@ import lombok.Data;
  */
 @Data
 public class MonthSettleDetailResp extends RequestPage {
+    @ExcelProperty(value = "交易流水号")
     @ApiModelProperty(value = "交易流水号")
     private String transNo;
 
+    @ExcelProperty(value = "订单号")
     @ApiModelProperty(value = "订单号")
     private String orderNO;
 
+    @ExcelProperty(value = "交易时间")
     @ApiModelProperty(value = "交易时间")
     private String transTime;
 
+    @ExcelProperty(value = "消费门店编号")
     @ApiModelProperty(value = "消费门店编号")
     private String storeCode;
 
+    @ExcelProperty(value = "消费门店名称")
     @ApiModelProperty(value = "消费门店名称")
     private String storeName;
 
+    @ExcelProperty(value = "商户编号")
     @ApiModelProperty(value = "商户编号")
     private String merCode;
 
+    @ExcelProperty(value = "商户名称")
     @ApiModelProperty(value = "商户名称")
     private String merName;
 
-    @ApiModelProperty(value = "类型")
+    @ExcelProperty(value = "门店类型")
+    @ApiModelProperty(value = "门店类型")
     private String type;
 
+    @ExcelProperty(value = "福利类型")
     @ApiModelProperty(value = "福利类型")
     private String welfareTypeCode;
 
+    @ExcelProperty(value = "福利类型名称")
     @ApiModelProperty(value = "福利类型名称")
     private String welfareTypeName;
 
+    @ExcelProperty(value = "实际付款金额")
     @ApiModelProperty(value = "实际付款金额")
     private String payAmount;
 
+    @ExcelProperty(value = "退款金额")
     @ApiModelProperty(value = "退款金额")
     private String refundAmount;
 
+    @ExcelProperty(value = "实付金额")
     @ApiModelProperty(value = "实付金额")
     private String realAmount;
 
+    @ExcelProperty(value = "结算金额")
     @ApiModelProperty(value = "结算金额")
     private String settleAmount;
 }

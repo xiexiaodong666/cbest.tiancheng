@@ -6,7 +6,73 @@
     </sql>
 
     <sql id="baseColumn">
-        id,settle_no,settle_month,mer_code,amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,create_user,create_time,uppdate_user,update_time,deleted
+        id,settle_no,settle_month,mer_code,trans_amount,settle_amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,create_user,create_time,uppdate_user,update_time,deleted
     </sql>
 
+
+    <resultMap id="monthSettleDTO" type="com.welfare.persist.dto.MonthSettleDTO">
+        <id property="id" column="id" />
+        <result property="settleNo" column="settle_no"/>
+        <result property="settleMonth" column="settle_month"/>
+        <result property="merCode" column="mer_code"/>
+        <result property="merName" column="mer_name"/>
+        <result property="transAmount" column="trans_amount"/>
+        <result property="settleAmount" column="settle_amount"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="merCooperationMode" column="mer_cooperation_mode"/>
+        <result property="merCooperationModeName" column="mer_cooperation_mode_name"/>
+        <result property="recStatus" column="rec_status"/>
+        <result property="settleStatus" column="settle_status"/>
+        <result property="sendStatus" column="send_status"/>
+        <result property="sendTime" column="send_time"/>
+        <result property="confirmTime" column="confirm_time"/>
+        <result property="rebateAmount" column="rebate_amount"/>
+        <result property="rebate" column="rebate"/>
+        <result property="realAmount" column="real_amount"/>
+    </resultMap>
+
+    <select id="selectMonthSettle" resultMap="monthSettleDTO" parameterType="com.welfare.persist.dto.query.MonthSettleQuery">
+        SELECT
+         t1.id,
+         t1.settle_no,
+         t1.settle_month,
+         t1.mer_code,
+         t1.trans_amount,
+         t1.settle_amount,
+         t1.order_num,
+         t1.rec_status,
+         t1.settle_status,
+         t1.send_status,
+         t1.send_time,
+         t1.confirm_time,
+         t1.rebate_amount,
+         t2.mer_cooperation_mode,
+         case when t2.mer_cooperation_mode = 'payFirt' then '先付费'
+              when t2.mer_cooperation_mode = 'payed' then '后付费' end as mer_cooperation_mode_name
+        from month_settle t1
+        LEFT JOIN merchant t2 on t1.mer_code = t2.mer_code
+        <where>
+            <if test="merCode!=null and merCode!=''">
+                and t1.mer_code = #{merCode}
+            </if>
+            <if test="merName!=null and merName!=''">
+                and t2.mer_name like concat('%',#{merName},'%')
+            </if>
+            <if test="startMonthStr!=null and startMonthStr!=''">
+                and t1.settle_month &lt;=#{startMonthStr}
+            </if>
+            <if test="endMonthStr!=null and endMonthStr!=''">
+                and t1.settle_month &gt;=#{endMonthStr}
+            </if>
+            <if test="merCooperationMode!=null and merCooperationMode!=''">
+                and t2.mer_cooperation_mode = #{merCooperationMode}
+            </if>
+            <if test="settleStatus!=null and settleStatus!=''">
+                and t1.settle_status = #{settleStatus}
+            </if>
+            <if test="recStatus!=null and recStatus!=''">
+                and t1.rec_status = #{recStatus}
+            </if>
+        </where>
+    </select>
 </mapper>

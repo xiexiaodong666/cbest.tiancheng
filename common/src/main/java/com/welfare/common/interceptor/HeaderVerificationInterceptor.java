@@ -32,6 +32,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler){
         //
         String source = request.getHeader(WelfareConstant.Header.SOURCE.code());
+        String api = request.getHeader(WelfareConstant.Header.API_USER.code());
         setApiUserToContext(handler, request);
         setMerchantUserToContext(handler, request);
         if(StringUtils.isEmpty(source)){

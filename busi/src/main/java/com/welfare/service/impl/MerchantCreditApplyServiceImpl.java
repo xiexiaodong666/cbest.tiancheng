@@ -60,7 +60,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             return apply.getId();
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY_REQUEST_ID, request.getRequestId());
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -127,7 +127,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -169,7 +169,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {

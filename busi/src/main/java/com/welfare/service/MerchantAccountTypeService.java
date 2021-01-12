@@ -56,6 +56,7 @@ public interface MerchantAccountTypeService {
     String exportList(MerchantAccountTypePageReq pageReq);
 
     /**
+     * @Deprecated
      * 移动扣款顺序
      * @return
      */

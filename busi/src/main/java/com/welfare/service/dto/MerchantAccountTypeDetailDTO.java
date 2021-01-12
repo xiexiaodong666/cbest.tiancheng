@@ -52,12 +52,15 @@ public class MerchantAccountTypeDetailDTO {
     List<TypeItem> typeList;
 
     @Data
-    @AllArgsConstructor
+    @NoArgsConstructor
     public static class  TypeItem{
+        private Long id;
         @ApiModelProperty("扣款序号")
         private Integer deductionOrder;
         @ApiModelProperty("商户账户类型名称")
         private String merAccountTypeName;
+        @ApiModelProperty("商户账户类型编码")
+        private String merAccountTypeCode;
     }
 
 }

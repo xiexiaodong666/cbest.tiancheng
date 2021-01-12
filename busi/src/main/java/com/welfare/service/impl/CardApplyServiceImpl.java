@@ -92,7 +92,7 @@ public class CardApplyServiceImpl implements CardApplyService {
             cardId = writeCardId;
 
             cardInfo.setCardType(cardApply.getCardType());
-            cardInfo.setCardStatus(cardApply.getStatus().toString());
+            cardInfo.setCardStatus(cardApply.getStatus());
             cardInfo.setDeleted(false);
             cardInfo.setCreateUser(cardApply.getCreateUser());
 

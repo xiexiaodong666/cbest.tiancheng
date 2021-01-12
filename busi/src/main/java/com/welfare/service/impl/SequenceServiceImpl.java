@@ -30,21 +30,14 @@ public class SequenceServiceImpl implements SequenceService {
 
     @Override
     public Long next(String sequenceType) {
-        RLock lock = redissonClient.getLock(SEQUENCE_GENERATE + ":" + sequenceType);
+        RLock lock = redissonClient.getFairLock(SEQUENCE_GENERATE + ":" + sequenceType);
         lock.lock();
         try{
             QueryWrapper<Sequence> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq(Sequence.SEQUENCE_TYPE,sequenceType);
             Sequence sequence = sequenceDao.getOne(queryWrapper);
-            if(Objects.isNull(sequence)){
-                sequence = new Sequence();
-                sequence.setSequenceType(sequenceType);
-                sequence.setSequenceNo(1L);
-                sequenceDao.save(sequence);
-            }else{
-                sequence.setSequenceNo(sequence.getSequenceNo() + 1);
-                sequenceDao.updateById(sequence);
-            }
+            sequence.setSequenceNo(sequence.getSequenceNo() + 1);
+            sequenceDao.updateById(sequence);
             return sequence.getSequenceNo();
         }finally {
             lock.unlock();

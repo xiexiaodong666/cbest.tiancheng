@@ -94,7 +94,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardInfo.setApplyCode(cardApply.getApplyCode());
       Long writeCardId = sequenceService.nextNo(
           SequenceTypeEnum.CARID.getCode(), cardApplyAddReq.getMerCode(), startId);
-      cardInfo.setCardId(prefix + SequenceTypeEnum.CARID.getCode() + writeCardId);
+      cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
       cardInfo.setCardType(cardApply.getCardType());
       cardInfo.setCardStatus(cardApply.getStatus());
       cardInfo.setDeleted(false);

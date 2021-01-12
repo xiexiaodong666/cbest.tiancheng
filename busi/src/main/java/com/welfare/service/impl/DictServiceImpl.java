@@ -85,9 +85,9 @@ public class DictServiceImpl implements DictService {
                 continue;
             }
             // 拼装出get方法名
-            String methodName=String.valueOf(field.charAt(0)).toUpperCase() + field.substring(1)+(nameFlag?"Name":"");
+            String methodName=String.valueOf(field.charAt(0)).toUpperCase() + field.substring(1);
             String methodNameGet = "get" + methodName;
-            String methodNameSet = "set" + methodName;
+            String methodNameSet = "set" + methodName+(nameFlag?"Name":"");
 
             // 通过方法名取得方法对象
             try {

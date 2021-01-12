@@ -19,7 +19,7 @@ import java.util.Map;
 
 
 @Configuration
-@MapperScan(basePackages = "com.welfare.persist.mapper")
+@MapperScan(basePackages = "com.welfare.persist.**")
 public class DataBaseConfig {
 
     @Bean(name = "mysqlDataSource")
@@ -58,7 +58,7 @@ public class DataBaseConfig {
             @Qualifier("prestoDataSource") DataSource minorDataSource) throws Exception {
         SqlSessionFactoryBean fb = new SqlSessionFactoryBean();
         fb.setDataSource(this.dynamicDataSource(primaryDataSource, minorDataSource));
-        fb.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:com/welfare/mapper/*.xml"));
+        fb.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/*.xml"));
         return fb.getObject();
     }
 }

@@ -2,6 +2,9 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.query.MonthSettleDetailQuery;
+import com.welfare.persist.entity.MonthSettle;
 import com.welfare.service.dto.MonthSettleDetailReq;
 import com.welfare.service.dto.MonthSettleDetailResp;
 import com.welfare.service.dto.MonthSettleReq;
@@ -55,4 +58,13 @@ public interface MonthSettleService {
      * @param id
      */
     Integer monthSettleFinish(String id);
+
+    /**
+     * 按条件查询生成商户月账单
+     * @param monthSettleDetailQuery
+     * @return
+     */
+    MonthSettle getMonthSettle(MonthSettleDetailQuery monthSettleDetailQuery);
+
+    Integer addMonthSettle(MonthSettle monthSettle);
 }

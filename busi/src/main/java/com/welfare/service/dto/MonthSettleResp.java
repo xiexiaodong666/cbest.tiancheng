@@ -12,6 +12,9 @@ import lombok.Data;
 @Data
 public class MonthSettleResp {
 
+    @ApiModelProperty(value = "序列号")
+    private String id;
+
     @ApiModelProperty(value = "账单编号")
     private String settleNo;
 

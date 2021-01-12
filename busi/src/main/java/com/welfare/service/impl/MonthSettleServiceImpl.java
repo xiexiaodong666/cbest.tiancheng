@@ -49,6 +49,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
     @Autowired
     private final MonthSettleMapper monthSettleMapper;
+    
+    private final MonthSettleDao monthSettleDao;
 
 
     @Override
@@ -57,8 +59,9 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettleQuery monthSettleQuery = new MonthSettleQuery();
         BeanUtils.copyProperties(monthSettleReqDto, monthSettleQuery);
 
-        PageInfo<MonthSettleDTO> monthSettleDTOPageInfo = PageHelper.startPage(monthSettleReqDto.getCurrentPage(), monthSettleReqDto.getPageSize())
-                .doSelectPageInfo(() -> monthSettleMapper.selectMonthSettle(monthSettleQuery));
+        PageHelper.startPage(monthSettleReqDto.getCurrentPage(),monthSettleReqDto.getPageSize());
+        List<MonthSettleDTO> monthSettleDTOS = monthSettleMapper.selectMonthSettle(monthSettleQuery);
+        PageInfo<MonthSettleDTO> monthSettleDTOPageInfo = new PageInfo<>(monthSettleDTOS);
 
         Page<MonthSettleResp> monthSettleRespPage = new Page<>(monthSettleReqDto.getCurrentPage(), monthSettleReqDto.getPageSize(),monthSettleDTOPageInfo.getTotal());
 
@@ -76,9 +79,9 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
 
-        PageInfo<MonthSettleDetailDTO> monthSettleDetailDTOPageInfo = PageHelper
-                .startPage(monthSettleDetailReq.getCurrentPage(), monthSettleDetailReq.getPageSize())
-                .doSelectPageInfo(() -> monthSettleMapper.selectMonthSettleDetail(monthSettleDetailQuery));
+        PageHelper.startPage(monthSettleDetailReq.getCurrentPage(), monthSettleDetailReq.getPageSize());
+        List<MonthSettleDetailDTO> monthSettleDetailDTOS = monthSettleMapper.selectMonthSettleDetail(monthSettleDetailQuery);
+        PageInfo<MonthSettleDetailDTO> monthSettleDetailDTOPageInfo = new PageInfo<>(monthSettleDetailDTOS);
 
         Page<MonthSettleDetailResp> monthSettleDetailRespPage = new Page<>(monthSettleDetailReq.getCurrentPage(),
                 monthSettleDetailReq.getPageSize(),monthSettleDetailDTOPageInfo.getTotal());
@@ -151,6 +154,16 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         );
     }
 
+    @Override
+    public MonthSettle getMonthSettle(MonthSettleDetailQuery monthSettleDetailQuery) {
+        return monthSettleMapper.sumSettleDetailToMonthSettle(monthSettleDetailQuery);
+    }
+
+    @Override
+    public Integer addMonthSettle(MonthSettle monthSettle) {
+        return monthSettleMapper.insert(monthSettle);
+    }
+
     /**
      * 根据账单编号及查询参数，获取查询账单明细限制查询条件
      * @param id 账单编号
@@ -158,8 +171,12 @@ public class MonthSettleServiceImpl implements MonthSettleService {
      * @return
      */
     private MonthSettleDetailQuery getMonthSettleDetailQuery(String id, MonthSettleDetailReq monthSettleDetailReq){
+        List<MonthSettle> list = monthSettleDao.list();
+        MonthSettle byId = monthSettleDao.getById(id);
         MonthSettle monthSettle = monthSettleMapper.selectById(id);
 
+        
+        
         if(monthSettle == null){
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"参数异常，未获取到账单信息", null);
         }

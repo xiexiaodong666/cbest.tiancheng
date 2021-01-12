@@ -77,6 +77,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     }
 
 
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq) {

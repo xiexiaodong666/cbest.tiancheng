@@ -2,16 +2,20 @@ package com.welfare.service.listener;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountType;
-import com.welfare.persist.mapper.AccountTypeMapper;
+import com.welfare.persist.entity.Department;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
+import com.welfare.service.DepartmentService;
+import com.welfare.service.MerchantService;
 import com.welfare.service.dto.AccountUploadDTO;
-import java.sql.Wrapper;
 import java.util.LinkedList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
@@ -23,42 +27,61 @@ import org.springframework.util.StringUtils;
  * @date 2021/1/11 11:10
  */
 @Slf4j
+@RequiredArgsConstructor
 public class AccountUploadListener extends AnalysisEventListener<AccountUploadDTO> {
 
   private List<Account> accountUploadList = new LinkedList<Account>();
 
-  private AccountTypeMapper accountTypeMapper;
+  private final AccountTypeService accountTypeService;
 
-  private AccountService accountService;
+  private final AccountService accountService;
 
-  private static StringBuilder  uploadInfo = new StringBuilder();
+  private final MerchantService merchantService;
 
-  public AccountUploadListener(AccountTypeMapper accountTypeMapper,
-      AccountService accountService) {
-    this.accountTypeMapper = accountTypeMapper;
-    this.accountService = accountService;
-  }
+  private final DepartmentService departmentService;
+
+  private static StringBuilder uploadInfo = new StringBuilder();
+
 
   @Override
   public void invoke(AccountUploadDTO accountUploadDTO, AnalysisContext analysisContext) {
-    QueryWrapper<AccountType> wrapper = new QueryWrapper<AccountType>();
-    wrapper.eq(AccountType.MER_CODE,accountUploadDTO.getMerCode());
-    wrapper.eq(AccountType.TYPE_CODE,accountUploadDTO.getAccountTypeCode());
-    AccountType accountType = accountTypeMapper.selectOne(wrapper);
-    if( null ==  accountType){
-      uploadInfo.append("不存在的员工类型编码").append(accountUploadDTO.getAccountCode());
-      return;
-    }
     Account account = new Account();
-    BeanUtils.copyProperties(accountUploadDTO,account);
-    accountUploadList.add(account);
+    BeanUtils.copyProperties(accountUploadDTO, account);
+    Boolean validate = validationAccount(account);
+    if( validate.booleanValue() == true ){
+      accountUploadList.add(account);
+    }
+  }
+
+  private boolean validationAccount(Account account){
+    Merchant merchant = merchantService.detailByMerCode(account.getMerCode());
+    if( null == merchant ) {
+      uploadInfo.append("不存在的商户:").append(account.getMerCode()).append(";");
+      return false;
+    }
+    AccountType accountType = accountTypeService.queryByTypeCode(account.getMerCode(),account.getAccountTypeCode());
+    if( null == accountType ){
+      uploadInfo.append("不存在的员工类型编码:").append(account.getAccountCode()).append(";");
+      return false;
+    }
+    Department department = departmentService.getByDepartmentCode(account.getStoreCode());
+    if( null ==  department){
+      uploadInfo.append("不存在的员工部门::").append(account.getStoreCode()).append(";");
+      return false;
+    }
+    Account queryAccount = accountService.getByAccountCode(account.getAccountCode());
+    if( null != queryAccount ){
+      uploadInfo.append("员工账号已经存在:").append(account.getAccountCode()).append(";");
+      return false;
+    }
+    return true;
   }
 
   @Override
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
-    if(!CollectionUtils.isEmpty(accountUploadList)){
+    if (!CollectionUtils.isEmpty(accountUploadList)) {
       Boolean result = accountService.batchSave(accountUploadList);
-      if( result == true && StringUtils.isEmpty(uploadInfo.toString()) ){
+      if (result == true && StringUtils.isEmpty(uploadInfo.toString())) {
         uploadInfo.append("导入成功");
       }
     }

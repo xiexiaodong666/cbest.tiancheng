@@ -99,6 +99,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
 
     roleConsumptionReq.setList(roleConsumptionListReqs);
+    roleConsumptionReq.setActionType("ADD");
     roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
     roleConsumptionReq.setTimestamp(new Date());
 
@@ -157,6 +158,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
           @Override
           public void afterCommit() {
               try {
+                log.info(mapper.writeValueAsString(roleConsumptionReq));
                 RoleConsumptionResp roleConsumptionResp = shoppingFeignClient.addOrUpdateRoleConsumption(roleConsumptionReq);
 
                 if(roleConsumptionResp.equals("200")) {
@@ -193,6 +195,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     queryWrapper.eq(MerchantStoreRelation.MER_CODE, merchantStoreRelation.getMerCode());
     List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
         queryWrapper);
+
     List<MerchantStoreRelation> merchantStoreRelationNewList = new ArrayList<>();
     List<Long> deleteIds = new ArrayList<>();
     List<AdminMerchantStore> adminMerchantStoreList = relationUpdateReq.getAdminMerchantStoreList();
@@ -202,6 +205,13 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if (adminMerchantStoreList == null) {
       adminMerchantStoreList = new ArrayList<>(0);
     }
+
+    RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
+    List<RoleConsumptionListReq> roleConsumptionListReqs = new ArrayList<>();
+    roleConsumptionReq.setList(roleConsumptionListReqs);
+    roleConsumptionReq.setActionType("UPDATE");
+    roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
+    roleConsumptionReq.setTimestamp(new Date());
 
     for (AdminMerchantStore merchantStore :
         adminMerchantStoreList) {
@@ -263,6 +273,25 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if (CollectionUtils.isNotEmpty(merchantStoreRelationNewList)) {
       saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
     }
+
+
+    // send after tx commit but is async
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronizationAdapter() {
+          @Override
+          public void afterCommit() {
+            try {
+              log.info(mapper.writeValueAsString(roleConsumptionReq));
+              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient.addOrUpdateRoleConsumption(roleConsumptionReq);
+
+            } catch (Exception e) {
+              log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
+            }
+
+          }
+        }
+    );
+
 
     return remove && updateBatch && saveBath;
   }

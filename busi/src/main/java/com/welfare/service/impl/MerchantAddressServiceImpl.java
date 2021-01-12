@@ -33,7 +33,8 @@ public class MerchantAddressServiceImpl implements MerchantAddressService {
     }
 
     @Override
-    public boolean saveOrUpdateBatch(List<MerchantAddress> list) {
-        return merchantAddressDao.saveOrUpdateBatch(list);
+    public boolean saveOrUpdateBatch(List<MerchantAddressDTO> list) {
+
+        return merchantAddressDao.saveOrUpdateBatch(merchantAddressConverter.toE(list));
     }
 }

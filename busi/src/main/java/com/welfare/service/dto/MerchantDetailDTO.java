@@ -42,7 +42,7 @@ public class MerchantDetailDTO {
   /**
    * 身份属性
    */
-  @ApiModelProperty("身份属性")
+  @ApiModelProperty("身份属性  supplier:供应商；customer:客户,多个用，号分隔")
   private String merIdentity;
   /**
    * 合作方式

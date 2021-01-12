@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
+import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 
 import java.util.List;
@@ -47,11 +48,9 @@ public interface SupplierStoreService {
 
     /**
      * 更改供应商门店激活状态
-     * @param id
-     * @param status
      * @return
      */
-    boolean activate(Long id,Integer status);
+    boolean activate(SupplierStoreActivateReq storeActivateReq);
 
     /**
      * 批量新增供应商门店

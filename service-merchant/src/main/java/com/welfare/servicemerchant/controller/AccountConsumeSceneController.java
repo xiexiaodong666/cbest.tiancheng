@@ -97,6 +97,7 @@ public class AccountConsumeSceneController implements IController {
     AccountConsumePageQuery accountConsumePageQuery = new AccountConsumePageQuery();
     BeanUtils.copyProperties(accountConsumePageReq,accountConsumePageQuery);
     List<AccountConsumeScenePageDTO> list = accountConsumeSceneService.export(accountConsumePageQuery);
-    return success(fileUploadService.uploadExcelFile(list, AccountConsumeScenePageDTO.class, "员工消费配置"));
+    String path = fileUploadService.uploadExcelFile(list, AccountConsumeScenePageDTO.class, "员工消费配置");
+    return success(fileUploadService.getFileServerUrl(path));
   }
 }

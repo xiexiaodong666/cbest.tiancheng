@@ -76,6 +76,12 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   }
 
   @Override
+  public List<MerchantStoreRelationDTO> exportMerchantStoreRelations(String merName, String status,
+      Date startTime, Date endTime) {
+    return merchantStoreRelationMapper.exportMerchantStoreRelations(merName, status, startTime, endTime);
+  }
+
+  @Override
   public MerchantStoreRelation getMerchantStoreRelationById(
       QueryWrapper<MerchantStoreRelation> queryWrapper) {
     return merchantStoreRelationDao.getOne(queryWrapper);

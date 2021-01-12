@@ -9,6 +9,7 @@ import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import io.swagger.models.auth.In;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 制卡信息服务接口
@@ -20,6 +21,9 @@ import java.util.Date;
 public interface CardApplyService {
 
   Page<CardApply> pageQuery(Page<CardApply> page,String cardName,String merCode, String cardType, String cardMedium,
+      Integer status, Date startTime,Date endTime);
+
+  List<CardApply> exportCardApplys(String cardName,String merCode, String cardType, String cardMedium,
       Integer status, Date startTime,Date endTime);
 
   CardApply getMerchantStoreRelationById(

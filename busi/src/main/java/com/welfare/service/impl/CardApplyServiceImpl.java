@@ -61,6 +61,14 @@ public class CardApplyServiceImpl implements CardApplyService {
   }
 
   @Override
+  public List<CardApply> exportCardApplys(String cardName, String merCode, String cardType,
+      String cardMedium, Integer status, Date startTime, Date endTime) {
+
+    return cardApplyMapper.exportCardApplys(cardName, merCode, cardType, cardMedium,
+                                            status, startTime, endTime);
+  }
+
+  @Override
   public CardApply getMerchantStoreRelationById(QueryWrapper<CardApply> queryWrapper) {
     return cardApplyMapper.selectOne(queryWrapper);
   }

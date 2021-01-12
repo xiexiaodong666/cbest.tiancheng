@@ -40,9 +40,6 @@ public class FileUploadService {
   @Value("${cbest.oss.config.bucket}")
   private String bucketName;
 
-  @Value("${cdn.server}")
-  private String cndServer;
-
   /**
    * 上传文件到oss
    * @param fileName 文件名称 xxx.jpg

@@ -10,7 +10,12 @@ spring:
     time-zone: GMT+8
 server:
   port: 10016
-
+cbest:
+  oss:
+    config:
+      accessKey: lF3iXaqMbr9f3GEdPJeN
+      secretKey: KqMaYYENOqD8JBZUhqgBhOddVYc5Y1Pd1pAJRoA2
+      keyPrefix: e-welfare/
 
 
 

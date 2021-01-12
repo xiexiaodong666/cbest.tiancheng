@@ -2,7 +2,10 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.SequenceTypeEnum;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ApiUserHolder;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.CardApplyDao;
@@ -20,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +69,8 @@ public class CardApplyServiceImpl implements CardApplyService {
       String cardMedium, Integer status, Date startTime, Date endTime) {
 
     return cardApplyMapper.exportCardApplys(cardName, merCode, cardType, cardMedium,
-                                            status, startTime, endTime);
+                                            status, startTime, endTime
+    );
   }
 
   @Override
@@ -105,7 +110,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
       cardInfo.setCardType(cardApply.getCardType());
       cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());
-      cardInfo.setCardStatus(0);
+      cardInfo.setCardStatus(WelfareConstant.CardStatus.NEW.code());
       cardInfo.setDeleted(false);
       cardInfo.setCreateUser(cardApply.getCreateUser());
 
@@ -119,6 +124,13 @@ public class CardApplyServiceImpl implements CardApplyService {
   @Override
   public boolean update(CardApplyUpdateReq cardApplyUpdateReq) {
     CardApply cardApply = cardApplyDao.getById(cardApplyUpdateReq.getId());
+    QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
+    queryWrapper.eq(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.WRITTEN.code());
+    List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapper);
+    if (CollectionUtils.isNotEmpty(cardInfoList)) {
+      throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "卡片已写入，无法再更改信息", null);
+    }
 
     if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
       cardApply.setCardName(cardApplyUpdateReq.getCardName());
@@ -152,9 +164,19 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardApply.setRemark(cardApplyUpdateReq.getRemark());
     }
 
-    // TODO 批量修改 cardInfo
-
-    return cardApplyDao.saveOrUpdate(cardApply);
+    queryWrapper.clear();
+    queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
+    cardInfoList = cardInfoDao.list(queryWrapper);
+    boolean saveCardApply = cardApplyDao.saveOrUpdate(cardApply);
+    boolean updateCardInfo = true;
+    if(CollectionUtils.isNotEmpty(cardInfoList)) {
+      for (CardInfo cardInfo:
+      cardInfoList) {
+        cardInfo.setCardType(cardApply.getCardType());
+      }
+      updateCardInfo = cardInfoDao.saveOrUpdateBatch(cardInfoList);
+    }
+    return saveCardApply && updateCardInfo;
   }
 
   @Override

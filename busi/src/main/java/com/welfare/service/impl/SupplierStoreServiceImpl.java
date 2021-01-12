@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
@@ -33,6 +34,7 @@ import com.welfare.service.helper.QueryHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,6 +70,33 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   public Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req) {
     Page<SupplierStoreWithMerchantDTO> pageResult=supplierStoreExMapper.listWithMerchant(page, req);
+    List<SupplierStoreWithMerchantDTO> supplierStoreWithMerchantDTOS = pageResult.getRecords();
+    // 消费门店拉取需要过滤已有配置的门店和 移除没有勾选的消费方法
+    if(SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
+      QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
+      queryWrapper.eq(MerchantStoreRelation.MER_CODE, req.getMerCode());
+      queryWrapper.eq(MerchantStoreRelation.STATUS, 0);
+      List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(queryWrapper);
+      if(CollectionUtils.isNotEmpty(merchantStoreRelations)) {
+        List<String> storeCodeList = merchantStoreRelations.stream().map(MerchantStoreRelation::getStoreCode).collect(Collectors.toList());
+
+        supplierStoreWithMerchantDTOS.stream().filter(s -> !storeCodeList.contains(s.getStoreCode()))				.collect(Collectors.toList());
+      }
+
+      for (SupplierStoreWithMerchantDTO s:
+      supplierStoreWithMerchantDTOS) {
+        try {
+          Map<String, Boolean> consumeTypeMap = mapper.readValue(
+              s.getConsumType(), Map.class);
+          ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
+          s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+        } catch (JsonProcessingException e) {
+          log.info("消费方式转换失败，格式错误【{}】",s.getConsumType());
+        }
+
+      }
+
+    }
     return pageResult;
   }
 

@@ -5,8 +5,8 @@ import com.welfare.persist.entity.Department;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
-import com.welfare.servicemerchant.converter.DepartmentConverter;
-import com.welfare.servicemerchant.dto.DepartmentInfo;
+import com.welfare.service.converter.DepartmentConverter;
+import com.welfare.service.dto.DepartmentDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,7 +41,7 @@ public class DepartmentController implements IController {
     @GetMapping("/list")
     @ApiOperation("根据商户代码查询商户部门列表（不分页）")
     @MerchantUser
-    public R<List<DepartmentInfo>> list(@Valid DepartmentReq req){
+    public R<List<DepartmentDTO>> list(@Valid DepartmentReq req){
         return R.success(departmentConverter.toD(departmentService.list(req)));
     }
 
@@ -53,8 +53,8 @@ public class DepartmentController implements IController {
 
     @GetMapping("/detail")
     @ApiOperation("查询商户详情）")
-    public R<DepartmentInfo> detail(@RequestParam(required = true) @ApiParam("id") Long id){
-        return R.success(departmentConverter.toD(departmentService.detail(id)));
+    public R<DepartmentDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+        return R.success(departmentService.detail(id));
     }
 
     @PostMapping("/add")

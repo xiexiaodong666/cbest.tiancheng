@@ -148,8 +148,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
-  public List<SupplierStoreWithMerchantDTO> exportList(StorePageReq req) {
-    return this.page(new Page(0,Integer.MAX_VALUE),req).getRecords();
+  public String exportList(StorePageReq req) {
+    return null;
   }
 
   @Override

@@ -3,11 +3,11 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.servicemerchant.converter.SupplierStoreConverter;
 import com.welfare.servicemerchant.dto.SupplierStoreInfo;
-import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotBlank;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -39,7 +38,6 @@ import java.util.List;
 public class SupplierStoreController implements IController {
     private final SupplierStoreService supplierStoreService;
     private final SupplierStoreConverter supplierStoreConverter;
-    private final FileUploadService fileUploadService;
     @GetMapping("/page")
     @ApiOperation("查询供应商门店列表（分页））")
     public R<Page<SupplierStoreWithMerchantDTO>> page(Page page, StorePageReq req){
@@ -76,13 +74,14 @@ public class SupplierStoreController implements IController {
     @PostMapping("/update")
     @ApiOperation("编辑供应商门店")
     public R update(@RequestBody SupplierStoreDetailDTO supplierStore){
-        return R.status(supplierStoreService.update(supplierStore),"编辑失败失败");
+        // TODO green.gao 消费能力变更后,同步修改到消费门店的消费能力字段。
+        return R.status(supplierStoreService.add(supplierStore),"编辑失败失败");
 
     }
     @PostMapping("/export-list")
     @ApiOperation("导出供应商门店列表")
-    public R exportList(StorePageReq req) throws IOException {
-        return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(supplierStoreService.exportList(req), SupplierStoreWithMerchantDTO.class,"门店导出")));
+    public R exportList(StorePageReq req){
+        return R.success(supplierStoreService.exportList(req));
 
     }
 }

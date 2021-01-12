@@ -12,6 +12,7 @@ import lombok.Data;
 @Data
 public class RoleConsumptionReq {
 
+  private String actionType;
   private List<RoleConsumptionListReq> list;
   private String requestId;
 

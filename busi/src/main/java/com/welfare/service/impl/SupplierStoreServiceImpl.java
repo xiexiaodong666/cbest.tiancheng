@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -107,6 +108,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreDetailDTO supplierStore) {
+    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
     boolean flag=supplierStoreDao.save(supplierStoreDetailConverter.toE((supplierStore))) ;
     return flag&& merchantAddressService.saveOrUpdateBatch(supplierStore.getAddressList());
   }
@@ -135,11 +137,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreDetailDTO supplierStore) {
-    return true;
-//    if(EmptyChecker.notEmpty(supplierStore.getConsumType())){
-//      this.syncConsumeType(supplierStore.getStoreCode(),supplierStore.getStoreCode());
-//    }
-//    return supplierStoreDao.updateById(supplierStore);
+    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
+    boolean flag2=true;
+    if(EmptyChecker.notEmpty(supplierStore.getConsumType())){
+      flag2=this.syncConsumeType(supplierStore.getStoreCode(),supplierStore.getConsumType());
+    }
+    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
+    boolean flag=supplierStoreDao.updateById(supplierStoreDetailConverter.toE((supplierStore))) ;
+    return flag&&flag2&& merchantAddressService.saveOrUpdateBatch(supplierStore.getAddressList());
   }
 
   @Override

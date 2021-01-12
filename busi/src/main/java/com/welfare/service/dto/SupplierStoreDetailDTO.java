@@ -53,7 +53,7 @@ public class SupplierStoreDetailDTO {
     /**
      * 消费方式
      */
-    @ApiModelProperty("消费方式")  
+    @ApiModelProperty("消费方式(前端多个用逗号分隔)")
     private String consumType;
     /**
      * 创建人

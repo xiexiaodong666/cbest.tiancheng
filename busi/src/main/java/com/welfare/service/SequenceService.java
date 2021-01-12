@@ -13,12 +13,5 @@ public interface SequenceService {
      * @param sequenceType
      * @return
      */
-    Long nextNo(String sequenceType);
-
-    /**
-     * 生成下一个序列号，拼接上前缀
-     * @param sequenceType
-     * @return
-     */
-    String nextFullNo(String sequenceType);
+    Long next(String sequenceType);
 }

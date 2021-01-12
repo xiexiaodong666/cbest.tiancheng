@@ -1,21 +1,35 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
+import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.SupplierStoreExMapper;
+import com.welfare.service.DictService;
+import com.welfare.service.MerchantAddressService;
+import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.converter.SupplierStoreDetailConverter;
+import com.welfare.service.dto.MerchantAddressDTO;
+import com.welfare.service.dto.MerchantAddressReq;
+import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.helper.QueryHelper;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +56,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   private final SupplierStoreExMapper supplierStoreExMapper;
 
+  private final MerchantService merchantService;
+
   private final ObjectMapper mapper;
+  private final SupplierStoreDetailConverter supplierStoreDetailConverter;
+
+  private final DictService dictService;
+  private final MerchantAddressService merchantAddressService;
 
   @Override
   public Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req) {
@@ -52,8 +72,30 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   public SupplierStoreDetailDTO detail(Long id) {
-//    return supplierStoreDao.getById(id);
-    return null;
+    SupplierStoreDetailDTO store= supplierStoreDetailConverter.toD(supplierStoreDao.getById(id));
+    if(EmptyChecker.isEmpty(store)){
+      throw new BusiException("门店不存在");
+    }
+    Map<String, Boolean> consumeTypeMap = null;
+    try {
+      consumeTypeMap = mapper.readValue(
+              store.getConsumType(), Map.class);
+      store.setConsumType(ConsumeTypesUtils.transferStr(consumeTypeMap));
+    } catch (JsonProcessingException e) {
+      log.info("消费方式转换失败，格式错误【{}】",store.getConsumType());
+    }
+    //字典转义
+    dictService.trans(SupplierStoreDetailDTO.class, SupplierStore.class.getSimpleName(), true, store);
+    //商户名称
+    store.setMerName( merchantService.getMerchantByMerCode(store.getMerCode()).getMerName());
+    //自提点地址
+    MerchantAddressReq merchantAddressReq = new MerchantAddressReq();
+    merchantAddressReq.setRelatedType(SupplierStore.class.getSimpleName());
+    merchantAddressReq.setRelatedId(store.getId());
+    List<MerchantAddressDTO> addressDTOLis = merchantAddressService.list(merchantAddressReq);
+    dictService.trans(MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), true, addressDTOLis.toArray());
+
+    return store;
   }
 
   @Override
@@ -64,12 +106,15 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreDetailDTO supplierStore) {
-//    return supplierStoreDao.save(supplierStore);
-    return true;
+    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
+    boolean flag=supplierStoreDao.save(supplierStoreDetailConverter.toE((supplierStore))) ;
+    return flag&& merchantAddressService.saveOrUpdateBatch(supplierStore.getAddressList());
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public boolean activate(Long id, Integer status) {
     SupplierStore supplierStore = new SupplierStore();
     supplierStore.setId(id);
@@ -78,6 +123,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public boolean batchAdd(List<SupplierStoreDetailDTO> list) {
     return true;
 //    return supplierStoreDao.saveBatch(list);
@@ -89,12 +135,16 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreDetailDTO supplierStore) {
-    return true;
-//    if(EmptyChecker.notEmpty(supplierStore.getConsumType())){
-//      this.syncConsumeType(supplierStore.getStoreCode(),supplierStore.getStoreCode());
-//    }
-//    return supplierStoreDao.updateById(supplierStore);
+    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
+    boolean flag2=true;
+    if(EmptyChecker.notEmpty(supplierStore.getConsumType())){
+      flag2=this.syncConsumeType(supplierStore.getStoreCode(),supplierStore.getConsumType());
+    }
+    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
+    boolean flag=supplierStoreDao.updateById(supplierStoreDetailConverter.toE((supplierStore))) ;
+    return flag&&flag2&& merchantAddressService.saveOrUpdateBatch(supplierStore.getAddressList());
   }
 
   @Override

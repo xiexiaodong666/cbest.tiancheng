@@ -1,7 +1,11 @@
 package com.welfare.common.util;
 
 import com.welfare.common.enums.ConsumeTypeEnum;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,5 +34,18 @@ public class ConsumeTypesUtils {
     }
 
     return list;
+  }
+
+  public static String transferStr(Map<String, Boolean> map){
+    return StringUtils.join(transfer(map),",");
+  }
+
+  public static Map<String, Boolean> transfer(String str){
+    List<String> list=Arrays.asList(str.split(str));
+    Map<String, Boolean> map=new HashMap<>();
+    for (String s:list){
+      map.put(s,Boolean.TRUE);
+    }
+    return map;
   }
 }

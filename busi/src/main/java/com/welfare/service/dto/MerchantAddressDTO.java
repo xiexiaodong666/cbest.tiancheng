@@ -32,6 +32,9 @@ public class MerchantAddressDTO {
    */
   @ApiModelProperty("地址类型")
   private String addressType;
+
+  @ApiModelProperty("地址类型(字典转义)")
+  private String addressTypeName;
   /**
    * 状态
    */

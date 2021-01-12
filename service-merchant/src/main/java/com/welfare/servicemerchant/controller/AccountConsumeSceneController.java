@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
@@ -67,8 +68,8 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/save")
   @ApiOperation("新增员工消费配置")
-  public R<Boolean> save(@RequestBody AccountConsumeSceneReq accountConsumeSceneReq){
-    return success(accountConsumeSceneService.save(accountConsumeSceneReq));
+  public R<Boolean> save(@RequestBody AccountConsumeSceneAddReq accountConsumeSceneAddReq){
+    return success(accountConsumeSceneService.save(accountConsumeSceneAddReq));
   }
 
   @PostMapping("/update")

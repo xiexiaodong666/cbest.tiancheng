@@ -28,5 +28,5 @@ public interface DictService {
      * @param <T> 待转换的类
      * @param objs 待转换类
      */
-     <T> void trans(  Class c,String className,boolean nameFlag,List<T> objs);
+     <T> void trans(  Class c,String className,boolean nameFlag,T... objs);
 }

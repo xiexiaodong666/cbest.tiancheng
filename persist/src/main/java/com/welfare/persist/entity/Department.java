@@ -1,13 +1,14 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,8 +21,8 @@ import lombok.experimental.Accessors;
 /**
  * 商户部门(department)实体类
  *
- * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @author hao.yin
+ * @since 2021-01-12 11:52:40
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -71,13 +72,13 @@ public class Department extends Model<Department> implements Serializable {
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic   
+    @ApiModelProperty("删除标志") @TableLogic
     @TableField(fill = FieldFill.INSERT_UPDATE)
 	private Boolean deleted;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")   
+    @ApiModelProperty("创建人")
     @TableField(fill = FieldFill.INSERT_UPDATE)
 	private String createUser;
     /**
@@ -109,6 +110,11 @@ public class Department extends Model<Department> implements Serializable {
      */
     @ApiModelProperty("外部编码")   
     private String externalCode;
+    /**
+     * 部门类型
+     */
+    @ApiModelProperty("部门类型")   
+    private String departmentType;
 
 //以下为列明常量
 
@@ -168,5 +174,9 @@ public class Department extends Model<Department> implements Serializable {
     * 外部编码
     */
     public static final String EXTERNAL_CODE = "external_code";
+    /**
+    * 部门类型
+    */
+    public static final String DEPARTMENT_TYPE = "department_type";
 
 }

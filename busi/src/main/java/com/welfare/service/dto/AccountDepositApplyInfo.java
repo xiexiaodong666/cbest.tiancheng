@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -23,27 +24,28 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @ApiModel("员工账号充值申请信息")
+@ExcelIgnoreUnannotated
 public class AccountDepositApplyInfo {
 
   /**
    * 申请id
    */
   @ApiModelProperty("申请id")
-  @ExcelProperty("编号")
-  private Integer id;
+  @ExcelProperty(value = "编号", index = 0)
+  private Long id;
 
   /**
    * 充值账户个数
    */
   @ApiModelProperty("充值账户个数")
-  @ExcelProperty("数量")
+  @ExcelProperty(value = "数量", index = 1)
   private Integer rechargeNum;
 
   /**
    * 申请充值总额
    */
   @ApiModelProperty("申请充值总额")
-  @ExcelProperty("数申请充值总额量")
+  @ExcelProperty(value = "数申请充值总额量", index = 2)
   private BigDecimal rechargeAmount;
 
   /**
@@ -51,56 +53,56 @@ public class AccountDepositApplyInfo {
    */
   @ApiModelProperty("福利类型名称")
   @NotEmpty(message = "余额类型名称为空")
-  @ExcelProperty("福利类型")
+  @ExcelProperty(value = "福利类型", index = 3)
   private String merAccountTypeName;
 
   /**
    * 申请人
    */
   @ApiModelProperty("申请人")
-  @ExcelProperty("申请人")
+  @ExcelProperty(value = "申请人", index = 4)
   private String applyUser;
 
   /**
    * 创建日期
    */
   @ApiModelProperty("申请时间(yyyy-MM-dd HH:mm:ss)")
-  @ExcelProperty("申请时间")
+  @ExcelProperty(value = "申请时间", index = 5)
   private Date applyTime;
 
   /**
    * 申请备注
    */
   @ApiModelProperty("申请备注")
-  @ExcelProperty("备注")
+  @ExcelProperty(value = "备注", index = 6)
   private String applyRemark;
 
   /**
    * 审批状态
    */
   @ApiModelProperty("审批状态(通过：AUDIT_SUCCESS， 不通过：AUDIT_FAILED, 待审核：AUDITING)")
-  @ExcelProperty("审批状态")
+  @ExcelProperty(value = "审批状态", index = 7)
   private String approvalStatus;
 
   /**
    * 审批人
    */
   @ApiModelProperty("审批人")
-  @ExcelProperty("审批人")
+  @ExcelProperty(value = "审批人", index = 8)
   private String approvalUser;
 
   /**
    * 审批时间
    */
   @ApiModelProperty("审批时间(yyyy-MM-dd HH:mm:ss)")
-  @ExcelProperty("审批时间")
+  @ExcelProperty(value = "审批时间", index = 9)
   private Date approvalTime;
 
   /**
    * 审批备注
    */
   @ApiModelProperty("审批备注")
-  @ExcelProperty("审批备注")
+  @ExcelProperty(value = "审批备注", index = 10)
   private String approvalRemark;
 
   /**

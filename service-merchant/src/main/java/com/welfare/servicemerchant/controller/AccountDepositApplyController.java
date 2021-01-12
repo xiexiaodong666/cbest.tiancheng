@@ -113,7 +113,8 @@ public class AccountDepositApplyController implements IController {
   @MerchantUser
   public R<String> export(@Validated@RequestBody AccountDepositApplyQuery query) throws IOException {
     List<AccountDepositApplyInfo> list = depositApplyService.list(query);
-    return success(fileUploadService.uploadExcelFile(list, AccountDepositApplyInfo.class, "员工额度申请"));
+    String path = fileUploadService.uploadExcelFile(list, AccountDepositApplyInfo.class, "员工额度申请");
+    return success(fileUploadService.getFileServerUrl(path));
   }
 
   @PostMapping("/approval")

@@ -8,6 +8,8 @@ import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ApiUserHolder;
+import com.welfare.common.util.ConsumeTypesUtils;
+import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dto.AdminMerchantStore;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
@@ -18,6 +20,11 @@ import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.remote.ShoppingFeignClient;
+import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
+import com.welfare.service.remote.entity.RoleConsumptionListReq;
+import com.welfare.service.remote.entity.RoleConsumptionReq;
+import com.welfare.service.remote.entity.RoleConsumptionResp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +36,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * 商户消费场景配置服务接口实现
@@ -46,6 +55,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private final MerchantStoreRelationMapper merchantStoreRelationMapper;
   private final SupplierStoreService supplierStoreService;
   private final ObjectMapper mapper;
+
+  private final ShoppingFeignClient shoppingFeignClient;
 
   @Override
   public Page<MerchantStoreRelation> pageQuery(Page<MerchantStoreRelation> page,
@@ -76,11 +87,21 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   }
 
   @Override
+  @Transactional(rollbackFor = {Exception.class})
   public boolean add(MerchantStoreRelationAddReq relationAddReq) {
     // 防止门店，消费门店  消费方法不一致
     if (!validateConsumeType(relationAddReq.getAdminMerchantStoreList())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
     }
+
+    RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
+    List<RoleConsumptionListReq> roleConsumptionListReqs = new ArrayList<>();
+
+
+    roleConsumptionReq.setList(roleConsumptionListReqs);
+    roleConsumptionReq.setActionType("ADD");
+    roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
+    roleConsumptionReq.setTimestamp(new Date());
 
     List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
     List<AdminMerchantStore> adminMerchantStoreList = relationAddReq.getAdminMerchantStoreList();
@@ -99,14 +120,63 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       merchantStoreRelation.setIsRebate(store.getIsRebate());
       merchantStoreRelation.setRebateType(store.getRebateType());
       merchantStoreRelation.setRebateRatio(store.getRebateRatio());
+      merchantStoreRelation.setSyncStatus(0);
 
       if (ApiUserHolder.getUserInfo() != null) {
         merchantStoreRelation.setCreateUser(ApiUserHolder.getUserInfo().getUserName());
       }
 
+      RoleConsumptionListReq roleConsumptionListReq = new RoleConsumptionListReq();
+      roleConsumptionListReqs.add(roleConsumptionListReq);
+      roleConsumptionListReq.setMerchantCode(relationAddReq.getMerCode());
+      roleConsumptionListReq.setEnabled(Boolean.TRUE);
+
+      List<RoleConsumptionBindingsReq> roleConsumptionBindingsReqs = new ArrayList<>();
+      RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
+
+      try {
+        Map<String, Boolean> consumeTypeMap = mapper.readValue(
+            merchantStoreRelation.getConsumType(), Map.class);
+
+        roleConsumptionBindingsReq.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
+        roleConsumptionBindingsReq.setStoreCode(merchantStoreRelation.getStoreCode());
+
+        roleConsumptionBindingsReqs.add(roleConsumptionBindingsReq);
+        roleConsumptionListReq.setBindings(roleConsumptionBindingsReqs);
+
+      } catch (JsonProcessingException e) {
+        log.error("[add] json convert error", e.getMessage());
+      }
       merchantStoreRelationList.add(merchantStoreRelation);
     }
-    return merchantStoreRelationDao.saveBatch(merchantStoreRelationList);
+
+    boolean save = merchantStoreRelationDao.saveBatch(merchantStoreRelationList);
+
+    // send after tx commit but is async
+    TransactionSynchronizationManager.registerSynchronization(
+         new TransactionSynchronizationAdapter() {
+          @Override
+          public void afterCommit() {
+              try {
+                log.info(mapper.writeValueAsString(roleConsumptionReq));
+                RoleConsumptionResp roleConsumptionResp = shoppingFeignClient.addOrUpdateRoleConsumption(roleConsumptionReq);
+
+                if(roleConsumptionResp.equals("200")) {
+                  // 写入
+                  for (MerchantStoreRelation m:
+                      merchantStoreRelationList) {
+                    m.setSyncStatus(1);
+                  }
+                  merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelationList);
+                }
+              } catch (Exception e) {
+                log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
+              }
+
+          }
+        }
+    );
+    return save;
   }
 
   @Override
@@ -125,6 +195,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     queryWrapper.eq(MerchantStoreRelation.MER_CODE, merchantStoreRelation.getMerCode());
     List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
         queryWrapper);
+
     List<MerchantStoreRelation> merchantStoreRelationNewList = new ArrayList<>();
     List<Long> deleteIds = new ArrayList<>();
     List<AdminMerchantStore> adminMerchantStoreList = relationUpdateReq.getAdminMerchantStoreList();
@@ -134,6 +205,13 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if (adminMerchantStoreList == null) {
       adminMerchantStoreList = new ArrayList<>(0);
     }
+
+    RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
+    List<RoleConsumptionListReq> roleConsumptionListReqs = new ArrayList<>();
+    roleConsumptionReq.setList(roleConsumptionListReqs);
+    roleConsumptionReq.setActionType("UPDATE");
+    roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
+    roleConsumptionReq.setTimestamp(new Date());
 
     for (AdminMerchantStore merchantStore :
         adminMerchantStoreList) {
@@ -195,6 +273,25 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if (CollectionUtils.isNotEmpty(merchantStoreRelationNewList)) {
       saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
     }
+
+
+    // send after tx commit but is async
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronizationAdapter() {
+          @Override
+          public void afterCommit() {
+            try {
+              log.info(mapper.writeValueAsString(roleConsumptionReq));
+              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient.addOrUpdateRoleConsumption(roleConsumptionReq);
+
+            } catch (Exception e) {
+              log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
+            }
+
+          }
+        }
+    );
+
 
     return remove && updateBatch && saveBath;
   }

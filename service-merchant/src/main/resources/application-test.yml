@@ -18,6 +18,11 @@ cbest:
       accessKey: lF3iXaqMbr9f3GEdPJeN
       secretKey: KqMaYYENOqD8JBZUhqgBhOddVYc5Y1Pd1pAJRoA2
       keyPrefix: e-welfare/
+  pay:
+    url: http://192.1.30.71:9999/gateway
+    appId: yufu
+    appKey: e4716980da4382e1f4cc6ee4bb640277
+    notifyUrl: http://xxx/accountDepositRecord/payNotify
 
 cdn:
   server: http://img-test.sjgo365.com
@@ -30,3 +35,10 @@ mybatis-plus:
     db-config:
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+
+platformUser:
+  url: http://test-welfare-app.sjgo365.com/shop-api/tc/store
+
+shopping:
+  url: http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base

@@ -1,6 +1,12 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.MerchantAddress;
+import com.welfare.service.dto.MerchantAddressDTO;
+import com.welfare.service.dto.MerchantAddressReq;
+
+import java.util.List;
+
 /**
  * 地址信息服务接口
  *
@@ -10,4 +16,6 @@ package com.welfare.service;
  */
 public interface MerchantAddressService {
 
+    List<MerchantAddressDTO> list(MerchantAddressReq merchantAddressReq);
+    boolean saveOrUpdateBatch(List<MerchantAddressDTO> list);
 }

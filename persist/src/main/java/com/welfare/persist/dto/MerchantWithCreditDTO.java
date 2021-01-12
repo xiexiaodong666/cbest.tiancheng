@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @author gaorui
+ * @author hao.yin
  * @version 1.0.0
  * @date 2021/1/8 2:26 PM
  */
@@ -24,6 +24,13 @@ public class MerchantWithCreditDTO {
   @ApiModelProperty("商户名称")
   private String merName;
   /**
+   * 员工自主充值
+   */
+  @ApiModelProperty("员工自主充值")
+  private String selfRecharge;
+  @ApiModelProperty("员工自主充值(字典转义)")
+  private String selfRechargeName;
+  /**
    * 商户代码
    */
   @ApiModelProperty("商户代码")
@@ -33,16 +40,23 @@ public class MerchantWithCreditDTO {
    */
   @ApiModelProperty("商户类型")
   private String merType;
+  @ApiModelProperty("商户类型(字典转义)")
+  private String merTypeName;
   /**
    * 身份属性
    */
   @ApiModelProperty("身份属性")
   private String merIdentity;
+  @ApiModelProperty("身份属性(字典转义)")
+  private String merIdentityName;
   /**
    * 合作方式
    */
   @ApiModelProperty("合作方式")
   private String merCooperationMode;
+
+  @ApiModelProperty("合作方式(字典转义)")
+  private String merCooperationModeName;
 
   /**
    * 信用额度

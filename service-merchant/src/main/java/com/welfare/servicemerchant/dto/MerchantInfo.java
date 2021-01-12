@@ -19,6 +19,11 @@ public class MerchantInfo {
     @ApiModelProperty("id")
     private Long id;
     /**
+     * 员工自主充值
+     */
+    @ApiModelProperty("员工自主充值")
+    private String selfRecharge;
+    /**
      * 商户名称
      */
     @ApiModelProperty("商户名称")

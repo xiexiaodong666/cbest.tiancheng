@@ -1,5 +1,9 @@
 package com.welfare.servicemerchant.controller;
 
+import com.welfare.service.DictService;
+import com.welfare.service.converter.DictConverter;
+import com.welfare.service.dto.DictDTO;
+import com.welfare.service.dto.DictReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,7 +34,7 @@ import java.util.Map;
 @RequestMapping("/dict")
 @Api(tags = "字典管理")
 public class DictController implements IController {
-
+  private final DictService dictService;
 
 
   @ApiOperation("查询字典")
@@ -37,5 +43,12 @@ public class DictController implements IController {
 
     return null;
   }
+
+  @ApiOperation("根据类型查询字典")
+  @GetMapping("/type")
+  public R<List<DictDTO>> getByType(@Valid DictReq req) {
+    return R.success(dictService.getByType(req));
+  }
+
 
 }

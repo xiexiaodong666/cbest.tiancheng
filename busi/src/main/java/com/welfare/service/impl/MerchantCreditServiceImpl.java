@@ -2,13 +2,11 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.SpringBeanUtils;
 import  com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.mapper.MerchantCreditMapper;
 import com.welfare.service.operator.merchant.*;
+import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantCreditService;
@@ -50,10 +48,6 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final Map<MerCreditType, MerAccountTypeOperator> operatorMap = new HashMap<>();
 
 
-    @Override
-    public int decreaseRechargeLimit(BigDecimal increaseLimit, Long id) {
-        return merchantCreditMapper.decreaseRechargeLimit(increaseLimit, id);
-    }
 
     @Override
     public MerchantCredit getByMerCode(String merCode) {
@@ -77,31 +71,28 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount) {
+    public void decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             MerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            BigDecimal operatedAmount = merAccountTypeOperator.decrease(merchantCredit, amount);
-            if(operatedAmount.subtract(amount).compareTo(BigDecimal.ZERO) != 0){
-                //todo 如果需要多个扣款通道累计，需要修改此处抛出的异常
-                throw new RuntimeException("operated amount not equals to target amount.");
-            }
+            merAccountTypeOperator.decrease(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
+
         } finally {
             lock.unlock();
         }
     }
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount) {
+    public void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             MerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            merAccountTypeOperator.increase(merchantCredit, amount);
+            MerchantAccountOperation increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
         } finally {
             lock.unlock();

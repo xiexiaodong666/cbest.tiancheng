@@ -5,8 +5,8 @@ import com.welfare.persist.entity.Department;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
-import com.welfare.servicemerchant.converter.DepartmentConverter;
-import com.welfare.servicemerchant.dto.DepartmentInfo;
+import com.welfare.service.converter.DepartmentConverter;
+import com.welfare.service.dto.DepartmentDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,7 +41,7 @@ public class DepartmentController implements IController {
     @GetMapping("/list")
     @ApiOperation("根据商户代码查询商户部门列表（不分页）")
     @MerchantUser
-    public R<List<DepartmentInfo>> list(@Valid DepartmentReq req){
+    public R<List<DepartmentDTO>> list(@Valid DepartmentReq req){
         return R.success(departmentConverter.toD(departmentService.list(req)));
     }
 
@@ -52,25 +52,31 @@ public class DepartmentController implements IController {
     }
 
     @GetMapping("/detail")
-    @ApiOperation("查询商户详情）")
-    public R<DepartmentInfo> detail(@RequestParam(required = true) @ApiParam("id") Long id){
-        return R.success(departmentConverter.toD(departmentService.detail(id)));
+    @ApiOperation("查询部门详情）")
+    public R<DepartmentDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+        return R.success(departmentService.detail(id));
     }
 
     @PostMapping("/add")
-    @ApiOperation("新增商户")
+    @ApiOperation("新增部门")
     public R add(@RequestBody Department department){
         return R.status(departmentService.add(department),"新增失败");
     }
+
+    @PostMapping("/update")
+    @ApiOperation("修改部门")
+    public R update(@RequestBody Department department){
+        return R.status(departmentService.update(department),"修改失败");
+    }
     @PostMapping("/batch-add")
-    @ApiOperation("批量新增子机构")
+    @ApiOperation("批量新增部门")
     public R batchAdd(@RequestBody List<Department> list){
         return R.status(departmentService.batchAdd(list),"批量新增失败");
 
     }
 
     @PostMapping("/delete/{id}")
-    @ApiOperation("删除子机构")
+    @ApiOperation("删除子部门")
     public R delete(@PathVariable @NotBlank String  departmentCode){
         return R.status(departmentService.delete(departmentCode),"删除失败");
     }

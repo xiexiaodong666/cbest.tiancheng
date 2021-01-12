@@ -41,6 +41,11 @@ public class RedisKeyConstant {
    */
   public static final String MERCHANT_CREDIT_APPLY= "merchant_credit_apply:";
 
+  /**
+   * 生成序列号
+   */
+  public static final String SEQUENCE_GENERATE = "sequence_generate:";
+
   public static String buidKey(String perfix, String... part) {
     return StringUtils.removeEnd(perfix, ":").concat(":").concat(StringUtils.join(part, ":"));
   }

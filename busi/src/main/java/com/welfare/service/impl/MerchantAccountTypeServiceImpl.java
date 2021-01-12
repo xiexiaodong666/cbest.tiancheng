@@ -2,15 +2,22 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.enums.MoveDirectionEnum;
+import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
+import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
+import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.MerchantAccountTypeService;
-import com.welfare.service.dto.MerchantAccountTypePageReq;
+import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
+import com.welfare.service.dto.MerchantAccountTypeSortReq;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,6 +33,7 @@ import java.util.List;
 @Service
 public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
+    private final MerchantAccountTypeExMapper merchantAccountTypeExMapper;
 
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
@@ -33,23 +41,26 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public MerchantAccountType detail(Long id) {
-        return merchantAccountTypeDao.getById(id);
-    }
-
-    @Override
-    public Page<MerchantAccountType> page(Page page, MerchantAccountTypePageReq pageReq) {
+    public MerchantAccountTypeDetailDTO detail(Long id) {
+//        return merchantAccountTypeDao.getById(id);
         return null;
     }
 
     @Override
-    public boolean add(MerchantAccountType merchantAccountType) {
-        return merchantAccountTypeDao.save(merchantAccountType);
+    public Page<MerchantAccountTypeWithMerchantDTO> page(Page page, MerchantAccountTypePageReq req) {
+        return merchantAccountTypeExMapper.listWithMerchant(page, req);
     }
 
     @Override
-    public boolean update(MerchantAccountType merchantAccountType) {
-        return merchantAccountTypeDao.updateById(merchantAccountType);
+    public boolean add(MerchantAccountTypeDetailDTO merchantAccountType) {
+//        return merchantAccountTypeDao.save(merchantAccountType);
+        return true;
+    }
+
+    @Override
+    public boolean update(MerchantAccountTypeDetailDTO merchantAccountType) {
+        return true;
+//        return merchantAccountTypeDao.updateById(merchantAccountType);
     }
 
     @Override
@@ -58,8 +69,26 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public boolean moveDeductionsOrder() {
-        return false;
+    @Transactional
+    public boolean moveDeductionsOrder(MerchantAccountTypeSortReq merchantAccountTypeSortReq) {
+        MerchantAccountType merchantAccountType=merchantAccountTypeDao.getById(merchantAccountTypeSortReq.getId());
+        MerchantAccountTypeReq req=new MerchantAccountTypeReq();
+        req.setMerCode(merchantAccountType.getMerCode());
+        if(MoveDirectionEnum.UP.getCode().equals(merchantAccountTypeSortReq.getDirection())){
+            req.setDeductionOrder(merchantAccountType.getDeductionOrder()+1);
+        }
+        if(MoveDirectionEnum.DOWN.getCode().equals(merchantAccountTypeSortReq.getDirection())){
+            req.setDeductionOrder(merchantAccountType.getDeductionOrder()-1);
+        }
+        MerchantAccountType type= merchantAccountTypeDao.getOne(QueryHelper.getWrapper(req));
+        boolean flag=true;
+        if(EmptyChecker.notEmpty(type)){
+            type.setDeductionOrder(merchantAccountType.getDeductionOrder());
+            flag=merchantAccountTypeDao.updateById(type);
+        }
+        merchantAccountType.setDeductionOrder(req.getDeductionOrder());
+        merchantAccountTypeDao.updateById(merchantAccountType);
+        return merchantAccountTypeDao.updateById(merchantAccountType)&&flag;
     }
 
     @Override

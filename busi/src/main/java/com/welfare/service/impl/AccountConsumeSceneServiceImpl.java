@@ -12,10 +12,12 @@ import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.service.AccountConsumeSceneService;
+import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.service.dto.AccountConsumeSceneReq;
 import com.welfare.service.dto.AccountConsumeSceneStoreRelationReq;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,21 +47,33 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean save(AccountConsumeSceneReq accountConsumeSceneReq) {
-        AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
-        BeanUtils.copyProperties(accountConsumeSceneReq,accountConsumeScene);
-        accountConsumeSceneDao.save(accountConsumeScene);
+    public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
+        List<Long> accountTypeIdList = accountConsumeSceneAddReq.getAccountTypeIdList();
+        accountTypeIdList.forEach(accountTypeId -> {
+            AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
+            BeanUtils.copyProperties(accountConsumeSceneAddReq,accountConsumeScene);
+            accountConsumeScene.setAccountTypeId(accountTypeId);
+            accountConsumeSceneDao.save(accountConsumeScene);
+            List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = getAccountConsumeSceneStoreRelations(
+                accountConsumeSceneAddReq, accountConsumeScene);
+            accountConsumeSceneStoreRelationDao.saveBatch(accountConsumeSceneStoreRelationList);
+        });
+        return true;
+    }
 
-        List<AccountConsumeSceneStoreRelationReq> accountConsumeSceneStoreRelationReqList = accountConsumeSceneReq.getAccountConsumeSceneStoreRelationReqList();
+    private List<AccountConsumeSceneStoreRelation> getAccountConsumeSceneStoreRelations(
+        AccountConsumeSceneAddReq accountConsumeSceneAddReq,
+        AccountConsumeScene accountConsumeScene) {
+        List<AccountConsumeSceneStoreRelationReq> accountConsumeSceneStoreRelationReqList = accountConsumeSceneAddReq.getAccountConsumeSceneStoreRelationReqList();
         List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = new ArrayList<>(accountConsumeSceneStoreRelationReqList.size());
         accountConsumeSceneStoreRelationReqList.forEach(accountConsumeSceneStoreRelationReq -> {
             AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation = new AccountConsumeSceneStoreRelation();
-            BeanUtils.copyProperties(accountConsumeSceneStoreRelationReq,accountConsumeSceneStoreRelation);
+            BeanUtils
+                .copyProperties(accountConsumeSceneStoreRelationReq,accountConsumeSceneStoreRelation);
             accountConsumeSceneStoreRelation.setAccountConsumeSceneId(accountConsumeScene.getId());
             accountConsumeSceneStoreRelationList.add(accountConsumeSceneStoreRelation);
         });
-        accountConsumeSceneStoreRelationDao.saveBatch(accountConsumeSceneStoreRelationList);
-        return true;
+        return accountConsumeSceneStoreRelationList;
     }
 
 
@@ -104,14 +118,14 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     public IPage<AccountConsumeScenePageDTO> getPageDTO(Page<AccountConsumeScenePageDTO> page,
         AccountConsumePageQuery accountConsumePageReq) {
         return accountConsumeSceneCustomizeMapper.getPageDTO(page,accountConsumePageReq.getMerCode(),
-            accountConsumePageReq.getAccountTypeId(),accountConsumePageReq.getStatus(),
+            accountConsumePageReq.getAccountTypeName(),accountConsumePageReq.getStatus(),
             accountConsumePageReq.getCreateTimeStart(),accountConsumePageReq.getCreateTimeEnd());
     }
 
     @Override
     public List<AccountConsumeScenePageDTO> export(AccountConsumePageQuery accountConsumePageReq) {
         return accountConsumeSceneCustomizeMapper.getPageDTO(accountConsumePageReq.getMerCode(),
-            accountConsumePageReq.getAccountTypeId(),accountConsumePageReq.getStatus(),
+            accountConsumePageReq.getAccountTypeName(),accountConsumePageReq.getStatus(),
             accountConsumePageReq.getCreateTimeStart(),accountConsumePageReq.getCreateTimeEnd());
     }
 

@@ -2,9 +2,12 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
+import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
-import com.welfare.service.dto.MerchantAccountTypePageReq;
+import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
+import com.welfare.service.dto.MerchantAccountTypeSortReq;
 
 import java.util.List;
 
@@ -27,24 +30,24 @@ public interface MerchantAccountTypeService {
      * @param id
      * @return
      */
-    MerchantAccountType detail(Long id);
+    MerchantAccountTypeDetailDTO detail(Long id);
 
     /**
      * 查询商户列表（分页））
      */
-    Page<MerchantAccountType> page(Page page, MerchantAccountTypePageReq pageReq);
+    Page<MerchantAccountTypeWithMerchantDTO> page(Page page, MerchantAccountTypePageReq pageReq);
 
     /**
      * 新增商户
      * @return
      */
-    boolean add(MerchantAccountType merchantAccountType);
+    boolean add(MerchantAccountTypeDetailDTO merchantAccountType);
 
     /**
      * 编辑商户
      * @return
      */
-    boolean update(MerchantAccountType merchantAccountType);
+    boolean update(MerchantAccountTypeDetailDTO merchantAccountType);
 
     /**
      * 导出商户列表
@@ -56,7 +59,7 @@ public interface MerchantAccountTypeService {
      * 移动扣款顺序
      * @return
      */
-    boolean moveDeductionsOrder();
+    boolean moveDeductionsOrder(MerchantAccountTypeSortReq merchantAccountTypeSortReq);
 
     /**
      * 根据编码查询单条

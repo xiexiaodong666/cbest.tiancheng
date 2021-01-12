@@ -13,13 +13,13 @@ import org.apache.ibatis.annotations.Param;
 public interface AccountConsumeSceneCustomizeMapper extends BaseMapper<AccountConsumeScene> {
   IPage<AccountConsumeScenePageDTO> getPageDTO(Page<AccountConsumeScenePageDTO> page,
       @Param("merCode") String merCode,
-      @Param("accountTypeId")Long accountTypeId,
+      @Param("accountTypeName")String accountTypeName,
       @Param("status")Integer status,
       @Param("createTimeStart")Date createTimeStart,
       @Param("createTimeEnd")Date createTimeEnd);
 
   List<AccountConsumeScenePageDTO> getPageDTO(@Param("merCode") String merCode,
-      @Param("accountTypeId")Long accountTypeId,
+      @Param("accountTypeName")String accountTypeName,
       @Param("status")Integer status,
       @Param("createTimeStart")Date createTimeStart,
       @Param("createTimeEnd")Date createTimeEnd);

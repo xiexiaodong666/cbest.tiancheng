@@ -60,11 +60,6 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
     @ApiModelProperty("金额")   
     private BigDecimal balance;
     /**
-     * 描述
-     */
-    @ApiModelProperty("描述")   
-    private String describe;
-    /**
      * 备注
      */
     @ApiModelProperty("备注")   
@@ -169,10 +164,6 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
     * 金额
     */
     public static final String BALANCE = "balance";
-    /**
-    * 描述
-    */
-    public static final String DESCRIBE = "describe";
     /**
     * 备注
     */

@@ -1,11 +1,13 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
+import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.MerchantAccountTypeService;
-import com.welfare.service.dto.MerchantAccountTypePageReq;
+import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
-import com.welfare.persist.dto.query.MerchantPageReq;
+import com.welfare.service.dto.MerchantAccountTypeSortReq;
 import com.welfare.servicemerchant.converter.MerchantAccountTypeConverter;
 import com.welfare.servicemerchant.dto.MerchantAccountTypeInfo;
 import io.swagger.annotations.Api;
@@ -47,23 +49,23 @@ public class MerchantAccountTypeController implements IController {
     }
     @GetMapping("/detail")
     @ApiOperation("查询商户详情）")
-    public R<MerchantAccountTypeInfo> detail(@RequestParam(required = true) @ApiParam("id") Long id){
-        return R.success(merchantAccountTypeConverter.toD(merchantAccountTypeService.detail(id)));
+    public R<MerchantAccountTypeDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+        return R.success(merchantAccountTypeService.detail(id));
     }
 
     @GetMapping("/page")
     @ApiOperation("查询商户列表（分页））")
-    public R<Page<MerchantAccountTypeInfo>> page(Page page, MerchantAccountTypePageReq pageReq){
-        return R.success(merchantAccountTypeConverter.toD(merchantAccountTypeService.page(page,pageReq)));
+    public R<Page<MerchantAccountTypeWithMerchantDTO>> page(Page page, MerchantAccountTypePageReq pageReq){
+        return R.success(merchantAccountTypeService.page(page,pageReq));
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")
-    public R add(@RequestBody MerchantAccountType merchantAccountType){
+    public R add(@RequestBody MerchantAccountTypeDetailDTO merchantAccountType){
         return R.status(merchantAccountTypeService.add(merchantAccountType),"新增失败");
     }
     @PostMapping("/update")
     @ApiOperation("编辑商户")
-    public R update(@RequestBody MerchantAccountType merchantAccountType){
+    public R update(@RequestBody MerchantAccountTypeDetailDTO merchantAccountType){
         return R.status(merchantAccountTypeService.update(merchantAccountType),"更新失败");
     }
     @PostMapping("/export-list")
@@ -74,7 +76,7 @@ public class MerchantAccountTypeController implements IController {
 
     @PostMapping("/move-deductions-order")
     @ApiOperation("移动商户福利类型扣款顺序")
-    public R moveDeductionsOrder(@RequestBody MerchantPageReq merchantPageReq){
-        return R.status(merchantAccountTypeService.moveDeductionsOrder(),"移动扣款顺序失败");
+    public R moveDeductionsOrder(@RequestBody@Valid MerchantAccountTypeSortReq merchantAccountTypeSortReq){
+        return R.status(merchantAccountTypeService.moveDeductionsOrder(merchantAccountTypeSortReq),"移动扣款顺序失败");
     }
 }

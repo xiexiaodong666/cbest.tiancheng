@@ -1,8 +1,6 @@
 package com.welfare.service.dto;
 
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.enums.ApprovalStatus;
-import com.welfare.service.enums.MerchantCreditApplyType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,7 +29,7 @@ public class MerchantCreditApprovalReq {
    * 审批状态
    */
   @ApiModelProperty("审批状态(通过：AUDIT_SUCCESS， 不通过：AUDIT_FAILED)")
-  @NotEmpty(message = "审批状态为空")
+  @NotNull(message = "审批状态为空")
   private ApprovalStatus approvalStatus;
 
   /**

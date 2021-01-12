@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
+import com.welfare.service.dto.SupplierStoreDetailDTO;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface SupplierStoreService {
      * @param id
      * @return
      */
-    SupplierStore detail(Long id);
+    SupplierStoreDetailDTO detail(Long id);
 
     /**
      * 查询供应商门店详情
@@ -42,7 +43,7 @@ public interface SupplierStoreService {
      * @param supplierStore
      * @return
      */
-    boolean add(SupplierStore supplierStore);
+    boolean add(SupplierStoreDetailDTO supplierStore);
 
     /**
      * 更改供应商门店激活状态
@@ -57,7 +58,7 @@ public interface SupplierStoreService {
      * @param list
      * @return
      */
-    boolean batchAdd(List<SupplierStore> list);
+    boolean batchAdd(List<SupplierStoreDetailDTO> list);
 
     /**
      * 删除供应商门店
@@ -71,7 +72,7 @@ public interface SupplierStoreService {
      * @param supplierStore
      * @return
      */
-    boolean update(SupplierStore supplierStore);
+    boolean update(SupplierStoreDetailDTO supplierStore);
 
     /**
      * 导出供应商门店列表

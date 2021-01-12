@@ -6,9 +6,9 @@ package com.welfare.common.enums;
  * @date 2021/1/10 8:07 PM
  */
 public enum ConsumeTypeEnum {
-  O2O("o2o", "O2O（线上下单，到店提货"),
-  ONLINE_MALL("onlineMall", "线上商城"),
-  SHOP_SHOPPING("shopShopping", "到店消费");
+  O2O("O2O", "O2O（线上下单，到店提货"),
+  ONLINE_MALL("ONLINE_MALL", "线上商城"),
+  SHOP_SHOPPING("SHOP_CONSUMPTION", "到店消费");
 
 
   public void setCode(String code) {

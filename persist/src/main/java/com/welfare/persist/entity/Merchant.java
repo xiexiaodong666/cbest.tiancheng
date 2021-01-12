@@ -56,18 +56,18 @@ public class Merchant extends Model<Merchant> implements Serializable {
     /**
      * 身份属性
      */
-    @ApiModelProperty("身份属性")   
+    @ApiModelProperty("身份属性  customer：客户，supplier：供应商")
     private String merIdentity;
     /**
      * 合作方式
      */
-    @ApiModelProperty("合作方式")   
+    @ApiModelProperty("合作方式 payFirt：先付费，payed：后付费")
     private String merCooperationMode;
     /**
      * 员工自主充值
      */
     @ApiModelProperty("员工自主充值")   
-    private Integer selfRecharge;
+    private String selfRecharge;
     /**
      * 备注
      */

@@ -4,8 +4,10 @@ import com.welfare.common.util.BarcodeUtil;
 import com.welfare.persist.entity.BarcodeSalt;
 import com.welfare.service.BarcodeSaltService;
 import com.welfare.service.dto.BarcodeSaltDO;
-import com.welfare.service.dto.PaymentBarcode;
-import com.welfare.service.dto.PaymentRequest;
+import com.welfare.service.dto.payment.BarcodePaymentRequest;
+import com.welfare.service.dto.payment.CardPaymentRequest;
+import com.welfare.service.dto.payment.PaymentBarcode;
+import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.RefundRequest;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
@@ -36,17 +38,30 @@ import java.util.stream.Collectors;
 @RequestMapping("/payment")
 @Api(tags = "支付接口")
 public class PaymentController implements IController {
-    private final BarcodeSaltService barcodeSaltService;
-    @PostMapping
-    @ApiOperation("支付")
-    public R<PaymentRequest> newPaymentRequest(@RequestBody PaymentRequest paymentRequest) {
+    @PostMapping("/online")
+    @ApiOperation("线上支付")
+    public R<OnlinePaymentRequest> newOnlinePaymentRequest(@RequestBody OnlinePaymentRequest paymentRequest) {
+        Map<String, Object> map = BeanUtil.toMap(paymentRequest);
+        return success(paymentRequest);
+    }
+
+    @PostMapping("/barcode")
+    @ApiOperation("条码支付")
+    public R<BarcodePaymentRequest> newBarcodePaymentRequest(@RequestBody BarcodePaymentRequest paymentRequest) {
+        Map<String, Object> map = BeanUtil.toMap(paymentRequest);
+        return success(paymentRequest);
+    }
+
+    @PostMapping("/card")
+    @ApiOperation("刷卡支付")
+    public R<CardPaymentRequest> newCardPaymentRequest(@RequestBody CardPaymentRequest paymentRequest) {
         Map<String, Object> map = BeanUtil.toMap(paymentRequest);
         return success(paymentRequest);
     }
 
     @GetMapping
     @ApiOperation("查询支付结果")
-    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
+    public R<OnlinePaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
         return success(null);
     }
 
@@ -62,42 +77,6 @@ public class PaymentController implements IController {
     @ApiOperation("查询退款结果")
     public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
         return success(null);
-    }
-
-    @GetMapping("/barcode")
-    @ApiOperation("用户获取支付条码")
-    public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode){
-        BarcodeSalt barcodeSalt =  barcodeSaltService.queryCurrentPeriodSaltValue();
-        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue());
-        return success(paymentBarcode);
-    }
-
-    @GetMapping("/test-barcode-parse")
-    public R<String> testBarcodeParse(@RequestParam String barcode){
-        Long saltValue = barcodeSaltService.queryCurrentPeriodSaltValue().getSaltValue();
-        return success(BarcodeUtil.calculateAccount("699048259340405130242", saltValue).toString());
-    }
-
-    @GetMapping("/barcode/parse-account")
-    @ApiOperation("根据条码查询支付账户")
-    @ApiModelProperty("支付账号, AccountNo")
-    public R<String> parseAccount(@RequestParam String barcode ){
-        Long saltValue = barcodeSaltService.queryCurrentPeriodSaltValue().getSaltValue();
-        return success(BarcodeUtil.calculateAccount(barcode, saltValue).toString());
-    }
-
-    @GetMapping("/barcode-salts")
-    @ApiOperation("支付条码加盐参数列表获取")
-    public R<List<BarcodeSaltDO>> getBarcodeSalts(){
-        Date currentDate = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        String dayStr = dateFormat.format(currentDate);
-        List<BarcodeSalt> barcodeSalts = barcodeSaltService.query(Long.valueOf(dayStr));
-        return success(
-                barcodeSalts.stream()
-                        .map(BarcodeSaltDO::of)
-                        .collect(Collectors.toList())
-        );
     }
 
 }

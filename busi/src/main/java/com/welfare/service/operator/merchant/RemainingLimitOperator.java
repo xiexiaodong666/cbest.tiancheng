@@ -1,12 +1,16 @@
 package com.welfare.service.operator.merchant;
 
-import com.welfare.persist.dao.MerchantCreditDao;
+import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.service.enums.IncOrDecType;
+import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Description:
@@ -18,26 +22,30 @@ import java.math.BigDecimal;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class RemainingLimitOperator implements MerAccountTypeOperator {
-
+public class RemainingLimitOperator extends MerAccountTypeOperator {
+    private MerCreditType merCreditType = MerCreditType.REMAINING_LIMIT;
     @Override
-    public BigDecimal decrease(MerchantCredit merchantCredit, BigDecimal amount) {
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to decrease merchantCredit.currentRemainingLimit for {}", amount.toString());
         BigDecimal currentRemainingLimit = merchantCredit.getRemainingLimit();
         BigDecimal subtract = currentRemainingLimit.subtract(amount);
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("剩余信用额度不足以扣减,current:" + currentRemainingLimit.toString() + ",to decrease:" + amount.toString());
-         } else {
+            return doWhenNotEnough(merchantCredit,subtract.negate(), transNo);
+        } else {
             merchantCredit.setRemainingLimit(subtract);
-            return amount;
+            MerchantAccountOperation operation = MerchantAccountOperation.of(
+                    merCreditType,
+                    subtract,
+                    IncOrDecType.DECREASE, merchantCredit,transNo );
+            return Arrays.asList(operation);
         }
 
     }
 
     @Override
-    public BigDecimal increase(MerchantCredit merchantCredit, BigDecimal amount) {
+    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setRemainingLimit(merchantCredit.getRemainingLimit().add(amount));
-        return amount;
+        return MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo);
     }
 }

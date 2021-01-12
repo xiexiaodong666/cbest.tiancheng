@@ -2,8 +2,9 @@ package com.welfare.service.converter;
 
 import com.welfare.persist.entity.AccountDepositApply;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
-import com.welfare.service.dto.AccountDepositApplyInfo;
-import com.welfare.service.dto.DepositApplyRequest;
+import com.welfare.service.dto.accountapply.AccountDepositApplyExcelInfo;
+import com.welfare.service.dto.accountapply.AccountDepositApplyInfo;
+import com.welfare.service.dto.accountapply.DepositApplyRequest;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -25,4 +26,7 @@ public interface AccountDepositApplyConverter {
 
   List<AccountDepositApplyInfo> toInfoList(List<AccountDepositApply> applys);
 
+  AccountDepositApplyExcelInfo toInfoExcel(AccountDepositApply apply);
+
+  List<AccountDepositApplyExcelInfo> toInfoExcelList(List<AccountDepositApply> applys);
 }

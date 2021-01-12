@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.util.ApiUserHolder;
 import com.welfare.service.MerchantCreditApplyService;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.merchantapply.*;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,8 +67,8 @@ public class MerchantCreditApplyController implements IController {
     @ApiOperation("导出商户额度申请(返回文件下载地址)")
     @ApiUser
     public R<String> export(@Validated @RequestBody MerchantCreditApplyQuery query) throws IOException {
-        List<MerchantCreditApplyInfo> list = applyService.list(query, ApiUserHolder.getUserInfo());
-        String path = fileUploadService.uploadExcelFile(list, MerchantCreditApplyInfo.class, "商户额度申请");
+        List<MerchantCreditApplyExcelInfo> list = applyService.list(query, ApiUserHolder.getUserInfo());
+        String path = fileUploadService.uploadExcelFile(list, MerchantCreditApplyExcelInfo.class, "商户额度申请");
         return success(fileUploadService.getFileServerUrl(path));
     }
 

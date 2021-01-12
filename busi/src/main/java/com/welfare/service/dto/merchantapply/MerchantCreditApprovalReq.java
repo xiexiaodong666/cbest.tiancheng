@@ -1,4 +1,4 @@
-package com.welfare.service.dto;
+package com.welfare.service.dto.merchantapply;
 
 import com.welfare.service.enums.ApprovalStatus;
 import io.swagger.annotations.ApiModel;

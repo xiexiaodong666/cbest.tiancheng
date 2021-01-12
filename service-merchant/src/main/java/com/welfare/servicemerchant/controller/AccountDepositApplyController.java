@@ -1,8 +1,5 @@
 package com.welfare.servicemerchant.controller;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.util.MerchantUserHolder;
@@ -10,7 +7,7 @@ import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.service.AccountDepositApplyDetailService;
 import com.welfare.service.AccountDepositApplyService;
 import com.welfare.service.TempAccountDepositApplyService;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.accountapply.*;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -112,8 +108,8 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("导出账号额度申请(返回文件下载地址)")
   @MerchantUser
   public R<String> export(@Validated@RequestBody AccountDepositApplyQuery query) throws IOException {
-    List<AccountDepositApplyInfo> list = depositApplyService.list(query);
-    String path = fileUploadService.uploadExcelFile(list, AccountDepositApplyInfo.class, "员工额度申请");
+    List<AccountDepositApplyExcelInfo> list = depositApplyService.list(query);
+    String path = fileUploadService.uploadExcelFile(list, AccountDepositApplyExcelInfo.class, "员工额度申请");
     return success(fileUploadService.getFileServerUrl(path));
   }
 

@@ -1,10 +1,9 @@
 package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.domain.ApiUserInfo;
 import com.welfare.persist.entity.MerchantCreditApply;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.merchantapply.*;
 
 import java.util.List;
 
@@ -36,14 +35,14 @@ public interface MerchantCreditApplyService {
    * @param apply
    * @return
    */
-  Long update(MerchantCreditApplyUpdateReq apply,  ApiUserInfo user);
+  Long update(MerchantCreditApplyUpdateReq apply, ApiUserInfo user);
 
   /**
    * 审批
    * @param apply
    * @return
    */
-  Long approval(MerchantCreditApprovalReq apply,  ApiUserInfo user);
+  Long approval(MerchantCreditApprovalReq apply, ApiUserInfo user);
 
   /**
    * 通过id查询详情
@@ -67,5 +66,5 @@ public interface MerchantCreditApplyService {
    * @param query
    * @return
    */
-  List<MerchantCreditApplyInfo> list(MerchantCreditApplyQuery query, ApiUserInfo user);
+  List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQuery query, ApiUserInfo user);
 }

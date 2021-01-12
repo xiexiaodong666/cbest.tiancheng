@@ -22,4 +22,6 @@ public interface MerchantStoreRelationMapper extends BaseMapper<MerchantStoreRel
       Page<MerchantStoreRelation> page,
       @Param("merName") String merName, @Param("status") String status,
       @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+  Boolean updateMerchantStoreRelationStatus(@Param("id") Long id);
 }

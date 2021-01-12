@@ -34,4 +34,9 @@
     GROUP BY
     msr.mer_code
   </select>
+
+
+  <update id="updateMerchantStoreRelationStatus">
+   update merchant_store_relation set sync_status = 1 where id = #{id}
+  </update>
 </mapper>

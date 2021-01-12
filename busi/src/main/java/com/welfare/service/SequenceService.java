@@ -21,4 +21,21 @@ public interface SequenceService {
      * @return
      */
     String nextFullNo(String sequenceType);
+
+    /**
+     * 生成下一个序列号，拼接上前缀
+     * @param sequenceType
+     * @return
+     */
+    String nextFullNo(String sequenceType, String prefix, Long startId);
+
+    /**
+     * 生成下一个序列号
+     * @param sequenceType
+     * @param prefix
+     * @param startId
+     * @return
+     */
+
+    Long nextNo(String sequenceType, String prefix, Long startId);
 }

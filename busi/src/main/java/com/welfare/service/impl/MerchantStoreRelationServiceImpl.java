@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ApiUserHolder;
@@ -96,12 +97,17 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
     List<RoleConsumptionListReq> roleConsumptionListReqs = new ArrayList<>();
-
+    List<RoleConsumptionBindingsReq> roleConsumptionBindingsReqs = new ArrayList<>();
 
     roleConsumptionReq.setList(roleConsumptionListReqs);
-    roleConsumptionReq.setActionType("ADD");
+    roleConsumptionReq.setActionType(ShoppingActionTypeEnum.ADD.getCode());
     roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
     roleConsumptionReq.setTimestamp(new Date());
+
+    RoleConsumptionListReq roleConsumptionListReq = new RoleConsumptionListReq();
+    roleConsumptionListReqs.add(roleConsumptionListReq);
+    roleConsumptionListReq.setMerchantCode(relationAddReq.getMerCode());
+    roleConsumptionListReq.setEnabled(Boolean.TRUE);
 
     List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
     List<AdminMerchantStore> adminMerchantStoreList = relationAddReq.getAdminMerchantStoreList();
@@ -126,12 +132,6 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         merchantStoreRelation.setCreateUser(ApiUserHolder.getUserInfo().getUserName());
       }
 
-      RoleConsumptionListReq roleConsumptionListReq = new RoleConsumptionListReq();
-      roleConsumptionListReqs.add(roleConsumptionListReq);
-      roleConsumptionListReq.setMerchantCode(relationAddReq.getMerCode());
-      roleConsumptionListReq.setEnabled(Boolean.TRUE);
-
-      List<RoleConsumptionBindingsReq> roleConsumptionBindingsReqs = new ArrayList<>();
       RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
 
       try {
@@ -154,24 +154,25 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     // send after tx commit but is async
     TransactionSynchronizationManager.registerSynchronization(
-         new TransactionSynchronizationAdapter() {
+        new TransactionSynchronizationAdapter() {
           @Override
           public void afterCommit() {
-              try {
-                log.info(mapper.writeValueAsString(roleConsumptionReq));
-                RoleConsumptionResp roleConsumptionResp = shoppingFeignClient.addOrUpdateRoleConsumption(roleConsumptionReq);
+            try {
+              log.info(mapper.writeValueAsString(roleConsumptionReq));
+              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
+                  .addOrUpdateRoleConsumption(roleConsumptionReq);
 
-                if(roleConsumptionResp.equals("200")) {
-                  // 写入
-                  for (MerchantStoreRelation m:
-                      merchantStoreRelationList) {
-                    m.setSyncStatus(1);
-                  }
-                  merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelationList);
+              if (roleConsumptionResp.getCode().equals("0000")) {
+                // 写入
+                for (MerchantStoreRelation m :
+                    merchantStoreRelationList) {
+                  m.setSyncStatus(1);
                 }
-              } catch (Exception e) {
-                log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
+                merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelationList);
               }
+            } catch (Exception e) {
+              log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
+            }
 
           }
         }
@@ -207,11 +208,18 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     }
 
     RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
+    List<RoleConsumptionBindingsReq> roleConsumptionBindingsReqs = new ArrayList<>();
+
     List<RoleConsumptionListReq> roleConsumptionListReqs = new ArrayList<>();
     roleConsumptionReq.setList(roleConsumptionListReqs);
-    roleConsumptionReq.setActionType("UPDATE");
+    roleConsumptionReq.setActionType(ShoppingActionTypeEnum.UPDATE.getCode());
     roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
     roleConsumptionReq.setTimestamp(new Date());
+
+    RoleConsumptionListReq roleConsumptionListReq = new RoleConsumptionListReq();
+    roleConsumptionListReqs.add(roleConsumptionListReq);
+    roleConsumptionListReq.setMerchantCode(merchantStoreRelation.getMerCode());
+    roleConsumptionListReq.setEnabled(Boolean.TRUE);
 
     for (AdminMerchantStore merchantStore :
         adminMerchantStoreList) {
@@ -230,6 +238,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         merchantStoreRelationNew.setRebateRatio(merchantStore.getRebateRatio());
         merchantStoreRelationNew.setRamark(relationUpdateReq.getRamark());
         merchantStoreRelationNew.setDeleted(false);
+        merchantStoreRelationNew.setSyncStatus(0);
         if (ApiUserHolder.getUserInfo() != null) {
           merchantStoreRelationNew.setCreateUser(ApiUserHolder.getUserInfo().getUserName());
           merchantStoreRelationNew.setUpdateUser(ApiUserHolder.getUserInfo().getUserName());
@@ -237,8 +246,25 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         }
         merchantStoreRelationNew.setStatus(0);
         merchantStoreRelationNewList.add(merchantStoreRelationNew);
+
+        RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
+
+        try {
+          Map<String, Boolean> consumeTypeMap = mapper.readValue(
+              merchantStoreRelationNew.getConsumType(), Map.class);
+
+          roleConsumptionBindingsReq.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
+          roleConsumptionBindingsReq.setStoreCode(merchantStoreRelationNew.getStoreCode());
+
+          roleConsumptionBindingsReqs.add(roleConsumptionBindingsReq);
+          roleConsumptionListReq.setBindings(roleConsumptionBindingsReqs);
+
+        } catch (JsonProcessingException e) {
+          log.error("[add] json convert error", e.getMessage());
+        }
       }
     }
+    List<MerchantStoreRelation> removeMerchantStoreRelationList = new ArrayList<>();
 
     for (MerchantStoreRelation m :
         merchantStoreRelations) {
@@ -255,12 +281,35 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         m.setRebateRatio(adminMerchantStore.getRebateRatio());
         m.setRebateType(adminMerchantStore.getRebateType());
         m.setRamark(relationUpdateReq.getRamark());
+        m.setSyncStatus(0);
+
+        RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
+
+        try {
+          Map<String, Boolean> consumeTypeMap = mapper.readValue(
+              adminMerchantStore.getConsumType(), Map.class);
+
+          roleConsumptionBindingsReq.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
+          roleConsumptionBindingsReq.setStoreCode(adminMerchantStore.getStoreCode());
+
+          roleConsumptionBindingsReqs.add(roleConsumptionBindingsReq);
+          roleConsumptionListReq.setBindings(roleConsumptionBindingsReqs);
+
+        } catch (JsonProcessingException e) {
+          log.error("[add] json convert error", e.getMessage());
+        }
+
       } // delete
       else {
         deleteIds.add(m.getId());
-        merchantStoreRelations.remove(m);
+        removeMerchantStoreRelationList.add(m);
       }
     }
+
+    if (CollectionUtils.isNotEmpty(removeMerchantStoreRelationList)) {
+      merchantStoreRelations.removeAll(removeMerchantStoreRelationList);
+    }
+
     boolean remove = true;
     boolean updateBatch = true;
     boolean saveBath = true;
@@ -274,7 +323,6 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
     }
 
-
     // send after tx commit but is async
     TransactionSynchronizationManager.registerSynchronization(
         new TransactionSynchronizationAdapter() {
@@ -282,7 +330,18 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
           public void afterCommit() {
             try {
               log.info(mapper.writeValueAsString(roleConsumptionReq));
-              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient.addOrUpdateRoleConsumption(roleConsumptionReq);
+              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
+                  .addOrUpdateRoleConsumption(roleConsumptionReq);
+
+              if (roleConsumptionResp.getCode().equals("0000")) {
+                merchantStoreRelations.addAll(merchantStoreRelationNewList);
+                // 写入
+                for (MerchantStoreRelation m :
+                    merchantStoreRelations) {
+                  m.setSyncStatus(1);
+                }
+                merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelations);
+              }
 
             } catch (Exception e) {
               log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
@@ -292,11 +351,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         }
     );
 
-
     return remove && updateBatch && saveBath;
   }
 
   @Override
+  @Transactional(rollbackFor = {Exception.class})
   public boolean updateStatus(Long id, Integer delete, Integer status) {
     QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(MerchantStoreRelation.ID, id);
@@ -307,22 +366,93 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
         queryWrapper);
 
+    RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
+
+    List<RoleConsumptionListReq> roleConsumptionListReqs = new ArrayList<>(1);
+    roleConsumptionReq.setList(roleConsumptionListReqs);
+
+    RoleConsumptionListReq roleConsumptionListReq = new RoleConsumptionListReq();
+      roleConsumptionListReq.setMerchantCode(merchantStoreRelation.getMerCode());
+    roleConsumptionListReqs.add(roleConsumptionListReq);
+
+    roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
+    roleConsumptionReq.setTimestamp(new Date());
+
+    List<RoleConsumptionBindingsReq> roleConsumptionBindingsReqs = new ArrayList<>();
+
+    if (status != null) {
+      roleConsumptionListReq.setEnabled(status == 0);
+    }
+
+    List<Long> removeIds = new ArrayList<>();
+
     if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
       for (MerchantStoreRelation storeRelation :
           merchantStoreRelations) {
         if (delete != null) {
-          storeRelation.setDeleted(delete != 0);
+          roleConsumptionReq.setActionType(ShoppingActionTypeEnum.DELETE.getCode());
+
+          removeIds.add(storeRelation.getId());
+          storeRelation.setSyncStatus(0);
         }
 
         if (status != null) {
+          roleConsumptionReq.setActionType(ShoppingActionTypeEnum.UPDATE.getCode());
+          storeRelation.setSyncStatus(0);
+          RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
+
+          try {
+            Map<String, Boolean> consumeTypeMap = mapper.readValue(
+                storeRelation.getConsumType(), Map.class);
+            roleConsumptionBindingsReq.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
+            roleConsumptionBindingsReq.setStoreCode(storeRelation.getStoreCode());
+            roleConsumptionBindingsReqs.add(roleConsumptionBindingsReq);
+
+            roleConsumptionListReq.setBindings(roleConsumptionBindingsReqs);
+
+          } catch (JsonProcessingException e) {
+            log.error("[updateStatus] json convert error", e.getMessage());
+          }
+
           storeRelation.setStatus(status);
         }
+
       }
     } else {
       return true;
     }
 
-    return merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelations);
+    boolean saveOrUpdateBatch = merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelations);
+
+    boolean remove = true;
+    if(CollectionUtils.isNotEmpty(removeIds)) {
+      remove = merchantStoreRelationDao.removeByIds(removeIds);
+    }
+    // send after tx commit but is async
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronizationAdapter() {
+          @Override
+          public void afterCommit() {
+            try {
+
+              log.info(mapper.writeValueAsString(roleConsumptionReq));
+              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
+                  .addOrUpdateRoleConsumption(roleConsumptionReq);
+
+              if (roleConsumptionResp.getCode().equals("0000")) {
+                for (MerchantStoreRelation m:
+                merchantStoreRelations) {
+                  merchantStoreRelationMapper.updateMerchantStoreRelationStatus(m.getId());
+                }
+              }
+
+            } catch (Exception e) {
+              log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
+            }
+          }
+        }
+    );
+    return remove && saveOrUpdateBatch;
   }
 
   private boolean validateConsumeType(List<AdminMerchantStore> merchantStoreList) {

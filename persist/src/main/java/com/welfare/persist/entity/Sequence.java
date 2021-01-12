@@ -132,5 +132,11 @@ public class Sequence extends Model<Sequence> implements Serializable {
     * 版本
     */
     public static final String VERSION = "version";
+    /**
+     * 前缀
+     */
+    public static final String PREFIX = "prefix";
+
+
 
 }

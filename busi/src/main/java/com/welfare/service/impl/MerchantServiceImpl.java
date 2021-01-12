@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.MerchantConstant;
+import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.MerchantDao;
@@ -98,6 +99,9 @@ public class MerchantServiceImpl implements MerchantService {
     }
     private String nextMaxCode(){
         String maxCode=merchantExMapper.getMaxMerCode();
+        if(MerchantConstant.MAX_MER_CODE.equals(maxCode)){
+            throw new BusiException("已达最大商户编码，请联系管理员");
+        }
         if(EmptyChecker.isEmpty(maxCode)){
             return MerchantConstant.INIT_MER_CODE;
         }

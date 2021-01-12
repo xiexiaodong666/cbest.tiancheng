@@ -2,6 +2,7 @@ package com.welfare.service;
 
 
 import com.welfare.persist.entity.Department;
+import com.welfare.service.dto.DepartmentDTO;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
 
@@ -34,7 +35,7 @@ public interface DepartmentService {
      * @param id
      * @return
      */
-    Department detail( Long id);
+    DepartmentDTO detail(Long id);
 
     /**
      * 新增商户

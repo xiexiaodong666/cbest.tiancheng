@@ -10,6 +10,11 @@ public class BusiException extends RuntimeException{
         this.code = code;
         this.msg = msg;
     }
+    public BusiException(String msg) {
+        this.code = ExceptionCode.UNKNOWON_EXCEPTION;
+        this.msg = msg;
+    }
+
 
     public String getCode() {
         return code.getCode();

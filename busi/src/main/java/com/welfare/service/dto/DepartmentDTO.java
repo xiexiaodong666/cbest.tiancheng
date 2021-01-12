@@ -1,4 +1,4 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-public class DepartmentInfo {
+public class DepartmentDTO {
 
     /**
      * id
@@ -38,6 +38,12 @@ public class DepartmentInfo {
      */
     @ApiModelProperty("部门父级")
     private String departmentParent;
+
+    /**
+     * 部门父级名称
+     */
+    @ApiModelProperty("部门父级名称")
+    private String departmentParentName;
     /**
      * 部门层级
      */

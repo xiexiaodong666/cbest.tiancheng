@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  */
 @Data
 public class AbstractPaymentRequest {
-    private static transient final String ONLINE_MACHINE_NO = "";
+    private static transient final String ONLINE_MACHINE_NO = "9002";
 
 
     @ApiModelProperty("支付请求id")
@@ -35,7 +35,8 @@ public class AbstractPaymentRequest {
     private String merCode;
     @ApiModelProperty("支付状态，0：新增，1：处理中，2：处理成功，-1：处理失败")
     private Integer paymentStatus;
-
+    @ApiModelProperty("账户号")
+    private String accountCode;
     public String chargePaymentScene(){
         if (!StringUtil.startsWithNumber(storeNo)) {
             //非数字开头的门店，供应商线下消费

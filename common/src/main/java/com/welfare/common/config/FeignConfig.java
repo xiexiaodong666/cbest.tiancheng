@@ -30,6 +30,11 @@ public class FeignConfig {
         return new SpringDecoder(feignHttpMessageConverter());
     }
 
+    @Bean
+    public FeignInterceptor feignInterceptor(){
+        return new FeignInterceptor();
+    }
+
     /**
      * 设置解码器为fastjson
      *
@@ -72,4 +77,7 @@ public class FeignConfig {
 
         return converter;
     }
+
+
+
 }

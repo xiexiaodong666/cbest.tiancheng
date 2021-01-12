@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.entity.AccountAmountType;
@@ -47,5 +48,12 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         accountBillDetail.setSurplusQuotaBalance(surplusQuota.getAccountBalance());
         accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT.code());
         accountBillDetailDao.save(accountBillDetail);
+    }
+
+    @Override
+    public AccountBillDetail queryByTransNo(String transNo) {
+        QueryWrapper<AccountBillDetail> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountBillDetail.TRANS_NO,transNo);
+        return accountBillDetailDao.getOne(queryWrapper);
     }
 }

@@ -23,4 +23,11 @@ public interface DepositService {
      * @param deposits
      */
     void deposit(List<Deposit> deposits);
+
+    /**
+     * 根据交易号查询充值状态
+     * @param transNo
+     * @return
+     */
+    Deposit getByTransNo(String transNo);
 }

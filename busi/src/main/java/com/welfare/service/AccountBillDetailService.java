@@ -2,6 +2,7 @@ package com.welfare.service;
 
 
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.dto.Deposit;
 
 import java.math.BigDecimal;
@@ -20,4 +21,11 @@ public interface AccountBillDetailService {
      * @param accountAmountType
      */
     void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType);
+
+    /**
+     * 根据流水号查询
+     * @param transNo
+     * @return
+     */
+    AccountBillDetail queryByTransNo(String transNo);
 }

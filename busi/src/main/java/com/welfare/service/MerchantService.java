@@ -75,4 +75,11 @@ public interface MerchantService {
      */
     Merchant detailByMerCode(String merCode);
 
+    /**
+     * 根据编码查询
+     * @param merCode
+     * @return
+     */
+    Merchant queryByCode(String merCode);
+
 }

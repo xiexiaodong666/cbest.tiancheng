@@ -185,4 +185,59 @@ public class WelfareConstant {
             return this.desc;
         }
     }
+
+    /**
+     * 异步状态
+     */
+    public enum AsyncStatus {
+        /**
+         *  异步状态
+         */
+        NEW(0,"新增"),HANDLING(1,"处理中"),SUCCEED(2,"成功"),FAILED(-1,"失败");
+
+        private Integer code;
+        private String desc;
+
+        AsyncStatus(Integer code, String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public Integer code(){
+            return this.code;
+        }
+
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+    public enum HeaderSource{
+        /**
+         * header.Source的取值
+         */
+        MERCHANT_BACKEND("merchant_backend","甜橙生活商户后台"),
+        CBEST_PAY("cbest_pay","重百付"),
+        E_WELFARE_ACCOUNT("e_welfare_account","福利平台-账户服务"),
+        E_WELFARE_MERCHANT("e_welfare_merchant","福利平台-商户服务"),
+        E_WELFARE_SETTLEMENT("e_welfare_settlement","福利平台-结算服务"),
+        E_WELFARE_API("e_welfare_api","福利平台-api");
+
+
+        private String code;
+        private String desc;
+
+        HeaderSource(String code, String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+
+        public String desc(){
+            return this.desc;
+        }
+    }
 }

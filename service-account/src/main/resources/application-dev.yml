@@ -40,9 +40,6 @@ mybatis-plus:
       logic-not-delete-value: 0
 platformUser:
   url:
-shopping:
-  url:
-
 
 cbest:
   pay:
@@ -50,5 +47,3 @@ cbest:
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
     notifyUrl: http://xxx/accountDepositRecord/payNotify
-
-

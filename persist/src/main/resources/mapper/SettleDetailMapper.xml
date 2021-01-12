@@ -28,45 +28,59 @@
 
     <select id="selectMonthSettleDetail" resultMap="monthSettleDetailDTO" parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
         select
-            trans_no,
-            order_id as order_no,
-            trans_time,
-            store_code,
-            store_name,
-            mer_code,
-            mer_name,
-            pos as pos,
-            mer_account_type as welfare_type_code,
-            mer_account_type_name as welfare_type_name,
-            trans_amount as pay_amount,
-            trans_amount as refund_amount,
-            trans_amount as real_amount,
-            trans_amount*0.1 as settle_amount
+            t1.trans_no,
+            t1.order_id as order_no,
+            t1.trans_time,
+            t1.store_code,
+            t1.store_name,
+            t1.mer_code,
+            t1.mer_name,
+            case when t3.mer_code = t1.mer_code then '自营'
+                 else '第三方' end as type,
+            t1.mer_account_type as welfare_type_code,
+            t1.mer_account_type_name as welfare_type_name,
+            case when t1.trans_type='consume' then t1.trans_amount
+                 when t1.trans_type='refund' then 0 end as pay_amount,
+            case when t1.trans_type='consume' then 0
+                 when t1.trans_type='refund' then t1.trans_amount end as refund_amount,
+            case when t1.trans_type='consume' then t1.trans_amount
+                 when t1.trans_type='refund' then 0 end as real_amount,
+            t1.trans_amount*t2.rebate_ratio as settle_amount
         from settle_detail t1
-        left join t2
+        left join merchant_store_relation t2
+        on t1.mer_code = t2.mer_code and t1.store_code = t2.store_code and t2.status=0
+        left join supplier_store t3
+        on t1.store_code = t3.store_code and t3.status=0
         <where>
             <if test="orderNo!=null and orderNo!=''">
-                and order_id = #{orderNo}
+                and t1.order_id = #{orderNo}
             </if>
             <if test="storeName!=null and storeName!=''">
-                and store_name = #{storeName}
+                and t1.store_name like concat('%',#{storeName},'%')
             </if>
             <if test="storeCode!=null and storeCode!=''">
-                and store_code = #{storeCode}
+                and t1.store_code = #{storeCode}
             </if>
             <if test="startTime!=null and startTime!=''">
-                and trans_time &lt;=#{startTime}
+                and t1.trans_time &lt;=#{startTime}
             </if>
             <if test="endTime!=null and endTime!=''">
-                and trans_time &lt;=#{endTime}
+                and t1.trans_time &lt;=#{endTime}
             </if>
             <if test="welfareTypeCode!=null and welfareTypeCode!=''">
-                and mer_account_type = #{welfareTypeCode}
+                and t1.mer_account_type = #{welfareTypeCode}
             </if>
             <if test="merCode!=null and merCode!=''">
-                and mer_code = #{merCode}
+                and t1.mer_code = #{merCode}
             </if>
-
+            <choose>
+                <when test="storeType!=null and storeType!='' and storeType='self'">
+                    and t3.mer_code = t1.mer_code
+                </when>
+                <when test="storeType!=null and storeType!='' and storeType='third'">
+                    and t3.mer_code != t1.mer_code
+                </when>
+            </choose>
         </where>
     </select>
 

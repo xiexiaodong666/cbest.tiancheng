@@ -26,4 +26,6 @@ public class MonthSettleDetailQuery{
     private String welfareTypeCode;
 
     private String merCode;
+
+    private String storeType;
 }

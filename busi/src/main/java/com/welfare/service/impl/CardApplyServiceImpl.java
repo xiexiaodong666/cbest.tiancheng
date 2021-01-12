@@ -96,7 +96,8 @@ public class CardApplyServiceImpl implements CardApplyService {
           SequenceTypeEnum.CARID.getCode(), cardApplyAddReq.getMerCode(), startId);
       cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
       cardInfo.setCardType(cardApply.getCardType());
-      cardInfo.setCardStatus(cardApply.getStatus());
+      cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());
+      cardInfo.setCardStatus(0);
       cardInfo.setDeleted(false);
       cardInfo.setCreateUser(cardApply.getCreateUser());
 
@@ -105,6 +106,7 @@ public class CardApplyServiceImpl implements CardApplyService {
 
     return cardApplyDao.save(cardApply) && cardInfoDao.saveBatch(cardInfoList);
   }
+
 
   @Override
   public boolean update(CardApplyUpdateReq cardApplyUpdateReq) {

@@ -31,4 +31,11 @@ public interface CardApplyService {
 
   boolean updateStatus(Long id, Integer delete, Integer status);
 
+  /**
+   * 根据申请号查询
+   * @param applyCode
+   * @return
+   */
+  CardApply queryByApplyCode(String applyCode);
+
 }

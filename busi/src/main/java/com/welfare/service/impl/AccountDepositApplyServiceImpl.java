@@ -98,7 +98,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return Long.valueOf(apply.getId());
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY_SAVE_REQUEST_ID, request.getRequestId());
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -143,7 +143,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return Long.valueOf(apply.getId());
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY_SAVE_REQUEST_ID, request.getRequestId());
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -200,7 +200,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(4, TimeUnit.SECONDS);
             if (locked) {
@@ -262,7 +262,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(4, TimeUnit.SECONDS);
             if (locked) {
@@ -331,7 +331,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return Long.valueOf(apply.getId());
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(4, TimeUnit.SECONDS);
             if (locked) {

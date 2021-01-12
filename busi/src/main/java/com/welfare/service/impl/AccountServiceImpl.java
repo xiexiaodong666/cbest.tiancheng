@@ -75,7 +75,6 @@ public class AccountServiceImpl implements AccountService {
 
   private final AccountDao accountDao;
   private final AccountMapper accountMapper;
-  private final AccountService accountService;
   private final AccountCustomizeMapper accountCustomizeMapper;
   private final AccountConverter accountConverter;
   private final AccountTypeService accountTypeService;
@@ -109,7 +108,7 @@ public class AccountServiceImpl implements AccountService {
   @Transactional(rollbackFor = Exception.class)
   public String uploadAccount(MultipartFile multipartFile) {
     try {
-      AccountUploadListener listener = new AccountUploadListener(accountTypeService,accountService,
+      AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,
           merchantService,departmentService);
       EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
           .doRead();

@@ -43,8 +43,7 @@ public class DepositServiceImpl implements DepositService {
     @Transactional(rollbackFor = Exception.class)
     public void deposit(Deposit deposit) {
         BigDecimal amount = deposit.getAmount();
-        Long transNo = sequenceService.next(WelfareConstant.SequenceType.DEPOSIT.code());
-        merchantCreditService.decreaseAccountType(deposit.getMerchantCode(), RECHARGE_LIMIT, amount, transNo.toString());
+        merchantCreditService.decreaseAccountType(deposit.getMerchantCode(), RECHARGE_LIMIT, amount, deposit.getTransNo());
         accountAmountTypeService.updateAccountAmountType(deposit);
         deposit.setDepositStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
     }

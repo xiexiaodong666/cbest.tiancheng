@@ -16,5 +16,5 @@ public class EmployerDTO {
   private String mobile;
   private String name;
   private String remark;
-  private String status;
+  private Integer status;
 }

@@ -17,6 +17,7 @@ import com.welfare.service.*;
 import com.welfare.service.converter.AccountDepositApplyConverter;
 import com.welfare.service.converter.DepositApplyDetailConverter;
 import com.welfare.service.dto.*;
+import com.welfare.service.dto.accountapply.*;
 import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.enums.ApprovalType;
 import com.welfare.service.enums.RechargeStatus;
@@ -32,11 +33,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 账户充值申请服务接口实现
@@ -89,6 +88,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     @Autowired
     private MerchantService merchantService;
 
+    @Autowired
+    private MerchantAccountTypeService accountTypeService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUser) {
@@ -98,7 +100,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return Long.valueOf(apply.getId());
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY_SAVE_REQUEST_ID, request.getRequestId());
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -143,7 +145,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return Long.valueOf(apply.getId());
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY_SAVE_REQUEST_ID, request.getRequestId());
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -200,7 +202,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(4, TimeUnit.SECONDS);
             if (locked) {
@@ -262,7 +264,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(4, TimeUnit.SECONDS);
             if (locked) {
@@ -331,7 +333,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return Long.valueOf(apply.getId());
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(4, TimeUnit.SECONDS);
             if (locked) {
@@ -411,15 +413,21 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     }
 
     @Override
-    public List<AccountDepositApplyInfo> list(AccountDepositApplyQuery query) {
+    public List<AccountDepositApplyExcelInfo> list(AccountDepositApplyQuery query) {
         List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
-        List<AccountDepositApplyInfo> infos = depositApplyConverter.toInfoList(applies);
+        List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
+            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());
+            Map<String, MerchantAccountType> accountTypeMap = new HashMap<>();
+            if (CollectionUtils.isNotEmpty(accountTypes)) {
+                accountTypeMap = accountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, MerchantAccountType->MerchantAccountType));
+            }
+            Map<String, MerchantAccountType> finalAccountTypeMap = accountTypeMap;
             infos.forEach(info -> {
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
                 if (approvalStatus != null) {
                     info.setApprovalStatus(approvalStatus.getValue());
-                    info.setMerAccountTypeName(WelfareConstant.MerCreditType.findByCode(info.getMerAccountTypeCode()).desc());
+                    info.setMerAccountTypeName(finalAccountTypeMap.get(info.getMerAccountTypeCode()).getMerAccountTypeName());
                 }
             });
         }

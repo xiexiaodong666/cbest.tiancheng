@@ -1,8 +1,9 @@
 package com.welfare.service.converter;
 
 import com.welfare.persist.entity.MerchantCreditApply;
-import com.welfare.service.dto.MerchantCreditApplyInfo;
-import com.welfare.service.dto.MerchantCreditApplyRequest;
+import com.welfare.service.dto.merchantapply.MerchantCreditApplyExcelInfo;
+import com.welfare.service.dto.merchantapply.MerchantCreditApplyInfo;
+import com.welfare.service.dto.merchantapply.MerchantCreditApplyRequest;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -25,4 +26,8 @@ public interface MerchantCreditApplyConverter {
   List<MerchantCreditApply> toApplyList(List<MerchantCreditApplyInfo> infos);
 
   MerchantCreditApply toApply(MerchantCreditApplyRequest request);
+
+  List<MerchantCreditApplyExcelInfo> toExcelInfoList(List<MerchantCreditApply> applyList);
+
+  MerchantCreditApplyExcelInfo toExcelInfo(MerchantCreditApply apply);
 }

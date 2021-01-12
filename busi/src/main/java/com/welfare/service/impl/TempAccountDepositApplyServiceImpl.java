@@ -89,7 +89,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
       return fileId;
     }
     String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.TEMP_ACCOUNT_DEPOSIT_APPLY_SAVE, requestId);
-    RLock lock = redissonClient.getLock(lockKey);
+    RLock lock = redissonClient.getFairLock(lockKey);
     try {
       boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
       if (locked) {

@@ -57,7 +57,7 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      * 卡状态
      */
     @ApiModelProperty("卡状态")   
-    private String cardStatus;
+    private Integer cardStatus;
     /**
      * 删除标志
      */

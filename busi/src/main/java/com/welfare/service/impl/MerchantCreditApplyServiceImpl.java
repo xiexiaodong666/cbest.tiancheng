@@ -18,6 +18,7 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantCreditApplyConverter;
 import com.welfare.service.dto.*;
+import com.welfare.service.dto.merchantapply.*;
 import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.utils.PageUtils;
@@ -60,7 +61,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             return apply.getId();
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY_REQUEST_ID, request.getRequestId());
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -127,7 +128,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -169,7 +170,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -188,7 +189,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
                     // 审批通过修改金额
                     WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyCode());
-                    Long transNo = sequenceService.next(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
+                    Long transNo = sequenceService.nextNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
                     merchantCreditService.increaseAccountType(apply.getMerCode(),type,apply.getBalance(), transNo.toString());
                 }
                 return apply.getId();
@@ -231,21 +232,23 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 Merchant merchant = merchantService.detailByMerCode(info.getMerCode());
                 info.setMerName(merchant.getMerName());
                 info.setMerCooperationMode(merchant.getMerCooperationMode());
+                info.setApplyType(WelfareConstant.MerCreditType.findByCode(info.getApplyType()).desc());
             });
         }
         return PageUtils.toPage(result, infos);
     }
 
     @Override
-    public List<MerchantCreditApplyInfo> list(MerchantCreditApplyQuery query, ApiUserInfo user) {
+    public List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQuery query, ApiUserInfo user) {
         List<MerchantCreditApply> result =  merchantCreditApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
-        List<MerchantCreditApplyInfo> infos = creditApplyConverter.toInfoList(result);
+        List<MerchantCreditApplyExcelInfo> infos = creditApplyConverter.toExcelInfoList(result);
         if (CollectionUtils.isNotEmpty(infos)) {
             infos.forEach(info -> {
                 Merchant merchant = merchantService.detailByMerCode(info.getMerCode());
                 info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());
                 info.setMerName(merchant.getMerName());
                 info.setMerCooperationMode(merchant.getMerCooperationMode());
+                info.setApplyType(WelfareConstant.MerCreditType.findByCode(info.getApplyType()).desc());
             });
         }
         return infos;

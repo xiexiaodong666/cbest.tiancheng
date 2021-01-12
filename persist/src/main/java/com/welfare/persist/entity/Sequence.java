@@ -43,11 +43,20 @@ public class Sequence extends Model<Sequence> implements Serializable {
      */
     @ApiModelProperty("序列类型")   
     private String sequenceType;
+    @ApiModelProperty("前缀")
+    private String prefix;
     /**
      * 序列号
      */
     @ApiModelProperty("序列号")   
     private Long sequenceNo;
+    @ApiModelProperty("最小序列号")
+    private Long minSequence;
+    @ApiModelProperty("最大序列号")
+    private Long maxSequence;
+
+    @ApiModelProperty("当达到最大序列号时的处理")
+    private String handlerForMax;
     /**
      * 创建人
      */

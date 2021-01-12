@@ -19,5 +19,4 @@ import org.apache.ibatis.annotations.Param;
 public interface MerchantExMapper  {
     Page<MerchantWithCreditDTO> listWithCredit(
             Page page,@Param("req") MerchantPageReq req);
-    String getMaxMerCode();
 }

@@ -81,6 +81,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public String uploadAccount(MultipartFile multipartFile) {
     try{
       AccountUploadListener listener = new AccountUploadListener(accountTypeMapper, this);
@@ -95,6 +96,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public String accountBatchBindCard(MultipartFile multipartFile) {
     try {
       AccountBatchBindCardListener accountBatchBindCardListener = new AccountBatchBindCardListener(cardInfoDao,accountDao,cardApplyDao);

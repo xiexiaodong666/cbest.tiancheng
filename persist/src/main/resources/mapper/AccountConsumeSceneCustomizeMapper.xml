@@ -49,8 +49,8 @@
     <if test=" merCode !='' and merCode != null ">
       and acs.mer_code = #{merCode}
     </if>
-    <if test="accountTypeId != null ">
-      and acs.account_type_id = #{accountTypeId}
+    <if test="accountTypeName != ''  and accountTypeName != null ">
+      and act.type_name = #{accountTypeName}
     </if>
     <if test="status != null ">
       and acs.status = #{status}

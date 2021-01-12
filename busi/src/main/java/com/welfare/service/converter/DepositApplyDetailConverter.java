@@ -1,7 +1,7 @@
 package com.welfare.service.converter;
 
 import com.welfare.persist.entity.AccountDepositApplyDetail;
-import com.welfare.service.dto.AccountDepositApplyDetailInfo;
+import com.welfare.service.dto.accountapply.AccountDepositApplyDetailInfo;
 import org.mapstruct.Mapper;
 
 import java.util.List;

@@ -18,6 +18,6 @@ import java.util.Date;
 public class BarcodePaymentRequest extends AbstractPaymentRequest{
     @ApiModelProperty("条码")
     private String barcode;
-    @ApiModelProperty("扫描日期")
+    @ApiModelProperty("扫描日期，yyyy-MM-ddTHH:mm:ss+08:00,例:2021-01-01T12:00:00+08:00")
     private Date scanDate;
 }

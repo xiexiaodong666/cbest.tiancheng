@@ -15,9 +15,9 @@ public class AccountConsumePageQuery {
    */
   private String merCode;
   /**
-   * 员工类型编码
+   * 员工类型名称
    */
-  private Long accountTypeId;
+  private String accountTypeName;
   /**
    * 使用状态
    */

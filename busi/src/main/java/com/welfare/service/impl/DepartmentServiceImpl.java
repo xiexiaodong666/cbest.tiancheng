@@ -77,18 +77,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         if(EmptyChecker.isEmpty(department.getDepartmentParent())){
             department.setDepartmentParent("0");
         }
-        department.setDepartmentCode(getNextCode());
+        //TODO
+//        department.setDepartmentCode(getNextCode());
         return departmentDao.save(department);
-    }
-    private String getNextCode(){
-        String maxCode=departmentExMapper.getMaxMerCode();
-        if(EmptyChecker.isEmpty(maxCode)){
-            return DepartmentConstant.INIT_DEPARTMENT_CODE;
-        }
-        if(DepartmentConstant.MAX_DEPARTMENT_CODE.equals(maxCode)){
-            throw new BusiException("已达最大部门编码，请联系管理员");
-        }
-        return ""+(Integer.parseInt(maxCode)+1);
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -2,14 +2,12 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.constants.MerchantAccountTypeConstant;
 import com.welfare.common.enums.MoveDirectionEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
-import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.MerchantAccountTypeService;
@@ -116,8 +114,9 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public String exportList(MerchantAccountTypePageReq pageReq) {
-        return null;
+    public List<MerchantAccountTypeWithMerchantDTO> exportList(MerchantAccountTypePageReq pageReq) {
+        List<MerchantAccountTypeWithMerchantDTO> list=this.page(new Page(0,Integer.MAX_VALUE),pageReq).getRecords();
+        return list;
     }
 
     @Override

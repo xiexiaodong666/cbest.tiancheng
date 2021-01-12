@@ -58,7 +58,7 @@ public interface MerchantService {
      * @param merchantPageReq
      * @return
      */
-    String exportList(MerchantPageReq merchantPageReq);
+    List<MerchantWithCreditDTO> exportList(MerchantPageReq merchantPageReq);
 
 
     /**

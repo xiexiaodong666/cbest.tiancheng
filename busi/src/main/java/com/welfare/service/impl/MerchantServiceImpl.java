@@ -2,10 +2,8 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.constants.MerchantConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
-import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
@@ -28,7 +26,6 @@ import com.welfare.service.MerchantService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -93,28 +90,10 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantDetailDTO merchant) {
-        merchant.setMerCode(nextMaxCode());
+        //TODO
+//        merchant.setMerCode(nextMaxCode());
         boolean flag=merchantDao.save(merchantDetailConverter.toE(merchant));
         return flag&merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
-    }
-    private String nextMaxCode(){
-        String maxCode=merchantExMapper.getMaxMerCode();
-        if(MerchantConstant.MAX_MER_CODE.equals(maxCode)){
-            throw new BusiException("已达最大商户编码，请联系管理员");
-        }
-        if(EmptyChecker.isEmpty(maxCode)){
-            return MerchantConstant.INIT_MER_CODE;
-        }
-        String first=String.valueOf(maxCode.charAt(0));
-        Integer second=Integer.parseInt(maxCode.substring(1));
-        if(MerchantConstant.MAX_MER_CODE_SECOND.equals(second)){
-            second=MerchantConstant.INIT_MER_CODE_SECOND;
-            first= StringUtil.getNextUpEn(first);
-
-        }else{
-            second=second+1;
-        }
-        return first+second;
     }
 
 
@@ -126,8 +105,10 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public String exportList(MerchantPageReq merchantPageReq) {
-        return null;
+    public List<MerchantWithCreditDTO> exportList(MerchantPageReq merchantPageReq) {
+        Page page=new Page(0,Integer.MAX_VALUE);
+        List<MerchantWithCreditDTO> list = this.page(page, merchantPageReq).getRecords();
+        return list;
     }
 
     @Override

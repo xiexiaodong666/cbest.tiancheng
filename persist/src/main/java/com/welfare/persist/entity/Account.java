@@ -68,17 +68,12 @@ public class Account extends Model<Account> implements Serializable {
      * 账号状态
      */
     @ApiModelProperty("账号状态")
-    private String accountStatus;
+    private Integer accountStatus;
     /**
      * 员工状态
      */
     @ApiModelProperty("员工状态")
     private String staffStatus;
-    /**
-     * 是否激活
-     */
-    @ApiModelProperty("是否激活")
-    private Integer active;
     /**
      * 是否绑卡
      */
@@ -148,6 +143,10 @@ public class Account extends Model<Account> implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer version;
 
+
+    @ApiModelProperty("同步状态")
+    private Integer syncStatus;
+
 //以下为列明常量
 
     /**
@@ -182,10 +181,6 @@ public class Account extends Model<Account> implements Serializable {
      * 员工状态
      */
     public static final String STAFF_STATUS = "staff_status";
-    /**
-     * 是否激活
-     */
-    public static final String ACTIVE = "active";
     /**
      * 是否绑卡
      */
@@ -234,5 +229,9 @@ public class Account extends Model<Account> implements Serializable {
      * 备注
      */
     public static final String REMARK = "remark";
+    /**
+     * 同步状态
+     */
+    public static final String SYNC_STATUS="sync_status";
 
 }

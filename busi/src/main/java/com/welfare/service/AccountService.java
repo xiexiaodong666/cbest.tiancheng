@@ -2,7 +2,9 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.dto.AccountPageDTO;
+import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
@@ -18,44 +20,48 @@ import org.springframework.web.multipart.MultipartFile;
  * 账户信息服务接口
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
  * @description 由 Mybatisplus Code Generator 创建
+ * @since 2021-01-06 13:49:25
  */
 public interface AccountService {
-    Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
-        AccountPageReq accountPageReq);
-    List<AccountDTO> export(AccountPageReq accountPageReq);
 
-    String uploadAccount(MultipartFile multipartFile);
-    String accountBatchBindCard(MultipartFile multipartFile);
+  Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
+      AccountPageReq accountPageReq);
 
-    /**
-     * 增加员工账号余额
-     * @param increaseBalance
-     * @param updateUser
-     * @param accountCode
-     * @return
-     */
-    int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode);
+  List<AccountDTO> export(AccountPageReq accountPageReq);
 
-    Account getByAccountCode(String accountCode);
+  String uploadAccount(MultipartFile multipartFile);
 
-    Boolean delete(Long id);
+  String accountBatchBindCard(MultipartFile multipartFile);
 
-    Boolean active(Long id,Integer active);
+  /**
+   * 增加员工账号余额
+   */
+  int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode);
 
-    AccountDetailDTO queryDetail(Long id);
+  Account getByAccountCode(String accountCode);
 
-    Boolean save(Account account);
-    Boolean batchSave(List<Account> accountList);
-    Boolean update(Account account);
+  Boolean delete(Long id);
 
-    Page<AccountBillDetailDTO> queryAccountBillDetail(Integer currentPage,Integer pageSize,
-        String accountCode, Date createTimeStart,Date createTimeEnd);
+  Boolean active(Long id, Integer active);
 
-    List<AccountBillDetailDTO> exportBillDetail(String accountCode, Date createTimeStart,Date createTimeEnd);
+  AccountDetailDTO queryDetail(Long id);
 
-    AccountBillDTO quertBill(String accountCode, Date createTimeStart,Date createTimeEnd);
+  Boolean save(Account account);
 
-    List<String> getAccountCodeList(List<String> accountCodes);
+  Boolean batchSave(List<Account> accountList);
+
+  Boolean update(Account account);
+
+  Page<AccountBillDetailDTO> queryAccountBillDetail(Integer currentPage, Integer pageSize,
+      String accountCode, Date createTimeStart, Date createTimeEnd);
+
+  List<AccountBillDetailDTO> exportBillDetail(String accountCode, Date createTimeStart,
+      Date createTimeEnd);
+
+  AccountBillDTO quertBill(String accountCode, Date createTimeStart, Date createTimeEnd);
+
+  List<String> getAccountCodeList(List<String> accountCodes);
+
+  public void syncAccount(ShoppingActionTypeEnum actionTypeEnum, List<AccountSyncDTO> accountSyncDTOS);
 }

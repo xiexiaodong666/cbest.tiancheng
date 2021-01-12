@@ -1,5 +1,6 @@
 package com.welfare.service.remote;
 
+import com.welfare.service.remote.entity.EmployerReqDTO;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.fallback.PlatformUserFallback;
@@ -24,5 +25,15 @@ public interface ShoppingFeignClient {
   @RequestMapping(value = "/inward/tc/addOrUpdateRoleConsumption", method = RequestMethod.POST, consumes = "application/json")
   RoleConsumptionResp addOrUpdateRoleConsumption(
       @RequestBody RoleConsumptionReq roleConsumptionReq);
+
+  /**
+   * 批量添加、修改员工账号
+   * @param employerReqDTO
+   * @return
+   */
+  @RequestMapping(value = "/inward/tc/addOrUpdateEmployer", method = RequestMethod.POST, consumes = "application/json")
+  RoleConsumptionResp addOrUpdateEmployer(
+      @RequestBody EmployerReqDTO employerReqDTO);
+
 
 }

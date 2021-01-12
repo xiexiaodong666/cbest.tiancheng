@@ -18,4 +18,5 @@ public interface AccountTypeService {
   public Boolean save(AccountType accountType);
   public Boolean update(AccountType accountType);
   public Boolean delete(Long id);
+  AccountType queryByTypeCode(String merCode,String typeCode);
 }

@@ -53,7 +53,7 @@ public interface MerchantAccountTypeService {
      * 导出商户列表
      * @return
      */
-    String exportList(MerchantAccountTypePageReq pageReq);
+    List<MerchantAccountTypeWithMerchantDTO> exportList(MerchantAccountTypePageReq pageReq);
 
     /**
      * @Deprecated

@@ -36,7 +36,18 @@ public class SequenceServiceImpl implements SequenceService {
     private final RedissonClient redissonClient;
 
     @Override
-    public Long next(String sequenceType) {
+    public Long nextNo(String sequenceType) {
+        Sequence next = next(sequenceType);
+        return next.getSequenceNo();
+    }
+
+    @Override
+    public String nextFullNo(String sequenceType) {
+        Sequence next = next(sequenceType);
+        return next.getPrefix() + next.getSequenceNo();
+    }
+
+    private Sequence next(String sequenceType){
         RLock lock = redissonClient.getFairLock(SEQUENCE_GENERATE + ":" + sequenceType);
         lock.lock();
         try{
@@ -50,7 +61,7 @@ public class SequenceServiceImpl implements SequenceService {
                 sequence.setSequenceNo(targetSequenceNo);
             }
             sequenceDao.updateById(sequence);
-            return sequence.getSequenceNo();
+            return sequence;
         }finally {
             lock.unlock();
         }

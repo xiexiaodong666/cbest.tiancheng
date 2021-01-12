@@ -188,7 +188,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
                     // 审批通过修改金额
                     WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyCode());
-                    Long transNo = sequenceService.next(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
+                    Long transNo = sequenceService.nextNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
                     merchantCreditService.increaseAccountType(apply.getMerCode(),type,apply.getBalance(), transNo.toString());
                 }
                 return apply.getId();

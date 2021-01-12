@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public interface AccountConsumeSceneService {
   public AccountConsumeScene getAccountConsumeScene(Long id);
-  public Boolean save(AccountConsumeSceneReq accountConsumeSceneReq);
+  public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq);
   public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq);
   public Boolean delete(Long id);
 

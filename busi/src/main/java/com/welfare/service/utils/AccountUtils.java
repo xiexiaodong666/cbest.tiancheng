@@ -34,7 +34,7 @@ public class AccountUtils {
     employerDTO.setMobile(accountSyncDTO.getPhone());
     employerDTO.setName(accountSyncDTO.getAccountName());
     employerDTO.setRemark(accountSyncDTO.getRemark());
-    employerDTO.setStatus(accountSyncDTO.getAccountStatus());
+    employerDTO.setStatus(String.valueOf(accountSyncDTO.getAccountStatus()));
     return employerDTO;
   }
 }

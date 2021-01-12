@@ -65,7 +65,7 @@ public class MerchantServiceImpl implements MerchantService {
         merchantAddressReq.setRelatedId(merchantDetailDTO.getId());
         //收获地址
         List<MerchantAddressDTO> addressDTOLis = merchantAddressService.list(merchantAddressReq);
-        dictService.trans(MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), false, addressDTOLis);
+        dictService.trans(MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), true, addressDTOLis);
         merchantDetailDTO.setAddressList(addressDTOLis);
 
         MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantDetailDTO.getMerCode());
@@ -78,14 +78,14 @@ public class MerchantServiceImpl implements MerchantService {
         }
         List<MerchantDetailDTO> list = new ArrayList<>();
         list.add(merchantDetailDTO);
-        dictService.trans(MerchantDetailDTO.class, Merchant.class.getSimpleName(), false, list);
+        dictService.trans(MerchantDetailDTO.class, Merchant.class.getSimpleName(), true, list);
         return list.get(0);
     }
 
     @Override
     public Page<MerchantWithCreditDTO> page(Page<Merchant> page, MerchantPageReq merchantPageReq) {
         Page<MerchantWithCreditDTO> pageResult = merchantExMapper.listWithCredit(page, merchantPageReq);
-        dictService.trans(MerchantWithCreditDTO.class, Merchant.class.getSimpleName(), false, pageResult.getRecords());
+        dictService.trans(MerchantWithCreditDTO.class, Merchant.class.getSimpleName(), true, pageResult.getRecords());
         return pageResult;
     }
 

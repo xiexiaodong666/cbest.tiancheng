@@ -28,6 +28,8 @@ public class MerchantWithCreditDTO {
    */
   @ApiModelProperty("员工自主充值")
   private String selfRecharge;
+  @ApiModelProperty("员工自主充值(字典转义)")
+  private String selfRechargeName;
   /**
    * 商户代码
    */
@@ -38,16 +40,23 @@ public class MerchantWithCreditDTO {
    */
   @ApiModelProperty("商户类型")
   private String merType;
+  @ApiModelProperty("商户类型(字典转义)")
+  private String merTypeName;
   /**
    * 身份属性
    */
   @ApiModelProperty("身份属性")
   private String merIdentity;
+  @ApiModelProperty("身份属性(字典转义)")
+  private String merIdentityName;
   /**
    * 合作方式
    */
   @ApiModelProperty("合作方式")
   private String merCooperationMode;
+
+  @ApiModelProperty("合作方式(字典转义)")
+  private String merCooperationModeName;
 
   /**
    * 信用额度

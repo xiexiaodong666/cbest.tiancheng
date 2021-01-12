@@ -54,6 +54,12 @@ public class DepartmentDTO {
      */
     @ApiModelProperty("部门路径")
     private String departmentPath;
+
+    @ApiModelProperty("部门类型")
+    private String departmentType;
+
+    @ApiModelProperty("部门类型(字典转义)")
+    private String departmentTypeName;
     /**
      * 创建人
      */

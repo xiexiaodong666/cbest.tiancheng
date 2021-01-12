@@ -60,12 +60,15 @@ public class MerchantServiceImpl implements MerchantService {
     public MerchantDetailDTO detail(Long id) {
         //商户详情
         MerchantDetailDTO merchantDetailDTO = merchantDetailConverter.toD(merchantDao.getById(id));
+        if(EmptyChecker.isEmpty(merchantDetailDTO)){
+            throw new BusiException("商户不存在");
+        }
         MerchantAddressReq merchantAddressReq = new MerchantAddressReq();
         merchantAddressReq.setRelatedType(Merchant.class.getSimpleName());
         merchantAddressReq.setRelatedId(merchantDetailDTO.getId());
         //收获地址
         List<MerchantAddressDTO> addressDTOLis = merchantAddressService.list(merchantAddressReq);
-        dictService.trans(MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), true, addressDTOLis);
+        dictService.trans(MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), true, addressDTOLis.toArray());
         merchantDetailDTO.setAddressList(addressDTOLis);
 
         MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantDetailDTO.getMerCode());
@@ -76,21 +79,19 @@ public class MerchantServiceImpl implements MerchantService {
             merchantDetailDTO.setCreditLimit(merchantCredit.getCreditLimit());
             merchantDetailDTO.setRemainingLimit(merchantCredit.getRemainingLimit());
         }
-        List<MerchantDetailDTO> list = new ArrayList<>();
-        list.add(merchantDetailDTO);
-        dictService.trans(MerchantDetailDTO.class, Merchant.class.getSimpleName(), true, list);
-        return list.get(0);
+        dictService.trans(MerchantDetailDTO.class, Merchant.class.getSimpleName(), true, merchantDetailDTO);
+        return merchantDetailDTO;
     }
 
     @Override
     public Page<MerchantWithCreditDTO> page(Page<Merchant> page, MerchantPageReq merchantPageReq) {
         Page<MerchantWithCreditDTO> pageResult = merchantExMapper.listWithCredit(page, merchantPageReq);
-        dictService.trans(MerchantWithCreditDTO.class, Merchant.class.getSimpleName(), true, pageResult.getRecords());
+        dictService.trans(MerchantWithCreditDTO.class, Merchant.class.getSimpleName(), true, pageResult.getRecords().toArray());
         return pageResult;
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantDetailDTO merchant) {
         merchant.setMerCode(nextMaxCode());
         boolean flag=merchantDao.save(merchantDetailConverter.toE(merchant));
@@ -117,7 +118,7 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
 
-    @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantDetailDTO merchant) {
         boolean flag= merchantDao.updateById(merchantDetailConverter.toE(merchant));
         return flag&&merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
@@ -132,6 +133,17 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public Merchant getMerchantByMerCode(QueryWrapper<Merchant> queryWrapper) {
         return merchantDao.getOne(queryWrapper);
+    }
+
+    @Override
+    public Merchant getMerchantByMerCode(String merCode) {
+        QueryWrapper<Merchant> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq(Merchant.MER_CODE,merCode);
+        Merchant merchant=this.getMerchantByMerCode(queryWrapper);
+        if(EmptyChecker.isEmpty(merchant)){
+            throw new BusiException("商户不存在");
+        }
+        return merchant;
     }
 
     @Override

@@ -62,21 +62,17 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
         //顶级部门的父级为机构
         if(EmptyChecker.isEmpty(department.getDepartmentParent())||"0".equals(department.getDepartmentParent())){
-            QueryWrapper<Merchant> queryWrapper =new QueryWrapper<>();
-            queryWrapper.eq(Merchant.MER_CODE,department.getMerCode());
-            Merchant merchant=merchantService.getMerchantByMerCode(queryWrapper);
+            Merchant merchant=merchantService.getMerchantByMerCode(department.getMerCode());
             department.setDepartmentParentName(EmptyChecker.isEmpty(merchant)?"":merchant.getMerName());
         }else {
             Department department1=this.getByDepartmentCode(department.getDepartmentParent());
             department.setDepartmentParentName(EmptyChecker.isEmpty(department1)?"":department1.getDepartmentName());
         }
-        List<DepartmentDTO> list=new ArrayList<>();
-        list.add(department);
-        dictService.trans(DepartmentDTO.class,Department.class.getSimpleName(),true,list);
-        return list.get(0);
+        dictService.trans(DepartmentDTO.class,Department.class.getSimpleName(),true,department);
+        return department;
     }
 
-    @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean add(Department department) {
         if(EmptyChecker.isEmpty(department.getDepartmentParent())){
             department.setDepartmentParent("0");
@@ -95,7 +91,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         return ""+(Integer.parseInt(maxCode)+1);
     }
 
-    @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean update(Department department) {
         Department update=new Department();
         update.setId(department.getId());
@@ -104,7 +100,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         return departmentDao.updateById(update);
     }
 
-    @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean batchAdd(List<Department> list) {
         return departmentDao.saveBatch(list);
     }

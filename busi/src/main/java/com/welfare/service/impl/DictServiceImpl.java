@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,7 +62,12 @@ public class DictServiceImpl implements DictService {
     }
     @Override
     public  <T> void trans(  Class c,String className,boolean nameFlag,
-                             List<T>objs) {
+                             T... objs) {
+        if(EmptyChecker.isEmpty(objs)){
+            return;
+        }
+        List<T> list=Arrays.asList(objs);
+
         if(EmptyChecker.isEmpty(className)){
             className=c.getSimpleName();
         }
@@ -101,11 +107,11 @@ public class DictServiceImpl implements DictService {
                 throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
             }
         }
-        for (T t : objs) {
+        for (T t : list) {
             for (FieldMethodDTO fieldMethod : fieldMethodList) {
                 try {
                     Map<String, List<Dict>> dictMap = map.get(fieldMethod.getDictType());
-                    Object dictCode = fieldMethod.getGMethod().invoke(t);
+                    Object dictCode = fieldMethod.getGMethod().invoke(c.cast(t));
                     if (EmptyChecker.isEmpty(dictCode)) {
                         continue;
                     }
@@ -120,9 +126,9 @@ public class DictServiceImpl implements DictService {
                     }
                     String dictName = StringUtils.join(dictNameList,",");
                     if(EmptyChecker.notEmpty(dictName)&&fieldMethod.getType().equals(Integer.class)){
-                        fieldMethod.getSMethod().invoke(t,Integer.parseInt(dictName));
+                        fieldMethod.getSMethod().invoke(c.cast(t),Integer.parseInt(dictName));
                     }else{
-                        fieldMethod.getSMethod().invoke(t, dictName);
+                        fieldMethod.getSMethod().invoke(c.cast(t), dictName);
                     }
                 } catch (IllegalAccessException e) {
                     throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);

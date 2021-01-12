@@ -310,7 +310,7 @@ public class AccountServiceImpl implements AccountService {
     EmployerReqDTO employerReqDTO = new EmployerReqDTO();
     employerReqDTO.setActionType(actionTypeEnum);
     employerReqDTO.setRequestId(UUID.randomUUID().toString());
-    employerReqDTO.setTimestamp(new Date());
+    employerReqDTO.setTimestamp(String.valueOf(new Date().getTime()));
     employerReqDTO.setList(employerDTOList);
 
     // send after tx commit but is async

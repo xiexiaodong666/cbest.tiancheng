@@ -19,7 +19,7 @@ public class AccountConsumeSceneResp implements Serializable {
    * 员工类型编号
    */
   @ApiModelProperty("员工类型编号")
-  private Long accountTypeId;
+  private String accountTypeCode;
 
   /**
    * 商户代码

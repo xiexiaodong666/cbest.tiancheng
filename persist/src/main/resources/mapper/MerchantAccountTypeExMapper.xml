@@ -30,7 +30,4 @@
         </where>
     </select>
 
-    <select id="getMaxCode" resultType="string">
-		SELECT MAX(mer_account_type_code ) FROM merchant_account_type where mer_code=#{merCode}
-	</select>
 </mapper>

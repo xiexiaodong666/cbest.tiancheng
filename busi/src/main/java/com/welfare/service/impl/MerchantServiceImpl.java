@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantDao;
@@ -14,6 +15,7 @@ import com.welfare.persist.mapper.MerchantExMapper;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantCreditService;
+import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantDetailConverter;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
@@ -45,6 +47,7 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantAddressService merchantAddressService;
     private final MerchantCreditService merchantCreditService;
     private final MerchantDetailConverter merchantDetailConverter;
+    private final SequenceService sequenceService;
 
 
     @Override
@@ -90,8 +93,7 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantDetailDTO merchant) {
-        //TODO
-//        merchant.setMerCode(nextMaxCode());
+        merchant.setMerCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_CODE.code()).toString());
         boolean flag=merchantDao.save(merchantDetailConverter.toE(merchant));
         return flag&merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
     }

@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.MoveDirectionEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
@@ -12,6 +13,7 @@ import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.MerchantService;
+import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantAccountTypeDetailConverter;
 import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
@@ -42,7 +44,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     private final MerchantAccountTypeExMapper merchantAccountTypeExMapper;
     private final MerchantService merchantService;
     private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
-
+    private final SequenceService sequenceService;
 
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
@@ -88,8 +90,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             type.setDeductionOrder(typeItem.getDeductionOrder());
             type.setMerAccountTypeCode(typeItem.getMerAccountTypeCode());
             type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
-            //TODO
-//            type.setMerAccountTypeCode(getMaxCode(merchantAccountType.get))
+            type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
             accountTypeList.add(type);
         }
         return merchantAccountTypeDao.saveBatch(accountTypeList);

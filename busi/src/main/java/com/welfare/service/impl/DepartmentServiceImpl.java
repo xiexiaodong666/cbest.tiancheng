@@ -1,17 +1,16 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.welfare.common.constants.DepartmentConstant;
-import com.welfare.common.constants.MerchantConstant;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.MerchantUserHolder;
 import  com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.mapper.DepartmentExMapper;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantService;
+import com.welfare.service.SequenceService;
 import com.welfare.service.converter.DepartmentConverter;
 import com.welfare.service.converter.DepartmentTreeConverter;
 import com.welfare.service.dto.DepartmentDTO;
@@ -25,7 +24,6 @@ import com.welfare.service.DepartmentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +41,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentTreeConverter departmentTreeConverter;
     private final MerchantService merchantService;
     private final DepartmentConverter departmentConverter;
-    private final DepartmentExMapper departmentExMapper;
+    private final SequenceService sequenceService;
     private final DictService dictService;
 
     @Override
@@ -77,8 +75,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         if(EmptyChecker.isEmpty(department.getDepartmentParent())){
             department.setDepartmentParent("0");
         }
-        //TODO
-//        department.setDepartmentCode(getNextCode());
+        department.setDepartmentCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()));
         return departmentDao.save(department);
     }
 

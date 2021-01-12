@@ -24,7 +24,7 @@ public class SinglePrefixAddHandler implements MaxSequenceExceedHandler{
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"序列号前缀达到最大",null);
         }
         sequence.setPrefix(String.valueOf(c));
-        sequence.setSequenceNo(sequence.getMinSequence());
+        sequence.setSequenceNo(sequence.getMinSequence()+1);
         return sequence;
     }
 }

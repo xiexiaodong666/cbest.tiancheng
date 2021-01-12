@@ -3,9 +3,8 @@ package com.welfare.servicemerchant.controller;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.CardInfoService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import com.welfare.servicemerchant.dto.LoginInfo;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -44,8 +43,15 @@ public class CardController implements IController {
     }
 
     @PutMapping("/written")
+    @ApiOperation("更新卡片写入成功")
     public R<CardInfo> updateToWritten(@RequestBody CardInfo cardInfo){
         CardInfo result = cardInfoService.updateWritten(cardInfo);
         return success(result);
+    }
+
+    @PostMapping("/login")
+    @ApiOperation("登录")
+    public R<Boolean> login(@RequestBody LoginInfo loginInfo ){
+        return null;
     }
 }

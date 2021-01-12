@@ -52,25 +52,31 @@ public class DepartmentController implements IController {
     }
 
     @GetMapping("/detail")
-    @ApiOperation("查询商户详情）")
+    @ApiOperation("查询部门详情）")
     public R<DepartmentDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
         return R.success(departmentService.detail(id));
     }
 
     @PostMapping("/add")
-    @ApiOperation("新增商户")
+    @ApiOperation("新增部门")
     public R add(@RequestBody Department department){
         return R.status(departmentService.add(department),"新增失败");
     }
+
+    @PostMapping("/update")
+    @ApiOperation("修改部门")
+    public R update(@RequestBody Department department){
+        return R.status(departmentService.update(department),"修改失败");
+    }
     @PostMapping("/batch-add")
-    @ApiOperation("批量新增子机构")
+    @ApiOperation("批量新增部门")
     public R batchAdd(@RequestBody List<Department> list){
         return R.status(departmentService.batchAdd(list),"批量新增失败");
 
     }
 
     @PostMapping("/delete/{id}")
-    @ApiOperation("删除子机构")
+    @ApiOperation("删除子部门")
     public R delete(@PathVariable @NotBlank String  departmentCode){
         return R.status(departmentService.delete(departmentCode),"删除失败");
     }

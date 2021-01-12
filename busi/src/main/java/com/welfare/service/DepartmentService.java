@@ -44,6 +44,13 @@ public interface DepartmentService {
     boolean add(Department department);
 
     /**
+     * 修改部门
+     * @param department
+     * @return
+     */
+    boolean update(Department department);
+
+    /**
      * 批量新增
      * @param list 批量实体
      */

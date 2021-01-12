@@ -93,9 +93,8 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional
     public boolean add(MerchantDetailDTO merchant) {
         merchant.setMerCode(nextMaxCode());
-        merchantDao.save(merchantDetailConverter.toE(merchant));
-        merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
-        return true;
+        boolean flag=merchantDao.save(merchantDetailConverter.toE(merchant));
+        return flag&merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
     }
     private String nextMaxCode(){
         String maxCode=merchantExMapper.getMaxMerCode();
@@ -120,9 +119,8 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public boolean update(MerchantDetailDTO merchant) {
-        merchantDao.updateById(merchantDetailConverter.toE(merchant));
-        merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
-        return true;
+        boolean flag= merchantDao.updateById(merchantDetailConverter.toE(merchant));
+        return flag&&merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
 
     }
 

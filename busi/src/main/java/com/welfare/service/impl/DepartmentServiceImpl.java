@@ -10,6 +10,7 @@ import  com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.DepartmentExMapper;
+import com.welfare.service.DictService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.converter.DepartmentConverter;
 import com.welfare.service.converter.DepartmentTreeConverter;
@@ -24,6 +25,7 @@ import com.welfare.service.DepartmentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,6 +44,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final MerchantService merchantService;
     private final DepartmentConverter departmentConverter;
     private final DepartmentExMapper departmentExMapper;
+    private final DictService dictService;
 
     @Override
     public List<Department> list(DepartmentReq req) {
@@ -67,7 +70,10 @@ public class DepartmentServiceImpl implements DepartmentService {
             Department department1=this.getByDepartmentCode(department.getDepartmentParent());
             department.setDepartmentParentName(EmptyChecker.isEmpty(department1)?"":department1.getDepartmentName());
         }
-        return department;
+        List<DepartmentDTO> list=new ArrayList<>();
+        list.add(department);
+        dictService.trans(DepartmentDTO.class,Department.class.getSimpleName(),true,list);
+        return list.get(0);
     }
 
     @Override
@@ -87,6 +93,15 @@ public class DepartmentServiceImpl implements DepartmentService {
             throw new BusiException("已达最大部门编码，请联系管理员");
         }
         return ""+(Integer.parseInt(maxCode)+1);
+    }
+
+    @Override
+    public boolean update(Department department) {
+        Department update=new Department();
+        update.setId(department.getId());
+        update.setDepartmentName(department.getDepartmentName());
+        update.setDepartmentType(department.getDepartmentType());
+        return departmentDao.updateById(update);
     }
 
     @Override

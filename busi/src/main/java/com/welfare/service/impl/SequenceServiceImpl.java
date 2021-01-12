@@ -36,7 +36,30 @@ public class SequenceServiceImpl implements SequenceService {
     private final RedissonClient redissonClient;
 
     @Override
-    public Long next(String sequenceType) {
+    public Long nextNo(String sequenceType) {
+        Sequence next = next(sequenceType);
+        return next.getSequenceNo();
+    }
+
+    @Override
+    public String nextFullNo(String sequenceType) {
+        Sequence next = next(sequenceType);
+        return next.getPrefix() + next.getSequenceNo();
+    }
+
+    @Override
+    public String nextFullNo(String sequenceType, String prefix, Long startId) {
+        Sequence next = next(sequenceType, prefix, startId);
+        return next.getPrefix() + next.getSequenceNo();
+    }
+
+    @Override
+    public Long nextNo(String sequenceType, String prefix, Long startId) {
+        Sequence next = next(sequenceType, prefix, startId);
+        return next.getSequenceNo();
+    }
+
+    private Sequence next(String sequenceType){
         RLock lock = redissonClient.getFairLock(SEQUENCE_GENERATE + ":" + sequenceType);
         lock.lock();
         try{
@@ -50,11 +73,38 @@ public class SequenceServiceImpl implements SequenceService {
                 sequence.setSequenceNo(targetSequenceNo);
             }
             sequenceDao.updateById(sequence);
-            return sequence.getSequenceNo();
+            return sequence;
         }finally {
             lock.unlock();
         }
     }
+
+
+    private Sequence next(String sequenceType, String prefix, Long startId) {
+        RLock lock = redissonClient.getFairLock(SEQUENCE_GENERATE + ":" + sequenceType);
+        lock.lock();
+        try{
+            QueryWrapper<Sequence> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq(Sequence.SEQUENCE_TYPE,sequenceType);
+            queryWrapper.eq(Sequence.PREFIX, prefix);
+            Sequence sequence = sequenceDao.getOne(queryWrapper);
+            if(sequence == null) {
+                sequence = new Sequence();
+                sequence.setSequenceNo(startId);
+                sequence.setPrefix(prefix);
+                sequence.setSequenceType(sequenceType);
+
+                sequenceDao.save(sequence);
+            } else {
+                sequence.setSequenceNo(sequence.getSequenceNo() + 1);
+                sequenceDao.updateById(sequence);
+            }
+            return sequence;
+        } finally {
+            lock.unlock();
+        }
+    }
+
 
     @SneakyThrows
     private Sequence handleWhenMaxSeqExceed(Sequence sequence) {

@@ -4,7 +4,7 @@ package com.welfare.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.persist.entity.AccountDepositApply;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.accountapply.*;
 
 import java.util.List;
 
@@ -79,7 +79,7 @@ public interface AccountDepositApplyService {
    * @param query
    * @return
    */
-  List list(AccountDepositApplyQuery query);
+  List<AccountDepositApplyExcelInfo> list(AccountDepositApplyQuery query);
 
   /**
    * 查询详情

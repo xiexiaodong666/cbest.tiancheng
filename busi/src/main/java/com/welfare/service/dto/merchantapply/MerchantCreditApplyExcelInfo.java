@@ -1,10 +1,9 @@
-package com.welfare.service.dto;
+package com.welfare.service.dto.merchantapply;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -13,24 +12,23 @@ import java.util.Date;
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/7  6:58 PM
+ * @date 2021/1/12  2:01 PM
  */
 @Data
-@NoArgsConstructor
 @ExcelIgnoreUnannotated
-public class MerchantCreditApplyInfo {
+public class MerchantCreditApplyExcelInfo {
 
   /**
    * 申请id
    */
   @ApiModelProperty("申请id")
-  @ExcelProperty("编号")
-  private Long id;
+  @ExcelProperty(value = "编号")
+  private String id;
 
   /**
    * 申请类型
    */
-  @ApiModelProperty("商户额度申请类型（充值额度：RECHARGE_LIMIT，余额：BALANCE, 剩余信用额度:REMAINING_LIMIT，信用额度S:CREDIT_LIMIT，消耗返点:REBATE_LIMIT）")
+  @ApiModelProperty("商户额度申请类型（充值额度：rechargeLimit，余额：currentBalance, 剩余信用额度:remainingLimit，信用额度:creditLimit，消耗返点:rebateLimit）")
   @ExcelProperty("申请类型")
   private String applyType;
 
@@ -66,7 +64,7 @@ public class MerchantCreditApplyInfo {
    */
   @ApiModelProperty("申请人")
   @ExcelProperty("申请人")
-  private Date applyUser;
+  private String applyUser;
 
   /**
    * 申请时间

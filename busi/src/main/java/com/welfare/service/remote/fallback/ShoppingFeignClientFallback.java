@@ -4,6 +4,7 @@ import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.EmployerReqDTO;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
+import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,14 @@ public class ShoppingFeignClientFallback implements FallbackFactory<ShoppingFeig
       @Override
       public RoleConsumptionResp addOrUpdateEmployer(EmployerReqDTO employerReqDTO) {
         log.error("批量添加、修改员工账号", cause);
+        RoleConsumptionResp response = new RoleConsumptionResp("500", cause.getMessage(), null);
+        return response;
+      }
+
+      @Override
+      public RoleConsumptionResp addOrUpdateUserRoleBinding(
+          UserRoleBindingReqDTO userRoleBindingReqDTO) {
+        log.error("批量添加、修改员工绑定", cause);
         RoleConsumptionResp response = new RoleConsumptionResp("500", cause.getMessage(), null);
         return response;
       }

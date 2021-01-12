@@ -5,6 +5,7 @@ import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.servicemerchant.converter.SupplierStoreConverter;
 import com.welfare.servicemerchant.dto.SupplierStoreInfo;
@@ -55,10 +56,10 @@ public class SupplierStoreController implements IController {
         return R.status(supplierStoreService.add(supplierStore),"新增失败");
     }
 
-    @PostMapping("/activate/{id}/{status}")
+    @PostMapping("/activate")
     @ApiOperation("更改供应商门店激活状态")
-    public R activate(@PathVariable @NotBlank Long id, @PathVariable@NotBlank Integer status){
-        return R.status(supplierStoreService.activate(id,status),"更改激活状态失败");
+    public R activate(@RequestBody SupplierStoreActivateReq storeActivateReq){
+        return R.status(supplierStoreService.activate(storeActivateReq),"更改激活状态失败");
     }
     @PostMapping("/batch-add")
     @ApiOperation("批量新增供应商门店")
@@ -68,7 +69,7 @@ public class SupplierStoreController implements IController {
 
     @PostMapping("/delete/{id}")
     @ApiOperation("删除供应商门店")
-    public R<SupplierStoreInfo> delete(@PathVariable @NotBlank Long id){
+    public R delete(@PathVariable @NotBlank Long id){
         return R.status(supplierStoreService.delete(id),"删除失败");
     }
     @PostMapping("/update")

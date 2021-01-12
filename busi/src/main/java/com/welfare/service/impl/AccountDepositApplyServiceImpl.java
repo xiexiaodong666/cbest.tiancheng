@@ -17,6 +17,7 @@ import com.welfare.service.*;
 import com.welfare.service.converter.AccountDepositApplyConverter;
 import com.welfare.service.converter.DepositApplyDetailConverter;
 import com.welfare.service.dto.*;
+import com.welfare.service.dto.accountapply.*;
 import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.enums.ApprovalType;
 import com.welfare.service.enums.RechargeStatus;
@@ -32,11 +33,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 账户充值申请服务接口实现
@@ -88,6 +87,12 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
     @Autowired
     private MerchantService merchantService;
+
+    @Autowired
+    private MerchantAccountTypeService accountTypeService;
+
+    @Autowired
+    private SequenceService sequenceService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -411,15 +416,21 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     }
 
     @Override
-    public List<AccountDepositApplyInfo> list(AccountDepositApplyQuery query) {
+    public List<AccountDepositApplyExcelInfo> list(AccountDepositApplyQuery query) {
         List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
-        List<AccountDepositApplyInfo> infos = depositApplyConverter.toInfoList(applies);
+        List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
+            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());
+            Map<String, MerchantAccountType> accountTypeMap = new HashMap<>();
+            if (CollectionUtils.isNotEmpty(accountTypes)) {
+                accountTypeMap = accountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, MerchantAccountType->MerchantAccountType));
+            }
+            Map<String, MerchantAccountType> finalAccountTypeMap = accountTypeMap;
             infos.forEach(info -> {
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
                 if (approvalStatus != null) {
                     info.setApprovalStatus(approvalStatus.getValue());
-                    info.setMerAccountTypeName(WelfareConstant.MerCreditType.findByCode(info.getMerAccountTypeCode()).desc());
+                    info.setMerAccountTypeName(finalAccountTypeMap.get(info.getMerAccountTypeCode()).getMerAccountTypeName());
                 }
             });
         }
@@ -545,6 +556,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
         apply.setCreateUser(merchantUser.getUserCode());
         apply.setUpdateUser(merchantUser.getUserCode());
+        apply.setChannel(WelfareConstant.Channel.PLATFORM.code());
+        apply.setTransNo(sequenceService.nextNo(WelfareConstant.SequenceType.DEPOSIT.code()) + "");
         apply.setCreateTime(now);
         apply.setUpdateTime(now);
         apply.setVersion(0);

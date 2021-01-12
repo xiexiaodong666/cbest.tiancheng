@@ -1,38 +1,30 @@
-package com.welfare.service.dto;
+package com.welfare.service.dto.accountapply;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 员工账号额度申请详情
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/6  5:28 PM
+ * @date 2021/1/12  2:00 PM
  */
 @Data
-@NoArgsConstructor
-@ApiModel("员工账号充值申请信息")
 @ExcelIgnoreUnannotated
-public class AccountDepositApplyInfo {
+public class AccountDepositApplyExcelInfo {
 
   /**
    * 申请id
    */
   @ApiModelProperty("申请id")
   @ExcelProperty(value = "编号", index = 0)
-  private Long id;
+  private String id;
 
   /**
    * 充值账户个数
@@ -45,7 +37,7 @@ public class AccountDepositApplyInfo {
    * 申请充值总额
    */
   @ApiModelProperty("申请充值总额")
-  @ExcelProperty(value = "数申请充值总额量", index = 2)
+  @ExcelProperty(value = "申请充值总额量", index = 2)
   private BigDecimal rechargeAmount;
 
   /**

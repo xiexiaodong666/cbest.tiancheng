@@ -51,10 +51,15 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     @ApiModelProperty("商户代码")
     private String merCode;
     /**
+     * 交易金额
+     */
+    @ApiModelProperty("交易金额")
+    private BigDecimal transAmount;
+    /**
      * 结算金额
      */
     @ApiModelProperty("结算金额")
-    private BigDecimal amount;
+    private BigDecimal settleAmount;
     /**
      * 返利金额
      */
@@ -139,9 +144,13 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     */
     public static final String MER_CODE = "mer_code";
     /**
-    * 结算金额
+    * 交易金额
     */
-    public static final String AMOUNT = "amount";
+    public static final String TRANS_AMOUNT = "trans_amount";
+    /**
+     * 结算金额
+     */
+    public static final String SETTLE_AMOUNT = "settle_amount";
     /**
     * 返利金额
     */

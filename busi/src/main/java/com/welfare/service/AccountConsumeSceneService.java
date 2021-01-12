@@ -3,6 +3,8 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
@@ -10,6 +12,7 @@ import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.service.dto.AccountConsumeSceneReq;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 员工消费场景配置服务接口
@@ -19,6 +22,8 @@ import java.util.List;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface AccountConsumeSceneService {
+  public void syncAccountConsumeScene(ShoppingActionTypeEnum actionTypeEnum,
+      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap);
   public AccountConsumeScene getAccountConsumeScene(Long id);
   public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq);
   public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq);

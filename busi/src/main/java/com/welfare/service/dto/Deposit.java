@@ -46,6 +46,8 @@ public class Deposit {
         deposit.setAmount(accountDepositApplyDetail.getRechargeAmount());
         deposit.setMerchantCode(accountDepositApply.getMerCode());
         deposit.setAccountCode(accountDepositApplyDetail.getAccountCode());
+        deposit.setTransNo(accountDepositApply.getTransNo());
+        deposit.setChannel(accountDepositApply.getChannel());
         return deposit;
     }
 

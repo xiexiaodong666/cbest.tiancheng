@@ -19,11 +19,11 @@ public class RequestPage {
     @ApiModelProperty(value = "每页大小", required = true)
     private int pageSize = 20;
 
-    public int getPageIndex() {
+    public int getCurrentPage() {
         return currentPage;
     }
 
-    public void setPageIndex(int currentPage) {
+    public void setCurrentPage(int currentPage) {
         this.currentPage = currentPage;
     }
 

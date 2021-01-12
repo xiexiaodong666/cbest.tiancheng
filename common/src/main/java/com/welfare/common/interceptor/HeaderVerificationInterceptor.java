@@ -17,6 +17,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Description:
@@ -32,6 +33,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler){
         //
         String source = request.getHeader(WelfareConstant.Header.SOURCE.code());
+        String api = request.getHeader(WelfareConstant.Header.API_USER.code());
         setApiUserToContext(handler, request);
         setMerchantUserToContext(handler, request);
         if(StringUtils.isEmpty(source)){
@@ -60,7 +62,11 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
             if(StringUtils.isEmpty(apiUserInfo)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"apiUser required for http header");
             }
-            ApiUserHolder.setApiUserInfoLocal(JSON.parseObject(apiUserInfo, ApiUserInfo.class));
+            try {
+                ApiUserHolder.setApiUserInfoLocal(JSON.parseObject(new String(apiUserInfo.getBytes("ISO-8859-1"),"utf8"), ApiUserInfo.class));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -74,7 +80,11 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
             if(StringUtils.isEmpty(merchantUserInfo)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"merchantUser required for http header");
             }
-            MerchantUserHolder.setDeptIds(JSON.parseObject(merchantUserInfo, MerchantUserInfo.class));
+            try {
+                MerchantUserHolder.setDeptIds(JSON.parseObject(new String(merchantUserInfo.getBytes("ISO-8859-1"),"utf8"), MerchantUserInfo.class));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

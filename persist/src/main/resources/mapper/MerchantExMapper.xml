@@ -40,7 +40,4 @@ FROM
 		</if>
 	</where>
     </select>
-	<select id="getMaxMerCode" resultType="string">
-		SELECT MAX(mer_code ) FROM merchant
-	</select>
 </mapper>

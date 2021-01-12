@@ -9,10 +9,13 @@ import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.service.CardApplyService;
 import com.welfare.service.MerchantService;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -39,6 +42,7 @@ public class CardApplyController implements IController {
 
   private final CardApplyService cardApplyService;
   private final MerchantService merchantService;
+  private final FileUploadService fileUploadService;
 
   @GetMapping("/list")
   @ApiOperation("分页查询卡片列表")
@@ -105,8 +109,21 @@ public class CardApplyController implements IController {
   @PostMapping("/export")
   @ApiOperation("导出卡片列表(返回文件下载地址)")
   @MerchantUser
-  public R<String> export() {
-    return null;
+  public R<String> export(
+      @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
+      @RequestParam(required = false) @ApiParam("所属商户") String merCode,
+      @RequestParam(required = false) @ApiParam("卡片类型") String cardType,
+      @RequestParam(required = false) @ApiParam("卡片介质") String cardMedium,
+      @RequestParam(required = false) @ApiParam("卡片介质") Integer status,
+      @RequestParam(required = false) @ApiParam("使用状态") Date startTime,
+      @RequestParam(required = false) @ApiParam("使用状态") Date endTime) throws IOException {
+
+    List<CardApply> exportList = cardApplyService.exportCardApplys(cardName, merCode, cardType,
+                                                                   cardMedium,
+                                                                   status, startTime, endTime
+    );
+    String path = fileUploadService.uploadExcelFile(exportList, CardApply.class, "账户明细");
+    return success(fileUploadService.getFileServerUrl(path));
   }
 
 }

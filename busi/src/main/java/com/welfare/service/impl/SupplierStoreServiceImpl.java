@@ -26,6 +26,7 @@ import com.welfare.service.converter.SupplierStoreDetailConverter;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;
+import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.helper.QueryHelper;
 
@@ -115,10 +116,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public boolean activate(Long id, Integer status) {
+  public boolean activate(SupplierStoreActivateReq storeActivateReq) {
     SupplierStore supplierStore = new SupplierStore();
-    supplierStore.setId(id);
-    supplierStore.setStatus(status);
+    supplierStore.setId(storeActivateReq.getId());
+    supplierStore.setStatus(storeActivateReq.getStatus());
     return supplierStoreDao.updateById(supplierStore);
   }
 

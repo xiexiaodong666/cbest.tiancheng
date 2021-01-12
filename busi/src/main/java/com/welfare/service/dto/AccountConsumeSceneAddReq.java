@@ -26,7 +26,7 @@ public class AccountConsumeSceneAddReq implements Serializable {
    */
   @ApiModelProperty("员工类型编码集合")
   @NotEmpty(message = "员工类型编码集合为空")
-  private List<Long> accountTypeIdList;
+  private List<String> accountTypeCodeList;
 
   /**
    * 员工类型编码

@@ -14,6 +14,7 @@ import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.DictService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -53,6 +54,10 @@ public class DictServiceImpl implements DictService {
         //List<Dict>集合，业务上来说只有一个。如果不止一个，请修改code
         Map<String, Map<String, List<Dict>>> map = dicts.stream().collect(Collectors.groupingBy(Dict::getDictType, Collectors.groupingBy(Dict::getDictCode)));
         return map;
+    }
+
+    public static void main(String[] args) {
+
     }
     @Override
     public  <T> void trans(  Class c,String className,boolean nameFlag,
@@ -99,14 +104,21 @@ public class DictServiceImpl implements DictService {
         for (T t : objs) {
             for (FieldMethodDTO fieldMethod : fieldMethodList) {
                 try {
+                    Map<String, List<Dict>> dictMap = map.get(fieldMethod.getDictType());
                     Object dictCode = fieldMethod.getGMethod().invoke(t);
-                    String dictName= null;
-                    try {
-                        dictName = map.get(fieldMethod.getDictType()).get(dictCode).get(0).getDictName();
-                    } catch (Exception e) {
-                        log.info("type=【{}】,code=【{}】该字典码不存在",fieldMethod.getDictType(),dictCode);
+                    if (EmptyChecker.isEmpty(dictCode)) {
                         continue;
                     }
+                    String[] dictCodeArr = dictCode.toString().split(",");
+                    List<String> dictNameList = new ArrayList();
+                    for (String item : dictCodeArr) {
+                        List<Dict> dicts = dictMap.get(item);
+                        if (EmptyChecker.isEmpty(dicts)) {
+                            continue;
+                        }
+                        dictNameList.add(dicts.get(0).getDictName());
+                    }
+                    String dictName = StringUtils.join(dictNameList,",");
                     if(EmptyChecker.notEmpty(dictName)&&fieldMethod.getType().equals(Integer.class)){
                         fieldMethod.getSMethod().invoke(t,Integer.parseInt(dictName));
                     }else{

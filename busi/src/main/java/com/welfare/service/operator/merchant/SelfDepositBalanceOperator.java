@@ -1,7 +1,6 @@
 package com.welfare.service.operator.merchant;
 
-import com.google.common.collect.Lists;
-import com.welfare.common.constants.WelfareConstant.MerCreditType;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
@@ -22,28 +21,27 @@ import java.util.Objects;
  * Description:
  *
  * @author Yuxiang Li
- * @email kobe663@gmail.com
- * @date 1/9/2021 10:42 PM
+ * @email yuxiang.li@sjgo365.com
+ * @date 1/13/2021
  */
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator implements InitializingBean {
-    private final MerCreditType merCreditType = MerCreditType.CURRENT_BALANCE;
-
-    private final RemainingLimitOperator remainingLimitOperator;
+public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator implements InitializingBean {
+    private final CurrentBalanceOperator currentBalanceOperator;
+    private final WelfareConstant.MerCreditType merCreditType = WelfareConstant.MerCreditType.SELF_DEPOSIT;
 
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
-        log.info("ready to decrease merchantCredit.currentBalance for {}", amount.toString());
-        BigDecimal currentBalance = merchantCredit.getCurrentBalance();
-        BigDecimal subtract = currentBalance.subtract(amount);
+        log.info("ready to decrease merchantCredit.selfDepositBalance for {}", amount.toString());
+        BigDecimal selfDepositBalance = merchantCredit.getSelfDepositBalance();
+        BigDecimal subtract = selfDepositBalance.subtract(amount);
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
             BigDecimal amountLeftToBeDecrease = subtract.negate();
             List<MerchantAccountOperation> operations = doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, transNo);
             return operations;
         } else {
-            merchantCredit.setCurrentBalance(subtract);
+            merchantCredit.setSelfDepositBalance(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     merCreditType,
                     subtract,
@@ -62,10 +60,10 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
         if (Objects.isNull(nextOperator)) {
             throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
         }
-        merchantCredit.setCurrentBalance(BigDecimal.ZERO);
+        merchantCredit.setSelfDepositBalance(BigDecimal.ZERO);
         MerchantAccountOperation operation = MerchantAccountOperation.of(
                 merCreditType,
-                merchantCredit.getCurrentBalance(),
+                merchantCredit.getSelfDepositBalance(),
                 IncOrDecType.DECREASE,
                 merchantCredit,
                 transNo
@@ -81,12 +79,12 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
     public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setCurrentBalance(merchantCredit.getCurrentBalance().add(amount));
-        MerchantAccountOperation merchantAccountOperation = MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit,transNo );
-        return Lists.newArrayList(merchantAccountOperation);
+        MerchantAccountOperation operation = MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit, transNo);
+        return Arrays.asList(operation);
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        this.next(remainingLimitOperator);
+    public void afterPropertiesSet() {
+        this.next(currentBalanceOperator);
     }
 }

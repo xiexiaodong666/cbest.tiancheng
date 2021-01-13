@@ -90,6 +90,11 @@ public class MerchantBillDetail extends Model<MerchantBillDetail> implements Ser
     @ApiModelProperty("返利额度")   
     private BigDecimal rebateLimit;
     /**
+     * 自主充值余额
+     */
+    @ApiModelProperty("自主充值余额")
+    private BigDecimal selfDepositBalance;
+    /**
      * 创建人
      */
     @ApiModelProperty("创建人")   

@@ -49,6 +49,7 @@ public class MerchantAccountOperation {
         merchantBillDetail.setRebateLimit(merchantCredit.getRebateLimit());
         merchantBillDetail.setCreditLimit(merchantCredit.getCreditLimit());
         merchantBillDetail.setRechargeLimit(merchantCredit.getRechargeLimit());
+        merchantBillDetail.setSelfDepositBalance(merchantCredit.getSelfDepositBalance());
         return merchantAccountOperation;
     }
 }

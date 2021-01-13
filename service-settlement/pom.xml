@@ -75,10 +75,6 @@
         <artifactId>presto-jdbc</artifactId>
         <version>330</version>
     </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-redis</artifactId>
-    </dependency>
 </dependencies>
 
     <build>

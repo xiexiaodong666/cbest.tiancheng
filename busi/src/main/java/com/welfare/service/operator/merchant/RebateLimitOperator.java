@@ -1,7 +1,7 @@
 package com.welfare.service.operator.merchant;
 
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
-import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.enums.IncOrDecType;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -25,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RebateLimitOperator extends AbstractMerAccountTypeOperator {
     private MerCreditType merCreditType = MerCreditType.REBATE_LIMIT;
-    private final MerchantCreditDao merchantCreditDao;
 
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
@@ -47,9 +46,10 @@ public class RebateLimitOperator extends AbstractMerAccountTypeOperator {
 
     }
     @Override
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
         log.info("ready to increase merchantCredit.rebateLimit for {}",amount.toString());
         merchantCredit.setRebateLimit(merchantCredit.getRebateLimit().add(amount));
-        return MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE,merchantCredit,transNo );
+        MerchantAccountOperation operation = MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE,merchantCredit,transNo );
+        return Lists.newArrayList(operation);
     }
 }

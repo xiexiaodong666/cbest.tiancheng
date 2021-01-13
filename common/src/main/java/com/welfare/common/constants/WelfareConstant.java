@@ -101,6 +101,7 @@ public class WelfareConstant {
          */
         RECHARGE_LIMIT("rechargeLimit", "充值额度"),
         CURRENT_BALANCE("currentBalance", "目前余额"),
+        SELF_DEPOSIT("self_deposit","自主充值"),
         CREDIT_LIMIT("creditLimit", "信用额度"),
         REMAINING_LIMIT("remainingLimit", "剩余信用额度"),
         REBATE_LIMIT("rebateLimit", "返利余额");
@@ -212,6 +213,31 @@ public class WelfareConstant {
             return this.desc;
         }
     }
+
+    /**
+     * 支付类型,用于结算
+     */
+    public enum PayCode{
+        /**
+         * 账户类型
+         */
+        WELFARE_CARD("welfare_card","福利卡消费");
+        private String code;
+        private String desc;
+
+        PayCode(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
 
     /**
      * 异步状态

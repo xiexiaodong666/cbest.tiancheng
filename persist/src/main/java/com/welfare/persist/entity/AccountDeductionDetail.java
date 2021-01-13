@@ -43,7 +43,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      * 员工账号
      */
     @ApiModelProperty("员工账号")   
-    private String accountCode;
+    private Long accountCode;
     /**
      * 卡号
      */
@@ -63,7 +63,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      * 交易类型(消费、退款、充值等)
      */
     @ApiModelProperty("交易类型(消费、退款、充值等)")   
-    private BigDecimal transType;
+    private String transType;
     /**
      * pos标识
      */

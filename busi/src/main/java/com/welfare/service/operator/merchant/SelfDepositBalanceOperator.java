@@ -12,10 +12,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Description:
@@ -80,7 +77,7 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setCurrentBalance(merchantCredit.getCurrentBalance().add(amount));
         MerchantAccountOperation operation = MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit, transNo);
-        return Arrays.asList(operation);
+        return Collections.singletonList(operation);
     }
 
     @Override

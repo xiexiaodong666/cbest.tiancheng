@@ -10,13 +10,11 @@ import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Description:
@@ -31,7 +29,8 @@ import java.util.Objects;
 public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator implements InitializingBean {
     private final MerCreditType merCreditType = MerCreditType.CURRENT_BALANCE;
 
-    private final RemainingLimitOperator remainingLimitOperator;
+    @Autowired
+    private RemainingLimitOperator remainingLimitOperator;
 
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
@@ -51,7 +50,7 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
                     merchantCredit,
                     transNo
             );
-            return Arrays.asList(operation);
+            return Collections.singletonList(operation);
         }
 
     }

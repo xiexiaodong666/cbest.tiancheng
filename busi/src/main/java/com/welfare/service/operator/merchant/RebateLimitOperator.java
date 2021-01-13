@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ public class RebateLimitOperator extends AbstractMerAccountTypeOperator {
                     IncOrDecType.DECREASE,
                     merchantCredit,
                     transNo);
-            return Arrays.asList(operation);
+            return Collections.singletonList(operation);
         }
 
     }

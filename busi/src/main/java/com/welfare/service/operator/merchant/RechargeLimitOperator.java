@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public class RechargeLimitOperator extends AbstractMerAccountTypeOperator {
         }else{
             merchantCredit.setRechargeLimit(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(operateType, amount, IncOrDecType.DECREASE, merchantCredit, transNo);
-            return Arrays.asList(operation);
+            return Collections.singletonList(operation);
         }
 
     }

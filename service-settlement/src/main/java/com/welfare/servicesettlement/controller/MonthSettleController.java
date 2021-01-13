@@ -6,16 +6,14 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ExcelUtil;
 import com.welfare.service.MonthSettleService;
-import com.welfare.service.dto.MonthSettleDetailReq;
-import com.welfare.service.dto.MonthSettleDetailResp;
-import com.welfare.service.dto.MonthSettleReq;
-import com.welfare.service.dto.MonthSettleResp;
+import com.welfare.service.dto.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,10 +53,21 @@ public class MonthSettleController implements IController {
         return success(monthSettleDetailRespDtoPage);
     }
 
+    @GetMapping("/{id}/allDetailList")
+    @ApiOperation("查询结算账单明细列表")
+    public R<List<MonthSettleDetailResp>> queryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailExportReq monthSettleDetailExportReq){
+        MonthSettleDetailReq monthSettleDetailReq = new MonthSettleDetailReq();
+        BeanUtils.copyProperties(monthSettleDetailReq, monthSettleDetailExportReq);
+        List<MonthSettleDetailResp> monthSettleDetailResps =  monthSettleService.queryMonthSettleDetail(id, monthSettleDetailReq);
+        return success(monthSettleDetailResps);
+    }
+
 
     @GetMapping("/{id}/export")
     @ApiOperation("结算账单明细导出")
-    public void exportMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq, HttpServletResponse response){
+    public void exportMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailExportReq monthSettleDetailExportReq, HttpServletResponse response){
+        MonthSettleDetailReq monthSettleDetailReq = new MonthSettleDetailReq();
+        BeanUtils.copyProperties(monthSettleDetailReq, monthSettleDetailExportReq);
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleService.queryMonthSettleDetail(id, monthSettleDetailReq);
         try {
             ExcelUtil.export(response, "结算账单明细", "结算账单明细", monthSettleDetailResps, MonthSettleDetailResp.class );
@@ -66,6 +75,8 @@ public class MonthSettleController implements IController {
             throw new BusiException(null, "文件导出异常", null);
         }
     }
+
+
 
     @PutMapping("/{id}/send")
     @ApiOperation("平台发送账单")

@@ -21,10 +21,7 @@ import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
-import com.welfare.service.dto.MonthSettleDetailReq;
-import com.welfare.service.dto.MonthSettleDetailResp;
-import com.welfare.service.dto.MonthSettleReq;
-import com.welfare.service.dto.MonthSettleResp;
+import com.welfare.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MonthSettleService;
@@ -197,12 +194,10 @@ public class MonthSettleServiceImpl implements MonthSettleService {
      * @return
      */
     private MonthSettleDetailQuery getMonthSettleDetailQuery(String id, MonthSettleDetailReq monthSettleDetailReq){
-        List<MonthSettle> list = monthSettleDao.list();
-        MonthSettle byId = monthSettleDao.getById(id);
         MonthSettle monthSettle = monthSettleMapper.selectById(id);
 
-        
-        
+
+
         if(monthSettle == null){
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"参数异常，未获取到账单信息", null);
         }

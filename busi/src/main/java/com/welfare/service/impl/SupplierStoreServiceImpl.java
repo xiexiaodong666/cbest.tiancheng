@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
@@ -15,8 +16,6 @@ import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
-import com.welfare.persist.entity.Department;
-import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.entity.SupplierStore;
@@ -26,21 +25,17 @@ import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
-import com.welfare.service.dto.AccountUploadDTO;
+import com.welfare.service.dto.DictDTO;
+import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
-import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreImportDTO;
-import com.welfare.service.helper.QueryHelper;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.listener.SupplierStoreListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -149,7 +144,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if(EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))){
       throw new BusiException("门店编码已存在");
     }
-    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
     SupplierStore save=supplierStoreDetailConverter.toE((supplierStore));
     save.setStoreParent(save.getMerCode()+"-"+save.getStoreCode());
     save.setStatus(0);
@@ -176,8 +170,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public String upload(MultipartFile multipartFile) {
+    DictReq req =new DictReq();
+    req.setDictType(WelfareConstant.DictType.STORE_CONSUM_TYPE.code());
+    //查询所有的消费类型字典，用来初始化
+    List<DictDTO> dictList=dictService.getByType(req);
+    Map<String,Boolean> map=dictList.stream().collect(Collectors.toMap(DictDTO::getDictCode,item->false));
     try {
-      SupplierStoreListener listener = new SupplierStoreListener(merchantService,this);
+      SupplierStoreListener listener = new SupplierStoreListener(merchantService,this,JSON.toJSONString(map));
       EasyExcel.read(multipartFile.getInputStream(), SupplierStoreImportDTO.class, listener).sheet()
               .doRead();
       String result = listener.getUploadInfo().toString();

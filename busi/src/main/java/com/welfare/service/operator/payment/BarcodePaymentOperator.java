@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BarcodePaymentOperator extends AbstractPaymentOperator {
 
-    private final RedisTemplate<String,String> redisTemplate;
+    //private final RedisTemplate<String,String> redisTemplate;
     private final BarcodeService barcodeService;
     @Override
     public void doPay(PaymentRequest paymentRequest) {

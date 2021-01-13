@@ -28,4 +28,6 @@ public class MonthSettleDetailQuery{
     private String merCode;
 
     private String storeType;
+
+    private Long minId;
 }

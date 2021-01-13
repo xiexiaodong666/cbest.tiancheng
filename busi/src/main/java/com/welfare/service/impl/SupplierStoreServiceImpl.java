@@ -27,7 +27,6 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
 import com.welfare.service.dto.AccountUploadDTO;
-import com.welfare.service.dto.DepartmentImportDTO;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;

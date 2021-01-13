@@ -3,6 +3,7 @@ package com.welfare.service.listener;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
@@ -10,6 +11,7 @@ import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.dto.AccountBindCardDTO;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +58,8 @@ public class AccountBatchBindCardListener extends AnalysisEventListener<AccountB
     }
     CardInfo cardInfo = new CardInfo();
     BeanUtils.copyProperties(accountBindCardDTO,cardInfo);
+    cardInfo.setBindTime(new Date());
+    cardInfo.setCardStatus(CardStatus.BIND.code());
     cardInfoList.add(cardInfo);
   }
 

@@ -3,6 +3,7 @@ package com.welfare.service.dto.merchantapply;
 import com.welfare.common.annotation.Query;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.enums.ApprovalStatus;
+import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,7 +20,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @ApiModel("商户额度申请审批查询")
-public class MerchantCreditApplyQuery {
+public class MerchantCreditApplyQuery extends PageReq {
 
   /**
    * 商户名称
@@ -33,14 +34,14 @@ public class MerchantCreditApplyQuery {
    */
   @ApiModelProperty("商户额度申请类型（充值额度：rechargeLimit，余额：currentBalance, 剩余信用额度:remainingLimit，信用额度:creditLimit，消耗返点:rebateLimit）")
   @Query(type = Query.Type.EQUAL)
-  private WelfareConstant.MerCreditType applyType;
+  private String applyType;
 
   /**
    * 审批状态
    */
   @ApiModelProperty("审批状态(通过：AUDIT_SUCCESS， 不通过：AUDIT_FAILED, 待审核：AUDITING)")
   @Query(type = Query.Type.EQUAL)
-  private ApprovalStatus approvalStatus;
+  private String approvalStatus;
 
   /**
    * 审批人

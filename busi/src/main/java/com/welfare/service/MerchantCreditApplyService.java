@@ -67,5 +67,5 @@ public interface MerchantCreditApplyService {
    * @param query
    * @return
    */
-  List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQuery query, ApiUserInfo user);
+  List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQueryReq query, ApiUserInfo user);
 }

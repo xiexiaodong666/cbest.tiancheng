@@ -1,6 +1,5 @@
 package com.welfare.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.persist.entity.OrderInfo;
 import com.welfare.service.dto.OrderReqDto;
@@ -19,4 +18,11 @@ import java.util.List;
 public interface OrderService {
 
     List<OrderInfo> selectList(OrderReqDto orderReqDto , MerchantUserInfo merchantUserInfo);
+
+    /**
+     * 同步重百小票数据
+     * @Return
+     * @Exception
+     */
+    void syncOrderData();
 }

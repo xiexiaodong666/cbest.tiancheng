@@ -9,11 +9,11 @@
         id,order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,card_id,order_amount,order_time,pay_code,pay_name,create_user,create_time
     </sql>
 	
-	<!--查询订单-->
+	<!--&lt;!&ndash;查询订单&ndash;&gt;
     <select id="searchOrder" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.entity.OrderInfo">
         with order_view as(
             select
-                <include refid="field"/>
+                <include refid="baseColumn"/>
             from dw_cbest.order_info
             <where>
                 <if test="orderQuery.orderId != null">
@@ -38,7 +38,7 @@
                     and order_time &lt;= ${orderQuery.endDateTime}
                 </if>
                 <if test="orderQuery.noRebateStoreList != null">
-                    <!--没有返利-->
+                    &lt;!&ndash;没有返利&ndash;&gt;
                     and store_code in
                     <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
                         ${item}
@@ -46,7 +46,7 @@
                     and pay_code = \'5065\'
                 </if>
                 <if test="orderQuery.cardRebateStoreList != null">
-                    <!--只有员工卡支付方式返利-->
+                    &lt;!&ndash;只有员工卡支付方式返利&ndash;&gt;
                     or store_code in
                     <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
                         ${item}
@@ -54,7 +54,7 @@
                     and pay_code = \'5065\'
                 </if>
                 <if test="orderQuery.otherRebateStoreList != null">
-                    <!--只有员工卡支付方式返利-->
+                    &lt;!&ndash;只有员工卡支付方式返利&ndash;&gt;
                     or store_code in
                     <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
                         ${item}
@@ -62,7 +62,7 @@
                     and pay_code != \'5065\'
                 </if>
                 <if test="orderQuery.allRebateStoreList != null">
-                    <!--只有员工卡支付方式返利-->
+                    &lt;!&ndash;只有员工卡支付方式返利&ndash;&gt;
                     or store_code in
                     <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
                         ${item}
@@ -70,7 +70,7 @@
                 </if>
             </where>
         )
-        <!--查询-->
+        &lt;!&ndash;查询&ndash;&gt;
       select * from (
         select ROW_NUMBER() over(ORDER BY T.id) as Row , ov.* , t.* from
         (
@@ -90,12 +90,12 @@
         )TT where TT.Row BETWEEN (pageNo - 1) * pageSize + 1 AND pageNo * pageSize
 
     </select>
-
+-->
 
 
     <insert id="saveOrUpdate" parameterType="list" >
-        insert into <include refid="tableName"/>
-        (order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,
+        insert into <!--<include refid="tableName"/>-->
+        order_info(order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,
         card_id,order_amount,order_time,pay_code,pay_name,create_user,create_time)
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -107,17 +107,17 @@
         </foreach>
         ON DUPLICATE KEY UPDATE
         goods = values(goods),
-        merchantCode = values(merchantCode),
-        merchantName =  values(merchantName),
-        storeCode = values(storeCode),
-        storeName =  values(storeName),
-        accountCode = values(accountCode),
-        accountName =  values(accountName),
-        cardId = values(cardId),
-        orderAmount =  values(orderAmount),
-        orderTime =  values(orderTime),
-        payCode =  values(payCode),
-        payName =  values(payName)
+        merchant_code = values(merchant_code),
+        merchant_name =  values(merchant_name),
+        store_code = values(store_code),
+        store_name =  values(store_name),
+        account_code = values(account_code),
+        account_name =  values(account_name),
+        card_id = values(card_id),
+        order_amount =  values(order_amount),
+        order_time =  values(order_time),
+        pay_code =  values(pay_code),
+        pay_name =  values(pay_name)
     </insert>
 
 </mapper>

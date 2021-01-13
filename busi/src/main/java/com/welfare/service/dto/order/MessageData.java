@@ -1,4 +1,4 @@
-package com.msxf.trans.receipt.sync.servie.protocal;
+package com.welfare.service.dto.order;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
@@ -29,8 +29,8 @@ public class MessageData implements Serializable {
     private static final long serialVersionUID = 1L;
     private String origin; // FJ/WSC
     // ITEM4, ITEM7 为 key-value
-    private /*HEADER*/JSONObject header;
-    private /*ITEM1*/JSONObject item1;
-    private List</*ITEM2*/JSONObject> item2List;
-    private List</*ITEM8*/JSONObject> item8List;
+    private HEADER /*JSONObject*/ header;
+    private ITEM1 /*JSONObject*/ item1;
+    private List<ITEM2/*JSONObject*/> item2List;
+    private List<ITEM8/*JSONObject*/> item8List;
 }

@@ -1,4 +1,4 @@
-package com.msxf.trans.receipt.sync.servie.protocal;
+package com.welfare.service.dto.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -3,6 +3,9 @@ package com.welfare.persist.mapper;
 import com.welfare.persist.entity.OrderInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * (order_info)数据Mapper
@@ -13,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
+
+    Integer saveOrUpdate(@Param("list") List<OrderInfo> list);
 
 }

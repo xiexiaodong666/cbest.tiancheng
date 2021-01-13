@@ -1,6 +1,8 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
@@ -26,7 +28,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("order_info")
-@ApiModel("")
+@ApiModel("a")
 public class OrderInfo extends Model<OrderInfo> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +36,7 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
      * id
      */
     @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
-    @TableId
+    @TableId(type = IdType.AUTO)
 	private Integer id;
     /**
      * orderId

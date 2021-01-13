@@ -7,6 +7,7 @@ import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public interface SupplierStoreService {
      * @param list
      * @return
      */
-    boolean batchAdd(List<SupplierStoreDetailDTO> list);
+    String batchAdd(MultipartFile multipartFile);
 
     /**
      * 删除供应商门店

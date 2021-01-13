@@ -6,10 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.domain.MerchantUserInfo;
-import com.welfare.persist.dao.MerchantDao;
-import com.welfare.persist.dao.OrderInfoDao;
-import com.welfare.persist.dao.SettleDetailDao;
-import com.welfare.persist.dao.SupplierStoreDao;
+import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.query.OrderPageQuery;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.OrderInfoMapper;
@@ -57,6 +54,8 @@ public class OrderServiceImpl implements OrderService {
     private SupplierStoreDao supplierStoreDao;
     @Autowired
     private SettleDetailDao settleDetailDao;
+    @Autowired
+    private ProductInfoDao productInfoDao;
 
     @Override
     public List<OrderInfo> selectList(OrderReqDto orderReqDto , MerchantUserInfo merchantUserInfo) {
@@ -214,7 +213,7 @@ public class OrderServiceImpl implements OrderService {
             String storeCode = messageData.getHeader().getRETAILSTOREID();
             Long orderTime = messageData.getHeader().getBEGINTIMESTAMP();
             String orderId = messageData.getHeader().getTRANSNUMBER().toString();
-            settleDetail.setOrderId(100235);
+            settleDetail.setOrderId(orderId);
             settleDetail.setAccountCode(null);
             settleDetail.setAccountName(null);
             settleDetail.setCardId(null);
@@ -242,7 +241,9 @@ public class OrderServiceImpl implements OrderService {
         OrderInfo orderInfo = new OrderInfo();
         //这个订单金额
         BigDecimal amount = getOrderAmount(messageData.getItem8List());
-        String productStr = getOrderProduct(messageData.getItem2List());
+        List<String> productCodeList = getOrderProduct(messageData.getItem2List());
+        //查询商品编码
+        String product = productInfoDao.select(productCodeList);
         String storeCode = messageData.getHeader().getRETAILSTOREID();
         Long orderTime = messageData.getHeader().getBEGINTIMESTAMP();
         String orderId = messageData.getHeader().getTRANSNUMBER().toString();
@@ -251,7 +252,7 @@ public class OrderServiceImpl implements OrderService {
         orderInfo.setAccountName(null);
         orderInfo.setCardId(null);
         orderInfo.setOrderAmount(amount);
-        orderInfo.setGoods(productStr);
+        orderInfo.setGoods(product);
         orderInfo.setStoreCode(storeCode);
         orderInfo.setStoreName(storeAndNameMap.get(storeCode));
         orderInfo.setMerchantCode(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[0]);
@@ -290,15 +291,15 @@ public class OrderServiceImpl implements OrderService {
      * @Return
      * @Exception 
      */
-    private String getOrderProduct(List<ITEM2> item2List) {
-        if (item2List != null && item2List.size() > 0){
+    private List<String> getOrderProduct(List<ITEM2> item2List) {
+        List<String> resultList = new ArrayList<>();
+        if (item2List != null && item2List.size() > 0) {
             String productStr = "";
-            for (ITEM2 item2 : item2List){
-                productStr += " " + item2.getITEMID();
-            }
-            return productStr;
+            item2List.forEach(item2 -> {
+                resultList.add(item2.getITEMID());
+            });
         }
-        return null;
+        return resultList;
     }
 
     /**

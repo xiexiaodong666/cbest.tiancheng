@@ -1,16 +1,18 @@
 package com.welfare.persist.entity;
 
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.*;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.sql.Date;
 
 /**
  * 字典(dict)实体类
@@ -22,69 +24,42 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("dict")
-@ApiModel("字典")
-public class Dict extends Model<Dict> implements Serializable {
+@TableName("product_info")
+@ApiModel("商品表")
+public class ProductInfo extends Model<ProductInfo> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * 商品编码
      */
-    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId
-	private Long id;
+    @ApiModelProperty("商品编码")
+    private String productCode;
     /**
-     * 码表类型
+     * 商品名称
      */
-    @ApiModelProperty("码表类型")   
-    private String dictType;
+    @ApiModelProperty("商品名称")
+    private String productName;
     /**
-     * 编码
+     * 更新时间
      */
-    @ApiModelProperty("编码")   
-    private String dictCode;
-    /**
-     * 名称
-     */
-    @ApiModelProperty("名称")   
-    private String dictName;
-    /**
-     * 状态
-     */
-    @ApiModelProperty("状态")   
-    private Integer status;
-    /**
-     * 删除标志
-     */
-    @ApiModelProperty("删除标志") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Boolean deleted;
+    @ApiModelProperty("更新时间")
+    private Date updateTime;
+
 
 //以下为列明常量
 
-    /**
-    * id
-    */
-    public static final String ID = "id";
-    /**
-    * 码表类型
-    */
-    public static final String DICT_TYPE = "dict_type";
+
     /**
     * 编码
     */
-    public static final String DICT_CODE = "dict_code";
+    public static final String PRODUCR_CODE = "product_code";
     /**
     * 名称
     */
-    public static final String DICT_NAME = "dict_name";
+    public static final String PRODUCT_NAME = "product_name";
     /**
     * 状态
     */
-    public static final String STATUS = "status";
-    /**
-    * 删除标志
-    */
-    public static final String DELETED = "deleted";
+    public static final String UPDATE_IMTE = "update_time";
 
 }

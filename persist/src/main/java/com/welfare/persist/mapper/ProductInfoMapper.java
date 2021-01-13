@@ -1,7 +1,8 @@
 package com.welfare.persist.mapper;
 
-import com.welfare.persist.entity.OrderInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.welfare.persist.entity.OrderInfo;
+import com.welfare.persist.entity.ProductInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,8 +16,7 @@ import java.util.List;
  * @description 由 Mybatisplus Code Generator 创建
 */
 @Mapper
-public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
+public interface ProductInfoMapper extends BaseMapper<ProductInfo> {
 
-    Integer saveOrUpdate(@Param("list") List<OrderInfo> list);
 
 }

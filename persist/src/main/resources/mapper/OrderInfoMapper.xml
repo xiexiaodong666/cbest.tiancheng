@@ -117,7 +117,9 @@
         order_amount =  values(order_amount),
         order_time =  values(order_time),
         pay_code =  values(pay_code),
-        pay_name =  values(pay_name)
+        pay_name =  values(pay_name),
+        update_user = values(update_user),
+        update_time = values(update_time)
     </insert>
 
 </mapper>

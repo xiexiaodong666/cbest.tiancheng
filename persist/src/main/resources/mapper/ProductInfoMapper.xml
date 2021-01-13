@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.welfare.persist.mapper.DictMapper">
+<mapper namespace="com.welfare.persist.mapper.ProductInfoMapper">
     <sql id="tableName">
-        dict
+        product_info
     </sql>
 
     <sql id="baseColumn">
-        id,dict_type,dict_code,dict_name,status,flag
+        product_code , product_name , update_time
     </sql>
 
 </mapper>

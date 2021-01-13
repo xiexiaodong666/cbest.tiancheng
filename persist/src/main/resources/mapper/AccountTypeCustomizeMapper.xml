@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.AccountTypeCustomizeMapper">
+  <sql id="tableName">
+        account_type
+    </sql>
+
+  <sql id="baseColumn">
+        id,mer_code,type_code,type_name,remark,flag,create_user,create_time,update_user,update_time,version
+    </sql>
+
+
+  <select id="queryAccountType" resultType="com.welfare.persist.dto.AccountTypeDTO">
+    SELECT
+    AT.mer_code AS merCode,
+    AT.type_code AS typeCode,
+    AT.type_name AS typeName,
+    AT.remark,
+    AT.create_time as 	createTime
+    FROM
+    account_type AT
+    WHERE
+    AT.deleted = 0
+    AND type_code IS NOT NULL
+    <if test=" merCode !='' and merCode != null ">
+      and AT.mer_code = #{merCode}
+    </if>
+    <if test=" typeCode !='' and typeCode != null ">
+      and AT.type_code = #{typeCode}
+    </if>
+    <if test="typeName != ''  and typeName != null ">
+      and AT.type_name = #{typeName}
+    </if>
+    <if test="createTimeStart != null ">
+      and AT.create_time <![CDATA[>=]]> #{createTimeStart}
+    </if>
+    <if test="createTimeEnd != null ">
+      and AT.create_time <![CDATA[<=]]> #{createTimeEnd}
+    </if>
+  </select>
+
+</mapper>

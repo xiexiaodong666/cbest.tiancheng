@@ -1,20 +1,21 @@
 package com.welfare.servicemerchant.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.AccountTypeDTO;
+import com.welfare.persist.dto.MerSupplierStoreDTO;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.service.AccountTypeService;
-import com.welfare.servicemerchant.converter.AccountTypeConverter;
-import com.welfare.servicemerchant.dto.AccountTypeReq;
+import com.welfare.persist.dto.query.AccountTypeReq;
+import com.welfare.service.converter.AccountTypeConverter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.util.Date;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,36 +44,33 @@ public class AccountTypeController implements IController {
 
   @GetMapping("/page")
   @ApiOperation("分页员工类型列表")
-  public R<Page<AccountType>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
+  public R<Page<AccountTypeDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
       @RequestParam(required = false) @ApiParam("商户代码") String merCode,
       @RequestParam(required = false) @ApiParam("类型编码") String typeCode,
-      @RequestParam(required = false) @ApiParam("类型名称") Integer typeName,
+      @RequestParam(required = false) @ApiParam("类型名称") String typeName,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    Page<AccountType> page = new Page(currentPage,pageSize);
-
-    QueryWrapper<AccountType> queryWrapper = new QueryWrapper<>();
-    if(Strings.isNotEmpty(merCode)){
-      queryWrapper.eq(AccountType.MER_CODE,merCode);
-    }
-    if(Strings.isNotEmpty(typeCode)){
-      queryWrapper.eq(AccountType.TYPE_CODE,typeCode);
-    }
-    if( null != typeName){
-      queryWrapper.eq(AccountType.TYPE_NAME,typeName);
-    }
-    if( null !=  createTimeStart){
-      queryWrapper.gt(AccountType.CREATE_TIME,createTimeStart);
-    }
-    if( null !=  createTimeEnd){
-      queryWrapper.lt(AccountType.CREATE_TIME,createTimeStart);
-    }
-    queryWrapper.ne(AccountType.DELETED,0);
-
-    Page<AccountType> accountTypePage = accountTypeService.pageQuery(page, queryWrapper);
+    Page<AccountTypeDTO> page = new Page(currentPage,pageSize);
+    Page<AccountTypeDTO> accountTypePage = accountTypeService.getPageDTO(page, merCode,typeCode,
+        typeName,createTimeStart,createTimeEnd);
     return success(accountTypePage);
   }
+
+  @GetMapping("/list")
+  @ApiOperation("查询商户下所有的员工类型")
+  public R<List<AccountTypeDTO>> queryAccountTypeDTO(@RequestParam(required = false) @ApiParam("商户代码") String merCode){
+    return success(accountTypeService.queryAccountTypeDTO(merCode,null,null,null,null));
+  }
+
+  @GetMapping("/merSupplierStore/list")
+  @ApiOperation("查询商户下所有的员工类型")
+  public R<List<MerSupplierStoreDTO>> queryMerSupplierStoreDTList(@RequestParam @ApiParam("商户代码") String merCode){
+    return success(accountTypeService.queryMerSupplierStoreDTList(merCode));
+  }
+
+
+
 
   @GetMapping("/{id}")
   @ApiOperation("员工类型详情")

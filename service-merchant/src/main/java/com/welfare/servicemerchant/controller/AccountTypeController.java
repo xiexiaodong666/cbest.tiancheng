@@ -58,13 +58,13 @@ public class AccountTypeController implements IController {
   }
 
   @GetMapping("/list")
-  @ApiOperation("查询商户下所有的员工类型")
+  @ApiOperation("查询商户下所有的员工类型list")
   public R<List<AccountTypeDTO>> queryAccountTypeDTO(@RequestParam(required = false) @ApiParam("商户代码") String merCode){
     return success(accountTypeService.queryAccountTypeDTO(merCode,null,null,null,null));
   }
 
   @GetMapping("/merSupplierStore/list")
-  @ApiOperation("查询商户下所有的员工类型")
+  @ApiOperation("查询商户下所有的供应商门店list")
   public R<List<MerSupplierStoreDTO>> queryMerSupplierStoreDTList(@RequestParam @ApiParam("商户代码") String merCode){
     return success(accountTypeService.queryMerSupplierStoreDTList(merCode));
   }

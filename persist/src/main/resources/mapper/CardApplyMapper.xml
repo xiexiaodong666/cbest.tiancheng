@@ -20,7 +20,8 @@
     ca.card_num as cardNum,
     ca.STATUS as status,
     ca.create_time as createTime,
-    m.mer_name as merName
+    m.mer_name as merName,
+    ca.apply_code as applyCode
     FROM
     card_apply ca
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code

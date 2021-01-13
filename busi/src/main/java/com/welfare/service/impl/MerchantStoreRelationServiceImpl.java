@@ -100,6 +100,13 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if (!validateConsumeType(relationAddReq.getAdminMerchantStoreList())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
     }
+    QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(MerchantStoreRelation.MER_CODE, relationAddReq.getMerCode());
+
+    List<MerchantStoreRelation> validateMerchantStoreRelationList = merchantStoreRelationDao.list(queryWrapper);
+    if(CollectionUtils.isNotEmpty(validateMerchantStoreRelationList)) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该商户已配置了门店", null);
+    }
 
     RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
     List<RoleConsumptionListReq> roleConsumptionListReqs = new ArrayList<>();

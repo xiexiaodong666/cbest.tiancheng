@@ -1,6 +1,7 @@
 package com.welfare.service.dto.accountapply;
 
 import com.welfare.common.annotation.Query;
+import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-public class AccountDepositApplyQuery {
+public class AccountDepositApplyQuery extends PageReq{
 
   /**
    * 申请人

@@ -1,28 +1,16 @@
 spring:
   profiles: test
   datasource:
-    mysql:
-      driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
-      username: root
-      password: mysql@123
-      type: com.alibaba.druid.pool.DruidDataSource
-      maxActive: 20
-      minIdle: 1
-      testOnBorrow: true
-      testOnReturn: false
-      validationQuery: SELECT 1
-    presto:
-      driverClassName: io.prestosql.jdbc.PrestoDriver
-      url: jdbc:presto://192.1.30.99:8080/hive
-      username: zhoujian
-      password:
-      type: com.alibaba.druid.pool.DruidDataSource
-      maxActive: 5
-      minIdle: 1
-      testOnBorrow: true
-      testOnReturn: false
-      validationQuery: SELECT 1
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: mysql@123
+    type: com.alibaba.druid.pool.DruidDataSource
+    maxActive: 20
+    minIdle: 1
+    testOnBorrow: true
+    testOnReturn: false
+    validationQuery: SELECT 1
   redis:
     lettuce:
       pool:

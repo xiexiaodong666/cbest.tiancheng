@@ -3,7 +3,11 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.AccountTypeDTO;
+import com.welfare.persist.dto.MerSupplierStoreDTO;
 import com.welfare.persist.entity.AccountType;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 员工类型服务接口
@@ -14,6 +18,12 @@ import com.welfare.persist.entity.AccountType;
  */
 public interface AccountTypeService {
   Page<AccountType> pageQuery(Page<AccountType> page, QueryWrapper<AccountType> queryWrapper);
+
+  Page<AccountTypeDTO> getPageDTO(Page<AccountTypeDTO> page,
+      String merCode,String typeCode,String typeName, Date startDate,Date endDate);
+  List<AccountTypeDTO> queryAccountTypeDTO(String merCode,String typeCode,String typeName, Date startDate,Date endDate);
+
+  List<MerSupplierStoreDTO> queryMerSupplierStoreDTList(String merCode);
   public AccountType getAccountType(Long id);
   public Boolean save(AccountType accountType);
   public Boolean update(AccountType accountType);

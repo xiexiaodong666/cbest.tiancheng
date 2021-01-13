@@ -235,11 +235,12 @@ public class AccountServiceImpl implements AccountService {
       Account queryAccount = this.getByAccountCode(account.getAccountCode());
       if( null != queryAccount ){
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账号已经存在",null);
-      }else{
-        Account syncAccount = accountMapper.selectById(account.getId());
-        if( null ==  syncAccount){
-          throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
-        }
+      }
+    }
+    else{
+      Account syncAccount = accountMapper.selectById(account.getId());
+      if( null ==  syncAccount){
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
       }
     }
   }

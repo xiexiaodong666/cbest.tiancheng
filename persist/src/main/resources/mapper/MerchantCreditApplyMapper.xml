@@ -9,4 +9,72 @@
         id,apply_code,mer_code,apply_type,balance,describe,remark,enclosure,flag,create_user,create_time,update_user,update_time,approval_status,approval_user,approval_time,approval_remark,version
     </sql>
 
+
+    <resultMap id="merchantCreditApplyInfo" type="com.welfare.persist.dto.MerchantCreditApplyInfoDTO">
+        <id property="id" column="id" />
+        <result property="id" column="id"/>
+        <result property="applyCode" column="apply_code"/>
+        <result property="merName" column="mer_name"/>
+        <result property="merCooperationMode" column="mer_cooperation_mode"/>
+        <result property="balance" column="balance"/>
+        <result property="applyUser" column="apply_user"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="remark" column="remark"/>
+        <result property="approvalStatus" column="approval_status"/>
+        <result property="approvalUser" column="approval_user"/>
+        <result property="approvalTime" column="approval_time"/>
+        <result property="approvalRemark" column="approval_remark"/>
+        <result property="enclosure" column="enclosure"/>
+    </resultMap>
+
+
+    <select id="queryByPage" resultMap="merchantCreditApplyInfo">
+        SELECT
+        ap.id,
+        ap.apply_type,
+        m.mer_name,
+        ap.mer_code,
+        m.mer_cooperation_mode,
+        ap.balance,
+        ap.apply_user,
+        ap.apply_time,
+        ap.remark,
+        ap.approval_status,
+        ap.approval_user,
+        ap.approval_time,
+        ap.approval_remark,
+        ap.enclosure
+        FROM
+            merchant_credit_apply ap
+            LEFT JOIN merchant m ON ap.mer_code = m.mer_code
+        <where>
+            <if test="query.merName != null and query.merName !=''">
+                AND m.mer_name LIKE  concat('%',#{query.merName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="query.applyType != null and query.applyType !=''">
+                AND ap.apply_type = #{query.applyType,jdbcType=VARCHAR}
+            </if>
+            <if test="query.approvalStatus != null and query.approvalStatus !=''">
+                AND ap.approval_status = #{query.approvalStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="query.applyUser != null and query.applyUser !=''">
+                AND ap.apply_user LIKE concat('%',#{query.applyUser,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="query.approvalUser != null and query.approvalUser !=''">
+                AND ap.approval_user LIKE concat('%',#{query.approvalUser,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="query.applyTimeStart != null ">
+                AND ap.apply_time ge #{query.applyTimeStart}
+            </if>
+            <if test="query.applyTimeEnd != null ">
+                AND ap.apply_time le #{query.applyTimeEnd}
+            </if>
+            <if test="query.approvalTimeStart != null ">
+                AND ap.approval_time ge #{query.approvalTimeStart}
+            </if>
+            <if test="query.approvalTimeEnd != null ">
+                AND ap.approval_time le #{query.approvalTimeEnd}
+            </if>
+        </where>
+    </select>
 </mapper>

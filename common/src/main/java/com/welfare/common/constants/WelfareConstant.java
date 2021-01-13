@@ -119,7 +119,8 @@ public class WelfareConstant {
         MERCHANT_CREDIT_APPLY("merchant_credit_apply", "商户额度变更申请"),
         DEPOSIT("deposit","账户充值"),
         CARD_NO("cardNo","卡号"),
-        MER_ACCOUNT_TYPE_CODE("mer_account_type_cod","福利类型编号"),
+        MER_ACCOUNT_TYPE_CODE("mer_account_type","福利类型编号"),
+        ACCOUNT_TYPE_CODE("account_type_code","员工类型编码"),
         DEPARTMENT_CODE("department_code","部门编号"),
         MER_CODE("mer_code","商户编号");
         private String code;
@@ -254,8 +255,8 @@ public class WelfareConstant {
          * 卡状态
          */
         NEW(0,"新增"),
-        WRITTEN(1,"已写入");
-
+        WRITTEN(1,"已写入"),
+        BIND(2,"已绑定");
         private Integer code;
         private String desc;
 

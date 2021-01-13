@@ -34,4 +34,13 @@ public enum MerCooperationModeEnum {
     this.code = code;
     this.desc = desc;
   }
+
+  public static MerCooperationModeEnum getByCode(String code){
+    for(MerCooperationModeEnum genderEnum: MerCooperationModeEnum.values()){
+      if(code.equals(genderEnum.code)){
+        return genderEnum;
+      }
+    }
+    throw new RuntimeException("MerCooperationModeEnum不存在");
+  };
 }

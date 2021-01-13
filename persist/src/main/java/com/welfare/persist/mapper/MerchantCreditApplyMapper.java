@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 商户金额申请(merchant_credit_apply)数据Mapper
  *
@@ -20,4 +22,7 @@ public interface MerchantCreditApplyMapper extends BaseMapper<MerchantCreditAppl
 
 
    Page<MerchantCreditApplyInfoDTO> queryByPage(Page page, @Param("query") MerchantCreditApplyQueryReq req);
+
+   List<MerchantCreditApplyInfoDTO> queryByPage(@Param("query") MerchantCreditApplyQueryReq req);
+
 }

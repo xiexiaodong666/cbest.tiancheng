@@ -56,13 +56,11 @@ public class AccountDepositApplyController implements IController {
   @Qualifier("accountApplySaveExecutor")
   private ThreadPoolExecutor executor;
 
-  @GetMapping("/page")
+  @PostMapping("/page")
   @ApiOperation("分页账号额度申请列表")
   @MerchantUser
-  public R<Page<AccountDepositApplyInfo>> page(@RequestParam @ApiParam("当前页（从1开始）") Integer current,
-                                               @RequestParam @ApiParam("单页大小") Integer size,
-                                               @Validated AccountDepositApplyQuery query){
-    return success(depositApplyService.page(current, size, query));
+  public R<Page<AccountDepositApplyInfo>> page(@RequestBody AccountDepositApplyQuery query){
+    return success(depositApplyService.page(query.getCurrent(), query.getSize(), query));
   }
 
   @GetMapping("/detail")

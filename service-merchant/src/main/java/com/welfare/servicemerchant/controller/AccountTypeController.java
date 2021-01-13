@@ -2,12 +2,13 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.exception.BusiException;
-import com.welfare.persist.dto.AccountTypeDTO;
+import com.welfare.persist.dto.AccountTypeMapperDTO;
 import com.welfare.persist.dto.MerSupplierStoreDTO;
+import com.welfare.persist.dto.query.AccountTypeReq;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.service.AccountTypeService;
-import com.welfare.persist.dto.query.AccountTypeReq;
 import com.welfare.service.converter.AccountTypeConverter;
+import com.welfare.service.dto.AccountTypeDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -52,7 +53,7 @@ public class AccountTypeController implements IController {
       @RequestParam(required = false) @ApiParam("类型名称") String typeName,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    Page<AccountTypeDTO> page = new Page(currentPage,pageSize);
+    Page<AccountTypeMapperDTO> page = new Page(currentPage,pageSize);
     Page<AccountTypeDTO> accountTypePage = accountTypeService.getPageDTO(page, merCode,typeCode,
         typeName,createTimeStart,createTimeEnd);
     return success(accountTypePage);

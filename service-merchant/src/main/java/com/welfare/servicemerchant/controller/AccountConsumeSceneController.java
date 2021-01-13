@@ -67,9 +67,9 @@ public class AccountConsumeSceneController implements IController {
 
   @GetMapping("/{id}")
   @ApiOperation("员工消费配置详情")
-  public R<AccountConsumeSceneDTO> detail(@PathVariable Long id) {
+  public R<AccountConsumeSceneDTO> detail(@PathVariable String id) {
     AccountConsumeSceneDTO accountConsumeSceneDTO = accountConsumeSceneService
-        .findAccountConsumeSceneDTOById(id);
+        .findAccountConsumeSceneDTOById(Long.parseLong(id));
     return success(accountConsumeSceneDTO);
   }
 
@@ -95,10 +95,10 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/updateStatus/{id}")
   @ApiOperation("激活")
-  public R<Boolean> updateStatus(@PathVariable Long id,
+  public R<Boolean> updateStatus(@PathVariable String id,
       @RequestParam(required = false) @ApiParam("使用状态") Integer status) {
     try {
-      return success(accountConsumeSceneService.updateStatus(id, status));
+      return success(accountConsumeSceneService.updateStatus(Long.parseLong(id), status));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }
@@ -106,9 +106,9 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/delete/{id}")
   @ApiOperation("删除员工消费配置")
-  public R<Boolean> delete(@PathVariable Long id) {
+  public R<Boolean> delete(@PathVariable String id) {
     try {
-      return success(accountConsumeSceneService.delete(id));
+      return success(accountConsumeSceneService.delete(Long.parseLong(id)));
     }catch (BusiException be){
       return R.fail(be.getMessage());
     }

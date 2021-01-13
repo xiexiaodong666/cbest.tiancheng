@@ -22,7 +22,7 @@ public interface MerchantCreditApplyService {
    * @param apply
    * @return
    */
-  Long save(MerchantCreditApplyRequest apply, ApiUserInfo user);
+  String save(MerchantCreditApplyRequest apply, ApiUserInfo user);
 
   /**
    * 通过requestId获取申请
@@ -36,14 +36,14 @@ public interface MerchantCreditApplyService {
    * @param apply
    * @return
    */
-  Long update(MerchantCreditApplyUpdateReq apply, ApiUserInfo user);
+  String update(MerchantCreditApplyUpdateReq apply, ApiUserInfo user);
 
   /**
    * 审批
    * @param apply
    * @return
    */
-  Long approval(MerchantCreditApprovalReq apply, ApiUserInfo user);
+  String approval(MerchantCreditApprovalReq apply, ApiUserInfo user);
 
   /**
    * 通过id查询详情

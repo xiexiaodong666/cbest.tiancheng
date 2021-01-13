@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 
 /**
@@ -25,7 +24,7 @@ public class AccountDepositRequest {
    * 员工账号
    */
   @ApiModelProperty(name = "员工账号", required = true)
-  private String accountCode;
+  private Long accountCode;
 
   /**
    * 申请充值总额

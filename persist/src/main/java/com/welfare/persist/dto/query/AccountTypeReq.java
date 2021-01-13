@@ -17,7 +17,8 @@ public class AccountTypeReq implements Serializable {
   /**
    * id
    */
-  @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+  @ApiModelProperty("id")
+  @JsonSerialize(using = ToStringSerializer.class)
   @TableId
   private Long id;
   /**

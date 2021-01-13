@@ -8,7 +8,7 @@ import lombok.Data;
 public class AccountDepositReq {
 
     @ApiModelProperty(value = "账号")
-    private String accountCode;
+    private Long accountCode;
 
     @ApiModelProperty(value = "商户号")
     private String merCode;

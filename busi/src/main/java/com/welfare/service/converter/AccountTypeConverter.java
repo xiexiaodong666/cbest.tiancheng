@@ -2,9 +2,11 @@ package com.welfare.service.converter;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.AccountTypeDTO;
+import com.welfare.persist.dto.AccountTypeMapperDTO;
 import com.welfare.persist.dto.query.AccountTypeReq;
 import com.welfare.persist.entity.AccountType;
+import com.welfare.service.dto.AccountTypeDTO;
+import java.util.List;
 import org.mapstruct.Mapper;
 
 /**
@@ -15,5 +17,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface AccountTypeConverter {
   Page<AccountTypeDTO> toPage(IPage<AccountTypeDTO> entityList);
+  Page<AccountTypeDTO> toDTOPage(IPage<AccountTypeMapperDTO> entityList);
+  List<AccountTypeDTO> toDTOList(List<AccountTypeMapperDTO> accountTypeMapperDTOList);
   AccountType toEntity(AccountTypeReq accountTypeReq);
 }

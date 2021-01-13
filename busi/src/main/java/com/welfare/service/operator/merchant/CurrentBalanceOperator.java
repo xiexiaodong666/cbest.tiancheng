@@ -27,7 +27,7 @@ import java.util.Objects;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class CurrentBalanceOperator extends MerAccountTypeOperator implements InitializingBean {
+public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator implements InitializingBean {
     private MerCreditType merCreditType = MerCreditType.CURRENT_BALANCE;
 
     private final RemainingLimitOperator remainingLimitOperator;
@@ -57,7 +57,7 @@ public class CurrentBalanceOperator extends MerAccountTypeOperator implements In
 
     @Override
     protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, String transNo) {
-        MerAccountTypeOperator nextOperator = getNext();
+        AbstractMerAccountTypeOperator nextOperator = getNext();
         if (Objects.isNull(nextOperator)) {
             throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
         }
@@ -85,6 +85,6 @@ public class CurrentBalanceOperator extends MerAccountTypeOperator implements In
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.putNext(remainingLimitOperator);
+        this.next(remainingLimitOperator);
     }
 }

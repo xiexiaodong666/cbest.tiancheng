@@ -59,10 +59,10 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     private final MerchantService merchantService;
 
     @Override
-    public Long save(MerchantCreditApplyRequest request, ApiUserInfo user) {
+    public String save(MerchantCreditApplyRequest request, ApiUserInfo user) {
         MerchantCreditApply apply = getByRequestId(request.getRequestId());
         if (apply != null) {
-            return apply.getId();
+            return apply.getId()+"";
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY_REQUEST_ID, request.getRequestId());
         RLock lock = redissonClient.getFairLock(lockKey);
@@ -71,7 +71,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             if (locked) {
                 apply = getByRequestId(request.getRequestId());
                 if (apply != null) {
-                    return apply.getId();
+                    return apply.getId()+"";
                 }
                 validationParmas(request.getApplyType(), request.getMerCode());
                 apply = creditApplyConverter.toApply(request);
@@ -80,7 +80,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setApplyUser(user.getUserName());
                 apply.setApplyTime(new Date());
                 merchantCreditApplyDao.save(apply);
-                return apply.getId();
+                return apply.getId()+"";
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -123,8 +123,8 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     }
 
     @Override
-    public Long update(MerchantCreditApplyUpdateReq request, ApiUserInfo user) {
-        MerchantCreditApply apply = merchantCreditApplyDao.getById(request.getId());
+    public String update(MerchantCreditApplyUpdateReq request, ApiUserInfo user) {
+        MerchantCreditApply apply = merchantCreditApplyDao.getById(Long.parseLong(request.getId()));
         if (apply == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
         }
@@ -150,7 +150,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setEnclosure(request.getEnclosure());
                 apply.setApplyUser(user.getUserName());
                 merchantCreditApplyDao.saveOrUpdate(apply);
-                return apply.getId();
+                return apply.getId()+"";
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -165,8 +165,8 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long approval(MerchantCreditApprovalReq request, ApiUserInfo user) {
-        MerchantCreditApply apply = merchantCreditApplyDao.getById(request.getId());
+    public String approval(MerchantCreditApprovalReq request, ApiUserInfo user) {
+        MerchantCreditApply apply = merchantCreditApplyDao.getById(Long.parseLong(request.getId()));
         if (apply == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
         }
@@ -196,7 +196,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                     Long transNo = sequenceService.nextNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
                     merchantCreditService.increaseAccountType(apply.getMerCode(),type,apply.getBalance(), transNo.toString());
                 }
-                return apply.getId();
+                return apply.getId()+"";
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -216,9 +216,11 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在！", null);
         }
         MerchantCreditApplyInfo info = creditApplyConverter.toInfo(apply);
+        info.setId(apply.getId()+"");
         Merchant merchant = merchantService.detailByMerCode(apply.getMerCode());
         info.setMerName(merchant.getMerName());
         info.setMerCooperationMode(merchant.getMerCooperationMode());
+        info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getCode());
         return info;
     }
 
@@ -234,6 +236,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             dtos.forEach(dto -> {
                 MerchantCreditApplyInfo info = new MerchantCreditApplyInfo();
                 BeanUtils.copyProperties(dto,info);
+                info.setId(dto.getId()+"");
                 info.setMerCooperationMode(MerCooperationModeEnum.getByCode(info.getMerCooperationMode()).getDesc());
                 info.setApplyType(WelfareConstant.MerCreditType.findByCode(info.getApplyType()).desc());
                 info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());

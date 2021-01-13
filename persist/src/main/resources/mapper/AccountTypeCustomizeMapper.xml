@@ -11,7 +11,7 @@
     </sql>
 
 
-  <select id="queryAccountType" resultType="com.welfare.persist.dto.AccountTypeDTO">
+  <select id="queryAccountType" resultType="com.welfare.persist.dto.AccountTypeMapperDTO">
     SELECT
     AT.id,
     AT.mer_code AS merCode,

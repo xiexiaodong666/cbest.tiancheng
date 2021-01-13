@@ -28,6 +28,8 @@ public interface AccountService {
   Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
       AccountPageReq accountPageReq);
 
+  Account findByPhone(String phone);
+
   List<AccountDTO> export(AccountPageReq accountPageReq);
 
   String uploadAccount(MultipartFile multipartFile);
@@ -39,7 +41,7 @@ public interface AccountService {
    */
   int increaseAccountBalance(BigDecimal increaseBalance, String updateUser, String accountCode);
 
-  Account getByAccountCode(String accountCode);
+  Account getByAccountCode(Long accountCode);
 
   Boolean delete(Long id);
 
@@ -61,7 +63,7 @@ public interface AccountService {
 
   AccountBillDTO quertBill(String accountCode, Date createTimeStart, Date createTimeEnd);
 
-  List<String> getAccountCodeList(List<String> accountCodes);
+  List<Long> getAccountCodeList(List<Long> accountCodes);
 
   public void syncAccount(ShoppingActionTypeEnum actionTypeEnum, List<AccountSyncDTO> accountSyncDTOS);
 }

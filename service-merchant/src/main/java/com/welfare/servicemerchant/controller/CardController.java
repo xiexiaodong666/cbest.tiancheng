@@ -114,7 +114,9 @@ public class CardController implements IController {
     cardInfoDTO.setCardType(cardInfo.getCardType());
     cardInfoDTO.setCardMedium(cardApply.getCardMedium());
     cardInfoDTO.setCardStatus(cardInfo.getCardStatus());
-    cardInfoDTO.setMerName(merchant.getMerName());
+    if(merchant != null) {
+      cardInfoDTO.setMerName(merchant.getMerName());
+    }
     cardInfoDTO.setCreateTime(cardInfo.getCreateTime());
     cardInfoDTO.setWrittenTime(cardInfo.getWrittenTime());
     cardInfoDTO.setBindTime(cardInfo.getBindTime());

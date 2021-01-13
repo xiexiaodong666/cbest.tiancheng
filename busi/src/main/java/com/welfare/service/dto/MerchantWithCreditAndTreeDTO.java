@@ -1,4 +1,4 @@
-package com.welfare.persist.dto;
+package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-public class MerchantWithCreditDTO {
+public class MerchantWithCreditAndTreeDTO extends Tree{
 
   @ApiModelProperty("id")
   private Long id;

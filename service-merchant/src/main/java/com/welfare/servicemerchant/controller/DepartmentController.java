@@ -55,7 +55,7 @@ public class DepartmentController implements IController {
 
     @GetMapping("/detail")
     @ApiOperation("查询部门详情）")
-    public R<DepartmentDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+    public R<DepartmentDTO> detail( @ApiParam("id") Long id){
         return R.success(departmentService.detail(id));
     }
 

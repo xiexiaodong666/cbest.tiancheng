@@ -2,42 +2,76 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.MerchantExMapper">
     <select id="listWithCredit" resultType="com.welfare.persist.dto.MerchantWithCreditDTO">
-        SELECT
-	m.id id,
-	m.mer_name merName,
-	m.mer_code merCode,
-	m.mer_type merType,
-	m.mer_identity merIdentity,
-	m.mer_cooperation_mode merCooperationMode,
-	m.create_time createTime,
-	mc.credit_limit creditLimit,
-	mc.remaining_limit remainingLimit,
-	mc.current_balance currentBalance
-FROM
-	merchant m
-	LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code
-	<where>
-		<if test="req.merCode!=null and req.merCode!=''">
-			and m.mer_code=#{req.merCode}
-		</if>
-		<if test="req.merName!=null and req.merName!=''">
-			and m.mer_name like concat('%',#{req.merCode},'%')
-		</if>
-		<if test="req.merType!=null and req.merType!=''">
-			and m.mer_type=#{req.merType}
-		</if>
-		<if test="req.merCode!=null and req.merCode!=''">
-			and m.mer_code=#{req.merCode}
-		</if>
-		<if test="req.merCooperationMode!=null and req.merCooperationMode!=''">
-			and m.mer_cooperationMode=#{req.merCooperationMode}
-		</if>
-		<if test="req.startTime!=null">
-			and m.create_time &gt;= #{req.startTime}
-		</if>
-		<if test="req.endTime!=null">
-			and m.create_time &lt;= #{req.endTime}
-		</if>
-	</where>
+		select * from (SELECT
+		m.id id,
+		m.mer_name merName,
+		m.mer_code merCode,
+		0 departmentParent,
+		m.mer_type merType,
+		m.mer_identity merIdentity,
+		m.mer_cooperation_mode merCooperationMode,
+		m.create_time createTime,
+		mc.credit_limit creditLimit,
+		mc.remaining_limit remainingLimit,
+		mc.current_balance currentBalance
+		FROM
+		merchant m
+		LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code) temp0
+		<where>
+			<if test="req.merCode!=null and req.merCode!=''">
+				and temp0.departmentCode=#{req.merCode}
+			</if>
+			<if test="req.merName!=null and req.merName!=''">
+				and temp0.departmentName like concat('%',#{req.merCode},'%')
+			</if>
+			<if test="req.merType!=null and req.merType!=''">
+				and temp0.merType=#{req.merType}
+			</if>
+			<if test="req.merCooperationMode!=null and req.merCooperationMode!=''">
+				and temp0.merCooperationMode=#{req.merCooperationMode}
+			</if>
+			<if test="req.startTime!=null">
+				and temp0.createTime &gt;= #{req.startTime}
+			</if>
+			<if test="req.endTime!=null">
+				and temp0.createTime &lt;= #{req.endTime}
+			</if>
+		</where>
+		 UNION
+		select * from (SELECT
+		d.id id,
+		d.department_name merName,
+		d.department_code merCode,
+		d.department_parent departmentParent,
+		d.create_time createTime,
+		NULL merType,
+		NULL merIdentity,
+		NULL merCooperationMode,
+		NULL creditLimit,
+		NULL remainingLimit,
+		NULL currentBalance
+		FROM
+		department d) temp
+
+		<where>
+			<if test="req.merCode!=null and req.merCode!=''">
+				and temp.departmentCode=#{req.merCode}
+			</if>
+			<if test="req.merName!=null and req.merName!=''">
+				and temp.departmentName like concat('%',#{req.merCode},'%')
+			</if>
+			<if test="req.merType!=null and req.merType!=''">
+				and temp.merType=#{req.merType}
+			</if>
+			<if test="req.merCooperationMode!=null and req.merCooperationMode!=''">
+				and temp.merCooperationMode=#{req.merCooperationMode}
+			</if>
+			<if test="req.startTime!=null">
+				and temp.createTime &gt;= #{req.startTime}
+			</if>
+			<if test="req.endTime!=null">
+				and temp.createTime &lt;= #{req.endTime}
+			</if>
+		</where>
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -24,22 +25,29 @@ import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
+import com.welfare.service.dto.AccountUploadDTO;
+import com.welfare.service.dto.DepartmentImportDTO;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
+import com.welfare.service.dto.SupplierStoreImportDTO;
 import com.welfare.service.helper.QueryHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.welfare.service.listener.AccountUploadListener;
+import com.welfare.service.listener.SupplierStoreListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 供应商门店服务接口实现
@@ -138,8 +146,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreDetailDTO supplierStore) {
+    if(EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))){
+      throw new BusiException("门店编码已存在");
+    }
     supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
-    boolean flag=supplierStoreDao.save(supplierStoreDetailConverter.toE((supplierStore))) ;
+    SupplierStore save=supplierStoreDetailConverter.toE((supplierStore));
+    save.setStoreParent(save.getMerCode()+"-"+save.getStoreCode());
+    save.setStatus(0);
+    boolean flag=supplierStoreDao.save(save) ;
     return flag&& merchantAddressService.saveOrUpdateBatch(supplierStore.getAddressList());
   }
 
@@ -154,9 +168,18 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public boolean batchAdd(List<SupplierStoreDetailDTO> list) {
-    return true;
-//    return supplierStoreDao.saveBatch(list);
+  public String batchAdd(MultipartFile multipartFile) {
+    try {
+      SupplierStoreListener listener = new SupplierStoreListener(merchantService,supplierStoreDao);
+      EasyExcel.read(multipartFile.getInputStream(), SupplierStoreImportDTO.class, listener).sheet()
+              .doRead();
+      String result = listener.getUploadInfo().toString();
+      listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
+      return result;
+    } catch (Exception e) {
+      log.info("批量新增门店解析 Excel exception:{}", e.getMessage());
+    }
+    return "解析失败";
   }
 
   @Override

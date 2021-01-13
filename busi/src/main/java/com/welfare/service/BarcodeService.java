@@ -1,6 +1,7 @@
 package com.welfare.service;
 
 import com.welfare.persist.entity.BarcodeSalt;
+import com.welfare.service.dto.payment.PaymentBarcode;
 
 import java.util.List;
 
@@ -11,13 +12,13 @@ import java.util.List;
  * @email yuxiang.li@sjgo365.com
  * @date 1/8/2021
  */
-public interface BarcodeSaltService {
+public interface BarcodeService {
     /**
      * 查询barcodeSalt
      * @param fromValidPeriodNumeric 从哪一个period开始拉起
      * @return
      */
-    List<BarcodeSalt> query(Long fromValidPeriodNumeric);
+    List<BarcodeSalt> querySalt(Long fromValidPeriodNumeric);
 
     /**
      * 生成指定有效期的加盐参数
@@ -29,7 +30,7 @@ public interface BarcodeSaltService {
     /**
      * 批量生成缺失的period
      */
-    void batchGenerate();
+    void batchGenerateSalt();
 
     /**
      * 获取当前周期的saltValue
@@ -42,5 +43,20 @@ public interface BarcodeSaltService {
      * @param period
      * @return
      */
-    BarcodeSalt queryByPeriodNumeric(Long period);
+    BarcodeSalt querySaltByPeriodNumeric(Long period);
+
+    /**
+     * 获取一个支付条码
+     * @param accountCode
+     * @return
+     */
+    PaymentBarcode getBarcode(Long accountCode);
+
+    /**
+     * 从barcode解析账户号
+     * @param barcode
+     * @param isOffline
+     * @return
+     */
+    Long parseAccountFromBarcode(String barcode, boolean isOffline);
 }

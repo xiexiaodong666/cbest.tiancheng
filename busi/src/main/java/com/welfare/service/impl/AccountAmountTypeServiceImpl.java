@@ -4,19 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountBillDetailService;
 import com.welfare.service.dto.Deposit;
+import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,7 +42,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     }
 
     @Override
-    public AccountAmountType queryOne(String accountCode, String merAccountTypeCode) {
+    public AccountAmountType queryOne(Long accountCode, String merAccountTypeCode) {
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper();
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, accountCode)
                 .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, merAccountTypeCode);
@@ -71,13 +69,19 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     }
 
     @Override
-    public AccountAmountType querySurplusQuota(String accountCode) {
+    public AccountAmountType querySurplusQuota(Long accountCode) {
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE,accountCode)
                 .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA);
         return accountAmountTypeDao.getOne(queryWrapper);
     }
 
+    @Override
+    public List<AccountAmountDO> queryAccountAmountDO(Long accountCode) {
+        QueryWrapper<AccountAmountDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE,accountCode);
+        return null;
+    }
 
 
 }

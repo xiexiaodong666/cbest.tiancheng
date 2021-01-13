@@ -48,7 +48,7 @@ public class MerchantCreditApplyController implements IController {
     public R<Page<MerchantCreditApplyInfo>> page(@RequestBody  MerchantCreditApplyQuery query){
         MerchantCreditApplyQueryReq req = new MerchantCreditApplyQueryReq();
         BeanUtils.copyProperties(query,req);
-        Page<MerchantCreditApplyInfo> page = applyService.page(query.getCurrent(), query.getSize(), req, ApiUserHolder.getUserInfo());
+        Page<MerchantCreditApplyInfo> page = applyService.page(query.getCurrent(), query.getSize() == 0? 10 : query.getSize(), req, ApiUserHolder.getUserInfo());
         return success(page);
     }
 
@@ -62,7 +62,7 @@ public class MerchantCreditApplyController implements IController {
     @PostMapping("/update")
     @ApiOperation("修改商户额度申请")
     @ApiUser
-    public R<Long> update(@Validated @RequestBody MerchantCreditApplyUpdateReq request){
+    public R<String> update(@Validated @RequestBody MerchantCreditApplyUpdateReq request){
         return success(applyService.update(request, ApiUserHolder.getUserInfo()));
     }
 
@@ -80,7 +80,7 @@ public class MerchantCreditApplyController implements IController {
     @PostMapping("/approval")
     @ApiOperation("审批商户额度申请")
     @ApiUser
-    public R<Long> approval(@Validated @RequestBody MerchantCreditApprovalReq request){
+    public R<String> approval(@Validated @RequestBody MerchantCreditApprovalReq request){
 
         return success(applyService.approval(request, ApiUserHolder.getUserInfo()));
     }
@@ -88,7 +88,7 @@ public class MerchantCreditApplyController implements IController {
     @PostMapping("/save")
     @ApiOperation("新增商户额度申请")
     @ApiUser
-    public R<Long> save(@Validated @RequestBody MerchantCreditApplyRequest request){
+    public R<String> save(@Validated @RequestBody MerchantCreditApplyRequest request){
         return success(applyService.save(request, ApiUserHolder.getUserInfo()));
     }
 }

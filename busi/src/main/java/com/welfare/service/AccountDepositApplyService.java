@@ -72,7 +72,7 @@ public interface AccountDepositApplyService {
    * @param query
    * @return
    */
-  Page<AccountDepositApplyInfo> page(Integer currentPage, Integer pageSize, AccountDepositApplyQuery query);
+  Page<AccountDepositApplyInfo> page(int currentPage, int pageSize, AccountDepositApplyQuery query);
 
   /**
    * 查询申请(不分页)

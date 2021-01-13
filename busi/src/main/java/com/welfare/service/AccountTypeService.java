@@ -3,9 +3,10 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.AccountTypeDTO;
+import com.welfare.persist.dto.AccountTypeMapperDTO;
 import com.welfare.persist.dto.MerSupplierStoreDTO;
 import com.welfare.persist.entity.AccountType;
+import com.welfare.service.dto.AccountTypeDTO;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
 public interface AccountTypeService {
   Page<AccountType> pageQuery(Page<AccountType> page, QueryWrapper<AccountType> queryWrapper);
 
-  Page<AccountTypeDTO> getPageDTO(Page<AccountTypeDTO> page,
+  Page<AccountTypeDTO> getPageDTO(Page<AccountTypeMapperDTO> page,
       String merCode,String typeCode,String typeName, Date startDate,Date endDate);
   List<AccountTypeDTO> queryAccountTypeDTO(String merCode,String typeCode,String typeName, Date startDate,Date endDate);
 

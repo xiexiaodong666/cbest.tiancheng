@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -70,7 +71,7 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
   @Override
   public void invoke(AccountDepositRequest request, AnalysisContext context) {
     log.info("员工账号存储申请：解析到一条数据:{}, requestId:{}, fileId;{}", JSON.toJSONString(request), requestId, fileId);
-    if (StringUtils.isBlank(request.getAccountCode())) {
+    if (Objects.isNull(request.getAccountCode())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账号不能为空！", null);
     }
     if (request.getRechargeAmount().compareTo(BigDecimal.ZERO) < 0) {

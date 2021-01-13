@@ -48,7 +48,7 @@ public class Account extends Model<Account> implements Serializable {
      * 员工账号
      */
     @ApiModelProperty("员工账号")
-    private String accountCode;
+    private Long accountCode;
     /**
      * 员工类型编码
      */

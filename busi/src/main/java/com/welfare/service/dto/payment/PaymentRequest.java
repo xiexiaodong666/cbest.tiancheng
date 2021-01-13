@@ -3,9 +3,12 @@ package com.welfare.service.dto.payment;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.StringUtil;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Description:
@@ -15,7 +18,7 @@ import java.math.BigDecimal;
  * @date 1/11/2021
  */
 @Data
-public class AbstractPaymentRequest {
+public abstract class PaymentRequest {
     private static transient final String ONLINE_MACHINE_NO = "9002";
 
 
@@ -36,7 +39,7 @@ public class AbstractPaymentRequest {
     @ApiModelProperty("支付状态，0：新增，1：处理中，2：处理成功，-1：处理失败")
     private Integer paymentStatus;
     @ApiModelProperty("账户号")
-    private String accountCode;
+    private Long accountCode;
     public String chargePaymentScene(){
         if (!StringUtil.startsWithNumber(storeNo)) {
             //非数字开头的门店，供应商线下消费
@@ -48,5 +51,11 @@ public class AbstractPaymentRequest {
             //其余情况，重百线下
             return WelfareConstant.PaymentScene.OFFLINE_CBEST.code();
         }
+    }
+
+
+
+    public Long calculateAccountCode(){
+        return getAccountCode();
     }
 }

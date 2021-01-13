@@ -32,7 +32,12 @@ public enum ExceptionCode {
     /**
      * 达到商户充值限额
      */
-    MERCHANT_RECHARGE_LIMIT_EXCEED(0x00000101);
+    MERCHANT_RECHARGE_LIMIT_EXCEED(0x00000101),
+
+
+
+    //------条码相关异常------
+    BARCODE_EXPIRE(0x00000201);
 
 
 

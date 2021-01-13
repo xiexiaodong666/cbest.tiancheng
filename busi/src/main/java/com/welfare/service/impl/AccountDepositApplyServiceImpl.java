@@ -396,7 +396,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     }
 
     @Override
-    public Page<AccountDepositApplyInfo> page(Integer currentPage, Integer pageSize, AccountDepositApplyQuery query) {
+    public Page<AccountDepositApplyInfo> page(int currentPage, int pageSize, AccountDepositApplyQuery query) {
         Page<AccountDepositApply> page = new Page<>();
         page.setCurrent(currentPage);
         page.setSize(pageSize);

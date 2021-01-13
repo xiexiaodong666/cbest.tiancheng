@@ -26,8 +26,8 @@ public class MerchantCreditApplyUpdateReq {
    * 申请id
    */
   @ApiModelProperty("申请id")
-  @NotNull(message = "申请id为空")
-  private Long id;
+  @NotEmpty(message = "申请id为空")
+  private String id;
 
   /**
   /**

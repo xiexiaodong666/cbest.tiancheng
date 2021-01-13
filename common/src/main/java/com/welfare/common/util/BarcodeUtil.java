@@ -3,6 +3,7 @@ package com.welfare.common.util;
 import jodd.util.MathUtil;
 import jodd.util.StringUtil;
 import lombok.SneakyThrows;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,7 +21,6 @@ public class BarcodeUtil {
     private BarcodeUtil(){
 
     }
-
     private static final Long MIN_SALT_VALUE = 10000000L;
     private static final Long MAX_SALT_VALUE = 89999999L;
     /**

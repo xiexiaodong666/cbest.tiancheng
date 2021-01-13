@@ -32,9 +32,9 @@ public class AccountReq implements Serializable {
   /**
    * 员工账号
    */
-  @ApiModelProperty("员工账号")
-  @NotEmpty(message = "员工账号为空")
-  private String accountCode;
+  @ApiModelProperty("员工手机号码")
+  @NotEmpty(message = "员工手机号码为空")
+  private String phone;
 
   /**
    * 账号状态

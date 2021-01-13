@@ -45,7 +45,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final RemainingLimitOperator remainingLimitOperator;
     private final RebateLimitOperator rebateLimitOperator;
 
-    private final Map<MerCreditType, MerAccountTypeOperator> operatorMap = new HashMap<>();
+    private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
 
 
 
@@ -76,7 +76,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         lock.lock();
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
-            MerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
+            AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
             merAccountTypeOperator.decrease(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
 
@@ -91,7 +91,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         lock.lock();
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
-            MerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
+            AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
             MerchantAccountOperation increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
         } finally {

@@ -26,7 +26,7 @@ public class TempAccountDepositApplyDTO {
    * 员工账号
    */
   @ApiModelProperty(name = "员工账号")
-  private String accountCode;
+  private Long accountCode;
 
   /**
    * 员工姓名

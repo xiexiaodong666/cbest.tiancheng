@@ -48,7 +48,7 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
      * 员工账户
      */
     @ApiModelProperty("员工账户")   
-    private String accountCode;
+    private Long accountCode;
     /**
      * 充值金额
      */

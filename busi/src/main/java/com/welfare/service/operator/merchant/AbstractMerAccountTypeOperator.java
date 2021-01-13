@@ -15,9 +15,9 @@ import java.util.List;
  * @email kobe663@gmail.com
  * @date 1/9/2021 10:36 PM
  */
-public abstract class MerAccountTypeOperator {
+public abstract class AbstractMerAccountTypeOperator {
 
-    private MerAccountTypeOperator next;
+    private AbstractMerAccountTypeOperator next;
 
 
     /**
@@ -46,11 +46,11 @@ public abstract class MerAccountTypeOperator {
      * 下一个MerAccountTypeOperator，用于构建operator的链表
      * @param merAccountTypeOperator
      */
-    public void putNext(MerAccountTypeOperator merAccountTypeOperator){
+    public void next(AbstractMerAccountTypeOperator merAccountTypeOperator){
         this.next = merAccountTypeOperator;
     }
 
-    protected MerAccountTypeOperator getNext(){
+    protected AbstractMerAccountTypeOperator getNext(){
         return next;
     }
 

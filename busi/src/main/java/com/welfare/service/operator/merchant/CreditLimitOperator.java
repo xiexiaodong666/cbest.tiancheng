@@ -14,6 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class CreditLimitOperator extends MerAccountTypeOperator {
+public class CreditLimitOperator extends AbstractMerAccountTypeOperator {
 
 }

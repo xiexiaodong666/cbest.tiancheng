@@ -25,7 +25,7 @@ public class Deposit {
     @ApiModelProperty("交易号")
     private String transNo;
     @ApiModelProperty("账户")
-    private String accountCode;
+    private Long accountCode;
     @ApiModelProperty("充值卡号")
     private String cardNo;
     @ApiModelProperty("充值金额")

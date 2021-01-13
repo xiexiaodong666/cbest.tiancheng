@@ -236,11 +236,13 @@ public class AccountServiceImpl implements AccountService {
       if( null != queryAccount ){
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账号已经存在",null);
       }
-    }else{
+    }
+    else{
       Account syncAccount = accountMapper.selectById(account.getId());
       if( null ==  syncAccount){
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
       }
+    }
   }
 
   @Override

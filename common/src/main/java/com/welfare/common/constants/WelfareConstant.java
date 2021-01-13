@@ -255,8 +255,8 @@ public class WelfareConstant {
          * 卡状态
          */
         NEW(0,"新增"),
-        WRITTEN(1,"已写入");
-
+        WRITTEN(1,"已写入"),
+        BIND(2,"已绑定");
         private Integer code;
         private String desc;
 

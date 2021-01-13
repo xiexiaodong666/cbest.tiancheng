@@ -2,6 +2,7 @@ package com.welfare.service.listener;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.Account;
@@ -12,6 +13,7 @@ import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.MerchantService;
+import com.welfare.service.SequenceService;
 import com.welfare.service.dto.AccountUploadDTO;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +42,8 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
 
   private final DepartmentService departmentService;
 
+  private final SequenceService sequenceService;
+
   private static StringBuilder uploadInfo = new StringBuilder();
 
 
@@ -49,6 +53,8 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
     BeanUtils.copyProperties(accountUploadDTO, account);
     Boolean validate = validationAccount(account);
     if( validate.booleanValue() == true ){
+      Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
+      account.setAccountCode(accounCode);
       accountUploadList.add(account);
     }
   }
@@ -69,9 +75,9 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       uploadInfo.append("不存在的员工部门::").append(account.getStoreCode()).append(";");
       return false;
     }
-    Account queryAccount = accountService.getByAccountCode(account.getAccountCode());
+    Account queryAccount = accountService.findByPhone(account.getPhone());
     if( null != queryAccount ){
-      uploadInfo.append("员工账号已经存在:").append(account.getAccountCode()).append(";");
+      uploadInfo.append("员工手机号已经存在:").append(account.getAccountCode()).append(";");
       return false;
     }
     return true;

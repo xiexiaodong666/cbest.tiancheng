@@ -3,8 +3,10 @@ package com.welfare.service;
 
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 商户额度信服务接口
@@ -31,8 +33,9 @@ public interface MerchantCreditService {
    * @param merCreditType
    * @param amount
    * @param transNo
+   * @return
    */
-  void decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
+  List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
 
   /**
    * 增加额度

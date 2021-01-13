@@ -1,10 +1,13 @@
 package com.welfare.persist.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @author yaoxiao
@@ -25,4 +28,7 @@ public class AccountTypeDTO {
   private String typeName;
   @ApiModelProperty("备注")
   private String remark;
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") //入参
+  @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss") //出参
+  private Date createTime;
 }

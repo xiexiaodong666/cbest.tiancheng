@@ -48,7 +48,7 @@ public class MerchantBillDetail extends Model<MerchantBillDetail> implements Ser
      * 交易流水号
      */
     @ApiModelProperty("交易流水号")   
-    private Integer transNo;
+    private String transNo;
     /**
      * 交易类型(消费、退款、添加余额、添加额度等)
      */

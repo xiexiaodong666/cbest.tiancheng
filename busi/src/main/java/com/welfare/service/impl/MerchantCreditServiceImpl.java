@@ -70,15 +70,15 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            merAccountTypeOperator.decrease(merchantCredit, amount,transNo );
+            List<MerchantAccountOperation> operations = merAccountTypeOperator.decrease(merchantCredit, amount, transNo);
             merchantCreditDao.updateById(merchantCredit);
-
+            return operations;
         } finally {
             lock.unlock();
         }

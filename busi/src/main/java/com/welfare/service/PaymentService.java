@@ -20,6 +20,7 @@ public interface PaymentService {
     /**
      * 处理支付请求
      * @param paymentRequest
+     * @return
      */
     List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest);
 }

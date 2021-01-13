@@ -1,8 +1,12 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerchantCreditApplyInfoDTO;
+import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
 import com.welfare.persist.entity.MerchantCreditApply;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 商户金额申请(merchant_credit_apply)数据Mapper
@@ -14,4 +18,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MerchantCreditApplyMapper extends BaseMapper<MerchantCreditApply> {
 
+
+   Page<MerchantCreditApplyInfoDTO> queryByPage(Page page, @Param("query") MerchantCreditApplyQueryReq req);
 }

@@ -55,14 +55,14 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardName,
+  public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String applyCode, String cardName,
       String merCode,
       String cardType, String cardMedium, String cardStatus, String writtenStartTime,
       String writtenEndTime, String startTime, String endTime, String bindStartTime,
       String bindEndTime) {
     Page<CardInfo> page = new Page<>(currentPage, pageSize);
 
-    return cardInfoMapper.list(page, cardName,
+    return cardInfoMapper.list(page, applyCode, cardName,
                                merCode, cardType, cardMedium,
                                cardStatus, writtenStartTime,
                                writtenEndTime, startTime,

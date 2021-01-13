@@ -48,7 +48,7 @@ public interface CardInfoService {
    * @param bindEndTime
    * @return
    */
-  Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardName, String merCode,
+  Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String applyCode, String cardName, String merCode,
       String cardType, String cardMedium, String cardStatus, String writtenStartTime,
       String writtenEndTime, String startTime, String endTime, String bindStartTime,
       String bindEndTime);

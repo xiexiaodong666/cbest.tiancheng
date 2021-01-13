@@ -1,10 +1,15 @@
 package com.welfare.servicemerchant.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dto.CardInfoDTO;
+import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.CardInfo;
+import com.welfare.persist.entity.Merchant;
+import com.welfare.service.CardApplyService;
 import com.welfare.service.CardInfoService;
+import com.welfare.service.MerchantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,6 +42,9 @@ public class CardController implements IController {
 
   private final CardInfoService cardInfoService;
 
+  private final MerchantService merchantService;
+
+  private final CardApplyService applyService;
   @GetMapping("/{cardNo}")
   @ApiOperation("根据卡号获取卡信息")
   public R<CardInfo> queryCardInfo(@PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo) {
@@ -64,6 +72,7 @@ public class CardController implements IController {
   public R<Page<CardInfoDTO>> queryCardInfo(
       @RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam(required = false) @ApiParam("申请卡片管理传applyCode") String applyCode,
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,
       @RequestParam(required = false) @ApiParam("卡片类型") String cardType,
@@ -76,12 +85,42 @@ public class CardController implements IController {
       @RequestParam(required = false) @ApiParam("绑定查询开始时间") String bindStartTime,
       @RequestParam(required = false) @ApiParam("绑定查询结束时间") String bindEndTime) {
 
-    return success(cardInfoService.list(currentPage, pageSize, cardName,
+    return success(cardInfoService.list(currentPage, pageSize, applyCode, cardName,
                                         merCode, cardType, cardMedium,
                                         cardStatus, writtenStartTime,
                                         writtenEndTime, startTime,
                                         endTime, bindStartTime, bindEndTime
     ));
+
+  }
+
+  @GetMapping("/admin/{cardNo}")
+  @ApiOperation("后台根据卡号获取卡信息")
+  public R<CardInfoDTO> queryCardInfoAdmin(
+      @PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo) {
+    CardInfo cardInfo = cardInfoService.getByCardNo(cardNo);
+
+    CardApply cardApply = applyService.queryByApplyCode(cardInfo.getApplyCode());
+
+    QueryWrapper<Merchant> queryWrapperM = new QueryWrapper<>();
+
+    queryWrapperM.eq(Merchant.MER_CODE, cardApply.getApplyCode());
+
+    Merchant merchant = merchantService.getMerchantByMerCode(queryWrapperM);
+
+    CardInfoDTO cardInfoDTO = new CardInfoDTO();
+    cardInfoDTO.setCardId(cardInfo.getCardId());
+    cardInfoDTO.setCardName(cardApply.getCardName());
+    cardInfoDTO.setCardType(cardInfo.getCardType());
+    cardInfoDTO.setCardMedium(cardApply.getCardMedium());
+    cardInfoDTO.setCardStatus(cardInfo.getCardStatus());
+    cardInfoDTO.setMerName(merchant.getMerName());
+    cardInfoDTO.setCreateTime(cardInfo.getCreateTime());
+    cardInfoDTO.setWrittenTime(cardInfo.getWrittenTime());
+    cardInfoDTO.setBindTime(cardInfo.getBindTime());
+    cardInfoDTO.setAccountCode(String.valueOf(cardInfo.getAccountCode()));
+
+    return success(cardInfoDTO);
   }
 
 }

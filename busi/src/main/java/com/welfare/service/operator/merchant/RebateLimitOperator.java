@@ -23,7 +23,7 @@ import java.util.List;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class RebateLimitOperator extends MerAccountTypeOperator {
+public class RebateLimitOperator extends AbstractMerAccountTypeOperator {
     private MerCreditType merCreditType = MerCreditType.REBATE_LIMIT;
     private final MerchantCreditDao merchantCreditDao;
 

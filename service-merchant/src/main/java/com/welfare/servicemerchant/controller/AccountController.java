@@ -1,16 +1,16 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
 import com.welfare.service.dto.AccountBillDTO;
+import com.welfare.service.dto.AccountBillDetailDTO;
+import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountReq;
-import com.welfare.service.dto.AccountDTO;
-import com.welfare.service.dto.AccountBillDetailDTO;
-import com.welfare.service.dto.accountapply.AccountDepositApplyInfo;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,72 +67,101 @@ public class AccountController implements IController {
   public R<Page<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
       AccountPageReq accountPageReq) {
-       Page<AccountPageDTO> page = new Page(currentPage,pageSize);
-        Page<AccountDTO> accountPage = accountService.getPageDTO(page,accountPageReq);
-        return success(accountPage);
+    Page<AccountPageDTO> page = new Page(currentPage, pageSize);
+    Page<AccountDTO> accountPage = accountService.getPageDTO(page, accountPageReq);
+    return success(accountPage);
   }
 
   @GetMapping("/{id}")
   @ApiOperation("员工账号详情")
-  public R<AccountDetailDTO> detail(@PathVariable Long id){
-    return success(accountService.queryDetail(id));
+  public R<AccountDetailDTO> detail(@PathVariable String id) {
+    return success(accountService.queryDetail(Long.parseLong(id)));
   }
 
   @PostMapping("/save")
   @ApiOperation("新增员工账号")
-  public R<Boolean> save(@RequestBody AccountReq accountReq){
-    Account account = new Account();
-    BeanUtils.copyProperties(accountReq,account);
-    return success(accountService.save(account));
+  public R<Boolean> save(@RequestBody AccountReq accountReq) {
+    try {
+      Account account = new Account();
+      BeanUtils.copyProperties(accountReq, account);
+      return success(accountService.save(account));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
 
 
   @PostMapping("/update")
   @ApiOperation("修改员工账号")
-  public R<Boolean> update(@RequestBody AccountReq accountReq){
-    Account account = new Account();
-    BeanUtils.copyProperties(accountReq,account);
-    return success(accountService.update(account));
+  public R<Boolean> update(@RequestBody AccountReq accountReq) {
+    try {
+      Account account = new Account();
+      BeanUtils.copyProperties(accountReq, account);
+      return success(accountService.update(account));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
 
   @PostMapping("/delete/{id}")
   @ApiOperation("删除员工账号")
-  public R<Boolean> delete(@PathVariable Long id){
-    return success(accountService.delete(id));
+  public R<Boolean> delete(@PathVariable String id) {
+    try {
+      return success(accountService.delete(Long.parseLong(id)));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
 
 
   @PostMapping("/active/{id}")
   @ApiOperation("激活或锁定账号")
-  public R<Boolean> active(@PathVariable Long id,@RequestParam @ApiParam("状态") Integer active){
-    return success(accountService.active(id,active));
+  public R<Boolean> active(@PathVariable String id, @RequestParam @ApiParam("状态") Integer active) {
+
+    try {
+      return success(accountService.active(Long.parseLong(id), active));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
 
   @ApiOperation("员工账号导出")
-  @GetMapping(value="/exportAccount")
+  @GetMapping(value = "/exportAccount")
   public R<String> exportAccount(AccountPageReq accountPageReq) throws IOException {
-    List<AccountDTO>  accountDTOList = accountService.export(accountPageReq);
+    List<AccountDTO> accountDTOList = accountService.export(accountPageReq);
     String path = fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号");
     return success(fileUploadService.getFileServerUrl(path));
   }
 
   @ApiOperation("批量新增员工账号")
   @PostMapping(value = "/uploadAccount")
-  public R<String> uploadAccount(@RequestPart(name = "file")@ApiParam(name = "file",required = true)MultipartFile multipartFile) {
-    return success(accountService.uploadAccount(multipartFile));
+  public R<String> uploadAccount(
+      @RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile) {
+    try {
+      return success(accountService.uploadAccount(multipartFile));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
+
   @ApiOperation("批量绑卡")
   @PostMapping(value = "/batchBindCard")
   public R<String> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
-    return success(accountService.accountBatchBindCard(multipartFile));
+
+    try {
+      return success(accountService.accountBatchBindCard(multipartFile));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
 
   @GetMapping("/bill")
   @ApiOperation("员工账号消费汇总")
-  public R<AccountBillDTO> quertBill(@RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+  public R<AccountBillDTO> quertBill(
+      @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
-      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    return success(accountService.quertBill(accountCode,createTimeStart,createTimeEnd));
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) {
+    return success(accountService.quertBill(accountCode, createTimeStart, createTimeEnd));
   }
 
 
@@ -142,8 +171,9 @@ public class AccountController implements IController {
       @RequestParam @ApiParam("单页大小") Integer pageSize,
       @RequestParam @ApiParam("accountCode") String accountCode,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
-      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
-    Page<AccountBillDetailDTO> result = accountService.queryAccountBillDetail(currentPage,pageSize,accountCode,createTimeStart,createTimeEnd);
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) {
+    Page<AccountBillDetailDTO> result = accountService
+        .queryAccountBillDetail(currentPage, pageSize, accountCode, createTimeStart, createTimeEnd);
     return success(result);
   }
 
@@ -151,9 +181,10 @@ public class AccountController implements IController {
   @ApiOperation("员工账号消费汇总导出")
   public R<String> exportAccountBill(@RequestParam @ApiParam("accountCode") String accountCode,
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
-      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) throws IOException{
-    List<AccountBillDetailDTO> exportList = accountService.exportBillDetail(accountCode,createTimeStart,createTimeEnd);
-    String path =fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细");
+      @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) throws IOException {
+    List<AccountBillDetailDTO> exportList = accountService
+        .exportBillDetail(accountCode, createTimeStart, createTimeEnd);
+    String path = fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细");
     return success(fileUploadService.getFileServerUrl(path));
   }
 }

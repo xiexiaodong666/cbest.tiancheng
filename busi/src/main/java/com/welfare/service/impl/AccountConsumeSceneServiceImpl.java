@@ -1,10 +1,13 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
@@ -12,8 +15,12 @@ import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
+import com.welfare.persist.entity.AccountType;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.service.AccountConsumeSceneService;
+import com.welfare.service.AccountTypeService;
+import com.welfare.service.MerchantService;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.service.dto.AccountConsumeSceneReq;
@@ -58,6 +65,8 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
   private final ObjectMapper mapper;
   private final ShoppingFeignClient shoppingFeignClient;
+  private final MerchantService merchantService;
+  private final AccountTypeService accountTypeService;
 
   @Override
   public void syncAccountConsumeScene(ShoppingActionTypeEnum actionTypeEnum,
@@ -147,12 +156,42 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
       BeanUtils.copyProperties(accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeScene.setAccountTypeCode(accountTypeCode);
+      validationAccountConsumeScene(accountConsumeScene,true);
       accountConsumeSceneDao.save(accountConsumeScene);
       List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = getAccountConsumeSceneStoreRelations(
           accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeSceneStoreRelationDao.saveBatch(accountConsumeSceneStoreRelationList);
     });
     return true;
+  }
+
+  private void validationAccountConsumeScene(AccountConsumeScene accountConsumeScene,boolean isNew){
+    Merchant merchant = merchantService.detailByMerCode(accountConsumeScene.getMerCode());
+    if( null == merchant ) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
+    }
+    AccountType queryAccountType = accountTypeService.queryByTypeCode(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
+    if( null == queryAccountType ) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户员工类型不存在",null);
+    }
+    if( isNew ){
+      AccountConsumeScene queryAccountConsumeScene = queryAccountConsumeScene(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
+      if(null != queryAccountConsumeScene){
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同类型的消费场景配置:" + accountConsumeScene.getId(),null);
+      }
+    }else{
+      AccountConsumeScene queryAccountConsumeScene = accountConsumeSceneDao.getById(accountConsumeScene.getId());
+      if( null == queryAccountConsumeScene ){
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景不存在:" + accountConsumeScene.getId(),null);
+      }
+    }
+  }
+
+  public AccountConsumeScene queryAccountConsumeScene(String merCode,String accountTypecode){
+    QueryWrapper<AccountConsumeScene> queryWrapper = new QueryWrapper<AccountConsumeScene>();
+    queryWrapper.eq(AccountConsumeScene.MER_CODE,merCode);
+    queryWrapper.eq(AccountConsumeScene.ACCOUNT_TYPE_CODE,accountTypecode);
+    return accountConsumeSceneDao.getOne(queryWrapper);
   }
 
   private List<AccountConsumeSceneStoreRelation> getAccountConsumeSceneStoreRelations(
@@ -178,6 +217,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq) {
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     BeanUtils.copyProperties(accountConsumeSceneReq, accountConsumeScene);
+    validationAccountConsumeScene(accountConsumeScene,false);
     accountConsumeSceneDao.updateById(accountConsumeScene);
     List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = new ArrayList<>();
     accountConsumeSceneReq.getAccountConsumeSceneStoreRelationReqList().stream()
@@ -199,6 +239,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     updateWrapper.eq(AccountConsumeScene.ID, id);
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     accountConsumeScene.setDeleted(true);
+    validationAccountConsumeScene(accountConsumeScene,false);
     return accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
   }
 
@@ -209,6 +250,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     updateWrapper.eq(AccountConsumeScene.ID, id);
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     accountConsumeScene.setStatus(status);
+    validationAccountConsumeScene(accountConsumeScene,false);
     return accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
   }
 

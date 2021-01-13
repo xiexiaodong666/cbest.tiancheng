@@ -146,7 +146,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public Account getByAccountCode(String accountCode) {
+  public Account getByAccountCode(Long accountCode) {
     QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(Account.ACCOUNT_CODE, accountCode);
     return accountDao.getOne(queryWrapper);
@@ -235,11 +235,12 @@ public class AccountServiceImpl implements AccountService {
       Account queryAccount = this.getByAccountCode(account.getAccountCode());
       if( null != queryAccount ){
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账号已经存在",null);
-      }else{
-        Account syncAccount = accountMapper.selectById(account.getId());
-        if( null ==  syncAccount){
-          throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
-        }
+      }
+    }
+    else{
+      Account syncAccount = accountMapper.selectById(account.getId());
+      if( null ==  syncAccount){
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
       }
     }
   }
@@ -288,11 +289,11 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public List<String> getAccountCodeList(List<String> accountCodes) {
+  public List<Long> getAccountCodeList(List<Long> accountCodes) {
     QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
     queryWrapper.in(Account.ACCOUNT_CODE, accountCodes);
     List<Account> accounts = accountDao.list(queryWrapper);
-    List<String> codes = new ArrayList<>();
+    List<Long> codes = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(accounts)) {
       codes = accounts.stream().map(Account::getAccountCode).collect(Collectors.toList());
     }

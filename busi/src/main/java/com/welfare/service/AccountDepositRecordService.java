@@ -8,7 +8,6 @@ import com.welfare.service.dto.AccountDepositReq;
 import com.welfare.service.dto.AccountPayResultQueryDTO;
 import com.welfare.service.dto.AccountPayResultQueryReq;
 import com.welfare.service.remote.entity.CbestPayBaseResp;
-import java.util.List;
 
 /**
  * 账号充值记录表服务接口
@@ -25,7 +24,5 @@ public interface AccountDepositRecordService extends IService<AccountDepositReco
 
     void payNotify(CbestPayBaseResp resp);
 
-    List<AccountDepositRecord> queryPendingPaymentList();
-
-    List<AccountDepositRecord> queryPendingAndFailureRechargeList();
+    void execPendingPaymentList();
 }

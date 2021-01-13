@@ -91,7 +91,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
         }
         if( isNew ){
             AccountType queryAccountType = this.queryByTypeCode(accountType.getMerCode(),accountType.getTypeCode());
-            if( null == queryAccountType ){
+            if( null != queryAccountType ){
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型code已经存在",null);
             }
         }

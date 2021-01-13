@@ -22,6 +22,7 @@ public class AccountConsumeSceneReq implements Serializable {
    * 场景ID
    */
   @ApiModelProperty("id")
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long id;
   /**
    * 商户代码

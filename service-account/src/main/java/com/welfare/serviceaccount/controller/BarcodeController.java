@@ -2,7 +2,7 @@ package com.welfare.serviceaccount.controller;
 
 import com.welfare.common.util.BarcodeUtil;
 import com.welfare.persist.entity.BarcodeSalt;
-import com.welfare.service.BarcodeSaltService;
+import com.welfare.service.BarcodeService;
 import com.welfare.service.dto.BarcodeSaltDO;
 import com.welfare.service.dto.payment.PaymentBarcode;
 import io.swagger.annotations.Api;
@@ -37,19 +37,18 @@ import java.util.stream.Collectors;
 @Api(tags = "条码接口")
 @RequestMapping("/barcode")
 public class BarcodeController implements IController {
-    private final BarcodeSaltService barcodeSaltService;
-
+    private final BarcodeService barcodeService;
     @GetMapping
     @ApiOperation("用户获取支付条码")
     public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode){
-        BarcodeSalt barcodeSalt =  barcodeSaltService.queryCurrentPeriodSaltValue();
+        BarcodeSalt barcodeSalt =  barcodeService.queryCurrentPeriodSaltValue();
         PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue());
         return success(paymentBarcode);
     }
 
     @GetMapping("/test-barcode-parse")
     public R<String> testBarcodeParse(@RequestParam String barcode){
-        Long saltValue = barcodeSaltService.queryCurrentPeriodSaltValue().getSaltValue();
+        Long saltValue = barcodeService.queryCurrentPeriodSaltValue().getSaltValue();
         return success(BarcodeUtil.calculateAccount("699048259340405130242", saltValue).toString());
     }
 
@@ -59,7 +58,7 @@ public class BarcodeController implements IController {
         Date currentDate = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String dayStr = dateFormat.format(currentDate);
-        List<BarcodeSalt> barcodeSalts = barcodeSaltService.query(Long.valueOf(dayStr));
+        List<BarcodeSalt> barcodeSalts = barcodeService.querySalt(Long.valueOf(dayStr));
         return success(
                 barcodeSalts.stream()
                         .map(BarcodeSaltDO::of)

@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class AccountPayResultQueryDTO {
 
-    @ApiModelProperty(value = "是否已支付")
-    private Boolean paid;
+    @ApiModelProperty(value = "支付状态")
+    private String paymentStatus;
 }

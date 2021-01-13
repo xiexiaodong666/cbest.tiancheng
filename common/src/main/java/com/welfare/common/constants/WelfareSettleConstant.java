@@ -78,12 +78,12 @@ public class WelfareSettleConstant {
         /**
          * 待结算
          */
-        UNSETTLED("UNSETTLED","已结算"),
+        UNSETTLED("UNSETTLED","待结算"),
 
         /**
          * 已结算
          */
-        SETTLED("SETTLED","待结算");
+        SETTLED("SETTLED","已结算");
 
         private String code;
         private String desc;

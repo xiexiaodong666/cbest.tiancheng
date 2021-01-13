@@ -3,8 +3,9 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.util.ApiUserHolder;
+import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
 import com.welfare.service.MerchantCreditApplyService;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.merchantapply.*;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,13 +42,14 @@ public class MerchantCreditApplyController implements IController {
     @Autowired
     private FileUploadService fileUploadService;
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ApiOperation("分页商户额度申请列表")
     @ApiUser
-    public R<Page<MerchantCreditApplyInfo>> page(@RequestParam @ApiParam("当前页（从1开始）") Integer current,
-                                                 @RequestParam @ApiParam("单页大小") Integer size,
-                                                 @Validated MerchantCreditApplyQuery query){
-        return success(applyService.page(current, size, query, ApiUserHolder.getUserInfo()));
+    public R<Page<MerchantCreditApplyInfo>> page(@RequestBody  MerchantCreditApplyQuery query){
+        MerchantCreditApplyQueryReq req = new MerchantCreditApplyQueryReq();
+        BeanUtils.copyProperties(query,req);
+        Page<MerchantCreditApplyInfo> page = applyService.page(query.getCurrent(), query.getSize(), req, ApiUserHolder.getUserInfo());
+        return success(page);
     }
 
     @GetMapping("/detail")
@@ -67,8 +70,10 @@ public class MerchantCreditApplyController implements IController {
     @ApiOperation("导出商户额度申请(返回文件下载地址)")
     @ApiUser
     public R<String> export(@Validated @RequestBody MerchantCreditApplyQuery query) throws IOException {
-        List<MerchantCreditApplyInfo> list = applyService.list(query, ApiUserHolder.getUserInfo());
-        String path = fileUploadService.uploadExcelFile(list, MerchantCreditApplyInfo.class, "商户额度申请");
+        MerchantCreditApplyQueryReq req = new MerchantCreditApplyQueryReq();
+        BeanUtils.copyProperties(query,req);
+        List<MerchantCreditApplyExcelInfo> list = applyService.list(req, ApiUserHolder.getUserInfo());
+        String path = fileUploadService.uploadExcelFile(list, MerchantCreditApplyExcelInfo.class, "商户额度申请");
         return success(fileUploadService.getFileServerUrl(path));
     }
 

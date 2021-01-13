@@ -2,10 +2,15 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.query.MonthSettleDetailQuery;
+import com.welfare.persist.entity.MonthSettle;
 import com.welfare.service.dto.MonthSettleDetailReq;
 import com.welfare.service.dto.MonthSettleDetailResp;
 import com.welfare.service.dto.MonthSettleReq;
 import com.welfare.service.dto.MonthSettleResp;
+
+import java.util.List;
 
 /**
  * 月度结算账单服务接口
@@ -24,33 +29,42 @@ public interface MonthSettleService {
     Page<MonthSettleResp> pageQuery(MonthSettleReq monthSettleReqDto);
 
     /**
-     * 分页查询月账单明细
-     * @param monthSettleDetailReqDto
+     * 根据主键账单id、部分限制条件，分页查询月账单明细
+     * @param monthSettleDetailReq
      * @return
      */
-    Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(MonthSettleDetailReq monthSettleDetailReqDto);
+    Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(String id, MonthSettleDetailReq monthSettleDetailReq);
 
     /**
-     * 根据主键账单id，导出账单数据
+     * 根据主键账单id、部分限制条件，导出账单数据
      * @param id
      */
-    void exportMonthSettleDetail(String id);
+    List<MonthSettleDetailResp> queryMonthSettleDetail(String id, MonthSettleDetailReq monthSettleDetailReq);
 
     /**
      * 月账单发送
      * @param id
      */
-    void monthSettleSend(String id);
+    Integer monthSettleSend(String id);
 
     /**
      * 月账单确认
      * @param id
      */
-    void monthSettleConfirm(String id);
+    Integer monthSettleConfirm(String id);
 
     /**
      * 月账单完成
      * @param id
      */
-    void monthSettleFinish(String id);
+    Integer monthSettleFinish(String id);
+
+    /**
+     * 按条件查询生成商户月账单
+     * @param monthSettleDetailQuery
+     * @return
+     */
+    MonthSettle getMonthSettle(MonthSettleDetailQuery monthSettleDetailQuery);
+
+    Integer addMonthSettle(MonthSettle monthSettle);
 }

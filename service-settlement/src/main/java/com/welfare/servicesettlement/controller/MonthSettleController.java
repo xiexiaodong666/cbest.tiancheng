@@ -1,6 +1,9 @@
 package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.ExcelUtil;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.MonthSettleDetailReq;
 import com.welfare.service.dto.MonthSettleDetailResp;
@@ -15,6 +18,10 @@ import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+
 /**
  * @author qiang.deng
  * @version 1.0.0
@@ -24,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/settlement/monthSettle")
+@RequestMapping("/api/settlement/monthSettle")
 @Api(tags = "结算账单管理")
 public class MonthSettleController implements IController {
 
@@ -39,39 +46,46 @@ public class MonthSettleController implements IController {
         return success(monthSettleRespDtoPage);
     }
 
+
     @GetMapping("/{id}")
     @ApiOperation("分页查询结算账单明细列表")
-    public R<Page<MonthSettleDetailResp>> pageQueryMonthSettleDetail(MonthSettleDetailReq monthSettleDetailReqDto){
-        Page<MonthSettleDetailResp>  monthSettleDetailRespDtoPage=  monthSettleService.pageQueryMonthSettleDetail(monthSettleDetailReqDto);
+    public R<Page<MonthSettleDetailResp>> pageQueryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq){
+        Page<MonthSettleDetailResp>  monthSettleDetailRespDtoPage=  monthSettleService.pageQueryMonthSettleDetail(id, monthSettleDetailReq);
         return success(monthSettleDetailRespDtoPage);
     }
 
 
     @GetMapping("/{id}/export")
     @ApiOperation("结算账单明细导出")
-    public void exportMonthSettleDetail(@PathVariable("id")String id){
-        monthSettleService.exportMonthSettleDetail(id);
+    public void exportMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq, HttpServletResponse response){
+        List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleService.queryMonthSettleDetail(id, monthSettleDetailReq);
+        try {
+            ExcelUtil.export(response, "结算账单明细", "结算账单明细", monthSettleDetailResps, MonthSettleDetailResp.class );
+        } catch (IOException e) {
+            throw new BusiException(null, "文件导出异常", null);
+        }
     }
 
-    @GetMapping("/{id}/send")
+    @PutMapping("/{id}/send")
     @ApiOperation("平台发送账单")
     public R monthSettleSend(@PathVariable("id")String id){
-        monthSettleService.monthSettleSend(id);
-        return R.success();
+        Integer count = monthSettleService.monthSettleSend(id);
+        return count == 1 ? R.success():R.fail("操作失败");
+
     }
 
-    @GetMapping("/{id}/confirm")
+    @PutMapping("/{id}/confirm")
     @ApiOperation("商户确认账单")
     public R monthSettleConfirm(@PathVariable("id")String id){
-        monthSettleService.monthSettleConfirm(id);
-        return R.success();
+        Integer count = monthSettleService.monthSettleConfirm(id);
+        return count == 1 ? R.success():R.fail("操作失败");
     }
 
 
-    @GetMapping("/{id}/finish")
+    @PutMapping("/{id}/finish")
     @ApiOperation("平台确认账单完成")
-    public Object monthSettleFinish(@PathVariable("id")String id){
-        monthSettleService.monthSettleFinish(id);
-        return R.success();
+    public R monthSettleFinish(@PathVariable("id")String id){
+        Integer count = monthSettleService.monthSettleFinish(id);
+        return count == 1 ? R.success():R.fail("操作失败");
     }
 }

@@ -1,6 +1,10 @@
-package com.welfare.service.dto;
+package com.welfare.service.dto.merchantapply;
 
 import com.welfare.common.annotation.Query;
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.service.enums.ApprovalStatus;
+import com.welfare.service.utils.PageReq;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,18 +15,26 @@ import java.util.Date;
  * @author duanhy
  * @version 1.0.0
  * @description
- * @date 2021/1/7  4:55 PM
+ * @date 2021/1/7  7:56 PM
  */
 @Data
 @NoArgsConstructor
-public class AccountDepositApplyQuery {
+@ApiModel("商户额度申请审批查询")
+public class MerchantCreditApplyQuery extends PageReq {
 
   /**
-   * 申请人
+   * 商户名称
    */
-  @ApiModelProperty("申请人")
+  @ApiModelProperty("商户名称")
   @Query(type = Query.Type.INNER_LIKE)
-  private String applyUser;
+  private String merName;
+
+  /**
+   * 申请类型
+   */
+  @ApiModelProperty("商户额度申请类型（充值额度：rechargeLimit，余额：currentBalance, 剩余信用额度:remainingLimit，信用额度:creditLimit，消耗返点:rebateLimit）")
+  @Query(type = Query.Type.EQUAL)
+  private String applyType;
 
   /**
    * 审批状态
@@ -30,6 +42,13 @@ public class AccountDepositApplyQuery {
   @ApiModelProperty("审批状态(通过：AUDIT_SUCCESS， 不通过：AUDIT_FAILED, 待审核：AUDITING)")
   @Query(type = Query.Type.EQUAL)
   private String approvalStatus;
+
+  /**
+   * 审批人
+   */
+  @ApiModelProperty("申请人")
+  @Query(type = Query.Type.INNER_LIKE)
+  private String applyUser;
 
   /**
    * 审批人

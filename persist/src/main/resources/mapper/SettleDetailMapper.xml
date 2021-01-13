@@ -9,4 +9,79 @@
         id,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,stroe_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,create_user,create_time,update_user,update_time,version
     </sql>
 
+    <resultMap id="monthSettleDetailDTO" type="com.welfare.persist.dto.MonthSettleDetailDTO">
+        <result property="transNo" column="trans_no"/>
+        <result property="orderNO" column="order_no"/>
+        <result property="transTime" column="trans_time" jdbcType="TIMESTAMP"/>
+        <result property="storeCode" column="store_code"/>
+        <result property="storeName" column="store_name"/>
+        <result property="merCode" column="mer_code"/>
+        <result property="merName" column="mer_name"/>
+        <result property="type" column="type"/>
+        <result property="welfareTypeCode" column="welfare_type_code"/>
+        <result property="welfareTypeName" column="welfare_type_name"/>
+        <result property="payAmount" column="pay_amount"/>
+        <result property="refundAmount" column="refund_amount"/>
+        <result property="realAmount" column="real_amount"/>
+        <result property="settleAmount" column="settle_amount"/>
+    </resultMap>
+
+    <select id="selectMonthSettleDetail" resultMap="monthSettleDetailDTO" parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
+        select
+            t1.trans_no,
+            t1.order_id as order_no,
+            t1.trans_time,
+            t1.store_code,
+            t1.store_name,
+            t1.mer_code,
+            t1.mer_name,
+            case when t3.mer_code = t1.mer_code then '自营'
+                 else '第三方' end as type,
+            t1.mer_account_type as welfare_type_code,
+            t1.mer_account_type_name as welfare_type_name,
+            case when t1.trans_type='consume' then t1.trans_amount
+                 when t1.trans_type='refund' then 0 end as pay_amount,
+            case when t1.trans_type='consume' then 0
+                 when t1.trans_type='refund' then t1.trans_amount end as refund_amount,
+            case when t1.trans_type='consume' then t1.trans_amount
+                 when t1.trans_type='refund' then 0 end as real_amount,
+            t1.trans_amount*t2.rebate_ratio as settle_amount
+        from settle_detail t1
+        left join merchant_store_relation t2
+        on t1.mer_code = t2.mer_code and t1.store_code = t2.store_code and t2.status=0
+        left join supplier_store t3
+        on t1.store_code = t3.store_code and t3.status=0
+        <where>
+            <if test="orderNo!=null and orderNo!=''">
+                and t1.order_id = #{orderNo}
+            </if>
+            <if test="storeName!=null and storeName!=''">
+                and t1.store_name like concat('%',#{storeName},'%')
+            </if>
+            <if test="storeCode!=null and storeCode!=''">
+                and t1.store_code = #{storeCode}
+            </if>
+            <if test="startTime!=null">
+                and t1.trans_time &gt;=#{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime!=null">
+                and t1.trans_time &lt;=#{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="welfareTypeCode!=null and welfareTypeCode!=''">
+                and t1.mer_account_type = #{welfareTypeCode}
+            </if>
+            <if test="merCode!=null and merCode!=''">
+                and t1.mer_code = #{merCode}
+            </if>
+    <!--        <choose>
+                <when test="storeType!=null and storeType!='' and storeType='self'">
+                    and t3.mer_code = t1.mer_code
+                </when>
+                <when test="storeType!=null and storeType!='' and storeType='third'">
+                    and t3.mer_code != t1.mer_code
+                </when>
+            </choose>-->
+        </where>
+    </select>
+
 </mapper>

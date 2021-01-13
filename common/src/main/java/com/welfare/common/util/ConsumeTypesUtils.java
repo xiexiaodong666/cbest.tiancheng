@@ -40,6 +40,19 @@ public class ConsumeTypesUtils {
     return StringUtils.join(transfer(map),",");
   }
 
+  public static void removeFalseKey(Map<String, Boolean> map){
+    if (!map.get(ConsumeTypeEnum.O2O.getCode())) {
+      map.remove(ConsumeTypeEnum.O2O.getCode());
+    }
+    if (!map.get(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
+      map.remove(ConsumeTypeEnum.ONLINE_MALL.getCode());
+    }
+    if (!map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+      map.remove(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+    }
+  }
+
+
   public static Map<String, Boolean> transfer(String str){
     List<String> list=Arrays.asList(str.split(str));
     Map<String, Boolean> map=new HashMap<>();

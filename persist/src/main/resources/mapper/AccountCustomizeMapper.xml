@@ -6,7 +6,7 @@
     </sql>
 
   <sql id="baseColumn">
-        id,account_name,account_code,account_type_code,mer_code,store_code,account_status,staff_status,active,binding,create_user,create_time,update_user,update_time,account_balance,flag,version,phone
+        id,account_name,account_code,account_type_code,mer_code,store_code,account_status,staff_status,binding,create_user,create_time,update_user,update_time,account_balance,flag,version,phone
     </sql>
   <select id ="queryPageDTO" resultType="com.welfare.persist.dto.AccountPageDTO">
     SELECT

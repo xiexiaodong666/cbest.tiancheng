@@ -2,7 +2,9 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.MoveDirectionEnum;
+import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
@@ -10,6 +12,9 @@ import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.MerchantAccountTypeService;
+import com.welfare.service.MerchantService;
+import com.welfare.service.SequenceService;
+import com.welfare.service.converter.MerchantAccountTypeDetailConverter;
 import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
 import com.welfare.service.dto.MerchantAccountTypeSortReq;
@@ -19,7 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * 商户信息服务接口实现
@@ -34,6 +42,9 @@ import java.util.List;
 public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
     private final MerchantAccountTypeExMapper merchantAccountTypeExMapper;
+    private final MerchantService merchantService;
+    private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
+    private final SequenceService sequenceService;
 
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
@@ -42,8 +53,24 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
 
     @Override
     public MerchantAccountTypeDetailDTO detail(Long id) {
-//        return merchantAccountTypeDao.getById(id);
-        return null;
+        MerchantAccountTypeDetailDTO detailDTO=merchantAccountTypeDetailConverter.toD(merchantAccountTypeDao.getById(id));
+        if(EmptyChecker.isEmpty(detailDTO)){
+            throw new BusiException("福利类型不存在");
+        }
+        detailDTO.setMerName(merchantService.getMerchantByMerCode(detailDTO.getMerCode()).getMerName());
+        List<MerchantAccountType> list=this.queryByMerCode(detailDTO.getMerCode());
+        if(EmptyChecker.notEmpty(list)){
+            List<MerchantAccountTypeDetailDTO.TypeItem> itemList=list.stream().map(item->{
+                MerchantAccountTypeDetailDTO.TypeItem typeItem=new MerchantAccountTypeDetailDTO.TypeItem();
+                typeItem.setDeductionOrder(item.getDeductionOrder());
+                typeItem.setMerAccountTypeName(item.getMerAccountTypeName());
+                typeItem.setId(item.getId());
+                typeItem.setMerAccountTypeCode(item.getMerAccountTypeCode());
+                return typeItem;
+            }).collect(Collectors.toList());
+            detailDTO.setTypeList(itemList);
+        }
+        return detailDTO;
     }
 
     @Override
@@ -52,24 +79,50 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantAccountTypeDetailDTO merchantAccountType) {
-//        return merchantAccountTypeDao.save(merchantAccountType);
-        return true;
+        if(EmptyChecker.isEmpty(merchantAccountType.getTypeList())){
+            throw new BusiException("福利类型扣款顺序不能为空");
+        }
+        List<MerchantAccountType> accountTypeList=new ArrayList<>();
+        for(MerchantAccountTypeDetailDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
+            MerchantAccountType type=merchantAccountTypeDetailConverter.toE(merchantAccountType);
+            type.setDeductionOrder(typeItem.getDeductionOrder());
+            type.setMerAccountTypeCode(typeItem.getMerAccountTypeCode());
+            type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
+            type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+            accountTypeList.add(type);
+        }
+        return merchantAccountTypeDao.saveBatch(accountTypeList);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantAccountTypeDetailDTO merchantAccountType) {
-        return true;
-//        return merchantAccountTypeDao.updateById(merchantAccountType);
+        //merCode不允许修改
+        merchantAccountType.setMerCode(null);
+        List<MerchantAccountType> accountTypeList=new ArrayList<>();
+        for(MerchantAccountTypeDetailDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
+            if(EmptyChecker.isEmpty(typeItem.getId())){
+                throw new BusiException("id不能为空");
+            }
+            MerchantAccountType type=merchantAccountTypeDetailConverter.toE(merchantAccountType);
+            type.setDeductionOrder(typeItem.getDeductionOrder());
+            type.setId(typeItem.getId());
+            accountTypeList.add(type);
+        }
+        return merchantAccountTypeDao.saveOrUpdateBatch(accountTypeList);
     }
 
     @Override
-    public String exportList(MerchantAccountTypePageReq pageReq) {
-        return null;
+    public List<MerchantAccountTypeWithMerchantDTO> exportList(MerchantAccountTypePageReq pageReq) {
+        List<MerchantAccountTypeWithMerchantDTO> list=this.page(new Page(0,Integer.MAX_VALUE),pageReq).getRecords();
+        return list;
     }
 
     @Override
-    @Transactional
+    @Deprecated
+    @Transactional(rollbackFor = Exception.class)
     public boolean moveDeductionsOrder(MerchantAccountTypeSortReq merchantAccountTypeSortReq) {
         MerchantAccountType merchantAccountType=merchantAccountTypeDao.getById(merchantAccountTypeSortReq.getId());
         MerchantAccountTypeReq req=new MerchantAccountTypeReq();

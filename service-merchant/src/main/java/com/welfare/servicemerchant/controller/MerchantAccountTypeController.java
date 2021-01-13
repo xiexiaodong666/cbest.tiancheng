@@ -74,9 +74,9 @@ public class MerchantAccountTypeController implements IController {
         return null;
     }
 
-    @PostMapping("/move-deductions-order")
-    @ApiOperation("移动商户福利类型扣款顺序")
-    public R moveDeductionsOrder(@RequestBody@Valid MerchantAccountTypeSortReq merchantAccountTypeSortReq){
-        return R.status(merchantAccountTypeService.moveDeductionsOrder(merchantAccountTypeSortReq),"移动扣款顺序失败");
-    }
+//    @PostMapping("/move-deductions-order")
+//    @ApiOperation("移动商户福利类型扣款顺序")
+//    public R moveDeductionsOrder(@RequestBody@Valid MerchantAccountTypeSortReq merchantAccountTypeSortReq){
+//        return R.status(merchantAccountTypeService.moveDeductionsOrder(merchantAccountTypeSortReq),"移动扣款顺序失败");
+//    }
 }

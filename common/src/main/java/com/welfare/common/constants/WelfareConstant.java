@@ -117,8 +117,12 @@ public class WelfareConstant {
          * 序列号类型
          */
         MERCHANT_CREDIT_APPLY("merchant_credit_apply", "商户额度变更申请"),
-        DEPOSIT("deposit","账户充值");
-
+        DEPOSIT("deposit","账户充值"),
+        CARD_NO("cardNo","卡号"),
+        MER_ACCOUNT_TYPE_CODE("mer_account_type","福利类型编号"),
+        ACCOUNT_TYPE_CODE("account_type_code","员工类型编码"),
+        DEPARTMENT_CODE("department_code","部门编号"),
+        MER_CODE("mer_code","商户编号");
         private String code;
         private String desc;
 
@@ -221,7 +225,8 @@ public class WelfareConstant {
         E_WELFARE_ACCOUNT("e_welfare_account","福利平台-账户服务"),
         E_WELFARE_MERCHANT("e_welfare_merchant","福利平台-商户服务"),
         E_WELFARE_SETTLEMENT("e_welfare_settlement","福利平台-结算服务"),
-        E_WELFARE_API("e_welfare_api","福利平台-api");
+        E_WELFARE_API("e_welfare_api","福利平台-api"),
+        CARD_INFO_WRITER("card_info_writer","写卡客户端");
 
 
         private String code;
@@ -237,6 +242,62 @@ public class WelfareConstant {
         }
 
         public String desc(){
+            return this.desc;
+        }
+    }
+
+    /**
+     * 卡状态
+     */
+    public enum CardStatus{
+
+        /**
+         * 卡状态
+         */
+        NEW(0,"新增"),
+        WRITTEN(1,"已写入"),
+        BIND(2,"已绑定");
+        private Integer code;
+        private String desc;
+
+        CardStatus(Integer code, String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public Integer code(){
+            return this.code;
+        }
+
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+    /**
+     * 渠道
+     */
+    public enum Channel {
+        /**
+         * 请求头的KEY
+         */
+        ALIPAY("alipay", "支付宝"),
+        WECHAT("wechat", "微信"),
+        PLATFORM("platform", "平台");
+
+        private String code;
+        private String desc;
+
+        Channel(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
             return this.desc;
         }
     }

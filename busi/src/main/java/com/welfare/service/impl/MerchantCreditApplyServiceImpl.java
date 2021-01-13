@@ -10,6 +10,8 @@ import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.MerchantCreditApplyDao;
+import com.welfare.persist.dto.MerchantCreditApplyInfoDTO;
+import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantCreditApply;
 import com.welfare.service.MerchantCreditApplyService;
@@ -18,6 +20,7 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantCreditApplyConverter;
 import com.welfare.service.dto.*;
+import com.welfare.service.dto.merchantapply.*;
 import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.utils.PageUtils;
@@ -26,9 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -60,7 +65,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             return apply.getId();
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY_REQUEST_ID, request.getRequestId());
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -127,7 +132,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -169,7 +174,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getFairLock(lockKey);
         try {
             boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
             if (locked) {
@@ -188,7 +193,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
                     // 审批通过修改金额
                     WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyCode());
-                    Long transNo = sequenceService.next(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
+                    Long transNo = sequenceService.nextNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
                     merchantCreditService.increaseAccountType(apply.getMerCode(),type,apply.getBalance(), transNo.toString());
                 }
                 return apply.getId();
@@ -218,34 +223,38 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     }
 
     @Override
-    public Page<MerchantCreditApplyInfo> page(int current, int size, MerchantCreditApplyQuery query, ApiUserInfo user) {
+    public Page<MerchantCreditApplyInfo> page(Integer current, Integer size, MerchantCreditApplyQueryReq query, ApiUserInfo user) {
         Page<MerchantCreditApply> page = new Page<>();
         page.setCurrent(current);
         page.setSize(size);
-        Page<MerchantCreditApply> result = merchantCreditApplyDao.page(page, QueryHelper.getWrapper(query));
-        List<MerchantCreditApplyInfo> infos = null;
+        Page<MerchantCreditApplyInfoDTO> result = merchantCreditApplyDao.getBaseMapper().queryByPage(page, query);
+        List<MerchantCreditApplyInfo> infos = new ArrayList<>();
         if (result != null && CollectionUtils.isNotEmpty(result.getRecords())) {
-            List<MerchantCreditApply> applys = result.getRecords();
-            infos = creditApplyConverter.toInfoList(applys);
-            infos.forEach(info -> {
-                Merchant merchant = merchantService.detailByMerCode(info.getMerCode());
-                info.setMerName(merchant.getMerName());
-                info.setMerCooperationMode(merchant.getMerCooperationMode());
+            List<MerchantCreditApplyInfoDTO> dtos = result.getRecords();
+            dtos.forEach(dto -> {
+                MerchantCreditApplyInfo info = new MerchantCreditApplyInfo();
+                BeanUtils.copyProperties(dto,info);
+                info.setMerCooperationMode(MerCooperationModeEnum.getByCode(info.getMerCooperationMode()).getDesc());
+                info.setApplyType(WelfareConstant.MerCreditType.findByCode(info.getApplyType()).desc());
+                info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());
+                infos.add(info);
             });
         }
         return PageUtils.toPage(result, infos);
     }
 
     @Override
-    public List<MerchantCreditApplyInfo> list(MerchantCreditApplyQuery query, ApiUserInfo user) {
-        List<MerchantCreditApply> result =  merchantCreditApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
-        List<MerchantCreditApplyInfo> infos = creditApplyConverter.toInfoList(result);
-        if (CollectionUtils.isNotEmpty(infos)) {
-            infos.forEach(info -> {
-                Merchant merchant = merchantService.detailByMerCode(info.getMerCode());
+    public List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQueryReq query, ApiUserInfo user) {
+        List<MerchantCreditApplyInfoDTO> result =  merchantCreditApplyDao.getBaseMapper().queryByPage(query);
+        List<MerchantCreditApplyExcelInfo> infos = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(result)) {
+            result.forEach(dto -> {
+                MerchantCreditApplyExcelInfo info = new MerchantCreditApplyExcelInfo();
+                BeanUtils.copyProperties(dto,info);
+                info.setMerCooperationMode(MerCooperationModeEnum.getByCode(info.getMerCooperationMode()).getDesc());
+                info.setApplyType(WelfareConstant.MerCreditType.findByCode(info.getApplyType()).desc());
                 info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());
-                info.setMerName(merchant.getMerName());
-                info.setMerCooperationMode(merchant.getMerCooperationMode());
+                infos.add(info);
             });
         }
         return infos;

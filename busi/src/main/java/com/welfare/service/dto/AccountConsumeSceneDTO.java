@@ -18,7 +18,7 @@ public class AccountConsumeSceneDTO {
   /**
    * 员工类型ID
    */
-  private Long accountTypeId;
+  private String accountTypeCode;
   /**
    * 员工类型名称
    */

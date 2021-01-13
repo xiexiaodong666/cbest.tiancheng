@@ -34,4 +34,34 @@
     GROUP BY
     msr.mer_code
   </select>
+
+  <select id="exportMerchantStoreRelations" resultType="com.welfare.persist.dto.MerchantStoreRelationDTO">
+    SELECT
+    msr.id as id,
+    msr.STATUS as status,
+    m.create_time as createTime,
+    msr.ramark as ramark,
+    msr.mer_code as merCode,
+    group_concat( msr.store_code ) as storeCode,
+    group_concat( msr.store_alias ) as storeAlias,
+    m.mer_name as merName
+    FROM
+    merchant_store_relation msr
+    LEFT JOIN merchant m ON m.mer_code = msr.mer_code
+    where
+    msr.deleted != 1
+    <if test="status != null and status !='' ">and msr.status = #{status}
+    </if>
+    <if test="merName != null and merName !='' ">and m.mer_name = #{merName}
+    </if>
+    <if test="startTime != null ">and msr.create_time &gt;= #{startTime}</if>
+    <if test="endTime != null ">and msr.create_time &lt;= #{endTime}</if>
+    GROUP BY
+    msr.mer_code
+  </select>
+
+
+  <update id="updateMerchantStoreRelationStatus">
+   update merchant_store_relation set sync_status = 1 where id = #{id}
+  </update>
 </mapper>

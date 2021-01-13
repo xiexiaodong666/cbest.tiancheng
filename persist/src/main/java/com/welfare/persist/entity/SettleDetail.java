@@ -219,7 +219,7 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     /**
     * 门店名称
     */
-    public static final String STROE_NAME = "stroe_name";
+    public static final String STORE_NAME = "store_name";
     /**
     * 交易时间
     */

@@ -1,8 +1,14 @@
 package com.welfare.persist.mapper;
 
+import com.welfare.persist.dto.MonthSettleDTO;
+import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.query.MonthSettleDetailQuery;
+import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * 月度结算账单(month_settle)数据Mapper
@@ -14,4 +20,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MonthSettleMapper extends BaseMapper<MonthSettle> {
 
+    List<MonthSettleDTO> selectMonthSettle(MonthSettleQuery monthSettleQuery);
+
+    List<MonthSettleDetailDTO> selectMonthSettleDetail(MonthSettleDetailQuery monthSettleDetailQuery);
+
+    MonthSettle sumSettleDetailToMonthSettle(MonthSettleDetailQuery monthSettleDetailQuery);
 }

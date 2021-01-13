@@ -57,7 +57,7 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      * 卡状态
      */
     @ApiModelProperty("卡状态")   
-    private String cardStatus;
+    private Integer cardStatus;
     /**
      * 删除标志
      */
@@ -104,6 +104,19 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      */
     @ApiModelProperty("磁条号")   
     private String magneticStripe;
+
+
+    /**
+     * 入库时间
+     */
+    @ApiModelProperty("入库时间")
+    private Date writtenTime;
+
+    /**
+     * 绑定时间
+     */
+    @ApiModelProperty("绑定时间")
+    private Date bindTime;
 
 //以下为列明常量
 
@@ -159,5 +172,13 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
     * 磁条号
     */
     public static final String MAGNETIC_STRIPE = "magnetic_stripe";
+    /**
+     * 入库时间
+     */
+    public static final String WRITTEN_TIME = "written_time";
+    /**
+     * 绑定时间
+     */
+    public static final String BIND_TIME = "bind_time";
 
 }

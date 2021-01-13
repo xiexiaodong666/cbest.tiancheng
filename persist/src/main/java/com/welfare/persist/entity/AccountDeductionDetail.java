@@ -93,7 +93,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      * 子账户类型(例如餐费、交通费等)
      */
     @ApiModelProperty("子账户类型(例如餐费、交通费等)")   
-    private BigDecimal merAccountType;
+    private String merAccountType;
     /**
      * 子账户扣款金额
      */

@@ -2,6 +2,10 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.SequenceTypeEnum;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ApiUserHolder;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.CardApplyDao;
@@ -13,11 +17,13 @@ import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.mapper.CardApplyMapper;
 import com.welfare.persist.mapper.CardInfoMapper;
 import com.welfare.service.CardApplyService;
+import com.welfare.service.SequenceService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +46,13 @@ public class CardApplyServiceImpl implements CardApplyService {
   private final CardInfoMapper cardInfoMapper;
   private final CardInfoDao cardInfoDao;
 
+  private final SequenceService sequenceService;
+
   // 卡片规则 TC01 + 客户商户编号（4位）+  9位自增（从100000001开始
+
+  private final static String prefix = "TC01";
+  private final static Long startId = 100000001L;
+
 
   @Override
   public Page<CardApply> pageQuery(Page<CardApply> page, String cardName, String merCode,
@@ -48,6 +60,15 @@ public class CardApplyServiceImpl implements CardApplyService {
       Integer status, Date startTime, Date endTime) {
 
     return cardApplyMapper.searchCardApplys(page, cardName, merCode, cardType, cardMedium,
+                                            status, startTime, endTime
+    );
+  }
+
+  @Override
+  public List<CardApply> exportCardApplys(String cardName, String merCode, String cardType,
+      String cardMedium, Integer status, Date startTime, Date endTime) {
+
+    return cardApplyMapper.exportCardApplys(cardName, merCode, cardType, cardMedium,
                                             status, startTime, endTime
     );
   }
@@ -80,17 +101,16 @@ public class CardApplyServiceImpl implements CardApplyService {
     cardApply.setStatus(0);
 
     List<CardInfo> cardInfoList = new ArrayList<>();
-    String cardId = cardInfoMapper.getCardId(cardApplyAddReq.getMerCode());
+    // String cardId = cardInfoMapper.getCardId(cardApplyAddReq.getMerCode());
     for (int i = 0; i < cardApplyAddReq.getCardNum(); i++) {
       CardInfo cardInfo = new CardInfo();
       cardInfo.setApplyCode(cardApply.getApplyCode());
-      String writeCardId = setId(cardId);
-      cardInfo.setCardId(writeCardId);
-      // 实现递增
-      cardId = writeCardId;
-
+      Long writeCardId = sequenceService.nextNo(
+          SequenceTypeEnum.CARID.getCode(), cardApplyAddReq.getMerCode(), startId);
+      cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
       cardInfo.setCardType(cardApply.getCardType());
-      cardInfo.setCardStatus(cardApply.getStatus().toString());
+      cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());
+      cardInfo.setCardStatus(WelfareConstant.CardStatus.NEW.code());
       cardInfo.setDeleted(false);
       cardInfo.setCreateUser(cardApply.getCreateUser());
 
@@ -100,9 +120,17 @@ public class CardApplyServiceImpl implements CardApplyService {
     return cardApplyDao.save(cardApply) && cardInfoDao.saveBatch(cardInfoList);
   }
 
+
   @Override
   public boolean update(CardApplyUpdateReq cardApplyUpdateReq) {
     CardApply cardApply = cardApplyDao.getById(cardApplyUpdateReq.getId());
+    QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
+    queryWrapper.eq(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.WRITTEN.code());
+    List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapper);
+    if (CollectionUtils.isNotEmpty(cardInfoList)) {
+      throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "卡片已写入，无法再更改信息", null);
+    }
 
     if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
       cardApply.setCardName(cardApplyUpdateReq.getCardName());
@@ -136,9 +164,19 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardApply.setRemark(cardApplyUpdateReq.getRemark());
     }
 
-    // TODO 批量修改 cardInfo
-
-    return cardApplyDao.saveOrUpdate(cardApply);
+    queryWrapper.clear();
+    queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
+    cardInfoList = cardInfoDao.list(queryWrapper);
+    boolean saveCardApply = cardApplyDao.saveOrUpdate(cardApply);
+    boolean updateCardInfo = true;
+    if(CollectionUtils.isNotEmpty(cardInfoList)) {
+      for (CardInfo cardInfo:
+      cardInfoList) {
+        cardInfo.setCardType(cardApply.getCardType());
+      }
+      updateCardInfo = cardInfoDao.saveOrUpdateBatch(cardInfoList);
+    }
+    return saveCardApply && updateCardInfo;
   }
 
   @Override
@@ -154,12 +192,19 @@ public class CardApplyServiceImpl implements CardApplyService {
     return cardApplyDao.saveOrUpdate(cardApply);
   }
 
+  @Override
+  public CardApply queryByApplyCode(String applyCode) {
+    QueryWrapper<CardApply> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(CardApply.APPLY_CODE, applyCode);
+    return cardApplyDao.getOne(queryWrapper);
+  }
+
   /**
    * 自增卡号id
    */
   private String setId(String id) {
     //截取头部字母编号
-    String head = id.substring(0, 8);
+    String head = id.substring(0, 9);
     //截取尾部数字
     String tail = id.substring(head.length(), id.length());
     //尾部数字 +1

@@ -9,8 +9,8 @@ import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountReq;
 import com.welfare.service.dto.AccountDTO;
-import com.welfare.service.dto.AccountDepositApplyInfo;
 import com.welfare.service.dto.AccountBillDetailDTO;
+import com.welfare.service.dto.accountapply.AccountDepositApplyInfo;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,14 +53,14 @@ public class AccountController implements IController {
   private FileUploadService fileUploadService;
 
 
-  @GetMapping("/incremental-page")
+  /*@GetMapping("/incremental-page")
   @ApiOperation("增量查询账户(支持离线消费场景)")
   public R<Page<AccountDepositApplyInfo>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
                                                     @RequestParam @ApiParam("单页大小") Integer pageSize,
                                                     @RequestParam(required = true) @ApiParam("门店编码") String storeCode,
                                                     @RequestParam(required = true) @ApiParam("查询开始的id > 0)") Long startId){
     return null;
-  }
+  }*/
 
   @GetMapping("/page")
   @ApiOperation("分页查询账户")
@@ -112,7 +112,8 @@ public class AccountController implements IController {
   @GetMapping(value="/exportAccount")
   public R<String> exportAccount(AccountPageReq accountPageReq) throws IOException {
     List<AccountDTO>  accountDTOList = accountService.export(accountPageReq);
-    return success(fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号"));
+    String path = fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号");
+    return success(fileUploadService.getFileServerUrl(path));
   }
 
   @ApiOperation("批量新增员工账号")
@@ -152,6 +153,7 @@ public class AccountController implements IController {
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) throws IOException{
     List<AccountBillDetailDTO> exportList = accountService.exportBillDetail(accountCode,createTimeStart,createTimeEnd);
-    return success(fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细"));
+    String path =fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细");
+    return success(fileUploadService.getFileServerUrl(path));
   }
 }

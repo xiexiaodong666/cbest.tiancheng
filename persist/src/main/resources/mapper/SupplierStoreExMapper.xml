@@ -30,4 +30,14 @@
             </if>
         </where>
     </select>
+
+    <select id="queryMerSupplierStoreDTList" resultType="com.welfare.persist.dto.MerSupplierStoreDTO">
+         SELECT
+         mer_code as merCode,
+        store_code as storeCode,
+        store_name as storeName,
+        consum_type as consumType
+        from supplier_store
+        where deleted = 0 and mer_code=#{merCode}
+    </select>
 </mapper>

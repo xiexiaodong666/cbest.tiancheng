@@ -2,14 +2,15 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.service.dto.AccountConsumeSceneAddReq;
-import com.welfare.service.dto.AccountConsumeSceneDTO;
+import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.service.AccountConsumeSceneService;
+import com.welfare.service.dto.AccountConsumeSceneAddReq;
+import com.welfare.service.dto.AccountConsumeSceneDTO;
+import com.welfare.service.dto.AccountConsumeSceneReq;
 import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
 import com.welfare.servicemerchant.dto.AccountConsumePageReq;
-import com.welfare.service.dto.AccountConsumeSceneReq;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,63 +42,89 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/accountConsumeScene")
 @Api(tags = "员工消费配置管理")
 public class AccountConsumeSceneController implements IController {
+
   @Autowired
   private AccountConsumeSceneService accountConsumeSceneService;
   @Autowired
   private AccountConsumeSceneConverter accountConsumeSceneConverter;
   @Autowired
   private FileUploadService fileUploadService;
+
   @GetMapping("/page")
   @ApiOperation("分页查询员工消费配置列表")
-  public R<Page<AccountConsumeScenePageDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize, AccountConsumePageReq accountConsumePageReq){
-    Page<AccountConsumeScenePageDTO> page = new Page(currentPage,pageSize);
+  public R<Page<AccountConsumeScenePageDTO>> pageQuery(
+      @RequestParam @ApiParam("当前页") Integer currentPage,
+      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      AccountConsumePageReq accountConsumePageReq) {
+    Page<AccountConsumeScenePageDTO> page = new Page(currentPage, pageSize);
     AccountConsumePageQuery accountConsumePageQuery = new AccountConsumePageQuery();
-    BeanUtils.copyProperties(accountConsumePageReq,accountConsumePageQuery);
-    IPage<AccountConsumeScenePageDTO> result = accountConsumeSceneService.getPageDTO(page,accountConsumePageQuery);
+    BeanUtils.copyProperties(accountConsumePageReq, accountConsumePageQuery);
+    IPage<AccountConsumeScenePageDTO> result = accountConsumeSceneService
+        .getPageDTO(page, accountConsumePageQuery);
 
     return success(accountConsumeSceneConverter.toD(result));
   }
 
   @GetMapping("/{id}")
   @ApiOperation("员工消费配置详情")
-  public R<AccountConsumeSceneDTO> detail(@PathVariable Long id){
-    AccountConsumeSceneDTO accountConsumeSceneDTO = accountConsumeSceneService.findAccountConsumeSceneDTOById(id);
+  public R<AccountConsumeSceneDTO> detail(@PathVariable Long id) {
+    AccountConsumeSceneDTO accountConsumeSceneDTO = accountConsumeSceneService
+        .findAccountConsumeSceneDTOById(id);
     return success(accountConsumeSceneDTO);
   }
 
   @PostMapping("/save")
   @ApiOperation("新增员工消费配置")
-  public R<Boolean> save(@RequestBody AccountConsumeSceneAddReq accountConsumeSceneAddReq){
-    return success(accountConsumeSceneService.save(accountConsumeSceneAddReq));
+  public R<Boolean> save(@RequestBody AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
+    try {
+      return success(accountConsumeSceneService.save(accountConsumeSceneAddReq));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
 
   @PostMapping("/update")
   @ApiOperation("修改员工消费配置")
-  public R<Boolean> update(@RequestBody AccountConsumeSceneReq accountConsumeSceneReq){
-    return success(accountConsumeSceneService.update(accountConsumeSceneReq));
+  public R<Boolean> update(@RequestBody AccountConsumeSceneReq accountConsumeSceneReq) {
+    try {
+      return success(accountConsumeSceneService.update(accountConsumeSceneReq));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
 
   @PostMapping("/updateStatus/{id}")
   @ApiOperation("激活")
-  public R<Boolean> updateStatus(@PathVariable Long id,@RequestParam(required = false) @ApiParam("使用状态") Integer status){
-    return success(accountConsumeSceneService.updateStatus(id,status));
+  public R<Boolean> updateStatus(@PathVariable Long id,
+      @RequestParam(required = false) @ApiParam("使用状态") Integer status) {
+    try {
+      return success(accountConsumeSceneService.updateStatus(id, status));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
   }
 
   @PostMapping("/delete/{id}")
   @ApiOperation("删除员工消费配置")
-  public R<Boolean> delete(@PathVariable Long id){
-    return success(accountConsumeSceneService.delete(id));
+  public R<Boolean> delete(@PathVariable Long id) {
+    try {
+      return success(accountConsumeSceneService.delete(id));
+    }catch (BusiException be){
+      return R.fail(be.getMessage());
+    }
   }
 
 
   @ApiOperation("员工消费配置导出")
-  @GetMapping(value="/exportAccountConsumeScene")
-  public R<String> exportAccountConsumeScene(AccountConsumePageReq accountConsumePageReq)throws IOException {
+  @GetMapping(value = "/exportAccountConsumeScene")
+  public R<String> exportAccountConsumeScene(AccountConsumePageReq accountConsumePageReq)
+      throws IOException {
     AccountConsumePageQuery accountConsumePageQuery = new AccountConsumePageQuery();
-    BeanUtils.copyProperties(accountConsumePageReq,accountConsumePageQuery);
-    List<AccountConsumeScenePageDTO> list = accountConsumeSceneService.export(accountConsumePageQuery);
-    String path = fileUploadService.uploadExcelFile(list, AccountConsumeScenePageDTO.class, "员工消费配置");
+    BeanUtils.copyProperties(accountConsumePageReq, accountConsumePageQuery);
+    List<AccountConsumeScenePageDTO> list = accountConsumeSceneService
+        .export(accountConsumePageQuery);
+    String path = fileUploadService
+        .uploadExcelFile(list, AccountConsumeScenePageDTO.class, "员工消费配置");
     return success(fileUploadService.getFileServerUrl(path));
   }
 }

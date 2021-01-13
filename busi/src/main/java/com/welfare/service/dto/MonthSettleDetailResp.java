@@ -17,6 +17,10 @@ import java.util.Date;
  */
 @Data
 public class MonthSettleDetailResp{
+    @ExcelProperty(value = "序列号")
+    @ApiModelProperty(value = "序列号")
+    private Long id;
+
     @ExcelProperty(value = "交易流水号")
     @ApiModelProperty(value = "交易流水号")
     private String transNo;

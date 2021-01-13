@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,11 +54,9 @@ public class MonthSettleController implements IController {
         return success(monthSettleDetailRespDtoPage);
     }
 
-    @GetMapping("/{id}/allDetailList")
+    @GetMapping("/{id}/detailList")
     @ApiOperation("查询结算账单明细列表")
-    public R<List<MonthSettleDetailResp>> queryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailExportReq monthSettleDetailExportReq){
-        MonthSettleDetailReq monthSettleDetailReq = new MonthSettleDetailReq();
-        BeanUtils.copyProperties(monthSettleDetailReq, monthSettleDetailExportReq);
+    public R<List<MonthSettleDetailResp>> queryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq){
         List<MonthSettleDetailResp> monthSettleDetailResps =  monthSettleService.queryMonthSettleDetail(id, monthSettleDetailReq);
         return success(monthSettleDetailResps);
     }
@@ -65,10 +64,14 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/{id}/export")
     @ApiOperation("结算账单明细导出")
-    public void exportMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailExportReq monthSettleDetailExportReq, HttpServletResponse response){
-        MonthSettleDetailReq monthSettleDetailReq = new MonthSettleDetailReq();
-        BeanUtils.copyProperties(monthSettleDetailReq, monthSettleDetailExportReq);
-        List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleService.queryMonthSettleDetail(id, monthSettleDetailReq);
+    public void exportMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq, HttpServletResponse response){
+        List<MonthSettleDetailResp> monthSettleDetailResps = new ArrayList<>();
+        List<MonthSettleDetailResp> monthSettleDetailRespsTemp;
+        do {
+            monthSettleDetailRespsTemp = monthSettleService.queryMonthSettleDetail(id, monthSettleDetailReq);
+            monthSettleDetailResps.addAll(monthSettleDetailRespsTemp);
+            monthSettleDetailReq.setMinId(monthSettleDetailRespsTemp.get(monthSettleDetailRespsTemp.size()).getId());
+        }while(monthSettleDetailRespsTemp.isEmpty());
         try {
             ExcelUtil.export(response, "结算账单明细", "结算账单明细", monthSettleDetailResps, MonthSettleDetailResp.class );
         } catch (IOException e) {

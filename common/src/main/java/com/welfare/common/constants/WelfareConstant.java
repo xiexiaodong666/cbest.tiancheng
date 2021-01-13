@@ -13,6 +13,28 @@ public class WelfareConstant {
     private WelfareConstant() {
 
     }
+    public enum DictType {
+        /**
+         * 门店消费类型
+         */
+        STORE_CONSUM_TYPE("SupplierStore.consumType", "消费类型");
+
+        private String code;
+        private String desc;
+
+        DictType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+    }
 
     public enum PaymentScene {
         /**

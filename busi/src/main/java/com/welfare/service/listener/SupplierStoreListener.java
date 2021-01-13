@@ -4,12 +4,9 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.util.EmptyChecker;
-import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.Sequence;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.MerchantService;
-import com.welfare.service.SequenceService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.dto.SupplierStoreImportDTO;
@@ -41,6 +38,8 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private final MerchantService merchantService;
 
   private final SupplierStoreService storeService;
+  private  final String defaultConsumType;
+
 
   private static StringBuilder uploadInfo = new StringBuilder();
 
@@ -51,6 +50,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     BeanUtils.copyProperties(storeImportDTO, store);
     store.setStatus(0);
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
+    store.setConsumType(defaultConsumType);
     list.add(store);
     merCodeList.add(store.getMerCode());
     storeCodeList.add(store.getStoreCode());

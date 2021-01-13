@@ -38,7 +38,7 @@ public abstract class AbstractMerAccountTypeOperator {
      * @param transNo
      * @return 实际操作金额
      */
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
         throw new RuntimeException("not supported method");
     }
 
@@ -63,5 +63,15 @@ public abstract class AbstractMerAccountTypeOperator {
      */
     protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, String transNo){
         throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
+    }
+    /**
+     * 默认抛出超过余额限度异常,子类可以自定义其他操作
+     * @param merchantCredit
+     * @param amountLeftToBeIncrease
+     * @param transNo
+     * @return
+     */
+    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo){
+        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
     }
 }

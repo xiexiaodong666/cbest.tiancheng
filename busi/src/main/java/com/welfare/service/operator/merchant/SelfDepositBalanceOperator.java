@@ -76,10 +76,11 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
     }
 
     @Override
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setCurrentBalance(merchantCredit.getCurrentBalance().add(amount));
-        return MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit,transNo );
+        MerchantAccountOperation operation = MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit, transNo);
+        return Arrays.asList(operation);
     }
 
     @Override

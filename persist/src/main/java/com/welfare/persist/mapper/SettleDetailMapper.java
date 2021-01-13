@@ -18,5 +18,10 @@ import java.util.List;
 @Mapper
 public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
 
+    /**
+     * 查询账单明细（限制每次最多拉取两千条数据）
+     * @param monthSettleDetailQuery
+     * @return
+     */
     List<MonthSettleDetailDTO> selectMonthSettleDetail(MonthSettleDetailQuery monthSettleDetailQuery);
 }

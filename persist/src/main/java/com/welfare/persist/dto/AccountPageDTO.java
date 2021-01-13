@@ -1,5 +1,7 @@
 package com.welfare.persist.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.math.BigDecimal;
 import lombok.Data;
 
@@ -12,6 +14,7 @@ import lombok.Data;
 public class AccountPageDTO {
   private Long id;
   private String accountName;
+  @JsonSerialize(using = ToStringSerializer.class)
   private String accountCode;
   private String accountStatus;
   private String departmentCode;

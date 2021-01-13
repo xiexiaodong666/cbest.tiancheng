@@ -1,6 +1,5 @@
 package com.welfare.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -8,23 +7,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import  com.welfare.persist.dao.AccountTypeDao;
-import com.welfare.persist.dto.AccountTypeDTO;
+import com.welfare.persist.dao.AccountTypeDao;
+import com.welfare.persist.dto.AccountTypeMapperDTO;
 import com.welfare.persist.dto.MerSupplierStoreDTO;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountTypeCustomizeMapper;
-import com.welfare.persist.mapper.AccountTypeMapper;
 import com.welfare.persist.mapper.SupplierStoreExMapper;
+import com.welfare.service.AccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.AccountTypeConverter;
+import com.welfare.service.dto.AccountTypeDTO;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.welfare.service.AccountTypeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,18 +51,18 @@ public class AccountTypeServiceImpl implements AccountTypeService {
     }
 
     @Override
-    public Page<AccountTypeDTO> getPageDTO(Page<AccountTypeDTO> page, String merCode,
+    public Page<AccountTypeDTO> getPageDTO(Page<AccountTypeMapperDTO> page, String merCode,
         String typeCode,
         String typeName, Date startDate, Date endDate) {
-        IPage<AccountTypeDTO> accountTypeDTOIPage = accountTypeCustomizeMapper.queryAccountType(page,merCode,typeCode,typeName,startDate,endDate);
-        return accountTypeConverter.toPage(accountTypeDTOIPage);
+        IPage<AccountTypeMapperDTO> accountTypeDTOIPage = accountTypeCustomizeMapper.queryAccountType(page,merCode,typeCode,typeName,startDate,endDate);
+        return accountTypeConverter.toDTOPage(accountTypeDTOIPage);
     }
 
     @Override
     public List<AccountTypeDTO> queryAccountTypeDTO(String merCode, String typeCode,
         String typeName,
         Date startDate, Date endDate) {
-        return accountTypeCustomizeMapper.queryAccountType(merCode,typeCode,typeName,startDate,endDate);
+        return accountTypeConverter.toDTOList(accountTypeCustomizeMapper.queryAccountType(merCode,typeCode,typeName,startDate,endDate));
     }
 
     @Override
@@ -107,12 +105,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean delete(Long id) {
-        UpdateWrapper<AccountType> updateWrapper = new UpdateWrapper();
-        updateWrapper.eq(AccountType.ID,id);
-        AccountType accountType = new AccountType();
-        accountType.setDeleted(true);
-
-        return accountTypeDao.update(accountType,updateWrapper);
+        return accountTypeDao.removeById(id);
     }
 
     @Override

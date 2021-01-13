@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -28,6 +29,7 @@ import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.MerchantService;
+import com.welfare.service.SequenceService;
 import com.welfare.service.converter.AccountConverter;
 import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
@@ -84,6 +86,7 @@ public class AccountServiceImpl implements AccountService {
   private final ObjectMapper mapper;
   private final MerchantService merchantService;
   private final DepartmentService departmentService;
+  private final SequenceService sequenceService;
 
 
   @Override
@@ -93,6 +96,14 @@ public class AccountServiceImpl implements AccountService {
             accountPageReq.getDepartmentCode(), accountPageReq.getAccountStatus(),
             accountPageReq.getAccountTypeCode());
     return accountConverter.toPage(iPage);
+  }
+
+  @Override
+  public Account findByPhone(String phone) {
+    QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
+    accountQueryWrapper.eq(Account.PHONE,phone);
+    Account acccount = accountDao.getOne(accountQueryWrapper);
+    return acccount;
   }
 
   @Override
@@ -109,7 +120,7 @@ public class AccountServiceImpl implements AccountService {
   public String uploadAccount(MultipartFile multipartFile) {
     try {
       AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,
-          merchantService,departmentService);
+          merchantService,departmentService,sequenceService);
       EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();
@@ -159,11 +170,7 @@ public class AccountServiceImpl implements AccountService {
     if( null ==  syncAccount){
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
     }
-    UpdateWrapper<Account> updateWrapper = new UpdateWrapper();
-    updateWrapper.eq(Account.ID, id);
-    Account account = new Account();
-    account.setDeleted(true);
-    boolean result = accountDao.update(updateWrapper);
+    boolean result = accountDao.removeById(id);
 
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(syncAccount);
     this.syncAccount(ShoppingActionTypeEnum.DELETE,
@@ -202,8 +209,9 @@ public class AccountServiceImpl implements AccountService {
   @Transactional(rollbackFor = Exception.class)
   public Boolean save(Account account) {
     validationAccount(account,true);
+    Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
+    account.setAccountCode(accounCode);
     boolean result = accountDao.save(account);
-
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(account);
     this.syncAccount(ShoppingActionTypeEnum.ADD,
         Arrays.asList(accountSyncDTO));
@@ -232,9 +240,9 @@ public class AccountServiceImpl implements AccountService {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工部门不存在",null);
     }
     if(isNew){
-      Account queryAccount = this.getByAccountCode(account.getAccountCode());
+      Account queryAccount = this.findByPhone(account.getPhone());
       if( null != queryAccount ){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账号已经存在",null);
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工手机号已经存在",null);
       }
     }
     else{

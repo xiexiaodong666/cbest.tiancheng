@@ -34,4 +34,7 @@ public class MonthSettleDetailReq extends RequestPage {
 
     @ApiModelProperty(value = "门店类型 自营：self，第三方：third")
     private String storeType;
+
+    @ApiModelProperty(value = "最小序列号")
+    private Long minId;
 }

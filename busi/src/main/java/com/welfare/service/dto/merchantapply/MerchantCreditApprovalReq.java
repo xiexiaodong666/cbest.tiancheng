@@ -22,8 +22,8 @@ public class MerchantCreditApprovalReq {
 
 
   @ApiModelProperty("申请id")
-  @NotNull(message = "申请id为空")
-  private Long id;
+  @NotEmpty(message = "申请id为空")
+  private String id;
 
   /**
    * 审批状态

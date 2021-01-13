@@ -122,6 +122,7 @@ public class WelfareConstant {
         CARD_NO("cardNo","卡号"),
         MER_ACCOUNT_TYPE_CODE("mer_account_type","福利类型编号"),
         ACCOUNT_TYPE_CODE("account_type_code","员工类型编码"),
+        ACCOUNT_CODE("account_code","员工账号"),
         DEPARTMENT_CODE("department_code","部门编号"),
         MER_CODE("mer_code","商户编号");
         private String code;

@@ -1,14 +1,14 @@
 package com.welfare.servicemerchant.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
-import com.welfare.persist.entity.Merchant;
 import com.welfare.service.MerchantService;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.servicemerchant.converter.MerchantConverter;
 import com.welfare.servicemerchant.dto.MerchantInfo;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -41,6 +42,8 @@ import java.util.List;
 public class MerchantController implements IController {
     private final MerchantService merchantService;
     private final MerchantConverter merchantConverter;
+    private final FileUploadService fileUploadService;
+
     @GetMapping("/list")
     @ApiOperation("查询商户列表（不分页）")
     public R<List<MerchantInfo>> list(@Valid MerchantReq req){
@@ -52,10 +55,10 @@ public class MerchantController implements IController {
         return R.success(merchantService.detail(id));
     }
 
-    @GetMapping("/page")
-    @ApiOperation("查询商户列表（分页））")
-    public R<Page<MerchantWithCreditDTO>> page(Page<Merchant> page, MerchantPageReq merchantPageReq){
-        return R.success(merchantService.page(page,merchantPageReq));
+    @GetMapping("/tree")
+    @ApiOperation("查询商户列表树形）")
+    public R<List<MerchantWithCreditAndTreeDTO>> tree( MerchantPageReq merchantPageReq){
+        return R.success(merchantService.tree(merchantPageReq));
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")
@@ -69,7 +72,7 @@ public class MerchantController implements IController {
     }
     @PostMapping("/export-list")
     @ApiOperation("导出商户列表")
-    public R exportList(@RequestBody MerchantPageReq merchantPageReq){
-        return null;
+    public R<String> exportList(@RequestBody MerchantPageReq merchantPageReq) throws IOException {
+        return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(merchantService.exportList(merchantPageReq), MerchantWithCreditAndTreeDTO.class,"商户导出")));
     }
 }

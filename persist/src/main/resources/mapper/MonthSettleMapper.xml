@@ -75,4 +75,38 @@
             </if>
         </where>
     </select>
+
+
+    <select id="selectMonthSettleSummaryInfo" resultType="map" parameterType="com.welfare.persist.dto.query.MonthSettleQuery">
+        SELECT
+        sum(trans_amount) as allTransAmount,
+        sum(order_num) as allTransCount,
+        min(str_to_date(settle_month,'%Y-%m')) as minSettleMonth,
+        max(str_to_date(settle_month,'%Y-%m')) as maxSettleMonth
+        from month_settle t1
+        LEFT JOIN merchant t2 on t1.mer_code = t2.mer_code
+        <where>
+            <if test="merCode!=null and merCode!=''">
+                and t1.mer_code = #{merCode}
+            </if>
+            <if test="merName!=null and merName!=''">
+                and t2.mer_name like concat('%',#{merName},'%')
+            </if>
+            <if test="startMonthStr!=null and startMonthStr!=''">
+                and t1.settle_month &lt;=#{startMonthStr}
+            </if>
+            <if test="endMonthStr!=null and endMonthStr!=''">
+                and t1.settle_month &gt;=#{endMonthStr}
+            </if>
+            <if test="merCooperationMode!=null and merCooperationMode!=''">
+                and t2.mer_cooperation_mode = #{merCooperationMode}
+            </if>
+            <if test="settleStatus!=null and settleStatus!=''">
+                and t1.settle_status = #{settleStatus}
+            </if>
+            <if test="recStatus!=null and recStatus!=''">
+                and t1.rec_status = #{recStatus}
+            </if>
+        </where>
+    </select>
 </mapper>

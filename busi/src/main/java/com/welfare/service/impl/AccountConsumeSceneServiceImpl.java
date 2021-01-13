@@ -19,6 +19,7 @@ import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.service.AccountConsumeSceneService;
+import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
@@ -33,6 +34,7 @@ import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final ShoppingFeignClient shoppingFeignClient;
   private final MerchantService merchantService;
   private final AccountTypeService accountTypeService;
+  private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationList;
 
   @Override
   public void syncAccountConsumeScene(ShoppingActionTypeEnum actionTypeEnum,
@@ -116,18 +119,32 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     List<UserRoleBinding> resultList = new LinkedList<UserRoleBinding>();
     Set<AccountConsumeScene> accountConsumeSceneSet = accountConsumeSceneMap.keySet();
     UserRoleBinding userRoleBinding = new UserRoleBinding();
-    List<StoreBinding> bindings = new LinkedList<StoreBinding>() ;
-    List<String> employeeRoles = new LinkedList<String>();
-    accountConsumeSceneSet.forEach(accountConsumeScene -> {
-      List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneMap.get(accountConsumeScene);
-      employeeRoles.add(accountConsumeScene.getAccountTypeCode());
-      bindings.addAll(assemableStoreBindings(relationList));
-      resultList.add(userRoleBinding);
-    });
 
+    accountConsumeSceneSet.forEach(accountConsumeScene -> {
+      List<StoreBinding> bindings = new LinkedList<StoreBinding>() ;
+      List<String> employeeRoles = new LinkedList<String>();
+      employeeRoles.add(accountConsumeScene.getAccountTypeCode());
+      bindings.addAll(assemableStoreBindings(accountConsumeSceneMap.get(accountConsumeScene)));
+
+      if( userRoleBinding.getBindings() == null  ){
+        userRoleBinding.setBindings(bindings);
+      }else{
+        userRoleBinding.getBindings().addAll(bindings);
+      }
+      if( userRoleBinding.getEmployeeRoles() == null  ){
+        userRoleBinding.setEmployeeRoles(employeeRoles);
+      }else{
+        userRoleBinding.getEmployeeRoles().addAll(employeeRoles);
+      }
+      userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0 ? true : false);
+      userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
+    });
+    resultList.add(userRoleBinding);
 
     return resultList;
   }
+
+
   private List<StoreBinding> assemableStoreBindings(List<AccountConsumeSceneStoreRelation> relationList){
     if( CollectionUtils.isEmpty(relationList)){
       return null;
@@ -151,17 +168,24 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
+    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     List<String> accountTypeCodeList = accountConsumeSceneAddReq.getAccountTypeCodeList();
     accountTypeCodeList.forEach(accountTypeCode -> {
       AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
       BeanUtils.copyProperties(accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeScene.setAccountTypeCode(accountTypeCode);
+      accountConsumeScene.setStatus(0);
       validationAccountConsumeScene(accountConsumeScene,true);
       accountConsumeSceneDao.save(accountConsumeScene);
       List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = getAccountConsumeSceneStoreRelations(
           accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeSceneStoreRelationDao.saveBatch(accountConsumeSceneStoreRelationList);
+      //下发数据Map
+      accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
     });
+    //下发数据
+    syncAccountConsumeScene(ShoppingActionTypeEnum.ADD,
+        accountConsumeSceneMap);
     return true;
   }
 
@@ -177,12 +201,12 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if( isNew ){
       AccountConsumeScene queryAccountConsumeScene = queryAccountConsumeScene(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
       if(null != queryAccountConsumeScene){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同类型的消费场景配置:" + accountConsumeScene.getId(),null);
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同类型的消费场景配置",null);
       }
     }else{
       AccountConsumeScene queryAccountConsumeScene = accountConsumeSceneDao.getById(accountConsumeScene.getId());
       if( null == queryAccountConsumeScene ){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景不存在:" + accountConsumeScene.getId(),null);
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景不存在",null);
       }
     }
   }
@@ -215,6 +239,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq) {
+    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     BeanUtils.copyProperties(accountConsumeSceneReq, accountConsumeScene);
     validationAccountConsumeScene(accountConsumeScene,false);
@@ -228,6 +253,10 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
           accountConsumeSceneStoreRelationList.add(accountConsumeSceneStoreRelation);
         });
     accountConsumeSceneStoreRelationDao.updateBatchById(accountConsumeSceneStoreRelationList);
+    //下发数据
+    accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
+    syncAccountConsumeScene(ShoppingActionTypeEnum.UPDATE,
+        accountConsumeSceneMap);
     return true;
   }
 
@@ -235,12 +264,16 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean delete(Long id) {
-    UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
-    updateWrapper.eq(AccountConsumeScene.ID, id);
-    AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
-    accountConsumeScene.setDeleted(true);
+    AccountConsumeScene accountConsumeScene = accountConsumeSceneDao.getById(id);
     validationAccountConsumeScene(accountConsumeScene,false);
-    return accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
+    boolean deleteResult =  accountConsumeSceneDao.removeById(id);
+    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
+    //下发数据
+    List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
+    accountConsumeSceneMap.put(accountConsumeScene,relationList);
+    syncAccountConsumeScene(ShoppingActionTypeEnum.UPDATE,
+        accountConsumeSceneMap);
+    return deleteResult;
   }
 
   @Override

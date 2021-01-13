@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * Created by hao.yin on 2021/1/8.
  */
@@ -22,4 +24,8 @@ public class MerchantReq {
     @Query(type = Query.Type.EQUAL)
     @ApiModelProperty("合作方式")
     private String merCooperationMode;
+
+    @Query(type = Query.Type.IN,propName = "merCode")
+    @ApiModelProperty("商户code集合")
+    private List<String> merCodeList;
 }

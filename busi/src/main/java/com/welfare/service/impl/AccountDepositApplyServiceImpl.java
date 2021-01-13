@@ -333,7 +333,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         }
         //已经审批过了
         if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-            return Long.valueOf(apply.getId());
+            return apply.getId();
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
         RLock lock = redissonClient.getFairLock(lockKey);
@@ -346,7 +346,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 }
                 //已经审批过了
                 if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                    return Long.valueOf(apply.getId());
+                    return apply.getId();
                 }
                 apply.setApprovalStatus(ApprovalStatus.getByCode(request.getApprovalStatus()).getCode());
                 apply.setApprovalRemark(request.getApplyRemark());
@@ -357,7 +357,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 List<AccountDepositApplyDetail> details = depositApplyDetailService.listByApplyCode(apply.getApplyCode());
                 if (CollectionUtils.isEmpty(details)) {
                     log.info("账号额度申请无员工,applyCode:{}", apply.getApplyCode());
-                    return Long.valueOf(apply.getId());
+                    return apply.getId();
                 }
                 if (apply.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS.getCode())) {
                     apply.setRechargeStatus(RechargeStatus.SUCCESS.getCode());
@@ -381,7 +381,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 accountDepositApplyDao.saveOrUpdate(apply);
                 // 更新申请明细充值状态
                 accountDepositApplyDetailDao.saveOrUpdateBatch(details);
-                return Long.valueOf(apply.getId());
+                return apply.getId();
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -396,7 +396,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     }
 
     @Override
-    public Page<AccountDepositApplyInfo> page(Integer currentPage, Integer pageSize, AccountDepositApplyQuery query) {
+    public Page<AccountDepositApplyInfo> page(int currentPage, int pageSize, AccountDepositApplyQuery query) {
         Page<AccountDepositApply> page = new Page<>();
         page.setCurrent(currentPage);
         page.setSize(pageSize);

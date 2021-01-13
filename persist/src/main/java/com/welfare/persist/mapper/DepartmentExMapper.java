@@ -1,6 +1,10 @@
 package com.welfare.persist.mapper;
 
+import com.welfare.persist.dto.DepartmentUnionMerchant;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 部门 数据Mapper
@@ -11,4 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface DepartmentExMapper {
+    List<DepartmentUnionMerchant> listUnionMerchant(@Param("merCode") String merCode);
+
 }

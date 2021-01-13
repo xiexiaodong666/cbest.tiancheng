@@ -170,11 +170,7 @@ public class AccountServiceImpl implements AccountService {
     if( null ==  syncAccount){
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
     }
-    UpdateWrapper<Account> updateWrapper = new UpdateWrapper();
-    updateWrapper.eq(Account.ID, id);
-    Account account = new Account();
-    account.setDeleted(true);
-    boolean result = accountDao.update(updateWrapper);
+    boolean result = accountDao.removeById(id);
 
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(syncAccount);
     this.syncAccount(ShoppingActionTypeEnum.DELETE,

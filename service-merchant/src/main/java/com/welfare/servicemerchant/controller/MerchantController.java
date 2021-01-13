@@ -1,12 +1,10 @@
 package com.welfare.servicemerchant.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.MerchantWithCreditDTO;
-import com.welfare.persist.entity.Merchant;
 import com.welfare.service.MerchantService;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.servicemerchant.converter.MerchantConverter;
 import com.welfare.servicemerchant.dto.MerchantInfo;
 import io.swagger.annotations.Api;
@@ -52,10 +50,10 @@ public class MerchantController implements IController {
         return R.success(merchantService.detail(id));
     }
 
-    @GetMapping("/page")
-    @ApiOperation("查询商户列表（分页））")
-    public R<Page<MerchantWithCreditDTO>> page(Page<Merchant> page, MerchantPageReq merchantPageReq){
-        return R.success(merchantService.page(page,merchantPageReq));
+    @GetMapping("/tree")
+    @ApiOperation("查询商户列表树形）")
+    public R<List<MerchantWithCreditAndTreeDTO>> tree( MerchantPageReq merchantPageReq){
+        return R.success(merchantService.tree(merchantPageReq));
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")

@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.DepartmentExMapper">
+    <select id="listUnionMerchant" resultType="com.welfare.persist.dto.DepartmentUnionMerchant">
+        select * from (SELECT
+        m.id id,
+        m.mer_name departmentName,
+        m.mer_code departmentCode,
+        m.mer_code merCode,
+        m.mer_code departmentPath,
+        0 departmentParent,
+        m.create_time createTime
+        FROM
+        merchant m) temp0
+        <where>
+            <if test="merCode!=null and merCode!=''">
+                and temp0.merCode=#{merCode}
+            </if>
+        </where>
+        UNION
+        select * from (SELECT
+        d.id id,
+        d.department_name departmentName,
+        d.department_code departmentCode,
+        d.mer_code merCode,
+        d.department_path departmentPath,
+        d.department_parent departmentParent,
+        d.create_time createTime
+        FROM
+        department d) temp
+
+        <where>
+            <if test="merCode!=null and merCode!=''">
+                and temp.merCode=#{merCode}
+            </if>
+        </where>
+    </select>
 </mapper>

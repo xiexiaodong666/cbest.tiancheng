@@ -1,7 +1,6 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
@@ -17,17 +16,21 @@ import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantDetailConverter;
+import com.welfare.service.converter.MerchantWithCreditConverter;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.service.helper.QueryHelper;
+import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,6 +51,8 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantCreditService merchantCreditService;
     private final MerchantDetailConverter merchantDetailConverter;
     private final SequenceService sequenceService;
+
+    private final MerchantWithCreditConverter merchantWithCreditConverter;
 
 
     @Override
@@ -84,10 +89,19 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public Page<MerchantWithCreditDTO> page(Page<Merchant> page, MerchantPageReq merchantPageReq) {
-        Page<MerchantWithCreditDTO> pageResult = merchantExMapper.listWithCredit(page, merchantPageReq);
-        dictService.trans(MerchantWithCreditDTO.class, Merchant.class.getSimpleName(), true, pageResult.getRecords().toArray());
-        return pageResult;
+    public List<MerchantWithCreditAndTreeDTO> tree( MerchantPageReq merchantPageReq) {
+        List<MerchantWithCreditDTO> list = merchantExMapper.listWithCredit( merchantPageReq);
+        if(EmptyChecker.isEmpty(list)){
+            return new ArrayList<>();
+        }
+        List<MerchantWithCreditAndTreeDTO> treeDTOList=merchantWithCreditConverter.toD(list);
+        treeDTOList.forEach(item->{
+            item.setCode(item.getMerCode());
+            item.setParentCode(item.getDepartmentParent());
+        });
+        dictService.trans(MerchantWithCreditAndTreeDTO.class, Merchant.class.getSimpleName(), true, treeDTOList.toArray());
+        TreeUtil treeUtil=new TreeUtil(treeDTOList,"0");
+        return treeUtil.getTree();
     }
 
     @Override
@@ -108,9 +122,8 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public List<MerchantWithCreditDTO> exportList(MerchantPageReq merchantPageReq) {
-        Page page=new Page(0,Integer.MAX_VALUE);
-        List<MerchantWithCreditDTO> list = this.page(page, merchantPageReq).getRecords();
+    public List<MerchantWithCreditAndTreeDTO> exportList(MerchantPageReq merchantPageReq) {
+        List<MerchantWithCreditAndTreeDTO> list = this.tree( merchantPageReq);
         return list;
     }
 

@@ -15,6 +15,7 @@ import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
+import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantStoreRelation;
@@ -164,12 +165,19 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     supplierStore.setStatus(storeActivateReq.getStatus());
     return supplierStoreDao.updateById(supplierStore);
   }
+  @Transactional(rollbackFor = Exception.class)
+  public boolean batchAdd(List<SupplierStore> list) {
+    return supplierStoreDao.saveBatch(list);
+  }
 
+  public List<SupplierStore> list(QueryWrapper<SupplierStore> queryWrapper) {
+    return supplierStoreDao.list(queryWrapper);
+  }
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public String batchAdd(MultipartFile multipartFile) {
+  public String upload(MultipartFile multipartFile) {
     try {
-      SupplierStoreListener listener = new SupplierStoreListener(merchantService,supplierStoreDao);
+      SupplierStoreListener listener = new SupplierStoreListener(merchantService,this);
       EasyExcel.read(multipartFile.getInputStream(), SupplierStoreImportDTO.class, listener).sheet()
               .doRead();
       String result = listener.getUploadInfo().toString();

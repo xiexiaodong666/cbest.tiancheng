@@ -66,7 +66,7 @@ public class SupplierStoreController implements IController {
     @PostMapping("/batch-add")
     @ApiOperation("批量新增供应商门店")
     public R batchAdd(@RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile){
-        return R.success(supplierStoreService.batchAdd(multipartFile));
+        return R.success(supplierStoreService.upload(multipartFile));
     }
 
     @PostMapping("/delete/{id}")

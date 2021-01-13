@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "shopping", url = "${shopping.url:123}", fallbackFactory = ShoppingFeignClientFallback.class)
+@FeignClient(value = "shopping", url = "${shopping.url}", fallbackFactory = ShoppingFeignClientFallback.class)
 public interface ShoppingFeignClient {
 
 

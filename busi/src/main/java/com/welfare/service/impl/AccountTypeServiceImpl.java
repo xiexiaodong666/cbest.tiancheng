@@ -105,12 +105,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean delete(Long id) {
-        UpdateWrapper<AccountType> updateWrapper = new UpdateWrapper();
-        updateWrapper.eq(AccountType.ID,id);
-        AccountType accountType = new AccountType();
-        accountType.setDeleted(true);
-
-        return accountTypeDao.update(accountType,updateWrapper);
+        return accountTypeDao.removeById(id);
     }
 
     @Override

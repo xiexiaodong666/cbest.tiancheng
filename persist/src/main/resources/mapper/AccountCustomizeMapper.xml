@@ -31,7 +31,7 @@ FROM
       and a.mer_code = #{merCode} and at.mer_code = #{merCode}
     </if>
     <if test=" accountName !='' and accountName != null  ">
-      and a.account_name = #{accountName}
+      and a.account_name like '%${accountName}'
     </if>
     <if test=" departmentCode !='' and departmentCode != null ">
       and d.department_code = #{departmentCode}

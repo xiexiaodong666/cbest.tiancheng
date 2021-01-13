@@ -264,18 +264,16 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean delete(Long id) {
-    UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
-    updateWrapper.eq(AccountConsumeScene.ID, id);
-    AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
-    accountConsumeScene.setDeleted(true);
+    AccountConsumeScene accountConsumeScene = accountConsumeSceneDao.getById(id);
     validationAccountConsumeScene(accountConsumeScene,false);
+    boolean deleteResult =  accountConsumeSceneDao.removeById(id);
     Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     //下发数据
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
     accountConsumeSceneMap.put(accountConsumeScene,relationList);
     syncAccountConsumeScene(ShoppingActionTypeEnum.UPDATE,
         accountConsumeSceneMap);
-    return accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
+    return deleteResult;
   }
 
   @Override

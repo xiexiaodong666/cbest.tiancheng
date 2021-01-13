@@ -1,6 +1,7 @@
 package com.welfare.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
@@ -53,12 +54,15 @@ public interface SupplierStoreService {
      */
     boolean activate(SupplierStoreActivateReq storeActivateReq);
 
+    boolean batchAdd(List<SupplierStore> list);
+
+    List<SupplierStore> list(QueryWrapper<SupplierStore> queryWrapper);
+
     /**
      * 批量新增供应商门店
-     * @param list
      * @return
      */
-    String batchAdd(MultipartFile multipartFile);
+    String upload(MultipartFile multipartFile);
 
     /**
      * 删除供应商门店

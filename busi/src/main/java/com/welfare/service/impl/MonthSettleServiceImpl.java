@@ -19,6 +19,7 @@ import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.mapper.MonthSettleMapper;
+import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.dto.MonthSettleDetailReq;
 import com.welfare.service.dto.MonthSettleDetailResp;
 import com.welfare.service.dto.MonthSettleReq;
@@ -49,7 +50,9 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
     @Autowired
     private final MonthSettleMapper monthSettleMapper;
-    
+
+    private final SettleDetailMapper settleDetailMapper;
+
     private final MonthSettleDao monthSettleDao;
 
 
@@ -80,7 +83,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
 
         PageHelper.startPage(monthSettleDetailReq.getCurrentPage(), monthSettleDetailReq.getPageSize());
-        List<MonthSettleDetailDTO> monthSettleDetailDTOS = monthSettleMapper.selectMonthSettleDetail(monthSettleDetailQuery);
+        List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
         PageInfo<MonthSettleDetailDTO> monthSettleDetailDTOPageInfo = new PageInfo<>(monthSettleDetailDTOS);
 
         Page<MonthSettleDetailResp> monthSettleDetailRespPage = new Page<>(monthSettleDetailReq.getCurrentPage(),
@@ -100,7 +103,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
 
-        List<MonthSettleDetailDTO> monthSettleDetailDTOS = monthSettleMapper.selectMonthSettleDetail(monthSettleDetailQuery);
+        List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
 
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleDetailDTOS.stream().map(monthSettleDetailDTO -> {
             MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();
@@ -147,10 +150,11 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         //修改账单结算状态为已结算
         MonthSettle monthSettle = new MonthSettle();
         monthSettle.setId(Long.parseLong(id));
+        monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
 
         return monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate().
-                        eq(MonthSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
+                        eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
         );
     }
 

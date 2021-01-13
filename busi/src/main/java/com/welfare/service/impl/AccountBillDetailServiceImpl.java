@@ -7,6 +7,7 @@ import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.dto.Deposit;
+import com.welfare.service.operator.payment.domain.PaymentOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountBillDetailService;
@@ -38,17 +39,20 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
     @Override
     public void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType) {
         AccountBillDetail accountBillDetail = new AccountBillDetail();
-        accountBillDetail.setAccountCode(deposit.getAccountCode());
-        accountBillDetail.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
+        Long accountCode = deposit.getAccountCode();
+        BigDecimal amount = deposit.getAmount();
+        accountBillDetail.setAccountCode(accountCode);
+        accountBillDetail.setAccountBalance(accountAmountType.getAccountBalance().add(amount));
         accountBillDetail.setChannel(deposit.getChannel());
         accountBillDetail.setTransNo(deposit.getTransNo());
-        accountBillDetail.setTransAmount(deposit.getAmount());
+        accountBillDetail.setTransAmount(amount);
         accountBillDetail.setTransTime(Calendar.getInstance().getTime());
-        AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(deposit.getAccountCode());
+        AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(accountCode);
         accountBillDetail.setSurplusQuotaBalance(surplusQuota.getAccountBalance());
         accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT.code());
         accountBillDetailDao.save(accountBillDetail);
     }
+
 
     @Override
     public AccountBillDetail queryByTransNo(String transNo) {

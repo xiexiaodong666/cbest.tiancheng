@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class RemainingLimitOperator extends AbstractMerAccountTypeOperator {
-    private MerCreditType merCreditType = MerCreditType.REMAINING_LIMIT;
+    private final MerCreditType merCreditType = MerCreditType.REMAINING_LIMIT;
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to decrease merchantCredit.currentRemainingLimit for {}", amount.toString());

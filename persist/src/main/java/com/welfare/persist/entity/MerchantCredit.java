@@ -70,6 +70,11 @@ public class MerchantCredit extends Model<MerchantCredit> implements Serializabl
     @ApiModelProperty("返利余额")   
     private BigDecimal rebateLimit;
     /**
+     * 自主充值余额
+     */
+    @ApiModelProperty("自主充值余额")
+    private BigDecimal selfDepositBalance;
+    /**
      * 创建人
      */
     @ApiModelProperty("创建人")   

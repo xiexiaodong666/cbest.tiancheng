@@ -2,14 +2,13 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
-import  com.welfare.persist.dao.MerchantCreditDao;
+import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.entity.MerchantCredit;
-import com.welfare.persist.mapper.MerchantCreditMapper;
+import com.welfare.service.MerchantCreditService;
 import com.welfare.service.operator.merchant.*;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.welfare.service.MerchantCreditService;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,7 +35,6 @@ import static com.welfare.common.constants.WelfareConstant.MerCreditType.*;
 public class MerchantCreditServiceImpl implements MerchantCreditService, InitializingBean {
 
     private final RedissonClient redissonClient;
-    private final MerchantCreditMapper merchantCreditMapper;
     private final MerchantCreditDao merchantCreditDao;
 
     private final CreditLimitOperator creditLimitOperator;

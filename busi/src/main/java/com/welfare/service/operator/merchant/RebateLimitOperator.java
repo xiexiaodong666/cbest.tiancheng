@@ -1,7 +1,6 @@
 package com.welfare.service.operator.merchant;
 
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
-import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.enums.IncOrDecType;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -25,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RebateLimitOperator extends AbstractMerAccountTypeOperator {
     private MerCreditType merCreditType = MerCreditType.REBATE_LIMIT;
-    private final MerchantCreditDao merchantCreditDao;
 
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo){

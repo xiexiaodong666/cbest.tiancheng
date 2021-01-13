@@ -1,5 +1,6 @@
 package com.welfare.service;
 
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
@@ -50,8 +51,8 @@ public interface AccountAmountTypeService {
 
   /**
    * 根据账户号查询AccountAmount领域模型
-   * @param accountCode
+   * @param account
    * @return
    */
-    List<AccountAmountDO> queryAccountAmountDO(Long accountCode);
+    List<AccountAmountDO> queryAccountAmountDO(Account account);
 }

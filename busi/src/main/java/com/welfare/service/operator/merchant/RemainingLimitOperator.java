@@ -57,7 +57,7 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         BigDecimal creditLimit = merchantCredit.getCreditLimit();
         BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
-        BigDecimal add = amount.add(remainingLimit).divide(creditLimit);
+        BigDecimal add = amount.add(remainingLimit).subtract(creditLimit);
         if (add.compareTo(creditLimit) > 0) {
             // 超过信用额度
             return doWhenMoreThan(merchantCredit,add,transNo);
@@ -81,7 +81,7 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
         merchantCredit.setRemainingLimit(creditLimit);
         MerchantAccountOperation remainingLimitOperator = MerchantAccountOperation.of(
                 merCreditType,
-                creditLimit.divide(remainingLimit),
+                creditLimit.subtract(remainingLimit),
                 IncOrDecType.INCREASE,
                 merchantCredit,
                 transNo

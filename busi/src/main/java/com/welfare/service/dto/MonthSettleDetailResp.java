@@ -5,6 +5,8 @@ import com.welfare.common.base.RequestPage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author qiang.deng
  * @version 1.0.0
@@ -12,7 +14,7 @@ import lombok.Data;
  * @desc 账单明细请求dto
  */
 @Data
-public class MonthSettleDetailResp extends RequestPage {
+public class MonthSettleDetailResp{
     @ExcelProperty(value = "交易流水号")
     @ApiModelProperty(value = "交易流水号")
     private String transNo;
@@ -23,7 +25,7 @@ public class MonthSettleDetailResp extends RequestPage {
 
     @ExcelProperty(value = "交易时间")
     @ApiModelProperty(value = "交易时间")
-    private String transTime;
+    private Date transTime;
 
     @ExcelProperty(value = "消费门店编号")
     @ApiModelProperty(value = "消费门店编号")

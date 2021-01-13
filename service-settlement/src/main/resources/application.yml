@@ -5,3 +5,12 @@ spring:
     name: e-welfare-settlement
 server:
   port: 10017
+
+mybatis-plus:
+  configuration:
+    default-statement-timeout: 180
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapperLocations: classpath:mapper/*.xml
+  global-config:
+    db-config:
+      idType: AUTO

@@ -329,6 +329,12 @@ public class DateUtil {
 		return cal.getTime();
 	}
 
+	/**
+	 * 通过月份获取当月最大日期
+	 * @param monthStr
+	 * @return
+	 * @throws ParseException
+	 */
 	public static Date getDayMaxByMontStr(String monthStr) throws ParseException{
 		SimpleDateFormat format = new SimpleDateFormat(FORMAT_YEAR_MONTH);
 		Date date = format.parse(monthStr);
@@ -340,6 +346,12 @@ public class DateUtil {
 		return ca.getTime();
 	}
 
+	/**
+	 * 通过月份获取当月最小日期
+	 * @param monthStr
+	 * @return
+	 * @throws ParseException
+	 */
 	public static Date getDayMinByMonthStr(String monthStr) throws ParseException{
 		SimpleDateFormat format = new SimpleDateFormat(FORMAT_YEAR_MONTH);
 		Date date = format.parse(monthStr);
@@ -351,6 +363,32 @@ public class DateUtil {
 		return ca.getTime();
 	}
 
+	/**
+	 * 根据传入日期获取对应月分最大日期
+	 * @param date
+	 * @return
+	 */
+	public static Date getMonthDayMaxByDate(Date date) {
+
+		Calendar ca = Calendar.getInstance();
+		ca.setTime(date);
+		ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+		return ca.getTime();
+	}
+	/**
+	 * 根据传入日期获取对应月分最小日期
+	 * @param date
+	 * @return
+	 */
+	public static Date getMonthDayMinByDate(Date date) {
+
+		Calendar ca = Calendar.getInstance();
+		ca.setTime(date);
+		ca.set(Calendar.DAY_OF_MONTH, ca.getActualMinimum(Calendar.DAY_OF_MONTH));
+
+		return ca.getTime();
+	}
 	
 	
 	public static Date getDaySecondMax(Date date,int addDay){

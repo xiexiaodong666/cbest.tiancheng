@@ -3,6 +3,8 @@ package com.welfare.persist.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author qiang.deng
  * @version 1.0.0
@@ -37,9 +39,9 @@ public class MonthSettleDTO {
 
     private String sendStatus;
 
-    private String sendTime;
+    private Date sendTime;
 
-    private String confirmTime;
+    private Date confirmTime;
 
     private String rebateAmount;
 

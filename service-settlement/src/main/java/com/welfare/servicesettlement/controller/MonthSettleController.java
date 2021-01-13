@@ -31,7 +31,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/settlement/monthSettle")
+@RequestMapping("/api/settlement/monthSettle")
 @Api(tags = "结算账单管理")
 public class MonthSettleController implements IController {
 

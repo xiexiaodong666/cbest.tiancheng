@@ -63,7 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
             );
             Map<String, List<MerchantBillDetail>> merBillDetailMap = merchantAccountOperations.stream()
                     .map(MerchantAccountOperation::getMerchantBillDetail)
-                    .collect(Collectors.groupingBy(MerchantBillDetail::getTransNo);
+                    .collect(Collectors.groupingBy(MerchantBillDetail::getTransNo));
             return decreaseAccount(paymentRequest, account, merBillDetailMap);
         } finally {
             merAccountLock.unlock();

@@ -13,6 +13,7 @@
 
   <select id="queryAccountType" resultType="com.welfare.persist.dto.AccountTypeDTO">
     SELECT
+    AT.id,
     AT.mer_code AS merCode,
     AT.type_code AS typeCode,
     AT.type_name AS typeName,

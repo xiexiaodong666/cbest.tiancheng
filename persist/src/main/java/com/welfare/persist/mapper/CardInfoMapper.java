@@ -19,7 +19,7 @@ public interface CardInfoMapper extends BaseMapper<CardInfo> {
 
   public String getCardId(@Param("merCode") String merCode);
 
-  public Page<CardInfoDTO> list(Page<CardInfo> page, @Param("cardName") String cardName,
+  public Page<CardInfoDTO> list(Page<CardInfo> page,@Param("applyCode")String applyCode, @Param("cardName") String cardName,
       @Param("merCode") String merCode,
       @Param("cardType") String cardType, @Param("cardMedium") String cardMedium,
       @Param("cardStatus") String cardStatus, @Param("writtenStartTime") String writtenStartTime,

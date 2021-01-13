@@ -70,7 +70,7 @@ public class CardApplyController implements IController {
     QueryWrapper<CardApply> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(CardApply.ID, id);
     CardApply cardApply = cardApplyService.getMerchantStoreRelationById(queryWrapper);
-    QueryWrapper<Merchant> queryWrapperM = new QueryWrapper();
+    QueryWrapper<Merchant> queryWrapperM = new QueryWrapper<>();
 
     queryWrapperM.eq(Merchant.MER_CODE, cardApply.getMerCode());
 

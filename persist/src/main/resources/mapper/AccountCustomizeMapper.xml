@@ -20,14 +20,13 @@
 	a.max_quota AS maxQuota,
 	a.surplus_quota AS surplusQuota,
   GROUP_CONCAT(ci.card_id) AS cardId,
-	a.account_balance AS accountBalance,
-  a.active
+	a.account_balance AS accountBalance
 FROM
 	account a
 	INNER JOIN department d ON a.store_code = d.department_code
 	LEFT JOIN account_type at ON at.type_code = a.account_type_code
 	LEFT JOIN card_info ci ON ci.account_code = a.account_code
-  where a.deleted = 0 and d.deleted =0 and at.deleted =0 and ci.deleted =0
+  where a.deleted = 0 and d.deleted =0 and at.deleted =0
     <if test=" merCode !='' and merCode != null ">
       and a.mer_code = #{merCode} and at.mer_code = #{merCode}
     </if>

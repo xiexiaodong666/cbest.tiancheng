@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -31,7 +32,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RemainingLimitOperator extends AbstractMerAccountTypeOperator implements InitializingBean {
     private MerCreditType merCreditType = MerCreditType.REMAINING_LIMIT;
-    private final CurrentBalanceOperator currentBalanceOperator;
+    @Autowired
+    private CurrentBalanceOperator currentBalanceOperator;
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to decrease merchantCredit.currentRemainingLimit for {}", amount.toString());

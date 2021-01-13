@@ -9,6 +9,7 @@ import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -28,7 +29,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CreditLimitOperator extends AbstractMerAccountTypeOperator implements InitializingBean{
   private WelfareConstant.MerCreditType merCreditType = WelfareConstant.MerCreditType.CREDIT_LIMIT;
-  private final RemainingLimitOperator remainingLimitOperator;
+  @Autowired
+  private RemainingLimitOperator remainingLimitOperator;
 
   @Override
   public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {

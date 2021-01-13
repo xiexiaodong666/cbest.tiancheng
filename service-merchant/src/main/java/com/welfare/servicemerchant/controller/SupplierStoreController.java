@@ -75,7 +75,6 @@ public class SupplierStoreController implements IController {
     @PostMapping("/update")
     @ApiOperation("编辑供应商门店")
     public R update(@RequestBody SupplierStoreDetailDTO supplierStore){
-        // TODO green.gao 消费能力变更后,同步修改到消费门店的消费能力字段。
         return R.status(supplierStoreService.add(supplierStore),"编辑失败失败");
 
     }

@@ -83,7 +83,7 @@ public interface SupplierStoreService {
      * @param req
      * @return
      */
-    String exportList(StorePageReq req);
+    List<SupplierStoreWithMerchantDTO> exportList(StorePageReq req);
 
     /**
      * 同步门店消费能力数据

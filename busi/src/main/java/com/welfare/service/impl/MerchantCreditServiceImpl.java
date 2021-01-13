@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
@@ -92,7 +93,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            MerchantAccountOperation increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo );
+            List<MerchantAccountOperation> increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
         } finally {
             lock.unlock();

@@ -3,20 +3,30 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountAmountTypeDao;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountBillDetailService;
+import com.welfare.service.AccountService;
+import com.welfare.service.AccountTypeService;
 import com.welfare.service.dto.Deposit;
+import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+
+import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 
 /**
  * @author duanhy
@@ -30,6 +40,8 @@ import java.util.Objects;
 public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountAmountTypeMapper accountAmountTypeMapper;
+    private final RedissonClient redissonClient;
+    private final AccountService accountService;
     /**
      * 循环依赖问题，所以未采用构造器注入
      */
@@ -52,20 +64,28 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
 
     @Override
     public void updateAccountAmountType(Deposit deposit) {
-        AccountAmountType accountAmountType = this.queryOne(deposit.getAccountCode(),
-                deposit.getMerAccountTypeCode());
-
-        if (Objects.isNull(accountAmountType)) {
-            accountAmountType = deposit.toNewAccountAmountType();
-            BigDecimal afterAddAmount = accountAmountType.getAccountBalance().add(deposit.getAmount());
-            accountAmountType.setAccountBalance(afterAddAmount);
-            accountAmountTypeDao.save(accountAmountType);
-        } else {
-            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
-            accountAmountTypeDao.updateById(accountAmountType);
+        RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + deposit.getAccountCode());
+        lock.lock();
+        try{
+            AccountAmountType accountAmountType = this.queryOne(deposit.getAccountCode(),
+                    deposit.getMerAccountTypeCode());
+            Account account = accountService.getByAccountCode(deposit.getAccountCode());
+            BigDecimal oldAccountBalance = account.getAccountBalance() != null ? account.getAccountBalance() : BigDecimal.ZERO;
+            if (Objects.isNull(accountAmountType)) {
+                accountAmountType = deposit.toNewAccountAmountType();
+                BigDecimal afterAddAmount = accountAmountType.getAccountBalance().add(deposit.getAmount());
+                accountAmountType.setAccountBalance(afterAddAmount);
+                accountAmountTypeDao.save(accountAmountType);
+            } else {
+                accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
+                accountAmountTypeDao.updateById(accountAmountType);
+            }
+            account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
+            accountService.save(account);
+            accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
+        } finally {
+            lock.unlock();
         }
-        accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
-
     }
 
     @Override

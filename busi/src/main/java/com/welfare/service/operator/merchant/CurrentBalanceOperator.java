@@ -1,5 +1,6 @@
 package com.welfare.service.operator.merchant;
 
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -77,10 +78,11 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
     }
 
     @Override
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setCurrentBalance(merchantCredit.getCurrentBalance().add(amount));
-        return MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit,transNo );
+        MerchantAccountOperation merchantAccountOperation = MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit,transNo );
+        return Lists.newArrayList(merchantAccountOperation);
     }
 
     @Override

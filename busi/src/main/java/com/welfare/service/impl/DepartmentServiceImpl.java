@@ -9,6 +9,7 @@ import com.welfare.common.util.MerchantUserHolder;
 import  com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.mapper.DepartmentExMapper;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
@@ -18,10 +19,8 @@ import com.welfare.service.dto.DepartmentDTO;
 import com.welfare.service.dto.DepartmentImportDTO;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
-import com.welfare.service.dto.SupplierStoreImportDTO;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.listener.DepartmentListener;
-import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +48,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentConverter departmentConverter;
     private final SequenceService sequenceService;
     private final DictService dictService;
+    private final DepartmentExMapper  departmentExMapper;
 
     @Override
     public List<Department> list(DepartmentReq req) {
@@ -148,9 +148,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public List<DepartmentTree> tree(String merCode) {
-        DepartmentReq req=new DepartmentReq();
-        req.setMerCode(merCode);
-        List<DepartmentTree> treeDTOList=departmentTreeConverter.toD(this.list(req));
+        List<DepartmentTree> treeDTOList=departmentTreeConverter.toD(departmentExMapper.listUnionMerchant(merCode));
         treeDTOList.forEach(item-> {
             item.setCode(item.getDepartmentCode());
             item.setParentCode(item.getDepartmentParent());

@@ -1,5 +1,6 @@
 package com.welfare.service.operator.merchant;
 
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.enums.IncOrDecType;
@@ -39,9 +40,10 @@ public class RechargeLimitOperator extends AbstractMerAccountTypeOperator {
 
     }
     @Override
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
         log.info("ready to increase merchantCredit.rechargeLimit for {}",amount.toString());
         merchantCredit.setRechargeLimit(merchantCredit.getRechargeLimit().add(amount));
-        return MerchantAccountOperation.of(operateType,amount,IncOrDecType.INCREASE, merchantCredit, transNo);
+        MerchantAccountOperation operation = MerchantAccountOperation.of(operateType,amount,IncOrDecType.INCREASE, merchantCredit, transNo);
+        return Lists.newArrayList(operation);
     }
 }

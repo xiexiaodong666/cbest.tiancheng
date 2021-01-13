@@ -80,7 +80,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setApplyUser(user.getUserName());
                 apply.setApplyTime(new Date());
                 merchantCreditApplyDao.save(apply);
-                return apply.getId()+"";
+                return String.valueOf(apply.getId());
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -89,28 +89,6 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
-            }
-        }
-    }
-
-    public void validationParmas(String typeStr, String merCode){
-        Merchant merchant = merchantService.detailByMerCode(merCode);
-        if (merchant == null) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
-        }
-        WelfareConstant.MerCreditType type = WelfareConstant.MerCreditType.findByCode(typeStr);
-        if (!merchant.getMerIdentity().equals(MerIdentityEnum.customer.getCode())) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持[客户]充值", null);
-        }
-        if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payFirt.getCode())) {
-            if (WelfareConstant.MerCreditType.CREDIT_LIMIT == type
-                    || WelfareConstant.MerCreditType.REMAINING_LIMIT == type) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("不能充值[%s]类型",type.desc()), null);
-            }
-        }
-        if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payed.getCode())) {
-            if (WelfareConstant.MerCreditType.CURRENT_BALANCE == type) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("不能充值[%s]类型",type.desc()), null);
             }
         }
     }
@@ -192,11 +170,11 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 merchantCreditApplyDao.saveOrUpdate(apply);
                 if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
                     // 审批通过修改金额
-                    WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyCode());
+                    WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyType());
                     Long transNo = sequenceService.nextNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
                     merchantCreditService.increaseAccountType(apply.getMerCode(),type,apply.getBalance(), transNo.toString());
                 }
-                return apply.getId()+"";
+                return String.valueOf(apply.getId());
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -219,8 +197,6 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         info.setId(apply.getId()+"");
         Merchant merchant = merchantService.detailByMerCode(apply.getMerCode());
         info.setMerName(merchant.getMerName());
-        info.setMerCooperationMode(merchant.getMerCooperationMode());
-        info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getCode());
         return info;
     }
 
@@ -261,5 +237,27 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             });
         }
         return infos;
+    }
+
+    private void validationParmas(String typeStr, String merCode){
+        Merchant merchant = merchantService.detailByMerCode(merCode);
+        if (merchant == null) {
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
+        }
+        WelfareConstant.MerCreditType type = WelfareConstant.MerCreditType.findByCode(typeStr);
+        if (!merchant.getMerIdentity().equals(MerIdentityEnum.customer.getCode())) {
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持[客户]充值", null);
+        }
+        if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payFirt.getCode())) {
+            if (WelfareConstant.MerCreditType.CREDIT_LIMIT == type
+                    || WelfareConstant.MerCreditType.REMAINING_LIMIT == type) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("不能充值[%s]类型",type.desc()), null);
+            }
+        }
+        if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payed.getCode())) {
+            if (WelfareConstant.MerCreditType.CURRENT_BALANCE == type) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("不能充值[%s]类型",type.desc()), null);
+            }
+        }
     }
 }

@@ -74,8 +74,8 @@ public class AccountController implements IController {
 
   @GetMapping("/{id}")
   @ApiOperation("员工账号详情")
-  public R<AccountDetailDTO> detail(@PathVariable Long id) {
-    return success(accountService.queryDetail(id));
+  public R<AccountDetailDTO> detail(@PathVariable String id) {
+    return success(accountService.queryDetail(Long.parseLong(id)));
   }
 
   @PostMapping("/save")
@@ -105,9 +105,9 @@ public class AccountController implements IController {
 
   @PostMapping("/delete/{id}")
   @ApiOperation("删除员工账号")
-  public R<Boolean> delete(@PathVariable Long id) {
+  public R<Boolean> delete(@PathVariable String id) {
     try {
-      return success(accountService.delete(id));
+      return success(accountService.delete(Long.parseLong(id)));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }
@@ -116,10 +116,10 @@ public class AccountController implements IController {
 
   @PostMapping("/active/{id}")
   @ApiOperation("激活或锁定账号")
-  public R<Boolean> active(@PathVariable Long id, @RequestParam @ApiParam("状态") Integer active) {
+  public R<Boolean> active(@PathVariable String id, @RequestParam @ApiParam("状态") Integer active) {
 
     try {
-      return success(accountService.active(id, active));
+      return success(accountService.active(Long.parseLong(id), active));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }

@@ -39,12 +39,12 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
      * 订单编码
      */
     @ApiModelProperty("订单编码")
-    private Integer orderId;
+    private String orderId;
     /**
      * 交易流水号
      */
     @ApiModelProperty("交易流水号")
-    private Integer transNo;
+    private String transNo;
     /**
      * 账户
      */

@@ -37,7 +37,7 @@ public class PlatformUserController {
   PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
       @RequestParam int pageSize,
       @RequestParam int page,
-      @RequestParam String merchant_code,
+      @RequestParam(required = false) String merchant_code,
       @RequestParam(required = false) Date start_create_time,
       @RequestParam(required = false) Date end_create_time
   ) {

@@ -2,12 +2,11 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 
 import java.util.List;
 
@@ -33,11 +32,11 @@ public interface MerchantService {
     MerchantDetailDTO detail(Long id);
 
     /**
-     * 查询商户列表（分页））
+     * 查询商户列表（树形））
      * @param merchantPageReq
      * @return
      */
-    Page<MerchantWithCreditDTO> page(Page<Merchant> page, MerchantPageReq merchantPageReq);
+    List<MerchantWithCreditAndTreeDTO> tree(MerchantPageReq merchantPageReq);
 
     /**
      * 新增商户
@@ -58,7 +57,7 @@ public interface MerchantService {
      * @param merchantPageReq
      * @return
      */
-    List<MerchantWithCreditDTO> exportList(MerchantPageReq merchantPageReq);
+    List<MerchantWithCreditAndTreeDTO> exportList(MerchantPageReq merchantPageReq);
 
 
     /**

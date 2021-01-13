@@ -1,6 +1,7 @@
 package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.base.BasePageVo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ExcelUtil;
@@ -41,8 +42,8 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/page")
     @ApiOperation("分页查询结算账单列表")
-    public R<Page<MonthSettleResp>> pageQuery(MonthSettleReq monthSettleReqDto){
-        Page<MonthSettleResp> monthSettleRespDtoPage =  monthSettleService.pageQuery(monthSettleReqDto);
+    public R<BasePageVo<MonthSettleResp>> pageQuery(MonthSettleReq monthSettleReqDto){
+        BasePageVo<MonthSettleResp> monthSettleRespDtoPage =  monthSettleService.pageQuery(monthSettleReqDto);
         return success(monthSettleRespDtoPage);
     }
 

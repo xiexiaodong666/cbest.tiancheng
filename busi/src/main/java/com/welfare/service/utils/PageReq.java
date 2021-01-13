@@ -13,8 +13,8 @@ import lombok.Data;
 public class PageReq {
 
   @ApiModelProperty("页码从1开始")
-  private Integer current = 1;
+  private int current = 1;
 
   @ApiModelProperty("每页大小")
-  private Integer size = 10;
+  private int size = 10;
 }

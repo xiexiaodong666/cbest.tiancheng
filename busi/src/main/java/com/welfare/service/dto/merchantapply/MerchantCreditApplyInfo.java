@@ -25,7 +25,7 @@ public class MerchantCreditApplyInfo {
    */
   @ApiModelProperty("申请id")
   @ExcelProperty(value = "编号")
-  private Long id;
+  private String id;
 
   /**
    * 申请类型

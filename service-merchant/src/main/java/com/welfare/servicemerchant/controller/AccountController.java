@@ -10,6 +10,7 @@ import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountReq;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
+import com.welfare.service.dto.accountapply.AccountDepositApplyInfo;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

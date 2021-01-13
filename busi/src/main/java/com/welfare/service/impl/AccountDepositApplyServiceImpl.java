@@ -91,6 +91,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     @Autowired
     private MerchantAccountTypeService accountTypeService;
 
+    @Autowired
+    private SequenceService sequenceService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUser) {
@@ -553,6 +556,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
         apply.setCreateUser(merchantUser.getUserCode());
         apply.setUpdateUser(merchantUser.getUserCode());
+        apply.setChannel(WelfareConstant.Channel.PLATFORM.code());
+        apply.setTransNo(sequenceService.nextNo(WelfareConstant.SequenceType.DEPOSIT.code()) + "");
         apply.setCreateTime(now);
         apply.setUpdateTime(now);
         apply.setVersion(0);

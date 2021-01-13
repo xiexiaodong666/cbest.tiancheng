@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * 字典服务接口实现
  *
- * @author hao.yin
+ * @author Yuxiang Li
  * @description 由 Mybatisplus Code Generator 创建
  * @since 2021-01-06 13:49:25
  */

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import java.util.Date;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +25,8 @@ public interface MerchantStoreRelationMapper extends BaseMapper<MerchantStoreRel
       @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
   Boolean updateMerchantStoreRelationStatus(@Param("id") Long id);
+
+  List<MerchantStoreRelationDTO> exportMerchantStoreRelations(
+      @Param("merName") String merName, @Param("status") String status,
+      @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }

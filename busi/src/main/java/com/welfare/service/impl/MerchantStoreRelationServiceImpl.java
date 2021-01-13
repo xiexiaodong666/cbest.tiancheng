@@ -76,6 +76,12 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   }
 
   @Override
+  public List<MerchantStoreRelationDTO> exportMerchantStoreRelations(String merName, String status,
+      Date startTime, Date endTime) {
+    return merchantStoreRelationMapper.exportMerchantStoreRelations(merName, status, startTime, endTime);
+  }
+
+  @Override
   public MerchantStoreRelation getMerchantStoreRelationById(
       QueryWrapper<MerchantStoreRelation> queryWrapper) {
     return merchantStoreRelationDao.getOne(queryWrapper);
@@ -93,6 +99,13 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     // 防止门店，消费门店  消费方法不一致
     if (!validateConsumeType(relationAddReq.getAdminMerchantStoreList())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
+    }
+    QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(MerchantStoreRelation.MER_CODE, relationAddReq.getMerCode());
+
+    List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationDao.list(queryWrapper);
+    if(CollectionUtils.isNotEmpty(merchantStoreRelationList)) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该商户已配置了门店", null);
     }
 
     RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();

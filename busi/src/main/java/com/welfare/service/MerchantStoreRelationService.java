@@ -25,6 +25,8 @@ public interface MerchantStoreRelationService {
   Page<MerchantStoreRelationDTO> searchMerchantStoreRelations(Page<MerchantStoreRelation> page,
       String merName, String status, Date startTime,Date endTime);
 
+  List<MerchantStoreRelationDTO> exportMerchantStoreRelations(String merName, String status, Date startTime,Date endTime);
+
   MerchantStoreRelation getMerchantStoreRelationById(
       QueryWrapper<MerchantStoreRelation> queryWrapper);
 

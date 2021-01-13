@@ -99,6 +99,7 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantDetailDTO merchant) {
         boolean flag= merchantDao.updateById(merchantDetailConverter.toE(merchant));

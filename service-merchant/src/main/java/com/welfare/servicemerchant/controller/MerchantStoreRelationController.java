@@ -14,9 +14,11 @@ import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.service.MerchantService;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.servicemerchant.dto.AdminMerchantStoreRelationDTO;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +52,8 @@ public class MerchantStoreRelationController implements IController {
 
   private final MerchantStoreRelationService merchantStoreRelationService;
   private final MerchantService merchantService;
+  private final FileUploadService fileUploadService;
+
 
   @GetMapping("/api/list")
   @ApiOperation("api分页查询消费门店配置列表")
@@ -152,11 +156,15 @@ public class MerchantStoreRelationController implements IController {
   @ApiOperation("导出消费门店配置(返回文件下载地址)")
   @MerchantUser
   public R<String> export(
-      @RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
       @RequestParam(required = false) @ApiParam("商户名称") String merName,
-      @RequestParam(required = false) @ApiParam("使用状态") String status) {
-    return null;
+      @RequestParam(required = false) @ApiParam("使用状态") String status,
+      @RequestParam(required = false) @ApiParam("起始时间") Date startTime,
+      @RequestParam(required = false) @ApiParam("结束时间") Date endTime) throws IOException {
+    List<MerchantStoreRelationDTO> exportList = merchantStoreRelationService
+        .exportMerchantStoreRelations(merName, status, startTime, endTime);
+    String path = fileUploadService.uploadExcelFile(
+        exportList, MerchantStoreRelationDTO.class, "账户明细");
+    return success(fileUploadService.getFileServerUrl(path));
   }
 
 

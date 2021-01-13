@@ -18,4 +18,11 @@ public class GenerateCodeUtil {
     return machineId + String.format("%015d", hashCodeV);
   }
 
+  // 生成32位UUID
+  public static String UUID(){
+    String uuid = UUID.randomUUID().toString();
+    return uuid.replaceAll("-", "");
+  }
+
+
 }

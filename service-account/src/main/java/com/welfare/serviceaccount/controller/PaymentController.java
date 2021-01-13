@@ -1,12 +1,7 @@
 package com.welfare.serviceaccount.controller;
 
-import com.welfare.common.util.BarcodeUtil;
-import com.welfare.persist.entity.BarcodeSalt;
-import com.welfare.service.BarcodeSaltService;
-import com.welfare.service.dto.BarcodeSaltDO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
-import com.welfare.service.dto.payment.PaymentBarcode;
 import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.RefundRequest;
 import io.swagger.annotations.*;
@@ -17,13 +12,7 @@ import net.dreamlu.mica.core.result.R;
 import net.dreamlu.mica.core.utils.BeanUtil;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Description:

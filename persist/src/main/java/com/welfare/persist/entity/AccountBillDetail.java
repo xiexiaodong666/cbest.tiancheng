@@ -43,7 +43,7 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
      * 员工账号
      */
     @ApiModelProperty("员工账号")   
-    private String accountCode;
+    private Long accountCode;
     /**
      * 卡号
      */

@@ -22,7 +22,7 @@ import java.util.List;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class RechargeLimitOperator extends MerAccountTypeOperator {
+public class RechargeLimitOperator extends AbstractMerAccountTypeOperator {
     private WelfareConstant.MerCreditType operateType = WelfareConstant.MerCreditType.RECHARGE_LIMIT;
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo){

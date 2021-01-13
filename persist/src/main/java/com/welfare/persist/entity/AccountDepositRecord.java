@@ -4,7 +4,6 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.FieldFill;
@@ -43,7 +42,7 @@ public class AccountDepositRecord extends Model<AccountDepositRecord> implements
      * 员工账号
      */
     @ApiModelProperty("员工账号")   
-    private String accountCode;
+    private Long accountCode;
     /**
      * 商户代码
      */

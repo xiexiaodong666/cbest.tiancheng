@@ -101,8 +101,6 @@ public class AccountDepositRecordServiceImpl extends
             .setRechargeStatus(AccountRechargeStatusEnum.PENDING_RECHARGE.getCode());
         accountDepositRecord.setPayTradeNo(payTradeNo);
         accountDepositRecord.setDepositAmount(rechargeAmount);
-        accountDepositRecord.setCreateUser(account.getAccountCode());
-        accountDepositRecord.setUpdateUser(account.getAccountCode());
         accountDepositRecord.setCreateTime(DateUtil.date());
         accountDepositRecord.setUpdateTime(DateUtil.date());
         CreateWXH5TradeResp createWXH5TradeResp = JSON

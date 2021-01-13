@@ -18,8 +18,8 @@ public class AccountUploadDTO extends BaseRowModel {
   private String merCode;
   @ExcelProperty(value = "员工名称", index = 1)
   private String accountName;
-  @ExcelProperty(value = "员工账号", index = 2)
-  private String accountCode;
+  @ExcelProperty(value = "手机号", index = 2)
+  private String phone;
   @ExcelProperty(value = "账号状态", index = 3)
   private String accountStatus;
   @ExcelProperty(value = "员工类型编码", index = 4)

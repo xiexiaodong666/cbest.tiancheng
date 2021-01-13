@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -63,8 +65,8 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/batch-add")
     @ApiOperation("批量新增供应商门店")
-    public R batchAdd(@RequestBody List<SupplierStoreDetailDTO> list){
-        return R.status(supplierStoreService.batchAdd(list),"批量新增失败");
+    public R batchAdd(@RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile){
+        return R.success(supplierStoreService.batchAdd(multipartFile));
     }
 
     @PostMapping("/delete/{id}")

@@ -60,7 +60,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("分页账号额度申请列表")
   @MerchantUser
   public R<Page<AccountDepositApplyInfo>> page(@RequestBody AccountDepositApplyQuery query){
-    return success(depositApplyService.page(query.getCurrent(), query.getSize(), query));
+    return success(depositApplyService.page(query.getCurrent(), query.getSize() == 0 ? 10 : query.getSize() , query));
   }
 
   @GetMapping("/detail")

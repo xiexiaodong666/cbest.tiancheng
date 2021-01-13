@@ -28,6 +28,8 @@ public interface AccountService {
   Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
       AccountPageReq accountPageReq);
 
+  Account findByPhone(String phone);
+
   List<AccountDTO> export(AccountPageReq accountPageReq);
 
   String uploadAccount(MultipartFile multipartFile);

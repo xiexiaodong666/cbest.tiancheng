@@ -50,7 +50,7 @@ public class BarcodeServiceImpl implements BarcodeService {
 
     private final BarcodeSaltDao barcodeSaltDao;
     private final RedissonClient redissonClient;
-    private final RedisTemplate<String,PaymentBarcode> redisTemplate;
+    private RedisTemplate<String,PaymentBarcode> redisTemplate;
     @Override
     public List<BarcodeSalt> querySalt(Long fromValidPeriodNumeric) {
         QueryWrapper<BarcodeSalt> queryWrapper = new QueryWrapper<>();

@@ -42,27 +42,13 @@ public class MerchantCreditApplyController implements IController {
     @Autowired
     private FileUploadService fileUploadService;
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ApiOperation("分页商户额度申请列表")
     @ApiUser
-    public R<Page<MerchantCreditApplyInfo>> page(@RequestParam(required = false) @ApiParam("当前页（从1开始）") Integer current,
-                                                 @RequestParam(required = false) @ApiParam("单页大小") Integer size,
-                                                 @Validated MerchantCreditApplyQuery query){
-        if (current == null) {
-            current = 1;
-        }
-        if (size == null) {
-            size = 10;
-        }
+    public R<Page<MerchantCreditApplyInfo>> page(@RequestBody  MerchantCreditApplyQuery query){
         MerchantCreditApplyQueryReq req = new MerchantCreditApplyQueryReq();
-        BeanUtils.copyProperties(query,req,"applyType","approvalStatus");
-        if (query.getApplyType() != null) {
-            req.setApplyType(query.getApplyType().code());
-        }
-        if (query.getApprovalStatus() != null) {
-            req.setApprovalStatus(query.getApprovalStatus().getValue());
-        }
-        Page<MerchantCreditApplyInfo> page = applyService.page(current, size, req, ApiUserHolder.getUserInfo());
+        BeanUtils.copyProperties(query,req);
+        Page<MerchantCreditApplyInfo> page = applyService.page(query.getCurrent(), query.getSize(), req, ApiUserHolder.getUserInfo());
         return success(page);
     }
 
@@ -84,7 +70,9 @@ public class MerchantCreditApplyController implements IController {
     @ApiOperation("导出商户额度申请(返回文件下载地址)")
     @ApiUser
     public R<String> export(@Validated @RequestBody MerchantCreditApplyQuery query) throws IOException {
-        List<MerchantCreditApplyExcelInfo> list = applyService.list(query, ApiUserHolder.getUserInfo());
+        MerchantCreditApplyQueryReq req = new MerchantCreditApplyQueryReq();
+        BeanUtils.copyProperties(query,req);
+        List<MerchantCreditApplyExcelInfo> list = applyService.list(req, ApiUserHolder.getUserInfo());
         String path = fileUploadService.uploadExcelFile(list, MerchantCreditApplyExcelInfo.class, "商户额度申请");
         return success(fileUploadService.getFileServerUrl(path));
     }

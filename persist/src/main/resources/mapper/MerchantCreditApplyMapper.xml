@@ -49,7 +49,7 @@
             LEFT JOIN merchant m ON ap.mer_code = m.mer_code
         <where>
             <if test="query.merName != null and query.merName !=''">
-                AND m.mer_name LIKE  '%' + #{query.merName,jdbcType=VARCHAR} + '%'
+                AND m.mer_name LIKE  concat('%',#{query.merName,jdbcType=VARCHAR},'%')
             </if>
             <if test="query.applyType != null and query.applyType !=''">
                 AND ap.apply_type = #{query.applyType,jdbcType=VARCHAR}
@@ -58,10 +58,10 @@
                 AND ap.approval_status = #{query.approvalStatus,jdbcType=VARCHAR}
             </if>
             <if test="query.applyUser != null and query.applyUser !=''">
-                AND ap.apply_user LIKE '%'  + #{query.applyUser,jdbcType=VARCHAR} + '%'
+                AND ap.apply_user LIKE concat('%',#{query.applyUser,jdbcType=VARCHAR},'%')
             </if>
             <if test="query.approvalUser != null and query.approvalUser !=''">
-                AND ap.approval_user LIKE '%'  + #{query.approvalUser,jdbcType=VARCHAR} + '%'
+                AND ap.approval_user LIKE concat('%',#{query.approvalUser,jdbcType=VARCHAR},'%')
             </if>
             <if test="query.applyTimeStart != null ">
                 AND ap.apply_time ge #{query.applyTimeStart}

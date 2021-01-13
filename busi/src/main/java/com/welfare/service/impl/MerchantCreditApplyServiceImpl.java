@@ -236,6 +236,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 BeanUtils.copyProperties(dto,info);
                 info.setMerCooperationMode(MerCooperationModeEnum.getByCode(info.getMerCooperationMode()).getDesc());
                 info.setApplyType(WelfareConstant.MerCreditType.findByCode(info.getApplyType()).desc());
+                info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());
                 infos.add(info);
             });
         }
@@ -243,16 +244,17 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     }
 
     @Override
-    public List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQuery query, ApiUserInfo user) {
-        List<MerchantCreditApply> result =  merchantCreditApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
-        List<MerchantCreditApplyExcelInfo> infos = creditApplyConverter.toExcelInfoList(result);
-        if (CollectionUtils.isNotEmpty(infos)) {
-            infos.forEach(info -> {
-                Merchant merchant = merchantService.detailByMerCode(info.getMerCode());
-                info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());
-                info.setMerName(merchant.getMerName());
-                info.setMerCooperationMode(merchant.getMerCooperationMode());
+    public List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQueryReq query, ApiUserInfo user) {
+        List<MerchantCreditApplyInfoDTO> result =  merchantCreditApplyDao.getBaseMapper().queryByPage(query);
+        List<MerchantCreditApplyExcelInfo> infos = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(result)) {
+            result.forEach(dto -> {
+                MerchantCreditApplyExcelInfo info = new MerchantCreditApplyExcelInfo();
+                BeanUtils.copyProperties(dto,info);
+                info.setMerCooperationMode(MerCooperationModeEnum.getByCode(info.getMerCooperationMode()).getDesc());
                 info.setApplyType(WelfareConstant.MerCreditType.findByCode(info.getApplyType()).desc());
+                info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());
+                infos.add(info);
             });
         }
         return infos;

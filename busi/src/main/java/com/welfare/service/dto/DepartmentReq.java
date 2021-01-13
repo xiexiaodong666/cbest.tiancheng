@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * Created by hao.yin on 2021/1/8.
@@ -22,4 +23,8 @@ public class DepartmentReq {
     @Query(type = Query.Type.EQUAL)
     @ApiModelProperty("部门层级")
     private String departmentLevel;
+
+    @Query(type = Query.Type.IN,propName = "departmentCode")
+    @ApiModelProperty("部门层级")
+    private List<String> departmentCodeList;
 }

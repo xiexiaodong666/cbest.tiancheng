@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -57,7 +59,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
 
     @Override
-    public Page<MonthSettleResp> pageQuery(MonthSettleReq monthSettleReqDto) {
+    public BasePageVo<MonthSettleResp> pageQuery(MonthSettleReq monthSettleReqDto) {
 
         MonthSettleQuery monthSettleQuery = new MonthSettleQuery();
         BeanUtils.copyProperties(monthSettleReqDto, monthSettleQuery);
@@ -66,13 +68,33 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         List<MonthSettleDTO> monthSettleDTOS = monthSettleMapper.selectMonthSettle(monthSettleQuery);
         PageInfo<MonthSettleDTO> monthSettleDTOPageInfo = new PageInfo<>(monthSettleDTOS);
 
-        Page<MonthSettleResp> monthSettleRespPage = new Page<>(monthSettleReqDto.getCurrentPage(), monthSettleReqDto.getPageSize(),monthSettleDTOPageInfo.getTotal());
+        Map<String, Object> summaryInfo = monthSettleMapper.selectMonthSettleSummaryInfo(monthSettleQuery);
+        String minSettleMonth = (String)summaryInfo.get("minSettleMonth");
+        String maxSettleMonth = (String)summaryInfo.get("maxSettleMonth");
+
+        Date dayMaxByMontStr = null;
+        Date dayMinByMonthStr = null;
+        try {
+            dayMaxByMontStr = DateUtil.getDayMaxByMontStr(maxSettleMonth);
+            dayMinByMonthStr = DateUtil.getDayMinByMonthStr(minSettleMonth);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        summaryInfo.put("billStartDay", DateUtil.dateTime2Str(dayMinByMonthStr, DateUtil.DEFAULT_DATE_FORMAT));
+        summaryInfo.put("billEndDay", DateUtil.dateTime2Str(dayMaxByMontStr, DateUtil.DEFAULT_DATE_FORMAT));
+
+
+        BasePageVo<MonthSettleResp> monthSettleRespPage = new BasePageVo<>(monthSettleReqDto.getCurrentPage(), monthSettleReqDto.getPageSize(),monthSettleDTOPageInfo.getTotal());
+
 
         monthSettleRespPage.setRecords(monthSettleDTOPageInfo.getList().stream().map(monthSettleDTO -> {
             MonthSettleResp monthSettleResp = new MonthSettleResp();
             BeanUtils.copyProperties(monthSettleDTO, monthSettleResp);
             return monthSettleResp;
         }).collect(Collectors.toList()));
+
+        monthSettleRespPage.setExt(summaryInfo);
 
         return monthSettleRespPage;
     }

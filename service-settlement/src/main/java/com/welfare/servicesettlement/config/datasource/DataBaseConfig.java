@@ -53,12 +53,12 @@ public class DataBaseConfig {
     /**
      * 根据数据源创建SqlSessionFactory
      */
-    @Bean
+   /* @Bean
     public SqlSessionFactory sqlSessionFactory(@Qualifier("mysqlDataSource") DataSource primaryDataSource,
             @Qualifier("prestoDataSource") DataSource minorDataSource) throws Exception {
         SqlSessionFactoryBean fb = new SqlSessionFactoryBean();
         fb.setDataSource(this.dynamicDataSource(primaryDataSource, minorDataSource));
         fb.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:com/welfare/mapper/*.xml"));
         return fb.getObject();
-    }
+    }*/
 }

@@ -8,8 +8,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 
-@Aspect
-@Component
+//@Aspect
+//@Component
 @Slf4j
 public class DataSourceAspect {
     @Around("execution(* com.welfare.persist.mapper.*.*(..))")

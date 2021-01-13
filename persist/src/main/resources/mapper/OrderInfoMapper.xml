@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.welfare.persist.mapper.OrderMapper">
-
-    <sql id="field">
-        order_id,goods,merchant_name,merchant_code,account_name,account_code,card_id,store_code,store_name,order_amount,order_time,pay_code
+<mapper namespace="com.welfare.persist.mapper.OrderInfoMapper">
+    <sql id="tableName">
+        order_info
     </sql>
-    <!--查询订单-->
+
+    <sql id="baseColumn">
+        id,order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,card_id,order_amount,order_time,pay_code,pay_name,create_user,create_time
+    </sql>
+	
+	<!--查询订单-->
     <select id="searchOrder" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.entity.OrderInfo">
         with order_view as(
             select
@@ -86,5 +90,34 @@
         )TT where TT.Row BETWEEN (pageNo - 1) * pageSize + 1 AND pageNo * pageSize
 
     </select>
+
+
+
+    <insert id="saveOrUpdate" parameterType="list" >
+        insert into <include refid="tableName"/>
+        (order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,
+        card_id,order_amount,order_time,pay_code,pay_name,create_user,create_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.orderId},#{item.goods},#{item.merchantCode},#{item.merchantName},#{item.storeCode},
+            #{item.storeName},#{item.accountCode},#{item.accountName},#{item.cardId},
+            #{item.orderAmount},#{item.orderTime},#{item.payCode},#{item.payName},
+            #{item.createUser},#{item.createTime}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        goods = values(goods),
+        merchantCode = values(merchantCode),
+        merchantName =  values(merchantName),
+        storeCode = values(storeCode),
+        storeName =  values(storeName),
+        accountCode = values(accountCode),
+        accountName =  values(accountName),
+        cardId = values(cardId),
+        orderAmount =  values(orderAmount),
+        orderTime =  values(orderTime),
+        payCode =  values(payCode),
+        payName =  values(payName)
+    </insert>
 
 </mapper>

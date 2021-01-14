@@ -10,7 +10,8 @@
         id,mer_code,store_code,consum_type,store_alias,is_rebate,rebate_type,rebate_ratio,ramark,flag,create_user,create_time,update_user,update_time,version,status
     </sql>
 
-  <select id="searchMerchantStoreRelations" resultType="com.welfare.persist.dto.MerchantStoreRelationDTO">
+  <select id="searchMerchantStoreRelations"
+    resultType="com.welfare.persist.dto.MerchantStoreRelationDTO">
     SELECT
     msr.id as id,
     msr.STATUS as status,
@@ -35,7 +36,34 @@
     msr.mer_code
   </select>
 
-  <select id="exportMerchantStoreRelations" resultType="com.welfare.persist.dto.MerchantStoreRelationDTO">
+  <select id="getMerchantStoreRelationListBySyncStatus"
+    resultType="com.welfare.persist.entity.MerchantStoreRelation">
+    SELECT
+    id,
+    mer_code as merCode,
+    store_code as storeCode,
+    consum_type as consumType,
+    store_alias as storeAlias,
+    is_rebate as isRebate,
+    rebate_type as rebateType,
+    rebate_ratio as rebateRatio,
+    ramark,
+    create_user as createUser,
+    create_time as createTime,
+    update_user as updateUser,
+    update_time as updateTime,
+    version ,
+    deleted,
+    status,
+    sync_status as syncStatus
+    FROM
+    merchant_store_relation
+    <if test="syncStatus != null ">and sync_status = #{syncStatus}
+    </if>
+  </select>
+
+  <select id="exportMerchantStoreRelations"
+    resultType="com.welfare.persist.dto.MerchantStoreRelationDTO">
     SELECT
     msr.id as id,
     msr.STATUS as status,

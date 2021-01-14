@@ -38,7 +38,7 @@ public class AccountAmountType extends Model<AccountAmountType> implements Seria
      */
     @ApiModelProperty("自增id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Integer id;
+	private Long id;
     /**
      * 账户编码
      */

@@ -27,6 +27,8 @@ public interface PlatformUserFeignClient {
       @RequestParam("pageSize") int pageSize,
       @RequestParam("page") int page,
       @RequestParam("merchant_code") String merchant_code,
+      @RequestParam("username") String username,
+      @RequestParam("status") Integer status,
       @RequestParam("start_create_time") Date start_create_time,
       @RequestParam("end_create_time") Date end_create_time
   );

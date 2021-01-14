@@ -100,4 +100,35 @@ public class WelfareSettleConstant {
             return this.desc;
         }
     }
+
+
+    /**
+     * 发送状态枚举
+     */
+    public enum PullTaksSendStatusEnum {
+        /**
+         * 成功
+         */
+        SUCCESS("success","成功"),
+
+        /**
+         * 失败
+         */
+        FAIL("fail","失败");
+
+        private String code;
+        private String desc;
+
+        PullTaksSendStatusEnum(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
 }

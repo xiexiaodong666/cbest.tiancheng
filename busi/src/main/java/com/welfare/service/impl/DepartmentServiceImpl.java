@@ -53,7 +53,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public List<Department> list(DepartmentReq req) {
         if(EmptyChecker.isEmpty(req.getMerCode())){
-            req.setMerCode(MerchantUserHolder.getDeptIds().getMerchantCode());
+            req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
         }
         return departmentDao.list(QueryHelper.getWrapper(req));
     }

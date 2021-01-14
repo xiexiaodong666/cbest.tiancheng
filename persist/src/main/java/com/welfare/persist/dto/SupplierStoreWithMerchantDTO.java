@@ -54,10 +54,20 @@ public class SupplierStoreWithMerchantDTO {
      */
     @ApiModelProperty("备注")  
     private String remark;
+    @ApiModelProperty("虚拟收银机号")
+    private String cashierNo;
     /**
      * 消费方式
      */
-    @ApiModelProperty("消费方式  {  \"o2o\": true,  \"onlineMall\": true,  \"shopShopping\": false}")
+    /**
+     * 消费方式
+     */
+    @ApiModelProperty("消费方式,json"
+        + "{"
+        + "  \"O2O\": true,"
+        + "  \"ONLINE_MALL\": true,"
+        + "  \"SHOP_CONSUMPTION\": false"
+        + "}")
     private String consumType;
     /**
      * 创建人

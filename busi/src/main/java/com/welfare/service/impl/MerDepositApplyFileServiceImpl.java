@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author duanhy
  * @version 1.0.0
@@ -26,5 +28,12 @@ public class MerDepositApplyFileServiceImpl implements MerDepositApplyFileServic
     QueryWrapper<MerDepositApplyFile> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(MerDepositApplyFile.MER_DEPOSIT_APPLY_CODE, merDepositApplyCode);
     return merDepositApplyFileDao.remove(queryWrapper);
+  }
+
+  @Override
+  public List<MerDepositApplyFile> listByMerDepositApplyCode(String merDepositApplyCode) {
+    QueryWrapper<MerDepositApplyFile> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(MerDepositApplyFile.MER_DEPOSIT_APPLY_CODE, merDepositApplyCode);
+    return merDepositApplyFileDao.list(queryWrapper);
   }
 }

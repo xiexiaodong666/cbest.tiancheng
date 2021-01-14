@@ -226,6 +226,14 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  public AccountDetailDTO queryDetailByAccountCode(String accountCode) {
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByAccountCode(accountCode);
+    AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
+    BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
+    return accountDetailDTO;
+  }
+
+  @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean save(Account account) {
     validationAccount(account,true);

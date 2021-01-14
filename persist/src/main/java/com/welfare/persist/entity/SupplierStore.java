@@ -119,6 +119,9 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
      */
     @ApiModelProperty("外部编码")   
     private String externalCode;
+
+    @ApiModelProperty("虚拟收银机号")
+    private String cashierNo;
     /**
      * 版本
      */
@@ -132,6 +135,10 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     * id
     */
     public static final String ID = "id";
+    /**
+     * 虚拟收银机号
+     */
+    public static final String CASHIER_NO = "cashier_no";
     /**
     * 商户代码
     */

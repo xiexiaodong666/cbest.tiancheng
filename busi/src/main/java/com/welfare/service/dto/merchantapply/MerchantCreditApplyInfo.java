@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author duanhy
@@ -114,5 +115,5 @@ public class MerchantCreditApplyInfo {
    * 附件
    */
   @ApiModelProperty("附件")
-  private String enclosure;
+  private List<String> enclosures;
 }

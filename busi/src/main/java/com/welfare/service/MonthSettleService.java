@@ -63,5 +63,5 @@ public interface MonthSettleService {
      */
     MonthSettle getMonthSettle(MonthSettleDetailQuery monthSettleDetailQuery);
 
-    Integer addMonthSettle(MonthSettle monthSettle);
+    Boolean addMonthSettleList(List<MonthSettle> monthSettleList);
 }

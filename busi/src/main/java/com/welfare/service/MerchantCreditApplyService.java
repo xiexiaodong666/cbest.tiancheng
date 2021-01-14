@@ -1,7 +1,7 @@
 package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.domain.ApiUserInfo;
+import com.welfare.common.domain.UserInfo;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
 import com.welfare.persist.entity.MerchantCreditApply;
 import com.welfare.service.dto.merchantapply.*;
@@ -22,7 +22,7 @@ public interface MerchantCreditApplyService {
    * @param apply
    * @return
    */
-  String save(MerchantCreditApplyRequest apply, ApiUserInfo user);
+  String save(MerchantCreditApplyRequest apply, UserInfo user);
 
   /**
    * 通过requestId获取申请
@@ -36,14 +36,14 @@ public interface MerchantCreditApplyService {
    * @param apply
    * @return
    */
-  String update(MerchantCreditApplyUpdateReq apply, ApiUserInfo user);
+  String update(MerchantCreditApplyUpdateReq apply, UserInfo user);
 
   /**
    * 审批
    * @param apply
    * @return
    */
-  String approval(MerchantCreditApprovalReq apply, ApiUserInfo user);
+  String approval(MerchantCreditApprovalReq apply, UserInfo user);
 
   /**
    * 通过id查询详情
@@ -60,12 +60,12 @@ public interface MerchantCreditApplyService {
    * @param query
    * @return
    */
-  Page<MerchantCreditApplyInfo> page(Integer current, Integer size, MerchantCreditApplyQueryReq query, ApiUserInfo user);
+  Page<MerchantCreditApplyInfo> page(Integer current, Integer size, MerchantCreditApplyQueryReq query, UserInfo user);
 
   /**
    * 通过条件查询申请列表（不分页）
    * @param query
    * @return
    */
-  List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQueryReq query, ApiUserInfo user);
+  List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQueryReq query, UserInfo user);
 }

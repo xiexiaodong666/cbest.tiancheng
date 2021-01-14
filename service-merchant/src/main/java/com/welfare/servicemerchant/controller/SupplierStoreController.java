@@ -61,12 +61,12 @@ public class SupplierStoreController implements IController {
 
     @GetMapping("/tree")
     @ApiOperation("查询供应商门店列表（树形）")
-    public R<List<SupplierStoreTreeDTO>> list(String merCode){
+    public R<List<SupplierStoreTreeDTO>> tree(String merCode){
         return R.success(supplierStoreService.tree(merCode));
     }
     @GetMapping("/detail")
     @ApiOperation("查询供应商门店详情）")
-    public R<SupplierStoreDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+    public R<SupplierStoreDetailDTO> detail( @ApiParam("id") Long id){
         return R.success(supplierStoreService.detail(id));
     }
 

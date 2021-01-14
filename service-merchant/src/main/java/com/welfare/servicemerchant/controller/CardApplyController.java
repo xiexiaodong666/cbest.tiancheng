@@ -75,8 +75,9 @@ public class CardApplyController implements IController {
     queryWrapperM.eq(Merchant.MER_CODE, cardApply.getMerCode());
 
     Merchant merchant = merchantService.getMerchantByMerCode(queryWrapperM);
-
-    cardApply.setMerName(merchant.getMerName());
+    if(merchant != null) {
+      cardApply.setMerName(merchant.getMerName());
+    }
 
     return success(cardApply);
   }

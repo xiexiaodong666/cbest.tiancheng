@@ -34,9 +34,9 @@ public class AdminMerchantStore {
    */
   @ApiModelProperty("消费方式,json"
       + "{"
-      + "  \"o2o\": true,"
-      + "  \"onlineMall\": true,"
-      + "  \"shopShopping\": false"
+      + "  \"O2O\": true,"
+      + "  \"ONLINE_MALL\": true,"
+      + "  \"SHOP_CONSUMPTION\": false"
       + "}")
   private String consumType;
 

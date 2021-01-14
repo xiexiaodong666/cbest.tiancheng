@@ -13,6 +13,7 @@ import com.welfare.service.MerchantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,12 +79,12 @@ public class CardController implements IController {
       @RequestParam(required = false) @ApiParam("卡片类型") String cardType,
       @RequestParam(required = false) @ApiParam("卡片介质") String cardMedium,
       @RequestParam(required = false) @ApiParam("卡片状态") String cardStatus,
-      @RequestParam(required = false) @ApiParam("入库查询开始时间") String writtenStartTime,
-      @RequestParam(required = false) @ApiParam("入库查询结束时间") String writtenEndTime,
-      @RequestParam(required = false) @ApiParam("申请开始时间") String startTime,
-      @RequestParam(required = false) @ApiParam("申请结束时间") String endTime,
-      @RequestParam(required = false) @ApiParam("绑定查询开始时间") String bindStartTime,
-      @RequestParam(required = false) @ApiParam("绑定查询结束时间") String bindEndTime) {
+      @RequestParam(required = false) @ApiParam("入库查询开始时间") Date writtenStartTime,
+      @RequestParam(required = false) @ApiParam("入库查询结束时间") Date writtenEndTime,
+      @RequestParam(required = false) @ApiParam("申请开始时间") Date startTime,
+      @RequestParam(required = false) @ApiParam("申请结束时间") Date endTime,
+      @RequestParam(required = false) @ApiParam("绑定查询开始时间") Date bindStartTime,
+      @RequestParam(required = false) @ApiParam("绑定查询结束时间") Date bindEndTime) {
 
     return success(cardInfoService.list(currentPage, pageSize, applyCode, cardName,
                                         merCode, cardType, cardMedium,
@@ -114,7 +115,9 @@ public class CardController implements IController {
     cardInfoDTO.setCardType(cardInfo.getCardType());
     cardInfoDTO.setCardMedium(cardApply.getCardMedium());
     cardInfoDTO.setCardStatus(cardInfo.getCardStatus());
-    cardInfoDTO.setMerName(merchant.getMerName());
+    if(merchant != null) {
+      cardInfoDTO.setMerName(merchant.getMerName());
+    }
     cardInfoDTO.setCreateTime(cardInfo.getCreateTime());
     cardInfoDTO.setWrittenTime(cardInfo.getWrittenTime());
     cardInfoDTO.setBindTime(cardInfo.getBindTime());

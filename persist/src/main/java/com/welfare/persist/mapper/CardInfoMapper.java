@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
+import java.util.Date;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,9 +23,9 @@ public interface CardInfoMapper extends BaseMapper<CardInfo> {
   public Page<CardInfoDTO> list(Page<CardInfo> page,@Param("applyCode")String applyCode, @Param("cardName") String cardName,
       @Param("merCode") String merCode,
       @Param("cardType") String cardType, @Param("cardMedium") String cardMedium,
-      @Param("cardStatus") String cardStatus, @Param("writtenStartTime") String writtenStartTime,
-      @Param("writtenEndTime") String writtenEndTime, @Param("startTime") String startTime,
-      @Param("endTime") String endTime, @Param("bindStartTime") String bindStartTime,
-      @Param("bindEndTime") String bindEndTime);
+      @Param("cardStatus") String cardStatus, @Param("writtenStartTime") Date writtenStartTime,
+      @Param("writtenEndTime") Date writtenEndTime, @Param("startTime") Date startTime,
+      @Param("endTime") Date endTime, @Param("bindStartTime") Date bindStartTime,
+      @Param("bindEndTime") Date bindEndTime);
 
 }

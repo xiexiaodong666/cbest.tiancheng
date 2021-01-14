@@ -29,4 +29,6 @@ public interface MerchantStoreRelationMapper extends BaseMapper<MerchantStoreRel
   List<MerchantStoreRelationDTO> exportMerchantStoreRelations(
       @Param("merName") String merName, @Param("status") String status,
       @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+  List<MerchantStoreRelation> getMerchantStoreRelationListBySyncStatus(@Param("syncStatus") Integer syncStatus);
 }

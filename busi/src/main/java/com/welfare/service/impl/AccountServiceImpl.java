@@ -39,6 +39,7 @@ import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
+import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.dto.AccountUploadDTO;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
@@ -357,5 +358,19 @@ public class AccountServiceImpl implements AccountService {
           }
         }
     );
+  }
+
+  @Override
+  public AccountSimpleDTO queryAccountInfo(Long accountCode) {
+    Account account = getByAccountCode(accountCode);
+    AccountSimpleDTO accountSimpleDTO = new AccountSimpleDTO();
+    String merCode = account.getMerCode();
+    Merchant merchant = merchantService.getMerchantByMerCode(merCode);
+    accountSimpleDTO.setMerName(merchant.getMerName());
+    accountSimpleDTO.setAccountCode(account.getAccountCode());
+    accountSimpleDTO.setAccountName(account.getAccountName());
+    accountSimpleDTO.setAccountBalance(account.getAccountBalance());
+    accountSimpleDTO.setSurplusQuota(account.getSurplusQuota());
+    return accountSimpleDTO;
   }
 }

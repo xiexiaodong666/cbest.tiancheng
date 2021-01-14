@@ -1,11 +1,14 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
+import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.dto.Deposit;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 用户流水明细服务接口
@@ -28,4 +31,7 @@ public interface AccountBillDetailService {
      * @return
      */
     AccountBillDetail queryByTransNo(String transNo);
+
+    List<AccountBillDetailSimpleDTO> queryAccountBillDetailSimpleList(
+        AccountBillDetailSimpleReq accountBillDetailSimpleReq);
 }

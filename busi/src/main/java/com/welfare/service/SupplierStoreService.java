@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
@@ -91,4 +92,6 @@ public interface SupplierStoreService {
      * 同步门店消费能力数据
      */
     boolean syncConsumeType(String storeCode, String consumeType);
+
+    void syncShopping(ShoppingActionTypeEnum typeEnum, List<SupplierStoreDetailDTO> supplierStoreDetailDTOS);
 }

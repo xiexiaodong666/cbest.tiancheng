@@ -3,11 +3,14 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountBillDetailDao;
+import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
+import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountBillDetailService;
@@ -59,5 +62,13 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         QueryWrapper<AccountBillDetail> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountBillDetail.TRANS_NO,transNo);
         return accountBillDetailDao.getOne(queryWrapper);
+    }
+
+    @Override
+    public List<AccountBillDetailSimpleDTO> queryAccountBillDetailSimpleList(
+        AccountBillDetailSimpleReq accountBillDetailSimpleReq) {
+        List<AccountBillDetailSimpleDTO> accountBillDetailSimpleDTOList = accountBillDetailDao
+            .getBaseMapper().selectAccountBillDetailSimpleList(accountBillDetailSimpleReq);
+        return accountBillDetailSimpleDTOList;
     }
 }

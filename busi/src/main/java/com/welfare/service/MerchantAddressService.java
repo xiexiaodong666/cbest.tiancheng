@@ -17,5 +17,6 @@ import java.util.List;
 public interface MerchantAddressService {
 
     List<MerchantAddressDTO> list(MerchantAddressReq merchantAddressReq);
-    boolean saveOrUpdateBatch(List<MerchantAddressDTO> list);
+    boolean saveOrUpdateBatch(List<MerchantAddressDTO> list,String relatedType,Long relatedId);
+    boolean delete(String relatedType,Long relatedId);
 }

@@ -2,6 +2,7 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.service.dto.MerchantDetailDTO;
@@ -44,6 +45,8 @@ public interface MerchantService {
      * @return
      */
     boolean add(MerchantDetailDTO merchant);
+
+    void syncShopping(ShoppingActionTypeEnum typeEnum, List<MerchantDetailDTO> merchantDetailDTOList);
 
     /**
      * 编辑商户

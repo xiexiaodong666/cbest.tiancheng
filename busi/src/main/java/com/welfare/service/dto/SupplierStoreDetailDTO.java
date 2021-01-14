@@ -60,6 +60,8 @@ public class SupplierStoreDetailDTO {
      */
     @ApiModelProperty("创建人")  
     private String createUser;
+
+    private Integer status;
     /**
      * 创建日期
      */

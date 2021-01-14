@@ -15,9 +15,6 @@ import java.util.UUID;
  * @date 2019-11-03 21:28
  */
 @Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(value = Include.NON_NULL)
 public class SupplierStoreActivateEvt extends SupplierStoreEvt {
 }

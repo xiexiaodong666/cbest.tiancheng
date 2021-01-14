@@ -13,9 +13,6 @@ import lombok.experimental.SuperBuilder;
  * @date 2019-11-03 21:28
  */
 @Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(value = Include.NON_NULL)
 public class SupplierStoreAddEvt extends SupplierStoreEvt {
 

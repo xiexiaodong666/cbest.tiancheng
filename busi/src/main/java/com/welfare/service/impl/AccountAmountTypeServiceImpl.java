@@ -5,6 +5,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountAmountTypeDao;
+import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantCredit;
@@ -50,6 +51,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountAmountTypeMapper accountAmountTypeMapper;
     private final MerchantAccountTypeService merchantAccountTypeService;
     private final RedissonClient redissonClient;
+    private final AccountDao accountDao;
     private final AccountService accountService;
     /**
      * 循环依赖问题，所以未采用构造器注入
@@ -90,7 +92,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 accountAmountTypeDao.updateById(accountAmountType);
             }
             account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
-            accountService.save(account);
+            accountDao.saveOrUpdate(account);
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
         } finally {
             lock.unlock();

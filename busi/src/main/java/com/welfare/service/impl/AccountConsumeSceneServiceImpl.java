@@ -255,6 +255,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
           accountConsumeSceneStoreRelationList.add(accountConsumeSceneStoreRelation);
         });
     accountConsumeSceneStoreRelationDao.updateBatchById(accountConsumeSceneStoreRelationList);
+    //TODO 修改了选择类型  账户变更表增加记录
     //下发数据
     accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
     syncAccountConsumeScene(ShoppingActionTypeEnum.UPDATE,
@@ -267,11 +268,9 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Transactional(rollbackFor = Exception.class)
   public Boolean delete(Long id) {
     AccountConsumeScene accountConsumeScene = accountConsumeSceneDao.getById(id);
-    Merchant merchant = merchantService.detailByMerCode(accountConsumeScene.getMerCode());
-    if( null == merchant ) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
+    if( null == accountConsumeScene ) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"消费场景不存在",null);
     }
-
     boolean deleteResult =  accountConsumeSceneDao.removeById(id);
     Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     //下发数据
@@ -286,9 +285,8 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Transactional(rollbackFor = Exception.class)
   public Boolean updateStatus(Long id, Integer status) {
     AccountConsumeScene queryAC = accountConsumeSceneDao.getById(id);
-    Merchant merchant = merchantService.detailByMerCode(queryAC.getMerCode());
-    if( null == merchant ) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
+    if( null == queryAC ) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该消费场景不存在",null);
     }
     UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
     updateWrapper.eq(AccountConsumeScene.ID, id);

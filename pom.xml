@@ -45,7 +45,6 @@
         <cbest-oss.version>1.0.0</cbest-oss.version>
         <guava.version>22.0</guava.version>
         <fastjson.version>1.2.58</fastjson.version>
-        <gson.version>2.2.4</gson.version>
     </properties>
 
     <dependencies>

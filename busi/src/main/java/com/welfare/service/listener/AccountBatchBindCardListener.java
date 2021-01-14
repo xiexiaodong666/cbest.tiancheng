@@ -3,6 +3,7 @@ package com.welfare.service.listener;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.CardApplyDao;
@@ -27,6 +28,7 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class AccountBatchBindCardListener extends AnalysisEventListener<AccountBindCardDTO> {
   List<CardInfo> cardInfoList = new LinkedList<CardInfo>();
+  List<Long> accountIdList = new LinkedList<Long>();
 
   private CardInfoDao cardInfoDao;
   private AccountDao accountDao;
@@ -61,16 +63,26 @@ public class AccountBatchBindCardListener extends AnalysisEventListener<AccountB
     cardInfo.setBindTime(new Date());
     cardInfo.setCardStatus(CardStatus.BIND.code());
     cardInfoList.add(cardInfo);
+    accountIdList.add(account.getId());
   }
 
   @Override
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
     if(!CollectionUtils.isEmpty(cardInfoList)){
       Boolean result = cardInfoDao.saveBatch(cardInfoList);
+      updateAccountBindStatus();
       if( result == true && StringUtils.isEmpty(uploadInfo.toString()) ){
         uploadInfo.append("导入成功");
       }
     }
+  }
+
+  private void updateAccountBindStatus() {
+    UpdateWrapper<Account> accountUpdateWrapper = new UpdateWrapper();
+    accountUpdateWrapper.in(Account.ID,accountIdList);
+    Account updateAccount = new Account();
+    updateAccount.setBinding(1);
+    accountDao.update(updateAccount,accountUpdateWrapper);
   }
 
   public StringBuilder getUploadInfo() {

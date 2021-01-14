@@ -16,5 +16,5 @@ public interface AccountConsumeSceneStoreRelationService {
    * @param storeCode
    * @param consumeType
    */
-  //public void updateStoreConsumeType(String storeCode,String consumeType);
+  public void updateStoreConsumeType(String storeCode,String consumeType);
 }

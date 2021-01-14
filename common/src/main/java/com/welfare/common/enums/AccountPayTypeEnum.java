@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum AccountPayTypeEnum {
-    WX("wx", "微信"),
+    WECHAT("wechat", "微信"),
     ALIPAY("alipay", "支付宝");
 
     private String type;

@@ -2,10 +2,14 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.AccountConsumeSceneService;
+import com.welfare.service.AccountConsumeSceneStoreRelationService;
+import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.service.dto.AccountConsumeSceneReq;
@@ -49,6 +53,17 @@ public class AccountConsumeSceneController implements IController {
   private AccountConsumeSceneConverter accountConsumeSceneConverter;
   @Autowired
   private FileUploadService fileUploadService;
+  @Autowired
+  private AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
+
+  @Autowired
+  private SupplierStoreService supplierStoreService;
+
+/*  @GetMapping("/test")
+  public void test(@RequestParam String storeCode){
+    SupplierStore supplierStore =supplierStoreService.getSupplierStoreByStoreCode(storeCode);
+    accountConsumeSceneStoreRelationService.updateStoreConsumeType(storeCode,supplierStore.getConsumType());
+  }*/
 
   @GetMapping("/page")
   @ApiOperation("分页查询员工消费配置列表")

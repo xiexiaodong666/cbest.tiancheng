@@ -51,7 +51,6 @@ FROM
 	a.account_name AS accountName,
 	a.account_code AS accountCode,
 	a.account_status AS accountStatus,
-	a.active,
 	AT.type_name AS accountTypeName,
 	d.department_code AS departmentCode,
 	d.department_name AS departmentName,

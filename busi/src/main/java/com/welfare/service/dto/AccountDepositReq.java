@@ -16,6 +16,6 @@ public class AccountDepositReq {
     @ApiModelProperty("充值金额")
     private BigDecimal rechargeAmount;
 
-    @ApiModelProperty("付款方式，微信传wx")
+    @ApiModelProperty("付款方式，微信传wechat")
     private String payType;
 }

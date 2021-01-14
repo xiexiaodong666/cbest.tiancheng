@@ -1,14 +1,19 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.gson.Gson;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.mapper.AccountConsumeSceneMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
+import com.welfare.service.dto.ConsumeTypeJson;
+import java.util.LinkedList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author yaoxiao
@@ -36,7 +41,8 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     return accountConsumeSceneStoreRelationDao.list(wrapper);
   }
 
-/*  @Override
+  @Override
+  @Transactional(rollbackFor = Exception.class)
   public void updateStoreConsumeType( String storeCode, String consumeType) {
     List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelations = this.getListByStoreCode(storeCode);
     if(CollectionUtils.isEmpty(accountConsumeSceneStoreRelations)){
@@ -44,7 +50,29 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     }
     Gson gson = new Gson();
     ConsumeTypeJson consumeTypeJson = gson.fromJson(consumeType,ConsumeTypeJson.class);
-    //TODO 判断如果 范围缩小调用更新方法
-  }*/
+    List<AccountConsumeSceneStoreRelation> updateList = new LinkedList<AccountConsumeSceneStoreRelation>();
+    accountConsumeSceneStoreRelations.forEach(accountConsumeSceneStoreRelation -> {
+      String[] selectType = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
+      StringBuilder sb = new StringBuilder();
+      for( int i =0 ; i <selectType.length; i ++  ){
+        String type = selectType[i];
+        if( consumeTypeJson.getType(type) ){
+          if( i == 0  ){
+            sb.append(type);
+          }else{
+            sb.append(",").append(type);
+          }
+        }
+      }
+      if( !sb.toString().equals(accountConsumeSceneStoreRelation.getSceneConsumType())){
+        accountConsumeSceneStoreRelation.setSceneConsumType(sb.toString());
+        //账号类型发生了改变
+        updateList.add(accountConsumeSceneStoreRelation);
+      }
+    });
+    accountConsumeSceneStoreRelationDao.saveOrUpdateBatch(updateList);
+    return;
+  }
+
 
 }

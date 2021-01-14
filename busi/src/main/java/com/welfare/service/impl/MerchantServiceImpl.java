@@ -32,10 +32,14 @@ import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
+import com.welfare.service.sync.event.MerchantAddEvt;
+import com.welfare.service.sync.event.MerchantEvt;
+import com.welfare.service.sync.event.MerchantUpdateEvt;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantService;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -64,6 +68,7 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantCreditService merchantCreditService;
     private final MerchantDetailConverter merchantDetailConverter;
     private final SequenceService sequenceService;
+    private final ApplicationContext applicationContext;
 
     private final MerchantWithCreditConverter merchantWithCreditConverter;
 
@@ -130,59 +135,8 @@ public class MerchantServiceImpl implements MerchantService {
         //同步商城中台
         List<MerchantDetailDTO> syncList=new ArrayList<>();
         syncList.add(merchant);
-        syncShopingAfterCommit(ShoppingActionTypeEnum.ADD,syncList);
+        applicationContext.publishEvent( MerchantAddEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
         return flag&&flag2;
-    }
-    private void syncShopingAfterCommit(ShoppingActionTypeEnum typeEnum,List<MerchantDetailDTO> merchantDetailDTOList){
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronizationAdapter() {
-                    @Override
-                    public void afterCommit() {
-                        syncShopping(typeEnum,merchantDetailDTOList);
-                    }
-                });
-    };
-    @Override
-    public void syncShopping(ShoppingActionTypeEnum typeEnum, List<MerchantDetailDTO> merchantDetailDTOList) {
-        log.info("同步类型【{}】，同步入参【{}】", typeEnum.getCode(), JSON.toJSONString(merchantDetailDTOList));
-        if (EmptyChecker.isEmpty(merchantDetailDTOList)) {
-            return;
-        }
-        MerchantShoppingReq req = new MerchantShoppingReq();
-        req.setActionType(typeEnum.getCode());
-        req.setTimestamp(new Date());
-        req.setRequestId(GenerateCodeUtil.UUID());
-        List<MerchantShoppingReq.ListBean> list = new ArrayList<>();
-        List<String> merCodeList = new ArrayList<>();
-        for (MerchantDetailDTO merchant : merchantDetailDTOList) {
-            MerchantShoppingReq.ListBean listBean = new MerchantShoppingReq.ListBean();
-            listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1") ? Boolean.TRUE : Boolean.FALSE);
-            listBean.setMerchantCode(merchant.getMerCode());
-            listBean.setMerchantName(merchant.getMerName());
-            listBean.setIdTypes(Arrays.asList(merchant.getMerType().split(",")));
-            List<MerchantShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
-            for (MerchantAddressDTO addressDTO : merchant.getAddressList()) {
-                MerchantShoppingReq.ListBean.AddressBean addressBean = new MerchantShoppingReq.ListBean.AddressBean();
-                addressBean.setAddress(addressDTO.getAddress());
-                addressBean.setAddressType(addressDTO.getAddressType());
-                addressBean.setName(addressDTO.getAddressName());
-                addressBeans.add(addressBean);
-            }
-            listBean.setAddress(addressBeans);
-            list.add(listBean);
-            merCodeList.add(merchant.getMerCode());
-        }
-        req.setList(list);
-        RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateMerchant(req);
-        if (("0000").equals(resp.getCode())) {
-            Merchant update = new Merchant();
-            update.setSyncStatus(1);
-            QueryWrapper<Merchant> queryWrapper = new QueryWrapper<>();
-            queryWrapper.in(Merchant.MER_CODE, merCodeList);
-            merchantDao.update(update, queryWrapper);
-        } else {
-            log.info("同步商户数据到商城中心失败msg【{}】", resp.getMsg());
-        }
     }
 
     @Override
@@ -195,7 +149,7 @@ public class MerchantServiceImpl implements MerchantService {
         //同步商城中台
         List<MerchantDetailDTO> syncList=new ArrayList<>();
         syncList.add(merchant);
-        syncShopingAfterCommit(ShoppingActionTypeEnum.UPDATE,syncList);
+        applicationContext.publishEvent( MerchantUpdateEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).build());
         return flag&&flag2;
     }
 

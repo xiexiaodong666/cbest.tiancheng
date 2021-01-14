@@ -46,7 +46,6 @@ public interface MerchantService {
      */
     boolean add(MerchantDetailDTO merchant);
 
-    void syncShopping(ShoppingActionTypeEnum typeEnum, List<MerchantDetailDTO> merchantDetailDTOList);
 
     /**
      * 编辑商户

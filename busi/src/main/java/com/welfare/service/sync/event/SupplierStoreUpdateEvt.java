@@ -17,6 +17,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(value = Include.NON_NULL)
-public class MerchantAddEvt extends MerchantEvt {
+public class SupplierStoreUpdateEvt extends SupplierStoreEvt {
 
 }

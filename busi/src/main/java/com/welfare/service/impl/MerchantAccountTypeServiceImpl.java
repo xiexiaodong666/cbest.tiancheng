@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -85,11 +86,14 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             throw new BusiException("福利类型扣款顺序不能为空");
         }
         List<MerchantAccountType> accountTypeList=new ArrayList<>();
+        Date date=new Date();
         for(MerchantAccountTypeDetailDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
             MerchantAccountType type=merchantAccountTypeDetailConverter.toE(merchantAccountType);
             type.setDeductionOrder(typeItem.getDeductionOrder());
+            type.setRemark(merchantAccountType.getRemark());
             type.setMerAccountTypeCode(typeItem.getMerAccountTypeCode());
             type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
+            type.setCreateTime(date);
             type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
             accountTypeList.add(type);
         }
@@ -101,6 +105,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     public boolean update(MerchantAccountTypeDetailDTO merchantAccountType) {
         //merCode不允许修改
         merchantAccountType.setMerCode(null);
+        Date date=new Date();
         List<MerchantAccountType> accountTypeList=new ArrayList<>();
         for(MerchantAccountTypeDetailDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
             if(EmptyChecker.isEmpty(typeItem.getId())){
@@ -109,6 +114,8 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             MerchantAccountType type=merchantAccountTypeDetailConverter.toE(merchantAccountType);
             type.setDeductionOrder(typeItem.getDeductionOrder());
             type.setId(typeItem.getId());
+            type.setRemark(merchantAccountType.getRemark());
+            type.setUpdateTime(date);
             accountTypeList.add(type);
         }
         return merchantAccountTypeDao.saveOrUpdateBatch(accountTypeList);

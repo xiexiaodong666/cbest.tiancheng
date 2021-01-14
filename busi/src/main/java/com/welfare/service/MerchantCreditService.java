@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 
 import java.math.BigDecimal;
@@ -36,6 +37,19 @@ public interface MerchantCreditService {
    * @return
    */
   List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
+
+  /**
+   * 操作商户金额
+   * @param merCode
+   * @param amount
+   * @param transNo
+   * @param merAccountTypeOperator
+   * @return
+   */
+  List<MerchantAccountOperation> doOperateAccount(String merCode,
+                                                  BigDecimal amount,
+                                                  String transNo,
+                                                  AbstractMerAccountTypeOperator merAccountTypeOperator);
 
   /**
    * 增加额度

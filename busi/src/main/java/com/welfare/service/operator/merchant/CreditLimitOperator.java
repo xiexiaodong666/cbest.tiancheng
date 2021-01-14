@@ -1,8 +1,6 @@
 package com.welfare.service.operator.merchant;
 
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.enums.IncOrDecType;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Description:
@@ -46,8 +43,8 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
   }
 
   @Override
-  protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, String transNo) {
-    return super.doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, transNo);
+  protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo) {
+    return super.doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, operatedAmount, transNo);
   }
 
   @Override

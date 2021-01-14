@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class RechargeLimitOperator extends AbstractMerAccountTypeOperator {
         BigDecimal currentRechargeLimit = merchantCredit.getRechargeLimit();
         BigDecimal subtract = currentRechargeLimit.subtract(amount);
         if(subtract.compareTo(BigDecimal.ZERO) < 0){
-            return doWhenNotEnough(merchantCredit,subtract.negate(), transNo);
+            return doWhenNotEnough(merchantCredit,subtract.negate(),currentRechargeLimit , transNo);
         }else{
             merchantCredit.setRechargeLimit(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(operateType, amount, IncOrDecType.DECREASE, merchantCredit, transNo);

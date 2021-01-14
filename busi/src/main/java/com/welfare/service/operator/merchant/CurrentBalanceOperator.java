@@ -39,13 +39,13 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
         BigDecimal subtract = currentBalance.subtract(amount);
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
             BigDecimal amountLeftToBeDecrease = subtract.negate();
-            List<MerchantAccountOperation> operations = doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, transNo);
+            List<MerchantAccountOperation> operations = doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, currentBalance, transNo);
             return operations;
         } else {
             merchantCredit.setCurrentBalance(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     merCreditType,
-                    subtract,
+                    amount,
                     IncOrDecType.DECREASE,
                     merchantCredit,
                     transNo
@@ -56,7 +56,7 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
     }
 
     @Override
-    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, String transNo) {
+    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo) {
         AbstractMerAccountTypeOperator nextOperator = getNext();
         if (Objects.isNull(nextOperator)) {
             throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);

@@ -101,7 +101,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     public AccountAmountType querySurplusQuota(Long accountCode) {
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, accountCode)
-                .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA);
+                .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code());
         return accountAmountTypeDao.getOne(queryWrapper);
     }
 
@@ -120,6 +120,19 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 .map(accountAmountType ->
                         AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode())))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public BigDecimal sumBalanceExceptSurplusQuota(Long accountCode) {
+        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE,accountCode)
+                .ne(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA)
+                .select(AccountAmountType.MER_ACCOUNT_TYPE_CODE,AccountAmountType.ACCOUNT_BALANCE);
+        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(queryWrapper);
+        BigDecimal balanceSum = accountAmountTypes.stream()
+                .map(AccountAmountType::getAccountBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return balanceSum;
     }
 
 

@@ -43,6 +43,16 @@ public class ShoppingFeignClientFallback implements FallbackFactory<ShoppingFeig
         RoleConsumptionResp response = new RoleConsumptionResp("500", cause.getMessage(), null);
         return response;
       }
+
+      @Override
+      public RoleConsumptionResp addOrUpdateMerchant(UserRoleBindingReqDTO userRoleBindingReqDTO) {
+        return null;
+      }
+
+      @Override
+      public RoleConsumptionResp addOrUpdateStore(UserRoleBindingReqDTO userRoleBindingReqDTO) {
+        return null;
+      }
     };
 
   }

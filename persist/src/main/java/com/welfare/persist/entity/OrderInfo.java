@@ -3,6 +3,7 @@ package com.welfare.persist.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
@@ -28,7 +29,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("order_info")
-@ApiModel("a")
+@ApiModel("订单实体")
 public class OrderInfo extends Model<OrderInfo> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -92,7 +93,7 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
      * orderTime
      */
     @ApiModelProperty("orderTime")  
-    private Date orderTime;
+    private String orderTime;
     /**
      * payCode
      */
@@ -104,6 +105,16 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
     @ApiModelProperty("payName")  
     private String payName;
     /**
+     * transType
+     */
+    @ApiModelProperty("transType")
+    private String transType;
+    /**
+     * transTypeName
+     */
+    @ApiModelProperty("transTypeName")
+    private String transTypeName;
+    /**
      * createUser
      */
     @ApiModelProperty("createUser")  
@@ -111,7 +122,8 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
     /**
      * createTime
      */
-    @ApiModelProperty("createTime")  
+    @ApiModelProperty("createTime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private Date createTime;
 
 //以下为列明常量
@@ -172,6 +184,14 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
     * 
     */
     public static final String PAY_NAME = "pay_name";
+    /**
+     *
+     */
+    public static final String TRANS_TYPE = "trans_type";
+    /**
+     *
+     */
+    public static final String TRANS_TYPE_NAME = "trans_type_name";
     /**
     * 
     */

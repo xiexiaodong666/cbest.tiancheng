@@ -23,7 +23,7 @@ public class OrderTask {
     @Autowired
     private OrderService orderService;
 
-    @Scheduled(cron = "0 * * * * ? ")
+//    @Scheduled(cron = "0 * * * * ? ")
     public void syncOrderData(){
         //查询系统中所有配置门店
 

@@ -1,7 +1,9 @@
 package com.welfare.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.persist.entity.OrderInfo;
+import com.welfare.persist.entity.OrderSummary;
 import com.welfare.service.dto.OrderReqDto;
 
 import java.util.List;
@@ -17,7 +19,11 @@ import java.util.List;
  */
 public interface OrderService {
 
+    Page<OrderInfo> selectPage(Page page,OrderReqDto orderReqDto , MerchantUserInfo merchantUserInfo);
+
     List<OrderInfo> selectList(OrderReqDto orderReqDto , MerchantUserInfo merchantUserInfo);
+
+    OrderSummary selectSummary(OrderReqDto orderReqDto , MerchantUserInfo merchantUserInfo);
 
     /**
      * 同步重百小票数据

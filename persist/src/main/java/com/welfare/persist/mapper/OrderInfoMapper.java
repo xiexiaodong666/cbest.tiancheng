@@ -1,7 +1,10 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.query.OrderPageQuery;
 import com.welfare.persist.entity.OrderInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.welfare.persist.entity.OrderSummary;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,4 +22,9 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
 
     Integer saveOrUpdate(@Param("list") List<OrderInfo> list);
 
+    Page<OrderInfo> searchOrder(Page page , @Param("orderPageQuery") OrderPageQuery orderPageQuery);
+
+    List<OrderInfo> searchOrder(@Param("orderPageQuery") OrderPageQuery orderPageQuery);
+
+    OrderSummary searchOrderSum(@Param("orderPageQuery") OrderPageQuery orderPageQuery);
 }

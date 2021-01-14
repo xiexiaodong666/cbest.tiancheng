@@ -91,7 +91,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("修改账号额度申请(单个)")
   @MerchantUser
   public R<Long> update(@Validated @RequestBody DepositApplyUpdateRequest requst){
-    return success(depositApplyService.updateOne(requst, MerchantUserHolder.getDeptIds()));
+    return success(depositApplyService.updateOne(requst, MerchantUserHolder.getMerchantUser()));
   }
 
   @PostMapping("/batch-update")
@@ -107,7 +107,7 @@ public class AccountDepositApplyController implements IController {
     requst.setApplyRemark(applyRemark);
     requst.setMerAccountTypeCode(merAccountTypeCode);
     requst.setMerAccountTypeName(merAccountTypeName);
-    return success(depositApplyService.updateBatch(requst, fileId, MerchantUserHolder.getDeptIds()));
+    return success(depositApplyService.updateBatch(requst, fileId, MerchantUserHolder.getMerchantUser()));
   }
 
   @PostMapping("/export")
@@ -130,7 +130,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("新增额度申请(单个)")
   @MerchantUser
   public R<Long> save(@Validated@RequestBody DepositApplyRequest request){
-    return success(depositApplyService.saveOne(request, MerchantUserHolder.getDeptIds()));
+    return success(depositApplyService.saveOne(request, MerchantUserHolder.getMerchantUser()));
   }
 
   @PostMapping("/batch-save")
@@ -147,7 +147,7 @@ public class AccountDepositApplyController implements IController {
     request.setApplyRemark(applyRemark);
     request.setMerAccountTypeCode(merAccountTypeCode);
     request.setMerAccountTypeName(merAccountTypeName);
-    return success(depositApplyService.saveBatch(request, fileId, MerchantUserHolder.getDeptIds()));
+    return success(depositApplyService.saveBatch(request, fileId, MerchantUserHolder.getMerchantUser()));
   }
 
   @PostMapping("/upload")

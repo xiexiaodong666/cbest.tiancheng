@@ -48,6 +48,8 @@ public class CardInfoServiceImpl implements CardInfoService {
   @Override
   public CardInfo updateWritten(CardInfo cardInfo) {
     cardInfo.setCardStatus(WelfareConstant.CardStatus.WRITTEN.code());
+    cardInfo.setWrittenTime(new Date());
+
     if (cardInfoDao.updateById(cardInfo)) {
       return cardInfo;
     } else {
@@ -58,7 +60,7 @@ public class CardInfoServiceImpl implements CardInfoService {
   @Override
   public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String applyCode, String cardName,
       String merCode,
-      String cardType, String cardMedium, String cardStatus, Date writtenStartTime,
+      String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
       Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
       Date bindEndTime) {
     Page<CardInfo> page = new Page<>(currentPage, pageSize);
@@ -69,5 +71,17 @@ public class CardInfoServiceImpl implements CardInfoService {
                                writtenEndTime, startTime,
                                endTime, bindStartTime, bindEndTime
     );
+  }
+
+  @Override
+  public List<CardInfoDTO> exportCardInfo(String cardName, String merCode, String cardType,
+      String cardMedium, Integer cardStatus, Date writtenStartTime, Date writtenEndTime,
+      Date startTime, Date endTime, Date bindStartTime, Date bindEndTime) {
+    return cardInfoMapper.exportCardInfo(cardName,
+                               merCode, cardType, cardMedium,
+                               cardStatus, writtenStartTime,
+                               writtenEndTime, startTime,
+                               endTime, bindStartTime, bindEndTime
+    );;
   }
 }

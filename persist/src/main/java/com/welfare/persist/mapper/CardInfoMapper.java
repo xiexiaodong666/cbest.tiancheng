@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
 import java.util.Date;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,12 +21,21 @@ public interface CardInfoMapper extends BaseMapper<CardInfo> {
 
   public String getCardId(@Param("merCode") String merCode);
 
-  public Page<CardInfoDTO> list(Page<CardInfo> page,@Param("applyCode")String applyCode, @Param("cardName") String cardName,
+  public Page<CardInfoDTO> list(Page<CardInfo> page, @Param("applyCode") String applyCode,
+      @Param("cardName") String cardName,
       @Param("merCode") String merCode,
       @Param("cardType") String cardType, @Param("cardMedium") String cardMedium,
-      @Param("cardStatus") String cardStatus, @Param("writtenStartTime") Date writtenStartTime,
+      @Param("cardStatus") Integer cardStatus, @Param("writtenStartTime") Date writtenStartTime,
       @Param("writtenEndTime") Date writtenEndTime, @Param("startTime") Date startTime,
       @Param("endTime") Date endTime, @Param("bindStartTime") Date bindStartTime,
       @Param("bindEndTime") Date bindEndTime);
+
+  public List<CardInfoDTO> exportCardInfo(@Param("cardName") String cardName,
+      @Param("merCode") String merCode, @Param("cardType") String cardType,
+      @Param("cardMedium") String cardMedium, @Param("cardStatus") Integer cardStatus,
+      @Param("writtenStartTime") Date writtenStartTime,
+      @Param("writtenEndTime") Date writtenEndTime,
+      @Param("startTime") Date startTime, @Param("endTime") Date endTime,
+      @Param("bindStartTime") Date bindStartTime, @Param("bindEndTime") Date bindEndTime);
 
 }

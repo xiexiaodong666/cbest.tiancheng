@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.TempAccountDepositApply;
 import com.welfare.service.AccountService;
 import com.welfare.service.TempAccountDepositApplyService;
@@ -15,12 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,7 +40,7 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
 
   private static final int MAX_COUNT = 2000;
 
-  private List<AccountDepositRequest> list = new ArrayList<>();
+  private List<TempAccountDepositApply> list = new ArrayList<>();
 
   private ThreadPoolExecutor executor;
 
@@ -55,6 +54,8 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
   private String requestId;
 
   private String fileId;
+
+  private Set<String> accountCodeSet = new HashSet<>(1000);
 
   public DepositApplyUploadListener() {}
 
@@ -71,44 +72,61 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
   @Override
   public void invoke(AccountDepositRequest request, AnalysisContext context) {
     log.info("员工账号存储申请：解析到一条数据:{}, requestId:{}, fileId;{}", JSON.toJSONString(request), requestId, fileId);
-    if (Objects.isNull(request.getAccountCode())) {
+    if (Objects.isNull(request.getPhone())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账号不能为空！", null);
     }
     if (request.getRechargeAmount().compareTo(BigDecimal.ZERO) < 0) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]金额不能小于0！", request.getAccountCode()), null);
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]金额不能小于0！", request.getPhone()), null);
     }
-    list.add(request);
-    if (list.size() > MAX_COUNT) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("超过最大上传数量[%s]！", MAX_COUNT), null);
+    if (accountCodeSet.contains(request.getPhone())) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]账号(手机号)不能重复！", request.getPhone()), null);
     }
+    Account account = accountService.findByPhone(request.getPhone());
+    if (account == null) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]账号(手机号)不存在！", request.getPhone()), null);
+    }
+    accountCodeSet.add(request.getPhone());
+    list.add(getTempAccountDepositApply(request, account));
+//    if (list.size() > MAX_COUNT) {
+//      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("超过最大上传数量[%s]！", MAX_COUNT), null);
+//    }
   }
+
+  /**
+   * 加上存储数据库
+   */
+//  private void saveData() {
+//    log.info("员工账号存储申请：{}条数据，开始存储数据库！requestId:{}, fileId:{}", list.size(), requestId, fileId);
+//    if (CollectionUtils.isNotEmpty(list)) {
+//      List<TempAccountDepositApply> batchSave = new ArrayList<>();
+//      final CountDownLatch countDownLatch = new CountDownLatch(page(list.size()));
+//      for (int i = 0; i < list.size(); i++) {
+//        TempAccountDepositApply apply = getTempAccountDepositApply(list.get(i));
+//        batchSave.add(apply);
+//        if ((batchSave.size() == BATCH_COUNT) || (i == list.size() - 1)) {
+//          List<TempAccountDepositApply> finalBatchSave = batchSave;
+//          executor.execute(() -> {
+//            depositApplyService.saveAll(finalBatchSave);
+//            countDownLatch.countDown();
+//          });
+//          batchSave = new ArrayList<>();
+//        }
+//      }
+//      try {
+//        countDownLatch.await();
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//    }
+//    log.info("员工账号存储申请: 存储数据库成功！{}条数据 requestId:{}, fileId:{}", list.size(), requestId, fileId);
+//  }
 
   /**
    * 加上存储数据库
    */
   private void saveData() {
     log.info("员工账号存储申请：{}条数据，开始存储数据库！requestId:{}, fileId:{}", list.size(), requestId, fileId);
-    if (CollectionUtils.isNotEmpty(list)) {
-      List<TempAccountDepositApply> batchSave = new ArrayList<>();
-      final CountDownLatch countDownLatch = new CountDownLatch(page(list.size()));
-      for (int i = 0; i < list.size(); i++) {
-        TempAccountDepositApply apply = getTempAccountDepositApply(list.get(i));
-        batchSave.add(apply);
-        if ((batchSave.size() == BATCH_COUNT) || (i == list.size() - 1)) {
-          List<TempAccountDepositApply> finalBatchSave = batchSave;
-          executor.execute(() -> {
-            depositApplyService.saveAll(finalBatchSave);
-            countDownLatch.countDown();
-          });
-          batchSave = new ArrayList<>();
-        }
-      }
-      try {
-        countDownLatch.await();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
+    depositApplyService.saveAll(list);
     log.info("员工账号存储申请: 存储数据库成功！{}条数据 requestId:{}, fileId:{}", list.size(), requestId, fileId);
   }
 
@@ -120,9 +138,10 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
     }
   }
 
-  private TempAccountDepositApply getTempAccountDepositApply(AccountDepositRequest request){
+  private TempAccountDepositApply getTempAccountDepositApply(AccountDepositRequest request, Account account){
     TempAccountDepositApply apply = new TempAccountDepositApply();
-    apply.setAccountCode(request.getAccountCode());
+    apply.setPhone(request.getPhone());
+    apply.setAccountCode(account.getAccountCode());
     apply.setRechargeAmount(request.getRechargeAmount());
     apply.setFileId(fileId);
     apply.setRequestId(requestId);
@@ -135,6 +154,7 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
    * @param context
    */
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void doAfterAllAnalysed(AnalysisContext context) {
     // 这里也要保存数据，确保最后遗留的数据也存储到数据库
     saveData();

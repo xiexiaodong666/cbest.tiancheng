@@ -115,6 +115,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 validationParmas(apply,request,merchant,merchantUser,request.getInfo().getRechargeAmount());
                 // 初始化主表
                 apply = depositApplyConverter.toAccountDepositApply(request);
+                if (accountService.findByPhone(request.getInfo().getPhone()) == null) {
+                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在！", null);
+                }
                 initAccountDepositApply(apply, request, merchant, merchantUser);
                 // 设置充值人数
                 apply.setRechargeNum(1);
@@ -158,8 +161,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 }
                 Merchant merchant = merchantService.detailByMerCode(merchantUser.getMerchantCode());
                 // 初始化主表
-                initAccountDepositApply(apply,request, merchant, merchantUser);
                 apply = depositApplyConverter.toAccountDepositApply(request);
+                initAccountDepositApply(apply,request,merchant,merchantUser);
                 List<TempAccountDepositApplyDTO> deposits = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
                 if (CollectionUtils.isEmpty(deposits)) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工", null);
@@ -167,7 +170,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 double sumAmoun = deposits.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
                 BigDecimal sumAmount = new BigDecimal(sumAmoun);
                 validationParmas(apply,request,merchant,merchantUser,sumAmount);
-                apply.setMerAccountTypeCode(WelfareConstant.MerCreditType.findByCode(request.getMerAccountTypeCode()).code());
+                apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
                 // 设置充值总金额
                 apply.setRechargeAmount(sumAmount);
                 // 设置充值人数
@@ -217,6 +220,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
                 }
+                //不支持非单个申请修改
+                if (!apply.getApprovalType().equals(ApprovalType.SINGLE.getCode())) {
+                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非单个申请修改", null);
+                }
                 // 判断金额是否超限
                 MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
                 // 修改充值明细表
@@ -228,7 +235,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 apply.setUpdateUser(merchantUserInfo.getUserCode());
                 apply.setRechargeAmount(request.getInfo().getRechargeAmount());
                 apply.setApplyRemark(request.getApplyRemark());
-                apply.setMerAccountTypeCode(WelfareConstant.MerCreditType.findByCode(request.getMerAccountTypeCode()).code());
+                apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
                 accountDepositApplyDao.saveOrUpdate(apply);
                 List<AccountDepositApplyDetail> details = depositApplyDetailService.listByApplyCode(apply.getApplyCode());
                 if (CollectionUtils.isNotEmpty(details)) {
@@ -279,6 +286,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
                 }
+                //不支持非批量申请修改
+                if (!apply.getApprovalType().equals(ApprovalType.BATCH.getCode())) {
+                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非批量申请修改", null);
+                }
                 List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
                 // 至少选一个员工
                 if (CollectionUtils.isEmpty(temps)) {
@@ -298,11 +309,12 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 apply.setRechargeAmount(sumAmount);
                 apply.setRechargeNum(temps.size());
                 apply.setApplyRemark(request.getApplyRemark());
-                apply.setMerAccountTypeCode(WelfareConstant.MerCreditType.findByCode(request.getMerAccountTypeCode()).code());
+                apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
                 accountDepositApplyDao.saveOrUpdate(apply);
-                depositApplyDetailService.delByApplyCode(apply.getApplyCode());
                 List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
+                depositApplyDetailService.delByApplyCode(apply.getApplyCode());
                 accountDepositApplyDetailDao.saveBatch(details);
+                tempAccountDepositApplyService.delByFileId(fileId);
                 return Long.valueOf(apply.getId());
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
@@ -510,7 +522,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {
         AccountDepositApplyDetail detail;
         detail = new AccountDepositApplyDetail();
-        detail.setAccountCode(accountAmounts.getAccountCode());
+        Account account = accountService.findByPhone(accountAmounts.getPhone());
+        detail.setAccountCode(account.getAccountCode());
         detail.setApplyCode(apply.getApplyCode());
         detail.setRechargeAmount(accountAmounts.getRechargeAmount());
         detail.setRechargeStatus(RechargeStatus.INIT.getCode());

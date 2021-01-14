@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,account_name,account_code,account_type_code,mer_code,store_code,account_status,staff_status,binding,create_user,create_time,update_user,update_time,account_balance,deleted,version,phone,max_quota,surplus_quota,remark,sync_status
+        id,account_name,account_code,account_type_code,mer_code,store_code,account_status,staff_status,binding,create_user,create_time,update_user,update_time,account_balance,deleted,version,phone,max_quota,surplus_quota,remark,sync_status,change_event_id
     </sql>
 
     <update id="increaseAccountBalance">

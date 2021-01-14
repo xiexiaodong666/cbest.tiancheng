@@ -93,5 +93,4 @@ public interface SupplierStoreService {
      */
     boolean syncConsumeType(String storeCode, String consumeType);
 
-    void syncShopping(ShoppingActionTypeEnum typeEnum, List<SupplierStoreDetailDTO> supplierStoreDetailDTOS);
 }

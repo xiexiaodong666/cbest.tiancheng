@@ -11,6 +11,5 @@ import lombok.Data;
  */
 @Data
 @JsonInclude(value = Include.NON_NULL)
-public class MerchantAddEvt extends MerchantEvt {
-
+public class SupplierStoreActivateEvt extends SupplierStoreEvt {
 }

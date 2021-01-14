@@ -2,6 +2,7 @@ package com.welfare.service.sync.listener;
 
 
 import com.welfare.service.sync.event.MerchantAddEvt;
+import com.welfare.service.sync.event.MerchantEvt;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.killbill.bus.api.PersistentBus.EventBusException;
@@ -32,9 +33,7 @@ public class MerchantListener {
 
   @EventListener
   @Transactional(rollbackFor = Exception.class)
-  public void onAdd(MerchantAddEvt evt) throws EventBusException {
-    log.info("监听器。。。。{}",evt.getTest());
-    ;
+  public void onAdd(MerchantEvt evt) throws EventBusException {
       persistentBus.postFromTransaction(evt, DataSourceUtils.getConnection(dataSource));
     }
 }

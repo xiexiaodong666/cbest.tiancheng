@@ -259,6 +259,8 @@ public class AccountDepositRecordServiceImpl extends
                                 AccountRechargePaymentStatusEnum.QUERY_PAY_RESULT_NOT_FOUND
                                     .getCode());
                         log.error(StrUtil.format("超过6分钟未查询到支付交易流水号[{}]的支付结果", payTradeNo));
+                    } else {
+                        continue;
                     }
                     break;
             }

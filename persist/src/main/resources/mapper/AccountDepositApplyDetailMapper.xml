@@ -12,6 +12,7 @@
     <resultMap id="tempAccountDepositApplyDTO" type="com.welfare.persist.dto.TempAccountDepositApplyDTO">
         <id property="id" column="id" />
         <result property="accountCode" column="account_code"/>
+        <result property="phone" column="phone"/>
         <result property="accountName" column="account_name"/>
         <result property="rechargeAmount" column="recharge_amount"/>
         <result property="departmentCode" column="store_code"/>
@@ -28,13 +29,18 @@
         <result property="rechargeAmount" column="recharge_amount"/>
     </resultMap>
 
+    <resultMap id="acountApplyTotalDTO" type="com.welfare.persist.dto.AccountApplyTotalDTO">
+        <id property="id" column="id" />
+        <result property="userCount" column="userCount"/>
+        <result property="totalAmount" column="totalAmount"/>
+    </resultMap>
 
     <select id="listByApplyCodeIfAccountExist" resultMap="accountDepositApplyDetail">
         SELECT
         ad.*
         from account ac LEFT JOIN account_deposit_apply_detail ad
         on ac.account_code = ad.account_code
-        where ad.apply_code = #{applyCode} and ac.deleted = 0
+        where ad.apply_code = #{applyCode} and ac.deleted = 0 and ad.deleted = 0
     </select>
 
     <select id="listByApplyCodeIfAccountExist2" resultMap="tempAccountDepositApplyDTO">
@@ -42,12 +48,22 @@
          ad.id,
          ac.account_name,
          ad.account_code,
+         ac.phone,
          ad.recharge_amount,
          ac.store_code,
          de.department_name
         from account ac LEFT JOIN account_deposit_apply_detail ad
         on ac.account_code = ad.account_code
         LEFT JOIN department de ON de.department_code = ac.store_code
-        where ad.apply_code = #{applyCode} and ac.deleted = 0
+        where ad.apply_code = #{applyCode} and ac.deleted = 0 and ad.deleted = 0
+    </select>
+
+    <select id="getUserCountAndTotalmount" resultMap="acountApplyTotalDTO">
+        SELECT
+            count(DISTINCT ad.account_code) as userCount,
+            SUM(ad.recharge_amount) as totalAmount
+        from account ac LEFT JOIN account_deposit_apply_detail ad
+        on ac.account_code = ad.account_code
+        where ad.apply_code = #{applyCode} and ac.deleted = 0 and ad.deleted = 0
     </select>
 </mapper>

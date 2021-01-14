@@ -5,10 +5,12 @@ import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.Data;
 import org.springframework.core.Ordered;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Description:
@@ -23,6 +25,7 @@ public class PaymentOperation {
     private AccountAmountType accountAmountType;
     private AccountBillDetail accountBillDetail;
     private AccountDeductionDetail accountDeductionDetail;
+    private List<MerchantAccountOperation> merchantAccountOperations;
 
     private BigDecimal operateAmount;
     private String transNo;

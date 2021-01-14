@@ -23,6 +23,12 @@ public class TempAccountDepositApplyDTO {
   private Long id;
 
   /**
+   * 员工手机号
+   */
+  @ApiModelProperty(name = "员工（手机号）")
+  private String phone;
+
+  /**
    * 员工账号
    */
   @ApiModelProperty(name = "员工账号")

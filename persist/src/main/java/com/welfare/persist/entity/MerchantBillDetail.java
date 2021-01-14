@@ -38,7 +38,7 @@ public class MerchantBillDetail extends Model<MerchantBillDetail> implements Ser
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Integer id;
+	private Long id;
     /**
      * 商户代码
      */

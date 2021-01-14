@@ -9,15 +9,15 @@ import com.welfare.common.enums.MerCooperationModeEnum;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.persist.dao.MerDepositApplyFileDao;
 import com.welfare.persist.dao.MerchantCreditApplyDao;
 import com.welfare.persist.dto.MerchantCreditApplyInfoDTO;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
+import com.welfare.persist.entity.MerDepositApplyFile;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantCreditApply;
-import com.welfare.service.MerchantCreditApplyService;
-import com.welfare.service.MerchantCreditService;
-import com.welfare.service.MerchantService;
-import com.welfare.service.SequenceService;
+import com.welfare.persist.mapper.MerDepositApplyFileMapper;
+import com.welfare.service.*;
 import com.welfare.service.converter.MerchantCreditApplyConverter;
 import com.welfare.service.dto.*;
 import com.welfare.service.dto.merchantapply.*;
@@ -57,8 +57,11 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     private final RedissonClient redissonClient;
     private final MerchantCreditService merchantCreditService;
     private final MerchantService merchantService;
+    private final MerDepositApplyFileDao depositApplyFileDao;
+    private final MerDepositApplyFileService merDepositApplyFileService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String save(MerchantCreditApplyRequest request, ApiUserInfo user) {
         MerchantCreditApply apply = getByRequestId(request.getRequestId());
         if (apply != null) {
@@ -80,6 +83,16 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setApplyUser(user.getUserName());
                 apply.setApplyTime(new Date());
                 merchantCreditApplyDao.save(apply);
+                List<MerDepositApplyFile> files = new ArrayList<>();;
+                if (CollectionUtils.isNotEmpty(request.getEnclosures())) {
+                    for (String url : request.getEnclosures()) {
+                        MerDepositApplyFile file = new MerDepositApplyFile();
+                        file.setFileUrl(url);
+                        file.setMerDepositApplyCode(apply.getApplyCode());
+                        files.add(file);
+                    }
+                    depositApplyFileDao.saveBatch(files);
+                }
                 return String.valueOf(apply.getId());
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
@@ -101,6 +114,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String update(MerchantCreditApplyUpdateReq request, ApiUserInfo user) {
         MerchantCreditApply apply = merchantCreditApplyDao.getById(Long.parseLong(request.getId()));
         if (apply == null) {
@@ -125,8 +139,18 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setApplyType(request.getApplyType());
                 apply.setBalance(request.getBalance());
                 apply.setRemark(request.getRemark());
-                apply.setEnclosure(request.getEnclosure());
                 apply.setApplyUser(user.getUserName());
+                merDepositApplyFileService.delByMerDepositApplyCode(apply.getApplyCode());
+                List<MerDepositApplyFile> files = new ArrayList<>();;
+                if (CollectionUtils.isNotEmpty(request.getEnclosures())) {
+                    for (String url : request.getEnclosures()) {
+                        MerDepositApplyFile file = new MerDepositApplyFile();
+                        file.setFileUrl(url);
+                        file.setMerDepositApplyCode(apply.getApplyCode());
+                        files.add(file);
+                    }
+                    depositApplyFileDao.saveBatch(files);
+                }
                 merchantCreditApplyDao.saveOrUpdate(apply);
                 return apply.getId()+"";
             } else {

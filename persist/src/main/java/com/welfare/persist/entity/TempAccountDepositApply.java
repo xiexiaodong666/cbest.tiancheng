@@ -40,10 +40,10 @@ public class TempAccountDepositApply extends Model<TempAccountDepositApply> impl
     @ApiModelProperty("上传文件id")   
     private String fileId;
     /**
-     * 员工账号
+     * 员工手机号
      */
-    @ApiModelProperty("员工账号")   
-    private Long accountCode;
+    @ApiModelProperty("员工手机号")
+    private String phone;
     /**
      * 充值金额
      */
@@ -54,6 +54,11 @@ public class TempAccountDepositApply extends Model<TempAccountDepositApply> impl
      */
     @ApiModelProperty("上传请求id")   
     private String requestId;
+    /**
+     * 员工账号
+     */
+    @ApiModelProperty("员工账号")
+    private Long accountCode;
 
 //以下为列明常量
 
@@ -66,9 +71,9 @@ public class TempAccountDepositApply extends Model<TempAccountDepositApply> impl
     */
     public static final String FILE_ID = "file_id";
     /**
-    * 员工账号
+    * 员工手机号
     */
-    public static final String ACCOUNT_CODE = "account_code";
+    public static final String PHONE = "phone";
     /**
     * 充值金额
     */
@@ -77,5 +82,8 @@ public class TempAccountDepositApply extends Model<TempAccountDepositApply> impl
     * 上传请求id
     */
     public static final String REQUEST_ID = "request_id";
-
+    /**
+     * 员工账号
+     */
+    public static final String ACCOUNT_CODE = "account_code";
 }

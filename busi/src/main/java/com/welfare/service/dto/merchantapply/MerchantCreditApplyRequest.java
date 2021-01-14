@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author duanhy
@@ -55,5 +56,5 @@ public class MerchantCreditApplyRequest {
    * 附件
    */
   @ApiModelProperty("附件(文件地址)")
-  private String enclosure;
+  private List<String> enclosures;
 }

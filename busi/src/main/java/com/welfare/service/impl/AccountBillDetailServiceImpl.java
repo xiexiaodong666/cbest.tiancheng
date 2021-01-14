@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountBillDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -51,7 +50,7 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         accountBillDetail.setTransAmount(amount);
         accountBillDetail.setTransTime(Calendar.getInstance().getTime());
         AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(accountCode);
-        accountBillDetail.setSurplusQuotaBalance(surplusQuota.getAccountBalance());
+        accountBillDetail.setSurplusQuota(surplusQuota.getAccountBalance());
         accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT.code());
         accountBillDetailDao.save(accountBillDetail);
     }

@@ -106,7 +106,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
       QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
       queryWrapper.eq(MerchantStoreRelation.MER_CODE, req.getMerCode());
-      queryWrapper.eq(MerchantStoreRelation.STATUS, 0);
+      // queryWrapper.eq(MerchantStoreRelation.STATUS, 0);
       List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
           queryWrapper);
       if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {

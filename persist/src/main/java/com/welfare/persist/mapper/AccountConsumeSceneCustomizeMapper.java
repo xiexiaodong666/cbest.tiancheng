@@ -26,4 +26,9 @@ public interface AccountConsumeSceneCustomizeMapper extends BaseMapper<AccountCo
 
   AccountConsumeSceneMapperDTO queryAccountConsumerScene4Detail(@Param("id")Long id);
 
+  Integer getCountByMerCodeAndAccountTypeAndStoreCode(
+      @Param("merCode")String merCode,
+      @Param("typeCode")String typeCode,
+      @Param("storeCode")String storeCode
+  );
 }

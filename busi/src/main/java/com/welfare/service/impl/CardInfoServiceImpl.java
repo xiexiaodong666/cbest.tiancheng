@@ -82,6 +82,6 @@ public class CardInfoServiceImpl implements CardInfoService {
                                cardStatus, writtenStartTime,
                                writtenEndTime, startTime,
                                endTime, bindStartTime, bindEndTime
-    );;
+    );
   }
 }

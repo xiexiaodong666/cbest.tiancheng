@@ -4,6 +4,7 @@ package com.welfare.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,8 +49,8 @@ public interface CardInfoService {
    * @param bindEndTime
    * @return
    */
-  Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardName, String merCode,
-      String cardType, String cardMedium, String cardStatus, String writtenStartTime,
-      String writtenEndTime, String startTime, String endTime, String bindStartTime,
-      String bindEndTime);
+  Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String applyCode, String cardName, String merCode,
+      String cardType, String cardMedium, String cardStatus, Date writtenStartTime,
+      Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
+      Date bindEndTime);
 }

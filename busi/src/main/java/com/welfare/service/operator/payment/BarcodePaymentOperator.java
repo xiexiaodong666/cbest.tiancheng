@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 /**
  * Description:
  *
@@ -20,10 +22,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BarcodePaymentOperator extends AbstractPaymentOperator {
 
-    //private final RedisTemplate<String,String> redisTemplate;
     private final BarcodeService barcodeService;
     @Override
     public void doPay(PaymentRequest paymentRequest) {
-        
+
     }
 }

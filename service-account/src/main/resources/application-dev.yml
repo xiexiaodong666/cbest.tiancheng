@@ -40,6 +40,8 @@ mybatis-plus:
       logic-not-delete-value: 0
 platformUser:
   url:
+shopping:
+  url:
 
 cbest:
   pay:

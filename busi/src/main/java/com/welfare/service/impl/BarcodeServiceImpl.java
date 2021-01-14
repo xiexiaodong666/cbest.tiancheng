@@ -15,12 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,6 +53,11 @@ public class BarcodeServiceImpl implements BarcodeService {
 
     private final BarcodeSaltDao barcodeSaltDao;
     private final RedissonClient redissonClient;
+    /**
+     * redisAutoConfiguration会在ioc中放入redisTemplate和stringRedisTemplate两个bean，
+     * 所以这里不能用构造器注入，而是应该用名字去注入
+     */
+    @Resource
     private RedisTemplate<String,PaymentBarcode> redisTemplate;
     @Override
     public List<BarcodeSalt> querySalt(Long fromValidPeriodNumeric) {

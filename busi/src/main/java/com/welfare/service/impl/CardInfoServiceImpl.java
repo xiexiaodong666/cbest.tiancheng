@@ -10,6 +10,7 @@ import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.mapper.CardInfoMapper;
 import com.welfare.service.CardInfoService;
+import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,14 +56,14 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardName,
+  public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String applyCode, String cardName,
       String merCode,
-      String cardType, String cardMedium, String cardStatus, String writtenStartTime,
-      String writtenEndTime, String startTime, String endTime, String bindStartTime,
-      String bindEndTime) {
+      String cardType, String cardMedium, String cardStatus, Date writtenStartTime,
+      Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
+      Date bindEndTime) {
     Page<CardInfo> page = new Page<>(currentPage, pageSize);
 
-    return cardInfoMapper.list(page, cardName,
+    return cardInfoMapper.list(page, applyCode, cardName,
                                merCode, cardType, cardMedium,
                                cardStatus, writtenStartTime,
                                writtenEndTime, startTime,

@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -170,6 +171,9 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
     Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     List<String> accountTypeCodeList = accountConsumeSceneAddReq.getAccountTypeCodeList();
+    if( CollectionUtils.isEmpty(accountTypeCodeList)  || accountTypeCodeList.size() == 0){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不能为空", null);
+    }
     accountTypeCodeList.forEach(accountTypeCode -> {
       AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
       BeanUtils.copyProperties(accountConsumeSceneAddReq, accountConsumeScene);
@@ -226,6 +230,9 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = new ArrayList<>(
         accountConsumeSceneStoreRelationReqList.size());
     accountConsumeSceneStoreRelationReqList.forEach(accountConsumeSceneStoreRelationReq -> {
+      if(StringUtils.isBlank(accountConsumeSceneStoreRelationReq.getSceneConsumType())){
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"请选择该员工类型在该门店下得消费方式", null);
+      }
       AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation = new AccountConsumeSceneStoreRelation();
       BeanUtils
           .copyProperties(accountConsumeSceneStoreRelationReq, accountConsumeSceneStoreRelation);

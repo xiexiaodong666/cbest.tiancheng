@@ -2,21 +2,39 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountAmountTypeDao;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountBillDetailService;
+import com.welfare.service.AccountService;
+import com.welfare.service.AccountTypeService;
+import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.dto.Deposit;
+import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 
 /**
  * @author duanhy
@@ -30,6 +48,9 @@ import java.util.Objects;
 public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountAmountTypeMapper accountAmountTypeMapper;
+    private final MerchantAccountTypeService merchantAccountTypeService;
+    private final RedissonClient redissonClient;
+    private final AccountService accountService;
     /**
      * 循环依赖问题，所以未采用构造器注入
      */
@@ -52,35 +73,53 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
 
     @Override
     public void updateAccountAmountType(Deposit deposit) {
-        AccountAmountType accountAmountType = this.queryOne(deposit.getAccountCode(),
-                deposit.getMerAccountTypeCode());
-
-        if (Objects.isNull(accountAmountType)) {
-            accountAmountType = deposit.toNewAccountAmountType();
-            BigDecimal afterAddAmount = accountAmountType.getAccountBalance().add(deposit.getAmount());
-            accountAmountType.setAccountBalance(afterAddAmount);
-            accountAmountTypeDao.save(accountAmountType);
-        } else {
-            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
-            accountAmountTypeDao.updateById(accountAmountType);
+        RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + deposit.getAccountCode());
+        lock.lock();
+        try{
+            AccountAmountType accountAmountType = this.queryOne(deposit.getAccountCode(),
+                    deposit.getMerAccountTypeCode());
+            Account account = accountService.getByAccountCode(deposit.getAccountCode());
+            BigDecimal oldAccountBalance = account.getAccountBalance() != null ? account.getAccountBalance() : BigDecimal.ZERO;
+            if (Objects.isNull(accountAmountType)) {
+                accountAmountType = deposit.toNewAccountAmountType();
+                BigDecimal afterAddAmount = accountAmountType.getAccountBalance().add(deposit.getAmount());
+                accountAmountType.setAccountBalance(afterAddAmount);
+                accountAmountTypeDao.save(accountAmountType);
+            } else {
+                accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
+                accountAmountTypeDao.updateById(accountAmountType);
+            }
+            account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
+            accountService.save(account);
+            accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
+        } finally {
+            lock.unlock();
         }
-        accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
-
     }
 
     @Override
     public AccountAmountType querySurplusQuota(Long accountCode) {
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE,accountCode)
+        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, accountCode)
                 .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA);
         return accountAmountTypeDao.getOne(queryWrapper);
     }
 
     @Override
-    public List<AccountAmountDO> queryAccountAmountDO(Long accountCode) {
-        QueryWrapper<AccountAmountDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE,accountCode);
-        return null;
+    public List<AccountAmountDO> queryAccountAmountDO(Account account) {
+        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, account.getAccountCode());
+        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(queryWrapper);
+        Assert.isTrue(!CollectionUtils.isEmpty(accountAmountTypes), "该用户没有账户余额信息");
+        List<MerchantAccountType> types = merchantAccountTypeService.queryByMerCode(account.getMerCode());
+        Assert.isTrue(!CollectionUtils.isEmpty(types), "该商户没有配置accountType");
+
+        Map<String, MerchantAccountType> map = types.stream()
+                .collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
+        return accountAmountTypes.stream()
+                .map(accountAmountType ->
+                        AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode())))
+                .collect(Collectors.toList());
     }
 
 

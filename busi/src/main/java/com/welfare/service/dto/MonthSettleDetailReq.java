@@ -13,7 +13,7 @@ import java.util.Date;
  * @desc 账单明细响应dto
  */
 @Data
-public class MonthSettleDetailReq extends RequestPage {
+public class MonthSettleDetailReq{
     @ApiModelProperty(value = "订单编号")
     private String orderNo;
 
@@ -35,6 +35,6 @@ public class MonthSettleDetailReq extends RequestPage {
     @ApiModelProperty(value = "门店类型 自营：self，第三方：third")
     private String storeType;
 
-    @ApiModelProperty(value = "最小序列号")
+    @ApiModelProperty(value = "最小序号")
     private Long minId;
 }

@@ -3,6 +3,7 @@ package com.welfare.service.remote.entity;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,13 +15,13 @@ import java.util.List;
 public class StoreShoppingReq implements Serializable {
   private String actionType;
   private String requestId;
-  private String timestamp;
+  private Date timestamp;
   private List<ListBean> list;
   @Data
   public static class ListBean  {
     private boolean enabled;
     private String merchantCode;
-    private String name;
+    private String storeName;
     private int status;
     private String storeCode;
     private List<AddressBean> address;

@@ -6,6 +6,7 @@ import com.welfare.persist.entity.SettleDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,4 +25,6 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
      * @return
      */
     List<MonthSettleDetailDTO> selectMonthSettleDetail(MonthSettleDetailQuery monthSettleDetailQuery);
+
+    List<SettleDetail> getSettleDetailFromAccountDetail(String merCode, Date date);
 }

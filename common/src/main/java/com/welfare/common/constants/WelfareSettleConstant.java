@@ -19,11 +19,11 @@ public class WelfareSettleConstant {
         /**
          * 待确认
          */
-        UNCONFIRMED("UNCONFIRMED","待确认"),
+        UNCONFIRMED("unconfirmed","待确认"),
         /**
          * 已确认
          */
-        CONFIRMED("CONFIRMED","已确认");
+        CONFIRMED("confirmed","已确认");
 
         private String code;
         private String desc;
@@ -48,12 +48,12 @@ public class WelfareSettleConstant {
         /**
          * 待发送
          */
-        UNSENDED("UNSENDED","待发送"),
+        UNSENDED("unsended","待发送"),
 
         /**
          * 已发送
          */
-        SENDED("SENDED","已发送");
+        SENDED("sended","已发送");
 
         private String code;
         private String desc;
@@ -78,12 +78,12 @@ public class WelfareSettleConstant {
         /**
          * 待结算
          */
-        UNSETTLED("UNSETTLED","待结算"),
+        UNSETTLED("unsettled","待结算"),
 
         /**
          * 已结算
          */
-        SETTLED("SETTLED","已结算");
+        SETTLED("settled","已结算");
 
         private String code;
         private String desc;

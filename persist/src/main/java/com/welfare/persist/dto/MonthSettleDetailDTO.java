@@ -13,6 +13,8 @@ import java.util.Date;
  */
 @Data
 public class MonthSettleDetailDTO{
+    private Long id;
+
     private String transNo;
 
     private String orderNO;

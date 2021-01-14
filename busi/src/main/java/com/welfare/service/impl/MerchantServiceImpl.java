@@ -1,15 +1,19 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
+import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantExMapper;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
@@ -22,15 +26,24 @@ import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
+import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.helper.QueryHelper;
+import com.welfare.service.remote.ShoppingFeignClient;
+import com.welfare.service.remote.entity.MerchantShoppingReq;
+import com.welfare.service.remote.entity.RoleConsumptionResp;
+import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,6 +66,8 @@ public class MerchantServiceImpl implements MerchantService {
     private final SequenceService sequenceService;
 
     private final MerchantWithCreditConverter merchantWithCreditConverter;
+
+    private final ShoppingFeignClient shoppingFeignClient;
 
 
     @Override
@@ -108,17 +123,80 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantDetailDTO merchant) {
         merchant.setMerCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_CODE.code()).toString());
-        boolean flag=merchantDao.save(merchantDetailConverter.toE(merchant));
-        return flag&merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
+        Merchant save =merchantDetailConverter.toE(merchant);
+        save.setSyncStatus(0);
+        boolean flag=merchantDao.save(save);
+        boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
+        //同步商城中台
+        List<MerchantDetailDTO> syncList=new ArrayList<>();
+        syncList.add(merchant);
+        syncShopingAfterCommit(ShoppingActionTypeEnum.ADD,syncList);
+        return flag&&flag2;
     }
-
+    private void syncShopingAfterCommit(ShoppingActionTypeEnum typeEnum,List<MerchantDetailDTO> merchantDetailDTOList){
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronizationAdapter() {
+                    @Override
+                    public void afterCommit() {
+                        syncShopping(typeEnum,merchantDetailDTOList);
+                    }
+                });
+    };
+    @Override
+    public void syncShopping(ShoppingActionTypeEnum typeEnum, List<MerchantDetailDTO> merchantDetailDTOList) {
+        log.info("同步类型【{}】，同步入参【{}】", typeEnum.getCode(), JSON.toJSONString(merchantDetailDTOList));
+        if (EmptyChecker.isEmpty(merchantDetailDTOList)) {
+            return;
+        }
+        MerchantShoppingReq req = new MerchantShoppingReq();
+        req.setActionType(typeEnum.getCode());
+        req.setTimestamp(new Date());
+        req.setRequestId(GenerateCodeUtil.UUID());
+        List<MerchantShoppingReq.ListBean> list = new ArrayList<>();
+        List<String> merCodeList = new ArrayList<>();
+        for (MerchantDetailDTO merchant : merchantDetailDTOList) {
+            MerchantShoppingReq.ListBean listBean = new MerchantShoppingReq.ListBean();
+            listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1") ? Boolean.TRUE : Boolean.FALSE);
+            listBean.setMerchantCode(merchant.getMerCode());
+            listBean.setMerchantName(merchant.getMerName());
+            listBean.setIdTypes(Arrays.asList(merchant.getMerType().split(",")));
+            List<MerchantShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
+            for (MerchantAddressDTO addressDTO : merchant.getAddressList()) {
+                MerchantShoppingReq.ListBean.AddressBean addressBean = new MerchantShoppingReq.ListBean.AddressBean();
+                addressBean.setAddress(addressDTO.getAddress());
+                addressBean.setAddressType(addressDTO.getAddressType());
+                addressBean.setName(addressDTO.getAddressName());
+                addressBeans.add(addressBean);
+            }
+            listBean.setAddress(addressBeans);
+            list.add(listBean);
+            merCodeList.add(merchant.getMerCode());
+        }
+        req.setList(list);
+        RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateMerchant(req);
+        if (("0000").equals(resp.getCode())) {
+            Merchant update = new Merchant();
+            update.setSyncStatus(1);
+            QueryWrapper<Merchant> queryWrapper = new QueryWrapper<>();
+            queryWrapper.in(Merchant.MER_CODE, merCodeList);
+            merchantDao.update(update, queryWrapper);
+        } else {
+            log.info("同步商户数据到商城中心失败msg【{}】", resp.getMsg());
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantDetailDTO merchant) {
-        boolean flag= merchantDao.updateById(merchantDetailConverter.toE(merchant));
-        return flag&&merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
-
+        Merchant update=merchantDetailConverter.toE(merchant);
+        update.setSyncStatus(0);
+        boolean flag= merchantDao.updateById(update);
+        boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
+        //同步商城中台
+        List<MerchantDetailDTO> syncList=new ArrayList<>();
+        syncList.add(merchant);
+        syncShopingAfterCommit(ShoppingActionTypeEnum.UPDATE,syncList);
+        return flag&&flag2;
     }
 
     @Override

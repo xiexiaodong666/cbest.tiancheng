@@ -58,11 +58,11 @@ public class MerchantStoreRelationController implements IController {
   @GetMapping("/api/list")
   @ApiOperation("api分页查询消费门店配置列表")
   public R<Page<MerchantStoreRelation>> apiPageQuery(
-      @RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam @ApiParam("当前页") Integer current,
+      @RequestParam @ApiParam("单页大小") Integer size,
       @RequestParam(required = true) @ApiParam("商户代码") String merCode) {
 
-    Page<MerchantStoreRelation> page = new Page(currentPage, pageSize);
+    Page<MerchantStoreRelation> page = new Page(current, size);
 
     QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
 
@@ -79,15 +79,15 @@ public class MerchantStoreRelationController implements IController {
   @GetMapping("/admin/list")
   @ApiOperation("后台分页查询消费门店配置列表")
   public R<Page<AdminMerchantStoreRelationDTO>> adminPageQuery(
-      @RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam @ApiParam("当前页") Integer current,
+      @RequestParam @ApiParam("单页大小") Integer size,
       @RequestParam(required = false) @ApiParam("商户名称") String merName,
       @RequestParam(required = false) @ApiParam("使用状态") String status,
       @RequestParam(required = false) @ApiParam("起始时间") Date startTime,
       @RequestParam(required = false) @ApiParam("结束时间") Date endTime
   ) {
 
-    Page<MerchantStoreRelation> page = new Page(currentPage, pageSize);
+    Page<MerchantStoreRelation> page = new Page(current, size);
     Page mapPage = merchantStoreRelationService
         .searchMerchantStoreRelations(page, merName, status, startTime, endTime);
 

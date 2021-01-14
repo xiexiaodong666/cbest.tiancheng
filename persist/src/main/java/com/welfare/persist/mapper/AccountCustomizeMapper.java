@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.dto.AccountBillMapperDTO;
 import com.welfare.persist.dto.AccountDetailMapperDTO;
+import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import java.util.Date;
@@ -42,4 +43,8 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
   AccountBillMapperDTO queryBill( @Param("accountCode") String accountCode,
       @Param("createTimeStart") Date createTimeStart,
       @Param("createTimeEnd")Date createTimeEnd);
+
+  List<AccountIncrementDTO> queryIncrementDTO(@Param("storeCode") String storeCode,
+      @Param("size")Integer  size,
+      @Param("changeEventId")Long changeEventId);
 }

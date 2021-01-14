@@ -47,8 +47,8 @@ public class CardApplyController implements IController {
   @GetMapping("/list")
   @ApiOperation("分页查询卡片列表")
   public R<Page<CardApply>> apiPageQuery(
-      @RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam @ApiParam("当前页") Integer current,
+      @RequestParam @ApiParam("单页大小") Integer size,
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,
       @RequestParam(required = false) @ApiParam("卡片类型") String cardType,
@@ -57,7 +57,7 @@ public class CardApplyController implements IController {
       @RequestParam(required = false) @ApiParam("使用状态") Date startTime,
       @RequestParam(required = false) @ApiParam("使用状态") Date endTime) {
 
-    Page<CardApply> page = new Page(currentPage, pageSize);
+    Page<CardApply> page = new Page<>(current, size);
 
     return success(cardApplyService.pageQuery(page, cardName, merCode, cardType, cardMedium,
                                               status, startTime, endTime

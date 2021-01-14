@@ -17,6 +17,7 @@ import com.welfare.persist.dto.AccountSimpleDTO;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -75,4 +76,5 @@ public interface AccountService {
   public void syncAccount(ShoppingActionTypeEnum actionTypeEnum, List<AccountSyncDTO> accountSyncDTOS);
 
   AccountSimpleDTO queryAccountInfo(Long accountCode);
+  void batchUpdateChangeEventId(List<Map<String,Object>> list);
 }

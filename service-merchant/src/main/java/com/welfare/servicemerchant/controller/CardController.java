@@ -71,8 +71,8 @@ public class CardController implements IController {
   @GetMapping("/admin/list")
   @ApiOperation("根据卡号获取卡信息")
   public R<Page<CardInfoDTO>> queryCardInfo(
-      @RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      @RequestParam @ApiParam("当前页") Integer current,
+      @RequestParam @ApiParam("单页大小") Integer size,
       @RequestParam(required = false) @ApiParam("申请卡片管理传applyCode") String applyCode,
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,
@@ -86,7 +86,7 @@ public class CardController implements IController {
       @RequestParam(required = false) @ApiParam("绑定查询开始时间") Date bindStartTime,
       @RequestParam(required = false) @ApiParam("绑定查询结束时间") Date bindEndTime) {
 
-    return success(cardInfoService.list(currentPage, pageSize, applyCode, cardName,
+    return success(cardInfoService.list(current, size, applyCode, cardName,
                                         merCode, cardType, cardMedium,
                                         cardStatus, writtenStartTime,
                                         writtenEndTime, startTime,

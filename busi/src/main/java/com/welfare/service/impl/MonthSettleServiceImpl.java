@@ -136,14 +136,14 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettle monthSettle = new MonthSettle();
 
         //修改账单发送状态为已发送
-        monthSettle.setId(Long.parseLong(id));
         monthSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.SENDED.code());
 
         monthSettle.setSendTime(new Date());
 
         return monthSettleMapper.update(monthSettle,
-                Wrappers.<MonthSettle>lambdaUpdate().
-                        eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code())
+                Wrappers.<MonthSettle>lambdaUpdate()
+                        .eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code())
+                        .eq(MonthSettle::getId, id)
         );
     }
 
@@ -152,13 +152,13 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettle monthSettle = new MonthSettle();
 
         //修改账单确认状态为已确认
-        monthSettle.setId(Long.parseLong(id));
         monthSettle.setRecStatus(WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code());
         monthSettle.setConfirmTime(new Date());
 
         return monthSettleMapper.update(monthSettle,
-                Wrappers.<MonthSettle>lambdaUpdate().
-                        eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.SENDED.code())
+                Wrappers.<MonthSettle>lambdaUpdate()
+                        .eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.SENDED.code())
+                        .eq(MonthSettle::getId, id)
         );
     }
 
@@ -166,12 +166,12 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     public Integer monthSettleFinish(String id) {
         //修改账单结算状态为已结算
         MonthSettle monthSettle = new MonthSettle();
-        monthSettle.setId(Long.parseLong(id));
         monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
 
         return monthSettleMapper.update(monthSettle,
-                Wrappers.<MonthSettle>lambdaUpdate().
-                        eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
+                Wrappers.<MonthSettle>lambdaUpdate()
+                        .eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
+                        .eq(MonthSettle::getId, id)
         );
     }
 

@@ -10,6 +10,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author duanhy
@@ -53,6 +54,6 @@ public class MerchantCreditApplyUpdateReq {
    * 附件
    */
   @ApiModelProperty("附件（文件地址）")
-  private String enclosure;
+  private List<String> enclosures;
 }
 

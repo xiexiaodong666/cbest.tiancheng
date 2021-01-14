@@ -19,7 +19,9 @@
                     and account_name = ${orderQuery.accountName}
                 </if>
                 <if test="orderQuery.lowPrice != null">
-                    and amount &gt;= ${orderQuery.lowPrice}
+                    a
+
+                    nd amount &gt;= ${orderQuery.lowPrice}
                 </if>
                 <if test="orderQuery.highPrice != null">
                     and amount &lt;= ${orderQuery.highPrice}

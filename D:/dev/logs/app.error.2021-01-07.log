@@ -1,0 +1,12 @@
+2021-01-07 15:45:48 [http-nio-8888-exec-3] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/manifest.json error status:404
+2021-01-07 15:45:48 [http-nio-8888-exec-1] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/index.html error status:404
+2021-01-07 15:45:48 [http-nio-8888-exec-2] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/robots.txt error status:404
+2021-01-07 15:51:11 [http-nio-8888-exec-5] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/manifest.json error status:404
+2021-01-07 15:51:11 [http-nio-8888-exec-9] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/robots.txt error status:404
+2021-01-07 15:51:11 [http-nio-8888-exec-8] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/index.html error status:404
+2021-01-07 18:42:09 [http-nio-8888-exec-3] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/robots.txt error status:404
+2021-01-07 18:42:09 [http-nio-8888-exec-4] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/manifest.json error status:404
+2021-01-07 18:42:09 [http-nio-8888-exec-1] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/index.html error status:404
+2021-01-07 18:42:20 [http-nio-8888-exec-1] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/manifest.json error status:404
+2021-01-07 18:42:20 [http-nio-8888-exec-2] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/robots.txt error status:404
+2021-01-07 18:42:20 [http-nio-8888-exec-4] ERROR CLASS:[net.dreamlu.mica.servlet.error.MicaErrorAttributes:48] - [TID: N/A] - URL:/index.html error status:404

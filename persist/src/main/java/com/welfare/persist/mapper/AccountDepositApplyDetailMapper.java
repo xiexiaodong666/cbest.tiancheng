@@ -1,6 +1,7 @@
 package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -23,4 +24,5 @@ public interface AccountDepositApplyDetailMapper extends BaseMapper<AccountDepos
 
   Page<TempAccountDepositApplyDTO> listByApplyCodeIfAccountExist2(@Param("page") Page page, @Param("applyCode") String applyCode);
 
+  AccountApplyTotalDTO getUserCountAndTotalmount(@Param("applyCode") String applyCode);
 }

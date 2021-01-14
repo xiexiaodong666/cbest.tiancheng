@@ -29,6 +29,13 @@ public class AccountReq implements Serializable {
   @ApiModelProperty("员工名称")
   @NotEmpty(message = "员工名称为空")
   private String accountName;
+
+  /**
+   * 商户CODE
+   */
+  @ApiModelProperty("商户CODE")
+  @NotEmpty(message = "商户CODE为空")
+  private String merCode;
   /**
    * 员工账号
    */

@@ -2,6 +2,7 @@ package com.welfare.service.sync.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.welfare.service.remote.entity.RoleConsumptionReq;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +22,7 @@ import org.killbill.bus.api.BusEvent;
 @JsonInclude(value = Include.NON_NULL)
 public class MerchantStoreRelationEvt implements BusEvent {
 
-  String test;
+  private RoleConsumptionReq roleConsumptionReq;
 
   @Override
   public Long getSearchKey1() {

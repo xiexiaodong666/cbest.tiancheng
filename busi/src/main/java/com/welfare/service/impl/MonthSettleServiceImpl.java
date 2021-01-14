@@ -1,8 +1,5 @@
 package com.welfare.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
@@ -12,7 +9,6 @@ import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DateUtil;
-import com.welfare.common.util.ExcelUtil;
 import  com.welfare.persist.dao.MonthSettleDao;
 import com.welfare.persist.dto.MonthSettleDTO;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
@@ -56,7 +52,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
 
     @Override
-    public BasePageVo<MonthSettleResp> pageQuery(MonthSettleReq monthSettleReqDto) {
+    public BasePageVo<MonthSettleResp> pageQuery(MonthSettlePageReq monthSettleReqDto) {
 
         MonthSettleQuery monthSettleQuery = new MonthSettleQuery();
         BeanUtils.copyProperties(monthSettleReqDto, monthSettleQuery);
@@ -97,16 +93,18 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
-    public Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(String id, MonthSettleDetailReq monthSettleDetailReq) {
+    public Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(String id, MonthSettleDetailPageReq monthSettleDetailPageReq) {
+        MonthSettleDetailReq monthSettleDetailReq = new MonthSettleDetailReq();
+        BeanUtils.copyProperties(monthSettleDetailPageReq, monthSettleDetailReq);
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
 
-        PageHelper.startPage(monthSettleDetailReq.getCurrentPage(), monthSettleDetailReq.getPageSize());
+        PageHelper.startPage(monthSettleDetailPageReq.getCurrentPage(), monthSettleDetailPageReq.getPageSize());
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
         PageInfo<MonthSettleDetailDTO> monthSettleDetailDTOPageInfo = new PageInfo<>(monthSettleDetailDTOS);
 
-        Page<MonthSettleDetailResp> monthSettleDetailRespPage = new Page<>(monthSettleDetailReq.getCurrentPage(),
-                monthSettleDetailReq.getPageSize(),monthSettleDetailDTOPageInfo.getTotal());
+        Page<MonthSettleDetailResp> monthSettleDetailRespPage = new Page<>(monthSettleDetailPageReq.getCurrentPage(),
+                monthSettleDetailPageReq.getPageSize(),monthSettleDetailDTOPageInfo.getTotal());
 
         monthSettleDetailRespPage.setRecords(monthSettleDetailDTOPageInfo.getList().stream().map(monthSettleDetailDTO -> {
             MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();
@@ -118,10 +116,10 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
-    public List<MonthSettleDetailResp> queryMonthSettleDetail(String id, MonthSettleDetailReq monthSettleDetailReq) {
+    public List<MonthSettleDetailResp> queryMonthSettleDetailLimit(String id, MonthSettleDetailReq monthSettleDetailReq) {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
-
+        PageHelper.startPage(1, 5000);
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
 
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleDetailDTOS.stream().map(monthSettleDetailDTO -> {
@@ -195,8 +193,6 @@ public class MonthSettleServiceImpl implements MonthSettleService {
      */
     private MonthSettleDetailQuery getMonthSettleDetailQuery(String id, MonthSettleDetailReq monthSettleDetailReq){
         MonthSettle monthSettle = monthSettleMapper.selectById(id);
-
-
 
         if(monthSettle == null){
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"参数异常，未获取到账单信息", null);

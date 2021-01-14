@@ -3,7 +3,6 @@ package com.welfare.servicesettlement.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ExcelUtil;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.*;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +39,7 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/page")
     @ApiOperation("分页查询结算账单列表")
-    public R<BasePageVo<MonthSettleResp>> pageQuery(MonthSettleReq monthSettleReqDto){
+    public R<BasePageVo<MonthSettleResp>> pageQuery(MonthSettlePageReq monthSettleReqDto){
         BasePageVo<MonthSettleResp> monthSettleRespDtoPage =  monthSettleService.pageQuery(monthSettleReqDto);
         return success(monthSettleRespDtoPage);
     }
@@ -49,7 +47,7 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/{id}")
     @ApiOperation("分页查询结算账单明细列表")
-    public R<Page<MonthSettleDetailResp>> pageQueryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq){
+    public R<Page<MonthSettleDetailResp>> pageQueryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailPageReq monthSettleDetailReq){
         Page<MonthSettleDetailResp>  monthSettleDetailRespDtoPage=  monthSettleService.pageQueryMonthSettleDetail(id, monthSettleDetailReq);
         return success(monthSettleDetailRespDtoPage);
     }
@@ -57,7 +55,7 @@ public class MonthSettleController implements IController {
     @GetMapping("/{id}/detailList")
     @ApiOperation("查询结算账单明细列表")
     public R<List<MonthSettleDetailResp>> queryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq){
-        List<MonthSettleDetailResp> monthSettleDetailResps =  monthSettleService.queryMonthSettleDetail(id, monthSettleDetailReq);
+        List<MonthSettleDetailResp> monthSettleDetailResps =  monthSettleService.queryMonthSettleDetailLimit(id, monthSettleDetailReq);
         return success(monthSettleDetailResps);
     }
 
@@ -68,10 +66,15 @@ public class MonthSettleController implements IController {
         List<MonthSettleDetailResp> monthSettleDetailResps = new ArrayList<>();
         List<MonthSettleDetailResp> monthSettleDetailRespsTemp;
         do {
-            monthSettleDetailRespsTemp = monthSettleService.queryMonthSettleDetail(id, monthSettleDetailReq);
-            monthSettleDetailResps.addAll(monthSettleDetailRespsTemp);
-            monthSettleDetailReq.setMinId(monthSettleDetailRespsTemp.get(monthSettleDetailRespsTemp.size()).getId());
-        }while(monthSettleDetailRespsTemp.isEmpty());
+            monthSettleDetailRespsTemp = monthSettleService.queryMonthSettleDetailLimit(id, monthSettleDetailReq);
+            if(!monthSettleDetailRespsTemp.isEmpty()){
+                monthSettleDetailResps.addAll(monthSettleDetailRespsTemp);
+                monthSettleDetailReq.setMinId(monthSettleDetailRespsTemp.get(monthSettleDetailRespsTemp.size()-1).getId()+1);
+            }else{
+                break;
+            }
+        }while(true);
+
         try {
             ExcelUtil.export(response, "结算账单明细", "结算账单明细", monthSettleDetailResps, MonthSettleDetailResp.class );
         } catch (IOException e) {

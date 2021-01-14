@@ -3,13 +3,9 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
-import com.welfare.persist.dto.MonthSettleDetailDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.entity.MonthSettle;
-import com.welfare.service.dto.MonthSettleDetailReq;
-import com.welfare.service.dto.MonthSettleDetailResp;
-import com.welfare.service.dto.MonthSettleReq;
-import com.welfare.service.dto.MonthSettleResp;
+import com.welfare.service.dto.*;
 
 import java.util.List;
 
@@ -27,20 +23,20 @@ public interface MonthSettleService {
      * @param monthSettleReqDto
      * @return
      */
-    BasePageVo<MonthSettleResp> pageQuery(MonthSettleReq monthSettleReqDto);
+    BasePageVo<MonthSettleResp> pageQuery(MonthSettlePageReq monthSettleReqDto);
 
     /**
      * 根据主键账单id、部分限制条件，分页查询月账单明细
      * @param monthSettleDetailReq
      * @return
      */
-    Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(String id, MonthSettleDetailReq monthSettleDetailReq);
+    Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(String id, MonthSettleDetailPageReq monthSettleDetailReq);
 
     /**
      * 根据主键账单id、部分限制条件，导出账单数据
      * @param id
      */
-    List<MonthSettleDetailResp> queryMonthSettleDetail(String id, MonthSettleDetailReq monthSettleDetailReq);
+    List<MonthSettleDetailResp> queryMonthSettleDetailLimit(String id, MonthSettleDetailReq monthSettleDetailReq);
 
     /**
      * 月账单发送

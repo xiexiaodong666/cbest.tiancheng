@@ -11,7 +11,7 @@ import lombok.Data;
  * @desc 账单列表请求dto
  */
 @Data
-public class MonthSettleReq extends RequestPage {
+public class MonthSettlePageReq extends RequestPage {
 
     @ApiModelProperty(value = "商户代码")
     private String merCode;

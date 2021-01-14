@@ -23,8 +23,6 @@ public interface MonthSettleMapper extends BaseMapper<MonthSettle> {
 
     List<MonthSettleDTO> selectMonthSettle(MonthSettleQuery monthSettleQuery);
 
-    List<MonthSettleDetailDTO> selectMonthSettleDetail(MonthSettleDetailQuery monthSettleDetailQuery);
-
     MonthSettle sumSettleDetailToMonthSettle(MonthSettleDetailQuery monthSettleDetailQuery);
 
     Map<String, Object> selectMonthSettleSummaryInfo(MonthSettleQuery monthSettleQuery);

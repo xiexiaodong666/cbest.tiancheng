@@ -10,6 +10,7 @@
     </sql>
 
     <resultMap id="monthSettleDetailDTO" type="com.welfare.persist.dto.MonthSettleDetailDTO">
+        <result property="id" column="id"/>
         <result property="transNo" column="trans_no"/>
         <result property="orderNO" column="order_no"/>
         <result property="transTime" column="trans_time" jdbcType="TIMESTAMP"/>
@@ -28,6 +29,7 @@
 
     <select id="selectMonthSettleDetail" resultMap="monthSettleDetailDTO" parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
         select
+            t1.id,
             t1.trans_no,
             t1.order_id as order_no,
             t1.trans_time,
@@ -86,7 +88,6 @@
             </choose>-->
         </where>
         order by t1.id
-        limit 5000
     </select>
 
 </mapper>

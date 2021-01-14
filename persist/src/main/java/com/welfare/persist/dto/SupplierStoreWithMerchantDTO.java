@@ -59,7 +59,15 @@ public class SupplierStoreWithMerchantDTO {
     /**
      * 消费方式
      */
-    @ApiModelProperty("消费方式  {  \"o2o\": true,  \"onlineMall\": true,  \"shopShopping\": false}")
+    /**
+     * 消费方式
+     */
+    @ApiModelProperty("消费方式,json"
+        + "{"
+        + "  \"O2O\": true,"
+        + "  \"ONLINE_MALL\": true,"
+        + "  \"SHOP_CONSUMPTION\": false"
+        + "}")
     private String consumType;
     /**
      * 创建人

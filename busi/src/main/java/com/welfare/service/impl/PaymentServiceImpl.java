@@ -1,6 +1,8 @@
 package com.welfare.service.impl;
 
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.persist.dao.AccountBillDetailDao;
+import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.dto.payment.CardPaymentRequest;
@@ -40,6 +42,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final AccountService accountService;
     private final RedissonClient redissonClient;
     private final MerchantCreditService merchantCreditService;
+    private final AccountBillDetailDao accountBillDetailDao;
+    private final AccountDeductionDetailDao accountDeductionDetailDao;
 
 
     @Override
@@ -93,10 +97,22 @@ public class PaymentServiceImpl implements PaymentService {
                     break;
                 }
             }
+            saveDetails(paymentOperations);
             return paymentOperations;
         } finally {
             accountLock.unlock();
         }
+    }
+
+    private void saveDetails(List<PaymentOperation> paymentOperations) {
+        List<AccountBillDetail> billDetails = paymentOperations.stream()
+                .map(PaymentOperation::getAccountBillDetail)
+                .collect(Collectors.toList());
+        List<AccountDeductionDetail> deductionDetails = paymentOperations.stream()
+                .map(PaymentOperation::getAccountDeductionDetail)
+                .collect(Collectors.toList());
+        accountBillDetailDao.saveBatch(billDetails);
+        accountDeductionDetailDao.saveBatch(deductionDetails);
     }
 
     private PaymentOperation decrease(AccountAmountDO accountAmountDO,

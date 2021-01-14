@@ -2,7 +2,9 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
+import com.welfare.persist.dao.MerchantBillDetailDao;
 import com.welfare.persist.dao.MerchantCreditDao;
+import com.welfare.persist.entity.MerchantBillDetail;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.operator.merchant.*;
@@ -19,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 import static com.welfare.common.constants.WelfareConstant.MerCreditType.*;
@@ -43,6 +46,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final RechargeLimitOperator rechargeLimitOperator;
     private final RemainingLimitOperator remainingLimitOperator;
     private final RebateLimitOperator rebateLimitOperator;
+    private final MerchantBillDetailDao merchantBillDetailDao;
 
     private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
 
@@ -78,6 +82,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
             List<MerchantAccountOperation> operations = merAccountTypeOperator.decrease(merchantCredit, amount, transNo);
             merchantCreditDao.updateById(merchantCredit);
+            List<MerchantBillDetail> merchantBillDetails = operations.stream()
+                    .map(MerchantAccountOperation::getMerchantBillDetail)
+                    .collect(Collectors.toList());
+            merchantBillDetailDao.saveBatch(merchantBillDetails);
             return operations;
         } finally {
             lock.unlock();

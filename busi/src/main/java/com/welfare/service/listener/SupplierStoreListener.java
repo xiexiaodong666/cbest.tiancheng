@@ -4,12 +4,10 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.util.EmptyChecker;
-import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.Sequence;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.MerchantService;
-import com.welfare.service.SequenceService;
+import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.dto.SupplierStoreImportDTO;
 import jodd.util.StringUtil;
@@ -39,7 +37,9 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
 
   private final MerchantService merchantService;
 
-  private final SupplierStoreDao storeDao;
+  private final SupplierStoreService storeService;
+  private  final String defaultConsumType;
+
 
   private static StringBuilder uploadInfo = new StringBuilder();
 
@@ -50,6 +50,8 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     BeanUtils.copyProperties(storeImportDTO, store);
     store.setStatus(0);
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
+    store.setConsumType(defaultConsumType);
+    store.setSyncStatus(0);
     list.add(store);
     merCodeList.add(store.getMerCode());
     storeCodeList.add(store.getStoreCode());
@@ -61,7 +63,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     if (!CollectionUtils.isEmpty(list)) {
       boolean flag = check();
       if(flag){
-        Boolean result = storeDao.saveBatch(list);
+        Boolean result = storeService.batchAdd(list);
         if (result == false) {
           uploadInfo.append("入库失败");
         }
@@ -76,7 +78,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private boolean check() {
     QueryWrapper<SupplierStore> storeQueryWrapper=new QueryWrapper<>();
     storeQueryWrapper.in(SupplierStore.STORE_CODE,storeCodeList);
-    List<SupplierStore> stores=storeDao.list(storeQueryWrapper);
+    List<SupplierStore> stores=storeService.list(storeQueryWrapper);
     MerchantReq req=new MerchantReq() ;
     req.setMerCodeList(merCodeList);
     List<Merchant> merchants=merchantService.list(req);

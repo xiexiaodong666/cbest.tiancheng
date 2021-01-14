@@ -1,9 +1,11 @@
 package com.welfare.service.dto;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.welfare.common.base.RequestPage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -15,6 +17,10 @@ import java.util.Date;
  */
 @Data
 public class MonthSettleDetailResp{
+    @ExcelProperty(value = "序列号")
+    @ApiModelProperty(value = "序列号")
+    private Long id;
+
     @ExcelProperty(value = "交易流水号")
     @ApiModelProperty(value = "交易流水号")
     private String transNo;
@@ -23,6 +29,8 @@ public class MonthSettleDetailResp{
     @ApiModelProperty(value = "订单号")
     private String orderNO;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "交易时间")
     @ApiModelProperty(value = "交易时间")
     private Date transTime;

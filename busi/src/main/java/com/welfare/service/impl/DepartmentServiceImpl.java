@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
@@ -8,21 +9,25 @@ import com.welfare.common.util.MerchantUserHolder;
 import  com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.mapper.DepartmentExMapper;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.DepartmentConverter;
 import com.welfare.service.converter.DepartmentTreeConverter;
 import com.welfare.service.dto.DepartmentDTO;
+import com.welfare.service.dto.DepartmentImportDTO;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.helper.QueryHelper;
+import com.welfare.service.listener.DepartmentListener;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.DepartmentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -43,6 +48,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentConverter departmentConverter;
     private final SequenceService sequenceService;
     private final DictService dictService;
+    private final DepartmentExMapper  departmentExMapper;
 
     @Override
     public List<Department> list(DepartmentReq req) {
@@ -73,9 +79,23 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional(rollbackFor = Exception.class)
     public boolean add(Department department) {
         if(EmptyChecker.isEmpty(department.getDepartmentParent())){
-            department.setDepartmentParent("0");
+            throw new BusiException("上级编码不能为空");
         }
-        department.setDepartmentCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()));
+        String departmentCode;
+        //构建path
+        if(!department.getDepartmentParent().equals(department.getMerCode())){
+            department.setDepartmentParent("0");
+            departmentCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code());
+            department.setDepartmentPath(departmentCode);
+        }else{
+            Department parent=this.getByDepartmentCode(department.getDepartmentParent());
+            if(EmptyChecker.isEmpty(parent)){
+                throw new BusiException("上级编码不存在");
+            }
+            departmentCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code());
+            department.setDepartmentPath(parent.getDepartmentPath()+"-"+departmentCode);
+        }
+        department.setDepartmentCode(departmentCode);
         return departmentDao.save(department);
     }
 
@@ -86,6 +106,21 @@ public class DepartmentServiceImpl implements DepartmentService {
         update.setDepartmentName(department.getDepartmentName());
         update.setDepartmentType(department.getDepartmentType());
         return departmentDao.updateById(update);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String upload(MultipartFile multipartFile) {
+        try {
+            DepartmentListener listener = new DepartmentListener(merchantService,this,sequenceService);
+            EasyExcel.read(multipartFile.getInputStream(), DepartmentImportDTO.class, listener).sheet()
+                    .doRead();
+            String result = listener.getUploadInfo().toString();
+            listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
+            return result;
+        } catch (Exception e) {
+            log.info("批量新增部门解析 Excel exception:{}", e.getMessage());
+        }
+        return "解析失败";
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -113,9 +148,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public List<DepartmentTree> tree(String merCode) {
-        DepartmentReq req=new DepartmentReq();
-        req.setMerCode(merCode);
-        List<DepartmentTree> treeDTOList=departmentTreeConverter.toD(this.list(req));
+        List<DepartmentTree> treeDTOList=departmentTreeConverter.toD(departmentExMapper.listUnionMerchant(merCode));
         treeDTOList.forEach(item-> {
             item.setCode(item.getDepartmentCode());
             item.setParentCode(item.getDepartmentParent());

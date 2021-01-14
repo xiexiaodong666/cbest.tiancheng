@@ -1,8 +1,10 @@
 package com.welfare.service.remote;
 
 import com.welfare.service.remote.entity.EmployerReqDTO;
+import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
+import com.welfare.service.remote.entity.StoreShoppingReq;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.remote.fallback.PlatformUserFallback;
 import com.welfare.service.remote.fallback.ShoppingFeignClientFallback;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "shopping", url = "${shopping.url:1}", fallbackFactory = ShoppingFeignClientFallback.class)
+@FeignClient(value = "shopping", url = "${shopping.url:http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base}", fallbackFactory = ShoppingFeignClientFallback.class)
 public interface ShoppingFeignClient {
 
 
@@ -45,5 +47,20 @@ public interface ShoppingFeignClient {
   @RequestMapping(value = "/inward/tc/addOrUpdateUserRoleBinding", method = RequestMethod.POST, consumes = "application/json")
   RoleConsumptionResp addOrUpdateUserRoleBinding(
       @RequestBody UserRoleBindingReqDTO userRoleBindingReqDTO);
+
+
+  /**
+   * 批量添加、修改商户
+   */
+  @RequestMapping(value = "/inward/tc/addOrUpdateMerchant", method = RequestMethod.POST, consumes = "application/json")
+  RoleConsumptionResp addOrUpdateMerchant(
+          @RequestBody MerchantShoppingReq merchantShoppingReq);
+
+  /**
+   * 批量添加、修改门店
+   */
+  @RequestMapping(value = "/inward/tc/addOrUpdateStore", method = RequestMethod.POST, consumes = "application/json")
+  RoleConsumptionResp addOrUpdateStore(
+          @RequestBody StoreShoppingReq storeShoppingReq);
 
 }

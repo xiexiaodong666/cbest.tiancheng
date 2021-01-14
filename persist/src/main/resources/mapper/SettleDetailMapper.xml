@@ -10,6 +10,7 @@
     </sql>
 
     <resultMap id="monthSettleDetailDTO" type="com.welfare.persist.dto.MonthSettleDetailDTO">
+        <result property="id" column="id"/>
         <result property="transNo" column="trans_no"/>
         <result property="orderNO" column="order_no"/>
         <result property="transTime" column="trans_time" jdbcType="TIMESTAMP"/>
@@ -28,6 +29,7 @@
 
     <select id="selectMonthSettleDetail" resultMap="monthSettleDetailDTO" parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
         select
+            t1.id,
             t1.trans_no,
             t1.order_id as order_no,
             t1.trans_time,
@@ -73,15 +75,19 @@
             <if test="merCode!=null and merCode!=''">
                 and t1.mer_code = #{merCode}
             </if>
-    <!--        <choose>
-                <when test="storeType!=null and storeType!='' and storeType='self'">
+            <if test="minId!=null">
+                and t1.id &gt;= #{minId}
+            </if>
+            <choose>
+                <when test="storeType=='self'">
                     and t3.mer_code = t1.mer_code
                 </when>
-                <when test="storeType!=null and storeType!='' and storeType='third'">
+                <when test="storeType=='third'">
                     and t3.mer_code != t1.mer_code
                 </when>
-            </choose>-->
+            </choose>
         </where>
+        order by t1.id
     </select>
 
 </mapper>

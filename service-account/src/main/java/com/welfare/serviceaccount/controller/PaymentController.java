@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.service.PaymentService;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
 import com.welfare.service.dto.payment.OnlinePaymentRequest;
@@ -27,10 +28,13 @@ import java.util.Map;
 @RequestMapping("/payment")
 @Api(tags = "支付接口")
 public class PaymentController implements IController {
+    private final PaymentService paymentService;
+
+
     @PostMapping("/online")
     @ApiOperation("线上支付")
     public R<OnlinePaymentRequest> newOnlinePaymentRequest(@RequestBody OnlinePaymentRequest paymentRequest) {
-        Map<String, Object> map = BeanUtil.toMap(paymentRequest);
+        paymentService.handlePayRequest(paymentRequest);
         return success(paymentRequest);
     }
 

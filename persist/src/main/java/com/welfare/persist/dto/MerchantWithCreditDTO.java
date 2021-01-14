@@ -30,6 +30,8 @@ public class MerchantWithCreditDTO {
   private String selfRecharge;
   @ApiModelProperty("员工自主充值(字典转义)")
   private String selfRechargeName;
+  @ApiModelProperty("父级编码")
+  private String departmentParent;
   /**
    * 商户代码
    */

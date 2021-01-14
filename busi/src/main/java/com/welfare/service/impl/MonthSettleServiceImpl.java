@@ -1,17 +1,14 @@
 package com.welfare.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DateUtil;
-import com.welfare.common.util.ExcelUtil;
 import  com.welfare.persist.dao.MonthSettleDao;
 import com.welfare.persist.dto.MonthSettleDTO;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
@@ -20,10 +17,7 @@ import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
-import com.welfare.service.dto.MonthSettleDetailReq;
-import com.welfare.service.dto.MonthSettleDetailResp;
-import com.welfare.service.dto.MonthSettleReq;
-import com.welfare.service.dto.MonthSettleResp;
+import com.welfare.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MonthSettleService;
@@ -34,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -57,16 +52,34 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
 
     @Override
-    public Page<MonthSettleResp> pageQuery(MonthSettleReq monthSettleReqDto) {
+    public BasePageVo<MonthSettleResp> pageQuery(MonthSettlePageReq monthSettleReqDto) {
 
         MonthSettleQuery monthSettleQuery = new MonthSettleQuery();
         BeanUtils.copyProperties(monthSettleReqDto, monthSettleQuery);
 
-        PageHelper.startPage(monthSettleReqDto.getCurrentPage(),monthSettleReqDto.getPageSize());
+        PageHelper.startPage(monthSettleReqDto.getCurrent(),monthSettleReqDto.getSize());
         List<MonthSettleDTO> monthSettleDTOS = monthSettleMapper.selectMonthSettle(monthSettleQuery);
         PageInfo<MonthSettleDTO> monthSettleDTOPageInfo = new PageInfo<>(monthSettleDTOS);
 
-        Page<MonthSettleResp> monthSettleRespPage = new Page<>(monthSettleReqDto.getCurrentPage(), monthSettleReqDto.getPageSize(),monthSettleDTOPageInfo.getTotal());
+        Map<String, Object> summaryInfo = monthSettleMapper.selectMonthSettleSummaryInfo(monthSettleQuery);
+        String minSettleMonth = (String)summaryInfo.get("minSettleMonth");
+        String maxSettleMonth = (String)summaryInfo.get("maxSettleMonth");
+
+        Date dayMaxByMontStr = null;
+        Date dayMinByMonthStr = null;
+        try {
+            dayMaxByMontStr = DateUtil.getDayMaxByMontStr(maxSettleMonth);
+            dayMinByMonthStr = DateUtil.getDayMinByMonthStr(minSettleMonth);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        summaryInfo.put("billStartDay", DateUtil.dateTime2Str(dayMinByMonthStr, DateUtil.DEFAULT_DATE_FORMAT));
+        summaryInfo.put("billEndDay", DateUtil.dateTime2Str(dayMaxByMontStr, DateUtil.DEFAULT_DATE_FORMAT));
+
+
+        BasePageVo<MonthSettleResp> monthSettleRespPage = new BasePageVo<>(monthSettleReqDto.getCurrent(), monthSettleReqDto.getSize(),monthSettleDTOPageInfo.getTotal());
+
 
         monthSettleRespPage.setRecords(monthSettleDTOPageInfo.getList().stream().map(monthSettleDTO -> {
             MonthSettleResp monthSettleResp = new MonthSettleResp();
@@ -74,20 +87,24 @@ public class MonthSettleServiceImpl implements MonthSettleService {
             return monthSettleResp;
         }).collect(Collectors.toList()));
 
+        monthSettleRespPage.setExt(summaryInfo);
+
         return monthSettleRespPage;
     }
 
     @Override
-    public Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(String id, MonthSettleDetailReq monthSettleDetailReq) {
+    public Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(String id, MonthSettleDetailPageReq monthSettleDetailPageReq) {
+        MonthSettleDetailReq monthSettleDetailReq = new MonthSettleDetailReq();
+        BeanUtils.copyProperties(monthSettleDetailPageReq, monthSettleDetailReq);
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
 
-        PageHelper.startPage(monthSettleDetailReq.getCurrentPage(), monthSettleDetailReq.getPageSize());
+        PageHelper.startPage(monthSettleDetailPageReq.getCurrent(), monthSettleDetailPageReq.getSize());
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
         PageInfo<MonthSettleDetailDTO> monthSettleDetailDTOPageInfo = new PageInfo<>(monthSettleDetailDTOS);
 
-        Page<MonthSettleDetailResp> monthSettleDetailRespPage = new Page<>(monthSettleDetailReq.getCurrentPage(),
-                monthSettleDetailReq.getPageSize(),monthSettleDetailDTOPageInfo.getTotal());
+        Page<MonthSettleDetailResp> monthSettleDetailRespPage = new Page<>(monthSettleDetailPageReq.getCurrent(),
+                monthSettleDetailPageReq.getSize(),monthSettleDetailDTOPageInfo.getTotal());
 
         monthSettleDetailRespPage.setRecords(monthSettleDetailDTOPageInfo.getList().stream().map(monthSettleDetailDTO -> {
             MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();
@@ -99,10 +116,10 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
-    public List<MonthSettleDetailResp> queryMonthSettleDetail(String id, MonthSettleDetailReq monthSettleDetailReq) {
+    public List<MonthSettleDetailResp> queryMonthSettleDetailLimit(String id, MonthSettleDetailReq monthSettleDetailReq) {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
-
+        PageHelper.startPage(1, 5000);
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
 
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleDetailDTOS.stream().map(monthSettleDetailDTO -> {
@@ -119,14 +136,14 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettle monthSettle = new MonthSettle();
 
         //修改账单发送状态为已发送
-        monthSettle.setId(Long.parseLong(id));
         monthSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.SENDED.code());
 
         monthSettle.setSendTime(new Date());
 
         return monthSettleMapper.update(monthSettle,
-                Wrappers.<MonthSettle>lambdaUpdate().
-                        eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code())
+                Wrappers.<MonthSettle>lambdaUpdate()
+                        .eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code())
+                        .eq(MonthSettle::getId, id)
         );
     }
 
@@ -135,13 +152,13 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettle monthSettle = new MonthSettle();
 
         //修改账单确认状态为已确认
-        monthSettle.setId(Long.parseLong(id));
         monthSettle.setRecStatus(WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code());
         monthSettle.setConfirmTime(new Date());
 
         return monthSettleMapper.update(monthSettle,
-                Wrappers.<MonthSettle>lambdaUpdate().
-                        eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.SENDED.code())
+                Wrappers.<MonthSettle>lambdaUpdate()
+                        .eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.SENDED.code())
+                        .eq(MonthSettle::getId, id)
         );
     }
 
@@ -149,12 +166,12 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     public Integer monthSettleFinish(String id) {
         //修改账单结算状态为已结算
         MonthSettle monthSettle = new MonthSettle();
-        monthSettle.setId(Long.parseLong(id));
         monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
 
         return monthSettleMapper.update(monthSettle,
-                Wrappers.<MonthSettle>lambdaUpdate().
-                        eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
+                Wrappers.<MonthSettle>lambdaUpdate()
+                        .eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
+                        .eq(MonthSettle::getId, id)
         );
     }
 
@@ -175,12 +192,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
      * @return
      */
     private MonthSettleDetailQuery getMonthSettleDetailQuery(String id, MonthSettleDetailReq monthSettleDetailReq){
-        List<MonthSettle> list = monthSettleDao.list();
-        MonthSettle byId = monthSettleDao.getById(id);
         MonthSettle monthSettle = monthSettleMapper.selectById(id);
 
-        
-        
         if(monthSettle == null){
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"参数异常，未获取到账单信息", null);
         }

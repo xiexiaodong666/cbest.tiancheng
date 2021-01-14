@@ -1,7 +1,9 @@
 package com.welfare.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -54,9 +56,13 @@ public class MonthSettleResp {
     private String sendStatus;
 
     @ApiModelProperty(value = "账单发送时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date sendTime;
 
     @ApiModelProperty(value = "账单确认时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date confirmTime;
 
     @ApiModelProperty(value = "账单返利金额")

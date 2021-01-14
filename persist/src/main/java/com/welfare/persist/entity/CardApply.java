@@ -128,6 +128,7 @@ public class CardApply extends Model<CardApply> implements Serializable {
     @ApiModelProperty("状态: 锁定、激活")   
     private Integer status;
 
+
 //以下为列明常量
 
     /**

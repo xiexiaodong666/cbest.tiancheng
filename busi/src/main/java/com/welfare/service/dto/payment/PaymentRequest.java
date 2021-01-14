@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -40,6 +41,9 @@ public abstract class PaymentRequest {
     private Integer paymentStatus;
     @ApiModelProperty("账户号")
     private Long accountCode;
+    @ApiModelProperty("支付时间")
+    private Date paymentDate;
+
     public String chargePaymentScene(){
         if (!StringUtil.startsWithNumber(storeNo)) {
             //非数字开头的门店，供应商线下消费

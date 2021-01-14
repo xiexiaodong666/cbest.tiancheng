@@ -108,4 +108,16 @@ WHERE
 	acs.id = #{id}
 	</select>
 
+  <select id = "getCountByMerCodeAndAccountTypeAndStoreCode" resultType="Integer">
+    SELECT
+	count( 1 )
+FROM
+	account_consume_scene acs
+	LEFT JOIN account_consume_scene_store_relation acssr ON acs.id = acssr.account_consume_scene_id
+WHERE
+	acs.mer_code = #{merCode}
+	AND acssr.store_code = #{typeCode}
+	AND acs.account_type_code = #{storeCode}
+  </select>
+
 </mapper>

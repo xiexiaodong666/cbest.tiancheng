@@ -1,12 +1,11 @@
 package com.welfare.persist.mapper;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.dto.query.MerchantPageReq;
-import com.welfare.persist.entity.MerchantStoreRelation;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 商户信息(merchant)数据Mapper
@@ -17,6 +16,5 @@ import org.apache.ibatis.annotations.Param;
 */
 @Mapper
 public interface MerchantExMapper  {
-    Page<MerchantWithCreditDTO> listWithCredit(
-            Page page,@Param("req") MerchantPageReq req);
+    List<MerchantWithCreditDTO> listWithCredit(@Param("req") MerchantPageReq req);
 }

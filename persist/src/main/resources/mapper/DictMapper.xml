@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,dict_type,dict_code,dict_name,status,flag
+        id,dict_type,dict_code,dict_name,status,deleted,sort
     </sql>
 
 </mapper>

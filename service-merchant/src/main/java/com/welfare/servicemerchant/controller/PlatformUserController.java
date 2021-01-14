@@ -35,14 +35,14 @@ public class PlatformUserController {
   @RequestMapping(value = "/list", method = RequestMethod.GET)
   @ApiOperation("获取商户用户列表")
   PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
-      @RequestParam int pageSize,
-      @RequestParam int page,
-      @RequestParam String merchant_code,
+      @RequestParam int current,
+      @RequestParam int size,
+      @RequestParam(required = false) String merchant_code,
       @RequestParam(required = false) Date start_create_time,
       @RequestParam(required = false) Date end_create_time
   ) {
     return platformUserFeignClient.getPlatformUserList(
-        pageSize, page, merchant_code, start_create_time, end_create_time);
+        size, current, merchant_code, start_create_time, end_create_time);
   }
 
   /**

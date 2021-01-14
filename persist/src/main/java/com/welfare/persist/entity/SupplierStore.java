@@ -1,13 +1,14 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,8 +21,8 @@ import lombok.experimental.Accessors;
 /**
  * 供应商门店(supplier_store)实体类
  *
- * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @author hao.yin
+ * @since 2021-01-14 11:03:55
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -76,7 +77,7 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     /**
      * 消费方式
      */
-    @ApiModelProperty("消费方式{  \"o2o\": true,  \"onlineMall\": true,  \"shopShopping\": false}")
+    @ApiModelProperty("消费方式")   
     private String consumType;
     /**
      * 状态
@@ -86,27 +87,27 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic   
+    @ApiModelProperty("删除标志") @TableLogic
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Boolean deleted;
+    private Boolean deleted;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")   
+    @ApiModelProperty("创建人")
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private String createUser;
+    private String createUser;
     /**
      * 创建日期
      */
-    @ApiModelProperty("创建日期")   
+    @ApiModelProperty("创建日期")
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Date createTime;
+    private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")   
+    @ApiModelProperty("更新人")
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private String updateUser;
+    private String updateUser;
     /**
      * 更新日期
      */
@@ -121,9 +122,14 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     /**
      * 版本
      */
-    @ApiModelProperty("版本")  @Version 
+    @ApiModelProperty("版本")  @Version
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Integer version;
+    private Integer version;
+    /**
+     * 同步状态
+     */
+    @ApiModelProperty("同步状态")   
+    private Integer syncStatus;
 
 //以下为列明常量
 
@@ -195,5 +201,9 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     * 版本
     */
     public static final String VERSION = "version";
+    /**
+    * 同步状态
+    */
+    public static final String SYNC_STATUS = "sync_status";
 
 }

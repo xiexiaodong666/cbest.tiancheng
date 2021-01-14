@@ -1,6 +1,7 @@
 package com.welfare.service.dto;
 
 import com.welfare.common.base.RequestPage;
+import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -11,7 +12,7 @@ import lombok.Data;
  * @desc 账单列表请求dto
  */
 @Data
-public class MonthSettleReq extends RequestPage {
+public class MonthSettlePageReq extends PageReq {
 
     @ApiModelProperty(value = "商户代码")
     private String merCode;

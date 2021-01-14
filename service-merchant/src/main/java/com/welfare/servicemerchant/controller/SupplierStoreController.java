@@ -7,8 +7,10 @@ import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
+import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.servicemerchant.converter.SupplierStoreConverter;
 import com.welfare.servicemerchant.dto.SupplierStoreInfo;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -41,10 +44,18 @@ import java.util.List;
 public class SupplierStoreController implements IController {
     private final SupplierStoreService supplierStoreService;
     private final SupplierStoreConverter supplierStoreConverter;
+    private final FileUploadService fileUploadService;
+
     @GetMapping("/page")
     @ApiOperation("查询供应商门店列表（分页））")
     public R<Page<SupplierStoreWithMerchantDTO>> page(Page page, StorePageReq req){
         return R.success(supplierStoreService.page(page,req));
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("查询供应商门店列表")
+    public R<List<SupplierStoreInfo>> list( SupplierStoreListReq req){
+        return R.success(supplierStoreConverter.toD(supplierStoreService.list(req)));
     }
     @GetMapping("/detail")
     @ApiOperation("查询供应商门店详情）")
@@ -66,7 +77,7 @@ public class SupplierStoreController implements IController {
     @PostMapping("/batch-add")
     @ApiOperation("批量新增供应商门店")
     public R batchAdd(@RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile){
-        return R.success(supplierStoreService.batchAdd(multipartFile));
+        return R.success(supplierStoreService.upload(multipartFile));
     }
 
     @PostMapping("/delete/{id}")
@@ -82,8 +93,8 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/export-list")
     @ApiOperation("导出供应商门店列表")
-    public R exportList(StorePageReq req){
-        return R.success(supplierStoreService.exportList(req));
+    public R exportList(StorePageReq req) throws IOException {
+        return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(supplierStoreService.exportList(req), SupplierStoreWithMerchantDTO.class,"门店导出")));
 
     }
 }

@@ -5,6 +5,7 @@ import com.welfare.persist.entity.Department;
 import com.welfare.service.dto.DepartmentDTO;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -55,6 +56,8 @@ public interface DepartmentService {
      * @param list 批量实体
      */
     boolean batchAdd(List<Department> list);
+
+    public String upload(MultipartFile multipartFile);
 
     /**
      * 删除子机构

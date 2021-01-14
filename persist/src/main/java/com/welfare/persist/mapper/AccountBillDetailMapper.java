@@ -1,7 +1,10 @@
 package com.welfare.persist.mapper;
 
+import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
+import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -13,5 +16,5 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface AccountBillDetailMapper extends BaseMapper<AccountBillDetail> {
-
+    List<AccountBillDetailSimpleDTO> selectAccountBillDetailSimpleList(AccountBillDetailSimpleReq accountBillDetailSimpleReq);
 }

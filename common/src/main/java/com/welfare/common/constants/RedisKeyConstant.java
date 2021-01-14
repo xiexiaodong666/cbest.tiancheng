@@ -45,6 +45,10 @@ public class RedisKeyConstant {
    * 生成序列号
    */
   public static final String SEQUENCE_GENERATE = "sequence_generate:";
+  /**
+   * 操作AccountAmountType表的更新需要的锁key前缀
+   */
+  public static final String ACCOUNT_AMOUNT_TYPE_OPERATE = "e-welfare_account_amount_type_operate";
 
   public static String buidKey(String perfix, String... part) {
     return StringUtils.removeEnd(perfix, ":").concat(":").concat(StringUtils.join(part, ":"));

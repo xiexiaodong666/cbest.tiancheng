@@ -1,5 +1,6 @@
 package com.welfare.service.operator.merchant;
 
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -9,13 +10,11 @@ import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Description:
@@ -28,9 +27,10 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator implements InitializingBean {
-    private MerCreditType merCreditType = MerCreditType.CURRENT_BALANCE;
+    private final MerCreditType merCreditType = MerCreditType.CURRENT_BALANCE;
 
-    private final RemainingLimitOperator remainingLimitOperator;
+    @Autowired
+    private RemainingLimitOperator remainingLimitOperator;
 
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
@@ -50,7 +50,7 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
                     merchantCredit,
                     transNo
             );
-            return Arrays.asList(operation);
+            return Collections.singletonList(operation);
         }
 
     }
@@ -77,10 +77,11 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
     }
 
     @Override
-    public MerchantAccountOperation increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setCurrentBalance(merchantCredit.getCurrentBalance().add(amount));
-        return MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit,transNo );
+        MerchantAccountOperation merchantAccountOperation = MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit,transNo );
+        return Lists.newArrayList(merchantAccountOperation);
     }
 
     @Override

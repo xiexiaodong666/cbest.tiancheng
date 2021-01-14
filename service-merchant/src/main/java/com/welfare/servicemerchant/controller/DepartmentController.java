@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -53,7 +55,7 @@ public class DepartmentController implements IController {
 
     @GetMapping("/detail")
     @ApiOperation("查询部门详情）")
-    public R<DepartmentDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+    public R<DepartmentDTO> detail( @ApiParam("id") Long id){
         return R.success(departmentService.detail(id));
     }
 
@@ -70,11 +72,10 @@ public class DepartmentController implements IController {
     }
     @PostMapping("/batch-add")
     @ApiOperation("批量新增部门")
-    public R batchAdd(@RequestBody List<Department> list){
-        return R.status(departmentService.batchAdd(list),"批量新增失败");
+    public R batchAdd(@RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile){
+        return R.success(departmentService.upload(multipartFile));
 
     }
-
     @PostMapping("/delete/{id}")
     @ApiOperation("删除子部门")
     public R delete(@PathVariable @NotBlank String  departmentCode){

@@ -11,6 +11,7 @@ import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountPageReq;
+import com.welfare.persist.dto.AccountSimpleDTO;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -66,4 +67,6 @@ public interface AccountService {
   List<Long> getAccountCodeList(List<Long> accountCodes);
 
   public void syncAccount(ShoppingActionTypeEnum actionTypeEnum, List<AccountSyncDTO> accountSyncDTOS);
+
+  AccountSimpleDTO queryAccountInfo(Long accountCode);
 }

@@ -2,11 +2,16 @@ package com.welfare.persist.entity;
 
 import java.io.Serializable;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +20,8 @@ import lombok.experimental.Accessors;
 /**
  * 字典(dict)实体类
  *
- * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @author hao.yin
+ * @since 2021-01-14 11:03:55
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -56,9 +61,14 @@ public class Dict extends Model<Dict> implements Serializable {
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic   
+    @ApiModelProperty("删除标志") @TableLogic
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Boolean deleted;
+    private Boolean deleted;
+    /**
+     * 顺序
+     */
+    @ApiModelProperty("顺序")   
+    private Integer sort;
 
 //以下为列明常量
 
@@ -86,5 +96,9 @@ public class Dict extends Model<Dict> implements Serializable {
     * 删除标志
     */
     public static final String DELETED = "deleted";
+    /**
+    * 顺序
+    */
+    public static final String SORT = "sort";
 
 }

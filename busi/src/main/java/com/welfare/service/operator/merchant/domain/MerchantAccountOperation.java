@@ -43,12 +43,15 @@ public class MerchantAccountOperation {
         merchantBillDetail.setBalanceType(operateType.code());
         merchantBillDetail.setTransAmount(amount);
         merchantBillDetail.setTransType(operateType.code());
-        merchantBillDetail.setTransNo(Integer.valueOf(transNo));
+        merchantBillDetail.setTransNo(transNo);
         merchantBillDetail.setMerCode(merchantCredit.getMerCode());
         merchantBillDetail.setCurrentBalance(merchantCredit.getCurrentBalance());
         merchantBillDetail.setRebateLimit(merchantCredit.getRebateLimit());
         merchantBillDetail.setCreditLimit(merchantCredit.getCreditLimit());
         merchantBillDetail.setRechargeLimit(merchantCredit.getRechargeLimit());
+        merchantBillDetail.setSelfDepositBalance(merchantCredit.getSelfDepositBalance());
+
+        merchantAccountOperation.setMerchantBillDetail(merchantBillDetail);
         return merchantAccountOperation;
     }
 }

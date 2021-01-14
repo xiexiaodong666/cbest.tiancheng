@@ -1,9 +1,15 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
+import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
 import com.welfare.service.AccountBillDetailService;
+import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
+import net.dreamlu.mica.core.result.R;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,5 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountBillDetailController implements IController {
     private final AccountBillDetailService accountBillDetailService;
 
-
+    @ApiOperation("账单列表")
+    @GetMapping("/billList/{accountCode}")
+    public R<List<AccountBillDetailSimpleDTO>> queryAccountBillDetailSimpleList(
+        AccountBillDetailSimpleReq req) {
+        return success(accountBillDetailService.queryAccountBillDetailSimpleList(req));
+    }
 }

@@ -2,6 +2,8 @@ package com.welfare.service.operator.payment.domain;
 
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.AccountBillDetail;
+import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.persist.entity.MerchantAccountType;
 import lombok.Data;
 import org.springframework.core.Ordered;
@@ -19,21 +21,10 @@ import java.math.BigDecimal;
 public class PaymentOperation {
     private MerchantAccountType merchantAccountType;
     private AccountAmountType accountAmountType;
+    private AccountBillDetail accountBillDetail;
+    private AccountDeductionDetail accountDeductionDetail;
 
-    /**
-     * 商户编码
-     */
-    private String merCode;
-    /**
-     * 账户类型（烤火费、自主、信用额度等）
-     */
-    private String merAccountTypeCode;
-    /**
-     * 操作金额
-     */
-    private BigDecimal amount;
-    /**
-     * 扣款顺序
-     */
-    private int deductionOrder;
+    private BigDecimal operateAmount;
+    private String transNo;
+    private boolean enough;
 }

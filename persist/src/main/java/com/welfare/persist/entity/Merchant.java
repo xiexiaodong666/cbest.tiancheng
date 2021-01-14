@@ -1,13 +1,14 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,8 +21,8 @@ import lombok.experimental.Accessors;
 /**
  * 商户信息(merchant)实体类
  *
- * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @author hao.yin
+ * @since 2021-01-14 11:03:55
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -56,12 +57,12 @@ public class Merchant extends Model<Merchant> implements Serializable {
     /**
      * 身份属性
      */
-    @ApiModelProperty("身份属性  customer：客户，supplier：供应商")
+    @ApiModelProperty("身份属性")   
     private String merIdentity;
     /**
      * 合作方式
      */
-    @ApiModelProperty("合作方式 payFirt：先付费，payed：后付费")
+    @ApiModelProperty("合作方式")   
     private String merCooperationMode;
     /**
      * 员工自主充值
@@ -76,21 +77,21 @@ public class Merchant extends Model<Merchant> implements Serializable {
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")   
+    @ApiModelProperty("创建人")
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private String createUser;
+    private String createUser;
     /**
      * 创建日期
      */
-    @ApiModelProperty("创建日期")   
+    @ApiModelProperty("创建日期")
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Date createTime;
+    private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")   
+    @ApiModelProperty("更新人")
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private String updateUser;
+    private String updateUser;
     /**
      * 更新日期
      */
@@ -105,9 +106,14 @@ public class Merchant extends Model<Merchant> implements Serializable {
     /**
      * 版本
      */
-    @ApiModelProperty("版本")  @Version 
+    @ApiModelProperty("版本")  @Version
     @TableField(fill = FieldFill.INSERT_UPDATE)
-	private Integer version;
+    private Integer version;
+    /**
+     * 同步状态
+     */
+    @ApiModelProperty("同步状态")   
+    private Integer syncStatus;
 
 //以下为列明常量
 
@@ -167,5 +173,9 @@ public class Merchant extends Model<Merchant> implements Serializable {
     * 版本
     */
     public static final String VERSION = "version";
+    /**
+    * 同步状态
+    */
+    public static final String SYNC_STATUS = "sync_status";
 
 }

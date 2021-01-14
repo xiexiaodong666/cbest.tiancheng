@@ -1,12 +1,15 @@
 package com.welfare.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
+import com.welfare.service.dto.SupplierStoreListReq;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -25,6 +28,7 @@ public interface SupplierStoreService {
      * @return
      */
     Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req);
+    List<SupplierStore> list(SupplierStoreListReq req);
 
     /**
      * 查询供应商门店详情
@@ -53,12 +57,15 @@ public interface SupplierStoreService {
      */
     boolean activate(SupplierStoreActivateReq storeActivateReq);
 
+    boolean batchAdd(List<SupplierStore> list);
+
+    List<SupplierStore> list(QueryWrapper<SupplierStore> queryWrapper);
+
     /**
      * 批量新增供应商门店
-     * @param list
      * @return
      */
-    String batchAdd(MultipartFile multipartFile);
+    String upload(MultipartFile multipartFile);
 
     /**
      * 删除供应商门店
@@ -79,10 +86,12 @@ public interface SupplierStoreService {
      * @param req
      * @return
      */
-    String exportList(StorePageReq req);
+    List<SupplierStoreWithMerchantDTO> exportList(StorePageReq req);
 
     /**
      * 同步门店消费能力数据
      */
     boolean syncConsumeType(String storeCode, String consumeType);
+
+    void syncShopping(ShoppingActionTypeEnum typeEnum, List<SupplierStoreDetailDTO> supplierStoreDetailDTOS);
 }

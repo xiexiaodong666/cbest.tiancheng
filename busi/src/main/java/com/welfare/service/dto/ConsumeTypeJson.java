@@ -14,8 +14,8 @@ public class ConsumeTypeJson implements Serializable {
   private Boolean onlineMall;
   private Boolean shopShopping;
   public static final  String O2O ="o2o";
-  public static final  String ONLINEMALL ="onlinemall";
-  public static final  String SHOPSHOPPING ="shopshopping";
+  public static final  String ONLINEMALL ="onlineMall";
+  public static final  String SHOPSHOPPING ="shopShopping";
 
   public boolean getType(String type){
     if( type.equals(O2O ) ){

@@ -61,6 +61,15 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         List<MonthSettleDTO> monthSettleDTOS = monthSettleMapper.selectMonthSettle(monthSettleQuery);
         PageInfo<MonthSettleDTO> monthSettleDTOPageInfo = new PageInfo<>(monthSettleDTOS);
 
+
+
+
+        BasePageVo<MonthSettleResp> monthSettleRespPage = new BasePageVo<>(monthSettleReqDto.getCurrent(), monthSettleReqDto.getSize(),monthSettleDTOPageInfo.getTotal());
+
+        if(monthSettleDTOS.isEmpty()){
+            return monthSettleRespPage;
+        }
+
         Map<String, Object> summaryInfo = monthSettleMapper.selectMonthSettleSummaryInfo(monthSettleQuery);
         String minSettleMonth = (String)summaryInfo.get("minSettleMonth");
         String maxSettleMonth = (String)summaryInfo.get("maxSettleMonth");
@@ -76,9 +85,6 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         summaryInfo.put("billStartDay", DateUtil.dateTime2Str(dayMinByMonthStr, DateUtil.DEFAULT_DATE_FORMAT));
         summaryInfo.put("billEndDay", DateUtil.dateTime2Str(dayMaxByMontStr, DateUtil.DEFAULT_DATE_FORMAT));
-
-
-        BasePageVo<MonthSettleResp> monthSettleRespPage = new BasePageVo<>(monthSettleReqDto.getCurrent(), monthSettleReqDto.getSize(),monthSettleDTOPageInfo.getTotal());
 
 
         monthSettleRespPage.setRecords(monthSettleDTOPageInfo.getList().stream().map(monthSettleDTO -> {
@@ -171,6 +177,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         return monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()
                         .eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
+                        .eq(MonthSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
                         .eq(MonthSettle::getId, id)
         );
     }
@@ -181,8 +188,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
-    public Integer addMonthSettle(MonthSettle monthSettle) {
-        return monthSettleMapper.insert(monthSettle);
+    public Boolean addMonthSettleList(List<MonthSettle> monthSettleList) {
+        return monthSettleDao.saveBatch(monthSettleList);
     }
 
     /**

@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * (settle_detail)数据Mapper
@@ -26,5 +27,10 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
      */
     List<MonthSettleDetailDTO> selectMonthSettleDetail(MonthSettleDetailQuery monthSettleDetailQuery);
 
-    List<SettleDetail> getSettleDetailFromAccountDetail(String merCode, Date date);
+    /**
+     * 查询获取账户交易明细
+     * @param params
+     * @return
+     */
+    List<SettleDetail> getSettleDetailFromAccountDetail(Map<String, Object> params);
 }

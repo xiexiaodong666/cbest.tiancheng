@@ -26,15 +26,18 @@ import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
+import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -57,6 +60,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private final SupplierStoreService supplierStoreService;
   private final ObjectMapper mapper;
 
+  private final ApplicationContext applicationContext;
   private final ShoppingFeignClient shoppingFeignClient;
 
   @Override
@@ -164,32 +168,10 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     }
 
     boolean save = merchantStoreRelationDao.saveBatch(merchantStoreRelationList);
+    MerchantStoreRelationEvt evt = new MerchantStoreRelationEvt();
+    evt.setRoleConsumptionReq(roleConsumptionReq);
+    applicationContext.publishEvent(evt);
 
-    // send after tx commit but is async
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronizationAdapter() {
-          @Override
-          public void afterCommit() {
-            try {
-              log.info(mapper.writeValueAsString(roleConsumptionReq));
-              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
-                  .addOrUpdateRoleConsumption(roleConsumptionReq);
-
-              if (roleConsumptionResp.getCode().equals("0000")) {
-                // 写入
-                for (MerchantStoreRelation m :
-                    merchantStoreRelationList) {
-                  m.setSyncStatus(1);
-                }
-                merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelationList);
-              }
-            } catch (Exception e) {
-              log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
-            }
-
-          }
-        }
-    );
     return save;
   }
 
@@ -336,33 +318,9 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
     }
 
-    // send after tx commit but is async
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronizationAdapter() {
-          @Override
-          public void afterCommit() {
-            try {
-              log.info(mapper.writeValueAsString(roleConsumptionReq));
-              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
-                  .addOrUpdateRoleConsumption(roleConsumptionReq);
-
-              if (roleConsumptionResp.getCode().equals("0000")) {
-                merchantStoreRelations.addAll(merchantStoreRelationNewList);
-                // 写入
-                for (MerchantStoreRelation m :
-                    merchantStoreRelations) {
-                  m.setSyncStatus(1);
-                }
-                merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelations);
-              }
-
-            } catch (Exception e) {
-              log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
-            }
-
-          }
-        }
-    );
+    MerchantStoreRelationEvt evt = new MerchantStoreRelationEvt();
+    evt.setRoleConsumptionReq(roleConsumptionReq);
+    applicationContext.publishEvent(evt);
 
     return remove && updateBatch && saveBath;
   }
@@ -441,30 +399,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if(CollectionUtils.isNotEmpty(removeIds)) {
       remove = merchantStoreRelationDao.removeByIds(removeIds);
     }
-    // send after tx commit but is async
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronizationAdapter() {
-          @Override
-          public void afterCommit() {
-            try {
 
-              log.info(mapper.writeValueAsString(roleConsumptionReq));
-              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
-                  .addOrUpdateRoleConsumption(roleConsumptionReq);
+    MerchantStoreRelationEvt evt = new MerchantStoreRelationEvt();
+    evt.setRoleConsumptionReq(roleConsumptionReq);
+    applicationContext.publishEvent(evt);
 
-              if (roleConsumptionResp.getCode().equals("0000")) {
-                for (MerchantStoreRelation m:
-                merchantStoreRelations) {
-                  merchantStoreRelationMapper.updateMerchantStoreRelationStatus(m.getId());
-                }
-              }
-
-            } catch (Exception e) {
-              log.error("[afterCommit] call addOrUpdateRoleConsumption error", e.getMessage());
-            }
-          }
-        }
-    );
     return remove && saveOrUpdateBatch;
   }
 

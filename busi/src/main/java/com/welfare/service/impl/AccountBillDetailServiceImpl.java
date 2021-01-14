@@ -5,9 +5,11 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
 import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.AccountAmountTypeService;
+import com.welfare.service.AccountService;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import java.util.List;
@@ -38,6 +40,8 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
      */
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
+    @Autowired
+    private AccountService accountService;
     @Override
     public void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType) {
         AccountBillDetail accountBillDetail = new AccountBillDetail();
@@ -49,8 +53,9 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         accountBillDetail.setTransNo(deposit.getTransNo());
         accountBillDetail.setTransAmount(amount);
         accountBillDetail.setTransTime(Calendar.getInstance().getTime());
-        AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(accountCode);
-        accountBillDetail.setSurplusQuota(surplusQuota.getAccountBalance());
+        //AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(accountCode);
+        Account account = accountService.getByAccountCode(accountCode);
+        accountBillDetail.setSurplusQuota(account.getSurplusQuota());
         accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT.code());
         accountBillDetailDao.save(accountBillDetail);
     }

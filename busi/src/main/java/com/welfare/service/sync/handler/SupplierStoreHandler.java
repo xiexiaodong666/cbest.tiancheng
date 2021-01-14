@@ -79,6 +79,7 @@ public class SupplierStoreHandler {
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
             listBean.setStoreName(supplierStoreDetailDTO.getStoreName());
             listBean.setStoreCode(supplierStoreDetailDTO.getStoreCode());
+            listBean.setCashierNo(supplierStoreDetailDTO.getCashierNo());
             listBean.setEnabled(supplierStoreDetailDTO.getStatus().equals(1));
             //门店相关地址
             List<StoreShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();

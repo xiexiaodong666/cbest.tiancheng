@@ -161,6 +161,17 @@ ORDER BY
 LIMIT #{size}
 	</select>
 
+  <update id="batchUpdateChangeEventId" parameterType="java.util.Map">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+    update account
+      <set>
+        <if test="item.changeEventId != null ">
+          change_event_id=#{item.changeEventId,jdbcType=BIGINT},
+        </if>
+      </set>
+      where account_code = #{item.accountCode,jdbcType=BIGINT}
+    </foreach>
+  </update>
 
     <select id="queryDetailByAccountCode" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
         SELECT

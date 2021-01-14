@@ -33,4 +33,20 @@ public enum  AccountChangeType {
   public String getChangeValue() {
     return changeValue;
   }
+
+  public static AccountChangeType getByAccountStatus(Integer accountStatus){
+    if( accountStatus.intValue() == 1 ){
+      return AccountChangeType.ACCOUNT_ACTIVE;
+    }else{
+      return AccountChangeType.ACCOUNT_LOCK;
+    }
+  }
+
+  public static AccountChangeType getByAccountConsumeStatus(Integer accountConsumeStatus){
+    if( accountConsumeStatus.intValue() == 1 ){
+      return AccountChangeType.ACCOUNT_CONSUME_SCENE_ENABLE;
+    }else{
+      return AccountChangeType.ACCOUNT_CONSUME_SCENE_DISABLE;
+    }
+  }
 }

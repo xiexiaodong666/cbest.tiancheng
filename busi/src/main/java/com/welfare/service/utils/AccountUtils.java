@@ -1,10 +1,15 @@
 package com.welfare.service.utils;
 
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.service.remote.entity.EmployerDTO;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -37,4 +42,27 @@ public class AccountUtils {
     employerDTO.setStatus(accountSyncDTO.getAccountStatus());
     return employerDTO;
   }
+
+  public static AccountChangeEventRecord assemableChangeEvent(AccountChangeType accountChangeType, Long accounCode,String createUser) {
+    AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
+    accountChangeEventRecord.setAccountCode(accounCode);
+    accountChangeEventRecord.setChangeType(accountChangeType.getChangeType());
+    accountChangeEventRecord.setChangeValue(accountChangeType.getChangeValue());
+    accountChangeEventRecord.setCreateTime(new Date());
+    accountChangeEventRecord.setCreateUser(createUser);
+    return accountChangeEventRecord;
+  }
+
+  public static List<Map<String, Object>> getMaps(
+      List<AccountChangeEventRecord> accountChangeEventRecordList) {
+    List<Map<String,Object>> list = new LinkedList<>();
+    accountChangeEventRecordList.forEach(accountChangeEventRecord -> {
+      Map<String,Object> map = new HashMap<String,Object>();
+      map.put("accountCode",accountChangeEventRecord.getAccountCode());
+      map.put("changeEventId",accountChangeEventRecord.getId());
+      list.add(map);
+    });
+    return list;
+  }
+
 }

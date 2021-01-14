@@ -1,8 +1,10 @@
 package com.welfare.service.remote;
 
 import com.welfare.service.remote.entity.EmployerReqDTO;
+import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
+import com.welfare.service.remote.entity.StoreShoppingReq;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.remote.fallback.PlatformUserFallback;
 import com.welfare.service.remote.fallback.ShoppingFeignClientFallback;
@@ -52,13 +54,13 @@ public interface ShoppingFeignClient {
    */
   @RequestMapping(value = "/inward/tc/addOrUpdateMerchant", method = RequestMethod.POST, consumes = "application/json")
   RoleConsumptionResp addOrUpdateMerchant(
-          @RequestBody UserRoleBindingReqDTO userRoleBindingReqDTO);
+          @RequestBody MerchantShoppingReq merchantShoppingReq);
 
   /**
    * 批量添加、修改门店
    */
   @RequestMapping(value = "/inward/tc/addOrUpdateStore", method = RequestMethod.POST, consumes = "application/json")
   RoleConsumptionResp addOrUpdateStore(
-          @RequestBody UserRoleBindingReqDTO userRoleBindingReqDTO);
+          @RequestBody StoreShoppingReq storeShoppingReq);
 
 }

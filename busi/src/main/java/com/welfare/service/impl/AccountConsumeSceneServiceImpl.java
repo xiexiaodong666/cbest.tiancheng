@@ -202,12 +202,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if( null == queryAccountType ) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户员工类型不存在",null);
     }
-    if( isNew ){
-      AccountConsumeScene queryAccountConsumeScene = queryAccountConsumeScene(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
-      if(null != queryAccountConsumeScene){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同类型的消费场景配置",null);
-      }
-    }else{
+    if(!isNew){
       AccountConsumeScene queryAccountConsumeScene = accountConsumeSceneDao.getById(accountConsumeScene.getId());
       if( null == queryAccountConsumeScene ){
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景不存在",null);
@@ -272,7 +267,11 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Transactional(rollbackFor = Exception.class)
   public Boolean delete(Long id) {
     AccountConsumeScene accountConsumeScene = accountConsumeSceneDao.getById(id);
-    validationAccountConsumeScene(accountConsumeScene,false);
+    Merchant merchant = merchantService.detailByMerCode(accountConsumeScene.getMerCode());
+    if( null == merchant ) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
+    }
+
     boolean deleteResult =  accountConsumeSceneDao.removeById(id);
     Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     //下发数据
@@ -286,11 +285,15 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean updateStatus(Long id, Integer status) {
+    AccountConsumeScene queryAC = accountConsumeSceneDao.getById(id);
+    Merchant merchant = merchantService.detailByMerCode(queryAC.getMerCode());
+    if( null == merchant ) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
+    }
     UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
     updateWrapper.eq(AccountConsumeScene.ID, id);
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     accountConsumeScene.setStatus(status);
-    validationAccountConsumeScene(accountConsumeScene,false);
     return accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
   }
 

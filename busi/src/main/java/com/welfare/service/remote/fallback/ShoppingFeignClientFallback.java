@@ -2,8 +2,10 @@ package com.welfare.service.remote.fallback;
 
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.EmployerReqDTO;
+import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
+import com.welfare.service.remote.entity.StoreShoppingReq;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +45,19 @@ public class ShoppingFeignClientFallback implements FallbackFactory<ShoppingFeig
         RoleConsumptionResp response = new RoleConsumptionResp("500", cause.getMessage(), null);
         return response;
       }
+
+
+      @Override
+      public RoleConsumptionResp addOrUpdateMerchant(MerchantShoppingReq merchantShoppingReq) {
+        log.error("批量添加、修改商户失败", cause);
+        RoleConsumptionResp response = new RoleConsumptionResp("500", cause.getMessage(), null);
+        return response;      }
+
+      @Override
+      public RoleConsumptionResp addOrUpdateStore(StoreShoppingReq storeShoppingReq) {
+        log.error("批量添加、修改门店失败", cause);
+        RoleConsumptionResp response = new RoleConsumptionResp("500", cause.getMessage(), null);
+        return response;      }
     };
 
   }

@@ -10,4 +10,11 @@ import java.util.List;
  */
 public interface AccountConsumeSceneStoreRelationService {
   public List<AccountConsumeSceneStoreRelation> getListByConsumeSceneId(Long accountConsumeSceneId);
+
+  /**
+   * 门店修改了消费方式,员工类型同步修改消费方式
+   * @param storeCode
+   * @param consumeType
+   */
+  //public void updateStoreConsumeType(String storeCode,String consumeType);
 }

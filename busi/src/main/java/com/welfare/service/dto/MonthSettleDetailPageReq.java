@@ -1,6 +1,7 @@
 package com.welfare.service.dto;
 
 import com.welfare.common.base.RequestPage;
+import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ import java.util.Date;
  * @desc 账单明细响应dto
  */
 @Data
-public class MonthSettleDetailPageReq extends RequestPage {
+public class MonthSettleDetailPageReq extends PageReq {
     @ApiModelProperty(value = "订单编号")
     private String orderNo;
 

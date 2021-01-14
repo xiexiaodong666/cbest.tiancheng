@@ -57,7 +57,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettleQuery monthSettleQuery = new MonthSettleQuery();
         BeanUtils.copyProperties(monthSettleReqDto, monthSettleQuery);
 
-        PageHelper.startPage(monthSettleReqDto.getCurrentPage(),monthSettleReqDto.getPageSize());
+        PageHelper.startPage(monthSettleReqDto.getCurrent(),monthSettleReqDto.getSize());
         List<MonthSettleDTO> monthSettleDTOS = monthSettleMapper.selectMonthSettle(monthSettleQuery);
         PageInfo<MonthSettleDTO> monthSettleDTOPageInfo = new PageInfo<>(monthSettleDTOS);
 
@@ -78,7 +78,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         summaryInfo.put("billEndDay", DateUtil.dateTime2Str(dayMaxByMontStr, DateUtil.DEFAULT_DATE_FORMAT));
 
 
-        BasePageVo<MonthSettleResp> monthSettleRespPage = new BasePageVo<>(monthSettleReqDto.getCurrentPage(), monthSettleReqDto.getPageSize(),monthSettleDTOPageInfo.getTotal());
+        BasePageVo<MonthSettleResp> monthSettleRespPage = new BasePageVo<>(monthSettleReqDto.getCurrent(), monthSettleReqDto.getSize(),monthSettleDTOPageInfo.getTotal());
 
 
         monthSettleRespPage.setRecords(monthSettleDTOPageInfo.getList().stream().map(monthSettleDTO -> {
@@ -99,12 +99,12 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
 
-        PageHelper.startPage(monthSettleDetailPageReq.getCurrentPage(), monthSettleDetailPageReq.getPageSize());
+        PageHelper.startPage(monthSettleDetailPageReq.getCurrent(), monthSettleDetailPageReq.getSize());
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
         PageInfo<MonthSettleDetailDTO> monthSettleDetailDTOPageInfo = new PageInfo<>(monthSettleDetailDTOS);
 
-        Page<MonthSettleDetailResp> monthSettleDetailRespPage = new Page<>(monthSettleDetailPageReq.getCurrentPage(),
-                monthSettleDetailPageReq.getPageSize(),monthSettleDetailDTOPageInfo.getTotal());
+        Page<MonthSettleDetailResp> monthSettleDetailRespPage = new Page<>(monthSettleDetailPageReq.getCurrent(),
+                monthSettleDetailPageReq.getSize(),monthSettleDetailDTOPageInfo.getTotal());
 
         monthSettleDetailRespPage.setRecords(monthSettleDetailDTOPageInfo.getList().stream().map(monthSettleDetailDTO -> {
             MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();

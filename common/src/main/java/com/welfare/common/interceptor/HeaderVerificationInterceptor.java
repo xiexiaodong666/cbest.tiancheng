@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.domain.ApiUserInfo;
+import com.welfare.common.domain.UserInfo;
 import com.welfare.common.domain.MerchantUserInfo;
-import com.welfare.common.util.ApiUserHolder;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.common.util.MerchantUserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,6 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler){
         //
         String source = request.getHeader(WelfareConstant.Header.SOURCE.code());
-        String api = request.getHeader(WelfareConstant.Header.API_USER.code());
         if(handler instanceof HandlerMethod){
             setApiUserToContext(handler, request);
             setMerchantUserToContext(handler, request);
@@ -66,7 +65,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"apiUser required for http header");
             }
             try {
-                ApiUserHolder.setApiUserInfoLocal(JSON.parseObject(new String(apiUserInfo.getBytes("ISO-8859-1"),"utf8"), ApiUserInfo.class));
+                UserInfoHolder.setApiUserInfoLocal(JSON.parseObject(new String(apiUserInfo.getBytes("ISO-8859-1"),"utf8"), UserInfo.class));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -84,7 +83,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"merchantUser required for http header");
             }
             try {
-                MerchantUserHolder.setDeptIds(JSON.parseObject(new String(merchantUserInfo.getBytes("ISO-8859-1"),"utf8"), MerchantUserInfo.class));
+                MerchantUserHolder.setMerchantUser(JSON.parseObject(new String(merchantUserInfo.getBytes("ISO-8859-1"),"utf8"), MerchantUserInfo.class));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

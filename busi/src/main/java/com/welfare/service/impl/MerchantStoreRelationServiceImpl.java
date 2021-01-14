@@ -8,7 +8,7 @@ import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.ApiUserHolder;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
@@ -141,8 +141,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       merchantStoreRelation.setRebateRatio(store.getRebateRatio());
       merchantStoreRelation.setSyncStatus(0);
 
-      if (ApiUserHolder.getUserInfo() != null) {
-        merchantStoreRelation.setCreateUser(ApiUserHolder.getUserInfo().getUserName());
+      if (UserInfoHolder.getUserInfo() != null) {
+        merchantStoreRelation.setCreateUser(UserInfoHolder.getUserInfo().getUserName());
       }
 
       RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
@@ -252,9 +252,9 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         merchantStoreRelationNew.setRamark(relationUpdateReq.getRamark());
         merchantStoreRelationNew.setDeleted(false);
         merchantStoreRelationNew.setSyncStatus(0);
-        if (ApiUserHolder.getUserInfo() != null) {
-          merchantStoreRelationNew.setCreateUser(ApiUserHolder.getUserInfo().getUserName());
-          merchantStoreRelationNew.setUpdateUser(ApiUserHolder.getUserInfo().getUserName());
+        if (UserInfoHolder.getUserInfo() != null) {
+          merchantStoreRelationNew.setCreateUser(UserInfoHolder.getUserInfo().getUserName());
+          merchantStoreRelationNew.setUpdateUser(UserInfoHolder.getUserInfo().getUserName());
 
         }
         merchantStoreRelationNew.setStatus(0);

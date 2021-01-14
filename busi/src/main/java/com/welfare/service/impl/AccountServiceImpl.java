@@ -26,6 +26,7 @@ import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.service.AccountChangeEventRecordService;
@@ -57,6 +58,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -94,6 +96,7 @@ public class AccountServiceImpl implements AccountService {
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
   private final AccountChangeEventRecordService accountChangeEventRecordService;
+  private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
 
 
   @Override
@@ -132,7 +135,7 @@ public class AccountServiceImpl implements AccountService {
   public String uploadAccount(MultipartFile multipartFile) {
     try {
       AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,
-          merchantService,departmentService,sequenceService);
+          merchantService,departmentService,sequenceService,accountChangeEventRecordService);
       EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();
@@ -183,7 +186,8 @@ public class AccountServiceImpl implements AccountService {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
     }
     boolean result = accountDao.removeById(id);
-
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode(),"员工删除");
+    accountChangeEventRecordService.save(accountChangeEventRecord);
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(syncAccount);
     this.syncAccount(ShoppingActionTypeEnum.DELETE,
         Arrays.asList(accountSyncDTO));
@@ -202,6 +206,10 @@ public class AccountServiceImpl implements AccountService {
     Account account = new Account();
     account.setAccountStatus(active);
     boolean result = accountDao.update(updateWrapper);
+    AccountChangeType accountChangeType = AccountChangeType.getByAccountStatus(active);
+
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(),"员工修改状态");
+    accountChangeEventRecordService.save(accountChangeEventRecord);
 
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(syncAccount);
     this.syncAccount(ShoppingActionTypeEnum.UPDATE,
@@ -223,7 +231,7 @@ public class AccountServiceImpl implements AccountService {
     validationAccount(account,true);
     Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
 
-    AccountChangeEventRecord accountChangeEventRecord = assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, accounCode,account.getCreateUser());
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, accounCode,account.getCreateUser());
     accountChangeEventRecordService.save(accountChangeEventRecord);
 
     account.setAccountCode(accounCode);
@@ -233,16 +241,6 @@ public class AccountServiceImpl implements AccountService {
     this.syncAccount(ShoppingActionTypeEnum.ADD,
         Arrays.asList(accountSyncDTO));
     return result;
-  }
-
-  private AccountChangeEventRecord assemableChangeEvent(AccountChangeType accountChangeType, Long accounCode,String createUser) {
-    AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
-    accountChangeEventRecord.setAccountCode(accounCode);
-    accountChangeEventRecord.setChangeType(accountChangeType.getChangeType());
-    accountChangeEventRecord.setChangeValue(accountChangeType.getChangeValue());
-    accountChangeEventRecord.setCreateTime(new Date());
-    accountChangeEventRecord.setCreateUser(createUser);
-    return accountChangeEventRecord;
   }
 
   private AccountSyncDTO getAccountSyncDTO(Account account) {
@@ -391,5 +389,11 @@ public class AccountServiceImpl implements AccountService {
     accountSimpleDTO.setAccountBalance(account.getAccountBalance());
     accountSimpleDTO.setSurplusQuota(account.getSurplusQuota());
     return accountSimpleDTO;
+  }
+
+  @Override
+  public void batchUpdateChangeEventId(List<Map<String, Object>> list) {
+    accountCustomizeMapper.batchUpdateChangeEventId(list);
+    return;
   }
 }

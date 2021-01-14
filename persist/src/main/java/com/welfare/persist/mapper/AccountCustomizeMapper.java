@@ -11,6 +11,7 @@ import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 public interface AccountCustomizeMapper extends BaseMapper<Account> {
@@ -47,4 +48,5 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
   List<AccountIncrementDTO> queryIncrementDTO(@Param("storeCode") String storeCode,
       @Param("size")Integer  size,
       @Param("changeEventId")Long changeEventId);
+  void batchUpdateChangeEventId(List<Map<String,Object>> list);
 }

@@ -34,8 +34,10 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
         //
         String source = request.getHeader(WelfareConstant.Header.SOURCE.code());
         String api = request.getHeader(WelfareConstant.Header.API_USER.code());
-        setApiUserToContext(handler, request);
-        setMerchantUserToContext(handler, request);
+        if(handler instanceof HandlerMethod){
+            setApiUserToContext(handler, request);
+            setMerchantUserToContext(handler, request);
+        }
         if(StringUtils.isEmpty(source)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Source required for http header");
         }
@@ -56,6 +58,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
      * 从header里获取apiUser并存入上下文中
      */
     private void setApiUserToContext(Object handler, HttpServletRequest request) {
+
         ApiUser apiUser = ((HandlerMethod) handler).getMethodAnnotation(ApiUser.class);
         if (apiUser != null) {
             String apiUserInfo = request.getHeader(WelfareConstant.Header.API_USER.code());

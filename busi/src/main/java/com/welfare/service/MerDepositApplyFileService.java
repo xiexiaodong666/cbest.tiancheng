@@ -1,5 +1,9 @@
 package com.welfare.service;
 
+import com.welfare.persist.entity.MerDepositApplyFile;
+
+import java.util.List;
+
 /**
  * @author duanhy
  * @version 1.0.0
@@ -9,4 +13,6 @@ package com.welfare.service;
 public interface MerDepositApplyFileService {
 
   boolean delByMerDepositApplyCode(String merDepositApplyCode);
+
+  List<MerDepositApplyFile> listByMerDepositApplyCode(String merDepositApplyCode);
 }

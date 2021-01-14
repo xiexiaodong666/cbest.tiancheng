@@ -10,6 +10,7 @@ import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
+import com.welfare.service.dto.SupplierStoreTreeDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public interface SupplierStoreService {
      */
     Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req);
     List<SupplierStore> list(SupplierStoreListReq req);
+    List<SupplierStoreTreeDTO> tree(String merCode);
 
     /**
      * 查询供应商门店详情

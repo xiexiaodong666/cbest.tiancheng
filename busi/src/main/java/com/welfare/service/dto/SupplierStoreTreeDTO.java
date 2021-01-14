@@ -1,19 +1,9 @@
-package com.welfare.servicemerchant.dto;
+package com.welfare.service.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -21,7 +11,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-public class SupplierStoreInfo  {
+public class SupplierStoreTreeDTO extends Tree{
 
     /**
      * id
@@ -78,20 +68,5 @@ public class SupplierStoreInfo  {
      */
     @ApiModelProperty("创建日期")  
     private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty("更新人")  
-    private String updateUser;
-    /**
-     * 更新日期
-     */
-    @ApiModelProperty("更新日期")  
-	private Date updateTime;
-    /**
-     * 外部编码
-     */
-    @ApiModelProperty("外部编码")  
-    private String externalCode;
 
 }

@@ -1,19 +1,16 @@
 package com.welfare.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
-import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantCredit;
-import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantExMapper;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
@@ -26,14 +23,8 @@ import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
-import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.helper.QueryHelper;
-import com.welfare.service.remote.ShoppingFeignClient;
-import com.welfare.service.remote.entity.MerchantShoppingReq;
-import com.welfare.service.remote.entity.RoleConsumptionResp;
-import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.sync.event.MerchantAddEvt;
-import com.welfare.service.sync.event.MerchantEvt;
 import com.welfare.service.sync.event.MerchantUpdateEvt;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +33,8 @@ import com.welfare.service.MerchantService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -72,7 +59,6 @@ public class MerchantServiceImpl implements MerchantService {
 
     private final MerchantWithCreditConverter merchantWithCreditConverter;
 
-    private final ShoppingFeignClient shoppingFeignClient;
 
 
     @Override

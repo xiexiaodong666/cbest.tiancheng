@@ -2,8 +2,10 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
+import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
@@ -23,6 +25,10 @@ import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.service.helper.QueryHelper;
+import com.welfare.service.remote.ShoppingFeignClient;
+import com.welfare.service.remote.entity.MerchantShoppingReq;
+import com.welfare.service.remote.entity.RoleConsumptionResp;
+import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,6 +61,8 @@ public class MerchantServiceImpl implements MerchantService {
     private final SequenceService sequenceService;
 
     private final MerchantWithCreditConverter merchantWithCreditConverter;
+
+    private final ShoppingFeignClient shoppingFeignClient;
 
 
     @Override
@@ -112,6 +122,32 @@ public class MerchantServiceImpl implements MerchantService {
         return flag&merchantAddressService.saveOrUpdateBatch(merchant.getAddressList());
     }
 
+    private void syncShopping(ShoppingActionTypeEnum typeEnum,List<MerchantDetailDTO> merchantDetailDTOList){
+        MerchantShoppingReq req=new MerchantShoppingReq();
+        req.setActionType(typeEnum.getCode());
+        req.setTimestamp(new Date());
+        req.setRequestId(GenerateCodeUtil.UUID());
+        List<MerchantShoppingReq.ListBean> list=new ArrayList<>();
+        for(MerchantDetailDTO merchant: merchantDetailDTOList){
+            MerchantShoppingReq.ListBean listBean=new MerchantShoppingReq.ListBean();
+            listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1")?Boolean.TRUE:Boolean.FALSE);
+            listBean.setMerchantCode(merchant.getMerCode());
+            listBean.setName(merchant.getMerName());
+            listBean.setIdTypes(Arrays.asList(merchant.getMerType().split(",")));
+            List<MerchantShoppingReq.ListBean.AddressBean> addressBeans=new ArrayList<>();
+            for(MerchantAddressDTO addressDTO :merchant.getAddressList()){
+                MerchantShoppingReq.ListBean.AddressBean addressBean=new MerchantShoppingReq.ListBean.AddressBean();
+                addressBean.setAddress(addressDTO.getAddress());
+                addressBean.setAddressType(addressDTO.getAddressType());
+                addressBean.setName(addressDTO.getAddressName());
+                addressBeans.add(addressBean);
+            }
+            listBean.setAddress(addressBeans);
+            list.add(listBean);
+        }
+        req.setList(list);
+        RoleConsumptionResp resp= shoppingFeignClient.addOrUpdateMerchant(req);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

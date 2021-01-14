@@ -40,7 +40,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/merchant-account-type")
-@Api(tags = "商户相关接口")
+@Api(tags = "商户福利类型相关接口")
 public class MerchantAccountTypeController implements IController {
     private final MerchantAccountTypeService merchantAccountTypeService;
     private final MerchantAccountTypeConverter merchantAccountTypeConverter;

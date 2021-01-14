@@ -8,10 +8,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
+import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
@@ -29,14 +31,22 @@ import com.welfare.service.dto.DictDTO;
 import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
+import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreImportDTO;
+
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.welfare.service.dto.SupplierStoreListReq;
+import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.listener.SupplierStoreListener;
+import com.welfare.service.remote.ShoppingFeignClient;
+import com.welfare.service.remote.entity.StoreShoppingReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -66,9 +76,16 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   private final ObjectMapper mapper;
   private final SupplierStoreDetailConverter supplierStoreDetailConverter;
+  private final ShoppingFeignClient shoppingFeignClient;
 
   private final DictService dictService;
   private final MerchantAddressService merchantAddressService;
+
+
+  @Override
+  public List<SupplierStore> list(SupplierStoreListReq req) {
+    return supplierStoreDao.list(QueryHelper.getWrapper(req));
+  }
 
   @Override
   public Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req) {
@@ -267,6 +284,21 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
     return merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);
   }
+  private void syncShopping(ShoppingActionTypeEnum typeEnum, List<SupplierStoreDetailDTO> supplierStoreDetailDTOS) {
+    StoreShoppingReq storeShoppingReq =new StoreShoppingReq();
+    storeShoppingReq.setActionType(typeEnum.getCode());
+    storeShoppingReq.setRequestId(GenerateCodeUtil.UUID());
+    storeShoppingReq.setTimestamp(new Date());
 
+    List<StoreShoppingReq.ListBean> listBeans=new ArrayList<>();
+    for(SupplierStoreDetailDTO supplierStoreDetailDTO:supplierStoreDetailDTOS){
+      StoreShoppingReq.ListBean listBean=new StoreShoppingReq.ListBean();
+
+      List<StoreShoppingReq.ListBean.AddressBean> addressBeans=new ArrayList<>();
+      listBeans.add(listBean);
+    }
+    storeShoppingReq.setList(listBeans);
+    shoppingFeignClient.addOrUpdateStore(storeShoppingReq);
+  }
 
 }

@@ -58,4 +58,43 @@ FROM
     <if test="bindEndTime != null ">and ci.bind_time &lt;= #{bindEndTime}</if>
 
   </select>
+
+  <select id="exportCardInfo" resultType="com.welfare.persist.dto.CardInfoDTO">
+    SELECT
+    ci.card_id as cardId,
+    ca.card_name as cardName,
+    ci.card_type as cardType,
+    ca.card_medium as cardMedium,
+    ci.card_status as cardStatus,
+    m.mer_name as merName,
+    ci.create_time as createTime,
+    ci.written_time as writtenTime,
+    ci.bind_time as bindTime,
+    ci.account_code as accountCode
+    FROM
+    card_info ci
+    LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
+    LEFT JOIN merchant m ON m.mer_code = ca.mer_code
+
+    <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
+    </if>
+    <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
+    </if>
+    <if test="cardType != null and cardType !='' ">and ci.card_type = #{cardType}
+    </if>
+    <if test="cardMedium != null and cardMedium !='' ">and ca.card_medium = #{cardMedium}
+    </if>
+    <if test="cardStatus != null  ">and ci.card_statu = #{cardStatus}
+    </if>
+
+    <if test="writtenStartTime != null ">and ci.written_time &gt;= #{writtenStartTime}</if>
+    <if test="writtenEndTime != null ">and ci.written_time &lt;= #{writtenEndTime}</if>
+
+    <if test="startTime != null ">and ci.create_time &gt;= #{createTime}</if>
+    <if test="endTime != null ">and ci.create_time &lt;= #{createTime}</if>
+
+    <if test="bindStartTime != null ">and ci.bind_time &gt;= #{bindStartTime}</if>
+    <if test="bindEndTime != null ">and ci.bind_time &lt;= #{bindEndTime}</if>
+
+  </select>
 </mapper>

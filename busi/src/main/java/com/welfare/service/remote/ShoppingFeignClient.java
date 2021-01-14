@@ -46,4 +46,21 @@ public interface ShoppingFeignClient {
   RoleConsumptionResp addOrUpdateUserRoleBinding(
       @RequestBody UserRoleBindingReqDTO userRoleBindingReqDTO);
 
+
+  /**
+   * 批量添加、修改商户
+   */
+  @RequestMapping(value = "/inward/tc/addOrUpdateMerchant", method = RequestMethod.POST, consumes = "application/json")
+  RoleConsumptionResp addOrUpdateMerchant(
+          @RequestBody UserRoleBindingReqDTO userRoleBindingReqDTO);
+
+  /**
+   * 批量添加、修改门店
+   * @param userRoleBindingReqDTO
+   * @return
+   */
+  @RequestMapping(value = "/inward/tc/addOrUpdateStore", method = RequestMethod.POST, consumes = "application/json")
+  RoleConsumptionResp addOrUpdateStore(
+          @RequestBody UserRoleBindingReqDTO userRoleBindingReqDTO);
+
 }

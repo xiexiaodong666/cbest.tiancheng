@@ -17,6 +17,7 @@ import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.dto.AccountBillMapperDTO;
 import com.welfare.persist.dto.AccountDetailMapperDTO;
+import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
@@ -36,6 +37,7 @@ import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountBindCardDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.dto.AccountUploadDTO;
@@ -97,6 +99,11 @@ public class AccountServiceImpl implements AccountService {
             accountPageReq.getDepartmentCode(), accountPageReq.getAccountStatus(),
             accountPageReq.getAccountTypeCode());
     return accountConverter.toPage(iPage);
+  }
+
+  @Override
+  public List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq) {
+    return accountCustomizeMapper.queryIncrementDTO(accountIncrementReq.getStoreCode(),accountIncrementReq.getSize(),accountIncrementReq.getChangeEventId());
   }
 
   @Override

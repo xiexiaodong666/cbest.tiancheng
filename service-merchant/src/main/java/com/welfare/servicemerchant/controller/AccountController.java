@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.exception.BusiException;
+import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
@@ -9,6 +10,7 @@ import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountReq;
 import com.welfare.servicemerchant.service.FileUploadService;
@@ -53,14 +55,11 @@ public class AccountController implements IController {
   private FileUploadService fileUploadService;
 
 
-  /*@GetMapping("/incremental-page")
-  @ApiOperation("增量查询账户(支持离线消费场景)")
-  public R<Page<AccountDepositApplyInfo>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
-                                                    @RequestParam @ApiParam("单页大小") Integer pageSize,
-                                                    @RequestParam(required = true) @ApiParam("门店编码") String storeCode,
-                                                    @RequestParam(required = true) @ApiParam("查询开始的id > 0)") Long startId){
-    return null;
-  }*/
+  @GetMapping("/increment")
+  @ApiOperation("员工账户增量查询")
+  public List<AccountIncrementDTO> incrementAccountList(AccountIncrementReq accountIncrementReq){
+    return accountService.queryIncrementDTO(accountIncrementReq);
+  }
 
   @GetMapping("/page")
   @ApiOperation("分页查询账户")

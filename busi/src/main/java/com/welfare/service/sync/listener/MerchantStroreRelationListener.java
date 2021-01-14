@@ -32,7 +32,7 @@ public class MerchantStroreRelationListener {
   @EventListener
   @Transactional(rollbackFor = Exception.class)
   public void onAdd(MerchantAddEvt evt) throws EventBusException {
-    log.info("监听器。。。。{}", evt.getTest());
+    log.info("监听器。。。。{}", "");
 
     persistentBus.postFromTransaction(evt, DataSourceUtils.getConnection(dataSource));
   }

@@ -49,3 +49,15 @@ cbest:
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
     notifyUrl: http://xxx/accountDepositRecord/payNotify
+
+exclude-header-interceptor:
+  - /swagger*/**
+  - /doc.html*
+  - /error*
+  - /index
+  - /**/*.css
+  - /**/*.js
+  - /**/*.png
+  - /**/*.jpg
+  - /**/*.jpeg
+  - /**/*.ico

@@ -224,9 +224,16 @@ public class PaymentServiceImpl implements PaymentService {
                         type -> !SELF.code().equals(type.getMerAccountTypeCode())
                                 && !SURPLUS_QUOTA.code().equals(type.getMerAccountTypeCode())
                 )
-                .map(type -> type.getAccountBalance())
+                .map(AccountAmountType::getAccountBalance)
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+        BigDecimal accountSurplusQuota =accountAmountTypes.stream()
+                .filter(
+                        type -> SURPLUS_QUOTA.code().equals(type.getMerAccountTypeCode())
+                )
+                .map(AccountAmountType::getAccountBalance)
                 .reduce(BigDecimal.ZERO,BigDecimal::add);
         accountBillDetail.setAccountBalance(accountBalance);
+        accountBillDetail.setSurplusQuota(accountSurplusQuota);
         AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(paymentRequest.calculateAccountCode());
         accountBillDetail.setSurplusQuota(surplusQuota.getAccountBalance());
         return accountBillDetail;

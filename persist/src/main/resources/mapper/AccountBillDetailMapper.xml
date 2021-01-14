@@ -9,4 +9,29 @@
         id,account_code,card_id,bill_no,order_time,bill_type,store_code,real_amount,account_balance,pos,create_user,create_time,payment_type,update_user,update_time,flag,version
     </sql>
 
+    <select id="selectAccountBillDetailSimpleList" resultType="com.welfare.persist.dto.AccountBillDetailSimpleDTO" parameterType="com.welfare.persist.dto.query.AccountBillDetailSimpleReq">
+        SELECT
+        abd.store_code,
+        ss.store_name,
+        abd.trans_type,
+        abd.trans_amount,
+        abd.trans_time,
+        mat.mer_account_type_name,
+        aded.account_deduction_amount
+        FROM
+        account_bill_detail abd
+        JOIN account_deduction_detail aded ON abd.trans_no = aded.trans_no
+        JOIN supplier_store ss ON abd.store_code = abd.store_code
+        JOIN merchant_account_type mat ON aded.mer_account_type = mat.mer_account_type_code
+        <where>
+            <if test="startTransTime != null ">
+                <![CDATA[AND abd.trans_time >= #{startTransTime}]]>
+            </if>
+            <if test="endTransTime != null ">
+                <![CDATA[AND abd.trans_time <= #{endTransTime}]]>
+            </if>
+        </where>
+        GROUP BY abd.trans_time DESC
+    </select>
+
 </mapper>

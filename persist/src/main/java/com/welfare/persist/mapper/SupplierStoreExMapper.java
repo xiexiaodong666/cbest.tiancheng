@@ -6,6 +6,8 @@ import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.persist.dto.query.StorePageReq;
 import java.util.List;
+
+import com.welfare.persist.entity.SupplierStore;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,4 +23,6 @@ public interface SupplierStoreExMapper {
     Page<SupplierStoreWithMerchantDTO> listWithMerchant(
             Page page,@Param("req") StorePageReq req);
     List<MerSupplierStoreDTO> queryMerSupplierStoreDTList(@Param("merCode")String merCode);
+    List<SupplierStore> listUnionMerchant(@Param("merCode")String merCode);
+
 }

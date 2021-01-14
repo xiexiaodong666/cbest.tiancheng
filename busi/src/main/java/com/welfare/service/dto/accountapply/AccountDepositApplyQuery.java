@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 /**
@@ -66,4 +67,11 @@ public class AccountDepositApplyQuery extends PageReq{
   @ApiModelProperty("审批结束时间(yyyy-MM-dd HH:mm:ss)")
   @Query(type = Query.Type.LESS_THAN, propName = "approvalTime")
   private Date approvalTimeEnd;
+
+  /**
+   * 福利类型code
+   */
+  @ApiModelProperty("福利类型code")
+  @Query(type = Query.Type.EQUAL)
+  private String merAccountTypeCode;
 }

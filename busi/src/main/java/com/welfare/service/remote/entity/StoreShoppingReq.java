@@ -21,7 +21,7 @@ public class StoreShoppingReq implements Serializable {
   public static class ListBean  {
     private boolean enabled;
     private String merchantCode;
-    private String name;
+    private String storeName;
     private int status;
     private String storeCode;
     private List<AddressBean> address;

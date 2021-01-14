@@ -18,6 +18,9 @@ public class SupplierStoreTreeDTO extends Tree{
      */
     @ApiModelProperty("id")
 	private Long id;
+
+    @ApiModelProperty("虚拟收银机号")
+    private String cashierNo;
     /**
      * 商户代码
      */

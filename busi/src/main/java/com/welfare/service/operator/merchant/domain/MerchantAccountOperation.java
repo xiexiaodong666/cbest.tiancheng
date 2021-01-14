@@ -24,24 +24,24 @@ public class MerchantAccountOperation {
     /**
      * 返回一个MerchantAccountOperation
      * @param operateType
-     * @param amount
+     * @param operatedAmount
      * @param incOrDecType
      * @param merchantCredit
      * @param transNo
      * @return
      */
     public static MerchantAccountOperation of(MerCreditType operateType,
-                                              BigDecimal amount,
+                                              BigDecimal operatedAmount,
                                               IncOrDecType incOrDecType,
                                               MerchantCredit merchantCredit, String transNo){
         MerchantAccountOperation merchantAccountOperation = new MerchantAccountOperation();
         merchantAccountOperation.setType(operateType);
-        merchantAccountOperation.setAmount(amount);
+        merchantAccountOperation.setAmount(operatedAmount);
         merchantAccountOperation.setIncOrDecType(incOrDecType);
 
         MerchantBillDetail merchantBillDetail = new MerchantBillDetail();
         merchantBillDetail.setBalanceType(operateType.code());
-        merchantBillDetail.setTransAmount(amount);
+        merchantBillDetail.setTransAmount(operatedAmount);
         merchantBillDetail.setTransType(operateType.code());
         merchantBillDetail.setTransNo(transNo);
         merchantBillDetail.setMerCode(merchantCredit.getMerCode());
@@ -49,6 +49,7 @@ public class MerchantAccountOperation {
         merchantBillDetail.setRebateLimit(merchantCredit.getRebateLimit());
         merchantBillDetail.setCreditLimit(merchantCredit.getCreditLimit());
         merchantBillDetail.setRechargeLimit(merchantCredit.getRechargeLimit());
+        merchantBillDetail.setRemainingLimit(merchantCredit.getRemainingLimit());
         merchantBillDetail.setSelfDepositBalance(merchantCredit.getSelfDepositBalance());
 
         merchantAccountOperation.setMerchantBillDetail(merchantBillDetail);

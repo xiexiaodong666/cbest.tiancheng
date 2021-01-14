@@ -35,24 +35,23 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
         BigDecimal subtract = selfDepositBalance.subtract(amount);
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
             BigDecimal amountLeftToBeDecrease = subtract.negate();
-            List<MerchantAccountOperation> operations = doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, transNo);
-            return operations;
+            return doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, selfDepositBalance , transNo);
         } else {
             merchantCredit.setSelfDepositBalance(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     merCreditType,
-                    subtract,
+                    amount,
                     IncOrDecType.DECREASE,
                     merchantCredit,
                     transNo
             );
-            return Arrays.asList(operation);
+            return Collections.singletonList(operation);
         }
 
     }
 
     @Override
-    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, String transNo) {
+    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo) {
         AbstractMerAccountTypeOperator nextOperator = getNext();
         if (Objects.isNull(nextOperator)) {
             throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
@@ -60,7 +59,7 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
         merchantCredit.setSelfDepositBalance(BigDecimal.ZERO);
         MerchantAccountOperation operation = MerchantAccountOperation.of(
                 merCreditType,
-                merchantCredit.getSelfDepositBalance(),
+                operatedAmount,
                 IncOrDecType.DECREASE,
                 merchantCredit,
                 transNo

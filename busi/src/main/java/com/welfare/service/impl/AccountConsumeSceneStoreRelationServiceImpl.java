@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author yaoxiao
@@ -41,6 +42,7 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void updateStoreConsumeType( String storeCode, String consumeType) {
     List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelations = this.getListByStoreCode(storeCode);
     if(CollectionUtils.isEmpty(accountConsumeSceneStoreRelations)){
@@ -63,12 +65,12 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
         }
       }
       if( !sb.toString().equals(accountConsumeSceneStoreRelation.getSceneConsumType())){
+        accountConsumeSceneStoreRelation.setSceneConsumType(sb.toString());
         //账号类型发生了改变
         updateList.add(accountConsumeSceneStoreRelation);
       }
     });
-    //TODO 修改了选择类型  账户变更表增加记录
-    //updateList
+    accountConsumeSceneStoreRelationDao.saveOrUpdateBatch(updateList);
     return;
   }
 

@@ -47,7 +47,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final RemainingLimitOperator remainingLimitOperator;
     private final RebateLimitOperator rebateLimitOperator;
     private final MerchantBillDetailDao merchantBillDetailDao;
-
+    private final SelfDepositBalanceOperator selfDepositBalanceOperator;
     private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
 
 
@@ -65,6 +65,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             credit.setCreditLimit(BigDecimal.ZERO);
             credit.setRemainingLimit(BigDecimal.ZERO);
             credit.setRebateLimit(BigDecimal.ZERO);
+            credit.setSelfDepositBalance(BigDecimal.ZERO);
             merchantCreditDao.save(credit);
         }
         return credit;
@@ -75,13 +76,11 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
+        AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
-            MerchantCredit merchantCredit = this.getByMerCode(merCode);
-            AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            List<MerchantAccountOperation> operations = merAccountTypeOperator.decrease(merchantCredit, amount, transNo);
-            merchantCreditDao.updateById(merchantCredit);
+            List<MerchantAccountOperation> operations = doOperateAccount(merCode, amount, transNo, merAccountTypeOperator);
             List<MerchantBillDetail> merchantBillDetails = operations.stream()
                     .map(MerchantAccountOperation::getMerchantBillDetail)
                     .collect(Collectors.toList());
@@ -91,6 +90,15 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             lock.unlock();
         }
     }
+
+    @Override
+    public List<MerchantAccountOperation> doOperateAccount(String merCode, BigDecimal amount, String transNo, AbstractMerAccountTypeOperator merAccountTypeOperator) {
+        MerchantCredit merchantCredit = this.getByMerCode(merCode);
+        List<MerchantAccountOperation> operations = merAccountTypeOperator.decrease(merchantCredit, amount, transNo);
+        merchantCreditDao.updateById(merchantCredit);
+        return operations;
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
@@ -113,5 +121,6 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         operatorMap.put(RECHARGE_LIMIT, rechargeLimitOperator);
         operatorMap.put(REMAINING_LIMIT, remainingLimitOperator);
         operatorMap.put(REBATE_LIMIT, rebateLimitOperator);
+        operatorMap.put(SELF_DEPOSIT,selfDepositBalanceOperator);
     }
 }

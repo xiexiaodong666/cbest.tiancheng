@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
@@ -10,7 +11,9 @@ import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
+import com.welfare.persist.dto.AccountSimpleDTO;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +30,8 @@ public interface AccountService {
 
   Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
       AccountPageReq accountPageReq);
+
+  List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq);
 
   Account findByPhone(String phone);
 
@@ -49,6 +54,8 @@ public interface AccountService {
 
   AccountDetailDTO queryDetail(Long id);
 
+  AccountDetailDTO queryDetailByAccountCode(String accountCode);
+
   Boolean save(Account account);
 
   Boolean batchSave(List<Account> accountList);
@@ -66,4 +73,6 @@ public interface AccountService {
   List<Long> getAccountCodeList(List<Long> accountCodes);
 
   public void syncAccount(ShoppingActionTypeEnum actionTypeEnum, List<AccountSyncDTO> accountSyncDTOS);
+
+  AccountSimpleDTO queryAccountInfo(Long accountCode);
 }

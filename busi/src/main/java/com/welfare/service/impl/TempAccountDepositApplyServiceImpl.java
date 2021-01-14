@@ -7,6 +7,7 @@ import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.TempAccountDepositApplyDao;
+import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.TempAccountDepositApply;
 import com.welfare.persist.mapper.TempAccountDepositApplyMapper;
@@ -102,11 +103,11 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
                 fileId, accountService, executor);
         EasyExcel.read(multipartFile.getInputStream(), AccountDepositRequest.class, listener).sheet().doRead();
         log.info("批量导入员工账号存储申请完成. requestId:{} fileId:{}", requestId, fileId);
-        Page<TempAccountDepositApplyDTO> page = pageByFileIdByExistAccount(1 , 1, fileId);
-        if (page == null || CollectionUtils.isEmpty(page.getRecords())) {
-          delByFileId(fileId);
-          throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工！", null);
-        }
+//        Page<TempAccountDepositApplyDTO> page = pageByFileIdByExistAccount(1 , 1, fileId);
+//        if (page == null || CollectionUtils.isEmpty(page.getRecords())) {
+//          delByFileId(fileId);
+//          throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工！", null);
+//        }
         return fileId;
       } else {
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
@@ -130,5 +131,10 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
     } else {
       return null;
     }
+  }
+
+  @Override
+  public AccountApplyTotalDTO getUserCountAndTotalmount(String fileId) {
+    return tempAccountDepositApplyDao.getBaseMapper().getUserCountAndTotalmount(fileId);
   }
 }

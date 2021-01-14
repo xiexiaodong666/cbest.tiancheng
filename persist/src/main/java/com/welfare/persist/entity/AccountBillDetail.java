@@ -93,7 +93,7 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
      * 授信余额
      */
     @ApiModelProperty("授信余额")   
-    private BigDecimal surplusQuotaBalance;
+    private BigDecimal surplusQuota;
     /**
      * 创建人
      */

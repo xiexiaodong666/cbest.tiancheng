@@ -5,6 +5,7 @@ import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -55,4 +56,11 @@ public interface AccountAmountTypeService {
    * @return
    */
     List<AccountAmountDO> queryAccountAmountDO(Account account);
+
+    /**
+     * 计算除了额度的余额
+     * @param accountCode
+     * @return
+     */
+    BigDecimal sumBalanceExceptSurplusQuota(Long accountCode);
 }

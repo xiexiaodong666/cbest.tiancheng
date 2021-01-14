@@ -116,6 +116,17 @@
                 <artifactId>spring-boot-starter-aop</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
+            <!--killbill-queue事务性发件箱(Transactional Outbox)-->
+            <dependency>
+                <artifactId>killbill-queue</artifactId>
+                <groupId>org.kill-bill.commons</groupId>
+                <version>0.24.4</version>
+            </dependency>
+            <dependency>
+                <artifactId>ST4</artifactId>
+                <groupId>org.antlr</groupId>
+                <version>4.3.1</version>
+            </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>

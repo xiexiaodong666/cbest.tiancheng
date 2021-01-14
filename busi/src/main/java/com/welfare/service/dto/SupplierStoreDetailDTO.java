@@ -30,6 +30,8 @@ public class SupplierStoreDetailDTO {
      */
     @ApiModelProperty("商户名称")
     private String merName;
+    @ApiModelProperty("虚拟收银机号")
+    private String cashierNo;
     /**
      * 门店代码
      */
@@ -60,6 +62,8 @@ public class SupplierStoreDetailDTO {
      */
     @ApiModelProperty("创建人")  
     private String createUser;
+
+    private Integer status;
     /**
      * 创建日期
      */

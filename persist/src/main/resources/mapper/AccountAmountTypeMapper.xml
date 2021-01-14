@@ -23,5 +23,4 @@
         update_user =  values(updateUser),
         version = version + values(version)
     </insert>
-
 </mapper>

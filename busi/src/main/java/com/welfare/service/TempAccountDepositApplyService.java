@@ -1,6 +1,7 @@
 package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.TempAccountDepositApply;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,5 +43,6 @@ public interface TempAccountDepositApplyService {
   String getFileIdByRequestId(String requestId);
 
 
+  AccountApplyTotalDTO getUserCountAndTotalmount(String fileId);
 
 }

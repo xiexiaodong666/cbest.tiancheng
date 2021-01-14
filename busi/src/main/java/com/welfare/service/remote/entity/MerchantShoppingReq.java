@@ -24,7 +24,7 @@ public class MerchantShoppingReq implements Serializable {
   public static class ListBean  {
     private boolean canSelfCharge;
     private String merchantCode;
-    private String name;
+    private String merchantName;
     private List<AddressBean> address;
     private List<String> idTypes;
     @Data

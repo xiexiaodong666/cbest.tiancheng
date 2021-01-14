@@ -4,25 +4,22 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.domain.ApiUserInfo;
+import com.welfare.common.domain.UserInfo;
 import com.welfare.common.enums.MerCooperationModeEnum;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.persist.dao.MerDepositApplyFileDao;
 import com.welfare.persist.dao.MerchantCreditApplyDao;
 import com.welfare.persist.dto.MerchantCreditApplyInfoDTO;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
+import com.welfare.persist.entity.MerDepositApplyFile;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantCreditApply;
-import com.welfare.service.MerchantCreditApplyService;
-import com.welfare.service.MerchantCreditService;
-import com.welfare.service.MerchantService;
-import com.welfare.service.SequenceService;
+import com.welfare.service.*;
 import com.welfare.service.converter.MerchantCreditApplyConverter;
-import com.welfare.service.dto.*;
 import com.welfare.service.dto.merchantapply.*;
 import com.welfare.service.enums.ApprovalStatus;
-import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.utils.PageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 商户金额申请服务接口实现
@@ -57,9 +55,12 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     private final RedissonClient redissonClient;
     private final MerchantCreditService merchantCreditService;
     private final MerchantService merchantService;
+    private final MerDepositApplyFileDao depositApplyFileDao;
+    private final MerDepositApplyFileService merDepositApplyFileService;
 
     @Override
-    public String save(MerchantCreditApplyRequest request, ApiUserInfo user) {
+    @Transactional(rollbackFor = Exception.class)
+    public String save(MerchantCreditApplyRequest request, UserInfo user) {
         MerchantCreditApply apply = getByRequestId(request.getRequestId());
         if (apply != null) {
             return apply.getId()+"";
@@ -80,6 +81,16 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setApplyUser(user.getUserName());
                 apply.setApplyTime(new Date());
                 merchantCreditApplyDao.save(apply);
+                List<MerDepositApplyFile> files = new ArrayList<>();;
+                if (CollectionUtils.isNotEmpty(request.getEnclosures())) {
+                    for (String url : request.getEnclosures()) {
+                        MerDepositApplyFile file = new MerDepositApplyFile();
+                        file.setFileUrl(url);
+                        file.setMerDepositApplyCode(apply.getApplyCode());
+                        files.add(file);
+                    }
+                    depositApplyFileDao.saveBatch(files);
+                }
                 return String.valueOf(apply.getId());
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
@@ -101,7 +112,8 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     }
 
     @Override
-    public String update(MerchantCreditApplyUpdateReq request, ApiUserInfo user) {
+    @Transactional(rollbackFor = Exception.class)
+    public String update(MerchantCreditApplyUpdateReq request, UserInfo user) {
         MerchantCreditApply apply = merchantCreditApplyDao.getById(Long.parseLong(request.getId()));
         if (apply == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
@@ -125,8 +137,18 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setApplyType(request.getApplyType());
                 apply.setBalance(request.getBalance());
                 apply.setRemark(request.getRemark());
-                apply.setEnclosure(request.getEnclosure());
                 apply.setApplyUser(user.getUserName());
+                merDepositApplyFileService.delByMerDepositApplyCode(apply.getApplyCode());
+                List<MerDepositApplyFile> files = new ArrayList<>();;
+                if (CollectionUtils.isNotEmpty(request.getEnclosures())) {
+                    for (String url : request.getEnclosures()) {
+                        MerDepositApplyFile file = new MerDepositApplyFile();
+                        file.setFileUrl(url);
+                        file.setMerDepositApplyCode(apply.getApplyCode());
+                        files.add(file);
+                    }
+                    depositApplyFileDao.saveBatch(files);
+                }
                 merchantCreditApplyDao.saveOrUpdate(apply);
                 return apply.getId()+"";
             } else {
@@ -143,7 +165,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String approval(MerchantCreditApprovalReq request, ApiUserInfo user) {
+    public String approval(MerchantCreditApprovalReq request, UserInfo user) {
         MerchantCreditApply apply = merchantCreditApplyDao.getById(Long.parseLong(request.getId()));
         if (apply == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
@@ -194,14 +216,20 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在！", null);
         }
         MerchantCreditApplyInfo info = creditApplyConverter.toInfo(apply);
+        List<MerDepositApplyFile> fileUrls = merDepositApplyFileService.listByMerDepositApplyCode(apply.getApplyCode());
         info.setId(apply.getId()+"");
         Merchant merchant = merchantService.detailByMerCode(apply.getMerCode());
         info.setMerName(merchant.getMerName());
+        List<String> list = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(fileUrls)) {
+            list = fileUrls.stream().map(MerDepositApplyFile::getFileUrl).collect(Collectors.toList());
+        }
+        info.setEnclosures(list);
         return info;
     }
 
     @Override
-    public Page<MerchantCreditApplyInfo> page(Integer current, Integer size, MerchantCreditApplyQueryReq query, ApiUserInfo user) {
+    public Page<MerchantCreditApplyInfo> page(Integer current, Integer size, MerchantCreditApplyQueryReq query, UserInfo user) {
         Page<MerchantCreditApply> page = new Page<>();
         page.setCurrent(current);
         page.setSize(size);
@@ -223,7 +251,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     }
 
     @Override
-    public List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQueryReq query, ApiUserInfo user) {
+    public List<MerchantCreditApplyExcelInfo> list(MerchantCreditApplyQueryReq query, UserInfo user) {
         List<MerchantCreditApplyInfoDTO> result =  merchantCreditApplyDao.getBaseMapper().queryByPage(query);
         List<MerchantCreditApplyExcelInfo> infos = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(result)) {

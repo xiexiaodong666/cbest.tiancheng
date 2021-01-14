@@ -23,8 +23,8 @@ public class AccountDepositRequest {
   /**
    * 员工账号
    */
-  @ApiModelProperty(name = "员工账号", required = true)
-  private Long accountCode;
+  @ApiModelProperty(name = "员工(手机号)账号", required = true)
+  private String phone;
 
   /**
    * 申请充值总额

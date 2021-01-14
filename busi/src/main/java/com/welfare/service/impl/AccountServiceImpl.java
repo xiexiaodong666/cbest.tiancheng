@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
@@ -17,14 +18,17 @@ import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.dto.AccountBillMapperDTO;
 import com.welfare.persist.dto.AccountDetailMapperDTO;
+import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.persist.mapper.AccountMapper;
+import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.DepartmentService;
@@ -36,7 +40,9 @@ import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountBindCardDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
+import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.dto.AccountUploadDTO;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
@@ -87,6 +93,7 @@ public class AccountServiceImpl implements AccountService {
   private final MerchantService merchantService;
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
+  private final AccountChangeEventRecordService accountChangeEventRecordService;
 
 
   @Override
@@ -96,6 +103,11 @@ public class AccountServiceImpl implements AccountService {
             accountPageReq.getDepartmentCode(), accountPageReq.getAccountStatus(),
             accountPageReq.getAccountTypeCode());
     return accountConverter.toPage(iPage);
+  }
+
+  @Override
+  public List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq) {
+    return accountCustomizeMapper.queryIncrementDTO(accountIncrementReq.getStoreCode(),accountIncrementReq.getSize(),accountIncrementReq.getChangeEventId());
   }
 
   @Override
@@ -206,16 +218,39 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  public AccountDetailDTO queryDetailByAccountCode(String accountCode) {
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByAccountCode(accountCode);
+    AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
+    BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
+    return accountDetailDTO;
+  }
+
+  @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean save(Account account) {
     validationAccount(account,true);
     Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
+
+    AccountChangeEventRecord accountChangeEventRecord = assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, accounCode,account.getCreateUser());
+    accountChangeEventRecordService.save(accountChangeEventRecord);
+
     account.setAccountCode(accounCode);
+    account.setChangeEventId(accountChangeEventRecord.getId());
     boolean result = accountDao.save(account);
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(account);
     this.syncAccount(ShoppingActionTypeEnum.ADD,
         Arrays.asList(accountSyncDTO));
     return result;
+  }
+
+  private AccountChangeEventRecord assemableChangeEvent(AccountChangeType accountChangeType, Long accounCode,String createUser) {
+    AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
+    accountChangeEventRecord.setAccountCode(accounCode);
+    accountChangeEventRecord.setChangeType(accountChangeType.getChangeType());
+    accountChangeEventRecord.setChangeValue(accountChangeType.getChangeValue());
+    accountChangeEventRecord.setCreateTime(new Date());
+    accountChangeEventRecord.setCreateUser(createUser);
+    return accountChangeEventRecord;
   }
 
   private AccountSyncDTO getAccountSyncDTO(Account account) {
@@ -350,5 +385,19 @@ public class AccountServiceImpl implements AccountService {
           }
         }
     );
+  }
+
+  @Override
+  public AccountSimpleDTO queryAccountInfo(Long accountCode) {
+    Account account = getByAccountCode(accountCode);
+    AccountSimpleDTO accountSimpleDTO = new AccountSimpleDTO();
+    String merCode = account.getMerCode();
+    Merchant merchant = merchantService.getMerchantByMerCode(merCode);
+    accountSimpleDTO.setMerName(merchant.getMerName());
+    accountSimpleDTO.setAccountCode(account.getAccountCode());
+    accountSimpleDTO.setAccountName(account.getAccountName());
+    accountSimpleDTO.setAccountBalance(account.getAccountBalance());
+    accountSimpleDTO.setSurplusQuota(account.getSurplusQuota());
+    return accountSimpleDTO;
   }
 }

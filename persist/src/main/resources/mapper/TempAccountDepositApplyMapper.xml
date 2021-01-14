@@ -6,11 +6,12 @@
     </sql>
 
     <sql id="baseColumn">
-        id,file_id,account_code,recharge_amount,request_id
+        id,file_id,phone,recharge_amount,request_id
     </sql>
 
     <resultMap id="tempAccountDepositApplyDTO" type="com.welfare.persist.dto.TempAccountDepositApplyDTO">
         <id property="id" column="id" />
+        <result property="phone" column="phone"/>
         <result property="accountCode" column="account_code"/>
         <result property="accountName" column="account_name"/>
         <result property="rechargeAmount" column="recharge_amount"/>
@@ -18,17 +19,33 @@
         <result property="departmentName" column="department_name"/>
     </resultMap>
 
+    <resultMap id="tempAccountApplyTotalDTO" type="com.welfare.persist.dto.AccountApplyTotalDTO">
+        <id property="id" column="id" />
+        <result property="userCount" column="userCount"/>
+        <result property="totalAmount" column="totalAmount"/>
+    </resultMap>
+
     <select id="pageByFileIdByExistAccount" resultMap="tempAccountDepositApplyDTO">
         SELECT
          t.id,
          a.account_name,
          t.account_code,
+         t.phone,
          t.recharge_amount,
          a.store_code,
          de.department_name
         from temp_account_deposit_apply t
-            LEFT JOIN account a ON t.account_code = a.account_code
+            LEFT JOIN account a ON t.phone = a.phone
             LEFT JOIN department de ON de.department_code = a.store_code
+        where file_id = #{fileId} and a.deleted = 0
+    </select>
+
+    <select id="getUserCountAndTotalmount" resultMap="tempAccountApplyTotalDTO">
+        SELECT
+        count(DISTINCT t.account_code) as userCount,
+        SUM(t.recharge_amount) as totalAmount
+        from temp_account_deposit_apply t
+        LEFT JOIN account a ON t.phone = a.phone
         where file_id = #{fileId} and a.deleted = 0
     </select>
 </mapper>

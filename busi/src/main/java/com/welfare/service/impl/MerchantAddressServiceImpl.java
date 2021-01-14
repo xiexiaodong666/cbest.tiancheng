@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import  com.welfare.persist.dao.MerchantAddressDao;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.service.converter.MerchantAddressConverter;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantAddressService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,8 +35,21 @@ public class MerchantAddressServiceImpl implements MerchantAddressService {
     }
 
     @Override
-    public boolean saveOrUpdateBatch(List<MerchantAddressDTO> list) {
-
+    @Transactional(rollbackFor = Exception.class)
+    public boolean saveOrUpdateBatch(List<MerchantAddressDTO> list,String relatedType,Long relatedId) {
+        delete(relatedType,relatedId);
+        list.forEach(item->{
+            item.setRelatedId(relatedId);
+            item.setRelatedType(relatedType);
+        });
         return merchantAddressDao.saveOrUpdateBatch(merchantAddressConverter.toE(list));
+    }
+
+    @Override
+    public boolean delete(String relatedType,Long relatedId) {
+        QueryWrapper<MerchantAddress> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq(MerchantAddress.RELATED_TYPE,relatedType);
+        queryWrapper.eq(MerchantAddress.RELATED_ID,relatedId);
+        return merchantAddressDao.remove(queryWrapper);
     }
 }

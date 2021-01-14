@@ -2,7 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
-import com.welfare.common.util.ApiUserHolder;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
 import com.welfare.service.MerchantCreditApplyService;
 import com.welfare.service.dto.merchantapply.*;
@@ -48,7 +48,7 @@ public class MerchantCreditApplyController implements IController {
     public R<Page<MerchantCreditApplyInfo>> page(@RequestBody  MerchantCreditApplyQuery query){
         MerchantCreditApplyQueryReq req = new MerchantCreditApplyQueryReq();
         BeanUtils.copyProperties(query,req);
-        Page<MerchantCreditApplyInfo> page = applyService.page(query.getCurrent(), query.getSize() == 0? 10 : query.getSize(), req, ApiUserHolder.getUserInfo());
+        Page<MerchantCreditApplyInfo> page = applyService.page(query.getCurrent(), query.getSize() == 0? 10 : query.getSize(), req, UserInfoHolder.getUserInfo());
         return success(page);
     }
 
@@ -63,7 +63,7 @@ public class MerchantCreditApplyController implements IController {
     @ApiOperation("修改商户额度申请")
     @ApiUser
     public R<String> update(@Validated @RequestBody MerchantCreditApplyUpdateReq request){
-        return success(applyService.update(request, ApiUserHolder.getUserInfo()));
+        return success(applyService.update(request, UserInfoHolder.getUserInfo()));
     }
 
     @PostMapping("/export")
@@ -72,7 +72,7 @@ public class MerchantCreditApplyController implements IController {
     public R<String> export(@Validated @RequestBody MerchantCreditApplyQuery query) throws IOException {
         MerchantCreditApplyQueryReq req = new MerchantCreditApplyQueryReq();
         BeanUtils.copyProperties(query,req);
-        List<MerchantCreditApplyExcelInfo> list = applyService.list(req, ApiUserHolder.getUserInfo());
+        List<MerchantCreditApplyExcelInfo> list = applyService.list(req, UserInfoHolder.getUserInfo());
         String path = fileUploadService.uploadExcelFile(list, MerchantCreditApplyExcelInfo.class, "商户额度申请");
         return success(fileUploadService.getFileServerUrl(path));
     }
@@ -82,13 +82,13 @@ public class MerchantCreditApplyController implements IController {
     @ApiUser
     public R<String> approval(@Validated @RequestBody MerchantCreditApprovalReq request){
 
-        return success(applyService.approval(request, ApiUserHolder.getUserInfo()));
+        return success(applyService.approval(request, UserInfoHolder.getUserInfo()));
     }
 
     @PostMapping("/save")
     @ApiOperation("新增商户额度申请")
     @ApiUser
     public R<String> save(@Validated @RequestBody MerchantCreditApplyRequest request){
-        return success(applyService.save(request, ApiUserHolder.getUserInfo()));
+        return success(applyService.save(request, UserInfoHolder.getUserInfo()));
     }
 }

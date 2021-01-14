@@ -2,6 +2,7 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
 
@@ -25,4 +26,5 @@ public interface AccountDepositApplyDetailService {
 
   List<AccountDepositApplyDetail> listByApplyCodeIfAccountExist(String applyCode);
 
+  AccountApplyTotalDTO getUserCountAndTotalmount(Long id);
 }

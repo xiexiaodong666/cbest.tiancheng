@@ -53,7 +53,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(rollbackFor = Exception.class)
     public List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest) {
         Long accountCode = paymentRequest.calculateAccountCode();
-        BigDecimal amount = paymentRequest.getAmount();
 
         Account account = accountService.getByAccountCode(accountCode);
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
@@ -120,7 +119,9 @@ public class PaymentServiceImpl implements PaymentService {
         accountDeductionDetailDao.saveBatch(deductionDetails);
         accountAmountTypeDao.updateBatchById(accountTypes);
         BigDecimal balanceSum = accountAmountTypeService.sumBalanceExceptSurplusQuota(account.getAccountCode());
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(account.getAccountCode(), SURPLUS_QUOTA.code());
         account.setAccountBalance(balanceSum);
+        account.setSurplusQuota(accountAmountType.getAccountBalance());
         accountDao.updateById(account);
     }
 
@@ -234,8 +235,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .reduce(BigDecimal.ZERO,BigDecimal::add);
         accountBillDetail.setAccountBalance(accountBalance);
         accountBillDetail.setSurplusQuota(accountSurplusQuota);
-        AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(paymentRequest.calculateAccountCode());
-        accountBillDetail.setSurplusQuota(surplusQuota.getAccountBalance());
         return accountBillDetail;
     }
 }

@@ -48,6 +48,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         try {
             MerchantUserHolder.release();
+            UserInfoHolder.release();
         } catch (Exception e) {
             log.error("MerchantUserHolder.release error.", e);
         }

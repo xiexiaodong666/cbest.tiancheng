@@ -38,7 +38,6 @@ public class CommonFieldObjectHandler implements MetaObjectHandler {
     public void updateFill(MetaObject metaObject) {
         log.debug("ready to fill on update operation ....");
         UserInfo userInfo = UserInfoHolder.getUserInfo();
-        //todo 获取用户信息
         this.setFieldValByName(UPDATER, userInfo.getUserId(), metaObject);
         this.setFieldValByName(UPDATE_TIME, Calendar.getInstance().getTime(), metaObject);
     }

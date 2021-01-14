@@ -103,6 +103,10 @@ public class Merchant extends Model<Merchant> implements Serializable {
      */
     @ApiModelProperty("状态")   
     private Integer status;
+
+    @ApiModelProperty("删除标记")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Boolean deleted;
     /**
      * 版本
      */

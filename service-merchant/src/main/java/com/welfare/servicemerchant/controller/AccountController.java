@@ -77,6 +77,12 @@ public class AccountController implements IController {
     return success(accountService.queryDetail(Long.parseLong(id)));
   }
 
+  @GetMapping("/detailByAccountCode")
+  @ApiOperation("通过账号获取员工账号详情")
+  public R<AccountDetailDTO> detailByAccountCode(@RequestParam @ApiParam("员工账号")  String accountCode) {
+    return success(accountService.queryDetailByAccountCode(accountCode));
+  }
+
   @PostMapping("/save")
   @ApiOperation("新增员工账号")
   public R<Boolean> save(@RequestBody AccountReq accountReq) {

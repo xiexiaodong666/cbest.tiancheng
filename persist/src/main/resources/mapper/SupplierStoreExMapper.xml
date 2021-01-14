@@ -28,6 +28,12 @@
             <if test="req.endTime!=null">
                 and ss.create_time &lt;= #{req.endTime}
             </if>
+            <if test="req.storeCodes != null and req.storeCodes.size()>0" >
+                and ss.store_code not in
+                <foreach close=")" collection="req.storeCodes" item="item" open="(" separator=", ">
+                    #{item}
+                </foreach>
+            </if>
         </where>
     </select>
 

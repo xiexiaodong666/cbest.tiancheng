@@ -3,14 +3,17 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantDao;
+import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.mapper.MerchantExMapper;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
@@ -27,9 +30,13 @@ import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.sync.event.MerchantAddEvt;
 import com.welfare.service.sync.event.MerchantUpdateEvt;
 import com.welfare.service.utils.TreeUtil;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +63,7 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantDetailConverter merchantDetailConverter;
     private final SequenceService sequenceService;
     private final ApplicationContext applicationContext;
-
+    private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantWithCreditConverter merchantWithCreditConverter;
 
 
@@ -97,6 +104,25 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public List<MerchantWithCreditAndTreeDTO> tree( MerchantPageReq merchantPageReq) {
         List<MerchantWithCreditDTO> list = merchantExMapper.listWithCredit( merchantPageReq);
+
+
+        if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(merchantPageReq.getSource())) {
+
+            QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
+            queryWrapper.groupBy(MerchantStoreRelation.MER_CODE);
+
+            List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
+                queryWrapper);
+            if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
+                List<String> storeCodeList = merchantStoreRelations.stream().map(
+                    MerchantStoreRelation::getStoreCode).collect(Collectors.toList());
+                Set<String> storeCodeSet = new HashSet<>(storeCodeList);
+
+                merchantPageReq.setStoreCodes(storeCodeSet);
+                list = merchantExMapper.listWithCredit(merchantPageReq);
+            }
+        }
+
         if(EmptyChecker.isEmpty(list)){
             return new ArrayList<>();
         }

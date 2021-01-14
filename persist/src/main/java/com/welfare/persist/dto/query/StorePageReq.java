@@ -1,6 +1,8 @@
 package com.welfare.persist.dto.query;
 
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +31,13 @@ public class StorePageReq {
      */
     @ApiModelProperty("来源")
     private String source;
+
+    /**
+     * 来源
+     */
+    @ApiModelProperty("来源")
+    private Set<String> storeCodes;
+
 
     @ApiModelProperty("开始时间")
     private Date startTime;

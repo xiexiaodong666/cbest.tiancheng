@@ -10,9 +10,11 @@ import com.welfare.persist.entity.Merchant;
 import com.welfare.service.CardApplyService;
 import com.welfare.service.CardInfoService;
 import com.welfare.service.MerchantService;
+import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,9 @@ public class CardController implements IController {
   private final MerchantService merchantService;
 
   private final CardApplyService applyService;
+
+  private final FileUploadService fileUploadService;
+
   @GetMapping("/{cardNo}")
   @ApiOperation("根据卡号获取卡信息")
   public R<CardInfo> queryCardInfo(@PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo) {
@@ -78,7 +83,7 @@ public class CardController implements IController {
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,
       @RequestParam(required = false) @ApiParam("卡片类型") String cardType,
       @RequestParam(required = false) @ApiParam("卡片介质") String cardMedium,
-      @RequestParam(required = false) @ApiParam("卡片状态") String cardStatus,
+      @RequestParam(required = false) @ApiParam("卡片状态") Integer cardStatus,
       @RequestParam(required = false) @ApiParam("入库查询开始时间") Date writtenStartTime,
       @RequestParam(required = false) @ApiParam("入库查询结束时间") Date writtenEndTime,
       @RequestParam(required = false) @ApiParam("申请开始时间") Date startTime,
@@ -92,6 +97,32 @@ public class CardController implements IController {
                                         writtenEndTime, startTime,
                                         endTime, bindStartTime, bindEndTime
     ));
+
+  }
+
+  @GetMapping("/export")
+  @ApiOperation("导出卡片信息")
+  public R<String> exportCardInfo(
+      @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
+      @RequestParam(required = false) @ApiParam("所属商户") String merCode,
+      @RequestParam(required = false) @ApiParam("卡片类型") String cardType,
+      @RequestParam(required = false) @ApiParam("卡片介质") String cardMedium,
+      @RequestParam(required = false) @ApiParam("卡片状态") Integer cardStatus,
+      @RequestParam(required = false) @ApiParam("入库查询开始时间") Date writtenStartTime,
+      @RequestParam(required = false) @ApiParam("入库查询结束时间") Date writtenEndTime,
+      @RequestParam(required = false) @ApiParam("申请开始时间") Date startTime,
+      @RequestParam(required = false) @ApiParam("申请结束时间") Date endTime,
+      @RequestParam(required = false) @ApiParam("绑定查询开始时间") Date bindStartTime,
+      @RequestParam(required = false) @ApiParam("绑定查询结束时间") Date bindEndTime) throws IOException {
+
+    List<CardInfoDTO> exportList = cardInfoService.exportCardInfo(cardName,
+                                   merCode, cardType, cardMedium,
+                                   cardStatus, writtenStartTime,
+                                   writtenEndTime, startTime,
+                                   endTime, bindStartTime, bindEndTime
+    );
+    String path = fileUploadService.uploadExcelFile(exportList, CardInfoDTO.class, "卡片信息");
+    return success(fileUploadService.getFileServerUrl(path));
 
   }
 

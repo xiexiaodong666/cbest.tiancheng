@@ -50,7 +50,12 @@ public interface CardInfoService {
    * @return
    */
   Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String applyCode, String cardName, String merCode,
-      String cardType, String cardMedium, String cardStatus, Date writtenStartTime,
+      String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
+      Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
+      Date bindEndTime);
+
+  List<CardInfoDTO> exportCardInfo( String cardName, String merCode,
+      String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
       Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
       Date bindEndTime);
 }

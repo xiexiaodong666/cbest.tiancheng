@@ -43,7 +43,7 @@ public class MerchantAccountOperation {
         merchantBillDetail.setBalanceType(operateType.code());
         merchantBillDetail.setTransAmount(amount);
         merchantBillDetail.setTransType(operateType.code());
-        merchantBillDetail.setTransNo(Integer.valueOf(transNo));
+        merchantBillDetail.setTransNo(transNo);
         merchantBillDetail.setMerCode(merchantCredit.getMerCode());
         merchantBillDetail.setCurrentBalance(merchantCredit.getCurrentBalance());
         merchantBillDetail.setRebateLimit(merchantCredit.getRebateLimit());

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 /**
  * @author hao.yin
  * @version 1.0.0
@@ -17,6 +19,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(value = Include.NON_NULL)
-public class MerchantAddEvt extends MerchantEvt {
-
+public class SupplierStoreActivateEvt extends SupplierStoreEvt {
 }

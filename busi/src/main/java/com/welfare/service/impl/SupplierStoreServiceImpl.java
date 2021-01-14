@@ -49,9 +49,15 @@ import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
+import com.welfare.service.sync.event.SupplierStoreActivateEvt;
+import com.welfare.service.sync.event.SupplierStoreAddEvt;
+import com.welfare.service.sync.event.SupplierStoreBatchAddEvt;
+import com.welfare.service.sync.event.SupplierStoreDeleteEvt;
+import com.welfare.service.sync.event.SupplierStoreUpdateEvt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -77,7 +83,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     private final SupplierStoreExMapper supplierStoreExMapper;
 
     private final MerchantService merchantService;
-
+    private final ApplicationContext applicationContext;
     private final ObjectMapper mapper;
     private final SupplierStoreDetailConverter supplierStoreDetailConverter;
     private final ShoppingFeignClient shoppingFeignClient;
@@ -174,7 +180,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         //同步商城中台
         List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
         syncList.add(supplierStore);
-        syncShoppingAfterCommit(ShoppingActionTypeEnum.ADD, syncList);
+        applicationContext.publishEvent(SupplierStoreAddEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
         return flag;
     }
 
@@ -191,16 +197,15 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         //同步商城中台
         List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
         syncList.add(supplierStoreDetailConverter.toD(supplierStore));
-        syncShoppingAfterCommit(ShoppingActionTypeEnum.UPDATE, syncList);
+        applicationContext.publishEvent(SupplierStoreActivateEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
         return flag;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public boolean batchAdd(List<SupplierStore> list) {
         boolean flag = supplierStoreDao.saveBatch(list);
-        ;
         //同步商城中台
-        syncShoppingAfterCommit(ShoppingActionTypeEnum.UPDATE, supplierStoreDetailConverter.toD(list));
+        applicationContext.publishEvent(SupplierStoreBatchAddEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(supplierStoreDetailConverter.toD(list)).build());
         return flag;
     }
 
@@ -239,7 +244,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         //同步商城中台
         List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
         syncList.add(supplierStoreDetailConverter.toD(supplierStore));
-        syncShoppingAfterCommit(ShoppingActionTypeEnum.DELETE, syncList);
+        applicationContext.publishEvent(SupplierStoreDeleteEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).build());
         return flag;
     }
 
@@ -260,7 +265,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         //同步商城中台
         List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
         syncList.add(supplierStore);
-        syncShoppingAfterCommit(ShoppingActionTypeEnum.DELETE, syncList);
+        applicationContext.publishEvent(SupplierStoreUpdateEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
         return flag && flag2 && flag3;
     }
 
@@ -326,67 +331,4 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         return merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);
     }
 
-    private void syncShoppingAfterCommit(ShoppingActionTypeEnum typeEnum, List<SupplierStoreDetailDTO> supplierStoreDetailDTOS) {
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronizationAdapter() {
-                    @Override
-                    public void afterCommit() {
-                      syncShopping( typeEnum, supplierStoreDetailDTOS);
-                    }
-                });
-    }
-    @Override
-    public  void syncShopping(ShoppingActionTypeEnum typeEnum, List<SupplierStoreDetailDTO> supplierStoreDetailDTOS) {
-        log.info("同步类型【{}】，同步入参【{}】", typeEnum.getCode(), JSON.toJSONString(supplierStoreDetailDTOS));
-        if (EmptyChecker.isEmpty(supplierStoreDetailDTOS)) {
-            return;
-        }
-
-        StoreShoppingReq storeShoppingReq = new StoreShoppingReq();
-        List<StoreShoppingReq.ListBean> listBeans = new ArrayList<>();
-        List<String> storeCodeList = new ArrayList<>();
-        for (SupplierStoreDetailDTO supplierStoreDetailDTO : supplierStoreDetailDTOS) {
-            StoreShoppingReq.ListBean listBean = new StoreShoppingReq.ListBean();
-            Map<String, Boolean> consumeTypeMap = null;
-            try {
-                consumeTypeMap = mapper.readValue(
-                        supplierStoreDetailDTO.getConsumType(), Map.class);
-            } catch (JsonProcessingException e) {
-                log.info("同步门店信息到商城中心，消费类型转换失败{}", supplierStoreDetailDTO.getConsumType());
-                continue;
-            }
-            listBean.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
-            listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
-            listBean.setStoreName(supplierStoreDetailDTO.getStoreName());
-            listBean.setStoreCode(supplierStoreDetailDTO.getStoreCode());
-            listBean.setEnabled(supplierStoreDetailDTO.getStatus().equals(1));
-            //门店相关地址
-            List<StoreShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
-            for (MerchantAddressDTO addressDTO : supplierStoreDetailDTO.getAddressList()) {
-                StoreShoppingReq.ListBean.AddressBean addressBean = new StoreShoppingReq.ListBean.AddressBean();
-                addressBean.setAddress(addressDTO.getAddress());
-                addressBean.setAddressType(addressDTO.getAddressType());
-                addressBean.setName(addressDTO.getAddressName());
-            }
-            listBean.setAddress(addressBeans);
-            listBeans.add(listBean);
-            storeCodeList.add(supplierStoreDetailDTO.getStoreCode());
-        }
-        storeShoppingReq.setActionType(typeEnum.getCode());
-        storeShoppingReq.setRequestId(GenerateCodeUtil.UUID());
-        storeShoppingReq.setTimestamp(new Date());
-        storeShoppingReq.setList(listBeans);
-        RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateStore(storeShoppingReq);
-        if (("0000").equals(resp.getCode())) {
-            SupplierStore update = new SupplierStore();
-            update.setSyncStatus(1);
-            QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
-            queryWrapper.in(SupplierStore.STORE_CODE, storeCodeList);
-            supplierStoreDao.update(update, queryWrapper);
-        } else {
-            log.info("同步门店数据到商城中心失败msg【{}】", resp.getMsg());
-        }
-
-
-    }
 }

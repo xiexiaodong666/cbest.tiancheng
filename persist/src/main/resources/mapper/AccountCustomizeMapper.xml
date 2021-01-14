@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.AccountCustomizeMapper">
   <sql id="tableName">
         account
@@ -8,25 +9,25 @@
   <sql id="baseColumn">
         id,account_name,account_code,account_type_code,mer_code,store_code,account_status,staff_status,binding,create_user,create_time,update_user,update_time,account_balance,flag,version,phone
     </sql>
-  <select id ="queryPageDTO" resultType="com.welfare.persist.dto.AccountPageDTO">
+  <select id="queryPageDTO" resultType="com.welfare.persist.dto.AccountPageDTO">
     SELECT
-	a.id,
-	a.account_name AS accountName,
-	a.account_code AS accountCode,
-	a.account_status AS accountStatus,
-	d.department_code AS departmentCode,
-	d.department_name AS departmentName,
-	at.type_name AS accountTypeName,
-	a.max_quota AS maxQuota,
-	a.surplus_quota AS surplusQuota,
-  GROUP_CONCAT(ci.card_id) AS cardId,
-	a.account_balance AS accountBalance
-FROM
-	account a
-	INNER JOIN department d ON a.store_code = d.department_code
-	LEFT JOIN account_type at ON at.type_code = a.account_type_code
-	LEFT JOIN card_info ci ON ci.account_code = a.account_code
-  where a.deleted = 0 and d.deleted =0 and at.deleted =0
+    a.id,
+    a.account_name AS accountName,
+    a.account_code AS accountCode,
+    a.account_status AS accountStatus,
+    d.department_code AS departmentCode,
+    d.department_name AS departmentName,
+    at.type_name AS accountTypeName,
+    a.max_quota AS maxQuota,
+    a.surplus_quota AS surplusQuota,
+    GROUP_CONCAT(ci.card_id) AS cardId,
+    a.account_balance AS accountBalance
+    FROM
+    account a
+    INNER JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN account_type at ON at.type_code = a.account_type_code
+    LEFT JOIN card_info ci ON ci.account_code = a.account_code
+    where a.deleted = 0 and d.deleted =0 and at.deleted =0
     <if test=" merCode !='' and merCode != null ">
       and a.mer_code = #{merCode} and at.mer_code = #{merCode}
     </if>
@@ -45,7 +46,7 @@ FROM
     GROUP BY a.account_code
   </select>
 
-  <select id ="queryDetail" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
+  <select id="queryDetail" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
     SELECT
 	a.id,
 	a.account_name AS accountName,
@@ -72,56 +73,90 @@ WHERE
 	AND a.id = #{id}
   </select>
 
-	<select id="queryAccountBillDetail" resultType="com.welfare.persist.dto.AccountBillDetailMapperDTO">
+  <select id="queryAccountBillDetail"
+    resultType="com.welfare.persist.dto.AccountBillDetailMapperDTO">
+    SELECT
+    ss.store_name AS storeName,
+    abd.trans_type AS transType,
+    abd.trans_amount AS transAmount,
+    abd.create_time AS createTime,
+    abd.account_balance AS accountBalance
+    FROM
+    account_bill_detail abd
+    LEFT JOIN supplier_store ss ON ss.store_code = abd.store_code
+    WHERE
+    abd.account_code = #{accountCode}
+    <if test="createTimeStart != null ">
+      and acs.create_time <![CDATA[>=]]> #{createTimeStart}
+    </if>
+    <if test="createTimeEnd != null ">
+      and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
+    </if>
+  </select>
+
+  <select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">
+    SELECT
+    abd.account_code AS accountCode,
+    SUM(
+    CASE
+
+    WHEN abd.trans_type = 1 THEN
+    trans_amount
+    WHEN abd.trans_type = 2 THEN
+    trans_amount * ( - 1 )
+    WHEN abd.trans_type = 3 THEN
+    trans_amount
+    WHEN abd.trans_type = 4 THEN
+    trans_amount * ( - 1 )
+    END
+    ) AS accountTotalAmount,
+    COUNT( abd.id ) AS tradeNum,
+    a.account_balance AS accountBalance
+    FROM
+    account_bill_detail abd
+    LEFT JOIN account a ON a.account_code = abd.account_code
+    WHERE
+    abd.account_code = #{accountCode}
+    <if test="createTimeStart != null ">
+      and acs.create_time <![CDATA[>=]]> #{createTimeStart}
+    </if>
+    <if test="createTimeEnd != null ">
+      and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
+    </if>
+  </select>
+
+  <select id="queryIncrementDTO" resultType="com.welfare.persist.dto.AccountIncrementDTO">
 		SELECT
-	ss.store_name AS storeName,
-	abd.trans_type AS transType,
-	abd.trans_amount AS transAmount,
-	abd.create_time AS createTime,
-	abd.account_balance AS accountBalance
+	a.account_code AS accountCode,
+	a.change_event_id AS changeEventId,
+	a.account_balance AS accountBalance,
+	GROUP_CONCAT( ci.magnetic_stripe ) AS magneticStripe,
+CASE
+
+	WHEN (
+	a.deleted = 0
+AND AT.deleted = 0
+AND acs.deleted = 0
+AND a.account_status = 1
+AND acs.`status` = 1
+AND locate( relation.scene_consum_type, "shopShopping" ) > 0
+	) THEN
+	TRUE ELSE FALSE
+	END AS canUse
 FROM
-	account_bill_detail abd
-	LEFT JOIN supplier_store ss ON ss.store_code = abd.store_code
+	account a
+	LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
+	LEFT JOIN account_consume_scene acs ON acs.account_type_code = AT.type_code
+	LEFT JOIN account_consume_scene_store_relation relation ON relation.account_consume_scene_id = acs.id
+	LEFT JOIN card_info ci ON a.account_code = ci.account_code
 WHERE
-	abd.account_code = #{accountCode}
-		<if test="createTimeStart != null ">
-			and acs.create_time <![CDATA[>=]]> #{createTimeStart}
-		</if>
-		<if test="createTimeEnd != null ">
-			and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
-		</if>
-	</select>
-
-	<select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">
-		SELECT
-		abd.account_code AS accountCode,
-		SUM(
-		CASE
-
-		WHEN abd.trans_type = 1 THEN
-		trans_amount
-		WHEN abd.trans_type = 2 THEN
-		trans_amount * ( - 1 )
-		WHEN abd.trans_type = 3 THEN
-		trans_amount
-		WHEN abd.trans_type = 4 THEN
-		trans_amount * ( - 1 )
-		END
-		) AS accountTotalAmount,
-		COUNT( abd.id ) AS tradeNum,
-		a.account_balance AS accountBalance
-		FROM
-		account_bill_detail abd
-		LEFT JOIN account a ON a.account_code = abd.account_code
-		WHERE
-		abd.account_code = #{accountCode}
-		<if test="createTimeStart != null ">
-			and acs.create_time <![CDATA[>=]]> #{createTimeStart}
-		</if>
-		<if test="createTimeEnd != null ">
-			and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
-		</if>
-
+	relation.store_code = #{storeCode}
+	AND a.change_event_id > #{changeEventId}
+GROUP BY
+	a.account_code
+ORDER BY
+	a.change_event_id ASC
+LIMIT #{size}
 	</select>
 
 </mapper>

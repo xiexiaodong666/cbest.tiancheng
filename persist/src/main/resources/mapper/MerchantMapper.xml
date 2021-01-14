@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,mer_name,mer_code,mer_type,mer_identity,mer_cooperation_mode,self_recharge,remark,create_user,create_time,update_user,update_time,status,version,sync_status
+        id,mer_name,mer_code,mer_type,mer_identity,mer_cooperation_mode,self_recharge,remark,create_user,create_time,update_user,update_time,status,version
     </sql>
 
 </mapper>

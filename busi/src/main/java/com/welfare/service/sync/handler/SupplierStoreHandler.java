@@ -1,7 +1,5 @@
 package com.welfare.service.sync.handler;
 
-import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -11,12 +9,9 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.GenerateCodeUtil;
-import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.MerchantAddressDTO;
-import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
-import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
 import com.welfare.service.sync.event.SupplierStoreEvt;
@@ -27,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

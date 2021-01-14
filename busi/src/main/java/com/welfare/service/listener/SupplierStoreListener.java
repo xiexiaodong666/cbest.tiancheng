@@ -51,7 +51,6 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     store.setStatus(0);
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
     store.setConsumType(defaultConsumType);
-    store.setSyncStatus(0);
     list.add(store);
     merCodeList.add(store.getMerCode());
     storeCodeList.add(store.getStoreCode());

@@ -174,7 +174,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
             throw new BusiException("门店编码已存在");
         }
         SupplierStore save = supplierStoreDetailConverter.toE((supplierStore));
-        save.setSyncStatus(0);
         save.setStoreParent(save.getMerCode() + "-" + save.getStoreCode());
         boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
         //同步商城中台
@@ -259,7 +258,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         }
         supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
         SupplierStore update = supplierStoreDetailConverter.toE((supplierStore));
-        update.setSyncStatus(0);
         boolean flag = supplierStoreDao.updateById(update);
         boolean flag3 = merchantAddressService.saveOrUpdateBatch(supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
         //同步商城中台

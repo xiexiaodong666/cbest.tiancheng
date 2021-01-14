@@ -129,7 +129,6 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean add(MerchantDetailDTO merchant) {
         merchant.setMerCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_CODE.code()).toString());
         Merchant save =merchantDetailConverter.toE(merchant);
-        save.setSyncStatus(0);
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         //同步商城中台
@@ -143,7 +142,6 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantDetailDTO merchant) {
         Merchant update=merchantDetailConverter.toE(merchant);
-        update.setSyncStatus(0);
         boolean flag= merchantDao.updateById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
         //同步商城中台

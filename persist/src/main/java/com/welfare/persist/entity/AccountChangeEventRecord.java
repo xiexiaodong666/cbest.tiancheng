@@ -1,5 +1,7 @@
 package com.welfare.persist.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import java.util.Date;
@@ -22,6 +24,8 @@ public class AccountChangeEventRecord {
   private Long accountCode;
   private String changeType;
   private String changeValue;
+  @TableField(fill = FieldFill.INSERT_UPDATE)
   private String createUser;
+  @TableField(fill = FieldFill.INSERT_UPDATE)
   private Date createTime;
 }

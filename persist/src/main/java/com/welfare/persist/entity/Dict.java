@@ -3,6 +3,7 @@ package com.welfare.persist.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -36,7 +37,7 @@ public class Dict extends Model<Dict> implements Serializable {
      * id
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId
+    @TableId(type = IdType.AUTO)
 	private Long id;
     /**
      * 码表类型

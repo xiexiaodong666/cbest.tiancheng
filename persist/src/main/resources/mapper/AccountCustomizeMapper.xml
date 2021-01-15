@@ -140,14 +140,12 @@ WHERE a.mer_code = at.mer_code
     SUM(
     CASE
 
-    WHEN abd.trans_type = 1 THEN
+    WHEN abd.trans_type = 'deposit' THEN
     trans_amount
-    WHEN abd.trans_type = 2 THEN
+    WHEN abd.trans_type = 'consume' THEN
     trans_amount * ( - 1 )
-    WHEN abd.trans_type = 3 THEN
+    WHEN abd.trans_type = 'refund' THEN
     trans_amount
-    WHEN abd.trans_type = 4 THEN
-    trans_amount * ( - 1 )
     END
     ) AS accountTotalAmount,
     COUNT( abd.id ) AS tradeNum,

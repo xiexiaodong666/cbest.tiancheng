@@ -39,9 +39,9 @@ public class MybatisPlusConfig {
 
     @Bean
     public CommonFieldObjectHandler commonFieldObjectHandler(){
-        CommonFieldObjectHandler commonFieldObjectHandler = new CommonFieldObjectHandler();
-        return commonFieldObjectHandler;
+        return new CommonFieldObjectHandler();
     }
+
 
     @Bean
     public PageInterceptor pageInterceptor() {

@@ -8,9 +8,11 @@ import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.SupplierStoreActivateReq;
+import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
+import com.welfare.service.dto.SupplierStoreUpdateDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -51,7 +53,7 @@ public interface SupplierStoreService {
      * @param supplierStore
      * @return
      */
-    boolean add(SupplierStoreDetailDTO supplierStore);
+    boolean add(SupplierStoreAddDTO supplierStore);
 
     /**
      * 更改供应商门店激活状态
@@ -81,7 +83,7 @@ public interface SupplierStoreService {
      * @param supplierStore
      * @return
      */
-    boolean update(SupplierStoreDetailDTO supplierStore);
+    boolean update(SupplierStoreUpdateDTO supplierStore);
 
     /**
      * 导出供应商门店列表

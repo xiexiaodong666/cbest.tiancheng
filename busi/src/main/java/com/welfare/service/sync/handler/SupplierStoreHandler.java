@@ -11,6 +11,7 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
+import com.welfare.service.dto.SupplierStoreSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
@@ -58,7 +59,7 @@ public class SupplierStoreHandler {
     @Subscribe
     public void onMerchantChange(SupplierStoreEvt evt) {
         ShoppingActionTypeEnum typeEnum=evt.getTypeEnum();
-        List<SupplierStoreDetailDTO> supplierStoreDetailDTOS=evt.getSupplierStoreDetailDTOS();
+        List<SupplierStoreSyncDTO> supplierStoreDetailDTOS=evt.getSupplierStoreDetailDTOS();
         if (EmptyChecker.isEmpty(supplierStoreDetailDTOS)) {
             return;
         }
@@ -66,7 +67,7 @@ public class SupplierStoreHandler {
         StoreShoppingReq storeShoppingReq = new StoreShoppingReq();
         List<StoreShoppingReq.ListBean> listBeans = new ArrayList<>();
         List<String> storeCodeList = new ArrayList<>();
-        for (SupplierStoreDetailDTO supplierStoreDetailDTO : supplierStoreDetailDTOS) {
+        for (SupplierStoreSyncDTO supplierStoreDetailDTO : supplierStoreDetailDTOS) {
             StoreShoppingReq.ListBean listBean = new StoreShoppingReq.ListBean();
             Map<String, Boolean> consumeTypeMap = null;
             try {

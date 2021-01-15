@@ -2,9 +2,11 @@ package com.welfare.service;
 
 
 import com.welfare.persist.entity.Department;
+import com.welfare.service.dto.DepartmentAddDTO;
 import com.welfare.service.dto.DepartmentDTO;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
+import com.welfare.service.dto.DepartmentUpdateDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -42,14 +44,14 @@ public interface DepartmentService {
      * 新增商户
      * @param department 实体
      */
-    boolean add(Department department);
+    boolean add(DepartmentAddDTO department);
 
     /**
      * 修改部门
      * @param department
      * @return
      */
-    boolean update(Department department);
+    boolean update(DepartmentUpdateDTO department);
 
     /**
      * 批量新增

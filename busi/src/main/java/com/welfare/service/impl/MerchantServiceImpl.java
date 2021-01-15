@@ -84,7 +84,7 @@ public class MerchantServiceImpl implements MerchantService {
                 Set<String> merCodeSet = new HashSet<>(merCodeList);
                 QueryWrapper<Merchant> queryWrapperMerchant = new QueryWrapper<>();
                 queryWrapperMerchant.notIn(Merchant.MER_CODE, merCodeSet);
-                queryWrapperMerchant.eq(Merchant.STATUS, 0);
+                queryWrapperMerchant.eq(Merchant.STATUS, 1);
                 list = merchantDao.list(queryWrapperMerchant);
             }
         }

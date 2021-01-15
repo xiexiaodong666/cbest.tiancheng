@@ -2,6 +2,7 @@ package com.welfare.serviceaccount.controller;
 
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.PaymentService;
+import com.welfare.service.RefundService;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
 import com.welfare.service.dto.payment.OnlinePaymentRequest;
@@ -31,7 +32,7 @@ import java.util.Map;
 @Api(tags = "支付接口")
 public class PaymentController implements IController {
     private final PaymentService paymentService;
-
+    private final RefundService refundService;
 
     @PostMapping("/online")
     @ApiOperation("线上支付")
@@ -65,15 +66,15 @@ public class PaymentController implements IController {
     @PostMapping("/refund")
     @ApiOperation("退款")
     public R<RefundRequest> newPaymentRequest(@RequestBody RefundRequest refundRequest) {
-
-        refundRequest.setRefundStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+        refundService.handleRefundRequest(refundRequest);
         return success(refundRequest);
     }
 
     @GetMapping("/refund")
     @ApiOperation("查询退款结果")
     public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
-        return success(null);
+        RefundRequest refundRequest = refundService.queryByTransNo(transNo);
+        return success(refundRequest);
     }
 
 }

@@ -68,7 +68,7 @@ public class MerchantStoreRelationController implements IController {
 
     queryWrapper.eq(MerchantStoreRelation.MER_CODE, merCode);
     queryWrapper.ne(MerchantStoreRelation.DELETED, 1);
-    queryWrapper.ne(MerchantStoreRelation.STATUS, 1);
+    queryWrapper.ne(MerchantStoreRelation.STATUS, 0);
 
     Page<MerchantStoreRelation> merchantStoreRelationPage = merchantStoreRelationService.pageQuery(
         page, queryWrapper);
@@ -147,7 +147,7 @@ public class MerchantStoreRelationController implements IController {
   public R<Boolean> updateMerchantStoreStatus(
       @RequestParam(required = true) @ApiParam("消费场景门店id") Long id,
       @RequestParam(required = false) @ApiParam("1删除") Integer delete,
-      @RequestParam(required = false) @ApiParam("状态 0 正常,1 禁用") Integer status) {
+      @RequestParam(required = false) @ApiParam("状态 1 启用  0禁用") Integer status) {
 
     return success(merchantStoreRelationService.updateStatus(id, delete, status));
   }

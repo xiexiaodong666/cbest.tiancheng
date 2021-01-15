@@ -136,7 +136,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
       merchantStoreRelation.setRamark(relationAddReq.getRamark());
       merchantStoreRelation.setDeleted(false);
-      merchantStoreRelation.setStatus(0);
+      merchantStoreRelation.setStatus(1);
       merchantStoreRelation.setStoreCode(store.getStoreCode());
       merchantStoreRelation.setConsumType(store.getConsumType());
       merchantStoreRelation.setStoreAlias(store.getStoreAlias());
@@ -239,7 +239,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
           merchantStoreRelationNew.setUpdateUser(UserInfoHolder.getUserInfo().getUserName());
 
         }
-        merchantStoreRelationNew.setStatus(0);
+        merchantStoreRelationNew.setStatus(1);
         merchantStoreRelationNewList.add(merchantStoreRelationNew);
 
         RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
@@ -352,7 +352,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     List<RoleConsumptionBindingsReq> roleConsumptionBindingsReqs = new ArrayList<>();
 
     if (status != null) {
-      roleConsumptionListReq.setEnabled(status == 0);
+      roleConsumptionListReq.setEnabled(status == 1);
     }
 
     List<Long> removeIds = new ArrayList<>();

@@ -100,8 +100,8 @@ public class CardApplyController implements IController {
   @ApiOperation("删除/禁用/启动卡片")
   public R<Boolean> updateStatus(
       @RequestParam(required = true) @ApiParam("id") Long id,
-      @RequestParam(required = false) @ApiParam("1删除") Integer delete,
-      @RequestParam(required = false) @ApiParam("状态 0 正常,1 禁用") Integer status) {
+      @RequestParam(required = false) @ApiParam("1 删除") Integer delete,
+      @RequestParam(required = false) @ApiParam("状态 1 启用  0禁用") Integer status) {
 
     return success(cardApplyService.updateStatus(id, delete, status));
   }

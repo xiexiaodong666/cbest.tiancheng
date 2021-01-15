@@ -6,7 +6,7 @@ package com.welfare.common.enums;
  * @date 2021/1/10 8:07 PM
  */
 public enum SequenceTypeEnum {
-  CARID("carId", "卡号");
+  CARDID("CARDID", "卡号");
 
   public void setCode(String code) {
     this.code = code;

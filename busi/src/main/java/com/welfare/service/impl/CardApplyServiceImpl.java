@@ -107,7 +107,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       CardInfo cardInfo = new CardInfo();
       cardInfo.setApplyCode(cardApply.getApplyCode());
       Long writeCardId = sequenceService.nextNo(
-          SequenceTypeEnum.CARID.getCode(), cardApplyAddReq.getMerCode(), startId);
+          SequenceTypeEnum.CARDID.getCode(), cardApplyAddReq.getMerCode(), startId);
       cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
       cardInfo.setCardType(cardApply.getCardType());
       cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());

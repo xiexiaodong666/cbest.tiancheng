@@ -12,15 +12,18 @@ import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.query.OrderPageQuery;
 import com.welfare.persist.entity.*;
+import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.persist.mapper.OrderInfoMapper;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.OrderService;
 import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.OrderReqDto;
+import com.welfare.service.dto.SynOrderDto;
 import com.welfare.service.dto.order.ITEM2;
 import com.welfare.service.dto.order.ITEM8;
 import com.welfare.service.dto.order.MessageData;
 import com.welfare.service.helper.QueryHelper;
+import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -28,6 +31,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -64,13 +68,36 @@ public class OrderServiceImpl implements OrderService {
     private ProductInfoDao productInfoDao;
     @Autowired
     private DictDao dictDao;
+    @Autowired
+    private AccountDao accountDao;
+    @Autowired
+    private AccountMapper accountMapper;
 
     @Override
-    public Page<OrderInfo> selectPage(Page page ,OrderReqDto orderReqDto , MerchantUserInfo merchantUserInfo) {
+    public Page<OrderInfo> selectPage(Page page ,OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, merchantUserInfo.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
-        List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
+        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        //TODO 判断用户传入的门店集合是否在上述商户关联门店中
+        List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
+        List<Integer> storeCodeList = orderReqDto.getStoreIds();
+        if (storeCodeList == null){
+            //平台端调用
+            merchantStoreRelationList.addAll(merchantStoreRelationList1);
+        }else {
+            //商户端调用
+            merchantStoreRelationList1.forEach(item->{
+                Integer storeCode = Integer.valueOf(item.getStoreCode());
+                if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)){
+                    merchantStoreRelationList.add(item);
+                }
+            });
+        }
+        if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1){
+            Page<OrderInfo> orderInfoPage = new Page<>();
+            return orderInfoPage;
+        }
         //没有配置返利门店
         List<String> noRebateStoreList = new ArrayList<>();
         //配置返利门店
@@ -120,12 +147,29 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderInfo> selectList(OrderReqDto orderReqDto , MerchantUserInfo merchantUserInfo) {
+    public List<OrderInfo> selectList(OrderReqDto orderReqDto ) {
         //根据当前用户查询所在组织的配置门店情况
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, merchantUserInfo.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
-        List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
-        //没有配置返利门店
+        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
+        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        //TODO 判断用户传入的门店集合是否在上述商户关联门店中
+        List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
+        List<Integer> storeCodeList = orderReqDto.getStoreIds();
+        if (storeCodeList == null){
+            //平台端调用
+            merchantStoreRelationList.addAll(merchantStoreRelationList1);
+        }else {
+            //商户端调用
+            merchantStoreRelationList1.forEach(item->{
+                Integer storeCode = Integer.valueOf(item.getStoreCode());
+                if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)){
+                    merchantStoreRelationList.add(item);
+                }
+            });
+        }
+        if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1){
+            return null;
+        }//没有配置返利门店
         List<String> noRebateStoreList = new ArrayList<>();
         //配置返利门店
         List<String> cardRebateStoreList = new ArrayList<>();
@@ -174,10 +218,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderSummary selectSummary(OrderReqDto orderReqDto , MerchantUserInfo merchantUserInfo) {
+    public OrderSummary selectSummary(OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, merchantUserInfo.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
+        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
         List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
         //没有配置返利门店
         List<String> noRebateStoreList = new ArrayList<>();
@@ -279,6 +323,47 @@ public class OrderServiceImpl implements OrderService {
         });
 
         getKafkaOrder(storeAndNameMap , storeAndMerchantMap , payMap , rebateStoreList , noRebateStoreList);
+    }
+
+    @Override
+    public void saveOrUpdateBacth(List<SynOrderDto> orderDtoList) {
+        List<OrderInfo> orderInfoList = new ArrayList<>();
+        orderDtoList.forEach(item->{
+            //TODO 根据查询账户详情
+            QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq(Account.ACCOUNT_CODE , item.getAccountCode());
+            Account account = accountMapper.selectOne(queryWrapper);
+            //根据门店查询门店名称
+            QueryWrapper<SupplierStore> supplierStoreQueryWrapper = new QueryWrapper<>();
+            supplierStoreQueryWrapper.eq(SupplierStore.STORE_CODE , item.getStoreCode());
+            SupplierStore supplierStore = supplierStoreDao.getOne(supplierStoreQueryWrapper);
+            //查询商户数据
+            QueryWrapper<Merchant> merchantQueryWrapper = new QueryWrapper<>();
+            merchantQueryWrapper.eq(Merchant.MER_CODE , supplierStore.getMerCode());
+            Merchant merchant = merchantDao.getOne(merchantQueryWrapper);
+
+            //构建OrdenInfo对象
+            OrderInfo orderInfo = new OrderInfo();
+            orderInfo.setOrderId(item.getOrderId());
+            orderInfo.setPayCode("5065");
+            orderInfo.setPayName("员工卡支付");
+            orderInfo.setTransType("1");
+            orderInfo.setTransTypeName("消费");
+            orderInfo.setCreateUser("system");
+            orderInfo.setCreateTime(new Date());
+            orderInfo.setOrderTime(item.getTransTime());
+            orderInfo.setAccountCode(Integer.valueOf(item.getAccountCode()));
+            orderInfo.setAccountName(account != null ? account.getAccountName():null);
+            orderInfo.setStoreCode(item.getStoreCode());
+            orderInfo.setStoreName(supplierStore.getStoreName());
+            orderInfo.setMerchantCode(merchant.getMerCode());
+            orderInfo.setMerchantName(merchant.getMerName());
+            orderInfo.setOrderAmount(item.getTransAmount());
+            orderInfoList.add(orderInfo);
+        });
+        int count = orderMapper.saveOrUpdate(orderInfoList);
+        System.out.println(count);
+
     }
 
 

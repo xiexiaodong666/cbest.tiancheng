@@ -1,6 +1,5 @@
 package com.welfare.servicesettlement.controller;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.domain.MerchantUserInfo;
@@ -11,7 +10,9 @@ import com.welfare.service.OrderService;
 import com.welfare.service.dto.OrderReqDto;
 import com.welfare.servicesettlement.dto.OrderRespDto;
 import com.welfare.servicesettlement.dto.PageVo;
+import com.welfare.service.dto.SynOrderDto;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,7 @@ import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,9 +57,9 @@ public class OrderController implements IController {
         Page page = new Page();
         page.setCurrent(orderReqDto.getCurrent());
         page.setSize(orderReqDto.getSize());
-        Page<OrderInfo> orderPage = orderService.selectPage(page , orderReqDto , merchantUserInfo);
+        Page<OrderInfo> orderPage = orderService.selectPage(page , orderReqDto);
 
-        if (Objects.nonNull(orderPage)){
+        if (Objects.nonNull(orderPage) && orderPage.getRecords().size() > 0){
             List<OrderRespDto> respDtoList = new ArrayList<>();
             orderPage.getRecords().forEach(item->{
                 OrderRespDto respDto = new OrderRespDto();
@@ -71,17 +70,25 @@ public class OrderController implements IController {
             resultPage.setCurrent(orderPage.getCurrent());
             resultPage.setSize(orderPage.getSize());
             resultPage.setTotal(orderPage.getTotal());
+            //订单汇总数据
+            OrderSummary orderSummary = orderService.selectSummary(orderReqDto);
+            PageVo.Ext ext1 = new PageVo.Ext();
+            if (orderSummary != null){
+                ext1.setAmount(orderSummary.getOrderAmount());
+                ext1.setOrderNum(orderSummary.getOrderNum());
+                resultPage.setExt(ext1);
+            }
         }
-        //订单汇总数据
-        OrderSummary orderSummary = orderService.selectSummary(orderReqDto , merchantUserInfo);
-        PageVo.Ext ext1 = new PageVo.Ext();
-        if (orderSummary != null){
-            ext1.setAmount(orderSummary.getOrderAmount());
-            ext1.setOrderNum(orderSummary.getOrderNum());
-            resultPage.setExt(ext1);
-        }
-
         return success(resultPage);
+    }
+    @ApiOperation("同步线下订单")
+    @PostMapping("sync")
+    public R<String> synOrder(@RequestBody List<SynOrderDto> orderList){
+        /**
+         * 订单id 流水号 退单流水号 商品 账户 卡号 消费类型 消费门店 消费金额 消费时间
+         */
+        orderService.saveOrUpdateBacth(orderList);
+        return success();
     }
 
 
@@ -90,9 +97,10 @@ public class OrderController implements IController {
     @GetMapping("select/list")
     public R<List<OrderRespDto>> selectList(OrderReqDto orderReqDto){
         MerchantUserInfo merchantUserInfo = MerchantUserHolder.getDeptIds();
-        merchantUserInfo = new MerchantUserInfo();
-        merchantUserInfo.setMerchantCode("A102");
-        List<OrderInfo> orderInfoPage = orderService.selectList(orderReqDto , merchantUserInfo);
+        if (merchantUserInfo != null){
+            
+        }
+        List<OrderInfo> orderInfoPage = orderService.selectList(orderReqDto);
         List<OrderRespDto> respDtoList = new ArrayList<>();
 
         if (Objects.nonNull(orderInfoPage)){

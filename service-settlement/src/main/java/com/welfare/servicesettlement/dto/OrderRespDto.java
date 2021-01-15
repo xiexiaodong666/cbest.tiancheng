@@ -40,5 +40,5 @@ public class OrderRespDto implements Serializable {
     @ApiModelProperty("订单总金额")
     private String orderAmount;
     @ApiModelProperty("订单创建时间")
-    private String orderDateTime;
+    private String orderTime;
 }

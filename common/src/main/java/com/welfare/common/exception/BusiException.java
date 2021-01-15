@@ -11,6 +11,7 @@ public class BusiException extends RuntimeException{
         this.msg = msg;
     }
     public BusiException(String msg) {
+        super(msg);
         this.code = ExceptionCode.UNKNOWON_EXCEPTION;
         this.msg = msg;
     }

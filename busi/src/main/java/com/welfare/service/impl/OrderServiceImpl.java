@@ -339,7 +339,7 @@ public class OrderServiceImpl implements OrderService {
             SupplierStore supplierStore = supplierStoreDao.getOne(supplierStoreQueryWrapper);
             //查询商户数据
             QueryWrapper<Merchant> merchantQueryWrapper = new QueryWrapper<>();
-            merchantQueryWrapper.eq(Merchant.MER_CODE , supplierStore.getMerCode());
+            merchantQueryWrapper.eq(Merchant.MER_CODE , supplierStore != null ? supplierStore.getMerCode():null);
             Merchant merchant = merchantDao.getOne(merchantQueryWrapper);
 
             //构建OrdenInfo对象
@@ -355,9 +355,9 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setAccountCode(Integer.valueOf(item.getAccountCode()));
             orderInfo.setAccountName(account != null ? account.getAccountName():null);
             orderInfo.setStoreCode(item.getStoreCode());
-            orderInfo.setStoreName(supplierStore.getStoreName());
-            orderInfo.setMerchantCode(merchant.getMerCode());
-            orderInfo.setMerchantName(merchant.getMerName());
+            orderInfo.setStoreName(supplierStore != null ? supplierStore.getStoreName() : null);
+            orderInfo.setMerchantCode(merchant != null ? merchant.getMerCode():null);
+            orderInfo.setMerchantName(merchant != null ? merchant.getMerName():null);
             orderInfo.setOrderAmount(item.getTransAmount());
             orderInfoList.add(orderInfo);
         });

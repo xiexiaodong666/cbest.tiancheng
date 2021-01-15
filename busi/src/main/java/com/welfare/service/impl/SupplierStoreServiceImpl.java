@@ -196,7 +196,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     SupplierStore save = supplierStoreAddConverter.toE((supplierStore));
     save.setStatus(0);
-    save.setStoreParent(save.getMerCode() + "-" + save.getStoreCode());
+    save.setStorePath(save.getMerCode() + "-" + save.getStoreCode());
+    save.setStoreParent(save.getMerCode());
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台

@@ -6,6 +6,7 @@ import com.welfare.service.remote.PlatformUserFeignClient;
 import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.remote.entity.PlatformUserDataResponse;
 import com.welfare.service.remote.entity.PlatformUserResponse;
+import com.welfare.service.remote.entity.ShoppingPlatformUser;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,8 +54,25 @@ public class PlatformUserController {
       @RequestParam(required = false) Date start_create_time,
       @RequestParam(required = false) Date end_create_time
   ) {
-    return platformUserFeignClient.getPlatformUserList(
+    PlatformUserResponse<PlatformUserDataResponse<ShoppingPlatformUser>> response = platformUserFeignClient.getPlatformUserList(
         size, current, merchant_code, username, status, start_create_time, end_create_time);
+
+
+    PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> responsePlatformUserResponse = new PlatformUserResponse();
+    List<ShoppingPlatformUser> shoppingPlatformUsers = response.getData().getList();
+    List<PlatformUser> platformUsers = new ArrayList<>(shoppingPlatformUsers.size());
+    PlatformUserDataResponse platformUserDataResponse = new PlatformUserDataResponse();
+    platformUserDataResponse.setTotal(response.getData().getTotal());
+    platformUserDataResponse.setList(platformUsers);
+    responsePlatformUserResponse.setCode(response.getCode());
+    responsePlatformUserResponse.setMessage(response.getMessage());
+    responsePlatformUserResponse.setData(platformUserDataResponse);
+
+    for (ShoppingPlatformUser s:
+    shoppingPlatformUsers) {
+      platformUsers.add(transferPlatformUser(s));
+    }
+    return responsePlatformUserResponse;
   }
 
   /**
@@ -64,7 +82,7 @@ public class PlatformUserController {
   @ApiOperation("新增商户用户")
   PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
 
-    return platformUserFeignClient.addPlatformUser(platformUser);
+    return platformUserFeignClient.addPlatformUser(transferShoppingPlatformUser(platformUser));
   }
 
   /**
@@ -74,7 +92,7 @@ public class PlatformUserController {
   @ApiOperation("修改商户用户")
   PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
 
-    return platformUserFeignClient.updatePlatformUser(platformUser);
+    return platformUserFeignClient.updatePlatformUser(transferShoppingPlatformUser(platformUser));
   }
 
 
@@ -85,8 +103,14 @@ public class PlatformUserController {
   @ApiOperation("详情")
   PlatformUserResponse<PlatformUser> getPlatformUserDetail(
       @RequestParam("id") Long id) {
+    PlatformUserResponse<ShoppingPlatformUser> response = platformUserFeignClient
+        .getPlatformUserDetail(id);
+    PlatformUserResponse<PlatformUser> platformUserPlatformUserResponse = new PlatformUserResponse<>();
+    platformUserPlatformUserResponse.setCode(response.getCode());
+    platformUserPlatformUserResponse.setMessage(response.getMessage());
+    platformUserPlatformUserResponse.setData(transferPlatformUser(response.getData()));
 
-    return platformUserFeignClient.getPlatformUserDetail(id);
+    return platformUserPlatformUserResponse;
   }
 
   /**
@@ -97,7 +121,8 @@ public class PlatformUserController {
   PlatformUserResponse<Boolean> updatePlatformUserStatus(
       @RequestBody PlatformUser platformUser) {
 
-    return platformUserFeignClient.updatePlatformUserStatus(platformUser);
+    return platformUserFeignClient.updatePlatformUserStatus(
+        transferShoppingPlatformUser(platformUser));
   }
 
 
@@ -113,13 +138,13 @@ public class PlatformUserController {
       @RequestParam(required = false) Date start_create_time,
       @RequestParam(required = false) Date end_create_time
   ) throws IOException {
-    List<PlatformUser> platformUserList = new ArrayList<>();
+    List<ShoppingPlatformUser> platformUserList = new ArrayList<>();
 
     Integer current = 1;
     while (true) {
       try {
         Thread.sleep(3 * 1000);
-        PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> response = platformUserFeignClient
+        PlatformUserResponse<PlatformUserDataResponse<ShoppingPlatformUser>> response = platformUserFeignClient
             .getPlatformUserList(
                 size, current, merchant_code, username, status, start_create_time, end_create_time);
         if (response == null || !response.getCode().equals(200) || CollectionUtils.isEmpty(
@@ -139,8 +164,44 @@ public class PlatformUserController {
     }
 
     String path = fileUploadService.uploadExcelFile(
-        platformUserList, PlatformUser.class, "商户用户列表");
+        platformUserList, ShoppingPlatformUser.class, "商户用户列表");
     return success(fileUploadService.getFileServerUrl(path));
 
+  }
+
+  private PlatformUser transferPlatformUser(ShoppingPlatformUser shoppingPlatformUser) {
+    PlatformUser platformUser = new PlatformUser();
+
+    platformUser.setId(shoppingPlatformUser.getId());
+    platformUser.setName(shoppingPlatformUser.getName());
+    platformUser.setUsername(shoppingPlatformUser.getUsername());
+    platformUser.setInitPassword(shoppingPlatformUser.getInit_password());
+    platformUser.setMerchantName(shoppingPlatformUser.getMerchant_name());
+    platformUser.setMerchantCode(shoppingPlatformUser.getMerchant_code());
+    platformUser.setStatus(shoppingPlatformUser.getStatus());
+    platformUser.setRemark(shoppingPlatformUser.getRemark());
+    platformUser.setCreatedBy(shoppingPlatformUser.getCreated_by());
+    platformUser.setUpdatedBy(shoppingPlatformUser.getUpdated_by());
+    platformUser.setCreatedAt(shoppingPlatformUser.getCreated_at());
+
+    return platformUser;
+  }
+
+  private ShoppingPlatformUser transferShoppingPlatformUser(PlatformUser platformUser) {
+    ShoppingPlatformUser shoppingPlatformUser = new ShoppingPlatformUser();
+
+    shoppingPlatformUser.setId(platformUser.getId());
+    shoppingPlatformUser.setName(platformUser.getName());
+    shoppingPlatformUser.setUsername(platformUser.getUsername());
+    shoppingPlatformUser.setInit_password(platformUser.getInitPassword());
+    shoppingPlatformUser.setMerchant_name(platformUser.getMerchantName());
+    shoppingPlatformUser.setMerchant_code(platformUser.getMerchantCode());
+    shoppingPlatformUser.setStatus(platformUser.getStatus());
+    shoppingPlatformUser.setRemark(platformUser.getRemark());
+    shoppingPlatformUser.setCreated_by(platformUser.getCreatedBy());
+    shoppingPlatformUser.setUpdated_by(platformUser.getUpdatedBy());
+    shoppingPlatformUser.setCreated_at(platformUser.getCreatedAt());
+
+    return shoppingPlatformUser;
   }
 }

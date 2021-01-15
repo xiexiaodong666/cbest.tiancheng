@@ -1,8 +1,8 @@
 package com.welfare.service.remote;
 
-import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.remote.entity.PlatformUserDataResponse;
 import com.welfare.service.remote.entity.PlatformUserResponse;
+import com.welfare.service.remote.entity.ShoppingPlatformUser;
 import com.welfare.service.remote.fallback.PlatformUserFallback;
 import java.util.Date;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -23,7 +23,7 @@ public interface PlatformUserFeignClient {
    * 获取商户用户列表
    */
   @RequestMapping(value = "/api/platform/user/list", method = RequestMethod.GET)
-  PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
+  PlatformUserResponse<PlatformUserDataResponse<ShoppingPlatformUser>> getPlatformUserList(
       @RequestParam("pageSize") int pageSize,
       @RequestParam("page") int page,
       @RequestParam("merchant_code") String merchant_code,
@@ -37,27 +37,27 @@ public interface PlatformUserFeignClient {
    * 新增商户用户
    */
   @RequestMapping(value = "/api/platform/user/create", method = RequestMethod.POST, consumes = "application/json")
-  PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser);
+  PlatformUserResponse<Boolean> addPlatformUser(@RequestBody ShoppingPlatformUser platformUser);
 
   /**
    * 修改商户用户
    */
   @RequestMapping(value = "/api/platform/user/update", method = RequestMethod.POST, consumes = "application/json")
-  PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser);
+  PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody ShoppingPlatformUser platformUser);
 
 
   /**
    * 详情
    */
   @RequestMapping(value = "/api/platform/user/detail", method = RequestMethod.GET, consumes = "application/json")
-  PlatformUserResponse<PlatformUser> getPlatformUserDetail(
+  PlatformUserResponse<ShoppingPlatformUser> getPlatformUserDetail(
       @RequestParam("id") Long id);
 
   /**
    * 锁定/解锁
    */
   @RequestMapping(value = "/api/platform/user/update-status", method = RequestMethod.POST, consumes = "application/json")
-  PlatformUserResponse<Boolean> updatePlatformUserStatus(@RequestBody PlatformUser platformUser);
+  PlatformUserResponse<Boolean> updatePlatformUserStatus(@RequestBody ShoppingPlatformUser platformUser);
 
 
 

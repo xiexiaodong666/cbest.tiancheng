@@ -11,7 +11,7 @@ import lombok.Data;
 public class EmployerDTO {
   private String employerId;
   private String employerRole;
-  private String merchantCode;
+  private String partnerCode;
   private String merchantId;
   private String mobile;
   private String name;

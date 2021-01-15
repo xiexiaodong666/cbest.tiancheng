@@ -4,12 +4,14 @@ import com.welfare.common.constants.AccountChangeType;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.service.remote.entity.EmployerDTO;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -18,6 +20,21 @@ import org.springframework.util.CollectionUtils;
  * @date 2021/1/12 14:04
  */
 public class AccountUtils {
+
+  public static List<AccountSyncDTO> getSyncDTO(List<Account> accountList,Map<String, Merchant>merchantMap){
+    if( CollectionUtils.isEmpty(accountList) ){
+      return null;
+    }
+    List<AccountSyncDTO> accountSyncDTOList = new LinkedList<AccountSyncDTO>();
+    accountList.forEach(account -> {
+      AccountSyncDTO accountSyncDTO = new AccountSyncDTO();
+      BeanUtils.copyProperties(account,accountSyncDTO);
+      Long merId = merchantMap.get(account.getMerCode()).getId();
+      accountSyncDTO.setMerchantId(String.valueOf(merId));
+      accountSyncDTOList.add(accountSyncDTO);
+    });
+    return accountSyncDTOList;
+  }
 
   public static List<EmployerDTO> assemableEmployerDTOList(
       List<AccountSyncDTO> accountSyncDTOList) {
@@ -36,7 +53,7 @@ public class AccountUtils {
     EmployerDTO employerDTO = new EmployerDTO();
     employerDTO.setEmployerId(String.valueOf(accountSyncDTO.getId()));
     employerDTO.setEmployerRole(accountSyncDTO.getAccountTypeCode());
-    employerDTO.setMerchantCode(accountSyncDTO.getMerCode());
+    employerDTO.setPartnerCode(accountSyncDTO.getMerCode());
     employerDTO.setMerchantId(accountSyncDTO.getMerchantId());
     employerDTO.setMobile(accountSyncDTO.getPhone());
     employerDTO.setName(accountSyncDTO.getAccountName());

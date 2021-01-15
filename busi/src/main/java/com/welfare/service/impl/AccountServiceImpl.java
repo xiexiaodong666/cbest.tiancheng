@@ -20,7 +20,7 @@ import com.welfare.persist.dto.AccountBillMapperDTO;
 import com.welfare.persist.dto.AccountDetailMapperDTO;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
-import com.welfare.persist.dto.AccountSyncDTO;
+import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountType;
@@ -43,33 +43,27 @@ import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
-import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.dto.AccountUploadDTO;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.remote.ShoppingFeignClient;
-import com.welfare.service.remote.entity.EmployerDTO;
-import com.welfare.service.remote.entity.EmployerReqDTO;
-import com.welfare.service.remote.entity.RoleConsumptionResp;
+import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -100,6 +94,7 @@ public class AccountServiceImpl implements AccountService {
   @Autowired
   private  AccountChangeEventRecordService accountChangeEventRecordService;
   private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
+  private final ApplicationContext applicationContext;
 
 
   @Override
@@ -191,9 +186,8 @@ public class AccountServiceImpl implements AccountService {
     boolean result = accountDao.removeById(id);
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode(),"员工删除");
     accountChangeEventRecordService.save(accountChangeEventRecord);
-    AccountSyncDTO accountSyncDTO = getAccountSyncDTO(syncAccount);
-    this.syncAccount(ShoppingActionTypeEnum.DELETE,
-        Arrays.asList(accountSyncDTO));
+
+    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).accountList(Arrays.asList(syncAccount)).build());
     return result;
   }
 
@@ -214,9 +208,7 @@ public class AccountServiceImpl implements AccountService {
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(),"员工修改状态");
     accountChangeEventRecordService.save(accountChangeEventRecord);
 
-    AccountSyncDTO accountSyncDTO = getAccountSyncDTO(syncAccount);
-    this.syncAccount(ShoppingActionTypeEnum.UPDATE,
-        Arrays.asList(accountSyncDTO));
+    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).accountList(Arrays.asList(account)).build());
     return result;
   }
 
@@ -259,18 +251,9 @@ public class AccountServiceImpl implements AccountService {
     account.setAccountCode(accounCode);
     account.setChangeEventId(accountChangeEventRecord.getId());
     boolean result = accountDao.save(account);
-    AccountSyncDTO accountSyncDTO = getAccountSyncDTO(account);
-    this.syncAccount(ShoppingActionTypeEnum.ADD,
-        Arrays.asList(accountSyncDTO));
-    return result;
-  }
 
-  private AccountSyncDTO getAccountSyncDTO(Account account) {
-    Merchant merchant = merchantService.detailByMerCode(account.getMerCode());
-    AccountSyncDTO accountSyncDTO = new AccountSyncDTO();
-    BeanUtils.copyProperties(account,accountSyncDTO);
-    accountSyncDTO.setMerchantId(String.valueOf(merchant.getId()));
-    return accountSyncDTO;
+    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).accountList(Arrays.asList(account)).build());
+    return result;
   }
 
   private void validationAccount(Account account,Boolean isNew){
@@ -311,9 +294,8 @@ public class AccountServiceImpl implements AccountService {
   public Boolean update(Account account) {
     validationAccount(account,false);
     boolean result = accountDao.updateById(account);
-    AccountSyncDTO accountSyncDTO = getAccountSyncDTO(account);
-    this.syncAccount(ShoppingActionTypeEnum.UPDATE,
-        Arrays.asList(accountSyncDTO));
+
+    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).accountList(Arrays.asList(account)).build());
     return result;
   }
 
@@ -353,50 +335,6 @@ public class AccountServiceImpl implements AccountService {
       codes = accounts.stream().map(Account::getAccountCode).collect(Collectors.toList());
     }
     return codes;
-  }
-
-  @Override
-  public void syncAccount(ShoppingActionTypeEnum actionTypeEnum,
-      List<AccountSyncDTO> accountSyncDTOList) {
-    if (CollectionUtils.isEmpty(accountSyncDTOList)) {
-      return;
-    }
-    // 员工账号数据同步
-    List<EmployerDTO> employerDTOList = AccountUtils.assemableEmployerDTOList(accountSyncDTOList);
-    EmployerReqDTO employerReqDTO = new EmployerReqDTO();
-    employerReqDTO.setActionType(actionTypeEnum);
-    employerReqDTO.setRequestId(UUID.randomUUID().toString());
-    employerReqDTO.setTimestamp(String.valueOf(new Date().getTime()));
-    employerReqDTO.setList(employerDTOList);
-
-    // send after tx commit but is async
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronizationAdapter() {
-          @Override
-          public void afterCommit() {
-            try {
-              log.info("批量添加、修改员工账号 addOrUpdateEmployer:{}",
-                  mapper.writeValueAsString(employerReqDTO));
-              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
-                  .addOrUpdateEmployer(employerReqDTO);
-              List<Account> accountList = new LinkedList<>();
-              if (roleConsumptionResp.equals("200")) {
-                // 写入
-                for (AccountSyncDTO accountSyncDTO :
-                    accountSyncDTOList) {
-                  Account account = new Account();
-                  BeanUtils.copyProperties(accountSyncDTO, account);
-                  account.setSyncStatus(1);
-                  accountList.add(account);
-                }
-                accountDao.saveOrUpdateBatch(accountList);
-              }
-            } catch (Exception e) {
-              log.error("[afterCommit] call addOrUpdateEmployer error", e.getMessage());
-            }
-          }
-        }
-    );
   }
 
   @Override

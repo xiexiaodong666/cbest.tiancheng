@@ -199,5 +199,10 @@ public class MerchantServiceImpl implements MerchantService {
         return merchantDao.getOne(queryWrapper);
     }
 
-
+    @Override
+    public List<Merchant> queryMerchantByCodeList(List<String> merCodeList) {
+        QueryWrapper<Merchant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(Merchant.MER_CODE,merCodeList);
+        return merchantDao.list(queryWrapper);
+    }
 }

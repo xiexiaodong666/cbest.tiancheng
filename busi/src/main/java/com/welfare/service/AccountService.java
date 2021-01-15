@@ -75,8 +75,6 @@ public interface AccountService {
 
   List<Long> getAccountCodeList(List<Long> accountCodes);
 
-  public void syncAccount(ShoppingActionTypeEnum actionTypeEnum, List<AccountSyncDTO> accountSyncDTOS);
-
   AccountSimpleDTO queryAccountInfo(Long accountCode);
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
   List<Account> queryByAccountTypeCode(String accountTypeCode);

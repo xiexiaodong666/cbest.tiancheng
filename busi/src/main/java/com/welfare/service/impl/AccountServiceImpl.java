@@ -97,7 +97,7 @@ public class AccountServiceImpl implements AccountService {
   private final MerchantService merchantService;
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
-  @AutowiredA
+  @Autowired
   private  AccountChangeEventRecordService accountChangeEventRecordService;
   private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
 

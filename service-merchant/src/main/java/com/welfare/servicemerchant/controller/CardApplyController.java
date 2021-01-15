@@ -116,7 +116,7 @@ public class CardApplyController implements IController {
   }
 
 
-  @PostMapping("/export")
+  @GetMapping("/export")
   @ApiOperation("导出卡片列表(返回文件下载地址)")
   public R<String> export(
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,

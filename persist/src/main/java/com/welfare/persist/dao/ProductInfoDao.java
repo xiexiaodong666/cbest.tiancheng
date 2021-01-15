@@ -27,7 +27,7 @@ public class ProductInfoDao extends ServiceImpl<ProductInfoMapper, ProductInfo> 
         StringBuffer sb = new StringBuffer();
         if (codeList != null && codeList.size() > 1){
             QueryWrapper<ProductInfo> queryWrapper = new QueryWrapper<>();
-            queryWrapper.in(ProductInfo.PRODUCR_CODE , codeList);
+            queryWrapper.in(ProductInfo.PRODUCT_CODE , codeList);
             List<ProductInfo> productInfos = list(queryWrapper);
             productInfos.forEach(item->{
                 sb.append(item.getProductName()).append(" ");

@@ -3,6 +3,7 @@ package com.welfare.persist.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
@@ -37,7 +38,7 @@ public class Merchant extends Model<Merchant> implements Serializable {
      * id
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId
+    @TableId(type = IdType.AUTO)
 	private Long id;
     /**
      * 商户名称

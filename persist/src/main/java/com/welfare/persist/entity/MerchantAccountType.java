@@ -1,6 +1,8 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
@@ -36,7 +38,7 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
      * 自增id
      */
     @ApiModelProperty("自增id")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId
+    @TableId(type = IdType.AUTO)
 	private Long id;
     /**
      * 商户代码

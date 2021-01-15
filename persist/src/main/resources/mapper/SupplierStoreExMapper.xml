@@ -28,6 +28,12 @@
             <if test="req.endTime!=null">
                 and ss.create_time &lt;= #{req.endTime}
             </if>
+            <if test="req.storeCodes != null and req.storeCodes.size()>0" >
+                and ss.store_code not in
+                <foreach close=")" collection="req.storeCodes" item="item" open="(" separator=", ">
+                    #{item}
+                </foreach>
+            </if>
         </where>
     </select>
 
@@ -39,5 +45,49 @@
         consum_type as consumType
         from supplier_store
         where deleted = 0 and mer_code=#{merCode}
+    </select>
+
+    <select id="listUnionMerchant" resultType="com.welfare.persist.entity.SupplierStore">
+        select * from (
+        select
+        id,
+        mer_code merCode,
+        store_code storeCode,
+        store_name storeName,
+        store_parent storeParent,
+        store_path storePath,
+        remark ,
+        consum_type consumType,
+        status ,
+        create_time createTime
+        from supplier_store ss
+        ) temp0
+        <where>
+            <if test="merCode!=null and merCode!=''">
+                and temp0.merCode=#{merCode}
+            </if>
+        </where>
+        UNION
+        select * from (
+        select
+        id,
+        mer_code merCode,
+        mer_code storeCode,
+        mer_name storeName,
+        0 storeParent,
+        mer_code storePath,
+        remark ,
+        null consumType,
+        status ,
+        create_time createTime
+        from merchant m
+
+        ) temp
+
+        <where>
+            <if test="merCode!=null and merCode!=''">
+                and temp.merCode=#{merCode}
+            </if>
+        </where>
     </select>
 </mapper>

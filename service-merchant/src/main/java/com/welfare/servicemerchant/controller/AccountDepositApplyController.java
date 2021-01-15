@@ -3,6 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.service.AccountDepositApplyDetailService;
 import com.welfare.service.AccountDepositApplyService;
@@ -79,11 +80,18 @@ public class AccountDepositApplyController implements IController {
     return success(detailService.pageByApplyCode(id, current, size));
   }
 
+  @GetMapping("/batch-total")
+  @ApiOperation("查询批量额度申请的总人数和总金额")
+  @MerchantUser
+  public R<AccountApplyTotalDTO> batchTotal(@RequestParam @ApiParam(name = "申请id", required = true) Long id){
+    return success(detailService.getUserCountAndTotalmount(id));
+  }
+
   @PostMapping("/update")
   @ApiOperation("修改账号额度申请(单个)")
   @MerchantUser
   public R<Long> update(@Validated @RequestBody DepositApplyUpdateRequest requst){
-    return success(depositApplyService.updateOne(requst, MerchantUserHolder.getDeptIds()));
+    return success(depositApplyService.updateOne(requst, MerchantUserHolder.getMerchantUser()));
   }
 
   @PostMapping("/batch-update")
@@ -91,15 +99,15 @@ public class AccountDepositApplyController implements IController {
   @MerchantUser
   public R<Long> batchUpdate(@RequestParam @ApiParam(name = "申请id）",required = true) Long id,
                              @RequestParam @ApiParam(name = "文件id",required = true) String fileId,
-                             @RequestParam @ApiParam("申请备注") String applyRemark,
-                             @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
-                             @RequestParam @ApiParam(name = "福利类型名称",required = true) String merAccountTypeName) {
+                             @RequestParam(required = false) @ApiParam("申请备注") String applyRemark,
+                             @RequestParam(required = false) @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
+                             @RequestParam(required = false) @ApiParam(name = "福利类型名称",required = true) String merAccountTypeName) {
     DepositApplyUpdateRequest requst = new DepositApplyUpdateRequest();
     requst.setId(id);
     requst.setApplyRemark(applyRemark);
     requst.setMerAccountTypeCode(merAccountTypeCode);
     requst.setMerAccountTypeName(merAccountTypeName);
-    return success(depositApplyService.updateBatch(requst, fileId, MerchantUserHolder.getDeptIds()));
+    return success(depositApplyService.updateBatch(requst, fileId, MerchantUserHolder.getMerchantUser()));
   }
 
   @PostMapping("/export")
@@ -122,7 +130,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("新增额度申请(单个)")
   @MerchantUser
   public R<Long> save(@Validated@RequestBody DepositApplyRequest request){
-    return success(depositApplyService.saveOne(request, MerchantUserHolder.getDeptIds()));
+    return success(depositApplyService.saveOne(request, MerchantUserHolder.getMerchantUser()));
   }
 
   @PostMapping("/batch-save")
@@ -139,7 +147,7 @@ public class AccountDepositApplyController implements IController {
     request.setApplyRemark(applyRemark);
     request.setMerAccountTypeCode(merAccountTypeCode);
     request.setMerAccountTypeName(merAccountTypeName);
-    return success(depositApplyService.saveBatch(request, fileId, MerchantUserHolder.getDeptIds()));
+    return success(depositApplyService.saveBatch(request, fileId, MerchantUserHolder.getMerchantUser()));
   }
 
   @PostMapping("/upload")
@@ -155,5 +163,11 @@ public class AccountDepositApplyController implements IController {
                                                         @RequestParam @ApiParam("单页大小") Integer size,
                                                         @RequestParam @ApiParam("文件id")String fileId) {
     return success(tempAccountDepositApplyService.pageByFileIdByExistAccount(current, size, fileId));
+  }
+
+  @GetMapping("/upload/total")
+  @ApiOperation("查询上传excel的总人数和总金额")
+  public R<AccountApplyTotalDTO> uploadTotalData(@RequestParam @ApiParam("文件id")String fileId) {
+    return success(tempAccountDepositApplyService.getUserCountAndTotalmount(fileId));
   }
 }

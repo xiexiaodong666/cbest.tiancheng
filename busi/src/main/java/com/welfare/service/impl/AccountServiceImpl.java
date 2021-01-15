@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
@@ -17,14 +18,18 @@ import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.dto.AccountBillMapperDTO;
 import com.welfare.persist.dto.AccountDetailMapperDTO;
+import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.persist.mapper.AccountMapper;
+import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.DepartmentService;
@@ -36,6 +41,7 @@ import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountBindCardDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.dto.AccountUploadDTO;
@@ -52,6 +58,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -88,6 +95,8 @@ public class AccountServiceImpl implements AccountService {
   private final MerchantService merchantService;
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
+  private final AccountChangeEventRecordService accountChangeEventRecordService;
+  private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
 
 
   @Override
@@ -97,6 +106,11 @@ public class AccountServiceImpl implements AccountService {
             accountPageReq.getDepartmentCode(), accountPageReq.getAccountStatus(),
             accountPageReq.getAccountTypeCode());
     return accountConverter.toPage(iPage);
+  }
+
+  @Override
+  public List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq) {
+    return accountCustomizeMapper.queryIncrementDTO(accountIncrementReq.getStoreCode(),accountIncrementReq.getSize(),accountIncrementReq.getChangeEventId());
   }
 
   @Override
@@ -121,7 +135,7 @@ public class AccountServiceImpl implements AccountService {
   public String uploadAccount(MultipartFile multipartFile) {
     try {
       AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,
-          merchantService,departmentService,sequenceService);
+          merchantService,departmentService,sequenceService,accountChangeEventRecordService);
       EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();
@@ -172,7 +186,8 @@ public class AccountServiceImpl implements AccountService {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
     }
     boolean result = accountDao.removeById(id);
-
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode(),"员工删除");
+    accountChangeEventRecordService.save(accountChangeEventRecord);
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(syncAccount);
     this.syncAccount(ShoppingActionTypeEnum.DELETE,
         Arrays.asList(accountSyncDTO));
@@ -191,6 +206,10 @@ public class AccountServiceImpl implements AccountService {
     Account account = new Account();
     account.setAccountStatus(active);
     boolean result = accountDao.update(updateWrapper);
+    AccountChangeType accountChangeType = AccountChangeType.getByAccountStatus(active);
+
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(),"员工修改状态");
+    accountChangeEventRecordService.save(accountChangeEventRecord);
 
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(syncAccount);
     this.syncAccount(ShoppingActionTypeEnum.UPDATE,
@@ -207,11 +226,24 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  public AccountDetailDTO queryDetailByAccountCode(String accountCode) {
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByAccountCode(accountCode);
+    AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
+    BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
+    return accountDetailDTO;
+  }
+
+  @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean save(Account account) {
     validationAccount(account,true);
     Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
+
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, accounCode,account.getCreateUser());
+    accountChangeEventRecordService.save(accountChangeEventRecord);
+
     account.setAccountCode(accounCode);
+    account.setChangeEventId(accountChangeEventRecord.getId());
     boolean result = accountDao.save(account);
     AccountSyncDTO accountSyncDTO = getAccountSyncDTO(account);
     this.syncAccount(ShoppingActionTypeEnum.ADD,
@@ -365,5 +397,11 @@ public class AccountServiceImpl implements AccountService {
     accountSimpleDTO.setAccountBalance(account.getAccountBalance());
     accountSimpleDTO.setSurplusQuota(account.getSurplusQuota());
     return accountSimpleDTO;
+  }
+
+  @Override
+  public void batchUpdateChangeEventId(List<Map<String, Object>> list) {
+    accountCustomizeMapper.batchUpdateChangeEventId(list);
+    return;
   }
 }

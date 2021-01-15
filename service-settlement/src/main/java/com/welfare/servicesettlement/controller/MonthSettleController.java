@@ -1,11 +1,14 @@
 package com.welfare.servicesettlement.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.ExcelUtil;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.*;
+import com.welfare.servicesettlement.task.SettlementBillBuildTask;
+import com.welfare.servicesettlement.task.SettlementDetailDealTask;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author qiang.deng
@@ -35,6 +40,10 @@ public class MonthSettleController implements IController {
 
     @Autowired
     private MonthSettleService monthSettleService;
+    @Autowired
+    private SettlementBillBuildTask settlementBillBuildTask;
+    @Autowired
+    private SettlementDetailDealTask settlementDetailDealTask;
 
 
     @GetMapping("/page")
@@ -105,5 +114,23 @@ public class MonthSettleController implements IController {
     public R monthSettleFinish(@PathVariable("id")String id){
         Integer count = monthSettleService.monthSettleFinish(id);
         return count == 1 ? R.success():R.fail("操作失败");
+    }
+
+    @GetMapping("/settlementDetailDealTask")
+    @ApiOperation("员工账户交易数据手工拉取")
+    public R settlementDetailDealTask(String date){
+        Map params = new HashMap<>();
+        params.put("date", date);
+        settlementDetailDealTask.execute(JSON.toJSONString(date));
+        return R.success();
+    }
+
+    @GetMapping("/settlementBillBuildTask")
+    @ApiOperation("账单数据手动生成")
+    public R settlementBillBuildTask(String date){
+        Map params = new HashMap<>();
+        params.put("date", date);
+        settlementBillBuildTask.execute(JSON.toJSONString(date));
+        return R.success();
     }
 }

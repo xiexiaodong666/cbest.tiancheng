@@ -28,6 +28,8 @@ public class SupplierStoreInfo  {
      */
     @ApiModelProperty("id")
 	private Long id;
+    @ApiModelProperty("虚拟收银机号")
+    private String cashierNo;
     /**
      * 商户代码
      */
@@ -87,7 +89,6 @@ public class SupplierStoreInfo  {
      * 更新日期
      */
     @ApiModelProperty("更新日期")  
-    @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 外部编码

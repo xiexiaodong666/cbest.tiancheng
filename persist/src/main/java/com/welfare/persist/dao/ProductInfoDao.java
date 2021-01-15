@@ -2,7 +2,6 @@ package com.welfare.persist.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.collect.Lists;
 import com.welfare.persist.entity.Dict;
 import com.welfare.persist.entity.ProductInfo;
 import com.welfare.persist.mapper.DictMapper;

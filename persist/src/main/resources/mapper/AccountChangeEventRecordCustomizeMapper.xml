@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper">
+  <insert id="insertAccountChangeEvent" useGeneratedKeys="true" keyProperty="id" parameterType="com.welfare.persist.entity.AccountChangeEventRecord">
+    insert into account_change_event_record (account_code,change_type,change_value,create_user,create_time) values (#{accountCode},#{changeType},#{changeValue},#{createUser},#{createTime})
+ </insert>
+  <insert id ="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="com.welfare.persist.entity.AccountChangeEventRecord">
+    insert into account_change_event_record (account_code,change_type,change_value,create_user,create_time) values
+    <foreach collection="list" item="item" index="index" separator="," >
+      ( #{item.accountCode,jdbcType=BIGINT},
+      #{item.changeType,jdbcType=VARCHAR},
+      #{item.changeValue,jdbcType=VARCHAR},
+      #{item.createUser,jdbcType=VARCHAR},
+      #{item.createTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+</mapper>

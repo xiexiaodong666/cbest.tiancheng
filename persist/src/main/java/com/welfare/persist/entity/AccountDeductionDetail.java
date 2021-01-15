@@ -55,6 +55,11 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     @ApiModelProperty("交易流水号")   
     private String transNo;
     /**
+     * 关联交易流水号
+     */
+    @ApiModelProperty("关联交易流水号")
+    private String relatedTransNo;
+    /**
      * 消费门店
      */
     @ApiModelProperty("消费门店")   
@@ -103,7 +108,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      * 子账户剩余金额
      */
     @ApiModelProperty("子账户剩余金额")   
-    private BigDecimal accountDeductionBalance;
+    private BigDecimal accountAmountTypeBalance;
     /**
      * 商户余额扣款金额
      */

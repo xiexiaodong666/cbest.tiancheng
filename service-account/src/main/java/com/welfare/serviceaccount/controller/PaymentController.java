@@ -41,14 +41,14 @@ public class PaymentController implements IController {
     @PostMapping("/barcode")
     @ApiOperation("条码支付")
     public R<BarcodePaymentRequest> newBarcodePaymentRequest(@RequestBody BarcodePaymentRequest paymentRequest) {
-        Map<String, Object> map = BeanUtil.toMap(paymentRequest);
+        paymentService.handlePayRequest(paymentRequest);
         return success(paymentRequest);
     }
 
     @PostMapping("/card")
     @ApiOperation("刷卡支付")
     public R<CardPaymentRequest> newCardPaymentRequest(@RequestBody CardPaymentRequest paymentRequest) {
-        Map<String, Object> map = BeanUtil.toMap(paymentRequest);
+        paymentService.handlePayRequest(paymentRequest);
         return success(paymentRequest);
     }
 

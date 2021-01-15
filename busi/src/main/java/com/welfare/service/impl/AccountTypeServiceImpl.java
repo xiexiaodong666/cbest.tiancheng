@@ -105,6 +105,11 @@ public class AccountTypeServiceImpl implements AccountTypeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean delete(Long id) {
+        AccountType accountType = accountTypeDao.getById(id);
+        if( null ==  accountType) {
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不存在",null);
+        }
+        //TODO 批量修改
         return accountTypeDao.removeById(id);
     }
 

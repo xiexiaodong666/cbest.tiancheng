@@ -11,17 +11,17 @@ import com.welfare.common.domain.MerchantUserInfo;
  */
 public class MerchantUserHolder {
 
-  private static final ThreadLocal<MerchantUserInfo> DEPT_ID_LOCAL = new ThreadLocal<>();
+  private static final ThreadLocal<MerchantUserInfo> merchantUserInfoThreadLocal = new ThreadLocal<>();
 
-  public static MerchantUserInfo getDeptIds() {
-    return DEPT_ID_LOCAL.get();
+  public static MerchantUserInfo getMerchantUser() {
+    return merchantUserInfoThreadLocal.get();
   }
 
-  public static void setDeptIds(MerchantUserInfo merchantUser) {
-    DEPT_ID_LOCAL.set(merchantUser);
+  public static void setMerchantUser(MerchantUserInfo merchantUser) {
+    merchantUserInfoThreadLocal.set(merchantUser);
   }
 
   public static void release() {
-    DEPT_ID_LOCAL.remove();
+    merchantUserInfoThreadLocal.remove();
   }
 }

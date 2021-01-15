@@ -103,17 +103,16 @@ public class Merchant extends Model<Merchant> implements Serializable {
      */
     @ApiModelProperty("状态")   
     private Integer status;
+
+    @ApiModelProperty("删除标记")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer version;
-    /**
-     * 同步状态
-     */
-    @ApiModelProperty("同步状态")   
-    private Integer syncStatus;
 
 //以下为列明常量
 
@@ -173,9 +172,5 @@ public class Merchant extends Model<Merchant> implements Serializable {
     * 版本
     */
     public static final String VERSION = "version";
-    /**
-    * 同步状态
-    */
-    public static final String SYNC_STATUS = "sync_status";
 
 }

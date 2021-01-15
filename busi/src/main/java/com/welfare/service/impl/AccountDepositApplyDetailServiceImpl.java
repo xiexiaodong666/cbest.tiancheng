@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dao.AccountDepositApplyDao;
 import  com.welfare.persist.dao.AccountDepositApplyDetailDao;
+import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.AccountDepositApply;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
 import com.welfare.persist.entity.TempAccountDepositApply;
 import com.welfare.persist.mapper.AccountDepositApplyDetailMapper;
+import com.welfare.service.AccountDepositApplyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountDepositApplyDetailService;
@@ -32,9 +34,11 @@ public class AccountDepositApplyDetailServiceImpl implements AccountDepositApply
     @Autowired
     private AccountDepositApplyDetailDao accountDepositApplyDetailDao;
 
-
     @Autowired
     private AccountDepositApplyDao accountDepositApplyDao;
+
+    @Autowired
+    private AccountDepositApplyDao accountDepositApplyService;
 
     @Override
     public List<AccountDepositApplyDetail> listByApplyCode(String applyCode) {
@@ -62,5 +66,11 @@ public class AccountDepositApplyDetailServiceImpl implements AccountDepositApply
     @Override
     public List<AccountDepositApplyDetail> listByApplyCodeIfAccountExist(String applyCode) {
         return accountDepositApplyDetailDao.getBaseMapper().listByApplyCodeIfAccountExist(applyCode);
+    }
+
+    @Override
+    public AccountApplyTotalDTO getUserCountAndTotalmount(Long id) {
+        AccountDepositApply apply = accountDepositApplyService.getById(id);
+        return accountDepositApplyDetailDao.getBaseMapper().getUserCountAndTotalmount(apply.getApplyCode());
     }
 }

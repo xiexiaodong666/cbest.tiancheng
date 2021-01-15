@@ -1,6 +1,7 @@
 package com.welfare.persist.dto.query;
 
 import io.swagger.annotations.ApiModelProperty;
+import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,4 +30,16 @@ public class MerchantPageReq {
 
     @ApiModelProperty("结束时间")
     private Date endTime;
+
+    /**
+     * 来源
+     */
+    @ApiModelProperty("来源")
+    private String source;
+
+    /**
+     * 来源
+     */
+    @ApiModelProperty("来源")
+    private Set<String> merCodes;
 }

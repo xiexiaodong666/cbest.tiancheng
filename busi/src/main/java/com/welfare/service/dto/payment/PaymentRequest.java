@@ -62,4 +62,8 @@ public abstract class PaymentRequest {
     public Long calculateAccountCode(){
         return getAccountCode();
     }
+
+    public String getCardNo() {
+        return null;
+    }
 }

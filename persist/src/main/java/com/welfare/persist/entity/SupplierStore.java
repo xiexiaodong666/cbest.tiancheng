@@ -119,17 +119,15 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
      */
     @ApiModelProperty("外部编码")   
     private String externalCode;
+
+    @ApiModelProperty("虚拟收银机号")
+    private String cashierNo;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer version;
-    /**
-     * 同步状态
-     */
-    @ApiModelProperty("同步状态")   
-    private Integer syncStatus;
 
 //以下为列明常量
 
@@ -137,6 +135,10 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     * id
     */
     public static final String ID = "id";
+    /**
+     * 虚拟收银机号
+     */
+    public static final String CASHIER_NO = "cashier_no";
     /**
     * 商户代码
     */
@@ -201,9 +203,5 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     * 版本
     */
     public static final String VERSION = "version";
-    /**
-    * 同步状态
-    */
-    public static final String SYNC_STATUS = "sync_status";
 
 }

@@ -6,7 +6,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.SequenceTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.ApiUserHolder;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
@@ -93,8 +93,8 @@ public class CardApplyServiceImpl implements CardApplyService {
     cardApply.setIdentificationCode(cardApplyAddReq.getIdentificationCode());
     cardApply.setIdentificationLength(cardApplyAddReq.getIdentificationLength());
     cardApply.setRemark(cardApplyAddReq.getRemark());
-    if (ApiUserHolder.getUserInfo() != null) {
-      cardApply.setCreateUser(ApiUserHolder.getUserInfo().getUserName());
+    if (UserInfoHolder.getUserInfo() != null) {
+      cardApply.setCreateUser(UserInfoHolder.getUserInfo().getUserName());
     }
 
     cardApply.setDeleted(false);

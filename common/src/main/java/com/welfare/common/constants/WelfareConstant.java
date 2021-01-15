@@ -146,7 +146,8 @@ public class WelfareConstant {
         ACCOUNT_TYPE_CODE("account_type_code","员工类型编码"),
         ACCOUNT_CODE("account_code","员工账号"),
         DEPARTMENT_CODE("department_code","部门编号"),
-        MER_CODE("mer_code","商户编号");
+        MER_CODE("mer_code","商户编号"),
+        ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请");
         private String code;
         private String desc;
 

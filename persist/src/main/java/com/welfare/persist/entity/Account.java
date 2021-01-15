@@ -147,6 +147,9 @@ public class Account extends Model<Account> implements Serializable {
     @ApiModelProperty("同步状态")
     private Integer syncStatus;
 
+    @ApiModelProperty("账号变更记录ID")
+    private Long changeEventId;
+
 //以下为列明常量
 
     /**
@@ -233,5 +236,7 @@ public class Account extends Model<Account> implements Serializable {
      * 同步状态
      */
     public static final String SYNC_STATUS="sync_status";
+
+    public static  final String CHANGE_EVENT_ID= "change_event_id";
 
 }

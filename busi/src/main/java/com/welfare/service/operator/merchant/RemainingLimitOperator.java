@@ -9,7 +9,6 @@ import com.welfare.service.enums.IncOrDecType;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,12 +36,12 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
         BigDecimal currentRemainingLimit = merchantCredit.getRemainingLimit();
         BigDecimal subtract = currentRemainingLimit.subtract(amount);
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
-            return doWhenNotEnough(merchantCredit,subtract.negate(), transNo);
+            return doWhenNotEnough(merchantCredit,subtract.negate(),currentRemainingLimit , transNo);
         } else {
             merchantCredit.setRemainingLimit(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     merCreditType,
-                    subtract,
+                    amount,
                     IncOrDecType.DECREASE, merchantCredit,transNo );
             return Collections.singletonList(operation);
         }
@@ -55,11 +54,11 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
         BigDecimal creditLimit = merchantCredit.getCreditLimit();
         BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
         BigDecimal add = amount.add(remainingLimit).subtract(creditLimit);
-        if (add.compareTo(creditLimit) > 0) {
+        if (add.compareTo(BigDecimal.ZERO) > 0) {
             // 超过信用额度
             return doWhenMoreThan(merchantCredit,add,transNo);
         } else {
-            merchantCredit.setRemainingLimit(amount);
+            merchantCredit.setRemainingLimit(remainingLimit.add(amount));
             MerchantAccountOperation remainingLimitOperator = MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo);
             return Lists.newArrayList(remainingLimitOperator);
         }

@@ -5,16 +5,13 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountAmountTypeDao;
+import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
-import com.welfare.service.AccountAmountTypeService;
-import com.welfare.service.AccountBillDetailService;
-import com.welfare.service.AccountService;
-import com.welfare.service.AccountTypeService;
-import com.welfare.service.MerchantAccountTypeService;
+import com.welfare.service.*;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
@@ -50,7 +47,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountAmountTypeMapper accountAmountTypeMapper;
     private final MerchantAccountTypeService merchantAccountTypeService;
     private final RedissonClient redissonClient;
+    private final AccountDao accountDao;
     private final AccountService accountService;
+    private final OrderTransRelationService orderTransRelationService;
     /**
      * 循环依赖问题，所以未采用构造器注入
      */
@@ -90,8 +89,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 accountAmountTypeDao.updateById(accountAmountType);
             }
             account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
-            accountService.save(account);
+            accountDao.saveOrUpdate(account);
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
+            orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT);
         } finally {
             lock.unlock();
         }
@@ -101,7 +101,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     public AccountAmountType querySurplusQuota(Long accountCode) {
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, accountCode)
-                .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA);
+                .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code());
         return accountAmountTypeDao.getOne(queryWrapper);
     }
 
@@ -120,6 +120,19 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 .map(accountAmountType ->
                         AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode())))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public BigDecimal sumBalanceExceptSurplusQuota(Long accountCode) {
+        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE,accountCode)
+                .ne(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA)
+                .select(AccountAmountType.MER_ACCOUNT_TYPE_CODE,AccountAmountType.ACCOUNT_BALANCE);
+        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(queryWrapper);
+        BigDecimal balanceSum = accountAmountTypes.stream()
+                .map(AccountAmountType::getAccountBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return balanceSum;
     }
 
 

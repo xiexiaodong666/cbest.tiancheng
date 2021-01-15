@@ -40,12 +40,12 @@ public class PullAccountDetailRecord extends Model<PullAccountDetailRecord> impl
      * 商户代码
      */
     @ApiModelProperty("商户代码")  
-    private String merchantCode;
+    private String merCode;
     /**
      * 处理日期
      */
     @ApiModelProperty("处理日期")  
-    private Date delDate;
+    private String delDate;
     /**
      * 处理状态 success-成功 fail-失败
      */

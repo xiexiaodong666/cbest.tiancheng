@@ -8,6 +8,7 @@ import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
+import com.welfare.service.dto.SupplierStoreTreeDTO;
 import com.welfare.servicemerchant.converter.SupplierStoreConverter;
 import com.welfare.servicemerchant.dto.SupplierStoreInfo;
 import com.welfare.servicemerchant.service.FileUploadService;
@@ -57,9 +58,15 @@ public class SupplierStoreController implements IController {
     public R<List<SupplierStoreInfo>> list( SupplierStoreListReq req){
         return R.success(supplierStoreConverter.toD(supplierStoreService.list(req)));
     }
+
+    @GetMapping("/tree")
+    @ApiOperation("查询供应商门店列表（树形）")
+    public R<List<SupplierStoreTreeDTO>> tree(String merCode){
+        return R.success(supplierStoreService.tree(merCode));
+    }
     @GetMapping("/detail")
     @ApiOperation("查询供应商门店详情）")
-    public R<SupplierStoreDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+    public R<SupplierStoreDetailDTO> detail( @ApiParam("id") Long id){
         return R.success(supplierStoreService.detail(id));
     }
 

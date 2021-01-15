@@ -76,6 +76,11 @@ public class AccountController implements IController {
   public R<AccountDetailDTO> detail(@PathVariable String id) {
     return success(accountService.queryDetail(Long.parseLong(id)));
   }
+  @GetMapping("/detailByPhone")
+  @ApiOperation("员工账号详情")
+  public R<AccountDetailDTO> detailByPhone(@RequestParam @ApiParam("员工手机号")  String phone){
+    return success(accountService.queryDetailByParam(null,null,phone));
+  }
 
   @GetMapping("/detailByAccountCode")
   @ApiOperation("通过账号获取员工账号详情")

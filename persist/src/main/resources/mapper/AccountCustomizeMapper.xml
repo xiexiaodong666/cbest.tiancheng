@@ -36,7 +36,8 @@
     <result property="changeEventId" column="change_event_id"/>
   </resultMap>
   <select id="queryByConsumeSceneIdList" resultMap="accountMap">
-    select <include refid="baseColumn"/>
+    select
+    <include refid="baseColumn"/>
     from account a
     left join account_type at on a.account_type_code = at.type_code
     left join account_consume_scene acs on acs.account_type_code = at.type_code
@@ -105,8 +106,8 @@ FROM
 	INNER JOIN department d ON a.store_code = d.department_code
 	INNER JOIN merchant m ON a.mer_code = m.mer_code
 	LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
-WHERE
-	a.deleted = 0
+WHERE a.mer_code = at.mer_code
+	and a.deleted = 0
 	AND d.deleted = 0
 	AND AT.deleted = 0
 	AND a.id = #{id}
@@ -189,6 +190,7 @@ FROM
 	LEFT JOIN account_consume_scene_store_relation relation ON relation.account_consume_scene_id = acs.id
 	LEFT JOIN card_info ci ON a.account_code = ci.account_code
 WHERE
+a.mer_code = at.mer_code and
 	relation.store_code = #{storeCode}
 	AND a.change_event_id > #{changeEventId}
 GROUP BY
@@ -210,30 +212,40 @@ LIMIT #{size}
     </foreach>
   </update>
 
-  <select id="queryDetailByAccountCode" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
-        SELECT
-        a.id,
-        a.account_name AS accountName,
-        a.account_code AS accountCode,
-        a.account_status AS accountStatus,
-        AT.type_name AS accountTypeName,
-        d.department_code AS departmentCode,
-        d.department_name AS departmentName,
-        m.mer_code AS merCode,
-        m.mer_name AS merName,
-        a.max_quota AS maxQuota,
-        a.surplus_quota AS surplusQuota,
-        a.account_balance AS accountBalance,
-        a.remark
-        FROM
-        account a
-        INNER JOIN department d ON a.store_code = d.department_code
-        INNER JOIN merchant m ON a.mer_code = m.mer_code
-        LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
-        WHERE
-        a.deleted = 0
-        AND d.deleted = 0
-        AND AT.deleted = 0
-        AND a.account_code = #{accountCode}
-    </select>
+  <select id="queryDetailByParam" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
+    SELECT
+    a.id,
+    a.account_name AS accountName,
+    a.account_code AS accountCode,
+    a.account_status AS accountStatus,
+    AT.type_name AS accountTypeName,
+    d.department_code AS departmentCode,
+    d.department_name AS departmentName,
+    m.mer_code AS merCode,
+    m.mer_name AS merName,
+    a.max_quota AS maxQuota,
+    a.surplus_quota AS surplusQuota,
+    a.account_balance AS accountBalance,
+    a.remark
+    FROM
+    account a
+    INNER JOIN department d ON a.store_code = d.department_code
+    INNER JOIN merchant m ON a.mer_code = m.mer_code
+    LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
+    WHERE
+    a.mer_code = at.mer_code and
+    a.deleted = 0
+    AND d.deleted = 0
+    AND AT.deleted = 0
+
+    <if test=" id != null ">
+      and a.id = #{id}
+    </if>
+    <if test=" accountCode != null ">
+      and a.account_code = #{accountCode}
+    </if>
+    <if test=" phone !='' and phone != null ">
+      and a.phone = #{phone}
+    </if>
+  </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.welfare.service.sync.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import lombok.Data;
 
 /**
@@ -12,5 +13,8 @@ import lombok.Data;
 @Data
 @JsonInclude(value = Include.NON_NULL)
 public class SupplierStoreUpdateEvt extends SupplierStoreEvt {
-
+    @Override
+    public Long getSearchKey1() {
+        return ShoppingActionTypeEnum.UPDATE.getEvtType();
+    }
 }

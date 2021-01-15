@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Description:
@@ -26,4 +27,6 @@ public class RefundRequest {
     private BigDecimal amount;
     @ApiModelProperty(value = "退款处理状态,1:新增, 2:处理中, 3:处理成功 -1:处理失败")
     private Integer refundStatus;
+    @ApiModelProperty("退款日期")
+    private Date refundDate;
 }

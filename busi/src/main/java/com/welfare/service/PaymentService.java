@@ -23,4 +23,11 @@ public interface PaymentService {
      * @return
      */
     List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest);
+
+    /**
+     * 查询支付结果
+     * @param transNo
+     * @return
+     */
+    PaymentRequest queryResult(String transNo);
 }

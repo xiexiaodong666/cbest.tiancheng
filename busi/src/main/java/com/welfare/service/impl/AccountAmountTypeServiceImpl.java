@@ -118,7 +118,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 .collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
         return accountAmountTypes.stream()
                 .map(accountAmountType ->
-                        AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode())))
+                        AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode()),account))
                 .collect(Collectors.toList());
     }
 

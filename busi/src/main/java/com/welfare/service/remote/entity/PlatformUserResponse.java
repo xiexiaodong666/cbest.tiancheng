@@ -13,13 +13,13 @@ import lombok.Data;
 public class PlatformUserResponse<T> {
 
   private Integer code;
-  private String msg;
+  private String message;
   private T data;
 
   @Builder
-  public PlatformUserResponse(Integer code, String msg, T data) {
+  public PlatformUserResponse(Integer code, String message, T data) {
     this.code = code;
-    this.msg = msg;
+    this.message = message;
     this.data = data;
   }
   public PlatformUserResponse(){

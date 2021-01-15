@@ -71,6 +71,23 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public List<Merchant> list(MerchantReq req) {
         List<Merchant> list = merchantDao.list(QueryHelper.getWrapper(req));
+        if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
+
+            QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
+            queryWrapper.groupBy(MerchantStoreRelation.MER_CODE);
+
+            List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
+                queryWrapper);
+            if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
+                List<String> merCodeList = merchantStoreRelations.stream().map(
+                    MerchantStoreRelation::getMerCode).collect(Collectors.toList());
+                Set<String> merCodeSet = new HashSet<>(merCodeList);
+                QueryWrapper<Merchant> queryWrapperMerchant = new QueryWrapper<>();
+                queryWrapperMerchant.notIn(Merchant.MER_CODE, merCodeSet);
+                queryWrapperMerchant.eq(Merchant.STATUS, 0);
+                list = merchantDao.list(queryWrapperMerchant);
+            }
+        }
         return list;
     }
 
@@ -105,23 +122,6 @@ public class MerchantServiceImpl implements MerchantService {
     public List<MerchantWithCreditAndTreeDTO> tree( MerchantPageReq merchantPageReq) {
         List<MerchantWithCreditDTO> list = merchantExMapper.listWithCredit( merchantPageReq);
 
-
-        if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(merchantPageReq.getSource())) {
-
-            QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-            queryWrapper.groupBy(MerchantStoreRelation.MER_CODE);
-
-            List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
-                queryWrapper);
-            if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
-                List<String> merCodeList = merchantStoreRelations.stream().map(
-                    MerchantStoreRelation::getMerCode).collect(Collectors.toList());
-                Set<String> merCodeSet = new HashSet<>(merCodeList);
-
-                merchantPageReq.setMerCodes(merCodeSet);
-                list = merchantExMapper.listWithCredit(merchantPageReq);
-            }
-        }
 
         if(EmptyChecker.isEmpty(list)){
             return new ArrayList<>();

@@ -57,6 +57,8 @@ public interface AccountService {
 
   AccountDetailDTO queryDetailByAccountCode(String accountCode);
 
+  AccountDetailDTO queryDetailByParam(Long id,Long accountCode,String phone);
+
   Boolean save(Account account);
 
   Boolean batchSave(List<Account> accountList);

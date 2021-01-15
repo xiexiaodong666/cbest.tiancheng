@@ -1,10 +1,13 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.persist.mapper.AccountDeductionDetailMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * 用户交易流水明细表(account_deduction_detail)数据DAO
@@ -17,4 +20,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AccountDeductionDetailDao extends ServiceImpl<AccountDeductionDetailMapper, AccountDeductionDetail> {
 
+    public List<AccountDeductionDetail> queryByTransNo(String transNo) {
+        QueryWrapper<AccountDeductionDetail> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountDeductionDetail.TRANS_NO, transNo);
+        return list(queryWrapper);
+    }
 }

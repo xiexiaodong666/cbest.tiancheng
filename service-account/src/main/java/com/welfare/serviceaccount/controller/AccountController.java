@@ -1,18 +1,16 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.common.annotation.AccountUser;
+import com.welfare.common.util.AccountUserHolder;
 import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.AccountService;
-import com.welfare.service.dto.AccountPayResultQueryDTO;
-import com.welfare.service.dto.AccountPayResultQueryReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,8 +31,10 @@ public class AccountController implements IController {
     private final AccountService accountService;
 
     @ApiOperation("账号信息")
-    @GetMapping("/info/{accountCode}")
-    public R<AccountSimpleDTO> info(@ApiParam("账号") @PathVariable Long accountCode) {
+    @GetMapping("/info")
+    @AccountUser
+    public R<AccountSimpleDTO> info() {
+        Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.queryAccountInfo(accountCode));
     }
 }

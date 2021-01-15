@@ -57,8 +57,8 @@ public class AccountController implements IController {
 
   @GetMapping("/increment")
   @ApiOperation("员工账户增量查询")
-  public List<AccountIncrementDTO> incrementAccountList(AccountIncrementReq accountIncrementReq){
-    return accountService.queryIncrementDTO(accountIncrementReq);
+  public R<List<AccountIncrementDTO>> incrementAccountList(AccountIncrementReq accountIncrementReq){
+    return success(accountService.queryIncrementDTO(accountIncrementReq));
   }
 
   @GetMapping("/page")

@@ -352,7 +352,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setCreateUser("system");
             orderInfo.setCreateTime(new Date());
             orderInfo.setOrderTime(item.getTransTime());
-            orderInfo.setAccountCode(Integer.valueOf(item.getAccountCode()));
+            orderInfo.setAccountCode(item.getAccountCode());
             orderInfo.setAccountName(account != null ? account.getAccountName():null);
             orderInfo.setStoreCode(item.getStoreCode());
             orderInfo.setStoreName(supplierStore != null ? supplierStore.getStoreName() : null);
@@ -510,7 +510,7 @@ public class OrderServiceImpl implements OrderService {
                 orderInfo.setMerchantName(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[1]);
                 DateTime time = new DateTime();
                 time.setTime(orderTime);
-                orderInfo.setOrderTime("");
+                orderInfo.setOrderTime(null);
                 orderInfo.setCreateUser("system");
                 orderInfo.setCreateTime(new Date());
                 //订单中是否包含员工卡支付
@@ -544,7 +544,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setMerchantName(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[1]);
             DateTime time = new DateTime();
             time.setTime(orderTime);
-            orderInfo.setOrderTime("");
+            orderInfo.setOrderTime(null);
             orderInfo.setCreateUser("system");
             orderInfo.setCreateTime(new Date());
             //订单中是否包含员工卡支付

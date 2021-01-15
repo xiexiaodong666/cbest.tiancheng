@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.persist.dao.MerchantBillDetailDao;
 import com.welfare.persist.dao.MerchantCreditDao;
@@ -108,6 +109,24 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
             List<MerchantAccountOperation> increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo );
+            merchantCreditDao.updateById(merchantCredit);
+            List<MerchantBillDetail> merchantBillDetails = increase.stream()
+                    .map(MerchantAccountOperation::getMerchantBillDetail)
+                    .collect(Collectors.toList());
+            merchantBillDetailDao.saveBatch(merchantBillDetails);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void setAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
+        RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
+        lock.lock();
+        try{
+            MerchantCredit merchantCredit = this.getByMerCode(merCode);
+            AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
+            List<MerchantAccountOperation> increase = merAccountTypeOperator.set(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
         } finally {
             lock.unlock();

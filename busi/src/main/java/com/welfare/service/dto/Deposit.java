@@ -38,6 +38,8 @@ public class Deposit {
     private Integer depositStatus;
     @ApiModelProperty("渠道,wechat,alipay")
     private String channel;
+    @ApiModelProperty("申请编号")
+    private String applyCode;
 
     public static Deposit of(AccountDepositApply accountDepositApply,AccountDepositApplyDetail accountDepositApplyDetail){
         Deposit deposit = new Deposit();
@@ -46,8 +48,9 @@ public class Deposit {
         deposit.setAmount(accountDepositApplyDetail.getRechargeAmount());
         deposit.setMerchantCode(accountDepositApply.getMerCode());
         deposit.setAccountCode(accountDepositApplyDetail.getAccountCode());
-        deposit.setTransNo(accountDepositApply.getTransNo());
+        deposit.setTransNo(accountDepositApplyDetail.getTransNo());
         deposit.setChannel(accountDepositApply.getChannel());
+        deposit.setApplyCode(accountDepositApply.getApplyCode());
         return deposit;
     }
 

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.OrderInfoMapper">
+    <sql id="tableName">
+        order_info
+    </sql>
+
+    <sql id="baseColumn">
+        id,order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,
+        account_name,card_id,order_amount,order_time,pay_code,pay_name,trans_type,trans_type_name,
+        create_user,create_time
+    </sql>
+	
+	<!--查询订单-->
+    <select id="searchOrder" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.entity.OrderInfo">
+        select <include refid="baseColumn"/> from order_info
+        <where>
+            <if test="orderPageQuery.orderId != null">
+                and order_id = #{orderPageQuery.orderId}
+            </if>
+            <if test="orderPageQuery.accountName != null">
+                and account_name = #{orderPageQuery.accountName}
+            </if>
+            <if test="orderPageQuery.lowPrice != null">
+                and order_amount &gt;= #{orderPageQuery.lowPrice}
+            </if>
+            <if test="orderPageQuery.highPrice != null">
+                and order_amount &lt;= #{orderPageQuery.highPrice}
+            </if>
+            <if test="orderPageQuery.merchantCode != null">
+                and merchant_code = #{orderPageQuery.merchantCode}
+            </if>
+            <if test="orderPageQuery.startDateTime != null">
+                and order_time &gt;= #{orderPageQuery.startDateTime}
+            </if>
+            <if test="orderPageQuery.endDateTime != null">
+                and order_time &lt;= #{orderPageQuery.endDateTime}
+            </if>
+            <if test="(orderPageQuery.noRebateStoreList != null and orderPageQuery.noRebateStoreList.size > 0)
+                or  (orderPageQuery.cardRebateStoreList != null and orderPageQuery.cardRebateStoreList.size >0)
+                or (orderPageQuery.otherRebateStoreList != null and orderPageQuery.otherRebateStoreList.size >0 )
+                or (orderPageQuery.allRebateStoreList != null and orderPageQuery.allRebateStoreList.size > 0)">
+                and ( 1 = 1
+                <if test="orderPageQuery.noRebateStoreList != null and orderPageQuery.noRebateStoreList.size > 0">
+                    <!--没有返利-->
+                    or (store_code in
+                    <foreach collection="orderPageQuery.noRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    and pay_code = "5065")
+                </if>
+                <if test="orderPageQuery.cardRebateStoreList != null and orderPageQuery.cardRebateStoreList.size >0">
+                    <!--只有员工卡支付方式返利-->
+                    or (1 = 1 and store_code in
+                    <foreach collection="orderPageQuery.cardRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    and pay_code = "5065")
+                </if>
+                <if test="orderPageQuery.otherRebateStoreList != null and orderPageQuery.otherRebateStoreList.size >0">
+                    <!--只有员工卡支付方式返利-->
+                    or (1 = 1 and store_code in
+                    <foreach collection="orderPageQuery.otherRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    and pay_code != "5065")
+                </if>
+                <if test="orderPageQuery.allRebateStoreList != null and orderPageQuery.allRebateStoreList.size > 0">
+                    <!--员工卡支付和其他支付方式返利-->
+                    or store_code in
+                    <foreach collection="orderPageQuery.allRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                )
+            </if>
+        </where>
+    </select>
+
+    <!--查询订单-->
+    <select id="searchOrderSum" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.entity.OrderSummary">
+        select sum(order_amount) as orderAmount , count(order_id) as orderNum from order_info
+        <where>
+            <if test="orderPageQuery.orderId != null">
+                and order_id = #{orderPageQuery.orderId}
+            </if>
+            <if test="orderPageQuery.accountName != null">
+                and account_name = #{orderPageQuery.accountName}
+            </if>
+            <if test="orderPageQuery.lowPrice != null">
+                and order_amount &gt;= #{orderPageQuery.lowPrice}
+            </if>
+            <if test="orderPageQuery.highPrice != null">
+                and order_amount &lt;= #{orderPageQuery.highPrice}
+            </if>
+            <if test="orderPageQuery.merchantCode != null">
+                and merchant_code = #{orderPageQuery.merchantCode}
+            </if>
+            <if test="orderPageQuery.startDateTime != null">
+                and order_time &gt;= #{orderPageQuery.startDateTime}
+            </if>
+            <if test="orderPageQuery.endDateTime != null">
+                and order_time &lt;= #{orderPageQuery.endDateTime}
+            </if>
+            <if test="(orderPageQuery.noRebateStoreList != null and orderPageQuery.noRebateStoreList.size > 0)
+                or  (orderPageQuery.cardRebateStoreList != null and orderPageQuery.cardRebateStoreList.size >0)
+                or (orderPageQuery.otherRebateStoreList != null and orderPageQuery.otherRebateStoreList.size >0 )
+                or (orderPageQuery.allRebateStoreList != null and orderPageQuery.allRebateStoreList.size > 0)">
+                and ( 1 = 1
+                <if test="orderPageQuery.noRebateStoreList != null and orderPageQuery.noRebateStoreList.size > 0">
+                    <!--没有返利-->
+                    or (store_code in
+                    <foreach collection="orderPageQuery.noRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    and pay_code = "5065")
+                </if>
+                <if test="orderPageQuery.cardRebateStoreList != null and orderPageQuery.cardRebateStoreList.size >0">
+                    <!--只有员工卡支付方式返利-->
+                    or (1 = 1 and store_code in
+                    <foreach collection="orderPageQuery.cardRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    and pay_code = "5065")
+                </if>
+                <if test="orderPageQuery.otherRebateStoreList != null and orderPageQuery.otherRebateStoreList.size >0">
+                    <!--只有员工卡支付方式返利-->
+                    or (1 = 1 and store_code in
+                    <foreach collection="orderPageQuery.otherRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    and pay_code != "5065")
+                </if>
+                <if test="orderPageQuery.allRebateStoreList != null and orderPageQuery.allRebateStoreList.size > 0">
+                    <!--员工卡支付和其他支付方式返利-->
+                    or store_code in
+                    <foreach collection="orderPageQuery.allRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                )
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="saveOrUpdate" parameterType="list" >
+        insert into <!--<include refid="tableName"/>-->
+        order_info(order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,
+        card_id,order_amount,order_time,pay_code,pay_name,trans_type , trans_type_name,create_user,create_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.orderId},#{item.goods},#{item.merchantCode},#{item.merchantName},#{item.storeCode},
+            #{item.storeName},#{item.accountCode},#{item.accountName},#{item.cardId},
+            #{item.orderAmount},#{item.orderTime},#{item.payCode},#{item.payName},
+            #{item.transType},#{item.transTypeName},
+            #{item.createUser},#{item.createTime}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        goods = values(goods),
+        merchant_code = values(merchant_code),
+        merchant_name =  values(merchant_name),
+        store_code = values(store_code),
+        store_name =  values(store_name),
+        account_code = values(account_code),
+        account_name =  values(account_name),
+        card_id = values(card_id),
+        order_amount =  values(order_amount),
+        order_time =  values(order_time),
+        pay_code =  values(pay_code),
+        pay_name =  values(pay_name),
+        trans_type = values(trans_type),
+        trans_type_name = values(trans_type_name),
+        update_user = values(update_user),
+        update_time = values(update_time)
+    </insert>
+
+</mapper>

@@ -11,11 +11,7 @@ import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
-import com.welfare.service.AccountAmountTypeService;
-import com.welfare.service.AccountBillDetailService;
-import com.welfare.service.AccountService;
-import com.welfare.service.AccountTypeService;
-import com.welfare.service.MerchantAccountTypeService;
+import com.welfare.service.*;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
@@ -53,6 +49,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final RedissonClient redissonClient;
     private final AccountDao accountDao;
     private final AccountService accountService;
+    private final OrderTransRelationService orderTransRelationService;
     /**
      * 循环依赖问题，所以未采用构造器注入
      */
@@ -94,6 +91,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
             accountDao.saveOrUpdate(account);
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
+            orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT);
         } finally {
             lock.unlock();
         }

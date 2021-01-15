@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -13,13 +14,17 @@ import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
+import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
+import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
@@ -31,6 +36,7 @@ import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreBinding;
 import com.welfare.service.remote.entity.UserRoleBinding;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
+import com.welfare.service.utils.AccountUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -71,6 +77,8 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final MerchantService merchantService;
   private final AccountTypeService accountTypeService;
   private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationList;
+  private final AccountService accountService;
+  private final AccountChangeEventRecordService accountChangeEventRecordService;
 
   @Override
   public void syncAccountConsumeScene(ShoppingActionTypeEnum actionTypeEnum,
@@ -241,7 +249,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq) {
-    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     BeanUtils.copyProperties(accountConsumeSceneReq, accountConsumeScene);
     validationAccountConsumeScene(accountConsumeScene,false);
@@ -254,12 +261,15 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
               accountConsumeSceneStoreRelation);
           accountConsumeSceneStoreRelationList.add(accountConsumeSceneStoreRelation);
         });
-    accountConsumeSceneStoreRelationDao.updateBatchById(accountConsumeSceneStoreRelationList);
-    //TODO 修改了选择类型  账户变更表增加记录
-    //下发数据
-    accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
-    syncAccountConsumeScene(ShoppingActionTypeEnum.UPDATE,
-        accountConsumeSceneMap);
+    boolean updateResult = accountConsumeSceneStoreRelationDao.updateBatchById(accountConsumeSceneStoreRelationList);
+    if( updateResult ){
+      accountChangeEventRecordService.batchSaveBySceneStoreRelation(accountConsumeSceneStoreRelationList);
+      //下发数据
+      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
+      accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
+      syncAccountConsumeScene(ShoppingActionTypeEnum.UPDATE,
+          accountConsumeSceneMap);
+    }
     return true;
   }
 
@@ -273,6 +283,10 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     }
     boolean deleteResult =  accountConsumeSceneDao.removeById(id);
     Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
+
+    if(deleteResult){
+      accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.ACCOUNT_CONSUME_SCENE_DELETE);
+    }
     //下发数据
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
     accountConsumeSceneMap.put(accountConsumeScene,relationList);
@@ -292,7 +306,11 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     updateWrapper.eq(AccountConsumeScene.ID, id);
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     accountConsumeScene.setStatus(status);
-    return accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
+    boolean updateResult =  accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
+    if(updateResult){
+      accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.getByAccountConsumeStatus(status));
+    }
+    return updateResult;
   }
 
   @Override

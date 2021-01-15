@@ -50,4 +50,6 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("size")Integer  size,
       @Param("changeEventId")Long changeEventId);
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
+
+  List<Account> queryByConsumeSceneIdList(List<Long> list);
 }

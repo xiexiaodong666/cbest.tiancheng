@@ -404,4 +404,16 @@ public class AccountServiceImpl implements AccountService {
     accountCustomizeMapper.batchUpdateChangeEventId(list);
     return;
   }
+
+  @Override
+  public List<Account> queryByAccountTypeCode(String accountTypeCode) {
+    QueryWrapper<Account> queryWrapper = new QueryWrapper<Account>();
+    queryWrapper.eq(Account.ACCOUNT_TYPE_CODE,accountTypeCode);
+    return accountDao.list(queryWrapper);
+  }
+
+  @Override
+  public List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId) {
+    return null;
+  }
 }

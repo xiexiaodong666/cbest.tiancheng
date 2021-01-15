@@ -26,7 +26,7 @@ import org.killbill.bus.api.BusEvent;
 @JsonInclude(value = Include.NON_NULL)
 public class AccountConsumeSceneEvt implements BusEvent {
   private ShoppingActionTypeEnum typeEnum;
-  private Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap;
+  private List<AccountConsumeSceneStoreRelation> relationList;
 
   @Override
   public Long getSearchKey1() {

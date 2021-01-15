@@ -68,6 +68,13 @@
             <artifactId>pagehelper</artifactId>
             <version>5.1.11</version>
         </dependency>
+
+        <dependency>
+            <artifactId>easypoi-spring-boot-starter</artifactId>
+            <groupId>cn.afterturn</groupId>
+            <version>4.1.0</version>
+        </dependency>
+
     </dependencies>
 
 

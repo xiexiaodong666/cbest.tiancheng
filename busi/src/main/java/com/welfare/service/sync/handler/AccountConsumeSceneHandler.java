@@ -5,8 +5,10 @@ import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
+import com.welfare.persist.dao.AccountConsumeSceneDao;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
+import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreBinding;
@@ -42,6 +44,8 @@ public class AccountConsumeSceneHandler {
   ShoppingFeignClient shoppingFeignClient;
 
   private Gson gson= new Gson();
+  @Autowired
+  private AccountConsumeSceneDao accountConsumeSceneDao;
 
 
   @PostConstruct
@@ -57,18 +61,18 @@ public class AccountConsumeSceneHandler {
   public void accountConsumeSceneEvt(AccountConsumeSceneEvt accountConsumeSceneEvt) {
 
     ShoppingActionTypeEnum actionTypeEnum = accountConsumeSceneEvt.getTypeEnum();
-    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = accountConsumeSceneEvt.getAccountConsumeSceneMap();
-    if (accountConsumeSceneMap.isEmpty()) {
+    List<AccountConsumeSceneStoreRelation> relationList =  accountConsumeSceneEvt.getRelationList();
+    if (CollectionUtils.isEmpty(relationList)) {
       return;
     }
     UserRoleBindingReqDTO userRoleBindingReqDTO = new UserRoleBindingReqDTO();
     userRoleBindingReqDTO.setActionType(actionTypeEnum);
     userRoleBindingReqDTO.setRequestId(UUID.randomUUID().toString());
     userRoleBindingReqDTO.setTimestamp(new Date());
-    List<UserRoleBinding> userRoleBindingList = assemableUserRoleBindings(accountConsumeSceneMap);
+    List<UserRoleBinding> userRoleBindingList = assemableUserRoleBindings(relationList);
     userRoleBindingReqDTO.setList(userRoleBindingList);
 
-    log.info("批量添加、修改员工账号 addOrUpdateEmployer:{}",
+    log.info("同步员工类型数据 userRoleBindingReqDTO:{}",
         gson.toJson(userRoleBindingReqDTO));
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateUserRoleBinding(userRoleBindingReqDTO);
@@ -77,34 +81,27 @@ public class AccountConsumeSceneHandler {
     }
   }
 
-  private List<UserRoleBinding> assemableUserRoleBindings(
-      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap) {
-    List<UserRoleBinding> resultList = new LinkedList<UserRoleBinding>();
-    Set<AccountConsumeScene> accountConsumeSceneSet = accountConsumeSceneMap.keySet();
+  private List<UserRoleBinding> assemableUserRoleBindings(List<AccountConsumeSceneStoreRelation> relationList) {
     UserRoleBinding userRoleBinding = new UserRoleBinding();
 
-    accountConsumeSceneSet.forEach(accountConsumeScene -> {
-      List<StoreBinding> bindings = new LinkedList<StoreBinding>() ;
-      List<String> employeeRoles = new LinkedList<String>();
+    List<StoreBinding> bindings = new LinkedList<>();
+    List<String> employeeRoles = new LinkedList<>();
+    AccountConsumeScene accountConsumeScene =null;
+    for( AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation :  relationList){
+      Long sceneId = accountConsumeSceneStoreRelation.getAccountConsumeSceneId();
+      accountConsumeScene = accountConsumeSceneDao.getById(sceneId);
       employeeRoles.add(accountConsumeScene.getAccountTypeCode());
-      bindings.addAll(assemableStoreBindings(accountConsumeSceneMap.get(accountConsumeScene)));
-
-      if( userRoleBinding.getBindings() == null  ){
-        userRoleBinding.setBindings(bindings);
-      }else{
-        userRoleBinding.getBindings().addAll(bindings);
-      }
-      if( userRoleBinding.getEmployeeRoles() == null  ){
-        userRoleBinding.setEmployeeRoles(employeeRoles);
-      }else{
-        userRoleBinding.getEmployeeRoles().addAll(employeeRoles);
-      }
-      userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0 ? true : false);
-      userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
-    });
-    resultList.add(userRoleBinding);
-
-    return resultList;
+      StoreBinding storeBinding = new StoreBinding();
+      String[] array = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
+      storeBinding.setConsumeTypes(Arrays.asList(array));
+      storeBinding.setStoreCode(accountConsumeSceneStoreRelation.getStoreCode());
+      bindings.add(storeBinding);
+    }
+    userRoleBinding.setEmployeeRoles(employeeRoles);
+    userRoleBinding.setBindings(bindings);
+    userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
+    userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0 ? true : false);
+    return Arrays.asList(userRoleBinding);
   }
 
   private List<StoreBinding> assemableStoreBindings(List<AccountConsumeSceneStoreRelation> relationList){

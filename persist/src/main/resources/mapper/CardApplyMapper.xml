@@ -10,7 +10,7 @@
         id,apply_code,mer_code,card_name,card_type,card_medium,card_num,identification_code,identification_length,remark,create_user,create_time,update_user,update_time,flag
     </sql>
 
-  <select id="searchCardApplys" resultType="com.welfare.persist.entity.CardApply">
+  <select id="searchCardApplys" resultType="com.welfare.persist.dto.CardApplyDTO">
     SELECT
     ca.id as id,
     ca.card_name as cardName ,
@@ -43,7 +43,7 @@
   </select>
 
 
-  <select id="exportCardApplys" resultType="com.welfare.persist.entity.CardApply">
+  <select id="exportCardApplys" resultType="com.welfare.persist.dto.CardApplyDTO">
     SELECT
     ca.id as id,
     ca.card_name as cardName ,
@@ -53,7 +53,9 @@
     ca.card_num as cardNum,
     ca.STATUS as status,
     ca.create_time as createTime,
-    m.mer_name as merName
+    m.mer_name as merName,
+    ca.apply_code as applyCode
+
     FROM
     card_apply ca
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code

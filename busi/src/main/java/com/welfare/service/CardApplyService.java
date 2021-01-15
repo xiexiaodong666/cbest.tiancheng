@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.CardApplyDTO;
 import com.welfare.persist.dto.query.CardApplyAddReq;
 import com.welfare.persist.dto.query.CardApplyUpdateReq;
 import com.welfare.persist.entity.CardApply;
@@ -20,10 +21,10 @@ import java.util.List;
  */
 public interface CardApplyService {
 
-  Page<CardApply> pageQuery(Page<CardApply> page,String cardName,String merCode, String cardType, String cardMedium,
+  Page<CardApplyDTO> pageQuery(Page<CardApply> page,String cardName,String merCode, String cardType, String cardMedium,
       Integer status, Date startTime,Date endTime);
 
-  List<CardApply> exportCardApplys(String cardName,String merCode, String cardType, String cardMedium,
+  List<CardApplyDTO> exportCardApplys(String cardName,String merCode, String cardType, String cardMedium,
       Integer status, Date startTime,Date endTime);
 
   CardApply getMerchantStoreRelationById(

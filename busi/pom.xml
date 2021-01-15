@@ -78,6 +78,13 @@
             <groupId>org.antlr</groupId>
         </dependency>
 
+        <dependency>
+            <artifactId>easypoi-spring-boot-starter</artifactId>
+            <groupId>cn.afterturn</groupId>
+            <version>4.1.0</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>

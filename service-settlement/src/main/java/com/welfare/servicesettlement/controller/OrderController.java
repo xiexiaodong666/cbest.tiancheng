@@ -51,7 +51,7 @@ public class OrderController implements IController {
     @GetMapping("page")
     public R<PageVo<OrderRespDto>> selectByPage(OrderReqDto orderReqDto){
         PageVo<OrderRespDto> resultPage = new PageVo<>();
-        MerchantUserInfo merchantUserInfo = MerchantUserHolder.getDeptIds();
+        MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
         merchantUserInfo = new MerchantUserInfo();
         merchantUserInfo.setMerchantCode("A102");
         Page page = new Page();
@@ -96,7 +96,7 @@ public class OrderController implements IController {
     @ApiOperation("查询所有线下订单")
     @GetMapping("select/list")
     public R<List<OrderRespDto>> selectList(OrderReqDto orderReqDto){
-        MerchantUserInfo merchantUserInfo = MerchantUserHolder.getDeptIds();
+        MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
         if (merchantUserInfo != null){
             
         }

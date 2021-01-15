@@ -64,7 +64,7 @@ public class AccountConsumeSceneHandler {
     UserRoleBindingReqDTO userRoleBindingReqDTO = new UserRoleBindingReqDTO();
     userRoleBindingReqDTO.setActionType(actionTypeEnum);
     userRoleBindingReqDTO.setRequestId(UUID.randomUUID().toString());
-    userRoleBindingReqDTO.setTimestamp(String.valueOf(new Date().getTime()));
+    userRoleBindingReqDTO.setTimestamp(new Date());
     List<UserRoleBinding> userRoleBindingList = assemableUserRoleBindings(accountConsumeSceneMap);
     userRoleBindingReqDTO.setList(userRoleBindingList);
 

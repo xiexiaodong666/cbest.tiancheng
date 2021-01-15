@@ -2,6 +2,7 @@ package com.welfare.service.remote.entity;
 
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import lombok.Data;
 
@@ -15,5 +16,5 @@ public class UserRoleBindingReqDTO implements Serializable {
   private ShoppingActionTypeEnum actionType;
   private List<UserRoleBinding> list;
   private String requestId;
-  private String timestamp;
+  private Date timestamp;
 }

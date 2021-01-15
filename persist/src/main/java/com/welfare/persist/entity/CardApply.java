@@ -48,6 +48,8 @@ public class CardApply extends Model<CardApply> implements Serializable {
      */
     @ApiModelProperty("商户代码")   
     private String merCode;
+    @ApiModelProperty("商户名称")
+    private String merName;
     /**
      * 卡片名称
      */

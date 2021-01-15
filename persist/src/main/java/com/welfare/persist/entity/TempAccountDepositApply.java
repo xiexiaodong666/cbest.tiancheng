@@ -61,7 +61,7 @@ public class TempAccountDepositApply extends Model<TempAccountDepositApply> impl
      * accountCode
      */
     @ApiModelProperty("accountCode")   
-    private String accountCode;
+    private Long accountCode;
 
 //以下为列明常量
 

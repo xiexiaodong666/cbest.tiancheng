@@ -37,9 +37,9 @@
       <if test="req.endTime!=null">
         and temp0.createTime &lt;= #{req.endTime}
       </if>
-      <if test="req.storeCodes != null and req.storeCodes.size()>0">
+      <if test="req.merCodes != null and req.merCodes.size()>0">
         and temp0.merCode not in
-        <foreach close=")" collection="req.storeCodes" item="item" open="(" separator=", ">
+        <foreach close=")" collection="req.merCodes" item="item" open="(" separator=", ">
           #{item}
         </foreach>
       </if>

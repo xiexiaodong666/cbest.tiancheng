@@ -114,11 +114,11 @@ public class MerchantServiceImpl implements MerchantService {
             List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
                 queryWrapper);
             if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
-                List<String> storeCodeList = merchantStoreRelations.stream().map(
-                    MerchantStoreRelation::getStoreCode).collect(Collectors.toList());
-                Set<String> storeCodeSet = new HashSet<>(storeCodeList);
+                List<String> merCodeList = merchantStoreRelations.stream().map(
+                    MerchantStoreRelation::getMerCode).collect(Collectors.toList());
+                Set<String> merCodeSet = new HashSet<>(merCodeList);
 
-                merchantPageReq.setStoreCodes(storeCodeSet);
+                merchantPageReq.setMerCodes(merCodeSet);
                 list = merchantExMapper.listWithCredit(merchantPageReq);
             }
         }

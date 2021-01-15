@@ -41,5 +41,5 @@ public class MerchantPageReq {
      * 来源
      */
     @ApiModelProperty("来源")
-    private Set<String> storeCodes;
+    private Set<String> merCodes;
 }

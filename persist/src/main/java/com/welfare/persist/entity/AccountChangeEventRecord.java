@@ -1,5 +1,6 @@
 package com.welfare.persist.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -27,7 +28,6 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("account_change_event_record")
-@ApiModel("")
 public class AccountChangeEventRecord extends Model<AccountChangeEventRecord> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -41,8 +41,7 @@ public class AccountChangeEventRecord extends Model<AccountChangeEventRecord> im
      * 员工账号Code
 
      */
-    @ApiModelProperty("员工账号Code
-")   
+    @ApiModelProperty("员工账号Code")
     private Long accountCode;
     /**
      * 变更类型

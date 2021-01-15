@@ -34,6 +34,9 @@ public class AccountEvt implements BusEvent {
 
   @Override
   public Long getSearchKey2() {
+    if(accountList.size()==1){
+      return accountList.get(0).getId();
+    }
     return null;
   }
 

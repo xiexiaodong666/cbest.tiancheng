@@ -23,7 +23,7 @@ import java.math.BigDecimal;
  */
 @Aspect
 @Component
-public class AccountDaoAspect {
+public class IServiceAspect {
 
     /**
      * AccountDao.update*

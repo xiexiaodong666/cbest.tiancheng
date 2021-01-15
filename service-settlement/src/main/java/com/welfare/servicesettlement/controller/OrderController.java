@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,13 +53,13 @@ public class OrderController implements IController {
     public R<PageVo<OrderRespDto>> selectByPage(OrderReqDto orderReqDto){
         PageVo<OrderRespDto> resultPage = new PageVo<>();
         MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
-        merchantUserInfo = new MerchantUserInfo();
-        merchantUserInfo.setMerchantCode("A102");
+        if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){
+            orderReqDto.setMerchantCode(merchantUserInfo.getMerchantCode());
+        }
         Page page = new Page();
         page.setCurrent(orderReqDto.getCurrent());
         page.setSize(orderReqDto.getSize());
         Page<OrderInfo> orderPage = orderService.selectPage(page , orderReqDto);
-
         if (Objects.nonNull(orderPage) && orderPage.getRecords().size() > 0){
             List<OrderRespDto> respDtoList = new ArrayList<>();
             orderPage.getRecords().forEach(item->{
@@ -97,8 +98,8 @@ public class OrderController implements IController {
     @GetMapping("select/list")
     public R<List<OrderRespDto>> selectList(OrderReqDto orderReqDto){
         MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
-        if (merchantUserInfo != null){
-            
+        if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){
+            orderReqDto.setMerchantCode(merchantUserInfo.getMerchantCode());
         }
         List<OrderInfo> orderInfoPage = orderService.selectList(orderReqDto);
         List<OrderRespDto> respDtoList = new ArrayList<>();

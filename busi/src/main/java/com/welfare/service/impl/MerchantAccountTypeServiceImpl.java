@@ -15,9 +15,11 @@ import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantAccountTypeDetailConverter;
+import com.welfare.service.dto.MerchantAccountTypeAddDTO;
 import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
 import com.welfare.service.dto.MerchantAccountTypeReq;
 import com.welfare.service.dto.MerchantAccountTypeSortReq;
+import com.welfare.service.dto.MerchantAccountTypeUpdateDTO;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,20 +83,20 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean add(MerchantAccountTypeDetailDTO merchantAccountType) {
+    public boolean add(MerchantAccountTypeAddDTO merchantAccountType) {
         if(EmptyChecker.isEmpty(merchantAccountType.getTypeList())){
             throw new BusiException("福利类型扣款顺序不能为空");
         }
         List<MerchantAccountType> accountTypeList=new ArrayList<>();
         Date date=new Date();
-        for(MerchantAccountTypeDetailDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
-            MerchantAccountType type=merchantAccountTypeDetailConverter.toE(merchantAccountType);
+        for(MerchantAccountTypeAddDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
+            MerchantAccountType type=new MerchantAccountType();
             type.setDeductionOrder(typeItem.getDeductionOrder());
-            type.setRemark(merchantAccountType.getRemark());
-            type.setMerAccountTypeCode(typeItem.getMerAccountTypeCode());
+            type.setMerCode(merchantAccountType.getMerCode());
             type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
-            type.setCreateTime(date);
             type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+            type.setRemark(merchantAccountType.getRemark());
+            type.setCreateTime(date);
             accountTypeList.add(type);
         }
         return merchantAccountTypeDao.saveBatch(accountTypeList);
@@ -102,23 +104,31 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean update(MerchantAccountTypeDetailDTO merchantAccountType) {
+    public boolean update(MerchantAccountTypeUpdateDTO merchantAccountType) {
         //merCode不允许修改
-        merchantAccountType.setMerCode(null);
         Date date=new Date();
-        List<MerchantAccountType> accountTypeList=new ArrayList<>();
-        for(MerchantAccountTypeDetailDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
+        List<MerchantAccountType> addList=new ArrayList<>();
+        List<MerchantAccountType> updateList=new ArrayList<>();
+        for(MerchantAccountTypeUpdateDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
             if(EmptyChecker.isEmpty(typeItem.getId())){
-                throw new BusiException("id不能为空");
+                MerchantAccountType type=new MerchantAccountType();
+                type.setDeductionOrder(typeItem.getDeductionOrder());
+                type.setMerCode(merchantAccountType.getMerCode());
+                type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
+                type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+                type.setRemark(merchantAccountType.getRemark());
+                type.setCreateTime(date);
+                addList.add(type);
+            }else{
+                MerchantAccountType type=new MerchantAccountType();
+                type.setDeductionOrder(typeItem.getDeductionOrder());
+                type.setRemark(merchantAccountType.getRemark());
+                type.setUpdateTime(date);
+                type.setUpdateUser(merchantAccountType.getUpdateUser());
+                updateList.add(type);
             }
-            MerchantAccountType type=merchantAccountTypeDetailConverter.toE(merchantAccountType);
-            type.setDeductionOrder(typeItem.getDeductionOrder());
-            type.setId(typeItem.getId());
-            type.setRemark(merchantAccountType.getRemark());
-            type.setUpdateTime(date);
-            accountTypeList.add(type);
         }
-        return merchantAccountTypeDao.saveOrUpdateBatch(accountTypeList);
+        return merchantAccountTypeDao.saveOrUpdateBatch(updateList)&&merchantAccountTypeDao.saveBatch(addList);
     }
 
     @Override

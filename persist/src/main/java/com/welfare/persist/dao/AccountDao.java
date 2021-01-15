@@ -20,4 +20,8 @@ public class AccountDao extends ServiceImpl<AccountMapper, Account> {
     public boolean updateById(Account entity) {
         return super.updateById(entity);
     }
+
+    public Integer updateAllColumnById(Account entity){
+        return getBaseMapper().alwaysUpdateSomeColumnById(entity);
+    }
 }

@@ -29,16 +29,19 @@ public class MerchantEvt implements BusEvent {
 
   @Override
   public Long getSearchKey1() {
-    return null;
+    return typeEnum.getEvtType();
   }
 
   @Override
   public Long getSearchKey2() {
+    if(merchantDetailDTOList.size()==1){
+      return merchantDetailDTOList.get(0).getId();
+    }
     return null;
   }
 
   @Override
   public UUID getUserToken() {
-    return null;
+    return UUID.randomUUID();
   }
 }

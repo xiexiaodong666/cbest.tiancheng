@@ -25,16 +25,19 @@ public class SupplierStoreEvt implements BusEvent {
     protected List<SupplierStoreDetailDTO> supplierStoreDetailDTOS;
     @Override
     public Long getSearchKey1() {
-        return null;
+        return typeEnum.getEvtType();
     }
 
     @Override
     public Long getSearchKey2() {
+        if(supplierStoreDetailDTOS.size()==1){
+            return supplierStoreDetailDTOS.get(0).getId();
+        }
         return null;
     }
 
     @Override
     public UUID getUserToken() {
-        return null;
+        return UUID.randomUUID();
     }
 }

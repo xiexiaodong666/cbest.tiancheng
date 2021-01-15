@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 /**
- * Description:
+ * Description: 更新用户的时候，需要做的额外操作
  *
  * @author Yuxiang Li
  * @email yuxiang.li@sjgo365.com
@@ -23,12 +23,12 @@ import java.math.BigDecimal;
  */
 @Aspect
 @Component
-public class IServiceAspect {
+public class AccountDaoAspect {
 
     /**
      * AccountDao.update*
      */
-    @Pointcut("execution(public * com.baomidou.mybatisplus.extension.service.IService.updateById(..))")
+    @Pointcut("execution(public * com.welfare.persist.dao.AccountDao.updateById(..))")
     public void onUpdateById(){
 
     }
@@ -36,9 +36,6 @@ public class IServiceAspect {
     @Before(value = "onUpdateById()")
     public void before(JoinPoint joinPoint){
         Object[] args = joinPoint.getArgs();
-        if(!(args[0] instanceof Account)){
-            return ;
-        }
         Account accountToUpdate = (Account)args[0];
         AccountDao accountDao = SpringBeanUtils.getBean(AccountDao.class);
         Account accountInDb = accountDao.getById(accountToUpdate.getId());

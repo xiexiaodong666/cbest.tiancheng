@@ -35,12 +35,16 @@ public abstract class PaymentRequest {
     private BigDecimal amount = BigDecimal.ZERO;
     @ApiModelProperty("是否离线，用于区分是离线支付还是在线支付")
     private Boolean offline;
-    @ApiModelProperty("商户编码")
-    private String merCode;
     @ApiModelProperty("支付状态，0：新增，1：处理中，2：处理成功，-1：处理失败")
     private Integer paymentStatus;
     @ApiModelProperty("账户号")
     private Long accountCode;
+    @ApiModelProperty("账户姓名，返回参数")
+    private String accountName;
+    @ApiModelProperty("账户余额，返回参数")
+    private BigDecimal accountBalance;
+    @ApiModelProperty("账户信用额度，返回参数")
+    private BigDecimal accountCredit;
     @ApiModelProperty("支付时间")
     private Date paymentDate;
 

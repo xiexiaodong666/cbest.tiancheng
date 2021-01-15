@@ -1,11 +1,15 @@
 package com.welfare.common.interceptor;
 
 import com.alibaba.fastjson.JSON;
+import com.welfare.common.annotation.AccountUser;
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.Header;
+import com.welfare.common.domain.AccountUserInfo;
 import com.welfare.common.domain.UserInfo;
 import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.util.AccountUserHolder;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.common.util.MerchantUserHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +40,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
         if(handler instanceof HandlerMethod){
             setApiUserToContext(handler, request);
             setMerchantUserToContext(handler, request);
+            setAccountUserToContext(handler, request);
         }
         if(StringUtils.isEmpty(source)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Source required for http header");
@@ -85,6 +90,21 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
             }
             try {
                 MerchantUserHolder.setMerchantUser(JSON.parseObject(new String(merchantUserInfo.getBytes("ISO-8859-1"),"utf8"), MerchantUserInfo.class));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setAccountUserToContext(Object handler, HttpServletRequest request) {
+        AccountUser accountUser = ((HandlerMethod) handler).getMethodAnnotation(AccountUser.class);
+        if (accountUser != null) {
+            String accountUserInfo = request.getHeader(Header.ACCOUNT_USER.code());
+            if(StringUtils.isEmpty(accountUserInfo)){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"accountUser required for http header");
+            }
+            try {
+                AccountUserHolder.setAccountUser(JSON.parseObject(new String(accountUserInfo.getBytes("ISO-8859-1"),"utf8"), AccountUserInfo.class));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

@@ -18,9 +18,11 @@ import org.springframework.util.CollectionUtils;
  * @date 2021/1/12 14:04
  */
 public class AccountUtils {
-  public static List<EmployerDTO> assemableEmployerDTOList(List<AccountSyncDTO> accountSyncDTOList){
+
+  public static List<EmployerDTO> assemableEmployerDTOList(
+      List<AccountSyncDTO> accountSyncDTOList) {
     List<EmployerDTO> employerDTOList = new LinkedList<EmployerDTO>();
-    if(CollectionUtils.isEmpty(accountSyncDTOList)){
+    if (CollectionUtils.isEmpty(accountSyncDTOList)) {
       return employerDTOList;
     }
     accountSyncDTOList.forEach(accountSyncDTO -> {
@@ -30,7 +32,7 @@ public class AccountUtils {
     return employerDTOList;
   }
 
-  private static EmployerDTO assemableEmployerDTO(AccountSyncDTO accountSyncDTO){
+  private static EmployerDTO assemableEmployerDTO(AccountSyncDTO accountSyncDTO) {
     EmployerDTO employerDTO = new EmployerDTO();
     employerDTO.setEmployerId(String.valueOf(accountSyncDTO.getId()));
     employerDTO.setEmployerRole(accountSyncDTO.getAccountTypeCode());
@@ -43,7 +45,24 @@ public class AccountUtils {
     return employerDTO;
   }
 
-  public static AccountChangeEventRecord assemableChangeEvent(AccountChangeType accountChangeType, Long accounCode,String createUser) {
+  public static List<AccountChangeEventRecord> getEventList(List<Account> accountList,
+      AccountChangeType accountChangeType) {
+    if (CollectionUtils.isEmpty(accountList)) {
+      return null;
+    }
+    List<AccountChangeEventRecord> records = new LinkedList<>();
+    accountList.forEach(account -> {
+      AccountChangeEventRecord accountChangeEventRecord = AccountUtils
+          .assemableChangeEvent(accountChangeType, account.getAccountCode(),
+              account.getCreateUser());
+      records.add(accountChangeEventRecord);
+    });
+    return records;
+  }
+
+
+  public static AccountChangeEventRecord assemableChangeEvent(AccountChangeType accountChangeType,
+      Long accounCode, String createUser) {
     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
     accountChangeEventRecord.setAccountCode(accounCode);
     accountChangeEventRecord.setChangeType(accountChangeType.getChangeType());
@@ -55,11 +74,11 @@ public class AccountUtils {
 
   public static List<Map<String, Object>> getMaps(
       List<AccountChangeEventRecord> accountChangeEventRecordList) {
-    List<Map<String,Object>> list = new LinkedList<>();
+    List<Map<String, Object>> list = new LinkedList<>();
     accountChangeEventRecordList.forEach(accountChangeEventRecord -> {
-      Map<String,Object> map = new HashMap<String,Object>();
-      map.put("accountCode",accountChangeEventRecord.getAccountCode());
-      map.put("changeEventId",accountChangeEventRecord.getId());
+      Map<String, Object> map = new HashMap<String, Object>();
+      map.put("accountCode", accountChangeEventRecord.getAccountCode());
+      map.put("changeEventId", accountChangeEventRecord.getId());
       list.add(map);
     });
     return list;

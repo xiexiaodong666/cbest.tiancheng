@@ -2,23 +2,18 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.annotation.ApiUser;
-import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dao.AccountChangeEventRecordDao;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
-import com.welfare.persist.entity.AccountChangeEventRecord;
-import com.welfare.persist.entity.SupplierStore;
-import com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
-import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.service.dto.AccountConsumeSceneReq;
-import com.welfare.service.utils.AccountUtils;
 import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
 import com.welfare.servicemerchant.dto.AccountConsumePageReq;
 import com.welfare.servicemerchant.service.FileUploadService;
@@ -26,7 +21,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,16 +61,20 @@ public class AccountConsumeSceneController implements IController {
   private AccountChangeEventRecordService accountChangeEventRecordService;
   @Autowired
   private AccountChangeEventRecordDao accountChangeEventRecordDao;
+  @Autowired
+  private AccountCustomizeMapper accountCustomizeMapper;
 
-  /*@GetMapping("/test")
-  public void test(){
-    List<AccountChangeEventRecord> list = new LinkedList<AccountChangeEventRecord>();
+  @GetMapping("/test")
+  public void test(@RequestParam("list")List<Long> list){
+   /* List<AccountChangeEventRecord> list = new LinkedList<AccountChangeEventRecord>();
     AccountChangeEventRecord a = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_TYPE_DELETE, 1l,"aaa");
     AccountChangeEventRecord b = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_TYPE_DELETE, 2l,"aaa");
     list.add(a);
     list.add(b);
-    accountChangeEventRecordService.batchSave(list,AccountChangeType.ACCOUNT_TYPE_DELETE);
-  }*/
+    accountChangeEventRecordService.batchSave(list,AccountChangeType.ACCOUNT_TYPE_DELETE);*/
+    List<Account>  accountList = accountCustomizeMapper.queryByConsumeSceneIdList(list);
+    System.out.println(accountList);
+  }
 
   @GetMapping("/page")
   @ApiOperation("分页查询员工消费配置列表")

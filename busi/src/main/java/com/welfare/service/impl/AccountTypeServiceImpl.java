@@ -1,9 +1,9 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -14,6 +14,7 @@ import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountTypeCustomizeMapper;
 import com.welfare.persist.mapper.SupplierStoreExMapper;
+import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
@@ -23,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +45,8 @@ public class AccountTypeServiceImpl implements AccountTypeService {
     private final AccountTypeConverter accountTypeConverter;
     private final SequenceService sequenceService;
     private final SupplierStoreExMapper supplierStoreExMapper;
+    @Autowired
+    private AccountChangeEventRecordService accountChangeEventRecordService;
 
     @Override
     public Page<AccountType> pageQuery(Page<AccountType> page,
@@ -109,8 +113,11 @@ public class AccountTypeServiceImpl implements AccountTypeService {
         if( null ==  accountType) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不存在",null);
         }
-        //TODO 批量修改
-        return accountTypeDao.removeById(id);
+        boolean update = accountTypeDao.removeById(id);
+        if( update ){
+            accountChangeEventRecordService.batchSaveByAccountTypeCode(accountType.getTypeCode(),AccountChangeType.ACCOUNT_TYPE_DELETE);
+        }
+        return update;
     }
 
     @Override

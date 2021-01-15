@@ -85,4 +85,6 @@ public interface MerchantService {
      */
     Merchant queryByCode(String merCode);
 
+    List<Merchant> queryMerchantByCodeList(List<String> merCodeList);
+
 }

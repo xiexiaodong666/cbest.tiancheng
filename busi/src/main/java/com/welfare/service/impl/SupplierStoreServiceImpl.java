@@ -211,8 +211,15 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     supplierStore.setStatus(storeActivateReq.getStatus());
     boolean flag = supplierStoreDao.updateById(supplierStore);
     //同步商城中台
+    //更新需要全量数据传过去，这里需要再查一次门店的 地址数据
+    SupplierStoreDetailDTO sync=supplierStoreDetailConverter.toD(supplierStore);
+    MerchantAddressReq merchantAddressReq =new MerchantAddressReq();
+    merchantAddressReq.setRelatedType(SupplierStore.class.getSimpleName());
+    merchantAddressReq.setRelatedId(sync.getId());
+    List<MerchantAddressDTO> syncAddress=merchantAddressService.list(merchantAddressReq);
+    sync.setAddressList(syncAddress);
     List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
-    syncList.add(supplierStoreDetailConverter.toD(supplierStore));
+    syncList.add(sync);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
     return flag;

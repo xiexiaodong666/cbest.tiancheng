@@ -43,7 +43,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      * 员工账号
      */
     @ApiModelProperty("员工账号")   
-    private Integer accountCode;
+    private Long accountCode;
     /**
      * 卡号
      */

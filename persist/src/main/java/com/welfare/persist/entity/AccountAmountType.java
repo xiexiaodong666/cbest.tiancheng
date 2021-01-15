@@ -43,7 +43,7 @@ public class AccountAmountType extends Model<AccountAmountType> implements Seria
      * 账户编码
      */
     @ApiModelProperty("账户编码")   
-    private Integer accountCode;
+    private Long accountCode;
     /**
      * 商家账户类型
      */

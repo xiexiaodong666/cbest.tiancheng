@@ -92,7 +92,7 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      * 员工账号
      */
     @ApiModelProperty("员工账号")   
-    private Integer accountCode;
+    private Long accountCode;
     /**
      * 版本
      */

@@ -192,6 +192,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
+    supplierStore.setId(save.getId());
     List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
     syncList.add(supplierStore);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(

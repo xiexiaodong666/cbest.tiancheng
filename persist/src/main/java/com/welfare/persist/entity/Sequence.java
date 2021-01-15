@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
  * (sequence)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-11 19:54:01
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -43,55 +43,66 @@ public class Sequence extends Model<Sequence> implements Serializable {
      */
     @ApiModelProperty("序列类型")   
     private String sequenceType;
-    @ApiModelProperty("前缀")
+    /**
+     * prefix
+     */
+    @ApiModelProperty("prefix")   
     private String prefix;
     /**
      * 序列号
      */
     @ApiModelProperty("序列号")   
     private Long sequenceNo;
-    @ApiModelProperty("最小序列号")
+    /**
+     * minSequence
+     */
+    @ApiModelProperty("minSequence")   
     private Long minSequence;
-    @ApiModelProperty("最大序列号")
+    /**
+     * maxSequence
+     */
+    @ApiModelProperty("maxSequence")   
     private Long maxSequence;
-
-    @ApiModelProperty("当达到最大序列号时的处理")
+    /**
+     * handlerForMax
+     */
+    @ApiModelProperty("handlerForMax")   
     private String handlerForMax;
     /**
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建日期
      */
     @ApiModelProperty("创建日期")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新日期
      */
     @ApiModelProperty("更新日期")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 删除标记
      */
     @ApiModelProperty("删除标记") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
 //以下为列明常量
@@ -105,9 +116,25 @@ public class Sequence extends Model<Sequence> implements Serializable {
     */
     public static final String SEQUENCE_TYPE = "sequence_type";
     /**
+    * 
+    */
+    public static final String PREFIX = "prefix";
+    /**
     * 序列号
     */
     public static final String SEQUENCE_NO = "sequence_no";
+    /**
+    * 
+    */
+    public static final String MIN_SEQUENCE = "min_sequence";
+    /**
+    * 
+    */
+    public static final String MAX_SEQUENCE = "max_sequence";
+    /**
+    * 
+    */
+    public static final String HANDLER_FOR_MAX = "handler_for_max";
     /**
     * 创建人
     */
@@ -132,11 +159,5 @@ public class Sequence extends Model<Sequence> implements Serializable {
     * 版本
     */
     public static final String VERSION = "version";
-    /**
-     * 前缀
-     */
-    public static final String PREFIX = "prefix";
-
-
 
 }

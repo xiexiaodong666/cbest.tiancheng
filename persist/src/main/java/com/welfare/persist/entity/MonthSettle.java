@@ -1,12 +1,16 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -18,7 +22,7 @@ import lombok.experimental.Accessors;
  * 月度结算账单(month_settle)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -32,80 +36,80 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * 账单编号
      */
-    @ApiModelProperty("账单编号")
+    @ApiModelProperty("账单编号")   
     private String settleNo;
     /**
      * 账单月
      */
-    @ApiModelProperty("账单月")
+    @ApiModelProperty("账单月")   
     private String settleMonth;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")
+    @ApiModelProperty("商户代码")   
     private String merCode;
     /**
      * 交易金额
      */
-    @ApiModelProperty("交易金额")
+    @ApiModelProperty("交易金额")   
     private BigDecimal transAmount;
     /**
      * 结算金额
      */
-    @ApiModelProperty("结算金额")
+    @ApiModelProperty("结算金额")   
     private BigDecimal settleAmount;
     /**
      * 返利金额
      */
-    @ApiModelProperty("返利金额")
+    @ApiModelProperty("返利金额")   
     private BigDecimal rebateAmount;
     /**
      * 交易笔数
      */
-    @ApiModelProperty("交易笔数")
+    @ApiModelProperty("交易笔数")   
     private Integer orderNum;
     /**
      * 对账状态（待确认-unconfirmed；已确认-confirmed）
      */
-    @ApiModelProperty("对账状态（待确认-unconfirmed；已确认-confirmed）")
+    @ApiModelProperty("对账状态（待确认-unconfirmed；已确认-confirmed）")   
     private String recStatus;
     /**
      * 结算状态（待结算-unsettled；已结算-settled）
      */
-    @ApiModelProperty("结算状态（待结算-unsettled；已结算-settled）")
+    @ApiModelProperty("结算状态（待结算-unsettled；已结算-settled）")   
     private String settleStatus;
     /**
      * 发送状态（待发送-unsended；已发送-sended）
      */
-    @ApiModelProperty("发送状态（待发送-unsended；已发送-sended）")
+    @ApiModelProperty("发送状态（待发送-unsended；已发送-sended）")   
     private String sendStatus;
     /**
      * 发送时间
      */
-    @ApiModelProperty("发送时间")
+    @ApiModelProperty("发送时间")   
     private Date sendTime;
     /**
      * 确定时间
      */
-    @ApiModelProperty("确定时间")
+    @ApiModelProperty("确定时间")   
     private Date confirmTime;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ApiModelProperty("创建人")   
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ApiModelProperty("创建时间")   
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
@@ -116,13 +120,13 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
      * 更新时间
      */
     @ApiModelProperty("更新时间")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ApiModelProperty("删除标志") @TableLogic   
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
 
 //以下为列明常量
@@ -148,8 +152,8 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     */
     public static final String TRANS_AMOUNT = "trans_amount";
     /**
-     * 结算金额
-     */
+    * 结算金额
+    */
     public static final String SETTLE_AMOUNT = "settle_amount";
     /**
     * 返利金额
@@ -160,11 +164,11 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     */
     public static final String ORDER_NUM = "order_num";
     /**
-    * 对账状态
+    * 对账状态（待确认-unconfirmed；已确认-confirmed）
     */
     public static final String REC_STATUS = "rec_status";
     /**
-    * 结算状态
+    * 结算状态（待结算-unsettled；已结算-settled）
     */
     public static final String SETTLE_STATUS = "settle_status";
     /**

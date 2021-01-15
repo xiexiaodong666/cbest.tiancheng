@@ -4,8 +4,10 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,8 +20,8 @@ import lombok.experimental.Accessors;
 /**
  * 账户交易明细拉取记录表(pull_account_detail_record)实体类
  *
- * @author kancy
- * @since 2021-01-13 20:51:36
+ * @author Yuxiang Li
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -33,49 +35,52 @@ public class PullAccountDetailRecord extends Model<PullAccountDetailRecord> impl
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")  
+    @ApiModelProperty("商户代码")   
     private String merCode;
     /**
      * 处理日期
      */
-    @ApiModelProperty("处理日期")  
+    @ApiModelProperty("处理日期")   
     private String delDate;
     /**
      * 处理状态 success-成功 fail-失败
      */
-    @ApiModelProperty("处理状态 success-成功 fail-失败")  
+    @ApiModelProperty("处理状态 success-成功 fail-失败")   
     private String delStatus;
     /**
      * 重试次数
      */
-    @ApiModelProperty("重试次数")  
+    @ApiModelProperty("重试次数")   
     private Integer tryCount;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")  
-    private String createUser;
+    @ApiModelProperty("创建人")   
+    @TableField(fill = FieldFill.INSERT)
+	private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")  
-    private Date createTime;
+    @ApiModelProperty("创建时间")   
+    @TableField(fill = FieldFill.INSERT)
+	private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")  
-    private String updateUser;
+    @ApiModelProperty("更新人")   
+    @TableField(fill = FieldFill.UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")  
-    @TableField(update = "now()")
+    @ApiModelProperty("更新时间")   
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
 
 //以下为列明常量
@@ -87,7 +92,7 @@ public class PullAccountDetailRecord extends Model<PullAccountDetailRecord> impl
     /**
     * 商户代码
     */
-    public static final String MERCHANT_CODE = "merchant_code";
+    public static final String MER_CODE = "mer_code";
     /**
     * 处理日期
     */

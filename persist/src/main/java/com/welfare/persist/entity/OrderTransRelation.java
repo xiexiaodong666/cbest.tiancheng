@@ -1,12 +1,16 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.util.Date;
 import lombok.Data;
@@ -16,8 +20,8 @@ import lombok.experimental.Accessors;
 /**
  * (order_trans_relation)实体类
  *
- * @author kancy
- * @since 2021-01-15 00:07:28
+ * @author Yuxiang Li
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -31,60 +35,61 @@ public class OrderTransRelation extends Model<OrderTransRelation> implements Ser
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * 订单号
      */
-    @ApiModelProperty("订单号")  
+    @ApiModelProperty("订单号")   
     private String orderId;
     /**
      * 交易号
      */
-    @ApiModelProperty("交易号")  
+    @ApiModelProperty("交易号")   
     private String transNo;
     /**
      * 类型(充值订单还是消费订单)
      */
-    @ApiModelProperty("类型(充值订单还是消费订单)")  
+    @ApiModelProperty("类型(充值订单还是消费订单)")   
     private String type;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String createUser;
+    @ApiModelProperty("创建人")   
+    @TableField(fill = FieldFill.INSERT)
+	private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date createTime;
+    @ApiModelProperty("创建时间")   
+    @TableField(fill = FieldFill.INSERT)
+	private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateUser;
+    @ApiModelProperty("更新人")   
+    @TableField(fill = FieldFill.UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")
-    @TableField(update = "now()")
-    private Date updateTime;
-    /**
-     * 删除标志  1-删除、0-未删除
-     */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Boolean deleted;
+    @ApiModelProperty("更新时间")   
+    @TableField(fill = FieldFill.UPDATE)
+	private Date updateTime;
     /**
      * 版本
      */
-    @ApiModelProperty("版本")  @Version
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Integer version;
+    @ApiModelProperty("版本")  @Version 
+    @TableField(fill = FieldFill.INSERT)
+	private Integer version;
+    /**
+     * 删除标记
+     */
+    @ApiModelProperty("删除标记") @TableLogic   
+    @TableField(fill = FieldFill.INSERT)
+	private Boolean deleted;
+
 //以下为列明常量
 
     /**

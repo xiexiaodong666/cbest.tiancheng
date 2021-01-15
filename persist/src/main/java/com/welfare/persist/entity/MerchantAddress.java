@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
  * 地址信息(merchant_address)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -62,31 +62,31 @@ public class MerchantAddress extends Model<MerchantAddress> implements Serializa
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建日期
      */
     @ApiModelProperty("创建日期")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新日期
      */
     @ApiModelProperty("更新日期")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
     /**
      * 关联类型

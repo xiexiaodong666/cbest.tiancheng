@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
  * 商户金额申请(merchant_credit_apply)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -73,31 +73,31 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      * 删除标志
      */
     @ApiModelProperty("删除标志") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
     /**
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新时间
      */
     @ApiModelProperty("更新时间")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 审批状态
@@ -123,7 +123,7 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
     /**
      * 申请人
@@ -135,11 +135,10 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
      */
     @ApiModelProperty("申请时间")   
     private Date applyTime;
-
     /**
-     * requestId
+     * 请求id
      */
-    @ApiModelProperty("requestId")
+    @ApiModelProperty("请求id")   
     private String requestId;
 
 //以下为列明常量
@@ -220,9 +219,9 @@ public class MerchantCreditApply extends Model<MerchantCreditApply> implements S
     * 申请时间
     */
     public static final String APPLY_TIME = "apply_time";
-
     /**
-     * 请求id
-     */
+    * 请求id
+    */
     public static final String REQUEST_ID = "request_id";
+
 }

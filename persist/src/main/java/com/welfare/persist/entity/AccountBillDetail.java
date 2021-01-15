@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
  * 用户交易流水明细表(account_bill_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:22
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -43,7 +43,7 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
      * 员工账号
      */
     @ApiModelProperty("员工账号")   
-    private Long accountCode;
+    private Integer accountCode;
     /**
      * 卡号
      */
@@ -98,37 +98,37 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新时间
      */
     @ApiModelProperty("更新时间")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 删除标志  1-删除、0-未删除
      */
     @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
 //以下为列明常量
@@ -180,7 +180,7 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     /**
     * 授信余额
     */
-    public static final String SURPLUS_QUOTA_BALANCE = "surplus_quota_balance";
+    public static final String SURPLUS_QUOTA = "surplus_quota";
     /**
     * 创建人
     */

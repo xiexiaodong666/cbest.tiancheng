@@ -1,14 +1,14 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -21,110 +21,123 @@ import lombok.experimental.Accessors;
 /**
  * (order_info)实体类
  *
- * @author kancy
- * @since 2021-01-12 17:25:14
+ * @author Yuxiang Li
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("order_info")
-@ApiModel("订单实体")
+@ApiModel("")
 public class OrderInfo extends Model<OrderInfo> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
-    @TableId(type = IdType.AUTO)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+    @TableId
 	private Integer id;
     /**
-     * orderId
+     * 订单号
      */
-    @ApiModelProperty("orderId")  
+    @ApiModelProperty("订单号")   
     private String orderId;
     /**
-     * goods
+     * 商品
      */
-    @ApiModelProperty("goods")  
+    @ApiModelProperty("商品")   
     private String goods;
     /**
-     * merchantCode
+     * 商户代码
      */
-    @ApiModelProperty("merchantCode")  
+    @ApiModelProperty("商户代码")   
     private String merchantCode;
     /**
-     * merchantName
+     * 商户名称
      */
-    @ApiModelProperty("merchantName")  
+    @ApiModelProperty("商户名称")   
     private String merchantName;
     /**
-     * storeCode
+     * 门店编码
      */
-    @ApiModelProperty("storeCode")  
+    @ApiModelProperty("门店编码")   
     private String storeCode;
     /**
-     * storeName
+     * 门店名称
      */
-    @ApiModelProperty("storeName")  
+    @ApiModelProperty("门店名称")   
     private String storeName;
     /**
-     * accountCode
+     * 账户
      */
-    @ApiModelProperty("accountCode")  
+    @ApiModelProperty("账户")   
     private Integer accountCode;
     /**
-     * accountName
+     * 账户名称
      */
-    @ApiModelProperty("accountName")  
+    @ApiModelProperty("账户名称")   
     private String accountName;
     /**
-     * cardId
+     * 交易类型
      */
-    @ApiModelProperty("cardId")  
-    private Integer cardId;
-    /**
-     * orderAmount
-     */
-    @ApiModelProperty("orderAmount")  
-    private BigDecimal orderAmount;
-    /**
-     * orderTime
-     */
-    @ApiModelProperty("orderTime")  
-    private String orderTime;
-    /**
-     * payCode
-     */
-    @ApiModelProperty("payCode")  
-    private String payCode;
-    /**
-     * payName
-     */
-    @ApiModelProperty("payName")  
-    private String payName;
-    /**
-     * transType
-     */
-    @ApiModelProperty("transType")
+    @ApiModelProperty("交易类型")   
     private String transType;
     /**
-     * transTypeName
+     * 交易类型名称
      */
-    @ApiModelProperty("transTypeName")
+    @ApiModelProperty("交易类型名称")   
     private String transTypeName;
     /**
-     * createUser
+     * 卡号
      */
-    @ApiModelProperty("createUser")  
-    private String createUser;
+    @ApiModelProperty("卡号")   
+    private Integer cardId;
     /**
-     * createTime
+     * 订单金额
      */
-    @ApiModelProperty("createTime")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private Date createTime;
+    @ApiModelProperty("订单金额")   
+    private BigDecimal orderAmount;
+    /**
+     * 订单时间
+     */
+    @ApiModelProperty("订单时间")   
+    private Date orderTime;
+    /**
+     * 支付编码
+     */
+    @ApiModelProperty("支付编码")   
+    private String payCode;
+    /**
+     * 支付名称
+     */
+    @ApiModelProperty("支付名称")   
+    private String payName;
+    /**
+     * 创建人
+     */
+    @ApiModelProperty("创建人")   
+    @TableField(fill = FieldFill.INSERT)
+	private String createUser;
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty("创建时间")   
+    @TableField(fill = FieldFill.INSERT)
+	private Date createTime;
+    /**
+     * 更新人
+     */
+    @ApiModelProperty("更新人")   
+    @TableField(fill = FieldFill.UPDATE)
+	private String updateUser;
+    /**
+     * 更新时间
+     */
+    @ApiModelProperty("更新时间")   
+    @TableField(fill = FieldFill.UPDATE)
+	private Date updateTime;
 
 //以下为列明常量
 
@@ -133,72 +146,80 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
     */
     public static final String ID = "id";
     /**
-    * 
+    * 订单号
     */
     public static final String ORDER_ID = "order_id";
     /**
-    * 
+    * 商品
     */
     public static final String GOODS = "goods";
     /**
-    * 
+    * 商户代码
     */
     public static final String MERCHANT_CODE = "merchant_code";
     /**
-    * 
+    * 商户名称
     */
     public static final String MERCHANT_NAME = "merchant_name";
     /**
-    * 
+    * 门店编码
     */
     public static final String STORE_CODE = "store_code";
     /**
-    * 
+    * 门店名称
     */
     public static final String STORE_NAME = "store_name";
     /**
-    * 
+    * 账户
     */
     public static final String ACCOUNT_CODE = "account_code";
     /**
-    * 
+    * 账户名称
     */
     public static final String ACCOUNT_NAME = "account_name";
     /**
-    * 
+    * 交易类型
+    */
+    public static final String TRANS_TYPE = "trans_type";
+    /**
+    * 交易类型名称
+    */
+    public static final String TRANS_TYPE_NAME = "trans_type_name";
+    /**
+    * 卡号
     */
     public static final String CARD_ID = "card_id";
     /**
-    * 
+    * 订单金额
     */
     public static final String ORDER_AMOUNT = "order_amount";
     /**
-    * 
+    * 订单时间
     */
     public static final String ORDER_TIME = "order_time";
     /**
-    * 
+    * 支付编码
     */
     public static final String PAY_CODE = "pay_code";
     /**
-    * 
+    * 支付名称
     */
     public static final String PAY_NAME = "pay_name";
     /**
-     *
-     */
-    public static final String TRANS_TYPE = "trans_type";
-    /**
-     *
-     */
-    public static final String TRANS_TYPE_NAME = "trans_type_name";
-    /**
-    * 
+    * 创建人
     */
     public static final String CREATE_USER = "create_user";
     /**
-    * 
+    * 创建时间
     */
     public static final String CREATE_TIME = "create_time";
+    /**
+    * 更新人
+    */
+    public static final String UPDATE_USER = "update_user";
+    /**
+    * 更新时间
+    */
+    public static final String UPDATE_TIME = "update_time";
 
 }

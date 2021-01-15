@@ -4,6 +4,7 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.FieldFill;
@@ -20,8 +21,8 @@ import lombok.experimental.Accessors;
 /**
  * 账号充值记录表(account_deposit_record)实体类
  *
- * @author kancy
- * @since 2021-01-11 09:20:53
+ * @author Yuxiang Li
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -42,7 +43,7 @@ public class AccountDepositRecord extends Model<AccountDepositRecord> implements
      * 员工账号
      */
     @ApiModelProperty("员工账号")   
-    private Long accountCode;
+    private Integer accountCode;
     /**
      * 商户代码
      */
@@ -107,31 +108,31 @@ public class AccountDepositRecord extends Model<AccountDepositRecord> implements
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新时间
      */
     @ApiModelProperty("更新时间")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
 //以下为列明常量

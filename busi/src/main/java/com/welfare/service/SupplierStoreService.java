@@ -11,6 +11,7 @@ import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
+import com.welfare.service.dto.SupplierStoreUpdateDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -81,7 +82,7 @@ public interface SupplierStoreService {
      * @param supplierStore
      * @return
      */
-    boolean update(SupplierStoreDetailDTO supplierStore);
+    boolean update(SupplierStoreUpdateDTO supplierStore);
 
     /**
      * 导出供应商门店列表

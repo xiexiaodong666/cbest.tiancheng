@@ -5,6 +5,7 @@ import com.welfare.service.MerchantService;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantUpdateDTO;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.servicemerchant.converter.MerchantConverter;
 import com.welfare.servicemerchant.dto.MerchantInfo;
@@ -67,7 +68,7 @@ public class MerchantController implements IController {
     }
     @PostMapping("/update")
     @ApiOperation("编辑商户")
-    public R update(@RequestBody MerchantDetailDTO merchant){
+    public R update(@RequestBody MerchantUpdateDTO merchant){
         return R.status(merchantService.update(merchant),"更新失败");
     }
     @PostMapping("/export-list")

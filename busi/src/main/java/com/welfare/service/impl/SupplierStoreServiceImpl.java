@@ -37,6 +37,7 @@ import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreImportDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
+import com.welfare.service.dto.SupplierStoreUpdateDTO;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.sync.event.SupplierStoreEvt;
@@ -47,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -54,6 +57,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * 供应商门店服务接口实现
@@ -280,7 +285,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public boolean update(SupplierStoreDetailDTO supplierStore) {
+  public boolean update(SupplierStoreUpdateDTO supplierStore) {
     supplierStore.setConsumType(
         JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
     boolean flag2 = true;
@@ -289,19 +294,35 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       accountConsumeSceneStoreRelationService.updateStoreConsumeType(
           supplierStore.getStoreCode(), supplierStore.getConsumType());
     }
-    supplierStore.setConsumType(
-        JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
-    SupplierStore update = supplierStoreDetailConverter.toE((supplierStore));
+    SupplierStore update = this.buildUpdate(supplierStore);
     update.setStoreParent(update.getMerCode());
     boolean flag = supplierStoreDao.updateById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
     //同步商城中台
     List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
-    syncList.add(supplierStore);
+    SupplierStoreDetailDTO detailDTO=supplierStoreDetailConverter.toD(update);
+    detailDTO.setAddressList(supplierStore.getAddressList());
+    syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
     return flag && flag2 && flag3;
+  }
+
+  private SupplierStore buildUpdate(SupplierStoreUpdateDTO update){
+    SupplierStore entity=supplierStoreDao.getById(update.getId());
+    if(EmptyChecker.isEmpty(entity)){
+      throw new BusiException("id不存在");
+    }
+    entity.setMerCode(update.getMerCode());
+    entity.setCashierNo(update.getCashierNo());
+    entity.setStoreCode(update.getStoreCode());
+    entity.setStoreName(update.getStoreName());
+    entity.setRemark(update.getRemark());
+    entity.setConsumType(update.getConsumType());
+    entity.setUpdateUser(update.getUpdateUser());
+    entity.setExternalCode(update.getExternalCode());
+    return entity;
   }
 
   @Override

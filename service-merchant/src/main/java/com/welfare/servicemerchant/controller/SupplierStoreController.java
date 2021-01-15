@@ -9,6 +9,7 @@ import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
+import com.welfare.service.dto.SupplierStoreUpdateDTO;
 import com.welfare.servicemerchant.converter.SupplierStoreConverter;
 import com.welfare.servicemerchant.dto.SupplierStoreInfo;
 import com.welfare.servicemerchant.service.FileUploadService;
@@ -94,8 +95,8 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/update")
     @ApiOperation("编辑供应商门店")
-    public R update(@RequestBody SupplierStoreDetailDTO supplierStore){
-        return R.status(supplierStoreService.add(supplierStore),"编辑失败失败");
+    public R update(@RequestBody SupplierStoreUpdateDTO supplierStore){
+        return R.status(supplierStoreService.update(supplierStore),"编辑失败失败");
 
     }
     @PostMapping("/export-list")

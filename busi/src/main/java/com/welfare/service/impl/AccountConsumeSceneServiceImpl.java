@@ -93,11 +93,11 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
-    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     List<String> accountTypeCodeList = accountConsumeSceneAddReq.getAccountTypeCodeList();
     if( CollectionUtils.isEmpty(accountTypeCodeList)  || accountTypeCodeList.size() == 0){
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不能为空", null);
     }
+    List<AccountConsumeSceneStoreRelation> sendData = new LinkedList<AccountConsumeSceneStoreRelation>();
     accountTypeCodeList.forEach(accountTypeCode -> {
       AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
       BeanUtils.copyProperties(accountConsumeSceneAddReq, accountConsumeScene);
@@ -108,11 +108,10 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = getAccountConsumeSceneStoreRelations(
           accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeSceneStoreRelationDao.saveBatch(accountConsumeSceneStoreRelationList);
-      //下发数据Map
-      accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
+      sendData.addAll(accountConsumeSceneStoreRelationList);
     });
     //下发数据
-    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).accountConsumeSceneMap(accountConsumeSceneMap).build());
+    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).relationList(sendData).build());
     return true;
   }
 
@@ -180,9 +179,9 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if( updateResult ){
       accountChangeEventRecordService.batchSaveBySceneStoreRelation(accountConsumeSceneStoreRelationList);
       //下发数据
-      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
-      accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
-      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).accountConsumeSceneMap(accountConsumeSceneMap).build());
+      Map<Long,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
+      accountConsumeSceneMap.put(accountConsumeScene.getId(),accountConsumeSceneStoreRelationList);
+      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(accountConsumeSceneStoreRelationList).build());
     }
     return true;
   }
@@ -203,7 +202,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
     Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     accountConsumeSceneMap.put(accountConsumeScene,relationList);
-    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).accountConsumeSceneMap(accountConsumeSceneMap).build());
+    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).relationList(relationList).build());
     return deleteResult;
   }
 
@@ -224,7 +223,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
       Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
       accountConsumeSceneMap.put(accountConsumeScene,relationList);
-      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).accountConsumeSceneMap(accountConsumeSceneMap).build());
+      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).relationList(relationList).build());
     }
     return updateResult;
   }

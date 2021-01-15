@@ -75,4 +75,10 @@ public class AccountReq implements Serializable {
    */
   @ApiModelProperty("剩余授权额度")
   private BigDecimal surplusQuota;
+
+  /**
+   * 备注
+   */
+  @ApiModelProperty("备注")
+  private String remark;
 }

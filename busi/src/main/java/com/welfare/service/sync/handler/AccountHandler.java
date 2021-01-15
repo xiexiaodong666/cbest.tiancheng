@@ -44,10 +44,9 @@ public class AccountHandler {
   @Autowired
   ShoppingFeignClient shoppingFeignClient;
   @Autowired
-  private ObjectMapper mapper;
-  @Autowired
   private MerchantService merchantService;
-  private Gson gson;
+
+  private Gson gson= new Gson();
 
 
   @PostConstruct
@@ -74,7 +73,7 @@ public class AccountHandler {
     });
 
     List<AccountSyncDTO> accountSyncDTOList = AccountUtils.getSyncDTO(accountList, merchantMap);
-// 员工账号数据同步
+    // 员工账号数据同步
     List<EmployerDTO> employerDTOList = AccountUtils.assemableEmployerDTOList(accountSyncDTOList);
     EmployerReqDTO employerReqDTO = new EmployerReqDTO();
     employerReqDTO.setActionType(actionTypeEnum);

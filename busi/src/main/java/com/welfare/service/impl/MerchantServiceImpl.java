@@ -21,12 +21,14 @@ import com.welfare.service.MerchantCreditService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantAddConverter;
 import com.welfare.service.converter.MerchantDetailConverter;
+import com.welfare.service.converter.MerchantSyncConverter;
 import com.welfare.service.converter.MerchantWithCreditConverter;
 import com.welfare.service.dto.MerchantAddDTO;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantSyncDTO;
 import com.welfare.service.dto.MerchantUpdateDTO;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.service.helper.QueryHelper;
@@ -67,6 +69,8 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantAddressService merchantAddressService;
     private final MerchantCreditService merchantCreditService;
     private final MerchantDetailConverter merchantDetailConverter;
+    private final MerchantSyncConverter merchantSyncConverter;
+
     private final MerchantAddConverter merchantAddConverter;
     private final SequenceService sequenceService;
     private final ApplicationContext applicationContext;
@@ -151,10 +155,10 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         //同步商城中台
-        MerchantDetailDTO detailDTO=merchantDetailConverter.toD(save);
+        MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
         detailDTO.setAddressList(merchant.getAddressList());
         detailDTO.setId(save.getId());
-        List<MerchantDetailDTO> syncList=new ArrayList<>();
+        List<MerchantSyncDTO> syncList=new ArrayList<>();
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
         return flag&&flag2;
@@ -167,8 +171,8 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag= merchantDao.updateById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
         //同步商城中台
-        List<MerchantDetailDTO> syncList=new ArrayList<>();
-        MerchantDetailDTO detailDTO=merchantDetailConverter.toD(update);
+        List<MerchantSyncDTO> syncList=new ArrayList<>();
+        MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).build());

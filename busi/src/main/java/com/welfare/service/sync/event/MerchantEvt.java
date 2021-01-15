@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.service.dto.MerchantDetailDTO;
+import com.welfare.service.dto.MerchantSyncDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +26,7 @@ import java.util.UUID;
 @JsonInclude(value = Include.NON_NULL)
 public class MerchantEvt implements BusEvent {
   private ShoppingActionTypeEnum typeEnum;
-  private List<MerchantDetailDTO> merchantDetailDTOList;
+  private List<MerchantSyncDTO> merchantDetailDTOList;
 
   @Override
   public Long getSearchKey1() {

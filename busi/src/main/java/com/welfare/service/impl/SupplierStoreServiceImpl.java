@@ -28,6 +28,7 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.converter.SupplierStoreAddConverter;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
+import com.welfare.service.converter.SupplierStoreSyncConverter;
 import com.welfare.service.converter.SupplierStoreTreeConverter;
 import com.welfare.service.dto.DictDTO;
 import com.welfare.service.dto.DictReq;
@@ -38,6 +39,7 @@ import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreImportDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
+import com.welfare.service.dto.SupplierStoreSyncDTO;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
 import com.welfare.service.dto.SupplierStoreUpdateDTO;
 import com.welfare.service.helper.QueryHelper;
@@ -86,6 +88,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   private final ApplicationContext applicationContext;
   private final ObjectMapper mapper;
   private final SupplierStoreDetailConverter supplierStoreDetailConverter;
+  private final SupplierStoreSyncConverter supplierStoreSyncConverter;
 
   private final DictService dictService;
   private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
@@ -201,10 +204,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
-    SupplierStoreDetailDTO detailDTO=supplierStoreDetailConverter.toD(save);
+    SupplierStoreSyncDTO detailDTO=supplierStoreSyncConverter.toD(save);
     detailDTO.setId(save.getId());
     detailDTO.setAddressList(supplierStore.getAddressList());
-    List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
+    List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
@@ -223,13 +226,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.updateById(supplierStore);
     //同步商城中台
     //更新需要全量数据传过去，这里需要再查一次门店的 地址数据
-    SupplierStoreDetailDTO sync=supplierStoreDetailConverter.toD(supplierStore);
+    SupplierStoreSyncDTO sync=supplierStoreSyncConverter.toD(supplierStore);
     MerchantAddressReq merchantAddressReq =new MerchantAddressReq();
     merchantAddressReq.setRelatedType(SupplierStore.class.getSimpleName());
     merchantAddressReq.setRelatedId(sync.getId());
     List<MerchantAddressDTO> syncAddress=merchantAddressService.list(merchantAddressReq);
     sync.setAddressList(syncAddress);
-    List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
+    List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(sync);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
@@ -241,7 +244,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.saveBatch(list);
     //同步商城中台
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(supplierStoreDetailConverter.toD(list))
+        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(supplierStoreSyncConverter.toD(list))
                                         .build());
     return flag;
   }
@@ -282,8 +285,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.removeById(id) && merchantAddressService.delete(
         SupplierStore.class.getSimpleName(), id);
     //同步商城中台
-    List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
-    syncList.add(supplierStoreDetailConverter.toD(supplierStore));
+    List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
+    syncList.add(supplierStoreSyncConverter.toD(supplierStore));
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).build());
     return flag;
@@ -306,8 +309,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
     //同步商城中台
-    List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
-    SupplierStoreDetailDTO detailDTO=supplierStoreDetailConverter.toD(update);
+    List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
+    SupplierStoreSyncDTO detailDTO=supplierStoreSyncConverter.toD(update);
     detailDTO.setAddressList(supplierStore.getAddressList());
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(

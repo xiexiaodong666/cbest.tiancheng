@@ -143,7 +143,8 @@ public class Account extends Model<Account> implements Serializable {
     /**
      * 同步状态
      */
-    @ApiModelProperty("同步状态")   
+    @ApiModelProperty("同步状态")
+    @TableField(exist = false)
     private Integer syncStatus;
     /**
      * 员工账号变更记录ID

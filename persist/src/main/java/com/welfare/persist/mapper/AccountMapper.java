@@ -1,5 +1,6 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.welfare.persist.entity.Account;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -19,4 +20,6 @@ public interface AccountMapper extends BaseMapper<Account> {
 
   int increaseAccountBalance(@Param("increaseBalance")BigDecimal increaseBalance, @Param("updateUser")String updateUser,
                              @Param("accountCode")String accountCode);
+
+  Integer alwaysUpdateSomeColumnById(@Param(Constants.ENTITY) Account account);
 }

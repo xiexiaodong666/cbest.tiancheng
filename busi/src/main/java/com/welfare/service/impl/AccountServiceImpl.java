@@ -236,6 +236,9 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public AccountDetailDTO queryDetailByParam(Long id, Long accountCode, String phone) {
     AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(id,accountCode,phone);
+    if( null == accountDetailMapperDTO ){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该员工账号不存在",null);
+    }
     AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
     BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
     return accountDetailDTO;

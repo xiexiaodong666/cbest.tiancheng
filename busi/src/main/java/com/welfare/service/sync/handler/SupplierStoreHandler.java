@@ -83,13 +83,15 @@ public class SupplierStoreHandler {
             listBean.setEnabled(supplierStoreDetailDTO.getStatus().equals(1));
             //门店相关地址
             List<StoreShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
-            for (MerchantAddressDTO addressDTO : supplierStoreDetailDTO.getAddressList()) {
-                StoreShoppingReq.ListBean.AddressBean addressBean = new StoreShoppingReq.ListBean.AddressBean();
-                addressBean.setAddress(addressDTO.getAddress());
-                addressBean.setAddressType(addressDTO.getAddressType());
-                addressBean.setName(addressDTO.getAddressName());
+            if(EmptyChecker.notEmpty(supplierStoreDetailDTO.getAddressList())){
+                for (MerchantAddressDTO addressDTO : supplierStoreDetailDTO.getAddressList()) {
+                    StoreShoppingReq.ListBean.AddressBean addressBean = new StoreShoppingReq.ListBean.AddressBean();
+                    addressBean.setAddress(addressDTO.getAddress());
+                    addressBean.setAddressType(addressDTO.getAddressType());
+                    addressBean.setName(addressDTO.getAddressName());
+                }
+                listBean.setAddress(addressBeans);
             }
-            listBean.setAddress(addressBeans);
             listBeans.add(listBean);
             storeCodeList.add(supplierStoreDetailDTO.getStoreCode());
         }

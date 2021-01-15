@@ -65,19 +65,25 @@ public class MerchantHandler  {
         List<String> merCodeList = new ArrayList<>();
         for (MerchantDetailDTO merchant : merchantDetailDTOList) {
             MerchantShoppingReq.ListBean listBean = new MerchantShoppingReq.ListBean();
-            listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1") ? Boolean.TRUE : Boolean.FALSE);
+            if(EmptyChecker.notEmpty(merchant.getSelfRecharge())){
+                listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1") ? Boolean.TRUE : Boolean.FALSE);
+            }
             listBean.setMerchantCode(merchant.getMerCode());
             listBean.setMerchantName(merchant.getMerName());
-            listBean.setIdTypes(Arrays.asList(merchant.getMerIdentity().split(",")));
-            List<MerchantShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
-            for (MerchantAddressDTO addressDTO : merchant.getAddressList()) {
-                MerchantShoppingReq.ListBean.AddressBean addressBean = new MerchantShoppingReq.ListBean.AddressBean();
-                addressBean.setAddress(addressDTO.getAddress());
-                addressBean.setAddressType(addressDTO.getAddressType());
-                addressBean.setName(addressDTO.getAddressName());
-                addressBeans.add(addressBean);
+            if(EmptyChecker.notEmpty(merchant.getMerIdentity())){
+                listBean.setIdTypes(Arrays.asList(merchant.getMerIdentity().split(",")));
             }
-            listBean.setAddress(addressBeans);
+            List<MerchantShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
+            if(EmptyChecker.notEmpty(merchant.getAddressList())){
+                for (MerchantAddressDTO addressDTO : merchant.getAddressList()) {
+                    MerchantShoppingReq.ListBean.AddressBean addressBean = new MerchantShoppingReq.ListBean.AddressBean();
+                    addressBean.setAddress(addressDTO.getAddress());
+                    addressBean.setAddressType(addressDTO.getAddressType());
+                    addressBean.setName(addressDTO.getAddressName());
+                    addressBeans.add(addressBean);
+                }
+                listBean.setAddress(addressBeans);
+            }
             list.add(listBean);
             merCodeList.add(merchant.getMerCode());
         }

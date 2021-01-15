@@ -94,11 +94,6 @@ public class AccountConsumeScene extends Model<AccountConsumeScene> implements S
     @ApiModelProperty("版本")  @Version 
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
-    /**
-     * syncStatus
-     */
-    @ApiModelProperty("syncStatus")   
-    private Integer syncStatus;
 
 //以下为列明常量
 

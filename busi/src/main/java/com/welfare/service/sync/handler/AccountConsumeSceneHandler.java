@@ -72,7 +72,7 @@ public class AccountConsumeSceneHandler {
     List<UserRoleBinding> userRoleBindingList = assemableUserRoleBindings(relationList);
     userRoleBindingReqDTO.setList(userRoleBindingList);
 
-    log.info("批量添加、修改员工账号 addOrUpdateEmployer:{}",
+    log.info("同步员工类型数据 userRoleBindingReqDTO:{}",
         gson.toJson(userRoleBindingReqDTO));
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateUserRoleBinding(userRoleBindingReqDTO);

@@ -43,7 +43,7 @@ public class AccountDepositRecord extends Model<AccountDepositRecord> implements
      * 员工账号
      */
     @ApiModelProperty("员工账号")   
-    private Integer accountCode;
+    private Long accountCode;
     /**
      * 商户代码
      */

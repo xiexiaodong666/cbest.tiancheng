@@ -53,7 +53,7 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
      * 账户
      */
     @ApiModelProperty("账户")   
-    private Integer accountCode;
+    private Long accountCode;
     /**
      * 账户名称
      */

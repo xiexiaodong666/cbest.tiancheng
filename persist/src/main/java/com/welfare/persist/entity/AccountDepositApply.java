@@ -1,6 +1,5 @@
 package com.welfare.persist.entity;
 
-import java.beans.Transient;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,7 +22,7 @@ import lombok.experimental.Accessors;
  * 账户充值申请(account_deposit_apply)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:22
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -69,31 +68,31 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建日期
      */
     @ApiModelProperty("创建日期")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新日期
      */
     @ApiModelProperty("更新日期")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
     /**
      * 审批状态
@@ -119,7 +118,7 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      * 删除标志  1-删除、0-未删除
      */
     @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
     /**
      * 申请备注
@@ -152,13 +151,16 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     @ApiModelProperty("requestId")   
     private String requestId;
     /**
-     * merAccountTypeCode
+     * 商家账户类型
      */
-    @ApiModelProperty("merAccountTypeCode")   
+    @ApiModelProperty("商家账户类型")   
     private String merAccountTypeCode;
-
-    @ApiModelProperty("渠道")
+    /**
+     * 渠道
+     */
+    @ApiModelProperty("渠道")   
     private String channel;
+
 //以下为列明常量
 
     /**
@@ -250,11 +252,12 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     */
     public static final String REQUEST_ID = "request_id";
     /**
-    * 
+    * 商家账户类型
     */
     public static final String MER_ACCOUNT_TYPE_CODE = "mer_account_type_code";
     /**
-     * 渠道
-     */
+    * 渠道
+    */
     public static final String CHANNEL = "channel";
+
 }

@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.util.EmptyChecker;
 import  com.welfare.persist.dao.MerchantAddressDao;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.service.converter.MerchantAddressConverter;
@@ -38,6 +39,9 @@ public class MerchantAddressServiceImpl implements MerchantAddressService {
     @Transactional(rollbackFor = Exception.class)
     public boolean saveOrUpdateBatch(List<MerchantAddressDTO> list,String relatedType,Long relatedId) {
         delete(relatedType,relatedId);
+        if(EmptyChecker.isEmpty(list)){
+            return Boolean.TRUE;
+        }
         list.forEach(item->{
             item.setRelatedId(relatedId);
             item.setRelatedType(relatedType);

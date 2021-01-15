@@ -1,14 +1,13 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,8 +20,8 @@ import lombok.experimental.Accessors;
 /**
  * 商户信息(merchant)实体类
  *
- * @author hao.yin
- * @since 2021-01-14 11:03:55
+ * @author Yuxiang Li
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -77,42 +76,44 @@ public class Merchant extends Model<Merchant> implements Serializable {
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String createUser;
+    @ApiModelProperty("创建人")   
+    @TableField(fill = FieldFill.INSERT)
+	private String createUser;
     /**
      * 创建日期
      */
-    @ApiModelProperty("创建日期")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date createTime;
+    @ApiModelProperty("创建日期")   
+    @TableField(fill = FieldFill.INSERT)
+	private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateUser;
+    @ApiModelProperty("更新人")   
+    @TableField(fill = FieldFill.UPDATE)
+	private String updateUser;
     /**
      * 更新日期
      */
     @ApiModelProperty("更新日期")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 状态
      */
     @ApiModelProperty("状态")   
     private Integer status;
-
-    @ApiModelProperty("删除标记")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Boolean deleted;
+    /**
+     * deleted
+     */
+    @ApiModelProperty("deleted") @TableLogic   
+    @TableField(fill = FieldFill.INSERT)
+	private Boolean deleted;
     /**
      * 版本
      */
-    @ApiModelProperty("版本")  @Version
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Integer version;
+    @ApiModelProperty("版本")  @Version 
+    @TableField(fill = FieldFill.INSERT)
+	private Integer version;
 
 //以下为列明常量
 
@@ -168,6 +169,10 @@ public class Merchant extends Model<Merchant> implements Serializable {
     * 状态
     */
     public static final String STATUS = "status";
+    /**
+    * 
+    */
+    public static final String DELETED = "deleted";
     /**
     * 版本
     */

@@ -1,12 +1,16 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -18,164 +22,172 @@ import lombok.experimental.Accessors;
  * (settle_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("settle_detail")
-@ApiModel("结算明细")
+@ApiModel("")
 public class SettleDetail extends Model<SettleDetail> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Long id;
+	private Integer id;
     /**
      * 订单编码
      */
-    @ApiModelProperty("订单编码")
+    @ApiModelProperty("订单编码")   
     private String orderId;
     /**
      * 交易流水号
      */
-    @ApiModelProperty("交易流水号")
+    @ApiModelProperty("交易流水号")   
     private String transNo;
     /**
      * 账户
      */
-    @ApiModelProperty("账户")
-    private String accountCode;
+    @ApiModelProperty("账户")   
+    private Integer accountCode;
     /**
      * 账户名称
      */
-    @ApiModelProperty("账户名称")
+    @ApiModelProperty("账户名称")   
     private String accountName;
     /**
      * 卡号
      */
-    @ApiModelProperty("卡号")
+    @ApiModelProperty("卡号")   
     private Integer cardId;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")
+    @ApiModelProperty("商户代码")   
     private String merCode;
     /**
      * 商户名称
      */
-    @ApiModelProperty("商户名称")
+    @ApiModelProperty("商户名称")   
     private String merName;
     /**
      * 门店编码
      */
-    @ApiModelProperty("门店编码")
+    @ApiModelProperty("门店编码")   
     private String storeCode;
     /**
      * 门店名称
      */
-    @ApiModelProperty("门店名称")
+    @ApiModelProperty("门店名称")   
     private String storeName;
     /**
      * 交易时间
      */
-    @ApiModelProperty("交易时间")
+    @ApiModelProperty("交易时间")   
     private Date transTime;
     /**
      * pos机器编码
      */
-    @ApiModelProperty("pos机器编码")
+    @ApiModelProperty("pos机器编码")   
     private String pos;
     /**
      * 支付编码
      */
-    @ApiModelProperty("支付编码")
+    @ApiModelProperty("支付编码")   
     private String payCode;
     /**
      * 支付名称
      */
-    @ApiModelProperty("支付名称")
+    @ApiModelProperty("支付名称")   
     private String payName;
     /**
      * 交易类型
      */
-    @ApiModelProperty("交易类型")
+    @ApiModelProperty("交易类型")   
     private String transType;
     /**
      * 交易类型名
      */
-    @ApiModelProperty("交易类型名")
+    @ApiModelProperty("交易类型名")   
     private String transTypeName;
     /**
      * 交易金额
      */
-    @ApiModelProperty("交易金额")
+    @ApiModelProperty("交易金额")   
     private BigDecimal transAmount;
     /**
      * 福利类型(餐费、交通费等)
      */
-    @ApiModelProperty("福利类型(餐费、交通费等)")
+    @ApiModelProperty("福利类型(餐费、交通费等)")   
     private String merAccountType;
     /**
      * 福利类型(餐费、交通费等)
      */
-    @ApiModelProperty("福利类型(餐费、交通费等)")
+    @ApiModelProperty("福利类型(餐费、交通费等)")   
     private String merAccountTypeName;
     /**
      * 子账户扣款金额
      */
-    @ApiModelProperty("子账户扣款金额")
+    @ApiModelProperty("子账户扣款金额")   
     private BigDecimal accountAmount;
     /**
      * 子账户余额
      */
-    @ApiModelProperty("子账户余额")
+    @ApiModelProperty("子账户余额")   
     private BigDecimal accountBalance;
     /**
      * 商户余额扣款金额
      */
-    @ApiModelProperty("商户余额扣款金额")
+    @ApiModelProperty("商户余额扣款金额")   
     private BigDecimal merDeductionAmount;
     /**
      * 商户信用扣款金额
      */
-    @ApiModelProperty("商户信用扣款金额")
+    @ApiModelProperty("商户信用扣款金额")   
     private BigDecimal merCreditDeductionAmount;
     /**
      * 自费扣款金额
      */
-    @ApiModelProperty("自费扣款金额")
+    @ApiModelProperty("自费扣款金额")   
     private BigDecimal selfDeductionAmount;
+    /**
+     * 数据支付类型 welfare-员工卡支付 third-其它三方支付
+     */
+    @ApiModelProperty("数据支付类型 welfare-员工卡支付 third-其它三方支付")   
+    private String dataType;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")
-    private String createUser;
+    @ApiModelProperty("创建人")   
+    @TableField(fill = FieldFill.INSERT)
+	private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")
-    private Date createTime;
+    @ApiModelProperty("创建时间")   
+    @TableField(fill = FieldFill.INSERT)
+	private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")
-    private String updateUser;
+    @ApiModelProperty("更新人")   
+    @TableField(fill = FieldFill.UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")
-    @TableField(update = "now()")
+    @ApiModelProperty("更新时间")   
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 版本
      */
-    @ApiModelProperty("版本")  @Version
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ApiModelProperty("版本")  @Version 
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
 //以下为列明常量
@@ -276,6 +288,10 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     * 自费扣款金额
     */
     public static final String SELF_DEDUCTION_AMOUNT = "self_deduction_amount";
+    /**
+    * 数据支付类型 welfare-员工卡支付 third-其它三方支付
+    */
+    public static final String DATA_TYPE = "data_type";
     /**
     * 创建人
     */

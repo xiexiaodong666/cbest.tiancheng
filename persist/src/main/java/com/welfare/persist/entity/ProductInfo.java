@@ -1,65 +1,68 @@
 package com.welfare.persist.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import java.util.Date;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.io.Serializable;
-import java.sql.Date;
 
 /**
- * 字典(dict)实体类
+ * (product_info)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("product_info")
-@ApiModel("商品表")
+@ApiModel("")
 public class ProductInfo extends Model<ProductInfo> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 商品编码
      */
-    @ApiModelProperty("商品编码")
-    private String productCode;
+    @ApiModelProperty("商品编码")   
+    @TableId
+	private String productCode;
     /**
      * 商品名称
      */
-    @ApiModelProperty("商品名称")
+    @ApiModelProperty("商品名称")   
     private String productName;
     /**
-     * 更新时间
+     * updateTime
      */
-    @ApiModelProperty("更新时间")
-    private Date updateTime;
-
+    @ApiModelProperty("updateTime")   
+    @TableField(fill = FieldFill.UPDATE)
+	private Date updateTime;
 
 //以下为列明常量
 
-
     /**
-    * 编码
+    * 商品编码
     */
-    public static final String PRODUCR_CODE = "product_code";
+    public static final String PRODUCT_CODE = "product_code";
     /**
-    * 名称
+    * 商品名称
     */
     public static final String PRODUCT_NAME = "product_name";
     /**
-    * 状态
+    * 
     */
-    public static final String UPDATE_IMTE = "update_time";
+    public static final String UPDATE_TIME = "update_time";
 
 }

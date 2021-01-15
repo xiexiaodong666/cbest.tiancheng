@@ -30,16 +30,4 @@ public class MerchantPageReq {
 
     @ApiModelProperty("结束时间")
     private Date endTime;
-
-    /**
-     * 来源
-     */
-    @ApiModelProperty("来源")
-    private String source;
-
-    /**
-     * 来源
-     */
-    @ApiModelProperty("来源")
-    private Set<String> merCodes;
 }

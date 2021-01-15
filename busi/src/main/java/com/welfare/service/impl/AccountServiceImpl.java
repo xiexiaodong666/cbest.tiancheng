@@ -230,7 +230,15 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public AccountDetailDTO queryDetailByAccountCode(String accountCode) {
-    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByAccountCode(accountCode);
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(null,Long.parseLong(accountCode),null);
+    AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
+    BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
+    return accountDetailDTO;
+  }
+
+  @Override
+  public AccountDetailDTO queryDetailByParam(Long id, Long accountCode, String phone) {
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(id,accountCode,phone);
     AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
     BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
     return accountDetailDTO;

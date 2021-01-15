@@ -30,11 +30,6 @@ public class AccountDetailDTO {
   @ApiModelProperty("账号状态")
   private String accountStatus;
 
-  /**
-   * 是否激活
-   */
-  @ApiModelProperty("是否激活")
-  private Integer active;
 
   /**
    * 员工类型编码名称

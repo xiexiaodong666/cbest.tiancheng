@@ -2,6 +2,7 @@ package com.welfare.service.dto;
 
 import com.welfare.common.annotation.Query;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,11 @@ public class MerchantReq {
     @Query(type = Query.Type.IN,propName = "merCode")
     @ApiModelProperty("商户code集合")
     private List<String> merCodeList;
+
+    /**
+     * 来源
+     */
+    @ApiModelProperty("来源")
+    private String source;
+
 }

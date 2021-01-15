@@ -6,6 +6,7 @@ import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.SupplierStoreActivateReq;
+import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
@@ -73,7 +74,7 @@ public class SupplierStoreController implements IController {
 
     @PostMapping("/add")
     @ApiOperation("新增供应商门店")
-    public R add(@RequestBody SupplierStoreDetailDTO supplierStore){
+    public R add(@RequestBody SupplierStoreAddDTO supplierStore){
         return R.status(supplierStoreService.add(supplierStore),"新增失败");
     }
 

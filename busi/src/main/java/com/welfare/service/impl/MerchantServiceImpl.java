@@ -19,8 +19,10 @@ import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.SequenceService;
+import com.welfare.service.converter.MerchantAddConverter;
 import com.welfare.service.converter.MerchantDetailConverter;
 import com.welfare.service.converter.MerchantWithCreditConverter;
+import com.welfare.service.dto.MerchantAddDTO;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;
@@ -65,6 +67,7 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantAddressService merchantAddressService;
     private final MerchantCreditService merchantCreditService;
     private final MerchantDetailConverter merchantDetailConverter;
+    private final MerchantAddConverter merchantAddConverter;
     private final SequenceService sequenceService;
     private final ApplicationContext applicationContext;
     private final MerchantStoreRelationDao merchantStoreRelationDao;
@@ -142,15 +145,17 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean add(MerchantDetailDTO merchant) {
+    public boolean add(MerchantAddDTO merchant) {
         merchant.setMerCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code()));
-        Merchant save =merchantDetailConverter.toE(merchant);
+        Merchant save =merchantAddConverter.toE(merchant);
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         //同步商城中台
-        merchant.setId(save.getId());
+        MerchantDetailDTO detailDTO=merchantDetailConverter.toD(save);
+        detailDTO.setAddressList(merchant.getAddressList());
+        detailDTO.setId(save.getId());
         List<MerchantDetailDTO> syncList=new ArrayList<>();
-        syncList.add(merchant);
+        syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
         return flag&&flag2;
     }

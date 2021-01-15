@@ -8,6 +8,7 @@ import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.SupplierStoreActivateReq;
+import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
@@ -52,7 +53,7 @@ public interface SupplierStoreService {
      * @param supplierStore
      * @return
      */
-    boolean add(SupplierStoreDetailDTO supplierStore);
+    boolean add(SupplierStoreAddDTO supplierStore);
 
     /**
      * 更改供应商门店激活状态

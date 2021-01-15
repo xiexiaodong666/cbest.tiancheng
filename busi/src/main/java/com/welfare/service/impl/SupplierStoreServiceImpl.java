@@ -26,6 +26,7 @@ import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.converter.SupplierStoreAddConverter;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
 import com.welfare.service.converter.SupplierStoreTreeConverter;
 import com.welfare.service.dto.DictDTO;
@@ -33,6 +34,7 @@ import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.SupplierStoreActivateReq;
+import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreImportDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
@@ -73,6 +75,7 @@ import javax.validation.constraints.NotBlank;
 public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   private final SupplierStoreDao supplierStoreDao;
+  private final SupplierStoreAddConverter supplierStoreAddConverter;
 
   private final MerchantStoreRelationDao merchantStoreRelationDao;
 
@@ -187,19 +190,21 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public boolean add(SupplierStoreDetailDTO supplierStore) {
-    supplierStore.setStatus(0);
+  public boolean add(SupplierStoreAddDTO supplierStore) {
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
       throw new BusiException("门店编码已存在");
     }
-    SupplierStore save = supplierStoreDetailConverter.toE((supplierStore));
+    SupplierStore save = supplierStoreAddConverter.toE((supplierStore));
+    save.setStatus(0);
     save.setStoreParent(save.getMerCode() + "-" + save.getStoreCode());
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
-    supplierStore.setId(save.getId());
+    SupplierStoreDetailDTO detailDTO=supplierStoreDetailConverter.toD(save);
+    detailDTO.setId(save.getId());
+    detailDTO.setAddressList(supplierStore.getAddressList());
     List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
-    syncList.add(supplierStore);
+    syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
     return flag;

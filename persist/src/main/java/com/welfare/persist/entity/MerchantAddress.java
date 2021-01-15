@@ -38,7 +38,7 @@ public class MerchantAddress extends Model<MerchantAddress> implements Serializa
      * id
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId(type = IdType.AUTO)
+    @TableId
 	private Long id;
     /**
      * 地址名称

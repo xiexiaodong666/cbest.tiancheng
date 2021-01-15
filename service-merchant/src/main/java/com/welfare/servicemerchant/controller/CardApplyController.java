@@ -3,12 +3,16 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.enums.CardApplyMediumEnum;
+import com.welfare.common.enums.CardApplyTypeEnum;
+import com.welfare.persist.dto.CardApplyDTO;
 import com.welfare.persist.dto.query.CardApplyAddReq;
 import com.welfare.persist.dto.query.CardApplyUpdateReq;
 import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.service.CardApplyService;
 import com.welfare.service.MerchantService;
+import com.welfare.servicemerchant.converter.CardApplyConverter;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,10 +49,11 @@ public class CardApplyController implements IController {
   private final CardApplyService cardApplyService;
   private final MerchantService merchantService;
   private final FileUploadService fileUploadService;
+  private final CardApplyConverter cardApplyConverter;
 
   @GetMapping("/list")
   @ApiOperation("分页查询卡片列表")
-  public R<Page<CardApply>> apiPageQuery(
+  public R<Page<CardApplyDTO>> apiPageQuery(
       @RequestParam @ApiParam("当前页") Integer current,
       @RequestParam @ApiParam("单页大小") Integer size,
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
@@ -65,8 +72,8 @@ public class CardApplyController implements IController {
   }
 
   @GetMapping("/detail")
-  @ApiOperation("api分页查询消费门店配置列表")
-  public R<CardApply> detail(@RequestParam(required = true) @ApiParam("消费场景门店id") Long id) {
+  @ApiOperation("查看申请卡片详情")
+  public R<CardApplyDTO> detail(@RequestParam(required = true) @ApiParam("申请卡片id") Long id) {
     QueryWrapper<CardApply> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(CardApply.ID, id);
     CardApply cardApply = cardApplyService.getMerchantStoreRelationById(queryWrapper);
@@ -75,11 +82,13 @@ public class CardApplyController implements IController {
     queryWrapperM.eq(Merchant.MER_CODE, cardApply.getMerCode());
 
     Merchant merchant = merchantService.getMerchantByMerCode(queryWrapperM);
-    if(merchant != null) {
-      cardApply.setMerName(merchant.getMerName());
+    CardApplyDTO cardApplyDTO = cardApplyConverter.toE(cardApply);
+
+    if (merchant != null) {
+      cardApplyDTO.setMerName(merchant.getMerName());
     }
 
-    return success(cardApply);
+    return success(cardApplyDTO);
   }
 
   @PostMapping
@@ -107,9 +116,8 @@ public class CardApplyController implements IController {
   }
 
 
-  @PostMapping("/export")
+  @GetMapping("/export")
   @ApiOperation("导出卡片列表(返回文件下载地址)")
-  @MerchantUser
   public R<String> export(
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,
@@ -119,11 +127,24 @@ public class CardApplyController implements IController {
       @RequestParam(required = false) @ApiParam("使用状态") Date startTime,
       @RequestParam(required = false) @ApiParam("使用状态") Date endTime) throws IOException {
 
-    List<CardApply> exportList = cardApplyService.exportCardApplys(cardName, merCode, cardType,
-                                                                   cardMedium,
-                                                                   status, startTime, endTime
+    List<CardApplyDTO> exportList = cardApplyService.exportCardApplys(cardName, merCode, cardType,
+                                                                      cardMedium,
+                                                                      status, startTime, endTime
     );
-    String path = fileUploadService.uploadExcelFile(exportList, CardApply.class, "账户明细");
+    if(CollectionUtils.isNotEmpty(exportList)) {
+      for (CardApplyDTO cardApplyDTO:
+      exportList) {
+        if(Strings.isNotEmpty(cardApplyDTO.getCardMedium())) {
+          cardApplyDTO.setCardMedium(CardApplyMediumEnum.valueOf(cardApplyDTO.getCardMedium()).getDesc());
+        }
+
+        if(Strings.isNotEmpty(cardApplyDTO.getCardType())) {
+          cardApplyDTO.setCardType(CardApplyTypeEnum.valueOf(cardApplyDTO.getCardType()).getDesc());
+        }
+
+      }
+    }
+    String path = fileUploadService.uploadExcelFile(exportList, CardApplyDTO.class, "账户明细");
     return success(fileUploadService.getFileServerUrl(path));
   }
 

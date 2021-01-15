@@ -1,6 +1,7 @@
 package com.welfare.service.remote.entity;
 
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import java.util.Date;
 import java.util.List;
 import lombok.Data;
 
@@ -14,5 +15,5 @@ public class EmployerReqDTO {
   private ShoppingActionTypeEnum actionType;
   private List<EmployerDTO> list;
   private String requestId;
-  private String timestamp;
+  private Date timestamp;
 }

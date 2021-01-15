@@ -141,12 +141,6 @@ public class Account extends Model<Account> implements Serializable {
     @ApiModelProperty("备注")   
     private String remark;
     /**
-     * 同步状态
-     */
-    @ApiModelProperty("同步状态")
-    @TableField(exist = false)
-    private Integer syncStatus;
-    /**
      * 员工账号变更记录ID
      */
     @ApiModelProperty("员工账号变更记录ID")   
@@ -234,10 +228,6 @@ public class Account extends Model<Account> implements Serializable {
     * 备注
     */
     public static final String REMARK = "remark";
-    /**
-    * 同步状态
-    */
-    public static final String SYNC_STATUS = "sync_status";
     /**
     * 员工账号变更记录ID
     */

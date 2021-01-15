@@ -22,8 +22,6 @@ import java.util.Map;
  * @description 由 Mybatisplus Code Generator 创建
  */
 public interface AccountConsumeSceneService {
-  public void syncAccountConsumeScene(ShoppingActionTypeEnum actionTypeEnum,
-      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap);
   public AccountConsumeScene getAccountConsumeScene(Long id);
   public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq);
   public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq);

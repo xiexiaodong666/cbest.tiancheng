@@ -1,5 +1,6 @@
 package com.welfare.service.sync.listener;
 
+import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 import com.welfare.service.sync.event.AccountEvt;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class AccountConsumeSceneListener {
   DataSource dataSource;
   @EventListener
   @Transactional(rollbackFor = Exception.class)
-  public void onAdd(AccountEvt evt) throws EventBusException {
+  public void onAdd(AccountConsumeSceneEvt evt) throws EventBusException {
     persistentBus.postFromTransaction(evt, DataSourceUtils.getConnection(dataSource));
   }
 }

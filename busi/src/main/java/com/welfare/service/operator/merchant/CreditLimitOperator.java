@@ -32,8 +32,8 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
   @Override
   public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
     log.info("ready to decrease merchantCredit.creditLimit for {}", amount.toString());
-    BigDecimal creditLimit = merchantCredit.getCreditLimit();
-    return super.decrease(merchantCredit, amount, transNo);
+
+    return doWhenNotEnough(merchantCredit, amount, merchantCredit.getCreditLimit(), transNo);
   }
 
   @Override
@@ -44,7 +44,31 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
 
   @Override
   protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo) {
-    return super.doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, operatedAmount, transNo);
+    List<MerchantAccountOperation> operations = new ArrayList<>();
+    BigDecimal oldCreditLimit = merchantCredit.getCreditLimit();
+    BigDecimal oldRemainingLimit = merchantCredit.getRemainingLimit();
+
+    merchantCredit.setCreditLimit(oldCreditLimit.subtract(amountLeftToBeDecrease));
+    MerchantAccountOperation creditLimitLimitOperator = MerchantAccountOperation.of(
+            merCreditType,
+            amountLeftToBeDecrease,
+            IncOrDecType.DECREASE,
+            merchantCredit,
+            transNo
+    );
+    operations.add(creditLimitLimitOperator);
+    AbstractMerAccountTypeOperator nextOperator = getNext();
+    // 减剩余授信额度，不够减就为负数
+    merchantCredit.setRemainingLimit(oldRemainingLimit.subtract(amountLeftToBeDecrease));
+    MerchantAccountOperation remainingLimitLimitOperator = MerchantAccountOperation.of(
+            WelfareConstant.MerCreditType.REMAINING_LIMIT,
+            amountLeftToBeDecrease,
+            IncOrDecType.DECREASE,
+            merchantCredit,
+            transNo
+    );
+    operations.add(remainingLimitLimitOperator);
+    return operations;
   }
 
   @Override
@@ -73,5 +97,15 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
   @Override
   public void afterPropertiesSet() throws Exception {
     super.next(remainingLimitOperator);
+  }
+
+  @Override
+  public List<MerchantAccountOperation> set(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+    BigDecimal creditLimit = merchantCredit.getCreditLimit();
+    if (amount.compareTo(creditLimit) >= 0 ) {
+      return increase(merchantCredit,amount.subtract(creditLimit),transNo);
+    } else {
+      return decrease(merchantCredit,creditLimit.subtract(amount),transNo);
+    }
   }
 }

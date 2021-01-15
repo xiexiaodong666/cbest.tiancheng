@@ -95,6 +95,11 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
     @ApiModelProperty("版本")  @Version 
     @TableField(fill = FieldFill.INSERT_UPDATE)
 	private Integer version;
+    /**
+     * 流水号
+     */
+    @ApiModelProperty("流水号")
+    private String transNo;
 
 //以下为列明常量
 
@@ -142,5 +147,8 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
     * 版本
     */
     public static final String VERSION = "version";
-
+    /**
+     * 流水号
+     */
+    public static final String TRANS_NO = "transNo";
 }

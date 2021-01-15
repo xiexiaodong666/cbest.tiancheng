@@ -159,9 +159,6 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
 
     @ApiModelProperty("渠道")
     private String channel;
-    @ApiModelProperty("流水号")
-    private String transNo;
-
 //以下为列明常量
 
     /**
@@ -260,9 +257,4 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
      * 渠道
      */
     public static final String CHANNEL = "channel";
-    /**
-     * 流水号
-     */
-    public static final String TRANS_NO = "transNo";
-
 }

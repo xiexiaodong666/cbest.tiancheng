@@ -98,7 +98,7 @@ public class CardApplyServiceImpl implements CardApplyService {
     }
 
     cardApply.setDeleted(false);
-    cardApply.setStatus(0);
+    cardApply.setStatus(1);
 
     List<CardInfo> cardInfoList = new ArrayList<>();
     // String cardId = cardInfoMapper.getCardId(cardApplyAddReq.getMerCode());

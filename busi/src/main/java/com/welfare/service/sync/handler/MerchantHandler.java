@@ -68,7 +68,7 @@ public class MerchantHandler  {
             listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1") ? Boolean.TRUE : Boolean.FALSE);
             listBean.setMerchantCode(merchant.getMerCode());
             listBean.setMerchantName(merchant.getMerName());
-            listBean.setIdTypes(Arrays.asList(merchant.getMerType().split(",")));
+            listBean.setIdTypes(Arrays.asList(merchant.getMerIdentity().split(",")));
             List<MerchantShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
             for (MerchantAddressDTO addressDTO : merchant.getAddressList()) {
                 MerchantShoppingReq.ListBean.AddressBean addressBean = new MerchantShoppingReq.ListBean.AddressBean();

@@ -125,7 +125,7 @@ public class CardApply extends Model<CardApply> implements Serializable {
     /**
      * 状态: 锁定、激活
      */
-    @ApiModelProperty("状态: 锁定、激活")   
+    @ApiModelProperty("状态: 锁定、激活 1 启用  0禁用")
     private Integer status;
 
 

@@ -39,11 +39,7 @@ import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.listener.SupplierStoreListener;
-import com.welfare.service.sync.event.SupplierStoreActivateEvt;
-import com.welfare.service.sync.event.SupplierStoreAddEvt;
-import com.welfare.service.sync.event.SupplierStoreBatchAddEvt;
-import com.welfare.service.sync.event.SupplierStoreDeleteEvt;
-import com.welfare.service.sync.event.SupplierStoreUpdateEvt;
+import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -196,9 +192,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
+    supplierStore.setId(save.getId());
     List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
     syncList.add(supplierStore);
-    applicationContext.publishEvent(SupplierStoreAddEvt.builder().typeEnum(
+    applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
     return flag;
   }
@@ -216,7 +213,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     //同步商城中台
     List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
     syncList.add(supplierStoreDetailConverter.toD(supplierStore));
-    applicationContext.publishEvent(SupplierStoreActivateEvt.builder().typeEnum(
+    applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
     return flag;
   }
@@ -225,7 +222,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public boolean batchAdd(List<SupplierStore> list) {
     boolean flag = supplierStoreDao.saveBatch(list);
     //同步商城中台
-    applicationContext.publishEvent(SupplierStoreBatchAddEvt.builder().typeEnum(
+    applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(supplierStoreDetailConverter.toD(list))
                                         .build());
     return flag;
@@ -269,7 +266,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     //同步商城中台
     List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
     syncList.add(supplierStoreDetailConverter.toD(supplierStore));
-    applicationContext.publishEvent(SupplierStoreDeleteEvt.builder().typeEnum(
+    applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).build());
     return flag;
   }
@@ -295,7 +292,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     //同步商城中台
     List<SupplierStoreDetailDTO> syncList = new ArrayList<>();
     syncList.add(supplierStore);
-    applicationContext.publishEvent(SupplierStoreUpdateEvt.builder().typeEnum(
+    applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
     return flag && flag2 && flag3;
   }

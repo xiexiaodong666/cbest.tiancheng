@@ -27,8 +27,7 @@ import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.service.helper.QueryHelper;
-import com.welfare.service.sync.event.MerchantAddEvt;
-import com.welfare.service.sync.event.MerchantUpdateEvt;
+import com.welfare.service.sync.event.MerchantEvt;
 import com.welfare.service.utils.TreeUtil;
 import java.util.HashSet;
 import java.util.Set;
@@ -139,14 +138,15 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantDetailDTO merchant) {
-        merchant.setMerCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_CODE.code()).toString());
+        merchant.setMerCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code()));
         Merchant save =merchantDetailConverter.toE(merchant);
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         //同步商城中台
+        merchant.setId(save.getId());
         List<MerchantDetailDTO> syncList=new ArrayList<>();
         syncList.add(merchant);
-        applicationContext.publishEvent( MerchantAddEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
+        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
         return flag&&flag2;
     }
 
@@ -159,7 +159,7 @@ public class MerchantServiceImpl implements MerchantService {
         //同步商城中台
         List<MerchantDetailDTO> syncList=new ArrayList<>();
         syncList.add(merchant);
-        applicationContext.publishEvent( MerchantUpdateEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).build());
+        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).build());
         return flag&&flag2;
     }
 

@@ -1,6 +1,8 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.IdType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
@@ -36,7 +38,7 @@ public class Sequence extends Model<Sequence> implements Serializable {
      * pk
      */
     @ApiModelProperty("pk")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId
+    @TableId(type = IdType.AUTO)
 	private Long id;
     /**
      * 序列类型

@@ -133,7 +133,7 @@ public class AccountServiceImpl implements AccountService {
   public String uploadAccount(MultipartFile multipartFile) {
     try {
       AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,
-          merchantService,departmentService,sequenceService,accountChangeEventRecordService);
+          merchantService,departmentService,sequenceService,accountChangeEventRecordService,applicationContext);
       EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();
@@ -208,7 +208,7 @@ public class AccountServiceImpl implements AccountService {
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(),"员工修改状态");
     accountChangeEventRecordService.save(accountChangeEventRecord);
 
-    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).accountList(Arrays.asList(account)).build());
+    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).accountList(Arrays.asList(account)).build());
     return result;
   }
 

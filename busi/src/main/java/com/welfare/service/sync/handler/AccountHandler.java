@@ -86,7 +86,7 @@ public class AccountHandler {
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateEmployer(employerReqDTO);
     if (!("0000").equals(roleConsumptionResp.getCode())) {
-      throw new BusiException("同步商户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
+      throw new BusiException("同步员工账户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
     }
 
   }

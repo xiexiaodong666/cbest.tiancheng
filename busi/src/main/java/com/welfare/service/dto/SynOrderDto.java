@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @ProjectName: e-welfare
@@ -27,7 +28,7 @@ public class SynOrderDto {
     @ApiModelProperty("商品")
     private String goods;
     @ApiModelProperty("账户")
-    private String accountCode;
+    private Long accountCode;
     @ApiModelProperty("卡号")
     private String cardId;
     @ApiModelProperty("消费门店")
@@ -37,5 +38,5 @@ public class SynOrderDto {
     @ApiModelProperty("消费金额")
     private BigDecimal transAmount;
     @ApiModelProperty("消费时间")
-    private String transTime;
+    private Date transTime;
 }

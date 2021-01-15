@@ -510,7 +510,7 @@ public class OrderServiceImpl implements OrderService {
                 orderInfo.setMerchantName(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[1]);
                 DateTime time = new DateTime();
                 time.setTime(orderTime);
-//                orderInfo.setOrderTime("");
+//                 orderInfo.setOrderTime("");
                 orderInfo.setCreateUser("system");
                 orderInfo.setCreateTime(new Date());
                 //订单中是否包含员工卡支付

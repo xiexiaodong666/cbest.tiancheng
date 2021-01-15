@@ -6,8 +6,8 @@ package com.welfare.common.enums;
  * @date 2021/1/10 8:07 PM
  */
 public enum MerIdentityEnum {
-  customer("customer", "客户"),
-  supplier("supplier", "供应商");
+  customer("PARTER", "客户"),
+  supplier("SUPPLIER", "供应商");
 
 
   public void setCode(String code) {

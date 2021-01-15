@@ -6,8 +6,8 @@ package com.welfare.common.enums;
  * @date 2021/1/10 8:07 PM
  */
 public enum MerCooperationModeEnum {
-  payFirt("payFirt", "先付费"),
-  payed("payed", "后付费");
+  payFirt("PAY_FIRST", "先付费"),
+  payed("PAYED", "后付费");
 
 
   public void setCode(String code) {

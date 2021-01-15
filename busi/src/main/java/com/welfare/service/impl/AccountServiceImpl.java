@@ -65,6 +65,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -87,7 +88,8 @@ public class AccountServiceImpl implements AccountService {
   private final AccountMapper accountMapper;
   private final AccountCustomizeMapper accountCustomizeMapper;
   private final AccountConverter accountConverter;
-  private final AccountTypeService accountTypeService;
+  @Autowired
+  private AccountTypeService accountTypeService;
   private final CardInfoDao cardInfoDao;
   private final CardApplyDao cardApplyDao;
   private final ShoppingFeignClient shoppingFeignClient;
@@ -95,7 +97,8 @@ public class AccountServiceImpl implements AccountService {
   private final MerchantService merchantService;
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
-  private final AccountChangeEventRecordService accountChangeEventRecordService;
+  @Autowired
+  private  AccountChangeEventRecordService accountChangeEventRecordService;
   private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
 
 

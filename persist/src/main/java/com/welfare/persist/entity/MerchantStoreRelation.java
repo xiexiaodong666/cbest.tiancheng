@@ -126,7 +126,7 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
   /**
    * 状态
    */
-  @ApiModelProperty("状态")
+  @ApiModelProperty("状态 1 启用  0禁用")
   private Integer status;
 
   /**

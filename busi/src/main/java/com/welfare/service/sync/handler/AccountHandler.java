@@ -78,10 +78,10 @@ public class AccountHandler {
     EmployerReqDTO employerReqDTO = new EmployerReqDTO();
     employerReqDTO.setActionType(actionTypeEnum);
     employerReqDTO.setRequestId(UUID.randomUUID().toString());
-    employerReqDTO.setTimestamp(String.valueOf(new Date().getTime()));
+    employerReqDTO.setTimestamp(new Date());
     employerReqDTO.setList(employerDTOList);
 
-    log.info("批量添加、修改员工账号 addOrUpdateEmployer:{}",
+    log.info("同步员工账户 addOrUpdateEmployer:{}",
         gson.toJson(employerReqDTO));
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateEmployer(employerReqDTO);

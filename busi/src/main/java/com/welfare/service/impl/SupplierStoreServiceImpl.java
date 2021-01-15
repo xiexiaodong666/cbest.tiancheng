@@ -27,6 +27,7 @@ import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
+import com.welfare.service.converter.SupplierStoreTreeConverter;
 import com.welfare.service.dto.DictDTO;
 import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.MerchantAddressDTO;
@@ -75,6 +76,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   private final MerchantStoreRelationDao merchantStoreRelationDao;
 
   private final SupplierStoreExMapper supplierStoreExMapper;
+  private final SupplierStoreTreeConverter supplierStoreTreeConverter;
 
   private final MerchantService merchantService;
   private final ApplicationContext applicationContext;
@@ -93,7 +95,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   public List<SupplierStoreTreeDTO> tree(String merCode) {
-    TreeUtil treeUtil = new TreeUtil(supplierStoreExMapper.listUnionMerchant(merCode), "0");
+    List<SupplierStoreTreeDTO> treeDTOS=supplierStoreTreeConverter.toD(supplierStoreExMapper.listUnionMerchant(merCode));
+    treeDTOS.forEach(item->{
+      item.setParentCode(item.getStoreParent());
+      item.setCode(item.getStoreCode());
+
+    });
+    TreeUtil treeUtil = new TreeUtil(treeDTOS, "0");
     return treeUtil.getTree();
   }
 

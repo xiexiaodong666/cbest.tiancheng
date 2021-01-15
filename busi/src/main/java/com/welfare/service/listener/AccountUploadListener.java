@@ -96,8 +96,8 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
     if (!CollectionUtils.isEmpty(accountUploadList)) {
       Boolean result = accountService.batchSave(accountUploadList);
       if (result == true && StringUtils.isEmpty(uploadInfo.toString())) {
-        List<AccountChangeEventRecord> recordList = getEventList(accountUploadList);
-        accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_TYPE_DELETE);
+        List<AccountChangeEventRecord> recordList = AccountUtils.getEventList(accountUploadList,AccountChangeType.ACCOUNT_NEW);
+        accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
         //批量回写
         List<Map<String,Object>> mapList = AccountUtils.getMaps(recordList);
         accountService.batchUpdateChangeEventId(mapList);
@@ -105,19 +105,6 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       }
     }
   }
-  private List<AccountChangeEventRecord> getEventList(List<Account> accountList){
-    if( CollectionUtils.isEmpty(accountList)){
-      return null;
-    }
-    List<AccountChangeEventRecord> records = new LinkedList<>();
-    accountList.forEach(account -> {
-      AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(
-          AccountChangeType.ACCOUNT_NEW, account.getAccountCode(),account.getCreateUser());
-      records.add(accountChangeEventRecord);
-    });
-    return records;
-  }
-
 
   public StringBuilder getUploadInfo() {
     return uploadInfo;

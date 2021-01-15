@@ -77,4 +77,6 @@ public interface AccountService {
 
   AccountSimpleDTO queryAccountInfo(Long accountCode);
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
+  List<Account> queryByAccountTypeCode(String accountTypeCode);
+  List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId);
 }

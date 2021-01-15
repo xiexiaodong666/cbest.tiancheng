@@ -2,13 +2,20 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.gson.Gson;
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.mapper.AccountConsumeSceneMapper;
+import com.welfare.persist.mapper.AccountCustomizeMapper;
+import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.dto.ConsumeTypeJson;
+import com.welfare.service.utils.AccountUtils;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -27,7 +34,8 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     AccountConsumeSceneStoreRelationService {
 
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
-  private final AccountConsumeSceneMapper accountConsumeSceneMapper;
+  private final AccountCustomizeMapper accountCustomizeMapper;
+  private final AccountChangeEventRecordService accountChangeEventRecordService;
 
   @Override
   public List<AccountConsumeSceneStoreRelation> getListByConsumeSceneId(Long accountConsumeSceneId){
@@ -70,7 +78,11 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
         updateList.add(accountConsumeSceneStoreRelation);
       }
     });
-    accountConsumeSceneStoreRelationDao.saveOrUpdateBatch(updateList);
+
+    boolean updateResult = accountConsumeSceneStoreRelationDao.saveOrUpdateBatch(updateList);
+    if( updateResult ){
+      accountChangeEventRecordService.batchSaveBySceneStoreRelation(updateList);
+    }
     return;
   }
 

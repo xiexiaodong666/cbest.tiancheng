@@ -18,7 +18,6 @@ public class MerchantReq {
     @ApiModelProperty("商户类型")
     private String merType;
 
-    @Query(type = Query.Type.EQUAL)
     @ApiModelProperty("身份属性")
     private String merIdentity;
 

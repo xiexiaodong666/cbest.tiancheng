@@ -163,7 +163,7 @@ public class MerchantStoreRelationController implements IController {
     List<MerchantStoreRelationDTO> exportList = merchantStoreRelationService
         .exportMerchantStoreRelations(merName, status, startTime, endTime);
     String path = fileUploadService.uploadExcelFile(
-        exportList, MerchantStoreRelationDTO.class, "账户明细");
+        exportList, MerchantStoreRelationDTO.class, "消费门店配置列表");
     return success(fileUploadService.getFileServerUrl(path));
   }
 

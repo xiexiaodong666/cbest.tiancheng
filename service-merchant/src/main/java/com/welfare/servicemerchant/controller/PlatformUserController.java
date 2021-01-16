@@ -157,7 +157,7 @@ public class PlatformUserController {
 
       } catch (Exception e) {
         platformUserList.clear();
-        log.error("导出商户列表失败", e.getMessage());
+        log.error("导出商户用户列表失败", e.getMessage());
         break;
 
       }

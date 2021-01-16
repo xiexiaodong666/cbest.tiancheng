@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
 
 /**
  * @author duanhy
@@ -100,6 +101,8 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             lock.unlock();
         }
     }
+
+
 
     @Override
     public AccountAmountType querySurplusQuota(Long accountCode) {

@@ -36,6 +36,7 @@ import com.welfare.service.dto.DictDTO;
 import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
+import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
@@ -60,6 +61,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,8 +106,37 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
-  public List<SupplierStoreTreeDTO> tree(String merCode) {
-    List<SupplierStoreTreeDTO> treeDTOS=supplierStoreTreeConverter.toD(supplierStoreExMapper.listUnionMerchant(merCode));
+  public List<SupplierStoreTreeDTO> tree(String merCode, String source) {
+    Set<String> merCodes = new HashSet<>();
+    if(Strings.isNotEmpty(merCode)) {
+      merCodes.add(merCode);
+    }
+    List<SupplierStore> supplierStores = supplierStoreExMapper.listUnionMerchant(merCodes);
+    // 消费门店配置拉取
+    if(SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(source)) {
+      MerchantReq req = new MerchantReq();
+      req.setMerIdentity(MerIdentityEnum.supplier.getCode());
+      List<Merchant> merchantList = merchantService.list(req);
+      List<String> merCodeList = merchantList.stream().map(
+          Merchant::getMerCode).collect(Collectors.toList());
+      merCodes = new HashSet<>(merCodeList);
+      supplierStores = supplierStoreExMapper.listUnionMerchant(merCodes);
+      for (SupplierStore s :
+          supplierStores) {
+        try {
+          Map<String, Boolean> consumeTypeMap = mapper.readValue(
+              s.getConsumType(), Map.class);
+          ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
+          s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+        } catch (JsonProcessingException e) {
+          log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
+        }
+
+      }
+    }
+
+
+    List<SupplierStoreTreeDTO> treeDTOS=supplierStoreTreeConverter.toD(supplierStores);
     treeDTOS.forEach(item->{
       item.setParentCode(item.getStoreParent());
       item.setCode(item.getStoreCode());
@@ -120,7 +151,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     Page<SupplierStoreWithMerchantDTO> pageResult = supplierStoreExMapper.listWithMerchant(
         page, req);
     // 消费门店拉取需要过滤已有配置的门店和 移除没有勾选的消费方法
-    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
+/*    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
 
       QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
       queryWrapper.eq(MerchantStoreRelation.MER_CODE, req.getMerCode());
@@ -151,7 +182,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
       }
 
-    }
+    }*/
     return pageResult;
   }
 

@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
@@ -23,6 +24,7 @@ import com.welfare.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MonthSettleService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,6 +94,11 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         monthSettleRespPage.setRecords(monthSettleDTOPageInfo.getList().stream().map(monthSettleDTO -> {
             MonthSettleResp monthSettleResp = new MonthSettleResp();
             BeanUtils.copyProperties(monthSettleDTO, monthSettleResp);
+            String settleStatisticsInfo = monthSettleDTO.getSettleStatisticsInfo();
+            if(StringUtils.isNotBlank(settleStatisticsInfo)){
+                List<MonthSettleResp.settleAccountInfo> settleAccountInfos = JSON.parseArray(settleStatisticsInfo, MonthSettleResp.settleAccountInfo.class);
+                monthSettleResp.setSettleAccountInfoList(settleAccountInfos);
+            }
             return monthSettleResp;
         }).collect(Collectors.toList()));
 
@@ -181,6 +188,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
                         .eq(MonthSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
                         .eq(MonthSettle::getId, id)
         );
+
+        //todo 调用额度恢复接口恢复额度（剔除自主充值的金额）
     }
 
     @Override

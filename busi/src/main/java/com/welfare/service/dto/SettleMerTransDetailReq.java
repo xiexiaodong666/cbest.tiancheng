@@ -1,6 +1,8 @@
 package com.welfare.service.dto;
 
+import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,7 +13,8 @@ import java.util.Date;
  * @date 2021/1/16 4:08 下午
  * @desc
  */
-public class SettleMerTransDetailReq {
+@Data
+public class SettleMerTransDetailReq extends PageReq {
 
     @ApiModelProperty(value = "出入账类型 in-入账 out-出账")
     private String inOrOutType;

@@ -3,6 +3,7 @@ package com.welfare.servicesettlement.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.SettleMerInfoResp;
+import com.welfare.service.dto.SettleMerTransDetailReq;
 import com.welfare.service.dto.SettleMerTransDetailResp;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class MerInfoController {
 
 
     @GetMapping("/page")
-    public R<Page<SettleMerTransDetailResp>> getAccountTransDetail(SettleMerInfoResp settleMerInfoResp){
+    public R<Page<SettleMerTransDetailResp>> getAccountTransDetail(SettleMerTransDetailReq settleMerTransDetailReq){
         Page<SettleMerTransDetailResp> settleAccountTransDetailRespPage = settleDetailService.getAccountTransDetail(1l);
         return R.success(settleAccountTransDetailRespPage);
     }

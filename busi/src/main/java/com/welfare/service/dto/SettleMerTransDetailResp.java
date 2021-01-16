@@ -1,6 +1,7 @@
 package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Date;
  * @date 2021/1/16 4:08 下午
  * @desc
  */
+@Data
 public class SettleMerTransDetailResp {
 
     @ApiModelProperty(value = "交易流水号")

@@ -149,37 +149,30 @@
         t1.mer_code as merCode,
         t1.mer_name as mer_name,
         sum(
-        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
-        when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
+        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' and t1.mer_account_type!='self' then t1.trans_amount
+        when t3.mer_code != t1.mer_code and t1.trans_type='refund' and t1.mer_account_type!='self' then t1.trans_amount*-1
         else 0 end
         ) as unSettleAmount,
         sum(
-        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
-        when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
+        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' and t1.mer_account_type='self' then t1.trans_amount
+        when t3.mer_code != t1.mer_code and t1.trans_type='refund' and t1.mer_account_type='self' then t1.trans_amount*-1
         else 0 end
         ) as unSettleSelfAmount,
-        sum(
-        case when t2.rebate_type='all' and t1.trans_type='consume' then rebate_ratio/100*trans_amount
-        when t2.rebate_type='all' and t1.trans_type='refund' then rebate_ratio/100*trans_amount*-1
-        when t2.rebate_type='card_pay' and t1.trans_type_name='员工卡支付' and t1.trans_type='consume' then  rebate_ratio/100*trans_amount
-        when t2.rebate_type='card_pay' and t1.trans_type_name='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
-        when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='consume' then  rebate_ratio/100*trans_amount
-        when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
-        else 0 end
-        ) as rebateAmount,
+        t5.rebate_limit as rebateAmount,
         t4.mer_cooperation_mode as merCooperationMode,
         case when t4.mer_cooperation_mode = 'payFirt' then '先付费'
         when t4.mer_cooperation_mode = 'payed' then '后付费' end as mer_cooperation_mode_name
         from settle_detail t1
-        left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code
+        left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code and t4.deleted=0
+        left join merchant_credit t5 on t1.mer_code = t5.mer_code t5.deleted=0
         where t1.settle_flag = 'unsettled'
         <if test="merCode!=null and merCode!=''">
             and t1.mer_code=#{merCode}
         </if>
         <if test="merName!=null and merName!=''">
-            and t1.mer_name like concat('%',#{merCode},'%')
+            and t1.mer_name like concat('%',#{merName},'%')
         </if>
         <if test="merCooperationMode!=null and merCooperationMode!=''">
             and t4.mer_cooperation_mode=#{merCooperationMode}
@@ -193,110 +186,31 @@
         t1.mer_code as merCode,
         sum(
         case when t1.trans_type='consume' then t1.trans_amount
-        when t1.trans_type='refund' then t1.trans_amount*-1
-        else 0 end
+             when t1.trans_type='refund' then t1.trans_amount*-1
+             else 0 end
         ) as transAmount,
         sum(
         case when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
-        when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
-        else 0 end
+             when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
+             else 0 end
         ) as settleAmount,
+        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' and t1.mer_account_type='self' then t1.trans_amount
+             when  t3.mer_code != t1.mer_code and t1.trans_type='refund' and mer_account_type='self' then t1.trans_amount*-1
+             else 0 end
+        ) as settleSelfAmount,
         sum(
         case when t2.rebate_type='all' and t1.trans_type='consume' then rebate_ratio/100*trans_amount
-        when t2.rebate_type='all' and t1.trans_type='refund' then rebate_ratio/100*trans_amount*-1
-        when t2.rebate_type='card_pay' and t1.trans_type_name='员工卡支付' and t1.trans_type='consume' then  rebate_ratio/100*trans_amount
-        when t2.rebate_type='card_pay' and t1.trans_type_name='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
-        when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='consume' then  rebate_ratio/100*trans_amount
-        when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
-        else 0 end
+             when t2.rebate_type='all' and t1.trans_type='refund' then rebate_ratio/100*trans_amount*-1
+             when t2.rebate_type='card_pay' and t1.trans_type_name='员工卡支付' and t1.trans_type='consume' then  rebate_ratio/100*trans_amount
+             when t2.rebate_type='card_pay' and t1.trans_type_name='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
+             when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='consume' then  rebate_ratio/100*trans_amount
+             when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
+             else 0 end
         ) as rebateAmount,
         sum(
         case when t1.trans_type='consume' then 1
-        when t1.trans_type='refund' then -1
-        else 0 end
-        ) as orderNum,
-        'unconfirmed' as  rec_status,
-        'unsettled' as settle_status,
-        'unsended' as send_status,
-        null as send_time,
-        null as confirm_time,
-        'system' as create_user
-        from settle_detail t1
-        left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code
-        left join supplier_store t3 on t1.store_code = t3.store_code and t3.status=0
-        <where>
-            <if test="startTime!=null">
-                and t1.trans_time &gt;=#{startTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="endTime!=null">
-                and t1.trans_time &lt;=#{endTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="merCode!=null and merCode!=''">
-                and t1.mer_code=#{merCode}
-            </if>
-            <if test="storeName!=null and storeName!=''">
-                and t3.store_name like concat('%',#{storeName},'%')
-            </if>
-            <if test="storeCode!=null and storeCode!=''">
-                and t3.store_code=#{storeCode}
-            </if>
-            <if test="welfareTypeCode!=null and welfareTypeCode!=''">
-                and t1.mer_account_type = #{welfareTypeCode}
-            </if>
-            <choose>
-                <when test="storeType=='self'">
-                    and t3.mer_code = t1.mer_code
-                </when>
-                <when test="storeType=='third'">
-                    and t3.mer_code != t1.mer_code
-                </when>
-            </choose>
-            <if test="transNo!=null and transNo!=''">
-                and t1.trans_no=#{transNo}
-            </if>
-            <if test="excludeIdList!=null and excludeIdList.size!=0">
-                and t1.id is not in(
-                <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
-                )
-            </if>
-            <if test="minId!=null">
-                and t1.id &gt;=#{minId}
-            </if>
-            <if test="limit!=null">
-                limit ${limit}
-            </if>
-        </where>
-        group by t1.mer_code
-    </select>
-
-
-    <select id="getSettleByCondition" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery" resultType="com.welfare.persist.entity.MonthSettle">
-        select
-        concat(t1.mer_code,DATE_FORMAT(now(),'%Y%m%d%h%m%s')) as settleNo,
-        t1.mer_code as merCode,
-        sum(
-        case when t1.trans_type='consume' then t1.trans_amount
-        when t1.trans_type='refund' then t1.trans_amount*-1
-        else 0 end
-        ) as transAmount,
-        sum(
-        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
-        when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
-        else 0 end
-        ) as settleAmount,
-        sum(
-        case when t2.rebate_type='all' and t1.trans_type='consume' then rebate_ratio/100*trans_amount
-        when t2.rebate_type='all' and t1.trans_type='refund' then rebate_ratio/100*trans_amount*-1
-        when t2.rebate_type='card_pay' and t1.trans_type_name='员工卡支付' and t1.trans_type='consume' then  rebate_ratio/100*trans_amount
-        when t2.rebate_type='card_pay' and t1.trans_type_name='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
-        when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='consume' then  rebate_ratio/100*trans_amount
-        when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
-        else 0 end
-        ) as rebateAmount,
-        sum(
-        case when t1.trans_type='consume' then 1
-        when t1.trans_type='refund' then -1
-        else 0 end
+             when t1.trans_type='refund' then -1
+             else 0 end
         ) as orderNum,
         'unconfirmed' as  rec_status,
         'unsettled' as settle_status,
@@ -410,6 +324,9 @@
             </choose>
         </where>
         order by t1.id
+        <if test="limit!=null">
+            limit #{limit}
+        </if>
     </select>
 
 

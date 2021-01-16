@@ -68,7 +68,17 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Override
     public List<WelfareSettleDetailResp> queryWelfareSettleDetail(WelfareSettleDetailReq welfareSettleDetailReq) {
-        return null;
+        WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
+        BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
+        welfareSettleDetailQuery.setPosOnlines(posOnlines);
+
+        List<WelfareSettleDetailResp> welfareSettleDetailRespList = settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
+            WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
+            BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);
+            return welfareSettleDetailResp;
+        }).collect(Collectors.toList());
+
+        return welfareSettleDetailRespList;
     }
 
     @Override

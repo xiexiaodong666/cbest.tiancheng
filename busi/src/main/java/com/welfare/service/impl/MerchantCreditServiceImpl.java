@@ -20,6 +20,7 @@ import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +57,8 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final RebateLimitOperator rebateLimitOperator;
     private final MerchantBillDetailDao merchantBillDetailDao;
     private final SelfDepositBalanceOperator selfDepositBalanceOperator;
-    private final MerchantService merchantService;
+    @Autowired
+    private  MerchantService merchantService;
     private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
     private final MerchantBillDetailService merchantBillDetailService;
 

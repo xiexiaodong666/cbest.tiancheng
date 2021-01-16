@@ -45,6 +45,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +70,8 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantExMapper merchantExMapper;
     private final DictService dictService;
     private final MerchantAddressService merchantAddressService;
-    private final MerchantCreditService merchantCreditService;
+    @Autowired
+    private  MerchantCreditService merchantCreditService;
     private final MerchantDetailConverter merchantDetailConverter;
     private final MerchantSyncConverter merchantSyncConverter;
 

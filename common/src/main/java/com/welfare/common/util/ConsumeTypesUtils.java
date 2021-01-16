@@ -3,6 +3,7 @@ package com.welfare.common.util;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +58,7 @@ public class ConsumeTypesUtils {
 
   public static Map<String, Boolean> transfer(String str) {
     List<String> list = Arrays.asList(str.split(","));
-    Map<String, Boolean> map = ConsumeTypeEnum.defaultMap;
+    Map<String, Boolean> map = defaultMap();
     Set<String> keys=map.keySet();
     for (String s : list) {
       if(keys.contains(s)){
@@ -66,13 +67,21 @@ public class ConsumeTypesUtils {
     }
     return map;
   }
+  public static Map<String, Boolean> defaultMap(){
+    Map<String, Boolean> map = new HashMap<>();
+    map.put(ConsumeTypeEnum.O2O.getCode(),Boolean.FALSE);
+    map.put(ConsumeTypeEnum.ONLINE_MALL.getCode(),Boolean.FALSE);
+    map.put(ConsumeTypeEnum.SHOP_SHOPPING.getCode(),Boolean.FALSE);
+    return map;
+  }
 
   public static Map<String, Boolean> transferWithExcel(List<String> list) {
-    Map<String, Boolean> map = ConsumeTypeEnum.defaultMap;
+    Map<String, Boolean> map=defaultMap();
     Set<String> keys=map.keySet();
     for (String s : list) {
-      if(keys.contains(ConsumeTypeEnum.getTypeByExcelType(s))){
-        map.put(s,Boolean.TRUE);
+      String code=ConsumeTypeEnum.getTypeByExcelType(s);
+      if(keys.contains(code)){
+        map.put(code,Boolean.TRUE);
       }
     }
     return map;

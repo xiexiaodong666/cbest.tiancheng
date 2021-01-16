@@ -28,6 +28,11 @@ spring:
         - 192.1.30.186:7004
         - 192.1.30.186:7005
     database: 0
+  kafka:
+    servers: 192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667
+    topic: order_info
+    group-id: welfare
+    offset: latest
 logging:
   file:
     path: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest

@@ -1,7 +1,12 @@
 package com.welfare.persist.mapper;
 
 import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.WelfareSettleDTO;
+import com.welfare.persist.dto.WelfareSettleDetailDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
+import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
+import com.welfare.persist.dto.query.WelfareSettleQuery;
+import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.entity.SettleDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -33,4 +38,32 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
      * @return
      */
     List<SettleDetail> getSettleDetailFromAccountDetail(Map<String, Object> params);
+
+    /**
+     * 查询商户未结算列表信息
+     * @param welfareSettleQuery
+     * @return
+     */
+    List<WelfareSettleDTO> getWelfareSettle(WelfareSettleQuery welfareSettleQuery);
+
+    /**
+     * 查询商户未结算详细信息列表
+     * @param welfareSettleDetailQuery
+     * @return
+     */
+    List<WelfareSettleDetailDTO> getSettleDetailInfo(WelfareSettleDetailQuery welfareSettleDetailQuery);
+
+    /**
+     * 查询商户未结算详细信息统计
+     * @param welfareSettleDetailQuery
+     * @return
+     */
+    Map<String, Object> getSettleDetailExtInfo(WelfareSettleDetailQuery welfareSettleDetailQuery);
+
+    /**
+     * 按条件获取结算账单
+     * @param welfareSettleDetailQuery
+     * @return
+     */
+    MonthSettle getSettleByCondition(WelfareSettleDetailQuery welfareSettleDetailQuery);
 }

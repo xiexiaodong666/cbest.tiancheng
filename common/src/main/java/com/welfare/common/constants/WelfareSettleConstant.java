@@ -131,4 +131,38 @@ public class WelfareSettleConstant {
             return this.desc;
         }
     }
+
+
+    /**
+     * 结算明细数据类型枚举
+     */
+    public enum SettleDetailDataTypeEnum {
+        /**
+         * 员工卡支付
+         */
+        WELFARE("welfare","员工卡支付"),
+
+        /**
+         * 第三方支付
+         */
+        THIRD("third","第三方支付");
+
+        private String code;
+        private String desc;
+
+        SettleDetailDataTypeEnum(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+
+    public static final Integer LIMIT = 5000;
 }

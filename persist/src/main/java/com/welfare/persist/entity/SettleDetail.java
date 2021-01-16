@@ -40,153 +40,162 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     @TableId
 	private Integer id;
     /**
+     * 账单编号
+     */
+    @ApiModelProperty("账单编号")
+    private String settleNo;
+    /**
      * 订单编码
      */
-    @ApiModelProperty("订单编码")   
+    @ApiModelProperty("订单编码")
     private String orderId;
     /**
      * 交易流水号
      */
-    @ApiModelProperty("交易流水号")   
+    @ApiModelProperty("交易流水号")
     private String transNo;
     /**
      * 账户
      */
-    @ApiModelProperty("账户")   
+    @ApiModelProperty("账户")
     private Long accountCode;
     /**
      * 账户名称
      */
-    @ApiModelProperty("账户名称")   
+    @ApiModelProperty("账户名称")
     private String accountName;
     /**
      * 卡号
      */
-    @ApiModelProperty("卡号")   
+    @ApiModelProperty("卡号")
     private Integer cardId;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")   
+    @ApiModelProperty("商户代码")
     private String merCode;
     /**
      * 商户名称
      */
-    @ApiModelProperty("商户名称")   
+    @ApiModelProperty("商户名称")
     private String merName;
     /**
      * 门店编码
      */
-    @ApiModelProperty("门店编码")   
+    @ApiModelProperty("门店编码")
     private String storeCode;
     /**
      * 门店名称
      */
-    @ApiModelProperty("门店名称")   
+    @ApiModelProperty("门店名称")
     private String storeName;
     /**
      * 交易时间
      */
-    @ApiModelProperty("交易时间")   
+    @ApiModelProperty("交易时间")
     private Date transTime;
     /**
      * pos机器编码
      */
-    @ApiModelProperty("pos机器编码")   
+    @ApiModelProperty("pos机器编码")
     private String pos;
     /**
      * 支付编码
      */
-    @ApiModelProperty("支付编码")   
+    @ApiModelProperty("支付编码")
     private String payCode;
     /**
      * 支付名称
      */
-    @ApiModelProperty("支付名称")   
+    @ApiModelProperty("支付名称")
     private String payName;
     /**
      * 交易类型
      */
-    @ApiModelProperty("交易类型")   
+    @ApiModelProperty("交易类型")
     private String transType;
     /**
      * 交易类型名
      */
-    @ApiModelProperty("交易类型名")   
+    @ApiModelProperty("交易类型名")
     private String transTypeName;
     /**
      * 交易金额
      */
-    @ApiModelProperty("交易金额")   
+    @ApiModelProperty("交易金额")
     private BigDecimal transAmount;
     /**
      * 福利类型(餐费、交通费等)
      */
-    @ApiModelProperty("福利类型(餐费、交通费等)")   
+    @ApiModelProperty("福利类型(餐费、交通费等)")
     private String merAccountType;
     /**
      * 福利类型(餐费、交通费等)
      */
-    @ApiModelProperty("福利类型(餐费、交通费等)")   
+    @ApiModelProperty("福利类型(餐费、交通费等)")
     private String merAccountTypeName;
     /**
      * 子账户扣款金额
      */
-    @ApiModelProperty("子账户扣款金额")   
+    @ApiModelProperty("子账户扣款金额")
     private BigDecimal accountAmount;
     /**
      * 子账户余额
      */
-    @ApiModelProperty("子账户余额")   
+    @ApiModelProperty("子账户余额")
     private BigDecimal accountBalance;
     /**
      * 商户余额扣款金额
      */
-    @ApiModelProperty("商户余额扣款金额")   
+    @ApiModelProperty("商户余额扣款金额")
     private BigDecimal merDeductionAmount;
     /**
      * 商户信用扣款金额
      */
-    @ApiModelProperty("商户信用扣款金额")   
+    @ApiModelProperty("商户信用扣款金额")
     private BigDecimal merCreditDeductionAmount;
     /**
      * 自费扣款金额
      */
-    @ApiModelProperty("自费扣款金额")   
+    @ApiModelProperty("自费扣款金额")
     private BigDecimal selfDeductionAmount;
+
+    @ApiModelProperty("结算标志 settled已结算 unsettled未结算")
+    private String settleFlag;
+
     /**
      * 数据支付类型 welfare-员工卡支付 third-其它三方支付
      */
-    @ApiModelProperty("数据支付类型 welfare-员工卡支付 third-其它三方支付")   
+    @ApiModelProperty("数据支付类型 welfare-员工卡支付 third-其它三方支付")
     private String dataType;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")   
+    @ApiModelProperty("创建人")
     @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")   
+    @ApiModelProperty("创建时间")
     @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")   
+    @ApiModelProperty("更新人")
     @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")   
+    @ApiModelProperty("更新时间")
     @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 版本
      */
-    @ApiModelProperty("版本")  @Version 
+    @ApiModelProperty("版本")  @Version
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
@@ -197,9 +206,13 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     */
     public static final String ID = "id";
     /**
+     * 账单编号
+     */
+    public static final String ORDER_ID = "order_id";
+    /**
     * 订单编码
     */
-    public static final String ORDER_ID = "order_id";
+    public static final String SETTLE_NO = "settleNo";
     /**
     * 交易流水号
     */
@@ -288,6 +301,10 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     * 自费扣款金额
     */
     public static final String SELF_DEDUCTION_AMOUNT = "self_deduction_amount";
+    /**
+     * 结算标志
+     */
+    public static final String SETTLE_FLAG = "settle_flag";
     /**
     * 数据支付类型 welfare-员工卡支付 third-其它三方支付
     */

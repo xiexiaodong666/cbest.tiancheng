@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +57,8 @@ public class SettlementDetailDealTask extends IJobHandler {
     @Autowired
     private PullAccountDetailRecordDao pullAccountDetailRecordDao;
 
+    @Autowired
+    private SettleDetailDao settleDetailDao;
 
     public ReturnT<String> execute(String param){
         log.info("============结算账单明细数据生成任务,任务执行开始===================");
@@ -84,10 +87,9 @@ public class SettlementDetailDealTask extends IJobHandler {
                 PullAccountDetailRecord pullAccountDetailRecord = new PullAccountDetailRecord();
                 pullAccountDetailRecord.setDelDate(DateUtil.date2Str(finalToday, DateUtil.DEFAULT_DATE_FORMAT));
                 pullAccountDetailRecord.setDelStatus(WelfareSettleConstant.PullTaksSendStatusEnum.FAIL.code());
-                pullAccountDetailRecord.setCreateTime(finalToday);
                 pullAccountDetailRecord.setCreateUser("system");
                 pullAccountDetailRecord.setTryCount(0);
-                 pullAccountDetailRecord.setMerCode(merchant.getMerCode());
+                pullAccountDetailRecord.setMerCode(merchant.getMerCode());
                 pullAccountDetailRecords.add(pullAccountDetailRecord);
             });
             pullAccountDetailRecordDao.saveBatch(pullAccountDetailRecords);
@@ -98,10 +100,26 @@ public class SettlementDetailDealTask extends IJobHandler {
             List<PullAccountDetailRecord> pullAccountDetailRecordList = pullAccountDetailRecordMapper.selectList(Wrappers.<PullAccountDetailRecord>lambdaQuery()
                     .eq(PullAccountDetailRecord::getDelStatus, WelfareSettleConstant.PullTaksSendStatusEnum.FAIL.code())
             );
+            log.info("执行结算账单明细数据生成任务，任务数据:{}",JSON.toJSONString(pullAccountDetailRecordList));
 
             pullAccountDetailRecordList.forEach(pullAccountDetailRecord -> {
                 pullAccountDetailRecord.setTryCount(pullAccountDetailRecord.getTryCount()+1);
                 pullAccountDetailRecordMapper.updateById(pullAccountDetailRecord);
+
+                //执行前，环境清理，保证任务可重复执行
+                Date date = null;
+                try {
+                    date = DateUtil.str2DateTime(pullAccountDetailRecord.getDelDate(), DateUtil.DEFAULT_DATE_FORMAT);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                settleDetailDao.remove(Wrappers.<SettleDetail>lambdaQuery()
+                        .eq(SettleDetail::getDataType, WelfareSettleConstant.SettleDetailDataTypeEnum.WELFARE)
+                        .eq(SettleDetail::getMerCode, pullAccountDetailRecord.getMerCode())
+                        .between(SettleDetail::getTransTime, DateUtil.getDayMin(date, -1), DateUtil.getDayMax(date, -1))
+                );
+
+                //执行数据拉取
                 pullAccountDetailRecordService.pullAccountDetailToSettleDetail(pullAccountDetailRecord);
             });
         } catch (Exception e) {

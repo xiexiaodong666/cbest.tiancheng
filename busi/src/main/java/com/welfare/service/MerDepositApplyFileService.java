@@ -15,4 +15,6 @@ public interface MerDepositApplyFileService {
   boolean delByMerDepositApplyCode(String merDepositApplyCode);
 
   List<MerDepositApplyFile> listByMerDepositApplyCode(String merDepositApplyCode);
+
+  void save(String merDepositApplyCode, List<String> fileUrls);
 }

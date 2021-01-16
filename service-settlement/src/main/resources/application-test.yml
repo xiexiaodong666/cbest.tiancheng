@@ -64,6 +64,9 @@ cbest:
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
     notifyUrl: http://xxx/accountDepositRecord/payNotify
+
+    card:
+      code: 5065
   oss:
     config:
       bucket: sjgo-img-test

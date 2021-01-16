@@ -37,5 +37,5 @@ public interface OrderService {
      * @Return
      * @Exception 
      */
-    void saveOrUpdateBacth(List<SynOrderDto> orderDtoList);
+    int saveOrUpdateBacth(List<SynOrderDto> orderDtoList);
 }

@@ -61,8 +61,9 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
     /**
      * 删除标识
      */
-    @ApiModelProperty("删除标识")   
-    private Boolean flag;
+    @ApiModelProperty("删除标识")
+    @TableLogic
+    private Boolean deleted;
     /**
      * 备注
      */

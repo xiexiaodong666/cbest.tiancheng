@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.entity.Merchant;
@@ -58,15 +59,15 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     BeanUtils.copyProperties(storeImportDTO, store);
     store.setStatus(0);
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
-    Integer row=analysisContext.readRowHolder().getRowIndex();
+    Integer row=analysisContext.readRowHolder().getRowIndex()+1;
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
-      uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空");
+      uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空").append(";");
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getMerCode())){
-      uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空");
+      uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空").append(";");
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreName())){
-      uploadInfo.append("第").append(row.toString()).append("行").append("门店名称不能为空");
+      uploadInfo.append("第").append(row.toString()).append("行").append("门店名称不能为空").append(";");
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getConsumType())){
       uploadInfo.append("第").append(row.toString()).append("行").append("消费类型不能为空").append(";");
@@ -117,6 +118,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     List<SupplierStore> stores=storeService.list(storeQueryWrapper);
     MerchantReq req=new MerchantReq() ;
     req.setMerCodeList(merCodeList);
+    req.setMerIdentity(MerIdentityEnum.supplier.getCode());
     List<Merchant> merchants=merchantService.list(req);
     merCodeList.removeAll(merchants.stream().map(item->item.getMerCode()).collect(Collectors.toList())) ;
     boolean flag=true;

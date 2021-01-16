@@ -52,11 +52,29 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
   public void invoke(DepartmentImportDTO departmentImportDTO, AnalysisContext analysisContext) {
     Department department = new Department();
     BeanUtils.copyProperties(departmentImportDTO, department);
-    department.setDepartmentType(DepartmentTypeEnum.getTypeByExcelType(departmentImportDTO.getDepartmentType()));
-    merCodeList.add(department.getMerCode());
-    if(department.getDepartmentParent().equals(department.getMerCode())){
+    Integer row=analysisContext.readRowHolder().getRowIndex()+1;
+    if(EmptyChecker.isEmpty(departmentImportDTO.getMerCode())){
+      uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空").append(";");
+    }
+    if(EmptyChecker.isEmpty(departmentImportDTO.getDepartmentParent())){
+      uploadInfo.append("第").append(row.toString()).append("行").append("上级编码不能为空").append(";");
+    }
+    if(EmptyChecker.isEmpty(departmentImportDTO.getDepartmentName())){
+      uploadInfo.append("第").append(row.toString()).append("行").append("机构名称不能为空").append(";");
+    }
+    if(EmptyChecker.isEmpty(departmentImportDTO.getDepartmentType())){
+      uploadInfo.append("第").append(row.toString()).append("行").append("机构类型不能为空").append(";");
+    }
+    String type=DepartmentTypeEnum.getTypeByExcelType(departmentImportDTO.getDepartmentType());
+    if(EmptyChecker.isEmpty(type)){
+      uploadInfo.append("第").append(row.toString()).append("行").append("机构类型错误").append(";");
+    }else{
+      department.setDepartmentType(type);
+    }
+    if(!department.getDepartmentParent().equals(department.getMerCode())){
       parenCodeList.add(department.getDepartmentParent());
     }
+    merCodeList.add(department.getMerCode());
     list.add(department);
   }
 
@@ -69,7 +87,7 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
         String departmentCode=sequenceService.nextNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()).toString();
         Map<String,String> pathMap=new HashMap<>();
         if(department.getDepartmentParent().equals(department.getMerCode())){
-          department.setDepartmentPath(departmentCode);
+          department.setDepartmentPath(department.getMerCode()+"-"+departmentCode);
         }else{
           if(EmptyChecker.isEmpty(pathMap.get(department.getDepartmentParent()))){
             Department parent=departmentService.getByDepartmentCode(department.getDepartmentParent());
@@ -81,6 +99,7 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
             department.setDepartmentPath(pathMap.get(department.getDepartmentParent())+"-"+department.getDepartmentCode());
           }
         }
+        department.setDepartmentCode(departmentCode);
       }
 
       if(flag){
@@ -97,14 +116,16 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
   }
 
   private boolean check() {
-    DepartmentReq departmentReq=new DepartmentReq();
-    departmentReq.setDepartmentCodeList(parenCodeList);
-    List<Department> departments=departmentService.list(departmentReq);
-    parenCodeList.removeAll(departments.stream().map(item->item.getDepartmentCode()).collect(Collectors.toList())) ;
     boolean flag=true;
     if(EmptyChecker.notEmpty(parenCodeList)){
-      uploadInfo.append("上级机构不存在:").append(StringUtil.join(parenCodeList,",")).append(";");
-      flag=false;
+      DepartmentReq departmentReq=new DepartmentReq();
+      departmentReq.setDepartmentCodeList(parenCodeList);
+      List<Department> departments=departmentService.list(departmentReq);
+      parenCodeList.removeAll(departments.stream().map(item->item.getDepartmentCode()).collect(Collectors.toList())) ;
+      if(EmptyChecker.notEmpty(parenCodeList)){
+        uploadInfo.append("上级机构不存在:").append(StringUtil.join(parenCodeList,",")).append(";");
+        flag=false;
+      }
     }
     MerchantReq req=new MerchantReq() ;
     req.setMerCodeList(merCodeList);

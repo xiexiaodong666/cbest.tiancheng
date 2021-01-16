@@ -1,12 +1,11 @@
 package com.welfare.service.impl;
 
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.persist.dao.*;
+import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.dto.payment.CardPaymentRequest;
-import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -54,6 +53,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest) {
+        String paymentScene = paymentRequest.chargePaymentScene();
         Long accountCode = paymentRequest.calculateAccountCode();
 
         Account account = accountService.getByAccountCode(accountCode);
@@ -80,7 +80,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentRequest queryResult(String transNo) {
-        List<AccountBillDetail> accountDeductionDetails = accountBillDetailDao.queryByTransNo(transNo);
+        List<AccountBillDetail> accountDeductionDetails = accountBillDetailDao.queryByTransNoAndTransType(
+                transNo,
+                WelfareConstant.TransType.CONSUME.code()
+        );
         CardPaymentRequest paymentRequest = new CardPaymentRequest();
         paymentRequest.setTransNo(transNo);
         if(CollectionUtils.isEmpty(accountDeductionDetails)){
@@ -97,6 +100,11 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(AccountBillDetail::getTransAmount)
                 .reduce(BigDecimal.ZERO,BigDecimal::add);
         paymentRequest.setAmount(amount);
+
+        Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
+        paymentRequest.setAccountBalance(account.getAccountBalance());
+        paymentRequest.setAccountName(account.getAccountName());
+        paymentRequest.setAccountCredit(account.getSurplusQuota());
         return paymentRequest;
     }
 

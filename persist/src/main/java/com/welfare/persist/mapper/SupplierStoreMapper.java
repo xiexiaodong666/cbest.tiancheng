@@ -1,8 +1,10 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.welfare.persist.entity.SupplierStore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 供应商门店(supplier_store)数据Mapper
@@ -13,5 +15,10 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface SupplierStoreMapper extends BaseMapper<SupplierStore> {
+    /**
+     * 更新所有字段（除了deleted）
+     * @return
+     */
+    Integer alwaysUpdateSomeColumnById(@Param(Constants.ENTITY) SupplierStore supplierStore);
 
 }

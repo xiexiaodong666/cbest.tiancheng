@@ -45,4 +45,9 @@ public class AccountPageReq implements Serializable {
    */
   @ApiModelProperty("是否绑卡")
   private Integer binding;
+  /**
+   * 卡片号码
+   */
+  @ApiModelProperty("卡片号码")
+  private String cardId;
 }

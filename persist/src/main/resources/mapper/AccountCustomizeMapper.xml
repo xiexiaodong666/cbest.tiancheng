@@ -89,6 +89,9 @@
     <if test=" accountTypeCode !='' and accountTypeCode != null ">
       and at.type_code = #{accountTypeCode}
     </if>
+    <if test=" cardId !='' and cardId != null ">
+      and ci.card_id = #{cardId}
+    </if>
     GROUP BY a.account_code
   </select>
 

@@ -24,7 +24,7 @@ spring:
         - 192.1.30.186:7005
 logging:
   file:
-    path: /home/finance/Logs/e-welfare-account.e-cbest.lotest
+    path: D:/home/finance/Logs/e-welfare-account.e-cbest.lotest
   level:
     root: info
 encrypt:

@@ -30,31 +30,31 @@ public interface MonthSettleService {
      * @param monthSettleDetailReq
      * @return
      */
-    Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(String id, MonthSettleDetailPageReq monthSettleDetailReq);
+    Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(Long id, MonthSettleDetailPageReq monthSettleDetailReq);
 
     /**
      * 根据主键账单id、部分限制条件，导出账单数据
      * @param id
      */
-    List<MonthSettleDetailResp> queryMonthSettleDetailLimit(String id, MonthSettleDetailReq monthSettleDetailReq);
+    List<MonthSettleDetailResp> queryMonthSettleDetailLimit(Long id, MonthSettleDetailReq monthSettleDetailReq);
 
     /**
      * 月账单发送
      * @param id
      */
-    Integer monthSettleSend(String id);
+    Integer monthSettleSend(Long id);
 
     /**
      * 月账单确认
      * @param id
      */
-    Integer monthSettleConfirm(String id);
+    Integer monthSettleConfirm(Long id);
 
     /**
      * 月账单完成
      * @param id
      */
-    Integer monthSettleFinish(String id);
+    Integer monthSettleFinish(Long id);
 
     /**
      * 按条件查询生成商户月账单
@@ -64,4 +64,6 @@ public interface MonthSettleService {
     MonthSettle getMonthSettle(MonthSettleDetailQuery monthSettleDetailQuery);
 
     Boolean addMonthSettleList(List<MonthSettle> monthSettleList);
+
+    MonthSettle getMonthSettleById(Long id);
 }

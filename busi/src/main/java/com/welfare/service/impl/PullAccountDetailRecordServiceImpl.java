@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.util.DateUtil;
 import com.welfare.persist.dao.PullAccountDetailRecordDao;
@@ -42,7 +43,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void pullAccountDetailToSettleDetail(PullAccountDetailRecord pullAccountDetailRecord) {
-
+        log.info("===========拉取账户详细交易数据，请求参数：{}", JSONObject.toJSONString(pullAccountDetailRecord)+"========");
         //拉取数据
         String delDate = pullAccountDetailRecord.getDelDate();
 
@@ -61,6 +62,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
         params.put("limit",2000);
 
         do {
+            log.info("settleDetailMapper循环拉取账户详细交易数据，请求参数：{}", JSONObject.toJSONString(params));
             List<SettleDetail> settleDetails = settleDetailMapper.getSettleDetailFromAccountDetail(params);
             if(!settleDetails.isEmpty()){
                 settleDetailDao.saveOrUpdateBatch(settleDetails);

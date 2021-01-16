@@ -158,14 +158,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.isEmpty(store)) {
       throw new BusiException("门店不存在");
     }
-    Map<String, Boolean> consumeTypeMap = null;
-    try {
-      consumeTypeMap = mapper.readValue(
-          store.getConsumType(), Map.class);
-      store.setConsumType(ConsumeTypesUtils.transferStr(consumeTypeMap));
-    } catch (JsonProcessingException e) {
-      log.info("消费方式转换失败，格式错误【{}】", store.getConsumType());
-    }
     //字典转义
     dictService.trans(
         SupplierStoreDetailDTO.class, SupplierStore.class.getSimpleName(), true, store);

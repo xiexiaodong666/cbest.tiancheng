@@ -3,10 +3,12 @@ package com.welfare.servicemerchant.controller;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.persist.entity.Department;
 import com.welfare.service.DepartmentService;
+import com.welfare.service.dto.DepartmentAddDTO;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.converter.DepartmentConverter;
 import com.welfare.service.dto.DepartmentDTO;
+import com.welfare.service.dto.DepartmentUpdateDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -61,13 +63,13 @@ public class DepartmentController implements IController {
 
     @PostMapping("/add")
     @ApiOperation("新增部门")
-    public R add(@RequestBody Department department){
+    public R add(@RequestBody DepartmentAddDTO department){
         return R.status(departmentService.add(department),"新增失败");
     }
 
     @PostMapping("/update")
     @ApiOperation("修改部门")
-    public R update(@RequestBody Department department){
+    public R update(@RequestBody DepartmentUpdateDTO department){
         return R.status(departmentService.update(department),"修改失败");
     }
     @PostMapping("/batch-add")
@@ -76,7 +78,7 @@ public class DepartmentController implements IController {
         return R.success(departmentService.upload(multipartFile));
 
     }
-    @PostMapping("/delete/{id}")
+    @PostMapping("/delete/{departmentCode}")
     @ApiOperation("删除子部门")
     public R delete(@PathVariable @NotBlank String  departmentCode){
         return R.status(departmentService.delete(departmentCode),"删除失败");

@@ -3,8 +3,10 @@ package com.welfare.servicemerchant.controller;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.service.MerchantService;
 import com.welfare.persist.dto.query.MerchantPageReq;
+import com.welfare.service.dto.MerchantAddDTO;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantUpdateDTO;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.servicemerchant.converter.MerchantConverter;
 import com.welfare.servicemerchant.dto.MerchantInfo;
@@ -62,12 +64,12 @@ public class MerchantController implements IController {
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")
-    public R add(@RequestBody MerchantDetailDTO merchant){
+    public R add(@RequestBody MerchantAddDTO merchant){
         return R.status(merchantService.add(merchant),"新增失败");
     }
     @PostMapping("/update")
     @ApiOperation("编辑商户")
-    public R update(@RequestBody MerchantDetailDTO merchant){
+    public R update(@RequestBody MerchantUpdateDTO merchant){
         return R.status(merchantService.update(merchant),"更新失败");
     }
     @PostMapping("/export-list")

@@ -74,15 +74,13 @@ public class RefundServiceImpl implements RefundService {
         accountLock.lock();
         try{
             List<AccountDeductionDetail> refundDeductionDetails = accountDeductionDetails.stream()
-                    .map(deduction -> {
-                        merchantCreditService.increaseAccountType(
-                                account.getMerCode(),
-                                WelfareConstant.MerCreditType.REMAINING_LIMIT,
-                                deduction.getTransAmount(),
-                                deduction.getTransNo()
-                        );
-                        return toRefundDeductionDetail(deduction, refundRequest);
-                    })
+                    .map(oldDeduction -> toRefundDeductionDetail(oldDeduction, refundRequest))
+                    .peek(refundDeduction-> merchantCreditService.increaseAccountType(
+                            account.getMerCode(),
+                            WelfareConstant.MerCreditType.REMAINING_LIMIT,
+                            refundDeduction.getTransAmount(),
+                            refundDeduction.getTransNo()
+                    ))
                     .collect(Collectors.toList());
             List<AccountBillDetail> refundBillDetails = accountBillDetails.stream()
                     .map(detail -> toRefundBillDetail(detail, refundRequest))
@@ -91,6 +89,9 @@ public class RefundServiceImpl implements RefundService {
                     .collect(Collectors.groupingBy(AccountDeductionDetail::getMerAccountType));
             accountAmountTypes.forEach(accountAmountType -> {
                 List<AccountDeductionDetail> deductionDetails = refundDeductionMap.get(accountAmountType.getMerAccountTypeCode());
+                if(CollectionUtils.isEmpty(deductionDetails)){
+                    return;
+                }
                 BigDecimal refundAmount = deductionDetails.stream()
                         .map(AccountDeductionDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                 accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(refundAmount));
@@ -145,7 +146,7 @@ public class RefundServiceImpl implements RefundService {
         refundDeductionDetail.setTransNo(refundRequest.getTransNo());
         refundDeductionDetail.setRelatedTransNo(accountDeductionDetail.getTransNo());
         //保存时自动赋值
-        refundDeductionDetail.setCardId(null);
+        refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);
         return refundDeductionDetail;
     }

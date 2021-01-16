@@ -8,6 +8,7 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantDetailDTO;
+import com.welfare.service.dto.MerchantSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
@@ -53,7 +54,7 @@ public class MerchantHandler  {
     @Subscribe
     public void onMerchantChange(MerchantEvt evt) {
         ShoppingActionTypeEnum typeEnum=evt.getTypeEnum();
-        List<MerchantDetailDTO> merchantDetailDTOList=evt.getMerchantDetailDTOList();
+        List<MerchantSyncDTO> merchantDetailDTOList=evt.getMerchantDetailDTOList();
         if (EmptyChecker.isEmpty(merchantDetailDTOList)) {
             return;
         }
@@ -63,7 +64,7 @@ public class MerchantHandler  {
         req.setRequestId(GenerateCodeUtil.UUID());
         List<MerchantShoppingReq.ListBean> list = new ArrayList<>();
         List<String> merCodeList = new ArrayList<>();
-        for (MerchantDetailDTO merchant : merchantDetailDTOList) {
+        for (MerchantSyncDTO merchant : merchantDetailDTOList) {
             MerchantShoppingReq.ListBean listBean = new MerchantShoppingReq.ListBean();
             if(EmptyChecker.notEmpty(merchant.getSelfRecharge())){
                 listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1") ? Boolean.TRUE : Boolean.FALSE);

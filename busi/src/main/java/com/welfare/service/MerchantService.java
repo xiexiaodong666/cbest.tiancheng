@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
+import com.welfare.service.dto.MerchantAddDTO;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantUpdateDTO;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 
 import java.util.List;
@@ -44,7 +46,7 @@ public interface MerchantService {
      * @param merchant
      * @return
      */
-    boolean add(MerchantDetailDTO merchant);
+    boolean add(MerchantAddDTO merchant);
 
 
     /**
@@ -52,7 +54,7 @@ public interface MerchantService {
      * @param merchant
      * @return
      */
-    boolean update(MerchantDetailDTO merchant);
+    boolean update(MerchantUpdateDTO merchant);
 
     /**
      * 导出商户列表

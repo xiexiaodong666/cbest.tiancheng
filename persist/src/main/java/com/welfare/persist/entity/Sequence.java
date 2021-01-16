@@ -38,7 +38,7 @@ public class Sequence extends Model<Sequence> implements Serializable {
      * pk
      */
     @ApiModelProperty("pk")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId(type = IdType.AUTO)
+    @TableId
 	private Long id;
     /**
      * 序列类型

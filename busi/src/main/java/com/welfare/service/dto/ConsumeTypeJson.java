@@ -12,7 +12,7 @@ import lombok.Data;
 public class ConsumeTypeJson implements Serializable {
   private Boolean o2o;
   private Boolean onlineMall;
-  private Boolean shopShopping;
+  private Boolean shopConsumption;
   public static final  String O2O ="O2O";
   public static final  String ONLINE_MALL ="ONLINE_MALL";
   public static final  String SHOP_CONSUMPTION ="SHOP_CONSUMPTION";
@@ -22,7 +22,7 @@ public class ConsumeTypeJson implements Serializable {
     }else if (type.equals(ONLINE_MALL )){
       return onlineMall.booleanValue();
     }else if(type.equals(SHOP_CONSUMPTION)){
-      return shopShopping.booleanValue();
+      return shopConsumption.booleanValue();
     }
     return false;
   }

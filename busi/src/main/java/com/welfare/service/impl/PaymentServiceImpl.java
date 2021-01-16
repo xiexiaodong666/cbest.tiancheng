@@ -55,8 +55,8 @@ public class PaymentServiceImpl implements PaymentService {
     public List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest) {
         String paymentScene = paymentRequest.chargePaymentScene();
         Long accountCode = paymentRequest.calculateAccountCode();
-
         Account account = accountService.getByAccountCode(accountCode);
+
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         merAccountLock.lock();
         try {

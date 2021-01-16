@@ -19,8 +19,8 @@ public class WelfareConstant {
          */
         STORE_CONSUM_TYPE("SupplierStore.consumType", "消费类型");
 
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         DictType(String code, String desc) {
             this.code = code;
@@ -50,8 +50,8 @@ public class WelfareConstant {
          */
         ONLINE_STORE("ONLINE_STORE", "线上商城");
 
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         PaymentScene(String code, String desc) {
             this.code = code;
@@ -76,8 +76,8 @@ public class WelfareConstant {
         API_USER("apiUser", "平台api请求用户"),
         ACCOUNT_USER("accountUser", "员工请求用户");
 
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         Header(String code, String desc) {
             this.code = code;
@@ -112,8 +112,8 @@ public class WelfareConstant {
             this.desc = desc;
         }
 
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         public String code() {
             return this.code;
@@ -149,8 +149,8 @@ public class WelfareConstant {
         DEPARTMENT_CODE("department_code","部门编号"),
         MER_CODE("mer_code","商户编号"),
         ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请");
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         SequenceType(String code, String desc) {
             this.code = code;
@@ -174,8 +174,8 @@ public class WelfareConstant {
          */
         SELF("self","自主余额"),
         SURPLUS_QUOTA("surplus_quota","授信额度");
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         MerAccountTypeCode(String code, String desc) {
             this.code = code;
@@ -200,8 +200,8 @@ public class WelfareConstant {
         CONSUME("consume","消费"),
         DEPOSIT("deposit","充值"),
         REFUND("refund","退款");
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         TransType(String code, String desc) {
             this.code = code;
@@ -224,8 +224,8 @@ public class WelfareConstant {
          * 账户类型
          */
         WELFARE_CARD("welfare_card","福利卡消费");
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         PayCode(String code, String desc) {
             this.code = code;
@@ -250,8 +250,8 @@ public class WelfareConstant {
          */
         NEW(0,"新增"),HANDLING(1,"处理中"),SUCCEED(2,"成功"),FAILED(-1,"失败");
 
-        private Integer code;
-        private String desc;
+        private final Integer code;
+        private final String desc;
 
         AsyncStatus(Integer code, String desc){
             this.code = code;
@@ -280,8 +280,8 @@ public class WelfareConstant {
         CARD_INFO_WRITER("card_info_writer","写卡客户端");
 
 
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         HeaderSource(String code, String desc){
             this.code = code;
@@ -308,8 +308,8 @@ public class WelfareConstant {
         NEW(0,"新增"),
         WRITTEN(1,"已写入"),
         BIND(2,"已绑定");
-        private Integer code;
-        private String desc;
+        private final Integer code;
+        private final String desc;
 
         CardStatus(Integer code, String desc){
             this.code = code;
@@ -336,8 +336,8 @@ public class WelfareConstant {
         WECHAT("wechat", "微信"),
         PLATFORM("platform", "平台");
 
-        private String code;
-        private String desc;
+        private final String code;
+        private final String desc;
 
         Channel(String code, String desc) {
             this.code = code;

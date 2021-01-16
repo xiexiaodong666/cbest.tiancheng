@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -47,8 +48,8 @@ public class AccountReq implements Serializable {
    * 账号状态
    */
   @ApiModelProperty("账号状态")
-  @NotEmpty(message = "账号状态为空")
-  private String accountStatus;
+  @NotNull(message = "账号状态为空")
+  private Integer accountStatus;
 
   /**
    * 员工类型编码名称

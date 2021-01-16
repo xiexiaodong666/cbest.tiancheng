@@ -8,6 +8,7 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantDetailDTO;
+import com.welfare.service.dto.MerchantSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
@@ -53,7 +54,7 @@ public class MerchantHandler  {
     @Subscribe
     public void onMerchantChange(MerchantEvt evt) {
         ShoppingActionTypeEnum typeEnum=evt.getTypeEnum();
-        List<MerchantDetailDTO> merchantDetailDTOList=evt.getMerchantDetailDTOList();
+        List<MerchantSyncDTO> merchantDetailDTOList=evt.getMerchantDetailDTOList();
         if (EmptyChecker.isEmpty(merchantDetailDTOList)) {
             return;
         }
@@ -63,21 +64,27 @@ public class MerchantHandler  {
         req.setRequestId(GenerateCodeUtil.UUID());
         List<MerchantShoppingReq.ListBean> list = new ArrayList<>();
         List<String> merCodeList = new ArrayList<>();
-        for (MerchantDetailDTO merchant : merchantDetailDTOList) {
+        for (MerchantSyncDTO merchant : merchantDetailDTOList) {
             MerchantShoppingReq.ListBean listBean = new MerchantShoppingReq.ListBean();
-            listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1") ? Boolean.TRUE : Boolean.FALSE);
+            if(EmptyChecker.notEmpty(merchant.getSelfRecharge())){
+                listBean.setCanSelfCharge(merchant.getSelfRecharge().equals("1") ? Boolean.TRUE : Boolean.FALSE);
+            }
             listBean.setMerchantCode(merchant.getMerCode());
             listBean.setMerchantName(merchant.getMerName());
-            listBean.setIdTypes(Arrays.asList(merchant.getMerType().split(",")));
-            List<MerchantShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
-            for (MerchantAddressDTO addressDTO : merchant.getAddressList()) {
-                MerchantShoppingReq.ListBean.AddressBean addressBean = new MerchantShoppingReq.ListBean.AddressBean();
-                addressBean.setAddress(addressDTO.getAddress());
-                addressBean.setAddressType(addressDTO.getAddressType());
-                addressBean.setName(addressDTO.getAddressName());
-                addressBeans.add(addressBean);
+            if(EmptyChecker.notEmpty(merchant.getMerIdentity())){
+                listBean.setIdTypes(Arrays.asList(merchant.getMerIdentity().split(",")));
             }
-            listBean.setAddress(addressBeans);
+            List<MerchantShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
+            if(EmptyChecker.notEmpty(merchant.getAddressList())){
+                for (MerchantAddressDTO addressDTO : merchant.getAddressList()) {
+                    MerchantShoppingReq.ListBean.AddressBean addressBean = new MerchantShoppingReq.ListBean.AddressBean();
+                    addressBean.setAddress(addressDTO.getAddress());
+                    addressBean.setAddressType(addressDTO.getAddressType());
+                    addressBean.setName(addressDTO.getAddressName());
+                    addressBeans.add(addressBean);
+                }
+                listBean.setAddress(addressBeans);
+            }
             list.add(listBean);
             merCodeList.add(merchant.getMerCode());
         }

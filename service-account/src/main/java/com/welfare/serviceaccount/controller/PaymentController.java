@@ -1,10 +1,13 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.PaymentService;
+import com.welfare.service.RefundService;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
 import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.RefundRequest;
+import com.welfare.service.dto.payment.PaymentRequest;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +32,7 @@ import java.util.Map;
 @Api(tags = "支付接口")
 public class PaymentController implements IController {
     private final PaymentService paymentService;
-
+    private final RefundService refundService;
 
     @PostMapping("/online")
     @ApiOperation("线上支付")
@@ -54,22 +57,24 @@ public class PaymentController implements IController {
 
     @GetMapping
     @ApiOperation("查询支付结果")
-    public R<OnlinePaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
-        return success(null);
+    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
+        PaymentRequest paymentRequest = paymentService.queryResult(transNo);
+        return success(paymentRequest);
     }
 
 
     @PostMapping("/refund")
     @ApiOperation("退款")
     public R<RefundRequest> newPaymentRequest(@RequestBody RefundRequest refundRequest) {
-        Map<String, Object> map = BeanUtil.toMap(refundRequest);
+        refundService.handleRefundRequest(refundRequest);
         return success(refundRequest);
     }
 
     @GetMapping("/refund")
     @ApiOperation("查询退款结果")
     public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
-        return success(null);
+        RefundRequest refundRequest = refundService.queryByTransNo(transNo);
+        return success(refundRequest);
     }
 
 }

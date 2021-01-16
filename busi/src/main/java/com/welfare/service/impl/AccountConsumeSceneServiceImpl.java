@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -13,13 +14,17 @@ import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
+import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
+import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
@@ -31,6 +36,8 @@ import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreBinding;
 import com.welfare.service.remote.entity.UserRoleBinding;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
+import com.welfare.service.sync.event.AccountConsumeSceneEvt;
+import com.welfare.service.utils.AccountUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -46,6 +53,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -71,95 +80,10 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final MerchantService merchantService;
   private final AccountTypeService accountTypeService;
   private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationList;
+  private final AccountService accountService;
+  private final AccountChangeEventRecordService accountChangeEventRecordService;
+  private final ApplicationContext applicationContext;
 
-  @Override
-  public void syncAccountConsumeScene(ShoppingActionTypeEnum actionTypeEnum,
-      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap) {
-
-    if (accountConsumeSceneMap.isEmpty()) {
-      return;
-    }
-    UserRoleBindingReqDTO userRoleBindingReqDTO = new UserRoleBindingReqDTO();
-    userRoleBindingReqDTO.setActionType(actionTypeEnum);
-
-    userRoleBindingReqDTO.setRequestId(UUID.randomUUID().toString());
-    userRoleBindingReqDTO.setTimestamp(String.valueOf(new Date().getTime()));
-    List<UserRoleBinding> userRoleBindingList = assemableUserRoleBindings(accountConsumeSceneMap);
-    userRoleBindingReqDTO.setList(userRoleBindingList);
-
-    // send after tx commit but is async
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronizationAdapter() {
-          @Override
-          public void afterCommit() {
-            try {
-              log.info("批量添加、修改员工账号 addOrUpdateEmployer:{}",
-                  mapper.writeValueAsString(userRoleBindingReqDTO));
-              RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
-                  .addOrUpdateUserRoleBinding(userRoleBindingReqDTO);
-              if (roleConsumptionResp.equals("200")) {
-                // 写入
-                List<AccountConsumeScene> accountConsumeSceneList = accountConsumeSceneMap.keySet().stream().collect(
-                    Collectors.toList());
-                
-                for (AccountConsumeScene accountConsumeScene : accountConsumeSceneList) {
-                  accountConsumeScene.setSyncStatus(1);
-                }
-                accountConsumeSceneDao.saveOrUpdateBatch(accountConsumeSceneList);
-              }
-            } catch (Exception e) {
-              log.error("[afterCommit] call addOrUpdateEmployer error", e.getMessage());
-            }
-          }
-        }
-    );
-
-  }
-
-  private List<UserRoleBinding> assemableUserRoleBindings(Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap) {
-    List<UserRoleBinding> resultList = new LinkedList<UserRoleBinding>();
-    Set<AccountConsumeScene> accountConsumeSceneSet = accountConsumeSceneMap.keySet();
-    UserRoleBinding userRoleBinding = new UserRoleBinding();
-
-    accountConsumeSceneSet.forEach(accountConsumeScene -> {
-      List<StoreBinding> bindings = new LinkedList<StoreBinding>() ;
-      List<String> employeeRoles = new LinkedList<String>();
-      employeeRoles.add(accountConsumeScene.getAccountTypeCode());
-      bindings.addAll(assemableStoreBindings(accountConsumeSceneMap.get(accountConsumeScene)));
-
-      if( userRoleBinding.getBindings() == null  ){
-        userRoleBinding.setBindings(bindings);
-      }else{
-        userRoleBinding.getBindings().addAll(bindings);
-      }
-      if( userRoleBinding.getEmployeeRoles() == null  ){
-        userRoleBinding.setEmployeeRoles(employeeRoles);
-      }else{
-        userRoleBinding.getEmployeeRoles().addAll(employeeRoles);
-      }
-      userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0 ? true : false);
-      userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
-    });
-    resultList.add(userRoleBinding);
-
-    return resultList;
-  }
-
-
-  private List<StoreBinding> assemableStoreBindings(List<AccountConsumeSceneStoreRelation> relationList){
-    if( CollectionUtils.isEmpty(relationList)){
-      return null;
-    }
-    List<StoreBinding> storeBindingList = new LinkedList<StoreBinding>();
-    relationList.forEach(accountConsumeSceneStoreRelation -> {
-      StoreBinding storeBinding = new StoreBinding();
-      storeBinding.setStoreCode(accountConsumeSceneStoreRelation.getStoreCode());
-      String[] types = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
-      storeBinding.setConsumeTypes(Arrays.asList(types));
-      storeBindingList.add(storeBinding);
-    });
-    return storeBindingList;
-  }
 
   @Override
   public AccountConsumeScene getAccountConsumeScene(Long id) {
@@ -169,11 +93,11 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
-    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     List<String> accountTypeCodeList = accountConsumeSceneAddReq.getAccountTypeCodeList();
     if( CollectionUtils.isEmpty(accountTypeCodeList)  || accountTypeCodeList.size() == 0){
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不能为空", null);
     }
+    List<AccountConsumeSceneStoreRelation> sendData = new LinkedList<AccountConsumeSceneStoreRelation>();
     accountTypeCodeList.forEach(accountTypeCode -> {
       AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
       BeanUtils.copyProperties(accountConsumeSceneAddReq, accountConsumeScene);
@@ -184,12 +108,10 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = getAccountConsumeSceneStoreRelations(
           accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeSceneStoreRelationDao.saveBatch(accountConsumeSceneStoreRelationList);
-      //下发数据Map
-      accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
+      sendData.addAll(accountConsumeSceneStoreRelationList);
     });
     //下发数据
-    syncAccountConsumeScene(ShoppingActionTypeEnum.ADD,
-        accountConsumeSceneMap);
+    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).relationList(sendData).build());
     return true;
   }
 
@@ -241,7 +163,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean update(AccountConsumeSceneReq accountConsumeSceneReq) {
-    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     BeanUtils.copyProperties(accountConsumeSceneReq, accountConsumeScene);
     validationAccountConsumeScene(accountConsumeScene,false);
@@ -254,12 +175,14 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
               accountConsumeSceneStoreRelation);
           accountConsumeSceneStoreRelationList.add(accountConsumeSceneStoreRelation);
         });
-    accountConsumeSceneStoreRelationDao.updateBatchById(accountConsumeSceneStoreRelationList);
-    //TODO 修改了选择类型  账户变更表增加记录
-    //下发数据
-    accountConsumeSceneMap.put(accountConsumeScene,accountConsumeSceneStoreRelationList);
-    syncAccountConsumeScene(ShoppingActionTypeEnum.UPDATE,
-        accountConsumeSceneMap);
+    boolean updateResult = accountConsumeSceneStoreRelationDao.updateBatchById(accountConsumeSceneStoreRelationList);
+    if( updateResult ){
+      accountChangeEventRecordService.batchSaveBySceneStoreRelation(accountConsumeSceneStoreRelationList);
+      //下发数据
+      Map<Long,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
+      accountConsumeSceneMap.put(accountConsumeScene.getId(),accountConsumeSceneStoreRelationList);
+      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(accountConsumeSceneStoreRelationList).build());
+    }
     return true;
   }
 
@@ -272,12 +195,14 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"消费场景不存在",null);
     }
     boolean deleteResult =  accountConsumeSceneDao.removeById(id);
-    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
+    if(deleteResult){
+      accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.ACCOUNT_CONSUME_SCENE_DELETE);
+    }
     //下发数据
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
+    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
     accountConsumeSceneMap.put(accountConsumeScene,relationList);
-    syncAccountConsumeScene(ShoppingActionTypeEnum.UPDATE,
-        accountConsumeSceneMap);
+    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).relationList(relationList).build());
     return deleteResult;
   }
 
@@ -292,7 +217,15 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     updateWrapper.eq(AccountConsumeScene.ID, id);
     AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
     accountConsumeScene.setStatus(status);
-    return accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
+    boolean updateResult =  accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
+    if(updateResult){
+      accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.getByAccountConsumeStatus(status));
+      List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
+      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
+      accountConsumeSceneMap.put(accountConsumeScene,relationList);
+      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).relationList(relationList).build());
+    }
+    return updateResult;
   }
 
   @Override

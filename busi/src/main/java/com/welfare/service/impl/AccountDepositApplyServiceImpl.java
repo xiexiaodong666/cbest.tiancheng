@@ -474,11 +474,11 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         return detailInfo;
     }
 
-    /**
-     * 给果审批通过，需要给员工增加余额；减少商户充值额度
-     * @param details
-     * @param apply
-     */
+//    /**
+//     * 给果审批通过，需要给员工增加余额；减少商户充值额度
+//     * @param details
+//     * @param apply
+//     */
 //    private void incrBalanceAndReduceRechargeLimit(List<AccountDepositApplyDetail> details, AccountDepositApply apply) {
 //        if (CollectionUtils.isNotEmpty(details)) {
 //            MerchantCredit merchantCredit = merchantCreditService.getByMerCode(apply.getMerCode());
@@ -498,26 +498,26 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 //            }
 //        }
 //    }
-
-    private List<AccountAmountType> assemblyAccountAmountTypeList(List<AccountDepositApplyDetail> details, AccountDepositApply apply){
-        List<AccountAmountType> list = new ArrayList<>();
-        AccountAmountType accountAmountType = null;
-        Date now = new Date();
-        for (AccountDepositApplyDetail detail: details) {
-            accountAmountType = new AccountAmountType();
-            accountAmountType.setAccountCode(detail.getAccountCode());
-            accountAmountType.setMerAccountTypeCode(apply.getMerAccountTypeCode());
-            accountAmountType.setAccountBalance(detail.getRechargeAmount());
-            accountAmountType.setDeleted(Boolean.FALSE);
-            accountAmountType.setCreateTime(now);
-            accountAmountType.setCreateUser(apply.getApprovalUser());
-            accountAmountType.setUpdateTime(now);
-            accountAmountType.setUpdateUser(apply.getApprovalUser());
-            accountAmountType.setVersion(0);
-            list.add(accountAmountType);
-        }
-        return list;
-    }
+//
+//    private List<AccountAmountType> assemblyAccountAmountTypeList(List<AccountDepositApplyDetail> details, AccountDepositApply apply){
+//        List<AccountAmountType> list = new ArrayList<>();
+//        AccountAmountType accountAmountType = null;
+//        Date now = new Date();
+//        for (AccountDepositApplyDetail detail: details) {
+//            accountAmountType = new AccountAmountType();
+//            accountAmountType.setAccountCode(detail.getAccountCode());
+//            accountAmountType.setMerAccountTypeCode(apply.getMerAccountTypeCode());
+//            accountAmountType.setAccountBalance(detail.getRechargeAmount());
+//            accountAmountType.setDeleted(Boolean.FALSE);
+//            accountAmountType.setCreateTime(now);
+//            accountAmountType.setCreateUser(apply.getApprovalUser());
+//            accountAmountType.setUpdateTime(now);
+//            accountAmountType.setUpdateUser(apply.getApprovalUser());
+//            accountAmountType.setVersion(0);
+//            list.add(accountAmountType);
+//        }
+//        return list;
+//    }
 
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {
         AccountDepositApplyDetail detail;
@@ -534,6 +534,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         detail.setUpdateTime(now);
         detail.setUpdateUser(apply.getApprovalUser());
         detail.setVersion(0);
+        detail.setTransNo(sequenceService.nextNo(WelfareConstant.SequenceType.DEPOSIT.code()) + "");
         return detail;
     }
 
@@ -553,6 +554,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             detail.setUpdateTime(now);
             detail.setUpdateUser(apply.getApprovalUser());
             detail.setVersion(0);
+            detail.setTransNo(sequenceService.nextNo(WelfareConstant.SequenceType.DEPOSIT.code()) + "");
             details.add(detail);
         }
         return details;
@@ -564,13 +566,12 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         apply.setApplyUser(merchantUser.getUsername());
         apply.setApplyTime(now);
         apply.setMerCode(merchantUser.getMerchantCode());
-        apply.setApplyCode(UUID.randomUUID().toString());
+        apply.setApplyCode(sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_DEPOSIT_APPLY.code()) + "");
         apply.setRechargeStatus(RechargeStatus.INIT.getCode());
         apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
         apply.setCreateUser(merchantUser.getUserCode());
         apply.setUpdateUser(merchantUser.getUserCode());
         apply.setChannel(WelfareConstant.Channel.PLATFORM.code());
-        apply.setTransNo(sequenceService.nextNo(WelfareConstant.SequenceType.DEPOSIT.code()) + "");
         apply.setCreateTime(now);
         apply.setUpdateTime(now);
         apply.setVersion(0);

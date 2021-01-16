@@ -10,6 +10,7 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
+import com.welfare.persist.dto.CardApplyDTO;
 import com.welfare.persist.dto.query.CardApplyAddReq;
 import com.welfare.persist.dto.query.CardApplyUpdateReq;
 import com.welfare.persist.entity.CardApply;
@@ -55,7 +56,7 @@ public class CardApplyServiceImpl implements CardApplyService {
 
 
   @Override
-  public Page<CardApply> pageQuery(Page<CardApply> page, String cardName, String merCode,
+  public Page<CardApplyDTO> pageQuery(Page<CardApply> page, String cardName, String merCode,
       String cardType, String cardMedium,
       Integer status, Date startTime, Date endTime) {
 
@@ -65,7 +66,7 @@ public class CardApplyServiceImpl implements CardApplyService {
   }
 
   @Override
-  public List<CardApply> exportCardApplys(String cardName, String merCode, String cardType,
+  public List<CardApplyDTO> exportCardApplys(String cardName, String merCode, String cardType,
       String cardMedium, Integer status, Date startTime, Date endTime) {
 
     return cardApplyMapper.exportCardApplys(cardName, merCode, cardType, cardMedium,
@@ -98,7 +99,7 @@ public class CardApplyServiceImpl implements CardApplyService {
     }
 
     cardApply.setDeleted(false);
-    cardApply.setStatus(0);
+    cardApply.setStatus(1);
 
     List<CardInfo> cardInfoList = new ArrayList<>();
     // String cardId = cardInfoMapper.getCardId(cardApplyAddReq.getMerCode());
@@ -106,7 +107,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       CardInfo cardInfo = new CardInfo();
       cardInfo.setApplyCode(cardApply.getApplyCode());
       Long writeCardId = sequenceService.nextNo(
-          SequenceTypeEnum.CARID.getCode(), cardApplyAddReq.getMerCode(), startId);
+          SequenceTypeEnum.CARDID.getCode(), cardApplyAddReq.getMerCode(), startId);
       cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
       cardInfo.setCardType(cardApply.getCardType());
       cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());

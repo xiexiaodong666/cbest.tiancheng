@@ -11,19 +11,19 @@ import lombok.Data;
 @Data
 public class PlatformUser {
 
+
   private Long id;
   private String name;
   private String username;
-  private String init_password;
-  private String merchant_name;
-  private String merchant_code;
+  private String initPassword;
+  private String merchantName;
+  private String merchantCode;
   /**
    * 1 正常，0 锁定， 2 删除
    */
   private Integer status;
   private String remark;
-  private String created_by;
-  private String updated_by;
-  private Date created_at;
-
+  private String createdBy;
+  private String updatedBy;
+  private Date createdAt;
 }

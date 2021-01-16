@@ -21,17 +21,21 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("accountName")String accountName,
       @Param("departmentCode")String  departmentCode,
       @Param("accountStatus")Integer accountStatus,
-      @Param("accountTypeCode")String accountTypeCode);
+      @Param("accountTypeCode")String accountTypeCode,
+      @Param("binding") Integer binding);
 
   List<AccountPageDTO> queryPageDTO(@Param("merCode") String merCode,
       @Param("accountName")String accountName,
       @Param("departmentCode")String  departmentCode,
       @Param("accountStatus")Integer accountStatus,
-      @Param("accountTypeCode")String accountTypeCode);
+      @Param("accountTypeCode")String accountTypeCode,
+      @Param("binding") Integer binding);
 
   AccountDetailMapperDTO queryDetail(@Param("id") Long id);
 
-  AccountDetailMapperDTO queryDetailByAccountCode(@Param("accountCode") String accountCode);
+  AccountDetailMapperDTO queryDetailByParam(@Param("id") Long id,@Param("accountCode") Long accountCode,
+      @Param("phone") String phone);
+
 
   IPage<AccountBillDetailMapperDTO> queryAccountBillDetail(Page<AccountBillDetailMapperDTO> page,
       @Param("accountCode") String accountCode,
@@ -50,4 +54,6 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("size")Integer  size,
       @Param("changeEventId")Long changeEventId);
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
+
+  List<Account> queryByConsumeSceneIdList(List<Long> list);
 }

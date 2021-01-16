@@ -74,3 +74,6 @@ pos:
 
 cdn:
   server: http://img-test.sjgo365.com
+kafka:
+  consumer:
+    topic: order_info

@@ -6,6 +6,7 @@ import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.dto.payment.CardPaymentRequest;
+import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -18,6 +19,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -64,11 +66,38 @@ public class PaymentServiceImpl implements PaymentService {
                     .map(MerchantAccountOperation::getMerchantBillDetail)
                     .collect(Collectors.toList());
             merchantBillDetailDao.saveBatch(merchantBillDetails);
+
+            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            paymentRequest.setAccountName(account.getAccountName());
+            paymentRequest.setAccountBalance(account.getAccountBalance());
+            paymentRequest.setAccountCredit(account.getSurplusQuota());
             return paymentOperations;
         } finally {
             merAccountLock.unlock();
         }
 
+    }
+
+    @Override
+    public PaymentRequest queryResult(String transNo) {
+        List<AccountBillDetail> accountDeductionDetails = accountBillDetailDao.queryByTransNo(transNo);
+        CardPaymentRequest paymentRequest = new CardPaymentRequest();
+        paymentRequest.setTransNo(transNo);
+        if(CollectionUtils.isEmpty(accountDeductionDetails)){
+            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.FAILED.code());
+        }
+        paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+        AccountBillDetail firstAccountBillDetail = accountDeductionDetails.get(0);
+        paymentRequest.setStoreNo(firstAccountBillDetail.getStoreCode());
+        paymentRequest.setAccountCode(firstAccountBillDetail.getAccountCode());
+        paymentRequest.setMachineNo(firstAccountBillDetail.getPos());
+        paymentRequest.setPaymentDate(firstAccountBillDetail.getTransTime());
+        paymentRequest.setCardNo(firstAccountBillDetail.getCardId());
+        BigDecimal amount = accountDeductionDetails.stream()
+                .map(AccountBillDetail::getTransAmount)
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+        paymentRequest.setAmount(amount);
+        return paymentRequest;
     }
 
     private List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
@@ -158,7 +187,8 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRequest,
                 accountAmountType,
                 operatedAmount,
-                paymentOperation
+                paymentOperation,
+                accountAmountDO.getAccount()
         );
         paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
         return paymentOperation;
@@ -167,7 +197,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     private AccountDeductionDetail decreaseMerchant(PaymentRequest paymentRequest,
                                                     AccountAmountType accountAmountType,
-                                                    BigDecimal operatedAmount, PaymentOperation paymentOperation) {
+                                                    BigDecimal operatedAmount,
+                                                    PaymentOperation paymentOperation,
+                                                    Account account) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(paymentRequest.calculateAccountCode());
         accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
@@ -193,7 +225,7 @@ public class PaymentServiceImpl implements PaymentService {
             accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
             //非自主充值，需要扣减商户账户
             List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.doOperateAccount(
-                    paymentRequest.getMerCode(),
+                    account.getMerCode(),
                     operatedAmount,
                     paymentRequest.getTransNo(),
                     currentBalanceOperator);

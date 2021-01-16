@@ -3,6 +3,7 @@ package com.welfare.service.sync.event;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
+import com.welfare.service.dto.SupplierStoreSyncDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,19 +23,22 @@ import java.util.UUID;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class SupplierStoreEvt implements BusEvent {
     protected ShoppingActionTypeEnum typeEnum;
-    protected List<SupplierStoreDetailDTO> supplierStoreDetailDTOS;
+    protected List<SupplierStoreSyncDTO> supplierStoreDetailDTOS;
     @Override
     public Long getSearchKey1() {
-        return null;
+        return typeEnum.getEvtType();
     }
 
     @Override
     public Long getSearchKey2() {
+        if(supplierStoreDetailDTOS.size()==1){
+            return supplierStoreDetailDTOS.get(0).getId();
+        }
         return null;
     }
 
     @Override
     public UUID getUserToken() {
-        return null;
+        return UUID.randomUUID();
     }
 }

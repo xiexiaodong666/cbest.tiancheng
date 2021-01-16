@@ -22,23 +22,23 @@ import lombok.experimental.Accessors;
  * (settle_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("settle_detail")
-@ApiModel("结算明细")
+@ApiModel("")
 public class SettleDetail extends Model<SettleDetail> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Long id;
+	private Integer id;
     /**
      * 账单编号
      */
@@ -58,7 +58,7 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
      * 账户
      */
     @ApiModelProperty("账户")
-    private String accountCode;
+    private Long accountCode;
     /**
      * 账户名称
      */
@@ -160,41 +160,43 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     @ApiModelProperty("自费扣款金额")
     private BigDecimal selfDeductionAmount;
 
-    /**
-     * 数据类型
-     */
-    @ApiModelProperty("数据支付类型 welfare-员工卡支付 third-其它三方支付")
-    private String dataType;
-
     @ApiModelProperty("结算标志 settled已结算 unsettled未结算")
     private String settleFlag;
 
     /**
+     * 数据支付类型 welfare-员工卡支付 third-其它三方支付
+     */
+    @ApiModelProperty("数据支付类型 welfare-员工卡支付 third-其它三方支付")
+    private String dataType;
+    /**
      * 创建人
      */
     @ApiModelProperty("创建人")
-    private String createUser;
+    @TableField(fill = FieldFill.INSERT)
+	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT)
+	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")
-    private String updateUser;
+    @TableField(fill = FieldFill.UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
     @ApiModelProperty("更新时间")
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
 //以下为列明常量
@@ -304,10 +306,9 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
      */
     public static final String SETTLE_FLAG = "settle_flag";
     /**
-     * 数据类型
-     */
+    * 数据支付类型 welfare-员工卡支付 third-其它三方支付
+    */
     public static final String DATA_TYPE = "data_type";
-
     /**
     * 创建人
     */

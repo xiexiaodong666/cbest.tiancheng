@@ -7,8 +7,47 @@
     </sql>
 
   <sql id="baseColumn">
-        id,account_name,account_code,account_type_code,mer_code,store_code,account_status,staff_status,binding,create_user,create_time,update_user,update_time,account_balance,flag,version,phone
+        a.id,a.account_name,a.account_code,a.account_type_code,a.mer_code,a.store_code,a.account_status,a.staff_status,
+        a.binding,a.create_user,a.create_time,a.update_user,a.update_time,a.account_balance,a.version,a.phone,a.max_quota,
+        a.surplus_quota,a.change_event_id,a.remark,a.deleted
     </sql>
+
+  <resultMap type="com.welfare.persist.entity.Account" id="accountMap">
+    <id property="id" column="id"/>
+    <result property="accountName" column="account_name"/>
+    <result property="accountCode" column="account_code"/>
+    <result property="accountTypeCode" column="account_type_code"/>
+    <result property="merCode" column="mer_code"/>
+    <result property="storeCode" column="store_code"/>
+    <result property="accountStatus" column="account_status"/>
+    <result property="staffStatus" column="staff_status"/>
+    <result property="binding" column="binding"/>
+    <result property="accountBalance" column="account_balance"/>
+    <result property="phone" column="phone"/>
+    <result property="maxQuota" column="max_quota"/>
+    <result property="surplusQuota" column="surplus_quota"/>
+    <result property="remark" column="remark"/>
+    <result property="createUser" column="create_user"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateUser" column="update_user"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="deleted" column="deleted"/>
+    <result property="version" column="version"/>
+    <result property="changeEventId" column="change_event_id"/>
+  </resultMap>
+  <select id="queryByConsumeSceneIdList" resultMap="accountMap">
+    select
+    <include refid="baseColumn"/>
+    from account a
+    left join account_type at on a.account_type_code = at.type_code
+    left join account_consume_scene acs on acs.account_type_code = at.type_code
+    where acs.id in
+    <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </select>
+
+
   <select id="queryPageDTO" resultType="com.welfare.persist.dto.AccountPageDTO">
     SELECT
     a.id,
@@ -21,13 +60,14 @@
     a.max_quota AS maxQuota,
     a.surplus_quota AS surplusQuota,
     GROUP_CONCAT(ci.card_id) AS cardId,
-    a.account_balance AS accountBalance
+    a.account_balance AS accountBalance,
+    a.binding
     FROM
     account a
-    INNER JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN department d ON a.store_code = d.department_code
     LEFT JOIN account_type at ON at.type_code = a.account_type_code
     LEFT JOIN card_info ci ON ci.account_code = a.account_code
-    where a.deleted = 0 and d.deleted =0 and at.deleted =0
+    where a.deleted = 0
     <if test=" merCode !='' and merCode != null ">
       and a.mer_code = #{merCode} and at.mer_code = #{merCode}
     </if>
@@ -40,12 +80,14 @@
     <if test="accountStatus != null ">
       and a.account_status = #{accountStatus}
     </if>
+    <if test="binding != null ">
+      and a.binding = #{binding}
+    </if>
     <if test=" accountTypeCode !='' and accountTypeCode != null ">
       and at.type_code = #{accountTypeCode}
     </if>
     GROUP BY a.account_code
   </select>
-
 
 
   <select id="queryDetail" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
@@ -65,15 +107,13 @@
 	a.remark
 FROM
 	account a
-	INNER JOIN department d ON a.store_code = d.department_code
-	INNER JOIN merchant m ON a.mer_code = m.mer_code
+	LEFT JOIN department d ON a.store_code = d.department_code
+	LEFT JOIN merchant m ON a.mer_code = m.mer_code
 	LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
-WHERE
-	a.deleted = 0
-	AND d.deleted = 0
-	AND AT.deleted = 0
+WHERE  a.deleted = 0
 	AND a.id = #{id}
   </select>
+
 
   <select id="queryAccountBillDetail"
     resultType="com.welfare.persist.dto.AccountBillDetailMapperDTO">
@@ -102,14 +142,12 @@ WHERE
     SUM(
     CASE
 
-    WHEN abd.trans_type = 1 THEN
+    WHEN abd.trans_type = 'deposit' THEN
     trans_amount
-    WHEN abd.trans_type = 2 THEN
+    WHEN abd.trans_type = 'consume' THEN
     trans_amount * ( - 1 )
-    WHEN abd.trans_type = 3 THEN
+    WHEN abd.trans_type = 'refund' THEN
     trans_amount
-    WHEN abd.trans_type = 4 THEN
-    trans_amount * ( - 1 )
     END
     ) AS accountTotalAmount,
     COUNT( abd.id ) AS tradeNum,
@@ -152,6 +190,7 @@ FROM
 	LEFT JOIN account_consume_scene_store_relation relation ON relation.account_consume_scene_id = acs.id
 	LEFT JOIN card_info ci ON a.account_code = ci.account_code
 WHERE
+a.mer_code = at.mer_code and
 	relation.store_code = #{storeCode}
 	AND a.change_event_id > #{changeEventId}
 GROUP BY
@@ -163,7 +202,7 @@ LIMIT #{size}
 
   <update id="batchUpdateChangeEventId" parameterType="java.util.Map">
     <foreach collection="list" item="item" index="index" open="" close="" separator=";">
-    update account
+      update account
       <set>
         <if test="item.changeEventId != null ">
           change_event_id=#{item.changeEventId,jdbcType=BIGINT},
@@ -173,30 +212,37 @@ LIMIT #{size}
     </foreach>
   </update>
 
-    <select id="queryDetailByAccountCode" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
-        SELECT
-        a.id,
-        a.account_name AS accountName,
-        a.account_code AS accountCode,
-        a.account_status AS accountStatus,
-        AT.type_name AS accountTypeName,
-        d.department_code AS departmentCode,
-        d.department_name AS departmentName,
-        m.mer_code AS merCode,
-        m.mer_name AS merName,
-        a.max_quota AS maxQuota,
-        a.surplus_quota AS surplusQuota,
-        a.account_balance AS accountBalance,
-        a.remark
-        FROM
-        account a
-        INNER JOIN department d ON a.store_code = d.department_code
-        INNER JOIN merchant m ON a.mer_code = m.mer_code
-        LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
-        WHERE
-        a.deleted = 0
-        AND d.deleted = 0
-        AND AT.deleted = 0
-        AND a.account_code = #{accountCode}
-    </select>
+  <select id="queryDetailByParam" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
+    SELECT
+    a.id,
+    a.account_name AS accountName,
+    a.account_code AS accountCode,
+    a.account_status AS accountStatus,
+    AT.type_name AS accountTypeName,
+    d.department_code AS departmentCode,
+    d.department_name AS departmentName,
+    m.mer_code AS merCode,
+    m.mer_name AS merName,
+    a.max_quota AS maxQuota,
+    a.surplus_quota AS surplusQuota,
+    a.account_balance AS accountBalance,
+    a.remark
+    FROM
+    account a
+    LEFT JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN merchant m ON a.mer_code = m.mer_code
+    LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
+    WHERE
+    a.deleted = 0
+
+    <if test=" id != null ">
+      and a.id = #{id}
+    </if>
+    <if test=" accountCode != null ">
+      and a.account_code = #{accountCode}
+    </if>
+    <if test=" phone !='' and phone != null ">
+      and a.phone = #{phone}
+    </if>
+  </select>
 </mapper>

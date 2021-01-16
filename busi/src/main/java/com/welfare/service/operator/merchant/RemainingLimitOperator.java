@@ -54,11 +54,11 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
         BigDecimal creditLimit = merchantCredit.getCreditLimit();
         BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
         BigDecimal add = amount.add(remainingLimit).subtract(creditLimit);
-        if (add.compareTo(creditLimit) > 0) {
+        if (add.compareTo(BigDecimal.ZERO) > 0) {
             // 超过信用额度
             return doWhenMoreThan(merchantCredit,add,transNo);
         } else {
-            merchantCredit.setRemainingLimit(amount);
+            merchantCredit.setRemainingLimit(remainingLimit.add(amount));
             MerchantAccountOperation remainingLimitOperator = MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo);
             return Lists.newArrayList(remainingLimitOperator);
         }
@@ -75,14 +75,16 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
         BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
         // 加剩余信用额度
         merchantCredit.setRemainingLimit(creditLimit);
-        MerchantAccountOperation remainingLimitOperator = MerchantAccountOperation.of(
+        MerchantAccountOperation remainingLimitOperation = MerchantAccountOperation.of(
                 merCreditType,
                 creditLimit.subtract(remainingLimit),
                 IncOrDecType.INCREASE,
                 merchantCredit,
                 transNo
         );
-        operations.add(remainingLimitOperator);
+        if(remainingLimitOperation.getAmount().compareTo(BigDecimal.ZERO) != 0){
+            operations.add(remainingLimitOperation);
+        }
         // 加余额
         List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo);
         operations.addAll(moreOperations);

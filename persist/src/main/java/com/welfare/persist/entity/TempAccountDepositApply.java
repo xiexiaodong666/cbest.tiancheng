@@ -3,8 +3,11 @@ package com.welfare.persist.entity;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -17,7 +20,7 @@ import lombok.experimental.Accessors;
  * (temp_account_deposit_apply)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -35,29 +38,29 @@ public class TempAccountDepositApply extends Model<TempAccountDepositApply> impl
     @TableId
 	private Long id;
     /**
-     * 上传文件id
+     * fileId
      */
-    @ApiModelProperty("上传文件id")   
+    @ApiModelProperty("fileId")   
     private String fileId;
     /**
-     * 员工手机号
+     * phone
      */
-    @ApiModelProperty("员工手机号")
+    @ApiModelProperty("phone")   
     private String phone;
     /**
-     * 充值金额
+     * rechargeAmount
      */
-    @ApiModelProperty("充值金额")   
+    @ApiModelProperty("rechargeAmount")   
     private BigDecimal rechargeAmount;
     /**
-     * 上传请求id
+     * requestId
      */
-    @ApiModelProperty("上传请求id")   
+    @ApiModelProperty("requestId")   
     private String requestId;
     /**
-     * 员工账号
+     * accountCode
      */
-    @ApiModelProperty("员工账号")
+    @ApiModelProperty("accountCode")   
     private Long accountCode;
 
 //以下为列明常量
@@ -67,23 +70,24 @@ public class TempAccountDepositApply extends Model<TempAccountDepositApply> impl
     */
     public static final String ID = "id";
     /**
-    * 上传文件id
+    * 
     */
     public static final String FILE_ID = "file_id";
     /**
-    * 员工手机号
+    * 
     */
     public static final String PHONE = "phone";
     /**
-    * 充值金额
+    * 
     */
     public static final String RECHARGE_AMOUNT = "recharge_amount";
     /**
-    * 上传请求id
+    * 
     */
     public static final String REQUEST_ID = "request_id";
     /**
-     * 员工账号
-     */
+    * 
+    */
     public static final String ACCOUNT_CODE = "account_code";
+
 }

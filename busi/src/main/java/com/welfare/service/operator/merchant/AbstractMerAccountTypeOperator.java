@@ -43,6 +43,17 @@ public abstract class AbstractMerAccountTypeOperator {
     }
 
     /**
+     * 设置
+     * @param merchantCredit
+     * @param amount
+     * @param transNo
+     * @return 实际操作金额
+     */
+    public List<MerchantAccountOperation> set(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
+        throw new RuntimeException("not supported method");
+    }
+
+    /**
      * 下一个MerAccountTypeOperator，用于构建operator的链表
      * @param merAccountTypeOperator
      */

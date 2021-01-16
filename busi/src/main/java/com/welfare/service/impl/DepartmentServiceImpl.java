@@ -15,10 +15,12 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.DepartmentConverter;
 import com.welfare.service.converter.DepartmentTreeConverter;
+import com.welfare.service.dto.DepartmentAddDTO;
 import com.welfare.service.dto.DepartmentDTO;
 import com.welfare.service.dto.DepartmentImportDTO;
 import com.welfare.service.dto.DepartmentReq;
 import com.welfare.service.dto.DepartmentTree;
+import com.welfare.service.dto.DepartmentUpdateDTO;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.listener.DepartmentListener;
 import com.welfare.service.utils.TreeUtil;
@@ -77,30 +79,36 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean add(Department department) {
+    @Override
+    public boolean add(DepartmentAddDTO department) {
         if(EmptyChecker.isEmpty(department.getDepartmentParent())){
             throw new BusiException("上级编码不能为空");
         }
+        Department save=new Department();
+        save.setDepartmentType(department.getDepartmentType());
+        save.setDepartmentName(department.getDepartmentName());
+        save.setMerCode(department.getMerCode());
+        save.setDepartmentParent(department.getDepartmentParent());
         String departmentCode;
         //构建path
         if(!department.getDepartmentParent().equals(department.getMerCode())){
-            department.setDepartmentParent("0");
             departmentCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code());
-            department.setDepartmentPath(departmentCode);
+            save.setDepartmentPath(departmentCode);
         }else{
             Department parent=this.getByDepartmentCode(department.getDepartmentParent());
             if(EmptyChecker.isEmpty(parent)){
                 throw new BusiException("上级编码不存在");
             }
             departmentCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code());
-            department.setDepartmentPath(parent.getDepartmentPath()+"-"+departmentCode);
+            save.setDepartmentPath(parent.getDepartmentPath()+"-"+departmentCode);
         }
-        department.setDepartmentCode(departmentCode);
-        return departmentDao.save(department);
+        save.setDepartmentCode(departmentCode);
+        return departmentDao.save(save);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean update(Department department) {
+    @Override
+    public boolean update(DepartmentUpdateDTO department) {
         Department update=new Department();
         update.setId(department.getId());
         update.setDepartmentName(department.getDepartmentName());

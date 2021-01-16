@@ -11,6 +11,7 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
+import com.welfare.service.dto.SupplierStoreSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
@@ -58,7 +59,7 @@ public class SupplierStoreHandler {
     @Subscribe
     public void onMerchantChange(SupplierStoreEvt evt) {
         ShoppingActionTypeEnum typeEnum=evt.getTypeEnum();
-        List<SupplierStoreDetailDTO> supplierStoreDetailDTOS=evt.getSupplierStoreDetailDTOS();
+        List<SupplierStoreSyncDTO> supplierStoreDetailDTOS=evt.getSupplierStoreDetailDTOS();
         if (EmptyChecker.isEmpty(supplierStoreDetailDTOS)) {
             return;
         }
@@ -66,14 +67,14 @@ public class SupplierStoreHandler {
         StoreShoppingReq storeShoppingReq = new StoreShoppingReq();
         List<StoreShoppingReq.ListBean> listBeans = new ArrayList<>();
         List<String> storeCodeList = new ArrayList<>();
-        for (SupplierStoreDetailDTO supplierStoreDetailDTO : supplierStoreDetailDTOS) {
+        for (SupplierStoreSyncDTO supplierStoreDetailDTO : supplierStoreDetailDTOS) {
             StoreShoppingReq.ListBean listBean = new StoreShoppingReq.ListBean();
             Map<String, Boolean> consumeTypeMap = null;
             try {
                 consumeTypeMap = mapper.readValue(
                         supplierStoreDetailDTO.getConsumType(), Map.class);
             } catch (JsonProcessingException e) {
-                throw new BusiException("同步门店信息到商城中心，消费类型转换失败【{supplierStoreDetailDTO.getConsumType()}】");
+                throw new BusiException("同步门店信息到商城中心，消费类型转换失败【"+supplierStoreDetailDTO.getConsumType()+"】");
             }
             listBean.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
@@ -83,13 +84,15 @@ public class SupplierStoreHandler {
             listBean.setEnabled(supplierStoreDetailDTO.getStatus().equals(1));
             //门店相关地址
             List<StoreShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
-            for (MerchantAddressDTO addressDTO : supplierStoreDetailDTO.getAddressList()) {
-                StoreShoppingReq.ListBean.AddressBean addressBean = new StoreShoppingReq.ListBean.AddressBean();
-                addressBean.setAddress(addressDTO.getAddress());
-                addressBean.setAddressType(addressDTO.getAddressType());
-                addressBean.setName(addressDTO.getAddressName());
+            if(EmptyChecker.notEmpty(supplierStoreDetailDTO.getAddressList())){
+                for (MerchantAddressDTO addressDTO : supplierStoreDetailDTO.getAddressList()) {
+                    StoreShoppingReq.ListBean.AddressBean addressBean = new StoreShoppingReq.ListBean.AddressBean();
+                    addressBean.setAddress(addressDTO.getAddress());
+                    addressBean.setAddressType(addressDTO.getAddressType());
+                    addressBean.setName(addressDTO.getAddressName());
+                }
+                listBean.setAddress(addressBeans);
             }
-            listBean.setAddress(addressBeans);
             listBeans.add(listBean);
             storeCodeList.add(supplierStoreDetailDTO.getStoreCode());
         }

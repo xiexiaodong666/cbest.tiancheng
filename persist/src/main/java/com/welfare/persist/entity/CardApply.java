@@ -1,6 +1,5 @@
 package com.welfare.persist.entity;
 
-import java.beans.Transient;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,7 +21,7 @@ import lombok.experimental.Accessors;
  * 制卡信息(card_apply)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -49,13 +48,6 @@ public class CardApply extends Model<CardApply> implements Serializable {
      */
     @ApiModelProperty("商户代码")   
     private String merCode;
-
-    /**
-     * 商户名称
-     */
-    @ApiModelProperty("商户名称")
-    @TableField(exist = false)
-    private String merName;
 
     /**
      * 卡片名称
@@ -96,38 +88,37 @@ public class CardApply extends Model<CardApply> implements Serializable {
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新时间
      */
     @ApiModelProperty("更新时间")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 删除标志
      */
     @ApiModelProperty("删除标志") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
     /**
      * 状态: 锁定、激活
      */
     @ApiModelProperty("状态: 锁定、激活")   
     private Integer status;
-
 
 //以下为列明常量
 

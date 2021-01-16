@@ -2,10 +2,7 @@ package com.welfare.service.operator.payment.domain;
 
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAccountType;
-import com.welfare.service.operator.payment.AbstractPaymentOperator;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -19,11 +16,13 @@ import lombok.Data;
 public class AccountAmountDO {
     private AccountAmountType accountAmountType;
     private MerchantAccountType merchantAccountType;
+    private Account account;
     private String transNo;
-    public static AccountAmountDO of(AccountAmountType accountAmountType, MerchantAccountType merchantAccountType){
+    public static AccountAmountDO of(AccountAmountType accountAmountType, MerchantAccountType merchantAccountType, Account account){
         AccountAmountDO accountAmountDO = new AccountAmountDO();
         accountAmountDO.setAccountAmountType(accountAmountType);
         accountAmountDO.setMerchantAccountType(merchantAccountType);
+        accountAmountDO.setAccount(account);
         return accountAmountDO;
     }
 }

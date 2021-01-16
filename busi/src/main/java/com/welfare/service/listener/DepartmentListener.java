@@ -2,12 +2,11 @@ package com.welfare.service.listener;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.DepartmentTypeEnum;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
@@ -53,6 +52,7 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
   public void invoke(DepartmentImportDTO departmentImportDTO, AnalysisContext analysisContext) {
     Department department = new Department();
     BeanUtils.copyProperties(departmentImportDTO, department);
+    department.setDepartmentType(DepartmentTypeEnum.getTypeByExcelType(departmentImportDTO.getDepartmentType()));
     merCodeList.add(department.getMerCode());
     if(department.getDepartmentParent().equals(department.getMerCode())){
       parenCodeList.add(department.getDepartmentParent());

@@ -57,8 +57,8 @@ public class AccountController implements IController {
 
   @GetMapping("/increment")
   @ApiOperation("员工账户增量查询")
-  public List<AccountIncrementDTO> incrementAccountList(AccountIncrementReq accountIncrementReq){
-    return accountService.queryIncrementDTO(accountIncrementReq);
+  public R<List<AccountIncrementDTO>> incrementAccountList(AccountIncrementReq accountIncrementReq){
+    return success(accountService.queryIncrementDTO(accountIncrementReq));
   }
 
   @GetMapping("/page")
@@ -74,13 +74,18 @@ public class AccountController implements IController {
   @GetMapping("/{id}")
   @ApiOperation("员工账号详情")
   public R<AccountDetailDTO> detail(@PathVariable String id) {
-    return success(accountService.queryDetail(Long.parseLong(id)));
+    return success(accountService.queryDetailByParam(Long.parseLong(id),null,null));
+  }
+  @GetMapping("/detailByPhone")
+  @ApiOperation("员工账号详情")
+  public R<AccountDetailDTO> detailByPhone(@RequestParam @ApiParam("员工手机号")  String phone){
+    return success(accountService.queryDetailByParam(null,null,phone));
   }
 
   @GetMapping("/detailByAccountCode")
   @ApiOperation("通过账号获取员工账号详情")
   public R<AccountDetailDTO> detailByAccountCode(@RequestParam @ApiParam("员工账号")  String accountCode) {
-    return success(accountService.queryDetailByAccountCode(accountCode));
+    return success(accountService.queryDetailByParam(null,Long.parseLong(accountCode),null));
   }
 
   @PostMapping("/save")

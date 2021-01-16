@@ -57,6 +57,8 @@ public interface AccountService {
 
   AccountDetailDTO queryDetailByAccountCode(String accountCode);
 
+  AccountDetailDTO queryDetailByParam(Long id,Long accountCode,String phone);
+
   Boolean save(Account account);
 
   Boolean batchSave(List<Account> accountList);
@@ -73,8 +75,8 @@ public interface AccountService {
 
   List<Long> getAccountCodeList(List<Long> accountCodes);
 
-  public void syncAccount(ShoppingActionTypeEnum actionTypeEnum, List<AccountSyncDTO> accountSyncDTOS);
-
   AccountSimpleDTO queryAccountInfo(Long accountCode);
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
+  List<Account> queryByAccountTypeCode(String accountTypeCode);
+  List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId);
 }

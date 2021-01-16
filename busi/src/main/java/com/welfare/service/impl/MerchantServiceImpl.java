@@ -19,20 +19,26 @@ import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.SequenceService;
+import com.welfare.service.converter.MerchantAddConverter;
 import com.welfare.service.converter.MerchantDetailConverter;
+import com.welfare.service.converter.MerchantSyncConverter;
 import com.welfare.service.converter.MerchantWithCreditConverter;
+import com.welfare.service.dto.MerchantAddDTO;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.MerchantSyncDTO;
+import com.welfare.service.dto.MerchantUpdateDTO;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.service.helper.QueryHelper;
-import com.welfare.service.sync.event.MerchantAddEvt;
-import com.welfare.service.sync.event.MerchantUpdateEvt;
+import com.welfare.service.sync.event.MerchantEvt;
 import com.welfare.service.utils.TreeUtil;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MerchantService;
@@ -41,6 +47,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +69,9 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantAddressService merchantAddressService;
     private final MerchantCreditService merchantCreditService;
     private final MerchantDetailConverter merchantDetailConverter;
+    private final MerchantSyncConverter merchantSyncConverter;
+
+    private final MerchantAddConverter merchantAddConverter;
     private final SequenceService sequenceService;
     private final ApplicationContext applicationContext;
     private final MerchantStoreRelationDao merchantStoreRelationDao;
@@ -71,6 +82,23 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public List<Merchant> list(MerchantReq req) {
         List<Merchant> list = merchantDao.list(QueryHelper.getWrapper(req));
+        if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
+
+            QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
+            queryWrapper.groupBy(MerchantStoreRelation.MER_CODE);
+
+            List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
+                queryWrapper);
+            if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
+                List<String> merCodeList = merchantStoreRelations.stream().map(
+                    MerchantStoreRelation::getMerCode).collect(Collectors.toList());
+                Set<String> merCodeSet = new HashSet<>(merCodeList);
+                QueryWrapper<Merchant> queryWrapperMerchant = new QueryWrapper<>();
+                queryWrapperMerchant.notIn(Merchant.MER_CODE, merCodeSet);
+                queryWrapperMerchant.eq(Merchant.STATUS, 1);
+                list = merchantDao.list(queryWrapperMerchant);
+            }
+        }
         return list;
     }
 
@@ -106,23 +134,6 @@ public class MerchantServiceImpl implements MerchantService {
         List<MerchantWithCreditDTO> list = merchantExMapper.listWithCredit( merchantPageReq);
 
 
-        if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(merchantPageReq.getSource())) {
-
-            QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-            queryWrapper.groupBy(MerchantStoreRelation.MER_CODE);
-
-            List<MerchantStoreRelation> merchantStoreRelations = merchantStoreRelationDao.list(
-                queryWrapper);
-            if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
-                List<String> merCodeList = merchantStoreRelations.stream().map(
-                    MerchantStoreRelation::getMerCode).collect(Collectors.toList());
-                Set<String> merCodeSet = new HashSet<>(merCodeList);
-
-                merchantPageReq.setMerCodes(merCodeSet);
-                list = merchantExMapper.listWithCredit(merchantPageReq);
-            }
-        }
-
         if(EmptyChecker.isEmpty(list)){
             return new ArrayList<>();
         }
@@ -138,29 +149,48 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean add(MerchantDetailDTO merchant) {
-        merchant.setMerCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_CODE.code()).toString());
-        Merchant save =merchantDetailConverter.toE(merchant);
+    public boolean add(MerchantAddDTO merchant) {
+        merchant.setMerCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code()));
+        Merchant save =merchantAddConverter.toE(merchant);
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         //同步商城中台
-        List<MerchantDetailDTO> syncList=new ArrayList<>();
-        syncList.add(merchant);
-        applicationContext.publishEvent( MerchantAddEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
+        MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
+        detailDTO.setAddressList(merchant.getAddressList());
+        detailDTO.setId(save.getId());
+        List<MerchantSyncDTO> syncList=new ArrayList<>();
+        syncList.add(detailDTO);
+        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
         return flag&&flag2;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean update(MerchantDetailDTO merchant) {
-        Merchant update=merchantDetailConverter.toE(merchant);
+    public boolean update(MerchantUpdateDTO merchant) {
+        Merchant update=buildEntity(merchant);
         boolean flag= merchantDao.updateById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
         //同步商城中台
-        List<MerchantDetailDTO> syncList=new ArrayList<>();
-        syncList.add(merchant);
-        applicationContext.publishEvent( MerchantUpdateEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).build());
+        List<MerchantSyncDTO> syncList=new ArrayList<>();
+        MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
+        detailDTO.setAddressList(merchant.getAddressList());
+        syncList.add(detailDTO);
+        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).build());
         return flag&&flag2;
+    }
+    private Merchant buildEntity(MerchantUpdateDTO merchant){
+        Merchant entity=merchantDao.getById(merchant.getId());
+        if(EmptyChecker.isEmpty(entity)){
+            throw new BusiException("id不存在");
+        }
+        entity.setSelfRecharge(merchant.getSelfRecharge());
+        entity.setMerName(merchant.getMerName());
+        entity.setMerType(merchant.getMerType());
+        entity.setMerIdentity(merchant.getMerIdentity());
+        entity.setMerCooperationMode(merchant.getMerCooperationMode());
+        entity.setUpdateUser(merchant.getUpdateUser());
+        entity.setRemark(merchant.getRemark());
+        return entity;
     }
 
     @Override
@@ -199,5 +229,10 @@ public class MerchantServiceImpl implements MerchantService {
         return merchantDao.getOne(queryWrapper);
     }
 
-
+    @Override
+    public List<Merchant> queryMerchantByCodeList(List<String> merCodeList) {
+        QueryWrapper<Merchant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(Merchant.MER_CODE,merCodeList);
+        return merchantDao.list(queryWrapper);
+    }
 }

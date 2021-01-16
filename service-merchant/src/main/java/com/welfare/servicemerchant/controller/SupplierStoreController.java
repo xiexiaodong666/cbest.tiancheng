@@ -6,9 +6,11 @@ import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.SupplierStoreActivateReq;
+import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
+import com.welfare.service.dto.SupplierStoreUpdateDTO;
 import com.welfare.servicemerchant.converter.SupplierStoreConverter;
 import com.welfare.servicemerchant.dto.SupplierStoreInfo;
 import com.welfare.servicemerchant.service.FileUploadService;
@@ -61,7 +63,7 @@ public class SupplierStoreController implements IController {
 
     @GetMapping("/tree")
     @ApiOperation("查询供应商门店列表（树形）")
-    public R<List<SupplierStoreTreeDTO>> tree(String merCode){
+    public R<List<SupplierStoreTreeDTO>> tree(@RequestParam(required = false) String merCode){
         return R.success(supplierStoreService.tree(merCode));
     }
     @GetMapping("/detail")
@@ -72,7 +74,7 @@ public class SupplierStoreController implements IController {
 
     @PostMapping("/add")
     @ApiOperation("新增供应商门店")
-    public R add(@RequestBody SupplierStoreDetailDTO supplierStore){
+    public R add(@RequestBody SupplierStoreAddDTO supplierStore){
         return R.status(supplierStoreService.add(supplierStore),"新增失败");
     }
 
@@ -94,8 +96,8 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/update")
     @ApiOperation("编辑供应商门店")
-    public R update(@RequestBody SupplierStoreDetailDTO supplierStore){
-        return R.status(supplierStoreService.add(supplierStore),"编辑失败失败");
+    public R update(@RequestBody SupplierStoreUpdateDTO supplierStore){
+        return R.status(supplierStoreService.update(supplierStore),"编辑失败失败");
 
     }
     @PostMapping("/export-list")

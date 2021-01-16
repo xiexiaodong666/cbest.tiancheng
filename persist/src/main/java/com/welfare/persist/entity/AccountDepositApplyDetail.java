@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
  * 充值申请明细(account_deposit_apply_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -63,38 +63,43 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新日期
      */
     @ApiModelProperty("更新日期")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 删除标志
      */
     @ApiModelProperty("删除标志") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
+    /**
+     * 流水号
+     */
+    @ApiModelProperty("流水号")   
+    private String transNo;
 
 //以下为列明常量
 
@@ -142,5 +147,9 @@ public class AccountDepositApplyDetail extends Model<AccountDepositApplyDetail> 
     * 版本
     */
     public static final String VERSION = "version";
+    /**
+    * 流水号
+    */
+    public static final String TRANS_NO = "trans_no";
 
 }

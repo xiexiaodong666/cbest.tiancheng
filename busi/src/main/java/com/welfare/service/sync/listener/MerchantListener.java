@@ -1,7 +1,6 @@
 package com.welfare.service.sync.listener;
 
 
-import com.welfare.service.sync.event.MerchantAddEvt;
 import com.welfare.service.sync.event.MerchantEvt;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;

@@ -30,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,7 +78,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 validationParmas(request.getApplyType(), request.getMerCode());
                 apply = creditApplyConverter.toApply(request);
                 apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
-                apply.setApplyCode(UUID.randomUUID().toString());
+                apply.setApplyCode(sequenceService.nextNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code()) + "");
                 apply.setApplyUser(user.getUserName());
                 apply.setApplyTime(new Date());
                 merchantCreditApplyDao.save(apply);
@@ -187,14 +188,14 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 }
                 validationParmas(apply.getApplyType(), apply.getMerCode());
                 apply.setApprovalRemark(request.getApplyRemark());
-                apply.setApplyUser(request.getApprovalUser());
+                apply.setApprovalUser(request.getApprovalUser());
                 apply.setApprovalStatus(request.getApprovalStatus().getCode());
+                apply.setApprovalTime(new Date());
                 merchantCreditApplyDao.saveOrUpdate(apply);
                 if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
                     // 审批通过修改金额
                     WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyType());
-                    Long transNo = sequenceService.nextNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code());
-                    merchantCreditService.increaseAccountType(apply.getMerCode(),type,apply.getBalance(), transNo.toString());
+                    operatorMerAccountByType(apply.getMerCode(),type,apply.getBalance(),apply.getApplyCode());
                 }
                 return String.valueOf(apply.getId());
             } else {
@@ -279,13 +280,26 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payFirt.getCode())) {
             if (WelfareConstant.MerCreditType.CREDIT_LIMIT == type
                     || WelfareConstant.MerCreditType.REMAINING_LIMIT == type) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("不能充值[%s]类型",type.desc()), null);
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("当前合作方式[%s]不能充值[%s]类型",MerCooperationModeEnum.payFirt.getDesc(),type.desc()), null);
             }
         }
         if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payed.getCode())) {
             if (WelfareConstant.MerCreditType.CURRENT_BALANCE == type) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("不能充值[%s]类型",type.desc()), null);
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("当前合作方式[%s]不能充值[%s]类型",MerCooperationModeEnum.payed.getDesc(),type.desc()), null);
             }
+        }
+    }
+
+    /**
+     * 通过不同申请额度类型操作对应的额度
+     */
+    private void operatorMerAccountByType(String merCode, WelfareConstant.MerCreditType merCreditType, BigDecimal amount, String transNo){
+        if (merCreditType == WelfareConstant.MerCreditType.REBATE_LIMIT) {
+            merchantCreditService.decreaseAccountType(merCode,merCreditType,amount,transNo);
+        } else if (merCreditType == WelfareConstant.MerCreditType.CREDIT_LIMIT) {
+            merchantCreditService.setAccountType(merCode,merCreditType,amount,transNo);
+        } else {
+            merchantCreditService.increaseAccountType(merCode,merCreditType,amount,transNo);
         }
     }
 }

@@ -73,7 +73,8 @@ public class WelfareConstant {
          */
         SOURCE("Source", "请求来源"),
         MERCHANT_USER("merchantUser", "商户请求用户"),
-        API_USER("apiUser", "平台api请求用户");
+        API_USER("apiUser", "平台api请求用户"),
+        ACCOUNT_USER("accountUser", "员工请求用户");
 
         private String code;
         private String desc;
@@ -146,7 +147,8 @@ public class WelfareConstant {
         ACCOUNT_TYPE_CODE("account_type_code","员工类型编码"),
         ACCOUNT_CODE("account_code","员工账号"),
         DEPARTMENT_CODE("department_code","部门编号"),
-        MER_CODE("mer_code","商户编号");
+        MER_CODE("mer_code","商户编号"),
+        ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请");
         private String code;
         private String desc;
 

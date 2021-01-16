@@ -16,5 +16,12 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class AccountDao extends ServiceImpl<AccountMapper, Account> {
+    @Override
+    public boolean updateById(Account entity) {
+        return super.updateById(entity);
+    }
 
+    public Integer updateAllColumnById(Account entity){
+        return getBaseMapper().alwaysUpdateSomeColumnById(entity);
+    }
 }

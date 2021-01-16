@@ -2,6 +2,7 @@ package com.welfare.service.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.Tree;
 
 import java.util.List;
@@ -51,6 +52,8 @@ public class TreeUtil<T extends Tree> {
                     getChild(c,map);//递归调用
                     childList.add(c);
                 });
-        beanTree.setChildren(childList);
+        if(EmptyChecker.notEmpty(childList)){
+            beanTree.setChildren(childList);
+        }
     }
 }

@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
  * 用户交易流水明细表(account_deduction_detail)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:22
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -55,9 +55,9 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     @ApiModelProperty("交易流水号")   
     private String transNo;
     /**
-     * 关联交易流水号
+     * 关联交易单号（退款时使用）
      */
-    @ApiModelProperty("关联交易流水号")
+    @ApiModelProperty("关联交易单号（退款时使用）")   
     private String relatedTransNo;
     /**
      * 消费门店
@@ -128,37 +128,37 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新时间
      */
     @ApiModelProperty("更新时间")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 删除标志  1-删除、0-未删除
      */
     @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
 //以下为列明常量
@@ -179,6 +179,10 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     * 交易流水号
     */
     public static final String TRANS_NO = "trans_no";
+    /**
+    * 关联交易单号（退款时使用）
+    */
+    public static final String RELATED_TRANS_NO = "related_trans_no";
     /**
     * 消费门店
     */
@@ -218,7 +222,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     /**
     * 子账户剩余金额
     */
-    public static final String ACCOUNT_DEDUCTION_BALANCE = "account_deduction_balance";
+    public static final String ACCOUNT_AMOUNT_TYPE_BALANCE = "account_amount_type_balance";
     /**
     * 商户余额扣款金额
     */

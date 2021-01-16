@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
  * 商户额度信(merchant_credit)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-09 15:13:38
+ * @since 2021-01-15 15:14:23
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -70,45 +70,45 @@ public class MerchantCredit extends Model<MerchantCredit> implements Serializabl
     @ApiModelProperty("返利余额")   
     private BigDecimal rebateLimit;
     /**
-     * 自主充值余额
+     * selfDepositBalance
      */
-    @ApiModelProperty("自主充值余额")
+    @ApiModelProperty("selfDepositBalance")   
     private BigDecimal selfDepositBalance;
     /**
      * 创建人
      */
     @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新时间
      */
     @ApiModelProperty("更新时间")   
-    @TableField(update = "now()")
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 删除标志
      */
     @ApiModelProperty("删除标志") @TableLogic   
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
     /**
      * 版本
      */
     @ApiModelProperty("版本")  @Version 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
 //以下为列明常量
@@ -141,6 +141,10 @@ public class MerchantCredit extends Model<MerchantCredit> implements Serializabl
     * 返利余额
     */
     public static final String REBATE_LIMIT = "rebate_limit";
+    /**
+    * 
+    */
+    public static final String SELF_DEPOSIT_BALANCE = "self_deposit_balance";
     /**
     * 创建人
     */

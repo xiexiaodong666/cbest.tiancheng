@@ -1,7 +1,10 @@
 package com.welfare.service.dto.payment;
 
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.common.util.StringUtil;
+import com.welfare.persist.dao.SupplierStoreDao;
+import com.welfare.persist.entity.SupplierStore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -52,7 +55,7 @@ public abstract class PaymentRequest {
         if (!StringUtil.startsWithNumber(storeNo)) {
             //非数字开头的门店，供应商线下消费
             return WelfareConstant.PaymentScene.OFFLINE_SUPPLIER.code();
-        } else if(ONLINE_MACHINE_NO.equals(machineNo)){
+        } else if(isVirtualMachineNo(machineNo)){
             //特殊支付机器号，重百线上
             return WelfareConstant.PaymentScene.ONLINE_STORE.code();
         } else {
@@ -61,6 +64,11 @@ public abstract class PaymentRequest {
         }
     }
 
+    private boolean isVirtualMachineNo(String machineNo) {
+        SupplierStoreDao supplierStoreDao = SpringBeanUtils.getBean(SupplierStoreDao.class);
+        SupplierStore oneByCashierNo = supplierStoreDao.getOneByCashierNo(machineNo);
+        return !Objects.isNull(oneByCashierNo);
+    }
 
 
     public Long calculateAccountCode(){

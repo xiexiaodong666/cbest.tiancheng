@@ -53,6 +53,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest) {
+        String paymentScene = paymentRequest.chargePaymentScene();
         Long accountCode = paymentRequest.calculateAccountCode();
 
         Account account = accountService.getByAccountCode(accountCode);

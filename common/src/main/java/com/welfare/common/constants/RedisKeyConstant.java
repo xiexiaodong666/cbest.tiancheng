@@ -50,6 +50,11 @@ public class RedisKeyConstant {
    */
   public static final String ACCOUNT_AMOUNT_TYPE_OPERATE = "e-welfare_account_amount_type_operate";
 
+  /**
+   * 调用恢复剩余剩余信用额度接口 请求id的key前缀
+   */
+  public static final String RESTORE_REMAINING_LIMIT_REQUEST_ID = "e-welfare_restore_remaining_limit_request_id:";
+
   public static String buidKey(String perfix, String... part) {
     return StringUtils.removeEnd(perfix, ":").concat(":").concat(StringUtils.join(part, ":"));
   }

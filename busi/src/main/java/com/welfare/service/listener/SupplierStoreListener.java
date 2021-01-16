@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.entity.Merchant;
@@ -117,6 +118,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     List<SupplierStore> stores=storeService.list(storeQueryWrapper);
     MerchantReq req=new MerchantReq() ;
     req.setMerCodeList(merCodeList);
+    req.setMerIdentity(MerIdentityEnum.supplier.getCode());
     List<Merchant> merchants=merchantService.list(req);
     merCodeList.removeAll(merchants.stream().map(item->item.getMerCode()).collect(Collectors.toList())) ;
     boolean flag=true;

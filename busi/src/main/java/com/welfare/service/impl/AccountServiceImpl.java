@@ -206,7 +206,7 @@ public class AccountServiceImpl implements AccountService {
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(),"员工修改状态");
     accountChangeEventRecordService.save(accountChangeEventRecord);
     syncAccount.setAccountStatus(accountStatus);
-    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).accountList(Arrays.asList(syncAccount)).build());
+    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).accountList(Arrays.asList(syncAccount)).build());
     return result;
   }
 

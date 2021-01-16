@@ -193,19 +193,19 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public Boolean active(Long id, Integer active) {
+  public Boolean active(Long id, Integer accountStatus) {
     Account syncAccount = accountMapper.selectById(id);
     if( null ==  syncAccount){
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
     }
     Account account = new Account();
     account.setId(id);
-    account.setAccountStatus(active);
+    account.setAccountStatus(accountStatus);
     boolean result = accountDao.updateById(account);
-    AccountChangeType accountChangeType = AccountChangeType.getByAccountStatus(active);
+    AccountChangeType accountChangeType = AccountChangeType.getByAccountStatus(accountStatus);
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(),"员工修改状态");
     accountChangeEventRecordService.save(accountChangeEventRecord);
-    syncAccount.setAccountStatus(active);
+    syncAccount.setAccountStatus(accountStatus);
     applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).accountList(Arrays.asList(syncAccount)).build());
     return result;
   }

@@ -51,7 +51,7 @@ public interface AccountService {
 
   Boolean delete(Long id);
 
-  Boolean active(Long id, Integer active);
+  Boolean active(Long id, Integer accountStatus);
 
   AccountDetailDTO queryDetail(Long id);
 

@@ -31,6 +31,17 @@ public class AccountDTO implements Serializable {
   private Long id;
 
   /**
+   * 商户名称
+   */
+  @ApiModelProperty("商户名称")
+  private String merName;
+  /**
+   * 商户编码
+   */
+  @ApiModelProperty("商户编码")
+  private String merCode;
+
+  /**
    * 员工名称
    */
   @ApiModelProperty("员工名称")

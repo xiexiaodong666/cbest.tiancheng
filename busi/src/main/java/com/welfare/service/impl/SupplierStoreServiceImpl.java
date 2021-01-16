@@ -295,7 +295,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     SupplierStore update = this.buildUpdate(supplierStore);
     update.setStoreParent(update.getMerCode());
-    boolean flag = supplierStoreDao.updateById(update);
+    boolean flag = 1==supplierStoreDao.updateAllColumnById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
     //同步商城中台

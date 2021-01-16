@@ -91,15 +91,14 @@ public class DepartmentServiceImpl implements DepartmentService {
         save.setDepartmentParent(department.getDepartmentParent());
         String departmentCode;
         //构建path
+        departmentCode=sequenceService.nextNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()).toString();
         if(!department.getDepartmentParent().equals(department.getMerCode())){
-            departmentCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code());
             save.setDepartmentPath(department.getDepartmentParent()+"-"+departmentCode);
         }else{
             Department parent=this.getByDepartmentCode(department.getDepartmentParent());
             if(EmptyChecker.isEmpty(parent)){
                 throw new BusiException("上级编码不存在");
             }
-            departmentCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code());
             save.setDepartmentPath(parent.getDepartmentPath()+"-"+departmentCode);
         }
         save.setDepartmentCode(departmentCode);

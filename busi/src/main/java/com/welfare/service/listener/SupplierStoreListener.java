@@ -58,21 +58,31 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     BeanUtils.copyProperties(storeImportDTO, store);
     store.setStatus(0);
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
+    Integer row=analysisContext.readRowHolder().getRowIndex();
+    if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
+      uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空").append(";");
+    }
+    if(EmptyChecker.isEmpty(storeImportDTO.getMerCode())){
+      uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空").append(";");
+    }
+    if(EmptyChecker.isEmpty(storeImportDTO.getStoreName())){
+      uploadInfo.append("第").append(row.toString()).append("行").append("门店名称不能为空").append(";");
+    }
     if(EmptyChecker.isEmpty(storeImportDTO.getConsumType())){
-      uploadInfo.append(storeImportDTO.getStoreCode()).append("消费类型不能为空").append(";");
+      uploadInfo.append("第").append(row.toString()).append("行").append("消费类型不能为空").append(";");
     }
     List<String> consumTypes=Arrays.asList(storeImportDTO.getConsumType().split(","));
     if(excelAllType.containsAll(consumTypes)){
-      uploadInfo.append(storeImportDTO.getStoreCode()).append("未输入正确的消费类型").append(";");
+      uploadInfo.append("第").append(row.toString()).append("行").append("未输入正确的消费类型").append(";");
     }
     if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
             ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
       if(EmptyChecker.isEmpty(storeImportDTO.getCasherNo())){
-        uploadInfo.append(storeImportDTO.getStoreCode()).append("线上商城或者O2O必须输入虚拟收银机号").append(";");
+        uploadInfo.append("第").append(row.toString()).append("行").append("线上商城或者O2O必须输入虚拟收银机号").append(";");
       }
     }else{
       if(EmptyChecker.notEmpty(storeImportDTO.getCasherNo())){
-        uploadInfo.append(storeImportDTO.getStoreCode()).append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
+        uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
       }
     }
     store.setCashierNo(store.getCashierNo());

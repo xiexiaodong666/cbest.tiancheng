@@ -34,6 +34,8 @@ import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.sync.event.MerchantEvt;
 import com.welfare.service.utils.TreeUtil;
+
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -98,6 +100,19 @@ public class MerchantServiceImpl implements MerchantService {
                 queryWrapperMerchant.eq(Merchant.STATUS, 1);
                 list = merchantDao.list(queryWrapperMerchant);
             }
+        }
+        if(EmptyChecker.notEmpty(req.getMerIdentity())){
+            List<String> merIddentityList= Arrays.asList(req.getMerIdentity().split(","));
+            return list.stream().filter(item->{
+                //商户已有的身份属性
+                List<String> merIddentityList2= Arrays.asList(item.getMerIdentity().split(","));
+                for(String merIddentity:merIddentityList2){
+                    if(merIddentityList.contains(merIddentity)){
+                        return true;
+                    }
+                }
+                return false;
+            }).collect(Collectors.toList());
         }
         return list;
     }

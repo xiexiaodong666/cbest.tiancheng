@@ -63,7 +63,15 @@
     create_time createTime
     from supplier_store ss
     ) temp0
-
+    <where>
+      <if test="merCodes != null and merCodes.size()>0">
+        and temp0.merCode in
+        <foreach item="item" index="index" collection="merCodes" open="(" separator=","
+          close=")">
+          #{item}
+        </foreach>
+      </if>
+    </where>
     UNION
     select * from (
     select
@@ -80,6 +88,5 @@
     from merchant m
 
     ) temp
-
   </select>
 </mapper>

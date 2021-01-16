@@ -1,10 +1,12 @@
 package com.welfare.servicesettlement.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @ProjectName: e-welfare
@@ -40,5 +42,6 @@ public class OrderRespDto implements Serializable {
     @ApiModelProperty("订单总金额")
     private String orderAmount;
     @ApiModelProperty("订单创建时间")
-    private String orderTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private Date orderTime;
 }

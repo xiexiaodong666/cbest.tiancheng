@@ -1,5 +1,6 @@
 package com.welfare.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.service.dto.*;
 
@@ -43,4 +44,8 @@ public interface SettleDetailService {
     Map<String, Object> queryWelfareSettleDetailExt(WelfareSettleDetailPageReq welfareSettleDetailPageReq);
 
     void buildSettle(WelfareSettleDetailReq welfareSettleDetailReq);
+
+    SettleMerInfoResp getAccountInfo(Long id);
+
+    Page<SettleMerTransDetailResp> getAccountTransDetail(Long id);
 }

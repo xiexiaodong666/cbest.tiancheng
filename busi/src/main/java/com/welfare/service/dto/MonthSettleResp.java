@@ -30,9 +30,6 @@ public class MonthSettleResp {
     @ApiModelProperty(value = "商户名称")
     private String merName;
 
-    @ApiModelProperty(value = "账单实际金额")
-    private String transAmount;
-
     @ApiModelProperty(value = "结算金额")
     private String settleAmount;
 
@@ -41,6 +38,9 @@ public class MonthSettleResp {
 
     @ApiModelProperty(value = "合作方式")
     private String merCooperationMode;
+
+    @ApiModelProperty(value = "创建时间")
+    private String createTime;
 
     @ApiModelProperty(value = "合作方式名称")
     private String merCooperationModeName;
@@ -67,18 +67,21 @@ public class MonthSettleResp {
     @ApiModelProperty(value = "账单返利金额")
     private String rebateAmount;
 
+    @ApiModelProperty(value = "结算周期start")
     private Date settleStartDay;
 
+    @ApiModelProperty(value = "结算周期end")
     private Date settleEndDay;
 
     private List<settleAccountInfo> settleAccountInfoList;
 
 
     public class settleAccountInfo{
+        @ApiModelProperty(value = "费用类型编码")
         private String settleAccountTypeCode;
-
+        @ApiModelProperty(value = "费用类型名称")
         private String settleAccountTypeName;
-
+        @ApiModelProperty(value = "费用类型金额")
         private BigDecimal amount;
     }
 

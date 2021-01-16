@@ -1,9 +1,18 @@
 package com.welfare.servicemerchant.controller;
 
+import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.service.MerchantCreditService;
+import com.welfare.service.dto.RestoreRemainingLimitReq;
+import com.welfare.service.dto.merchantapply.MerchantCreditApplyRequest;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
+import net.dreamlu.mica.core.result.R;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -19,6 +28,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RestController
 @RequestMapping("/merchantCredit")
 public class MerchantCreditController implements IController {
+
     private final MerchantCreditService merchantCreditService;
 
+    @PostMapping("/restore/remainingLimit")
+    @ApiOperation("恢复商户剩余信用额度")
+    @ApiUser
+    public R<String> save(@Validated @RequestBody RestoreRemainingLimitReq request){
+
+        return success(null);
+    }
 }

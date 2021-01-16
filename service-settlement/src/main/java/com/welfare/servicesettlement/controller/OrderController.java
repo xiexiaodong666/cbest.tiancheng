@@ -82,13 +82,16 @@ public class OrderController implements IController {
         }
         return success(resultPage);
     }
+
     @ApiOperation("同步线下订单")
     @PostMapping("sync")
     public R<String> synOrder(@RequestBody List<SynOrderDto> orderList){
+        log.info("开始同步收银服务线下订单数据{}条" , orderList != null ? orderList.size(): 0);
         /**
          * 订单id 流水号 退单流水号 商品 账户 卡号 消费类型 消费门店 消费金额 消费时间
          */
-        orderService.saveOrUpdateBacth(orderList);
+        int count = orderService.saveOrUpdateBacth(orderList);
+        log.info("同步收银服务线下订单条数{}" , count);
         return success();
     }
 

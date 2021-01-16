@@ -1,8 +1,9 @@
 package com.welfare.service.impl;
 
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.*;
-import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.dto.payment.CardPaymentRequest;
@@ -49,13 +50,15 @@ public class PaymentServiceImpl implements PaymentService {
     private final AccountDao accountDao;
     private final CurrentBalanceOperator currentBalanceOperator;
     private final MerchantBillDetailDao merchantBillDetailDao;
+    private final AccountConsumeSceneDao accountConsumeSceneDao;
+    private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest) {
-        String paymentScene = paymentRequest.chargePaymentScene();
         Long accountCode = paymentRequest.calculateAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
+        //chargePaymentScene(paymentRequest, account);
 
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         merAccountLock.lock();
@@ -76,6 +79,18 @@ public class PaymentServiceImpl implements PaymentService {
             merAccountLock.unlock();
         }
 
+    }
+
+    private void chargePaymentScene(PaymentRequest paymentRequest, Account account) {
+        String paymentScene = paymentRequest.calculatePaymentScene();
+        AccountConsumeScene accountConsumeScene = accountConsumeSceneDao
+                .getOneByAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
+        AccountConsumeSceneStoreRelation sceneStoreRelation = accountConsumeSceneStoreRelationDao
+                .getOneBySceneIdAndStoreNo(accountConsumeScene.getId(), paymentRequest.getStoreNo());
+        List<String> sceneConsumeTypes = Arrays.asList(sceneStoreRelation.getSceneConsumType().split(","));
+        if(!sceneConsumeTypes.contains(paymentScene)){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景",null);
+        }
     }
 
     @Override

@@ -51,7 +51,7 @@ public abstract class PaymentRequest {
     @ApiModelProperty("支付时间")
     private Date paymentDate;
 
-    public String chargePaymentScene(){
+    public String calculatePaymentScene(){
         if (!StringUtil.startsWithNumber(storeNo)) {
             //非数字开头的门店，供应商线下消费
             return WelfareConstant.PaymentScene.OFFLINE_SUPPLIER.code();

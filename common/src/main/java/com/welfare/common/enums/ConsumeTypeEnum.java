@@ -10,6 +10,9 @@ import java.util.stream.Stream;
  * @date 2021/1/10 8:07 PM
  */
 public enum ConsumeTypeEnum {
+  /**
+   * 消费类型
+   */
   O2O("O2O", "O2O（线上下单，到店提货","1"),
   ONLINE_MALL("ONLINE_MALL", "线上商城","2"),
   SHOP_SHOPPING("SHOP_CONSUMPTION", "到店消费","3");

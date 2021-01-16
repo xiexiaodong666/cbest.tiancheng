@@ -5,6 +5,11 @@ import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantAccountType;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
+
 /**
  * Description:
  *
@@ -24,5 +29,17 @@ public class AccountAmountDO {
         accountAmountDO.setMerchantAccountType(merchantAccountType);
         accountAmountDO.setAccount(account);
         return accountAmountDO;
+    }
+
+    public static BigDecimal calculateAccountCredit(List<AccountAmountType> accountTypes) {
+        return accountTypes.stream()
+                .filter(accountAmountType -> SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public static BigDecimal calculateAccountBalance(List<AccountAmountType> accountTypes) {
+        return accountTypes.stream()
+                .filter(accountAmountType -> !SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

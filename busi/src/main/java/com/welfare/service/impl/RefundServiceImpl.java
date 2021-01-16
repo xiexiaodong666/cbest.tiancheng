@@ -11,6 +11,7 @@ import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.service.*;
 import com.welfare.service.dto.RefundRequest;
+import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.RefundOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -149,15 +150,14 @@ public class RefundServiceImpl implements RefundService {
         List<AccountDeductionDetail> refundDeductionDetails = refundOperations.stream()
                 .map(RefundOperation::getRefundDeductionDetail)
                 .collect(Collectors.toList());
+        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
+        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
+        account.setAccountBalance(accountBalance);
+        account.setSurplusQuota(accountCreditBalance);
+        accountDao.updateById(account);
         accountBillDetailDao.saveBatch(refundBillDetails);
         accountAmountTypeDao.updateBatchById(accountAmountTypes);
         accountDeductionDetailDao.saveBatch(refundDeductionDetails);
-        BigDecimal balanceSum = accountAmountTypeService.sumBalanceExceptSurplusQuota(account.getAccountCode());
-        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(account.getAccountCode(), SURPLUS_QUOTA.code());
-        account.setAccountBalance(balanceSum);
-        account.setSurplusQuota(accountAmountType.getAccountBalance());
-        accountDao.updateById(account);
-
     }
 
 

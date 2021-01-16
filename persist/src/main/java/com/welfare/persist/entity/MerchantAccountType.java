@@ -126,7 +126,7 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
     /**
     * 删除标识
     */
-    public static final String FLAG = "flag";
+    public static final String DELETED = "deleted";
     /**
     * 备注
     */

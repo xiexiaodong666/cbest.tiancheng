@@ -66,9 +66,9 @@
     <where>
       <if test="merCodes != null and merCodes.size()>0">
         and temp0.merCode in
-        <foreach item="merCode" index="index" collection="merCodes" open="(" separator=","
+        <foreach item="item" index="index" collection="merCodes" open="(" separator=","
           close=")">
-          #{merCode}
+          #{item}
         </foreach>
       </if>
     </where>
@@ -88,11 +88,5 @@
     from merchant m
 
     ) temp
-
-    <where>
-      <if test="merCode!=null and merCode!=''">
-        and temp.merCode=#{merCode}
-      </if>
-    </where>
   </select>
 </mapper>

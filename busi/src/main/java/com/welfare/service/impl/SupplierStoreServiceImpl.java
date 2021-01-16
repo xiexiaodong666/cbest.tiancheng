@@ -124,10 +124,15 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       for (SupplierStore s :
           supplierStores) {
         try {
-          Map<String, Boolean> consumeTypeMap = mapper.readValue(
-              s.getConsumType(), Map.class);
-          ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
-          s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+          if(Strings.isNotEmpty(s.getConsumType())) {
+            Map<String, Boolean> consumeTypeMap = mapper.readValue(
+                s.getConsumType(), Map.class);
+            ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
+            s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+          } else {
+            log.error(s.getConsumType()+"########");
+          }
+
         } catch (JsonProcessingException e) {
           log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
         }

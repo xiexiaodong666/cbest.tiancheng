@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
@@ -17,6 +18,7 @@ import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.entity.SupplierStore;
@@ -47,6 +49,7 @@ import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -186,6 +189,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreAddDTO supplierStore) {
+    Merchant merchant=merchantService.detailByMerCode(supplierStore.getMerCode());
+    if(EmptyChecker.isEmpty(merchant)){
+      throw new BusiException("商户不存在");
+    }
+    if(!Arrays.asList(merchant.getMerIdentity().split(",")).contains(MerIdentityEnum.supplier.getCode())){
+      throw new BusiException("非供应商门店");
+    }
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
       throw new BusiException("门店编码已存在");
     }
@@ -295,7 +305,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     SupplierStore update = this.buildUpdate(supplierStore);
     update.setStoreParent(update.getMerCode());
-    boolean flag = supplierStoreDao.updateById(update);
+    boolean flag = 1==supplierStoreDao.updateAllColumnById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
     //同步商城中台

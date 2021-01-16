@@ -108,9 +108,9 @@ public class AccountTypeController implements IController {
     }
   }
 
-  @PostMapping("/delete/{id}")
+  @PostMapping("/delete")
   @ApiOperation("删除员工类型")
-  public R<Boolean> delete(@PathVariable String id){
+  public R<Boolean> delete(@RequestParam(required = true) @ApiParam("id") String id){
     try {
       return success(accountTypeService.delete(Long.parseLong(id)));
     }catch (BusiException be){

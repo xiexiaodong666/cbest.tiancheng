@@ -128,6 +128,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
             List<MerchantAccountOperation> increase = merAccountTypeOperator.set(merchantCredit, amount,transNo );
             merchantCreditDao.updateById(merchantCredit);
+            List<MerchantBillDetail> merchantBillDetails = increase.stream()
+                    .map(MerchantAccountOperation::getMerchantBillDetail)
+                    .collect(Collectors.toList());
+            merchantBillDetailDao.saveBatch(merchantBillDetails);
         } finally {
             lock.unlock();
         }

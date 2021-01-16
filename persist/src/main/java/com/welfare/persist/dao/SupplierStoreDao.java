@@ -18,6 +18,9 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierStore> {
+    public Integer updateAllColumnById(SupplierStore entity){
+        return getBaseMapper().alwaysUpdateSomeColumnById(entity);
+    }
 
     @Cacheable(value = "supplierStore-by-cashierNo",key="#cashierNo")
     public SupplierStore getOneByCashierNo(String cashierNo){

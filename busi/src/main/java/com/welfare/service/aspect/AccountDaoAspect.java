@@ -42,7 +42,7 @@ public class AccountDaoAspect {
         Account accountInDb = accountDao.getById(accountToUpdate.getId());
         BigDecimal balanceToUpdate = accountToUpdate.getAccountBalance();
         BigDecimal balanceInDb = accountInDb.getAccountBalance();
-        if(balanceInDb.compareTo(balanceToUpdate)!=0){
+        if(null != balanceToUpdate && balanceInDb.compareTo(balanceToUpdate)!=0){
             AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
             accountChangeEventRecord.setAccountCode(accountToUpdate.getAccountCode());
             accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());

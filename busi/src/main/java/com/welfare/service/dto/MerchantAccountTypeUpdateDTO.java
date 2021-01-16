@@ -27,6 +27,7 @@ public class MerchantAccountTypeUpdateDTO {
     @ApiModelProperty("备注")
     private String remark;
     @ApiModelProperty("商户编码")
+    @NotBlank
     private String merCode;
     @ApiModelProperty("更新人")
     private String updateUser;

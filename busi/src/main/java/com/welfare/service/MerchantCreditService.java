@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.service.dto.RestoreRemainingLimitReq;
 import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 
@@ -68,4 +69,8 @@ public interface MerchantCreditService {
    * @param transNo
    */
   void setAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
+
+
+  //void restoreRemainingLimit(RestoreRemainingLimitReq req)
+
 }

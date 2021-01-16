@@ -100,7 +100,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
         AccountDepositApply apply = getByRequestId(request.getRequestId());
         if (apply != null) {
-            return Long.valueOf(apply.getId());
+            return apply.getId();
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY_SAVE_REQUEST_ID, request.getRequestId());
         RLock lock = redissonClient.getFairLock(lockKey);
@@ -109,10 +109,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             if (locked) {
                 apply = getByRequestId(request.getRequestId());
                 if (apply != null) {
-                    return Long.valueOf(apply.getId());
+                    return apply.getId();
                 }
                 Merchant merchant = merchantService.detailByMerCode(merchantUser.getMerchantCode());
-                validationParmas(apply,request,merchant,merchantUser,request.getInfo().getRechargeAmount());
+                validationParmas(request,merchant,merchantUser,request.getInfo().getRechargeAmount());
                 // 初始化主表
                 apply = depositApplyConverter.toAccountDepositApply(request);
                 if (accountService.findByPhone(request.getInfo().getPhone()) == null) {
@@ -128,7 +128,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 AccountDepositApplyDetail detail = assemblyAccountDepositApplyDetailList(apply, request.getInfo());
                 accountDepositApplyDao.save(apply);
                 accountDepositApplyDetailDao.save(detail);
-                return Long.valueOf(apply.getId());
+                return apply.getId();
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -169,7 +169,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 }
                 double sumAmoun = deposits.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
                 BigDecimal sumAmount = new BigDecimal(sumAmoun);
-                validationParmas(apply,request,merchant,merchantUser,sumAmount);
+                validationParmas(request,merchant,merchantUser,sumAmount);
                 apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
                 // 设置充值总金额
                 apply.setRechargeAmount(sumAmount);
@@ -578,7 +578,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         apply.setDeleted(Boolean.FALSE);
     }
 
-    public void validationParmas(AccountDepositApply apply, DepositApplyRequest request,Merchant merchant,
+    public void validationParmas(DepositApplyRequest request,Merchant merchant,
                                  MerchantUserInfo merchantUser, BigDecimal amount){
         if (merchant == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);

@@ -108,7 +108,6 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
         //merCode不允许修改
         Date date=new Date();
         List<MerchantAccountType> addList=new ArrayList<>();
-        List<MerchantAccountType> updateList=new ArrayList<>();
         for(MerchantAccountTypeUpdateDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
             if(EmptyChecker.isEmpty(typeItem.getId())){
                 MerchantAccountType type=new MerchantAccountType();
@@ -121,14 +120,19 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
                 addList.add(type);
             }else{
                 MerchantAccountType type=new MerchantAccountType();
+                type.setId(typeItem.getId());
+                type.setMerCode(merchantAccountType.getMerCode());
+                type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
+                type.setMerAccountTypeCode(typeItem.getMerAccountTypeCode());
                 type.setDeductionOrder(typeItem.getDeductionOrder());
                 type.setRemark(merchantAccountType.getRemark());
+                type.setCreateTime(date);
                 type.setUpdateTime(date);
                 type.setUpdateUser(merchantAccountType.getUpdateUser());
-                updateList.add(type);
+                merchantAccountTypeDao.updateAllColumnById(type);
             }
         }
-        return merchantAccountTypeDao.saveOrUpdateBatch(updateList)&&merchantAccountTypeDao.saveBatch(addList);
+        return merchantAccountTypeDao.saveBatch(addList);
     }
 
     @Override

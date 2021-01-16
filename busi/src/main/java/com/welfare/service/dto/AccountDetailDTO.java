@@ -50,11 +50,13 @@ public class AccountDetailDTO {
   /**
    * 商户CODE
    */
+  @ApiModelProperty("商户CODE")
   private String merCode;
 
   /**
    * 商户名称
    */
+  @ApiModelProperty("商户名称")
   private String merName;
 
 
@@ -80,6 +82,11 @@ public class AccountDetailDTO {
    */
   @ApiModelProperty("备注")
   private String remark;
+  /**
+   * 手机号
+   */
+  @ApiModelProperty("手机号")
+  private String phone;
 
 
 }

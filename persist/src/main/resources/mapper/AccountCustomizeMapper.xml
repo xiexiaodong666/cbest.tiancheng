@@ -89,6 +89,9 @@
     <if test=" accountTypeCode !='' and accountTypeCode != null ">
       and at.type_code = #{accountTypeCode}
     </if>
+    <if test=" cardId !='' and cardId != null ">
+      and ci.card_id = #{cardId}
+    </if>
     GROUP BY a.account_code
   </select>
 
@@ -230,7 +233,8 @@ LIMIT #{size}
     a.max_quota AS maxQuota,
     a.surplus_quota AS surplusQuota,
     a.account_balance AS accountBalance,
-    a.remark
+    a.remark,
+    a.phone
     FROM
     account a
     LEFT JOIN department d ON a.store_code = d.department_code

@@ -100,6 +100,7 @@ public class RefundServiceImpl implements RefundService {
         refundRequest.setAccountCredit(account.getSurplusQuota());
         refundRequest.setAccountCode(account.getAccountCode());
         refundRequest.setAccountName(account.getAccountName());
+        refundRequest.setRefundStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
     }
 
     private void operateMerchantCredit(Account account, AccountDeductionDetail refundDeductionDetail) {

@@ -103,23 +103,25 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRequest.setTransNo(transNo);
         if(CollectionUtils.isEmpty(accountDeductionDetails)){
             paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.FAILED.code());
-        }
-        paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-        AccountBillDetail firstAccountBillDetail = accountDeductionDetails.get(0);
-        paymentRequest.setStoreNo(firstAccountBillDetail.getStoreCode());
-        paymentRequest.setAccountCode(firstAccountBillDetail.getAccountCode());
-        paymentRequest.setMachineNo(firstAccountBillDetail.getPos());
-        paymentRequest.setPaymentDate(firstAccountBillDetail.getTransTime());
-        paymentRequest.setCardNo(firstAccountBillDetail.getCardId());
-        BigDecimal amount = accountDeductionDetails.stream()
-                .map(AccountBillDetail::getTransAmount)
-                .reduce(BigDecimal.ZERO,BigDecimal::add);
-        paymentRequest.setAmount(amount);
+        }else{
+            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            AccountBillDetail firstAccountBillDetail = accountDeductionDetails.get(0);
+            paymentRequest.setStoreNo(firstAccountBillDetail.getStoreCode());
+            paymentRequest.setAccountCode(firstAccountBillDetail.getAccountCode());
+            paymentRequest.setMachineNo(firstAccountBillDetail.getPos());
+            paymentRequest.setPaymentDate(firstAccountBillDetail.getTransTime());
+            paymentRequest.setCardNo(firstAccountBillDetail.getCardId());
+            BigDecimal amount = accountDeductionDetails.stream()
+                    .map(AccountBillDetail::getTransAmount)
+                    .reduce(BigDecimal.ZERO,BigDecimal::add);
+            paymentRequest.setAmount(amount);
 
-        Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
-        paymentRequest.setAccountBalance(account.getAccountBalance());
-        paymentRequest.setAccountName(account.getAccountName());
-        paymentRequest.setAccountCredit(account.getSurplusQuota());
+            Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
+            paymentRequest.setAccountBalance(account.getAccountBalance());
+            paymentRequest.setAccountName(account.getAccountName());
+            paymentRequest.setAccountCredit(account.getSurplusQuota());
+        }
+
         return paymentRequest;
     }
 

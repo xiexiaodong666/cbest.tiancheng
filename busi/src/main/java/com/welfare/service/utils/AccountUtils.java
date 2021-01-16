@@ -54,7 +54,8 @@ public class AccountUtils {
     employerDTO.setEmployerId(String.valueOf(accountSyncDTO.getId()));
     employerDTO.setEmployerRole(accountSyncDTO.getAccountTypeCode());
     employerDTO.setPartnerCode(accountSyncDTO.getMerCode());
-    employerDTO.setMerchantId(accountSyncDTO.getMerchantId());
+    //accountSyncDTO.getMerchantId()
+    employerDTO.setMerchantId("0");
     employerDTO.setMobile(accountSyncDTO.getPhone());
     employerDTO.setName(accountSyncDTO.getAccountName());
     employerDTO.setRemark(accountSyncDTO.getRemark());

@@ -186,7 +186,7 @@ public class AccountServiceImpl implements AccountService {
     boolean result = accountDao.removeById(id);
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode(),"员工删除");
     accountChangeEventRecordService.save(accountChangeEventRecord);
-
+    syncAccount.setDeleted(true);
     applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).accountList(Arrays.asList(syncAccount)).build());
     return result;
   }
@@ -198,17 +198,15 @@ public class AccountServiceImpl implements AccountService {
     if( null ==  syncAccount){
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
     }
-    UpdateWrapper<Account> updateWrapper = new UpdateWrapper();
-    updateWrapper.eq(Account.ID, id);
     Account account = new Account();
+    account.setId(id);
     account.setAccountStatus(active);
-    boolean result = accountDao.update(updateWrapper);
+    boolean result = accountDao.updateById(account);
     AccountChangeType accountChangeType = AccountChangeType.getByAccountStatus(active);
-
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(),"员工修改状态");
     accountChangeEventRecordService.save(accountChangeEventRecord);
-
-    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).accountList(Arrays.asList(account)).build());
+    syncAccount.setAccountStatus(active);
+    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).accountList(Arrays.asList(syncAccount)).build());
     return result;
   }
 

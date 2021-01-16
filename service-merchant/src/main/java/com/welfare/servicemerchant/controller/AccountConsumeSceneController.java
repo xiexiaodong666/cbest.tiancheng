@@ -119,9 +119,9 @@ public class AccountConsumeSceneController implements IController {
     }
   }
 
-  @PostMapping("/updateStatus/{id}")
+  @PostMapping("/updateStatus")
   @ApiOperation("激活")
-  public R<Boolean> updateStatus(@PathVariable String id,
+  public R<Boolean> updateStatus(@RequestParam(required = true) @ApiParam("id") String id,
       @RequestParam(required = false) @ApiParam("使用状态") Integer status) {
     try {
       return success(accountConsumeSceneService.updateStatus(Long.parseLong(id), status));
@@ -130,9 +130,9 @@ public class AccountConsumeSceneController implements IController {
     }
   }
 
-  @PostMapping("/delete/{id}")
+  @PostMapping("/delete")
   @ApiOperation("删除员工消费配置")
-  public R<Boolean> delete(@PathVariable String id) {
+  public R<Boolean> delete(@RequestParam(required = true) @ApiParam("id") String id) {
     try {
       return success(accountConsumeSceneService.delete(Long.parseLong(id)));
     }catch (BusiException be){

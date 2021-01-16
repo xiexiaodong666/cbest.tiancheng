@@ -75,6 +75,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         uploadInfo.append(storeImportDTO.getStoreCode()).append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
       }
     }
+    store.setCashierNo(store.getCashierNo());
     store.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transferWithExcel(consumTypes)));
     store.setStoreParent(store.getMerCode());
     list.add(store);

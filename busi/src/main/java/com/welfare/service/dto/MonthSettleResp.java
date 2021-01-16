@@ -5,7 +5,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author qiang.deng
@@ -22,17 +24,11 @@ public class MonthSettleResp {
     @ApiModelProperty(value = "账单编号")
     private String settleNo;
 
-    @ApiModelProperty(value = "账单月")
-    private String settleMonth;
-
     @ApiModelProperty(value = "商户编码")
     private String merCode;
 
     @ApiModelProperty(value = "商户名称")
     private String merName;
-
-    @ApiModelProperty(value = "账单实际金额")
-    private String transAmount;
 
     @ApiModelProperty(value = "结算金额")
     private String settleAmount;
@@ -42,6 +38,9 @@ public class MonthSettleResp {
 
     @ApiModelProperty(value = "合作方式")
     private String merCooperationMode;
+
+    @ApiModelProperty(value = "创建时间")
+    private String createTime;
 
     @ApiModelProperty(value = "合作方式名称")
     private String merCooperationModeName;
@@ -68,6 +67,22 @@ public class MonthSettleResp {
     @ApiModelProperty(value = "账单返利金额")
     private String rebateAmount;
 
-    @ApiModelProperty(value = "账单返利比例")
-    private String rebate;
+    @ApiModelProperty(value = "结算周期start")
+    private Date settleStartDay;
+
+    @ApiModelProperty(value = "结算周期end")
+    private Date settleEndDay;
+
+    private List<settleAccountInfo> settleAccountInfoList;
+
+
+    public class settleAccountInfo{
+        @ApiModelProperty(value = "费用类型编码")
+        private String settleAccountTypeCode;
+        @ApiModelProperty(value = "费用类型名称")
+        private String settleAccountTypeName;
+        @ApiModelProperty(value = "费用类型金额")
+        private BigDecimal amount;
+    }
+
 }

@@ -14,3 +14,9 @@ mybatis-plus:
   global-config:
     db-config:
       idType: AUTO
+cbest:
+  oss:
+    config:
+      accessKey: lF3iXaqMbr9f3GEdPJeN
+      secretKey: KqMaYYENOqD8JBZUhqgBhOddVYc5Y1Pd1pAJRoA2
+      keyPrefix: e-welfare/

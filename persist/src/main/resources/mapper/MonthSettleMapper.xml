@@ -113,7 +113,7 @@
     <select id="sumSettleDetailToMonthSettle" resultType="com.welfare.persist.entity.MonthSettle" parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
         select
             concat(t1.mer_code,DATE_FORMAT(t1.trans_time,'%Y%m')) as settleNo,
-            DATE_FORMAT(t1.trans_time,'%Y-%m') as settle_month,
+            DATE_FORMAT(t1.trans_time,'%Y-%m') as settleMonth,
             t1.mer_code as merCode,
             sum(
                 case when t1.trans_type='consume' then t1.trans_amount
@@ -144,10 +144,7 @@
             'unsended' as send_status,
             null as send_time,
             null as confirm_time,
-            'system' as create_user,
-            now() as create_time,
-            null as uppdate_user,
-            null as update_time
+            'system' as create_user
         from settle_detail t1
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.status=0

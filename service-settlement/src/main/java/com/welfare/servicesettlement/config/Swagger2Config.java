@@ -38,6 +38,20 @@ public class Swagger2Config {
                 .parameterType("header")
                 .required(true)
                 .build());
+        parameters.add(new ParameterBuilder()
+                .name(WelfareConstant.Header.API_USER.code())
+                .description("平台请求用户信息")
+                .modelRef(new ModelRef("string"))
+                .parameterType("header")
+                .required(true)
+                .build());
+        parameters.add(new ParameterBuilder()
+                .name(WelfareConstant.Header.MERCHANT_USER.code())
+                .description("商户请求用户信息")
+                .modelRef(new ModelRef("string"))
+                .parameterType("header")
+                .required(false)
+                .build());
         return  new Docket(DocumentationType.SWAGGER_2)
                 .globalOperationParameters(parameters)
                 .useDefaultResponseMessages(false)

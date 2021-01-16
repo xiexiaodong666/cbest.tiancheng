@@ -17,6 +17,7 @@ import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -63,8 +64,8 @@ public class SupplierStoreController implements IController {
 
     @GetMapping("/tree")
     @ApiOperation("查询供应商门店列表（树形）")
-    public R<List<SupplierStoreTreeDTO>> tree(@RequestParam(required = false) String merCode){
-        return R.success(supplierStoreService.tree(merCode));
+    public R<List<SupplierStoreTreeDTO>> tree(@RequestParam(required = false) String merCode, @RequestParam(required = false)@ApiParam("来源")String source){
+        return R.success(supplierStoreService.tree(merCode, source));
     }
     @GetMapping("/detail")
     @ApiOperation("查询供应商门店详情）")

@@ -56,9 +56,7 @@ public class SupplierStoreWithMerchantDTO {
     private String remark;
     @ApiModelProperty("虚拟收银机号")
     private String cashierNo;
-    /**
-     * 消费方式
-     */
+
     /**
      * 消费方式
      */

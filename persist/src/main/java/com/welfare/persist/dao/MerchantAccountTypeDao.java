@@ -16,5 +16,7 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class MerchantAccountTypeDao extends ServiceImpl<MerchantAccountTypeMapper, MerchantAccountType> {
-
+    public Integer updateAllColumnById(MerchantAccountType entity){
+        return getBaseMapper().alwaysUpdateSomeColumnById(entity);
+    }
 }

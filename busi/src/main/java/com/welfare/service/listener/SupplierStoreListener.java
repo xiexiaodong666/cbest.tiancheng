@@ -60,13 +60,13 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
     Integer row=analysisContext.readRowHolder().getRowIndex();
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
-      uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空");
+      uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空").append(";");
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getMerCode())){
-      uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空");
+      uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空").append(";");
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreName())){
-      uploadInfo.append("第").append(row.toString()).append("行").append("门店名称不能为空");
+      uploadInfo.append("第").append(row.toString()).append("行").append("门店名称不能为空").append(";");
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getConsumType())){
       uploadInfo.append("第").append(row.toString()).append("行").append("消费类型不能为空").append(";");

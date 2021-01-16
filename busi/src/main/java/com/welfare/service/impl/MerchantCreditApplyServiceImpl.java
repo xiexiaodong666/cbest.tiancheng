@@ -64,7 +64,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     public String save(MerchantCreditApplyRequest request, UserInfo user) {
         MerchantCreditApply apply = getByRequestId(request.getRequestId());
         if (apply != null) {
-            return apply.getId()+"";
+            return String.valueOf(apply.getId());
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY_REQUEST_ID, request.getRequestId());
         RLock lock = redissonClient.getFairLock(lockKey);
@@ -82,16 +82,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setApplyUser(user.getUserName());
                 apply.setApplyTime(new Date());
                 merchantCreditApplyDao.save(apply);
-                List<MerDepositApplyFile> files = new ArrayList<>();;
-                if (CollectionUtils.isNotEmpty(request.getEnclosures())) {
-                    for (String url : request.getEnclosures()) {
-                        MerDepositApplyFile file = new MerDepositApplyFile();
-                        file.setFileUrl(url);
-                        file.setMerDepositApplyCode(apply.getApplyCode());
-                        files.add(file);
-                    }
-                    depositApplyFileDao.saveBatch(files);
-                }
+                merDepositApplyFileService.save(apply.getApplyCode(), request.getEnclosures());
                 return String.valueOf(apply.getId());
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
@@ -139,19 +130,9 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 apply.setBalance(request.getBalance());
                 apply.setRemark(request.getRemark());
                 apply.setApplyUser(user.getUserName());
-                merDepositApplyFileService.delByMerDepositApplyCode(apply.getApplyCode());
-                List<MerDepositApplyFile> files = new ArrayList<>();;
-                if (CollectionUtils.isNotEmpty(request.getEnclosures())) {
-                    for (String url : request.getEnclosures()) {
-                        MerDepositApplyFile file = new MerDepositApplyFile();
-                        file.setFileUrl(url);
-                        file.setMerDepositApplyCode(apply.getApplyCode());
-                        files.add(file);
-                    }
-                    depositApplyFileDao.saveBatch(files);
-                }
+                merDepositApplyFileService.save(apply.getApplyCode(), request.getEnclosures());
                 merchantCreditApplyDao.saveOrUpdate(apply);
-                return apply.getId()+"";
+                return String.valueOf(apply.getId());
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -194,7 +175,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 merchantCreditApplyDao.saveOrUpdate(apply);
                 if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
                     // 审批通过修改金额
-                    WelfareConstant.MerCreditType type =  WelfareConstant.MerCreditType.findByCode(apply.getApplyType());
+                    WelfareConstant.MerCreditType type = WelfareConstant.MerCreditType.findByCode(apply.getApplyType());
                     operatorMerAccountByType(apply.getMerCode(),type,apply.getBalance(),apply.getApplyCode());
                 }
                 return String.valueOf(apply.getId());

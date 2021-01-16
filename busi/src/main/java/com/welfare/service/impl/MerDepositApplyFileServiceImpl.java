@@ -5,9 +5,12 @@ import com.welfare.persist.dao.MerDepositApplyFileDao;
 import com.welfare.persist.entity.MerDepositApplyFile;
 import com.welfare.service.MerDepositApplyFileService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,5 +38,21 @@ public class MerDepositApplyFileServiceImpl implements MerDepositApplyFileServic
     QueryWrapper<MerDepositApplyFile> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(MerDepositApplyFile.MER_DEPOSIT_APPLY_CODE, merDepositApplyCode);
     return merDepositApplyFileDao.list(queryWrapper);
+  }
+
+  @Override
+  @Transactional
+  public void save(String merDepositApplyCode, List<String> fileUrls) {
+    delByMerDepositApplyCode(merDepositApplyCode);
+    if (CollectionUtils.isNotEmpty(fileUrls)) {
+      List<MerDepositApplyFile> files = new ArrayList<>();
+      fileUrls.forEach(url -> {
+        MerDepositApplyFile file = new MerDepositApplyFile();
+        file.setFileUrl(url);
+        file.setMerDepositApplyCode(merDepositApplyCode);
+        files.add(file);
+      });
+      merDepositApplyFileDao.saveBatch(files);
+    }
   }
 }

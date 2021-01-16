@@ -1,15 +1,13 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountDao;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.MerchantCredit;
-import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.*;
 import com.welfare.service.dto.Deposit;
@@ -50,6 +48,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountDao accountDao;
     private final AccountService accountService;
     private final OrderTransRelationService orderTransRelationService;
+    private final AccountChangeEventRecordService accountChangeEventRecordService;
     /**
      * 循环依赖问题，所以未采用构造器注入
      */
@@ -89,6 +88,11 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 accountAmountTypeDao.updateById(accountAmountType);
             }
             account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
+            AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
+            accountChangeEventRecord.setAccountCode(account.getAccountCode());
+            accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
+            accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
+            accountChangeEventRecordService.save(accountChangeEventRecord);
             accountDao.saveOrUpdate(account);
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
             orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT);

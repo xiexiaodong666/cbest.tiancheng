@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,13 +53,13 @@ public class OrderController implements IController {
     public R<PageVo<OrderRespDto>> selectByPage(OrderReqDto orderReqDto){
         PageVo<OrderRespDto> resultPage = new PageVo<>();
         MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
-        merchantUserInfo = new MerchantUserInfo();
-        merchantUserInfo.setMerchantCode("A102");
+        if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){
+            orderReqDto.setMerchantCode(merchantUserInfo.getMerchantCode());
+        }
         Page page = new Page();
         page.setCurrent(orderReqDto.getCurrent());
         page.setSize(orderReqDto.getSize());
         Page<OrderInfo> orderPage = orderService.selectPage(page , orderReqDto);
-
         if (Objects.nonNull(orderPage) && orderPage.getRecords().size() > 0){
             List<OrderRespDto> respDtoList = new ArrayList<>();
             orderPage.getRecords().forEach(item->{
@@ -81,13 +82,16 @@ public class OrderController implements IController {
         }
         return success(resultPage);
     }
+
     @ApiOperation("同步线下订单")
     @PostMapping("sync")
     public R<String> synOrder(@RequestBody List<SynOrderDto> orderList){
+        log.info("开始同步收银服务线下订单数据{}条" , orderList != null ? orderList.size(): 0);
         /**
          * 订单id 流水号 退单流水号 商品 账户 卡号 消费类型 消费门店 消费金额 消费时间
          */
-        orderService.saveOrUpdateBacth(orderList);
+        int count = orderService.saveOrUpdateBacth(orderList);
+        log.info("同步收银服务线下订单条数{}" , count);
         return success();
     }
 
@@ -97,8 +101,8 @@ public class OrderController implements IController {
     @GetMapping("select/list")
     public R<List<OrderRespDto>> selectList(OrderReqDto orderReqDto){
         MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
-        if (merchantUserInfo != null){
-            
+        if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){
+            orderReqDto.setMerchantCode(merchantUserInfo.getMerchantCode());
         }
         List<OrderInfo> orderInfoPage = orderService.selectList(orderReqDto);
         List<OrderRespDto> respDtoList = new ArrayList<>();

@@ -424,7 +424,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setPayCode(cardPayCode);
             orderInfo.setPayName("员工卡");
             orderInfo.setTransType(item.getTransType());
-            orderInfo.setTransTypeName(WelfareConstant.TransType.valueOf(item.getTransType()).name());
+            orderInfo.setTransTypeName(WelfareConstant.TransType.valueOf(item.getTransType().toUpperCase()).desc());
             orderInfo.setCreateTime(new Date());
             orderInfo.setOrderTime(item.getTransTime());
             orderInfo.setAccountCode(item.getAccountCode());

@@ -158,14 +158,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.isEmpty(store)) {
       throw new BusiException("门店不存在");
     }
-    Map<String, Boolean> consumeTypeMap = null;
-    try {
-      consumeTypeMap = mapper.readValue(
-          store.getConsumType(), Map.class);
-      store.setConsumType(ConsumeTypesUtils.transferStr(consumeTypeMap));
-    } catch (JsonProcessingException e) {
-      log.info("消费方式转换失败，格式错误【{}】", store.getConsumType());
-    }
     //字典转义
     dictService.trans(
         SupplierStoreDetailDTO.class, SupplierStore.class.getSimpleName(), true, store);
@@ -295,8 +287,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
-    supplierStore.setConsumType(
-        JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
     boolean flag2 = true;
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
       flag2 = this.syncConsumeType(supplierStore.getStoreCode(), supplierStore.getConsumType());

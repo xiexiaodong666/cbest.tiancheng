@@ -29,7 +29,7 @@ public class RebateLimitOperator extends AbstractMerAccountTypeOperator {
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
         log.info("ready to decrease merchantCredit.rebateLimit for {}",amount.toString());
-        BigDecimal currentBalance = merchantCredit.getRechargeLimit();
+        BigDecimal currentBalance = merchantCredit.getRebateLimit();
         BigDecimal subtract = currentBalance.subtract(amount);
         if(subtract.compareTo(BigDecimal.ZERO) < 0){
             return doWhenNotEnough(merchantCredit,subtract.negate(),currentBalance , transNo);

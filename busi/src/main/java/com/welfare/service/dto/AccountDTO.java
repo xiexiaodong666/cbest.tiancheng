@@ -85,9 +85,9 @@ public class AccountDTO implements Serializable {
   private BigDecimal accountBalance;
 
   /**
-   * 是否激活
+   * 是否绑卡(1绑定0未绑定)
    */
-  @ApiModelProperty("是否激活")
-  private Integer active;
+  @ApiModelProperty("是否绑卡(1绑定0未绑定)")
+  private Integer binding;
 
 }

@@ -108,6 +108,7 @@ public class AccountController implements IController {
     try {
       Account account = new Account();
       BeanUtils.copyProperties(accountReq, account);
+      account.setStoreCode(accountReq.getDepartmentCode());
       return success(accountService.update(account));
     } catch (BusiException be) {
       return R.fail(be.getMessage());

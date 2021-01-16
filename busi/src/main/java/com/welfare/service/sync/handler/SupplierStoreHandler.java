@@ -74,7 +74,7 @@ public class SupplierStoreHandler {
                 consumeTypeMap = mapper.readValue(
                         supplierStoreDetailDTO.getConsumType(), Map.class);
             } catch (JsonProcessingException e) {
-                throw new BusiException("同步门店信息到商城中心，消费类型转换失败【{supplierStoreDetailDTO.getConsumType()}】");
+                throw new BusiException("同步门店信息到商城中心，消费类型转换失败【"+supplierStoreDetailDTO.getConsumType()+"】");
             }
             listBean.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());

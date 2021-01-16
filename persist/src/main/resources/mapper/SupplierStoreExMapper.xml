@@ -44,7 +44,7 @@
         store_name as storeName,
         consum_type as consumType
         from supplier_store
-        where deleted = 0 and mer_code=#{merCode}
+        where deleted = 0 and consum_type like"%true%" and mer_code=#{merCode}
     </select>
 
     <select id="listUnionMerchant" resultType="com.welfare.persist.entity.SupplierStore">

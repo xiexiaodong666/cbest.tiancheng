@@ -22,5 +22,5 @@ public interface RefundService {
      * @param transNo
      * @return
      */
-    RefundRequest queryByTransNo(String transNo);
+    RefundRequest queryResult(String transNo);
 }

@@ -6,6 +6,7 @@ import com.welfare.persist.dao.AccountChangeEventRecordDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
+import com.welfare.service.AccountChangeEventRecordService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -41,13 +42,14 @@ public class AccountDaoAspect {
         Account accountInDb = accountDao.getById(accountToUpdate.getId());
         BigDecimal balanceToUpdate = accountToUpdate.getAccountBalance();
         BigDecimal balanceInDb = accountInDb.getAccountBalance();
-        if(balanceInDb.compareTo(balanceToUpdate)!=0){
+        if(null != balanceToUpdate && balanceInDb.compareTo(balanceToUpdate)!=0){
             AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
             accountChangeEventRecord.setAccountCode(accountToUpdate.getAccountCode());
             accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
             accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
-            AccountChangeEventRecordDao accountChangeEventRecordDao = SpringBeanUtils.getBean(AccountChangeEventRecordDao.class);
-            accountChangeEventRecordDao.save(accountChangeEventRecord);
+            AccountChangeEventRecordService accountChangeEventRecordService = SpringBeanUtils.getBean(
+                AccountChangeEventRecordService.class);
+            accountChangeEventRecordService.save(accountChangeEventRecord);
         }
     }
 }

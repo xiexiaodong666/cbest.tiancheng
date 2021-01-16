@@ -60,13 +60,14 @@
     a.max_quota AS maxQuota,
     a.surplus_quota AS surplusQuota,
     GROUP_CONCAT(ci.card_id) AS cardId,
-    a.account_balance AS accountBalance
+    a.account_balance AS accountBalance,
+    a.binding
     FROM
     account a
-    INNER JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN department d ON a.store_code = d.department_code
     LEFT JOIN account_type at ON at.type_code = a.account_type_code
     LEFT JOIN card_info ci ON ci.account_code = a.account_code
-    where a.deleted = 0 and d.deleted =0 and at.deleted =0
+    where a.deleted = 0 and a.mer_code = at.mer_code
     <if test=" merCode !='' and merCode != null ">
       and a.mer_code = #{merCode} and at.mer_code = #{merCode}
     </if>
@@ -78,6 +79,9 @@
     </if>
     <if test="accountStatus != null ">
       and a.account_status = #{accountStatus}
+    </if>
+    <if test="binding != null ">
+      and a.binding = #{binding}
     </if>
     <if test=" accountTypeCode !='' and accountTypeCode != null ">
       and at.type_code = #{accountTypeCode}
@@ -103,15 +107,14 @@
 	a.remark
 FROM
 	account a
-	INNER JOIN department d ON a.store_code = d.department_code
-	INNER JOIN merchant m ON a.mer_code = m.mer_code
+	LEFT JOIN department d ON a.store_code = d.department_code
+	LEFT JOIN merchant m ON a.mer_code = m.mer_code
 	LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
 WHERE a.mer_code = at.mer_code
 	and a.deleted = 0
-	AND d.deleted = 0
-	AND AT.deleted = 0
 	AND a.id = #{id}
   </select>
+
 
   <select id="queryAccountBillDetail"
     resultType="com.welfare.persist.dto.AccountBillDetailMapperDTO">
@@ -227,14 +230,12 @@ LIMIT #{size}
     a.remark
     FROM
     account a
-    INNER JOIN department d ON a.store_code = d.department_code
-    INNER JOIN merchant m ON a.mer_code = m.mer_code
+    LEFT JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN merchant m ON a.mer_code = m.mer_code
     LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
     WHERE
     a.mer_code = at.mer_code and
     a.deleted = 0
-    AND d.deleted = 0
-    AND AT.deleted = 0
 
     <if test=" id != null ">
       and a.id = #{id}

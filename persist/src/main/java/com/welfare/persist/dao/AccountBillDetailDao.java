@@ -20,9 +20,10 @@ import java.util.List;
 @Repository
 public class AccountBillDetailDao extends ServiceImpl<AccountBillDetailMapper, AccountBillDetail> {
 
-    public List<AccountBillDetail> queryByTransNo(String transNo) {
+    public List<AccountBillDetail> queryByTransNoAndTransType(String transNo, String transType) {
         QueryWrapper<AccountBillDetail> wrapper = new QueryWrapper<>();
         wrapper.eq(AccountBillDetail.TRANS_NO,transNo);
+        wrapper.eq(AccountBillDetail.TRANS_TYPE,transType);
         return list(wrapper);
     }
 }

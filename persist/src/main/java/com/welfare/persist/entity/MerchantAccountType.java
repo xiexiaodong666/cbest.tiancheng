@@ -63,6 +63,7 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
      */
     @ApiModelProperty("删除标识")
     @TableLogic
+    @TableField(fill = FieldFill.INSERT)
     private Boolean deleted;
     /**
      * 备注

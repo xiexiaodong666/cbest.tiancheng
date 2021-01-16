@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,24 +20,25 @@ import java.util.Date;
 @ApiModel("订单同步实体")
 @Data
 public class SynOrderDto {
-    @ApiModelProperty("订单号")
+    @ApiModelProperty(value = "订单号" , required = true)
     private String orderId;
-    @ApiModelProperty("交易流水号")
-    private String getawayNo;
-    @ApiModelProperty("退款流水号")
-    private String returnGetawayNo;
-    @ApiModelProperty("商品")
+    @ApiModelProperty(value = "交易流水号" , required = true)
+    private String transNo;
+    @ApiModelProperty(value = "退款流水号" , required = false)
+    private String returnTransNo;
+    @ApiModelProperty(value = "商品" , required = false)
     private String goods;
-    @ApiModelProperty("账户")
+    @ApiModelProperty(value = "账户" , required = true)
     private Long accountCode;
-    @ApiModelProperty("卡号")
+    @ApiModelProperty(value = "卡号" , required = false)
     private String cardId;
-    @ApiModelProperty("消费门店")
+    @ApiModelProperty(value = "门店号" , required = true)
     private String storeCode;
-    @ApiModelProperty("消费类型")
+    @ApiModelProperty(value = "交易类型[consume(消费)|refund(退款)]" , required = true)
     private String transType;
-    @ApiModelProperty("消费金额")
+    @ApiModelProperty(value = "交易金额" , required = true)
     private BigDecimal transAmount;
-    @ApiModelProperty("消费时间")
+    @ApiModelProperty(value = "交易时间[yyyy-MM-dd HH:mm:ss]" , required = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private Date transTime;
 }

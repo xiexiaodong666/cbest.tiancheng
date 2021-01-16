@@ -124,7 +124,6 @@ public class OrderController implements IController {
 
     private void beanCopy(OrderInfo orderInfo , OrderRespDto orderRespDto){
         BeanUtils.copyProperties(orderInfo , orderRespDto);
-//        orderRespDto.setOrderTime(orderInfo.getOrderTime());
         orderRespDto.setOrderAmount(orderInfo.getOrderAmount().toPlainString());
     }
 

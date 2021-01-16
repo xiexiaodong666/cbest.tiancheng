@@ -102,7 +102,7 @@ public class AccountServiceImpl implements AccountService {
     IPage<AccountPageDTO> iPage = accountCustomizeMapper
         .queryPageDTO(page, accountPageReq.getMerCode(), accountPageReq.getAccountName(),
             accountPageReq.getDepartmentCode(), accountPageReq.getAccountStatus(),
-            accountPageReq.getAccountTypeCode());
+            accountPageReq.getAccountTypeCode(),accountPageReq.getBinding());
     return accountConverter.toPage(iPage);
   }
 
@@ -124,7 +124,7 @@ public class AccountServiceImpl implements AccountService {
     List<AccountPageDTO> list = accountCustomizeMapper
         .queryPageDTO(accountPageReq.getMerCode(), accountPageReq.getAccountName(),
             accountPageReq.getDepartmentCode(), accountPageReq.getAccountStatus(),
-            accountPageReq.getAccountTypeCode());
+            accountPageReq.getAccountTypeCode(),accountPageReq.getBinding());
     return accountConverter.toAccountDTOList(list);
   }
 

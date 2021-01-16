@@ -2,6 +2,7 @@ package com.welfare.persist.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import lombok.Data;
 
@@ -24,5 +25,5 @@ public class AccountPageDTO {
   private BigDecimal surplusQuota;
   private String cardId;
   private BigDecimal accountBalance;
-  private Integer active;
+  private Integer binding;
 }

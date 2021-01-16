@@ -33,9 +33,9 @@ public class StorePageReq {
     private String source;
 
     /**
-     * 来源
+     * 门店编码
      */
-    @ApiModelProperty("来源")
+    @ApiModelProperty("门店编码")
     private Set<String> storeCodes;
 
 

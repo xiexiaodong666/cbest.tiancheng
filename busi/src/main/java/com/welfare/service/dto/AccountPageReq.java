@@ -39,4 +39,10 @@ public class AccountPageReq implements Serializable {
    */
   @ApiModelProperty("员工类型编码")
   private  String accountTypeCode;
+
+  /**
+   * 是否绑卡
+   */
+  @ApiModelProperty("是否绑卡")
+  private Integer binding;
 }

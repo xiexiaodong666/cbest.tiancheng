@@ -21,13 +21,15 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("accountName")String accountName,
       @Param("departmentCode")String  departmentCode,
       @Param("accountStatus")Integer accountStatus,
-      @Param("accountTypeCode")String accountTypeCode);
+      @Param("accountTypeCode")String accountTypeCode,
+      @Param("binding") Integer binding);
 
   List<AccountPageDTO> queryPageDTO(@Param("merCode") String merCode,
       @Param("accountName")String accountName,
       @Param("departmentCode")String  departmentCode,
       @Param("accountStatus")Integer accountStatus,
-      @Param("accountTypeCode")String accountTypeCode);
+      @Param("accountTypeCode")String accountTypeCode,
+      @Param("binding") Integer binding);
 
   AccountDetailMapperDTO queryDetail(@Param("id") Long id);
 

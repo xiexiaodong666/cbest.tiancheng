@@ -32,7 +32,7 @@ spring:
     servers: 192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667
     topic: order_info
     group-id: welfare
-    offset: latest
+    offset: earliest
 logging:
   file:
     path: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest
@@ -81,6 +81,3 @@ pos:
 
 cdn:
   server: http://img-test.sjgo365.com
-kafka:
-  consumer:
-    topic: order_info

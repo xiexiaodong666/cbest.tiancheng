@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import springfox.documentation.spring.web.json.Json;
 
 import java.math.BigDecimal;
@@ -348,6 +349,7 @@ public class OrderServiceImpl implements OrderService {
         return orderInfoList;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void syncOrderData() {
         //获取所有商户数据
@@ -537,11 +539,12 @@ public class OrderServiceImpl implements OrderService {
                     boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
                     log.info("kafka明细结算数据保存到数据库{}条{}" , settleDetailList.size() , flag == true? "成功" : "失败");
                     consumer.commitAsync();
+                    break;
                 }
             }
         }catch (Exception ex){
             log.error("解析小票异常:" ,ex);
-            consumer.commitAsync();
+            throw ex;
         }finally {
             consumer.close();
         }

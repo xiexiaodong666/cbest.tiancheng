@@ -37,7 +37,7 @@ public class MerInfoController {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/page")
     public R<Page<SettleMerTransDetailResp>> getAccountTransDetail(SettleMerInfoResp settleMerInfoResp){
         Page<SettleMerTransDetailResp> settleAccountTransDetailRespPage = settleDetailService.getAccountTransDetail(1l);
         return R.success(settleAccountTransDetailRespPage);

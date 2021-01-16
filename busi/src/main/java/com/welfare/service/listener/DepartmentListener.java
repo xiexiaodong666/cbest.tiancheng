@@ -52,7 +52,7 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
   public void invoke(DepartmentImportDTO departmentImportDTO, AnalysisContext analysisContext) {
     Department department = new Department();
     BeanUtils.copyProperties(departmentImportDTO, department);
-    Integer row=analysisContext.readRowHolder().getRowIndex();
+    Integer row=analysisContext.readRowHolder().getRowIndex()+1;
     if(EmptyChecker.isEmpty(departmentImportDTO.getMerCode())){
       uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空").append(";");
     }
@@ -62,7 +62,7 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
     if(EmptyChecker.isEmpty(departmentImportDTO.getDepartmentName())){
       uploadInfo.append("第").append(row.toString()).append("行").append("机构名称不能为空").append(";");
     }
-    if(EmptyChecker.isEmpty(departmentImportDTO.getDepartmentName())){
+    if(EmptyChecker.isEmpty(departmentImportDTO.getDepartmentType())){
       uploadInfo.append("第").append(row.toString()).append("行").append("机构类型不能为空").append(";");
     }
     String type=DepartmentTypeEnum.getTypeByExcelType(departmentImportDTO.getDepartmentType());

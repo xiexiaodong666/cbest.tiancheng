@@ -59,7 +59,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     BeanUtils.copyProperties(storeImportDTO, store);
     store.setStatus(0);
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
-    Integer row=analysisContext.readRowHolder().getRowIndex();
+    Integer row=analysisContext.readRowHolder().getRowIndex()+1;
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
       uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空").append(";");
     }

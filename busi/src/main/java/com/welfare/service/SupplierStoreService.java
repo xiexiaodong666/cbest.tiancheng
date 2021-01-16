@@ -13,6 +13,7 @@ import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreListReq;
 import com.welfare.service.dto.SupplierStoreTreeDTO;
 import com.welfare.service.dto.SupplierStoreUpdateDTO;
+import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public interface SupplierStoreService {
      */
     Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req);
     List<SupplierStore> list(SupplierStoreListReq req);
-    List<SupplierStoreTreeDTO> tree(String merCode);
+    List<SupplierStoreTreeDTO> tree(String merCode , String source);
 
     /**
      * 查询供应商门店详情

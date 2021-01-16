@@ -26,19 +26,6 @@ public class StorePageReq {
     @ApiModelProperty("门店状态")
     private Integer status;
 
-    /**
-     * 来源
-     */
-    @ApiModelProperty("来源")
-    private String source;
-
-    /**
-     * 门店编码
-     */
-    @ApiModelProperty("门店编码")
-    private Set<String> storeCodes;
-
-
     @ApiModelProperty("开始时间")
     private Date startTime;
 

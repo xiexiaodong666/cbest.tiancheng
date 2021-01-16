@@ -51,21 +51,17 @@ public enum ConsumeTypeEnum {
     this.desc = desc;
     this.excelType=excelType;
   }
-  public   final static Map<String,Boolean> defaultMap=Stream
-          .of(DepartmentTypeEnum.values()).collect(Collectors
-                  .toMap(DepartmentTypeEnum::getType,
-                          item->Boolean.FALSE));
 
-  private final static Map<String, DepartmentTypeEnum> ENUM_MAP = Stream
-          .of(DepartmentTypeEnum.values()).collect(Collectors
-                  .toMap(DepartmentTypeEnum::getType,
+  private final static Map<String, ConsumeTypeEnum> ENUM_MAP = Stream
+          .of(ConsumeTypeEnum.values()).collect(Collectors
+                  .toMap(ConsumeTypeEnum::getCode,
                           e -> e));
   private final static Map<String, String> TYPE_MAP = Stream
-          .of(DepartmentTypeEnum.values()).collect(Collectors
-                  .toMap(DepartmentTypeEnum::getExcelType,
-                          DepartmentTypeEnum::getType));
+          .of(ConsumeTypeEnum.values()).collect(Collectors
+                  .toMap(ConsumeTypeEnum::getExcelType,
+                          ConsumeTypeEnum::getCode));
 
-  public static DepartmentTypeEnum getByType(String type) {
+  public static ConsumeTypeEnum getByType(String type) {
     return ENUM_MAP.get(type);
   }
 

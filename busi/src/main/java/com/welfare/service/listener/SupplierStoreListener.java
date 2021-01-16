@@ -2,7 +2,10 @@ package com.welfare.service.listener;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
@@ -22,6 +25,7 @@ import org.springframework.util.StringUtils;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -55,18 +59,23 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     store.setStatus(0);
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
     if(EmptyChecker.isEmpty(storeImportDTO.getConsumType())){
-      uploadInfo.append(storeImportDTO.getStoreCode()).append("消费类型不能为空");
+      uploadInfo.append(storeImportDTO.getStoreCode()).append("消费类型不能为空").append(";");
     }
     List<String> consumTypes=Arrays.asList(storeImportDTO.getConsumType().split(","));
     if(excelAllType.containsAll(consumTypes)){
-      uploadInfo.append(storeImportDTO.getStoreCode()).append("未输入正确的消费类型");
+      uploadInfo.append(storeImportDTO.getStoreCode()).append("未输入正确的消费类型").append(";");
     }
-    if((consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
-            ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode()))
-            &&EmptyChecker.isEmpty(storeImportDTO.getCasherNo())){
-      uploadInfo.append(storeImportDTO.getStoreCode()).append("线上商城或者O2O必须输入虚拟收银机号");
+    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
+            ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
+      if(EmptyChecker.isEmpty(storeImportDTO.getCasherNo())){
+        uploadInfo.append(storeImportDTO.getStoreCode()).append("线上商城或者O2O必须输入虚拟收银机号").append(";");
+      }
+    }else{
+      if(EmptyChecker.notEmpty(storeImportDTO.getCasherNo())){
+        uploadInfo.append(storeImportDTO.getStoreCode()).append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
+      }
     }
-    store.setConsumType(ConsumeTypesUtils.transferStr(ConsumeTypesUtils.transferWithExcel(consumTypes)));
+    store.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transferWithExcel(consumTypes)));
     store.setStoreParent(store.getMerCode());
     list.add(store);
     merCodeList.add(store.getMerCode());
@@ -78,7 +87,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
     if (!CollectionUtils.isEmpty(list)) {
       boolean flag = check();
-      if(flag){
+      if(flag&&EmptyChecker.notEmpty(uploadInfo)){
         Boolean result = storeService.batchAdd(list);
         if (result == false) {
           uploadInfo.append("入库失败");

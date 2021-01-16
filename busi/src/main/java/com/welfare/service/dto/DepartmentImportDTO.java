@@ -19,12 +19,6 @@ import lombok.NoArgsConstructor;
 @ApiModel("商户部门")
 public class DepartmentImportDTO {
 
-    /**
-     * 部门名称
-     */
-    @ApiModelProperty("部门名称")
-    @ExcelProperty(value = "机构名称", index = 2)
-    private String departmentName;
     @ApiModelProperty("商户代码")
     @ExcelProperty(value = "商户代码", index = 0)
     private String merCode;
@@ -35,11 +29,20 @@ public class DepartmentImportDTO {
     @ExcelProperty(value = "上级机构代码", index = 1)
     private String departmentParent;
     /**
+     * 部门名称
+     */
+    @ApiModelProperty("部门名称")
+    @ExcelProperty(value = "机构名称", index = 2)
+    private String departmentName;
+    /**
      * 部门类型
      */
     @ApiModelProperty("部门类型")
     @ExcelProperty(value = "机构类型", index = 3)
     private String departmentType;
+
+
+
 
 
 }

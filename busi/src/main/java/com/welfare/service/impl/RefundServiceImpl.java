@@ -18,6 +18,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -50,9 +51,13 @@ public class RefundServiceImpl implements RefundService {
     private final MerchantCreditService merchantCreditService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void handleRefundRequest(RefundRequest refundRequest) {
         String originalTransNo = refundRequest.getOriginalTransNo();
-        List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao.queryByTransNo(originalTransNo);
+        List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao.queryByTransNoAndTransType(
+                originalTransNo,
+                WelfareConstant.TransType.CONSUME.code()
+        );
         Assert.isTrue(!CollectionUtils.isEmpty(accountDeductionDetails), "未找到正向支付流水");
         AccountDeductionDetail first = accountDeductionDetails.get(0);
         Account account = accountService.getByAccountCode(first.getAccountCode());
@@ -90,6 +95,10 @@ public class RefundServiceImpl implements RefundService {
         } finally {
             accountLock.unlock();
         }
+        refundRequest.setAccountBalance(account.getAccountBalance());
+        refundRequest.setAccountCredit(account.getSurplusQuota());
+        refundRequest.setAccountCode(account.getAccountCode());
+        refundRequest.setAccountName(account.getAccountName());
     }
 
     private void operateMerchantCredit(Account account, AccountDeductionDetail refundDeductionDetail) {
@@ -106,8 +115,29 @@ public class RefundServiceImpl implements RefundService {
     }
 
     @Override
-    public RefundRequest queryByTransNo(String transNo) {
-        return null;
+    public RefundRequest queryResult(String transNo) {
+        List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao.queryByTransNoAndTransType(
+                transNo,
+                WelfareConstant.TransType.REFUND.code());
+        RefundRequest refundRequest = new RefundRequest();
+        refundRequest.setTransNo(transNo);
+        if (CollectionUtils.isEmpty(accountDeductionDetails)) {
+            refundRequest.setRefundStatus(WelfareConstant.AsyncStatus.FAILED.code());
+        } else {
+            AccountDeductionDetail detail = accountDeductionDetails.get(0);
+            refundRequest.setRefundStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            refundRequest.setRefundDate(detail.getTransTime());
+            refundRequest.setOriginalTransNo(detail.getRelatedTransNo());
+            BigDecimal amount = accountDeductionDetails.stream()
+                    .map(AccountDeductionDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            refundRequest.setAmount(amount);
+            Account account = accountService.getByAccountCode(detail.getAccountCode());
+            refundRequest.setAccountBalance(account.getAccountBalance());
+            refundRequest.setAccountCredit(account.getSurplusQuota());
+            refundRequest.setAccountCode(account.getAccountCode());
+            refundRequest.setAccountName(account.getAccountName());
+        }
+        return refundRequest;
     }
 
     private void saveDetails(List<RefundOperation> refundOperations,

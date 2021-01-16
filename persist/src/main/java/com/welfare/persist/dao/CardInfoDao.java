@@ -1,5 +1,6 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.mapper.CardInfoMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,5 +17,9 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class CardInfoDao extends ServiceImpl<CardInfoMapper, CardInfo> {
-
+    public CardInfo getOneByMagneticStripe(String magneticStripe){
+        QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(CardInfo.MAGNETIC_STRIPE,magneticStripe);
+        return getOne(queryWrapper);
+    }
 }

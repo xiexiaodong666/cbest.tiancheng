@@ -1,6 +1,5 @@
 package com.welfare.serviceaccount.controller;
 
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.PaymentService;
 import com.welfare.service.RefundService;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
@@ -13,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
-import net.dreamlu.mica.core.utils.BeanUtil;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * Description:
@@ -73,7 +69,7 @@ public class PaymentController implements IController {
     @GetMapping("/refund")
     @ApiOperation("查询退款结果")
     public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
-        RefundRequest refundRequest = refundService.queryByTransNo(transNo);
+        RefundRequest refundRequest = refundService.queryResult(transNo);
         return success(refundRequest);
     }
 

@@ -183,7 +183,7 @@ public class MerchantServiceImpl implements MerchantService {
     @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantUpdateDTO merchant) {
         Merchant update=buildEntity(merchant);
-        boolean flag= merchantDao.updateById(update);
+        boolean flag= 1==merchantDao.updateAllColumnById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
         //同步商城中台
         List<MerchantSyncDTO> syncList=new ArrayList<>();

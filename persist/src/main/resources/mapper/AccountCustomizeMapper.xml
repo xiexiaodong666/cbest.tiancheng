@@ -51,6 +51,8 @@
   <select id="queryPageDTO" resultType="com.welfare.persist.dto.AccountPageDTO">
     SELECT
     a.id,
+    m.mer_name as merName,
+    m.mer_code as merCode,
     a.account_name AS accountName,
     a.account_code AS accountCode,
     a.account_status AS accountStatus,
@@ -64,6 +66,7 @@
     a.binding
     FROM
     account a
+    left JOIN merchant m on a.mer_code = m.mer_code
     LEFT JOIN department d ON a.store_code = d.department_code
     LEFT JOIN account_type at ON at.type_code = a.account_type_code
     LEFT JOIN card_info ci ON ci.account_code = a.account_code

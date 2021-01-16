@@ -15,13 +15,13 @@ public class ConsumeTypeJson implements Serializable {
   private Boolean shopShopping;
   public static final  String O2O ="O2O";
   public static final  String ONLINE_MALL ="ONLINE_MALL";
-  public static final  String SHOP_SHOPPING ="SHOP_SHOPPING";
+  public static final  String SHOP_CONSUMPTION ="SHOP_CONSUMPTION";
   public boolean getType(String type){
     if( type.equals(O2O ) ){
       return o2o.booleanValue();
     }else if (type.equals(ONLINE_MALL )){
       return onlineMall.booleanValue();
-    }else if(type.equals(SHOP_SHOPPING)){
+    }else if(type.equals(SHOP_CONSUMPTION)){
       return shopShopping.booleanValue();
     }
     return false;

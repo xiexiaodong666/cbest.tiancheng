@@ -7,15 +7,13 @@ import com.welfare.common.base.BasePageVo;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.ExcelUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.*;
-import com.welfare.service.remote.entity.PlatformUser;
-import com.welfare.service.utils.FileUploadService;
 import com.welfare.servicesettlement.task.SettlementBillBuildTask;
 import com.welfare.servicesettlement.task.SettlementDetailDealTask;
+import com.welfare.servicesettlement.util.FileUploadServiceUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +52,7 @@ public class MonthSettleController implements IController {
     @Autowired
     private SettlementDetailDealTask settlementDetailDealTask;
     @Autowired
-    private FileUploadService fileUploadService;
+    private FileUploadServiceUtil fileUploadService;
 
 
 

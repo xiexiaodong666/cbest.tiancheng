@@ -14,6 +14,7 @@ import com.welfare.service.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,9 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Autowired
     private MonthSettleMapper monthSettleMapper;
+
+    @Value("${pos.onlines:1001}")
+    private String posOnlines;
 
 
     @Override
@@ -70,6 +74,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     public BasePageVo<WelfareSettleDetailResp> queryWelfareSettleDetailPage(WelfareSettleDetailPageReq welfareSettleDetailPageReq) {
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailPageReq, welfareSettleDetailQuery);
+        welfareSettleDetailQuery.setPosOnlines(posOnlines);
 
         PageInfo<WelfareSettleDetailResp> welfareSettleDetailRespPageInfo = PageHelper.startPage(welfareSettleDetailPageReq.getCurrent(), welfareSettleDetailPageReq.getSize())
                 .doSelectPageInfo(() -> {
@@ -92,6 +97,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     public Map<String, Object> queryWelfareSettleDetailExt(WelfareSettleDetailPageReq welfareSettleDetailPageReq) {
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailPageReq, welfareSettleDetailQuery);
+        welfareSettleDetailQuery.setPosOnlines(posOnlines);
         Map<String, Object> extInfo = settleDetailMapper.getSettleDetailExtInfo(welfareSettleDetailQuery);
         return extInfo;
     }

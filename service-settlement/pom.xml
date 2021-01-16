@@ -2,88 +2,105 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<parent>
-    <artifactId>e-welfare</artifactId>
+    <parent>
+        <artifactId>e-welfare</artifactId>
+        <groupId>e-welfare</groupId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
     <groupId>e-welfare</groupId>
+
+    <artifactId>service-settlement</artifactId>
     <version>1.0</version>
-    <relativePath>../pom.xml</relativePath>
-</parent>
-<modelVersion>4.0.0</modelVersion>
+    <!--本地私服地址-->
+    <repositories>
+        <repository>
+            <id>public</id>
+            <url>http://172.30.37.60:8081/repository/maven-public/</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>e-welfare</groupId>
+            <artifactId>busi</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>e-welfare</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-<artifactId>service-settlement</artifactId>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
 
-<dependencies>
-    <dependency>
-        <groupId>e-welfare</groupId>
-        <artifactId>busi</artifactId>
-        <version>1.0</version>
-    </dependency>
-    <dependency>
-        <groupId>e-welfare</groupId>
-        <artifactId>common</artifactId>
-        <version>1.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-boot</artifactId>
+            <version>${mica-boot.version}</version>
+        </dependency>
 
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cbest.boot</groupId>
+            <artifactId>oss-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
 
-    <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>com.github.xiaoymin</groupId>
-        <artifactId>knife4j-spring-boot-starter</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>net.dreamlu</groupId>
-        <artifactId>mica-boot</artifactId>
-        <version>${mica-boot.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-commons</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct</artifactId>
-        <version>${mapstruct.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct-processor</artifactId>
-        <version>${mapstruct.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.xuxueli</groupId>
-        <artifactId>xxl-job-core</artifactId>
-        <version>1.9.2</version>
-    </dependency>
-    <dependency>
-        <groupId>io.prestosql</groupId>
-        <artifactId>presto-jdbc</artifactId>
-        <version>330</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-redis</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.kafka</groupId>
-        <artifactId>spring-kafka</artifactId>
-    </dependency>
-</dependencies>
+        <!--feign-->
+        <dependency>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jsr305</artifactId>
+                    <groupId>com.google.code.findbugs</groupId>
+                </exclusion>
+            </exclusions>
+            <groupId>org.springframework.cloud</groupId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-httpclient</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.prestosql</groupId>
+            <artifactId>presto-jdbc</artifactId>
+            <version>330</version>
+        </dependency>
+
+    </dependencies>
 
     <build>
         <finalName>e-welfare-settlement</finalName>

@@ -53,7 +53,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     private final SettleDetailMapper settleDetailMapper;
     @Autowired
     private final MonthSettleDao monthSettleDao;
-    @Value("${pos.onlines}")
+    @Value("${pos.onlines:1001}")
     private String posOnlines;
 
 

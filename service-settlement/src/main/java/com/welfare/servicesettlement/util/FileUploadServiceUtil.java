@@ -1,4 +1,4 @@
-package com.welfare.service.utils;
+package com.welfare.servicesettlement.util;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class FileUploadService {
+public class FileUploadServiceUtil {
 
   @Value("${cdn.server}")
   private String cdnServerAddress;

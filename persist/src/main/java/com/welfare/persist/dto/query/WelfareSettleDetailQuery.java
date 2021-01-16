@@ -48,4 +48,6 @@ public class WelfareSettleDetailQuery {
     private Long minId;
 
     private Integer limit;
+
+    private String posOnlines;
 }

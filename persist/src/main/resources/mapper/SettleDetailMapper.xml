@@ -352,28 +352,24 @@
         group by t1.mer_code
     </select>
 
-    <select id="getSettleDetailInfo" resultMap="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
+    <select id="getSettleDetailInfo" resultType="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
         select
-        t1.id,
-        t1.trans_no,
-        t1.order_id as order_no,
-        t1.trans_time,
-        t1.store_code,
-        t1.store_name,
-        t1.mer_code,
-        t1.mer_name,
+        t1.id as id,
+        t1.trans_no as transNo,
+        t1.order_id as orderNO,
+        t1.trans_time as transTime,
+        t1.store_code as storeCode,
+        t1.store_name as storeName,
+        t1.mer_code as merCode,
+        t1.mer_name as  merName,
         case when t3.mer_code = t1.mer_code then '自营'
         when locate(t1.pos,${posOnlines})>0 then '第三方线上'
         else '第三方线下' end as type,
-        t1.mer_account_type as welfare_type_code,
-        t1.mer_account_type_name as welfare_type_name,
+        t1.mer_account_type as welfareTypeCode,
+        t1.mer_account_type_name as welfareTypeName,
         case when t1.trans_type='consume' then t1.trans_amount
-        when t1.trans_type='refund' then 0 end as pay_amount,
-        case when t1.trans_type='consume' then 0
-        when t1.trans_type='refund' then t1.trans_amount end as refund_amount,
-        case when t1.trans_type='consume' then t1.trans_amount
-        when t1.trans_type='refund' then 0 end as real_amount,
-        t1.trans_amount*t2.rebate_ratio as settle_amount
+             when t1.trans_type='refund' then 0 end as payAmount,
+        t1.trans_amount*t2.rebate_ratio as settleAmount
         from settle_detail t1
         left join merchant_store_relation t2
         on t1.mer_code = t2.mer_code and t1.store_code = t2.store_code and t2.status=0

@@ -25,6 +25,20 @@ public class SupplierStoreImportDTO {
     @ApiModelProperty("商户代码")
     @ExcelProperty(value = "所属商户代码", index = 2)
     private String merCode;
+
+    /**
+     * 虚拟收银机号
+     */
+    @ApiModelProperty("虚拟收银机号")
+    @ExcelProperty(value = "虚拟收银机号", index = 4)
+    private String casherNo;
+
+    /**
+     * 门店消费类型
+     */
+    @ApiModelProperty("门店消费类型")
+    @ExcelProperty(value = "门店消费类型", index =3)
+    private String consumType;
     /**
      * 门店代码
      */

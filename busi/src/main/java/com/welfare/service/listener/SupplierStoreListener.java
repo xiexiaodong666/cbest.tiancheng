@@ -3,6 +3,8 @@ package com.welfare.service.listener;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.SupplierStore;
@@ -17,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +36,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private List<SupplierStore> list = new LinkedList();
   private List<String> merCodeList = new LinkedList();
   private List<String> storeCodeList = new LinkedList();
+  private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getCode(),ConsumeTypeEnum.ONLINE_MALL.getCode(),ConsumeTypeEnum.SHOP_SHOPPING.getCode()});
 
 
   private final MerchantService merchantService;
@@ -50,7 +54,19 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     BeanUtils.copyProperties(storeImportDTO, store);
     store.setStatus(0);
     store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
-    store.setConsumType(defaultConsumType);
+    if(EmptyChecker.isEmpty(storeImportDTO.getConsumType())){
+      uploadInfo.append(storeImportDTO.getStoreCode()).append("消费类型不能为空");
+    }
+    List<String> consumTypes=Arrays.asList(storeImportDTO.getConsumType().split(","));
+    if(excelAllType.containsAll(consumTypes)){
+      uploadInfo.append(storeImportDTO.getStoreCode()).append("未输入正确的消费类型");
+    }
+    if((consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
+            ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode()))
+            &&EmptyChecker.isEmpty(storeImportDTO.getCasherNo())){
+      uploadInfo.append(storeImportDTO.getStoreCode()).append("线上商城或者O2O必须输入虚拟收银机号");
+    }
+    store.setConsumType(ConsumeTypesUtils.transferStr(ConsumeTypesUtils.transferWithExcel(consumTypes)));
     store.setStoreParent(store.getMerCode());
     list.add(store);
     merCodeList.add(store.getMerCode());

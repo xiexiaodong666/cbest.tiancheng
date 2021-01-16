@@ -3,9 +3,10 @@ package com.welfare.common.util;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -55,10 +56,24 @@ public class ConsumeTypesUtils {
 
 
   public static Map<String, Boolean> transfer(String str) {
-    List<String> list = Arrays.asList(str.split(str));
-    Map<String, Boolean> map = new HashMap<>();
+    List<String> list = Arrays.asList(str.split(","));
+    Map<String, Boolean> map = ConsumeTypeEnum.defaultMap;
+    Set<String> keys=map.keySet();
     for (String s : list) {
-      map.put(s, Boolean.TRUE);
+      if(keys.contains(s)){
+        map.put(s,Boolean.TRUE);
+      }
+    }
+    return map;
+  }
+
+  public static Map<String, Boolean> transferWithExcel(List<String> list) {
+    Map<String, Boolean> map = ConsumeTypeEnum.defaultMap;
+    Set<String> keys=map.keySet();
+    for (String s : list) {
+      if(keys.contains(ConsumeTypeEnum.getTypeByExcelType(s))){
+        map.put(s,Boolean.TRUE);
+      }
     }
     return map;
   }

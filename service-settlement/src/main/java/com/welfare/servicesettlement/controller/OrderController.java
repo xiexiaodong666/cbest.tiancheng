@@ -1,6 +1,7 @@
 package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.util.MerchantUserHolder;
@@ -47,6 +48,7 @@ public class OrderController implements IController {
     @Autowired
     private OrderService orderService;
 
+    @ApiUser
     @MerchantUser
     @ApiOperation("分页查看线下订单")
     @GetMapping("page")
@@ -96,6 +98,7 @@ public class OrderController implements IController {
     }
 
 
+    @ApiUser
     @MerchantUser
     @ApiOperation("查询所有线下订单")
     @GetMapping("select/list")

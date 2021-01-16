@@ -154,7 +154,7 @@
             #{item.storeName},#{item.accountCode},#{item.accountName},#{item.cardId},
             #{item.orderAmount},#{item.orderTime},#{item.payCode},#{item.payName},
             #{item.transType},#{item.transTypeName},
-            #{item.createUser},#{item.createTime}
+            "system",now()
             )
         </foreach>
         ON DUPLICATE KEY UPDATE

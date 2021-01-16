@@ -54,6 +54,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
         try {
             MerchantUserHolder.release();
             UserInfoHolder.release();
+            AccountUserHolder.release();
         } catch (Exception e) {
             log.error("MerchantUserHolder.release error.", e);
         }

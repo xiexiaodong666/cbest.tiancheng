@@ -1,5 +1,7 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.common.annotation.AccountUser;
+import com.welfare.common.util.AccountUserHolder;
 import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
 import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
 import com.welfare.service.AccountBillDetailService;
@@ -28,9 +30,11 @@ public class AccountBillDetailController implements IController {
     private final AccountBillDetailService accountBillDetailService;
 
     @ApiOperation("账单列表")
-    @GetMapping("/billList/{accountCode}")
-    public R<List<AccountBillDetailSimpleDTO>> queryAccountBillDetailSimpleList(
+    @GetMapping("/billList")
+    @AccountUser
+    public R<List<AccountBillDetailSimpleDTO>> billList(
         AccountBillDetailSimpleReq req) {
+        req.setAccountCode(AccountUserHolder.getAccountUser().getAccountCode());
         return success(accountBillDetailService.queryAccountBillDetailSimpleList(req));
     }
 }

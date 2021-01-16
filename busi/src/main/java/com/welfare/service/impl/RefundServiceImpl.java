@@ -30,7 +30,7 @@ import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPE
 import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
 
 /**
- * Description:
+ * Description: 退款
  *
  * @author Yuxiang Li
  * @email yuxiang.li@sjgo365.com
@@ -56,12 +56,11 @@ public class RefundServiceImpl implements RefundService {
         Assert.isTrue(!CollectionUtils.isEmpty(accountDeductionDetails), "未找到正向支付流水");
         AccountDeductionDetail first = accountDeductionDetails.get(0);
         Account account = accountService.getByAccountCode(first.getAccountCode());
-        List<AccountBillDetail> accountBillDetails = accountBillDetailDao.queryByTransNo(originalTransNo);
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByAccountCode(account.getAccountCode());
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         merAccountLock.lock();
         try {
-            refund(refundRequest, accountDeductionDetails, account, accountBillDetails, accountAmountTypes);
+            refund(refundRequest, accountDeductionDetails, account, accountAmountTypes);
         } finally {
             merAccountLock.unlock();
         }
@@ -70,7 +69,6 @@ public class RefundServiceImpl implements RefundService {
     private void refund(RefundRequest refundRequest,
                         List<AccountDeductionDetail> accountDeductionDetails,
                         Account account,
-                        List<AccountBillDetail> accountBillDetails,
                         List<AccountAmountType> accountAmountTypes) {
         String lockKey = "account:" + account.getAccountCode();
         RLock accountLock = redissonClient.getFairLock(lockKey);
@@ -96,7 +94,7 @@ public class RefundServiceImpl implements RefundService {
 
     private void operateMerchantCredit(Account account, AccountDeductionDetail refundDeductionDetail) {
         if (refundDeductionDetail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SELF.code())) {
-            //自主余额不需要操作商户账户
+            //自主充值余额不需要操作商户账户
             return;
         }
         merchantCreditService.increaseAccountType(

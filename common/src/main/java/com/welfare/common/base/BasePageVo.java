@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,5 +21,16 @@ public class BasePageVo<T> extends Page<T> {
 
     public BasePageVo(long current, long size, long total){
         super(current, size, total);
+    }
+
+    public BasePageVo(long current, long size, long total, List<T> record){
+        super(current, size, total);
+        this.setRecords(record);
+    }
+
+    public BasePageVo(long current, long size, long total, List<T> record, Map<String, Object> ext){
+        super(current, size, total);
+        this.setRecords(record);
+        this.setExt(ext);
     }
 }

@@ -1,12 +1,19 @@
 package com.welfare.servicesettlement.controller;
 
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
+import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ExcelUtil;
+import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.entity.MonthSettle;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.*;
+import com.welfare.service.remote.entity.PlatformUser;
+import com.welfare.service.utils.FileUploadService;
 import com.welfare.servicesettlement.task.SettlementBillBuildTask;
 import com.welfare.servicesettlement.task.SettlementDetailDealTask;
 import io.swagger.annotations.Api;
@@ -24,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static net.dreamlu.mica.core.result.R.success;
 
 /**
  * @author qiang.deng
@@ -44,11 +53,21 @@ public class MonthSettleController implements IController {
     private SettlementBillBuildTask settlementBillBuildTask;
     @Autowired
     private SettlementDetailDealTask settlementDetailDealTask;
+    @Autowired
+    private FileUploadService fileUploadService;
+
 
 
     @GetMapping("/page")
     @ApiOperation("分页查询结算账单列表")
     public R<BasePageVo<MonthSettleResp>> pageQuery(MonthSettlePageReq monthSettleReqDto){
+
+        //商户用户只能查询本商户数据
+        MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
+        if(merchantUser!=null && StringUtils.isEmpty(merchantUser.getMerchantCode())){
+            monthSettleReqDto.setMerCode(merchantUser.getMerchantCode());
+        }
+
         BasePageVo<MonthSettleResp> monthSettleRespDtoPage =  monthSettleService.pageQuery(monthSettleReqDto);
         return success(monthSettleRespDtoPage);
     }
@@ -56,22 +75,21 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/{id}")
     @ApiOperation("分页查询结算账单明细列表")
-    public R<Page<MonthSettleDetailResp>> pageQueryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailPageReq monthSettleDetailReq){
+    public R<Page<MonthSettleDetailResp>> pageQueryMonthSettleDetail(@PathVariable("id")Long id, MonthSettleDetailPageReq monthSettleDetailReq){
+
+        authMerchant(id);
+
         Page<MonthSettleDetailResp>  monthSettleDetailRespDtoPage=  monthSettleService.pageQueryMonthSettleDetail(id, monthSettleDetailReq);
         return success(monthSettleDetailRespDtoPage);
-    }
-
-    @GetMapping("/{id}/detailList")
-    @ApiOperation("查询结算账单明细列表")
-    public R<List<MonthSettleDetailResp>> queryMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq){
-        List<MonthSettleDetailResp> monthSettleDetailResps =  monthSettleService.queryMonthSettleDetailLimit(id, monthSettleDetailReq);
-        return success(monthSettleDetailResps);
     }
 
 
     @GetMapping("/{id}/export")
     @ApiOperation("结算账单明细导出")
-    public void exportMonthSettleDetail(@PathVariable("id")String id, MonthSettleDetailReq monthSettleDetailReq, HttpServletResponse response){
+    public Object exportMonthSettleDetail(@PathVariable("id")Long id, MonthSettleDetailReq monthSettleDetailReq, HttpServletResponse response){
+
+        authMerchant(id);
+
         List<MonthSettleDetailResp> monthSettleDetailResps = new ArrayList<>();
         List<MonthSettleDetailResp> monthSettleDetailRespsTemp;
         do {
@@ -84,18 +102,21 @@ public class MonthSettleController implements IController {
             }
         }while(true);
 
+        String path = null;
         try {
-            ExcelUtil.export(response, "结算账单明细", "结算账单明细", monthSettleDetailResps, MonthSettleDetailResp.class );
+            path = fileUploadService.uploadExcelFile(
+                    monthSettleDetailResps, MonthSettleDetailResp.class, "结算账单明细");
         } catch (IOException e) {
             throw new BusiException(null, "文件导出异常", null);
         }
+        return success(path);
     }
 
 
 
     @PutMapping("/{id}/send")
     @ApiOperation("平台发送账单")
-    public R monthSettleSend(@PathVariable("id")String id){
+    public R monthSettleSend(@PathVariable("id")Long id){
         Integer count = monthSettleService.monthSettleSend(id);
         return count == 1 ? R.success():R.fail("操作失败");
 
@@ -103,7 +124,7 @@ public class MonthSettleController implements IController {
 
     @PutMapping("/{id}/confirm")
     @ApiOperation("商户确认账单")
-    public R monthSettleConfirm(@PathVariable("id")String id){
+    public R monthSettleConfirm(@PathVariable("id")Long id){
         Integer count = monthSettleService.monthSettleConfirm(id);
         return count == 1 ? R.success():R.fail("操作失败");
     }
@@ -111,7 +132,7 @@ public class MonthSettleController implements IController {
 
     @PutMapping("/{id}/finish")
     @ApiOperation("平台确认账单完成")
-    public R monthSettleFinish(@PathVariable("id")String id){
+    public R monthSettleFinish(@PathVariable("id")Long id){
         Integer count = monthSettleService.monthSettleFinish(id);
         return count == 1 ? R.success():R.fail("操作失败");
     }
@@ -132,5 +153,19 @@ public class MonthSettleController implements IController {
         params.put("date", date);
         settlementBillBuildTask.execute(JSON.toJSONString(date));
         return R.success();
+    }
+
+    /**
+     *
+     * @param id 月账单id
+     */
+    private void authMerchant(Long id){
+        MonthSettle monthSettleById = monthSettleService.getMonthSettleById(id);
+        MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
+        if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getUserCode())){
+            if(!monthSettleById.getMerCode().equals(merchantUser.getUserCode())){
+                throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前商户无其它商户数据权限",null);
+            }
+        }
     }
 }

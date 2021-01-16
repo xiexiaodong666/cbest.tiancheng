@@ -40,6 +40,11 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     @TableId
 	private Long id;
     /**
+     * 账单编号
+     */
+    @ApiModelProperty("账单编号")
+    private String settleNo;
+    /**
      * 订单编码
      */
     @ApiModelProperty("订单编码")
@@ -154,6 +159,16 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
      */
     @ApiModelProperty("自费扣款金额")
     private BigDecimal selfDeductionAmount;
+
+    /**
+     * 数据类型
+     */
+    @ApiModelProperty("数据支付类型 welfare-员工卡支付 third-其它三方支付")
+    private String dataType;
+
+    @ApiModelProperty("结算标志 settled已结算 unsettled未结算")
+    private String settleFlag;
+
     /**
      * 创建人
      */
@@ -189,9 +204,13 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     */
     public static final String ID = "id";
     /**
+     * 账单编号
+     */
+    public static final String ORDER_ID = "order_id";
+    /**
     * 订单编码
     */
-    public static final String ORDER_ID = "order_id";
+    public static final String SETTLE_NO = "settleNo";
     /**
     * 交易流水号
     */
@@ -280,6 +299,15 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     * 自费扣款金额
     */
     public static final String SELF_DEDUCTION_AMOUNT = "self_deduction_amount";
+    /**
+     * 结算标志
+     */
+    public static final String SETTLE_FLAG = "settle_flag";
+    /**
+     * 数据类型
+     */
+    public static final String DATA_TYPE = "data_type";
+
     /**
     * 创建人
     */

@@ -5,7 +5,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author qiang.deng
@@ -21,9 +23,6 @@ public class MonthSettleResp {
 
     @ApiModelProperty(value = "账单编号")
     private String settleNo;
-
-    @ApiModelProperty(value = "账单月")
-    private String settleMonth;
 
     @ApiModelProperty(value = "商户编码")
     private String merCode;
@@ -68,6 +67,19 @@ public class MonthSettleResp {
     @ApiModelProperty(value = "账单返利金额")
     private String rebateAmount;
 
-    @ApiModelProperty(value = "账单返利比例")
-    private String rebate;
+    private Date settleStartDay;
+
+    private Date settleEndDay;
+
+    private List<settleAccountInfo> settleAccountInfoList;
+
+
+    public class settleAccountInfo{
+        private String settleAccountTypeCode;
+
+        private String settleAccountTypeName;
+
+        private BigDecimal amount;
+    }
+
 }

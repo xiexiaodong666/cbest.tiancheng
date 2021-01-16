@@ -65,3 +65,12 @@ cbest:
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
     notifyUrl: http://xxx/accountDepositRecord/payNotify
+  oss:
+    config:
+      bucket: sjgo-img-test
+
+pos:
+  onlines: 1001
+
+cdn:
+  server: http://img-test.sjgo365.com

@@ -14,6 +14,8 @@ import lombok.Data;
 @Data
 public class AccountPageDTO {
   private Long id;
+  private String merName;
+  private String merCode;
   private String accountName;
   @JsonSerialize(using = ToStringSerializer.class)
   private String accountCode;

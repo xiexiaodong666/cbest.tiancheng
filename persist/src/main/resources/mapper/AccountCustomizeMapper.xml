@@ -64,7 +64,7 @@
     a.binding
     FROM
     account a
-    INNER JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN department d ON a.store_code = d.department_code
     LEFT JOIN account_type at ON at.type_code = a.account_type_code
     LEFT JOIN card_info ci ON ci.account_code = a.account_code
     where a.deleted = 0
@@ -107,11 +107,10 @@
 	a.remark
 FROM
 	account a
-	INNER JOIN department d ON a.store_code = d.department_code
-	INNER JOIN merchant m ON a.mer_code = m.mer_code
+	LEFT JOIN department d ON a.store_code = d.department_code
+	LEFT JOIN merchant m ON a.mer_code = m.mer_code
 	LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
-WHERE a.mer_code = at.mer_code
-	and a.deleted = 0
+WHERE  a.deleted = 0
 	AND a.id = #{id}
   </select>
 
@@ -230,11 +229,10 @@ LIMIT #{size}
     a.remark
     FROM
     account a
-    INNER JOIN department d ON a.store_code = d.department_code
-    INNER JOIN merchant m ON a.mer_code = m.mer_code
+    LEFT JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN merchant m ON a.mer_code = m.mer_code
     LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
     WHERE
-    a.mer_code = at.mer_code and
     a.deleted = 0
 
     <if test=" id != null ">

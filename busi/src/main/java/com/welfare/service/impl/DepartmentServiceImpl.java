@@ -93,7 +93,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         //构建path
         if(!department.getDepartmentParent().equals(department.getMerCode())){
             departmentCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code());
-            save.setDepartmentPath(departmentCode);
+            save.setDepartmentPath(department.getDepartmentParent()+"-"+departmentCode);
         }else{
             Department parent=this.getByDepartmentCode(department.getDepartmentParent());
             if(EmptyChecker.isEmpty(parent)){

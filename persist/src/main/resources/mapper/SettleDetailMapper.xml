@@ -29,6 +29,7 @@
 
     <select id="getSettleDetailFromAccountDetail" parameterType="Map" resultType="com.welfare.persist.entity.SettleDetail">
         select
+        t1.id as id,
         null as orderId,
         t1.trans_no as transNo,
         t1.account_code as accountCode,
@@ -166,7 +167,7 @@
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code and t4.deleted=0
-        left join merchant_credit t5 on t1.mer_code = t5.mer_code t5.deleted=0
+        left join merchant_credit t5 on t1.mer_code = t5.mer_code and t5.deleted=0
         where t1.settle_flag = 'unsettled'
         <if test="merCode!=null and merCode!=''">
             and t1.mer_code=#{merCode}

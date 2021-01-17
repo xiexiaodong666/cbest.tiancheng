@@ -181,7 +181,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         List<SettleMerTransDetailResp> settleMerTransDetailRespList = merchantBillDetailMapper.getMerTransDetail(merTransDetailQuery).stream()
                 .map(merTransDetailDTO -> {
                     SettleMerTransDetailResp settleMerTransDetailRespTemp = new SettleMerTransDetailResp();
-                    BeanUtils.copyProperties(merTransDetailDTO, settleMerTransDetailReq);
+                    BeanUtils.copyProperties(merTransDetailDTO, settleMerTransDetailRespTemp);
                     return settleMerTransDetailRespTemp;
                 }).collect(Collectors.toList());
 

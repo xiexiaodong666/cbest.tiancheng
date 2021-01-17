@@ -38,7 +38,7 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Integer id;
+	private Long id;
     /**
      * 账单编号
      */

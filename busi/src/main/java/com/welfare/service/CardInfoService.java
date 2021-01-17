@@ -22,6 +22,12 @@ public interface CardInfoService {
   CardInfo getByCardNo(String cardNo);
 
   /**
+   * 根据磁条号获取卡信息
+   * @param magneticStripe
+   * @return
+   */
+  CardInfo getByMagneticStripe(String magneticStripe);
+  /**
    * 根据申请号查询出所有
    */
   List<CardInfo> listByApplyCode(String applyCode, Integer status);

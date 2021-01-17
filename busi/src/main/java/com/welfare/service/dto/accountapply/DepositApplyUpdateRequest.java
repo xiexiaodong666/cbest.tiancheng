@@ -26,8 +26,8 @@ public class DepositApplyUpdateRequest {
    * 申请id
    */
   @ApiModelProperty("申请id")
-  @NotNull(message = "id为空")
-  private Long id;
+  @NotEmpty(message = "id为空")
+  private String id;
 
   /**
    * 申请备注

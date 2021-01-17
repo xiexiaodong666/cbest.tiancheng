@@ -153,6 +153,9 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         if (merchantService.queryByCode(req.getMerCode())== null) {
             throw new BusiException("商户不存在");
         }
+        if (req.getAmount() == null) {
+            return;
+        }
         List<MerchantBillDetail> details = merchantBillDetailService.findByTransNoAndTransType(req.getTransNo(),MerCreditType.REMAINING_LIMIT.code());
         if (CollectionUtils.isNotEmpty(details)) {
             return;

@@ -95,7 +95,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
             accountChangeEventRecordService.save(accountChangeEventRecord);
             accountDao.saveOrUpdate(account);
-            accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
+            accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType, account);
             orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT);
         } finally {
             lock.unlock();

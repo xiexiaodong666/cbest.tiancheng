@@ -533,11 +533,19 @@ public class OrderServiceImpl implements OrderService {
                         || settleDetailList.size() > 2000
                         || (System.currentTimeMillis() - startTime) > 5 * 60 * 1000 ){
                     //保存订单数据
-                    int count = orderMapper.saveOrUpdate(orderInfoList);
-                    log.info("kafka订单数据保存到数据库{}条" , count);
+                    if(orderInfoList.size() > 0){
+                        int count = orderMapper.saveOrUpdate(orderInfoList);
+                        log.info("kafka订单数据保存到数据库{}条" , count);
+                    }else {
+                        log.info("kafka订单中没有满足条件的数据");
+                    }
                     //保存结算明细数据
-                    boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
-                    log.info("kafka明细结算数据保存到数据库{}条{}" , settleDetailList.size() , flag == true? "成功" : "失败");
+                    if (settleDetailList.size() > 0){
+                        boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
+                        log.info("kafka明细结算数据保存到数据库{}条{}" , settleDetailList.size() , flag == true? "成功" : "失败");
+                    }else {
+                        log.info("kafka明细结算数据中没有满足条件的数据");
+                    }
                     consumer.commitAsync();
                     break;
                 }

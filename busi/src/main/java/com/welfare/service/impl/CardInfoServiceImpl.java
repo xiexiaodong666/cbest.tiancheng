@@ -39,6 +39,13 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
+  public CardInfo getByMagneticStripe(String magneticStripe) {
+    QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(CardInfo.MAGNETIC_STRIPE, magneticStripe);
+    return cardInfoDao.getOne(queryWrapper);
+  }
+
+  @Override
   public List<CardInfo> listByApplyCode(String applyCode, Integer status) {
     QueryWrapper<CardInfo> wrapper = new QueryWrapper<>();
     wrapper.eq(CardInfo.APPLY_CODE, applyCode).eq(CardInfo.CARD_STATUS, status);

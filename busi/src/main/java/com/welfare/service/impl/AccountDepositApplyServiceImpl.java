@@ -9,6 +9,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.MerchantUserHolder;
 import  com.welfare.persist.dao.AccountDepositApplyDao;
 import com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
@@ -522,7 +523,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {
         AccountDepositApplyDetail detail;
         detail = new AccountDepositApplyDetail();
-        Account account = accountService.findByPhone(accountAmounts.getPhone());
+        Account account = accountService.findByPhoneAndMerCode(accountAmounts.getPhone(), MerchantUserHolder.getMerchantUser().getMerchantCode());
+        if (account == null) {
+          throw new BusiException("员工不存在");
+        }
         detail.setAccountCode(account.getAccountCode());
         detail.setApplyCode(apply.getApplyCode());
         detail.setRechargeAmount(accountAmounts.getRechargeAmount());
@@ -578,7 +582,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         apply.setDeleted(Boolean.FALSE);
     }
 
-    public void validationParmas(DepositApplyRequest request,Merchant merchant,
+    private void validationParmas(DepositApplyRequest request,Merchant merchant,
                                  MerchantUserInfo merchantUser, BigDecimal amount){
         if (merchant == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);

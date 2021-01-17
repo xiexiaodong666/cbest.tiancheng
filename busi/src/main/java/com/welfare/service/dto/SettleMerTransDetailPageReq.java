@@ -2,11 +2,11 @@ package com.welfare.service.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -16,14 +16,7 @@ import java.util.Date;
  * @desc
  */
 @Data
-public class SettleMerTransDetailResp {
-
-    @ApiModelProperty(value = "交易流水号")
-    private String transNo;
-
-
-    @ApiModelProperty(value = "交易日期")
-    private Date transTime;
+public class SettleMerTransDetailPageReq extends PageReq {
 
     @ApiModelProperty(value = "出入账类型 in-入账 out-出账")
     private String inOrOutType;
@@ -31,10 +24,15 @@ public class SettleMerTransDetailResp {
     @ApiModelProperty(value = "所属类型")
     private String transType;
 
-    @ApiModelProperty(value = "出入账金额")
-    private BigDecimal inOrOutAmount;
+    @ApiModelProperty(value = "起始时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
 
-    @ApiModelProperty(value = "总金额")
-    private BigDecimal allAmount;
-
+    @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
 }

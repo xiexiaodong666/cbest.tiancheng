@@ -359,14 +359,6 @@
             <if test="welfareTypeCode!=null and welfareTypeCode!=''">
                 and t1.mer_account_type = #{welfareTypeCode}
             </if>
-            <choose>
-                <when test="storeType=='self'">
-                    and t3.mer_code = t1.mer_code
-                </when>
-                <when test="storeType=='third'">
-                    and t3.mer_code != t1.mer_code
-                </when>
-            </choose>
             <if test="transNo!=null and transNo!=''">
                 and t1.trans_no=#{transNo}
             </if>
@@ -381,6 +373,14 @@
             <if test="limit!=null">
                 limit ${limit}
             </if>
+            <choose>
+                <when test="storeType=='self'">
+                    and t3.mer_code = t1.mer_code
+                </when>
+                <when test="storeType=='third'">
+                    and t3.mer_code != t1.mer_code
+                </when>
+            </choose>
         </where>
         group by t1.mer_code
     </select>

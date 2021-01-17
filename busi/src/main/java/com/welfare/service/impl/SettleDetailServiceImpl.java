@@ -1,13 +1,20 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
+import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.dao.SettleDetailDao;
+import com.welfare.persist.dto.MerTransDetailDTO;
+import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
+import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.mapper.MerchantBillDetailMapper;
+import com.welfare.persist.mapper.MerchantCreditMapper;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.SettleDetailService;
@@ -41,6 +48,12 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Autowired
     private MonthSettleMapper monthSettleMapper;
+
+    @Autowired
+    private MerchantCreditMapper merchantCreditMapper;
+
+    @Autowired
+    private MerchantBillDetailMapper merchantBillDetailMapper;
 
     @Value("${pos.onlines:1001}")
     private String posOnlines;
@@ -123,12 +136,55 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     }
 
     @Override
-    public SettleMerInfoResp getAccountInfo(Long id) {
-        return null;
+    public SettleMerInfoResp getMerAccountInfo(String merCode) {
+        MerchantCredit merchantCredit = merchantCreditMapper.selectOne(Wrappers.<MerchantCredit>lambdaQuery()
+                .eq(MerchantCredit::getMerCode, merCode)
+                .eq(MerchantCredit::getDeleted, 0)
+        );
+        SettleMerInfoResp settleMerInfoResp = new SettleMerInfoResp();
+        settleMerInfoResp.setMerCode(merCode);
+        settleMerInfoResp.setCreditLimit(merchantCredit.getCreditLimit());
+        settleMerInfoResp.setTransAmount(merchantCredit.getCurrentBalance());
+        settleMerInfoResp.setRebateLimit(merchantCredit.getRebateLimit());
+        settleMerInfoResp.setRemainingLimit(merchantCredit.getRemainingLimit());
+        settleMerInfoResp.setRechargeLimit(merchantCredit.getRechargeLimit());
+        return settleMerInfoResp;
     }
 
     @Override
-    public Page<SettleMerTransDetailResp> getAccountTransDetail(Long id) {
-        return null;
+    public BasePageVo<SettleMerTransDetailResp> getMerAccountTransPageDetail(String merCode, SettleMerTransDetailPageReq settleMerTransDetailReq) {
+        MerTransDetailQuery merTransDetailQuery = new MerTransDetailQuery();
+        BeanUtils.copyProperties(settleMerTransDetailReq, merTransDetailQuery);
+        merTransDetailQuery.setMerCode(merCode);
+
+        PageInfo<SettleMerTransDetailResp> selectPageInfo = PageHelper
+                .startPage(settleMerTransDetailReq.getCurrent(), settleMerTransDetailReq.getSize())
+                .doSelectPageInfo(() -> {
+                    merchantBillDetailMapper.getMerTransDetail(merTransDetailQuery).stream()
+                            .map(merTransDetailDTO -> {
+                                SettleMerTransDetailResp settleMerTransDetailRespTemp = new SettleMerTransDetailResp();
+                                BeanUtils.copyProperties(merTransDetailDTO, settleMerTransDetailReq);
+                                return settleMerTransDetailRespTemp;
+                            }).collect(Collectors.toList());
+                });
+        return new BasePageVo<>(settleMerTransDetailReq.getCurrent(), settleMerTransDetailReq.getSize(),
+                selectPageInfo.getTotal(), selectPageInfo.getList());
+    }
+
+    @Override
+    public List<SettleMerTransDetailResp> getMerAccountTransDetail(String merCode, SettleMerTransDetailReq settleMerTransDetailReq) {
+        MerTransDetailQuery merTransDetailQuery = new MerTransDetailQuery();
+        BeanUtils.copyProperties(settleMerTransDetailReq, merTransDetailQuery);
+        merTransDetailQuery.setMerCode(merCode);
+
+
+        List<SettleMerTransDetailResp> settleMerTransDetailRespList = merchantBillDetailMapper.getMerTransDetail(merTransDetailQuery).stream()
+                .map(merTransDetailDTO -> {
+                    SettleMerTransDetailResp settleMerTransDetailRespTemp = new SettleMerTransDetailResp();
+                    BeanUtils.copyProperties(merTransDetailDTO, settleMerTransDetailReq);
+                    return settleMerTransDetailRespTemp;
+                }).collect(Collectors.toList());
+
+        return settleMerTransDetailRespList;
     }
 }

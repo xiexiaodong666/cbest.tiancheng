@@ -45,7 +45,9 @@ public interface SettleDetailService {
 
     void buildSettle(WelfareSettleDetailReq welfareSettleDetailReq);
 
-    SettleMerInfoResp getAccountInfo(Long id);
+    SettleMerInfoResp getMerAccountInfo(String id);
 
-    Page<SettleMerTransDetailResp> getAccountTransDetail(Long id);
+    BasePageVo<SettleMerTransDetailResp> getMerAccountTransPageDetail(String id, SettleMerTransDetailPageReq settleMerTransDetailReq);
+
+    List<SettleMerTransDetailResp> getMerAccountTransDetail(String id, SettleMerTransDetailReq settleMerTransDetailReq);
 }

@@ -1,8 +1,12 @@
 package com.welfare.persist.mapper;
 
+import com.welfare.persist.dto.MerTransDetailDTO;
+import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.entity.MerchantBillDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * (merchant_bill_detail)数据Mapper
@@ -13,5 +17,5 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface MerchantBillDetailMapper extends BaseMapper<MerchantBillDetail> {
-
+    List<MerTransDetailDTO> getMerTransDetail(MerTransDetailQuery merTransDetailQuery);
 }

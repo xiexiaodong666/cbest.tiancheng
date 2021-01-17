@@ -88,7 +88,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
         } catch (Exception e) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "新增商户额度申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -137,7 +137,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
         } catch (Exception e) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "修改商户额度申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -183,7 +183,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
         } catch (Exception e) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "审批商户额度申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();

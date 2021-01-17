@@ -60,7 +60,7 @@ public class CardController implements IController {
   @GetMapping("/byMagneticStripe")
   @ApiOperation("根据卡号获取卡信息")
   public R<CardInfo> queryCardInfoByMagneticStripe(@RequestParam("magneticStripe")@ApiParam("磁条号") String magneticStripe) {
-    return cardFeignClient.queryCardInfoByMagneticStripe(magneticStripe);
+    return success(cardInfoService.getByMagneticStripe(magneticStripe));
   }
 
   @GetMapping("/apply/{applyCode}")

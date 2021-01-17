@@ -2,6 +2,7 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
 import java.util.Date;
@@ -30,7 +31,7 @@ public interface CardInfoService {
   /**
    * 根据申请号查询出所有
    */
-  List<CardInfo> listByApplyCode(String applyCode, Integer status);
+  List<CardInfoApiDTO> listByApplyCode(String applyCode, Integer status);
 
   /**
    * 更新卡信息为已写入

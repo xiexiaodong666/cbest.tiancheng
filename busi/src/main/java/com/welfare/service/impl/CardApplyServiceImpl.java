@@ -75,7 +75,7 @@ public class CardApplyServiceImpl implements CardApplyService {
   }
 
   @Override
-  public CardApply getMerchantStoreRelationById(QueryWrapper<CardApply> queryWrapper) {
+  public CardApply getCardApplyById(QueryWrapper<CardApply> queryWrapper) {
     return cardApplyMapper.selectOne(queryWrapper);
   }
 

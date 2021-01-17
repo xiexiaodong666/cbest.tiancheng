@@ -59,6 +59,37 @@ FROM
 
   </select>
 
+  <select id="listByApplyCode" resultType="com.welfare.persist.dto.CardInfoApiDTO">
+   SELECT
+	ci.id,
+	ci.apply_code AS applyCode,
+	ci.deleted,
+	ci.create_user AS createUser,
+	ci.update_user AS updateUser,
+	ci.update_time AS updateTime,
+	ci.card_id AS cardId,
+	ci.version,
+	ci.magnetic_stripe AS magneticStripe,
+	ca.card_name AS cardName,
+	ci.card_type AS cardType,
+	ca.card_medium AS cardMedium,
+	ci.card_status AS cardStatus,
+	m.mer_name AS merName,
+	ca.mer_code AS merCode,
+	ci.create_time AS createTime,
+	ci.written_time AS writtenTime,
+	ci.bind_time AS bindTime,
+	ci.account_code AS accountCode
+FROM
+	card_info ci
+	LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
+	LEFT JOIN merchant m ON m.mer_code = ca.mer_code
+WHERE
+  ci.apply_code = #{applyCode} and
+  ci.card_status = #{status} and
+	ci.deleted = 0
+  </select>
+
   <select id="exportCardInfo" resultType="com.welfare.persist.dto.CardInfoDTO">
     SELECT
     ci.card_id as cardId,

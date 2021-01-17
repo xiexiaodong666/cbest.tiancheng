@@ -464,8 +464,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         }
         AccountDepositApplyInfo info = depositApplyConverter.toInfo(apply);
         detailInfo.setMainInfo(info);
-        List<AccountDepositApplyDetail> details = depositApplyDetailService.listByApplyCode(apply.getApplyCode());
-        if (CollectionUtils.isNotEmpty(details)) {
+        if (apply.getApprovalType().equals(ApprovalType.SINGLE.getCode())) {
+          List<AccountDepositApplyDetail> details = depositApplyDetailService.listByApplyCode(apply.getApplyCode());
+          if (CollectionUtils.isNotEmpty(details)) {
             AccountDepositApplyDetail detail = details.get(0);
             Account account = accountService.getByAccountCode(detail.getAccountCode());
             Department department = departmentService.getByDepartmentCode(account.getStoreCode());
@@ -477,6 +478,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             item.setDepartmentName(department.getDepartmentName());
             item.setPhone(account.getPhone());
             detailInfo.setItems(Lists.newArrayList(item));
+          }
         }
         return detailInfo;
     }

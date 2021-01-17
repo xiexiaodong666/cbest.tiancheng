@@ -21,8 +21,8 @@ public class AccountDepositApprovalRequest {
 
 
   @ApiModelProperty("申请id")
-  @NotNull(message = "id不能为空")
-  private Long id;
+  @NotEmpty(message = "id不能为空")
+  private String id;
 
   /**
    * 审批状态

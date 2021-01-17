@@ -525,7 +525,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         detail = new AccountDepositApplyDetail();
         Account account = accountService.findByPhoneAndMerCode(accountAmounts.getPhone(), MerchantUserHolder.getMerchantUser().getMerchantCode());
         if (account == null) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("商户下没有[%s]员工！", accountAmounts.getPhone()), null);
+          throw new BusiException("员工不存在");
         }
         detail.setAccountCode(account.getAccountCode());
         detail.setApplyCode(apply.getApplyCode());

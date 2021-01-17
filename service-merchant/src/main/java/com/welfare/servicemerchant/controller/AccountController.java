@@ -201,6 +201,7 @@ public class AccountController implements IController {
     return success(fileUploadService.getFileServerUrl(path));
   }
   @GetMapping("/account/binding")
+  @ApiOperation("绑卡")
   public R<Boolean> bindingCard(@RequestParam @ApiParam("accountCode") String accountCode,
       @RequestParam @ApiParam("cardId") String cardId){
     try {

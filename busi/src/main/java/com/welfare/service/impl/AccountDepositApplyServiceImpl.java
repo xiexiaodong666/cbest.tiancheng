@@ -27,6 +27,7 @@ import com.welfare.service.utils.PageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -292,33 +293,35 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 if (!apply.getApprovalType().equals(ApprovalType.BATCH.getCode())) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非批量申请修改", null);
                 }
-                List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
-                // 至少选一个员工
-                if (CollectionUtils.isEmpty(temps)) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "至少上传一个员工", null);
-                }
-                // 判断金额是否超限
-                double sumAmoun = temps.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
-                BigDecimal sumAmount = new BigDecimal(sumAmoun);
-                MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
-                // 修改充值明细表
-                if (merchantCredit.getRechargeLimit().compareTo(sumAmount) < 0) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
+                if (StringUtils.isBlank(fileId)) {
+                    List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
+                    // 至少选一个员工
+                    if (CollectionUtils.isEmpty(temps)) {
+                        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "至少重新上传一个员工", null);
+                    }
+                    // 判断金额是否超限
+                    double sumAmoun = temps.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
+                    BigDecimal sumAmount = new BigDecimal(sumAmoun);
+                    MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
+                    // 修改充值明细表
+                    if (merchantCredit.getRechargeLimit().compareTo(sumAmount) < 0) {
+                        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
+                    }
+                    List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
+                    depositApplyDetailService.delByApplyCode(apply.getApplyCode());
+                    accountDepositApplyDetailDao.saveBatch(details);
+                    tempAccountDepositApplyService.delByFileId(fileId);
+                    apply.setRechargeAmount(sumAmount);
+                    apply.setRechargeNum(temps.size());
                 }
                 Date now = new Date();
                 apply.setUpdateTime(now);
                 apply.setUpdateUser(merchantUserInfo.getUserCode());
-                apply.setRechargeAmount(sumAmount);
-                apply.setRechargeNum(temps.size());
                 apply.setApplyRemark(request.getApplyRemark());
                 apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
                 apply.setMerAccountTypeName(request.getMerAccountTypeName());
                 accountDepositApplyDao.saveOrUpdate(apply);
-                List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
-                depositApplyDetailService.delByApplyCode(apply.getApplyCode());
-                accountDepositApplyDetailDao.saveBatch(details);
-                tempAccountDepositApplyService.delByFileId(fileId);
-                return Long.valueOf(apply.getId());
+                return apply.getId();
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }

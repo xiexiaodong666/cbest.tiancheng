@@ -98,7 +98,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("修改账号额度申请(批量)")
   @MerchantUser
   public R<String> batchUpdate(@RequestParam @ApiParam(name = "申请id）",required = true) String id,
-                             @RequestParam @ApiParam(name = "文件id",required = true) String fileId,
+                             @RequestParam(required = false) @ApiParam(name = "文件id") String fileId,
                              @RequestParam(required = false) @ApiParam("申请备注") String applyRemark,
                              @RequestParam(required = false) @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
                              @RequestParam(required = false) @ApiParam(name = "福利类型名称",required = true) String merAccountTypeName) {

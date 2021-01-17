@@ -128,6 +128,9 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
    * 加上存储数据库
    */
   private void saveData() {
+    if (CollectionUtils.isEmpty(list)) {
+      throw new BusiException("请至少上传一个员工");
+    }
     log.info("员工账号存储申请：{}条数据，开始存储数据库！requestId:{}, fileId:{}", list.size(), requestId, fileId);
     depositApplyService.saveAll(list);
     log.info("员工账号存储申请: 存储数据库成功！{}条数据 requestId:{}, fileId:{}", list.size(), requestId, fileId);

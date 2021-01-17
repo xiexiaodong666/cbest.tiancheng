@@ -366,4 +366,12 @@ public class AccountServiceImpl implements AccountService {
   public List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId) {
     return null;
   }
+
+  @Override
+  public Account findByPhoneAndMerCode(String phone, String merCode) {
+    QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
+    accountQueryWrapper.eq(Account.PHONE,phone);
+    accountQueryWrapper.eq(Account.MER_CODE, merCode);
+    return accountDao.getOne(accountQueryWrapper);
+  }
 }

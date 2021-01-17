@@ -55,18 +55,21 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
 
   private String fileId;
 
+  private String merCode;
+
   private Set<String> accountCodeSet = new HashSet<>(1000);
 
   public DepositApplyUploadListener() {}
 
   public DepositApplyUploadListener(TempAccountDepositApplyService depositApplyService,
                                     String requestId, String fileId,AccountService accountService,
-                                    ThreadPoolExecutor executor) {
+                                    ThreadPoolExecutor executor, String merCode) {
     this.depositApplyService = depositApplyService;
     this.requestId = requestId;
     this.fileId = fileId;
     this.accountService = accountService;
     this.executor = executor;
+    this.merCode = merCode;
   }
 
   @Override
@@ -75,15 +78,15 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
     if (Objects.isNull(request.getPhone())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账号不能为空！", null);
     }
-    if (request.getRechargeAmount().compareTo(BigDecimal.ZERO) < 0) {
+    if (request.getRechargeAmount() == null || request.getRechargeAmount().compareTo(BigDecimal.ZERO) < 0) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]金额不能小于0！", request.getPhone()), null);
     }
     if (accountCodeSet.contains(request.getPhone())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]账号(手机号)不能重复！", request.getPhone()), null);
     }
-    Account account = accountService.findByPhone(request.getPhone());
+    Account account = accountService.findByPhoneAndMerCode(request.getPhone(), merCode);
     if (account == null) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]账号(手机号)不存在！", request.getPhone()), null);
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("商户下没有[%s]员工！", request.getPhone()), null);
     }
     accountCodeSet.add(request.getPhone());
     list.add(getTempAccountDepositApply(request, account));

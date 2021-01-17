@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -29,7 +30,8 @@ public class AccountDepositRequest {
   /**
    * 申请充值总额
    */
-  @ApiModelProperty("申请充值金额")
+  @ApiModelProperty(value = "申请充值金额", required = true)
   @DecimalMin(value = "0", message = "金额不能小于0")
+  @NotNull(message = "申请充值金额不能为空")
   private BigDecimal rechargeAmount;
 }

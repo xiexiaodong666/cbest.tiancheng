@@ -237,6 +237,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 apply.setRechargeAmount(request.getInfo().getRechargeAmount());
                 apply.setApplyRemark(request.getApplyRemark());
                 apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
+                apply.setMerAccountTypeName(request.getMerAccountTypeName());
                 accountDepositApplyDao.saveOrUpdate(apply);
                 List<AccountDepositApplyDetail> details = depositApplyDetailService.listByApplyCode(apply.getApplyCode());
                 if (CollectionUtils.isNotEmpty(details)) {
@@ -311,6 +312,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 apply.setRechargeNum(temps.size());
                 apply.setApplyRemark(request.getApplyRemark());
                 apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
+                apply.setMerAccountTypeName(request.getMerAccountTypeName());
                 accountDepositApplyDao.saveOrUpdate(apply);
                 List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
                 depositApplyDetailService.delByApplyCode(apply.getApplyCode());
@@ -433,17 +435,17 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
         List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
-            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());
-            Map<String, MerchantAccountType> accountTypeMap = new HashMap<>();
-            if (CollectionUtils.isNotEmpty(accountTypes)) {
-                accountTypeMap = accountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, MerchantAccountType->MerchantAccountType));
-            }
-            Map<String, MerchantAccountType> finalAccountTypeMap = accountTypeMap;
+//            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());
+//            Map<String, MerchantAccountType> accountTypeMap = new HashMap<>();
+//            if (CollectionUtils.isNotEmpty(accountTypes)) {
+//                accountTypeMap = accountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, MerchantAccountType->MerchantAccountType));
+//            }
+//            Map<String, MerchantAccountType> finalAccountTypeMap = accountTypeMap;
             infos.forEach(info -> {
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
                 if (approvalStatus != null) {
                     info.setApprovalStatus(approvalStatus.getValue());
-                    info.setMerAccountTypeName(finalAccountTypeMap.get(info.getMerAccountTypeCode()).getMerAccountTypeName());
+                    //info.setMerAccountTypeName(finalAccountTypeMap.get(info.getMerAccountTypeCode()).getMerAccountTypeName());
                 }
             });
         }

@@ -83,7 +83,7 @@ public class WelfareSettleController implements IController {
         } catch (IOException e) {
             throw new BusiException(null, "文件导出异常", null);
         }
-        return success(path);
+        return success(fileUploadService.getFileServerUrl(path));
     }
 
     @GetMapping("/buildSettle")

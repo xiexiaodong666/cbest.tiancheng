@@ -81,4 +81,5 @@ public interface AccountService {
   List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId);
 
   boolean bindingCard(String accountCode,String cardId);
+  Account findByPhoneAndMerCode(String phone,String merCode);
 }

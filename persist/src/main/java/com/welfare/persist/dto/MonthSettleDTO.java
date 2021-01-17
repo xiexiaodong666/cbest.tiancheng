@@ -46,4 +46,10 @@ public class MonthSettleDTO {
     private String rebateAmount;
 
     private String rebate;
+
+    private String settleStatisticsInfo;
+
+    private Date settleStartDay;
+
+    private Date settleEndDay;
 }

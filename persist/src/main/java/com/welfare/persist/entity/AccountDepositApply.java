@@ -156,6 +156,11 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     @ApiModelProperty("商家账户类型")   
     private String merAccountTypeCode;
     /**
+     * 商家账户类型
+     */
+    @ApiModelProperty("商家账户类型名称")
+    private String merAccountTypeName;
+    /**
      * 渠道
      */
     @ApiModelProperty("渠道")   
@@ -259,5 +264,9 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     * 渠道
     */
     public static final String CHANNEL = "channel";
+    /**
+     * 商家账户类型名称
+     */
+    public static final String MER_ACCOUNT_TYPE_NAME = "mer_account_type_name";
 
 }

@@ -9,6 +9,7 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.MerchantAccountTypeService;
@@ -105,7 +106,18 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantAccountTypeUpdateDTO merchantAccountType) {
-        //merCode不允许修改
+        if(EmptyChecker.isEmpty(merchantAccountType.getTypeList())){
+            throw new BusiException("福利类型扣款顺序不能为空");
+        }
+        MerchantAccountTypeReq req=new MerchantAccountTypeReq();
+        req.setMerCode(merchantAccountType.getMerCode());
+        //数据库已有的福利类型id
+        List<Long> list=list(req).stream().map(item->item.getId()).collect(Collectors.toList());
+        //此次更新包含的福利类型id
+        List<Long> updateList=merchantAccountType.getTypeList().stream().map(item->item.getId()).collect(Collectors.toList());
+        //此次更新需要删除的福利类型
+        list.removeAll(updateList);
+        merchantAccountTypeDao.removeByIds(list);
         Date date=new Date();
         List<MerchantAccountType> addList=new ArrayList<>();
         for(MerchantAccountTypeUpdateDTO.TypeItem typeItem:merchantAccountType.getTypeList()){
@@ -132,7 +144,9 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
                 merchantAccountTypeDao.updateAllColumnById(type);
             }
         }
-        return merchantAccountTypeDao.saveBatch(addList);
+        merchantAccountTypeDao.saveBatch(addList);
+        //无法判断更新是否成功，因为这里有三种更新方式， 没报错默认更新成功
+        return Boolean.TRUE;
     }
 
     @Override

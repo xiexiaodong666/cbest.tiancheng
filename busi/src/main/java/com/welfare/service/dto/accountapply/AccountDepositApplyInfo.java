@@ -29,7 +29,7 @@ public class AccountDepositApplyInfo {
    */
   @ApiModelProperty("申请id")
   @ExcelProperty(value = "编号", index = 0)
-  private Long id;
+  private String id;
 
   /**
    * 充值账户个数

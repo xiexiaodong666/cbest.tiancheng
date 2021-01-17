@@ -39,6 +39,13 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
+  public CardInfo getByMagneticStripe(String magneticStripe) {
+    QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(CardInfo.MAGNETIC_STRIPE, magneticStripe);
+    return cardInfoDao.getOne(queryWrapper);
+  }
+
+  @Override
   public List<CardInfo> listByApplyCode(String applyCode, Integer status) {
     QueryWrapper<CardInfo> wrapper = new QueryWrapper<>();
     wrapper.eq(CardInfo.APPLY_CODE, applyCode).eq(CardInfo.CARD_STATUS, status);
@@ -47,14 +54,23 @@ public class CardInfoServiceImpl implements CardInfoService {
 
   @Override
   public CardInfo updateWritten(CardInfo cardInfo) {
-    cardInfo.setCardStatus(WelfareConstant.CardStatus.WRITTEN.code());
-    cardInfo.setWrittenTime(new Date());
 
-    if (cardInfoDao.updateById(cardInfo)) {
-      return cardInfo;
-    } else {
+    cardInfo = cardInfoDao.getById(cardInfo.getId());
+    if(cardInfo == null) {
       throw new BusiException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
     }
+    if(WelfareConstant.CardStatus.NEW.code().equals(cardInfo.getCardStatus())) {
+      cardInfo.setCardStatus(WelfareConstant.CardStatus.WRITTEN.code());
+      cardInfo.setWrittenTime(new Date());
+
+      if (cardInfoDao.saveOrUpdate(cardInfo)) {
+        return cardInfo;
+      } else {
+        throw new BusiException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
+      }
+    }
+
+    return cardInfo;
   }
 
   @Override

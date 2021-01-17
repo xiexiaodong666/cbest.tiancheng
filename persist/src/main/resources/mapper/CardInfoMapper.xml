@@ -51,8 +51,8 @@ FROM
     <if test="writtenStartTime != null ">and ci.written_time &gt;= #{writtenStartTime}</if>
     <if test="writtenEndTime != null ">and ci.written_time &lt;= #{writtenEndTime}</if>
 
-    <if test="startTime != null ">and ci.create_time &gt;= #{createTime}</if>
-    <if test="endTime != null ">and ci.create_time &lt;= #{createTime}</if>
+    <if test="startTime != null ">and ci.create_time &gt;= #{startTime}</if>
+    <if test="endTime != null ">and ci.create_time &lt;= #{endTime}</if>
 
     <if test="bindStartTime != null ">and ci.bind_time &gt;= #{bindStartTime}</if>
     <if test="bindEndTime != null ">and ci.bind_time &lt;= #{bindEndTime}</if>

@@ -65,8 +65,8 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
             log.info("settleDetailMapper循环拉取账户详细交易数据，请求参数：{}", JSONObject.toJSONString(params));
             List<SettleDetail> settleDetails = settleDetailMapper.getSettleDetailFromAccountDetail(params);
             if(!settleDetails.isEmpty()){
-                settleDetailDao.saveOrUpdateBatch(settleDetails);
                 params.put("minId",settleDetails.get(settleDetails.size()-1).getId()+1);
+                settleDetailDao.saveOrUpdateBatch(settleDetails);
             }else{
                 break;
             }

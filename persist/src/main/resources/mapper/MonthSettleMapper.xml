@@ -64,6 +64,7 @@
             <if test="endMonthStr!=null and endMonthStr!=''">
                 and t1.settle_month &gt;=#{endMonthStr}
             </if>
+
             <if test="merCooperationMode!=null and merCooperationMode!=''">
                 and t2.mer_cooperation_mode = #{merCooperationMode}
             </if>

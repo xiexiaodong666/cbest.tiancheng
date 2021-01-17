@@ -1,5 +1,6 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
@@ -19,4 +20,10 @@ import org.springframework.stereotype.Repository;
 public class AccountConsumeSceneStoreRelationDao extends
     ServiceImpl<AccountConsumeSceneStoreRelationMapper, AccountConsumeSceneStoreRelation> {
 
+    public AccountConsumeSceneStoreRelation getOneBySceneIdAndStoreNo(Long sceneId,String storeNo){
+        QueryWrapper<AccountConsumeSceneStoreRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,sceneId)
+                .eq(AccountConsumeSceneStoreRelation.STORE_CODE,storeNo);
+        return getOne(queryWrapper);
+    }
 }

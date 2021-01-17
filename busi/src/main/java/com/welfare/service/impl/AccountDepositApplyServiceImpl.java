@@ -9,6 +9,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.MerchantUserHolder;
 import  com.welfare.persist.dao.AccountDepositApplyDao;
 import com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
@@ -26,6 +27,7 @@ import com.welfare.service.utils.PageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,7 +136,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("新增员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), JSON.toJSONString(merchantUser), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "新增员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -188,7 +190,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("批量员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), JSON.toJSONString(merchantUser), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "批量员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -236,6 +238,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 apply.setRechargeAmount(request.getInfo().getRechargeAmount());
                 apply.setApplyRemark(request.getApplyRemark());
                 apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
+                apply.setMerAccountTypeName(request.getMerAccountTypeName());
                 accountDepositApplyDao.saveOrUpdate(apply);
                 List<AccountDepositApplyDetail> details = depositApplyDetailService.listByApplyCode(apply.getApplyCode());
                 if (CollectionUtils.isNotEmpty(details)) {
@@ -254,7 +257,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("修改员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "修改员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -290,38 +293,41 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 if (!apply.getApprovalType().equals(ApprovalType.BATCH.getCode())) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非批量申请修改", null);
                 }
-                List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
-                // 至少选一个员工
-                if (CollectionUtils.isEmpty(temps)) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "至少上传一个员工", null);
-                }
-                // 判断金额是否超限
-                double sumAmoun = temps.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
-                BigDecimal sumAmount = new BigDecimal(sumAmoun);
-                MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
-                // 修改充值明细表
-                if (merchantCredit.getRechargeLimit().compareTo(sumAmount) < 0) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
+                if (StringUtils.isNotBlank(fileId)) {
+                    List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
+                    // 至少选一个员工
+                    if (CollectionUtils.isEmpty(temps)) {
+                        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "至少重新上传一个员工", null);
+                    }
+                    // 判断金额是否超限
+                    double sumAmoun = temps.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
+                    BigDecimal sumAmount = new BigDecimal(sumAmoun);
+                    MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
+                    // 修改充值明细表
+                    if (merchantCredit.getRechargeLimit().compareTo(sumAmount) < 0) {
+                        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
+                    }
+                    List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
+                    depositApplyDetailService.delByApplyCode(apply.getApplyCode());
+                    accountDepositApplyDetailDao.saveBatch(details);
+                    tempAccountDepositApplyService.delByFileId(fileId);
+                    apply.setRechargeAmount(sumAmount);
+                    apply.setRechargeNum(temps.size());
                 }
                 Date now = new Date();
                 apply.setUpdateTime(now);
                 apply.setUpdateUser(merchantUserInfo.getUserCode());
-                apply.setRechargeAmount(sumAmount);
-                apply.setRechargeNum(temps.size());
                 apply.setApplyRemark(request.getApplyRemark());
                 apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
+                apply.setMerAccountTypeName(request.getMerAccountTypeName());
                 accountDepositApplyDao.saveOrUpdate(apply);
-                List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
-                depositApplyDetailService.delByApplyCode(apply.getApplyCode());
-                accountDepositApplyDetailDao.saveBatch(details);
-                tempAccountDepositApplyService.delByFileId(fileId);
-                return Long.valueOf(apply.getId());
+                return apply.getId();
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
         } catch (Exception e) {
             log.error("批量修改员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "批量修改员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -399,7 +405,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("审批员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "审批员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -432,17 +438,17 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
         List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
-            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());
-            Map<String, MerchantAccountType> accountTypeMap = new HashMap<>();
-            if (CollectionUtils.isNotEmpty(accountTypes)) {
-                accountTypeMap = accountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, MerchantAccountType->MerchantAccountType));
-            }
-            Map<String, MerchantAccountType> finalAccountTypeMap = accountTypeMap;
+//            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());
+//            Map<String, MerchantAccountType> accountTypeMap = new HashMap<>();
+//            if (CollectionUtils.isNotEmpty(accountTypes)) {
+//                accountTypeMap = accountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, MerchantAccountType->MerchantAccountType));
+//            }
+//            Map<String, MerchantAccountType> finalAccountTypeMap = accountTypeMap;
             infos.forEach(info -> {
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
                 if (approvalStatus != null) {
                     info.setApprovalStatus(approvalStatus.getValue());
-                    info.setMerAccountTypeName(finalAccountTypeMap.get(info.getMerAccountTypeCode()).getMerAccountTypeName());
+                    //info.setMerAccountTypeName(finalAccountTypeMap.get(info.getMerAccountTypeCode()).getMerAccountTypeName());
                 }
             });
         }
@@ -458,8 +464,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         }
         AccountDepositApplyInfo info = depositApplyConverter.toInfo(apply);
         detailInfo.setMainInfo(info);
-        List<AccountDepositApplyDetail> details = depositApplyDetailService.listByApplyCode(apply.getApplyCode());
-        if (CollectionUtils.isNotEmpty(details)) {
+        if (apply.getApprovalType().equals(ApprovalType.SINGLE.getCode())) {
+          List<AccountDepositApplyDetail> details = depositApplyDetailService.listByApplyCode(apply.getApplyCode());
+          if (CollectionUtils.isNotEmpty(details)) {
             AccountDepositApplyDetail detail = details.get(0);
             Account account = accountService.getByAccountCode(detail.getAccountCode());
             Department department = departmentService.getByDepartmentCode(account.getStoreCode());
@@ -469,7 +476,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             item.setRechargeAmount(detail.getRechargeAmount());
             item.setDepartmentCode(account.getStoreCode());
             item.setDepartmentName(department.getDepartmentName());
+            item.setPhone(account.getPhone());
             detailInfo.setItems(Lists.newArrayList(item));
+          }
         }
         return detailInfo;
     }
@@ -522,7 +531,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {
         AccountDepositApplyDetail detail;
         detail = new AccountDepositApplyDetail();
-        Account account = accountService.findByPhone(accountAmounts.getPhone());
+        Account account = accountService.findByPhoneAndMerCode(accountAmounts.getPhone(), MerchantUserHolder.getMerchantUser().getMerchantCode());
+        if (account == null) {
+          throw new BusiException("员工不存在");
+        }
         detail.setAccountCode(account.getAccountCode());
         detail.setApplyCode(apply.getApplyCode());
         detail.setRechargeAmount(accountAmounts.getRechargeAmount());
@@ -578,7 +590,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         apply.setDeleted(Boolean.FALSE);
     }
 
-    public void validationParmas(DepositApplyRequest request,Merchant merchant,
+    private void validationParmas(DepositApplyRequest request,Merchant merchant,
                                  MerchantUserInfo merchantUser, BigDecimal amount){
         if (merchant == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);

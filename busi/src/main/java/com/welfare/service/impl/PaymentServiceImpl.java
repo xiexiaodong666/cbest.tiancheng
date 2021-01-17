@@ -1,8 +1,9 @@
 package com.welfare.service.impl;
 
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.*;
-import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.dto.payment.CardPaymentRequest;
@@ -49,13 +50,15 @@ public class PaymentServiceImpl implements PaymentService {
     private final AccountDao accountDao;
     private final CurrentBalanceOperator currentBalanceOperator;
     private final MerchantBillDetailDao merchantBillDetailDao;
+    private final AccountConsumeSceneDao accountConsumeSceneDao;
+    private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest) {
-        String paymentScene = paymentRequest.chargePaymentScene();
         Long accountCode = paymentRequest.calculateAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
+        //chargePaymentScene(paymentRequest, account);
 
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         merAccountLock.lock();
@@ -78,6 +81,18 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
+    private void chargePaymentScene(PaymentRequest paymentRequest, Account account) {
+        String paymentScene = paymentRequest.calculatePaymentScene();
+        AccountConsumeScene accountConsumeScene = accountConsumeSceneDao
+                .getOneByAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
+        AccountConsumeSceneStoreRelation sceneStoreRelation = accountConsumeSceneStoreRelationDao
+                .getOneBySceneIdAndStoreNo(accountConsumeScene.getId(), paymentRequest.getStoreNo());
+        List<String> sceneConsumeTypes = Arrays.asList(sceneStoreRelation.getSceneConsumType().split(","));
+        if(!sceneConsumeTypes.contains(paymentScene)){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景",null);
+        }
+    }
+
     @Override
     public PaymentRequest queryResult(String transNo) {
         List<AccountBillDetail> accountDeductionDetails = accountBillDetailDao.queryByTransNoAndTransType(
@@ -88,23 +103,25 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRequest.setTransNo(transNo);
         if(CollectionUtils.isEmpty(accountDeductionDetails)){
             paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.FAILED.code());
-        }
-        paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-        AccountBillDetail firstAccountBillDetail = accountDeductionDetails.get(0);
-        paymentRequest.setStoreNo(firstAccountBillDetail.getStoreCode());
-        paymentRequest.setAccountCode(firstAccountBillDetail.getAccountCode());
-        paymentRequest.setMachineNo(firstAccountBillDetail.getPos());
-        paymentRequest.setPaymentDate(firstAccountBillDetail.getTransTime());
-        paymentRequest.setCardNo(firstAccountBillDetail.getCardId());
-        BigDecimal amount = accountDeductionDetails.stream()
-                .map(AccountBillDetail::getTransAmount)
-                .reduce(BigDecimal.ZERO,BigDecimal::add);
-        paymentRequest.setAmount(amount);
+        }else{
+            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            AccountBillDetail firstAccountBillDetail = accountDeductionDetails.get(0);
+            paymentRequest.setStoreNo(firstAccountBillDetail.getStoreCode());
+            paymentRequest.setAccountCode(firstAccountBillDetail.getAccountCode());
+            paymentRequest.setMachineNo(firstAccountBillDetail.getPos());
+            paymentRequest.setPaymentDate(firstAccountBillDetail.getTransTime());
+            paymentRequest.setCardNo(firstAccountBillDetail.getCardId());
+            BigDecimal amount = accountDeductionDetails.stream()
+                    .map(AccountBillDetail::getTransAmount)
+                    .reduce(BigDecimal.ZERO,BigDecimal::add);
+            paymentRequest.setAmount(amount);
 
-        Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
-        paymentRequest.setAccountBalance(account.getAccountBalance());
-        paymentRequest.setAccountName(account.getAccountName());
-        paymentRequest.setAccountCredit(account.getSurplusQuota());
+            Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
+            paymentRequest.setAccountBalance(account.getAccountBalance());
+            paymentRequest.setAccountName(account.getAccountName());
+            paymentRequest.setAccountCredit(account.getSurplusQuota());
+        }
+
         return paymentRequest;
     }
 
@@ -124,7 +141,7 @@ public class PaymentServiceImpl implements PaymentService {
             List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                     .collect(Collectors.toList());
             for (AccountAmountDO accountAmountDO : accountAmountDOList) {
-                if(BigDecimal.ZERO.equals(accountAmountDO.getAccountAmountType().getAccountBalance())){
+                if(BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance())==0){
                     //当前的accountType没钱，则继续下一个账户
                     continue;
                 }
@@ -152,15 +169,18 @@ public class PaymentServiceImpl implements PaymentService {
         List<AccountAmountType> accountTypes = paymentOperations.stream()
                 .map(PaymentOperation::getAccountAmountType)
                 .collect(Collectors.toList());
+
+        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountTypes);
+        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountTypes);
+        account.setAccountBalance(accountBalance);
+        account.setSurplusQuota(accountCreditBalance);
+        accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
-        accountAmountTypeDao.updateBatchById(accountTypes);
-        BigDecimal balanceSum = accountAmountTypeService.sumBalanceExceptSurplusQuota(account.getAccountCode());
-        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(account.getAccountCode(), SURPLUS_QUOTA.code());
-        account.setAccountBalance(balanceSum);
-        account.setSurplusQuota(accountAmountType.getAccountBalance());
-        accountDao.updateById(account);
+        accountAmountTypeDao.saveOrUpdateBatch(accountTypes);
     }
+
+
 
     private PaymentOperation decrease(AccountAmountDO accountAmountDO,
                                       BigDecimal toOperateAmount,
@@ -260,19 +280,8 @@ public class PaymentServiceImpl implements PaymentService {
         accountBillDetail.setTransAmount(operatedAmount);
         accountBillDetail.setStoreCode(paymentRequest.getStoreNo());
         accountBillDetail.setCardId(paymentRequest.getCardNo());
-        BigDecimal accountBalance = accountAmountTypes.stream()
-                .filter(
-                        type -> !SELF.code().equals(type.getMerAccountTypeCode())
-                                && !SURPLUS_QUOTA.code().equals(type.getMerAccountTypeCode())
-                )
-                .map(AccountAmountType::getAccountBalance)
-                .reduce(BigDecimal.ZERO,BigDecimal::add);
-        BigDecimal accountSurplusQuota =accountAmountTypes.stream()
-                .filter(
-                        type -> SURPLUS_QUOTA.code().equals(type.getMerAccountTypeCode())
-                )
-                .map(AccountAmountType::getAccountBalance)
-                .reduce(BigDecimal.ZERO,BigDecimal::add);
+        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
+        BigDecimal accountSurplusQuota = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
         accountBillDetail.setAccountBalance(accountBalance);
         accountBillDetail.setSurplusQuota(accountSurplusQuota);
         return accountBillDetail;

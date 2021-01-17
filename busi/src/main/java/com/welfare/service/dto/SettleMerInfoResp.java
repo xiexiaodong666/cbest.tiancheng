@@ -1,6 +1,7 @@
 package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
@@ -10,16 +11,17 @@ import java.math.BigDecimal;
  * @date 2021/1/16 4:08 下午
  * @desc
  */
+@Data
 public class SettleMerInfoResp {
 
     @ApiModelProperty(value = "商户编码")
     private String merCode;
 
     @ApiModelProperty(value = "充值额度")
-    private String rechargeLimit;
+    private BigDecimal rechargeLimit;
 
     @ApiModelProperty(value = "消费余额")
-    private String transAmount;
+    private BigDecimal transAmount;
 
     @ApiModelProperty(value = "信用额度")
     private BigDecimal creditLimit;

@@ -65,6 +65,11 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     @ApiModelProperty("结算金额")   
     private BigDecimal settleAmount;
     /**
+     * 结算金额
+     */
+    @ApiModelProperty("结算自费金额")
+    private BigDecimal settleSelfAmount;
+    /**
      * 返利金额
      */
     @ApiModelProperty("返利金额")   
@@ -99,6 +104,9 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
      */
     @ApiModelProperty("确定时间")   
     private Date confirmTime;
+
+    @ApiModelProperty("账单账户类型统计信息")
+    private String settleStatisticsInfo;
     /**
      * 创建人
      */
@@ -156,6 +164,10 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     */
     public static final String SETTLE_AMOUNT = "settle_amount";
     /**
+     * 结算的自费金额
+     */
+    public static final String SETTLE_SELF_AMOUNT = "settle_self_amount";
+    /**
     * 返利金额
     */
     public static final String REBATE_AMOUNT = "rebate_amount";
@@ -204,4 +216,8 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     */
     public static final String DELETED = "deleted";
 
+    /**
+     * 删除标志
+     */
+    public static final String SETTLESTATISTICSINFO = "settle_statistics_info";
 }

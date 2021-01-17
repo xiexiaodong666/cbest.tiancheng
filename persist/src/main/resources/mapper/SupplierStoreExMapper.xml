@@ -1,43 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.SupplierStoreExMapper">
-    <select id="listWithMerchant" resultType="com.welfare.persist.dto.SupplierStoreWithMerchantDTO">
-        SELECT
-        store_code as storeCode,
-        store_name as storeName,
-        m.mer_name as merName,
-        ss.mer_code as merCode,
-        ss.STATUS  as status,
-        ss.create_time as createTime
-        FROM
-        supplier_store ss
-        LEFT JOIN merchant m ON ss.mer_code = m.mer_code
-        <where>
-            <if test="req.merCode!=null and req.merCode!=''">
-                and ss.mer_code=#{req.merCode}
-            </if>
-            <if test="req.storeName!=null and req.storeName!=''">
-                and ss.storeName like concat('%',#{req.storeName},'%')
-            </if>
-            <if test="req.storeCode!=null and req.storeCode!=''">
-                and ss.store_code=#{req.storeCode}
-            </if>
-            <if test="req.startTime!=null">
-                and ss.create_time &gt;= #{req.startTime}
-            </if>
-            <if test="req.endTime!=null">
-                and ss.create_time &lt;= #{req.endTime}
-            </if>
-            <if test="req.storeCodes != null and req.storeCodes.size()>0" >
-                and ss.store_code not in
-                <foreach close=")" collection="req.storeCodes" item="item" open="(" separator=", ">
-                    #{item}
-                </foreach>
-            </if>
-        </where>
-    </select>
+  <select id="listWithMerchant" resultType="com.welfare.persist.dto.SupplierStoreWithMerchantDTO">
+    SELECT
+    store_code as storeCode,
+    store_name as storeName,
+    m.mer_name as merName,
+    ss.mer_code as merCode,
+    ss.STATUS as status,
+    ss.create_time as createTime
+    FROM
+    supplier_store ss
+    LEFT JOIN merchant m ON ss.mer_code = m.mer_code
+    <where>
+      <if test="req.merCode!=null and req.merCode!=''">
+        and ss.mer_code=#{req.merCode}
+      </if>
+      <if test="req.storeName!=null and req.storeName!=''">
+        and ss.storeName like concat('%',#{req.storeName},'%')
+      </if>
+      <if test="req.storeCode!=null and req.storeCode!=''">
+        and ss.store_code=#{req.storeCode}
+      </if>
+      <if test="req.startTime!=null">
+        and ss.create_time &gt;= #{req.startTime}
+      </if>
+      <if test="req.endTime!=null">
+        and ss.create_time &lt;= #{req.endTime}
+      </if>
+      <if test="req.storeCodes != null and req.storeCodes.size()>0">
+        and ss.store_code not in
+        <foreach close=")" collection="req.storeCodes" item="item" open="(" separator=", ">
+          #{item}
+        </foreach>
+      </if>
+    </where>
+  </select>
 
-    <select id="queryMerSupplierStoreDTList" resultType="com.welfare.persist.dto.MerSupplierStoreDTO">
+  <select id="queryMerSupplierStoreDTList" resultType="com.welfare.persist.dto.MerSupplierStoreDTO">
          SELECT
          mer_code as merCode,
         store_code as storeCode,
@@ -47,47 +48,45 @@
         where deleted = 0 and consum_type like"%true%" and mer_code=#{merCode}
     </select>
 
-    <select id="listUnionMerchant" resultType="com.welfare.persist.entity.SupplierStore">
-        select * from (
-        select
-        id,
-        mer_code merCode,
-        store_code storeCode,
-        store_name storeName,
-        store_parent storeParent,
-        store_path storePath,
-        remark ,
-        consum_type consumType,
-        status ,
-        create_time createTime
-        from supplier_store ss
-        ) temp0
-        <where>
-            <if test="merCode!=null and merCode!=''">
-                and temp0.merCode=#{merCode}
-            </if>
-        </where>
-        UNION
-        select * from (
-        select
-        id,
-        mer_code merCode,
-        mer_code storeCode,
-        mer_name storeName,
-        0 storeParent,
-        mer_code storePath,
-        remark ,
-        null consumType,
-        status ,
-        create_time createTime
-        from merchant m
+  <select id="listUnionMerchant" resultType="com.welfare.persist.entity.SupplierStore">
+    select * from (
+    select
+    id,
+    mer_code merCode,
+    store_code storeCode,
+    store_name storeName,
+    store_parent storeParent,
+    store_path storePath,
+    remark ,
+    consum_type consumType,
+    status ,
+    create_time createTime
+    from supplier_store ss
+    ) temp0
+    <where>
+      <if test="merCodes != null and merCodes.size()>0">
+        and temp0.merCode in
+        <foreach item="item" index="index" collection="merCodes" open="(" separator=","
+          close=")">
+          #{item}
+        </foreach>
+      </if>
+    </where>
+    UNION
+    select * from (
+    select
+    id,
+    mer_code merCode,
+    mer_code storeCode,
+    mer_name storeName,
+    0 storeParent,
+    mer_code storePath,
+    remark ,
+    null consumType,
+    status ,
+    create_time createTime
+    from merchant m
 
-        ) temp
-
-        <where>
-            <if test="merCode!=null and merCode!=''">
-                and temp.merCode=#{merCode}
-            </if>
-        </where>
-    </select>
+    ) temp
+  </select>
 </mapper>

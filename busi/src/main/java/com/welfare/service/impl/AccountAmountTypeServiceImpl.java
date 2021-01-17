@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
 
 /**
  * @author duanhy
@@ -94,12 +95,14 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
             accountChangeEventRecordService.save(accountChangeEventRecord);
             accountDao.saveOrUpdate(account);
-            accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType);
+            accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType, account);
             orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT);
         } finally {
             lock.unlock();
         }
     }
+
+
 
     @Override
     public AccountAmountType querySurplusQuota(Long accountCode) {

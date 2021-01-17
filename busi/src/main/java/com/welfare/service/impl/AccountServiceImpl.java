@@ -376,29 +376,35 @@ public class AccountServiceImpl implements AccountService {
   @Transactional(rollbackFor = Exception.class)
   public boolean bindingCard(String accountCode, String cardId) {
     Account account = this.getByAccountCode(Long.parseLong(accountCode));
-    if(  null == account){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
+    if (null == account) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
     }
     CardInfo cardInfo = cardInfoService.getByCardNo(cardId);
-    if( null ==  cardInfo){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该卡号不存在",null);
+    if (null == cardInfo) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号不存在", null);
     }
     QueryWrapper<CardInfo> cardInfoQueryWrapper = new QueryWrapper();
-    cardInfoQueryWrapper.eq(CardInfo.CARD_ID,cardId);
+    cardInfoQueryWrapper.eq(CardInfo.CARD_ID, cardId);
     cardInfoQueryWrapper.isNotNull(CardInfo.ACCOUNT_CODE);
     CardInfo queryCardInfo = cardInfoDao.getOne(cardInfoQueryWrapper);
-    if( null !=  queryCardInfo){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该卡号已经绑定其他账号",null);
+    if (null != queryCardInfo) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
     }
     //绑定创建卡号信息
     cardInfo.setAccountCode(account.getAccountCode());
     cardInfo.setCardStatus(CardStatus.BIND.code());
     cardInfo.setBindTime(new Date());
     boolean updateResult = cardInfoDao.updateById(cardInfo);
-    if( updateResult ){
+    if (updateResult) {
       account.setBinding(AccountBindStatus.BIND.getCode());
     }
     boolean accountUpdate = accountDao.updateById(account);
     return accountUpdate && updateResult;
+  }
+  public Account findByPhoneAndMerCode(String phone, String merCode) {
+    QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
+    accountQueryWrapper.eq(Account.PHONE,phone);
+    accountQueryWrapper.eq(Account.MER_CODE, merCode);
+    return accountDao.getOne(accountQueryWrapper);
   }
 }

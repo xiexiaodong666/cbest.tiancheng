@@ -293,7 +293,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 if (!apply.getApprovalType().equals(ApprovalType.BATCH.getCode())) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非批量申请修改", null);
                 }
-                if (StringUtils.isBlank(fileId)) {
+                if (StringUtils.isNotBlank(fileId)) {
                     List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
                     // 至少选一个员工
                     if (CollectionUtils.isEmpty(temps)) {

@@ -470,6 +470,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             item.setRechargeAmount(detail.getRechargeAmount());
             item.setDepartmentCode(account.getStoreCode());
             item.setDepartmentName(department.getDepartmentName());
+            item.setPhone(account.getPhone());
             detailInfo.setItems(Lists.newArrayList(item));
         }
         return detailInfo;

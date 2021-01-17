@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -24,6 +26,7 @@ import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountType;
+import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper;
@@ -32,6 +35,7 @@ import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
+import com.welfare.service.CardInfoService;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
@@ -91,6 +95,7 @@ public class AccountServiceImpl implements AccountService {
   private final MerchantService merchantService;
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
+  private final CardInfoService cardInfoService;
   @Autowired
   private  AccountChangeEventRecordService accountChangeEventRecordService;
   private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
@@ -365,5 +370,35 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId) {
     return null;
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public boolean bindingCard(String accountCode, String cardId) {
+    Account account = this.getByAccountCode(Long.parseLong(accountCode));
+    if(  null == account){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
+    }
+    CardInfo cardInfo = cardInfoService.getByCardNo(cardId);
+    if( null ==  cardInfo){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该卡号不存在",null);
+    }
+    QueryWrapper<CardInfo> cardInfoQueryWrapper = new QueryWrapper();
+    cardInfoQueryWrapper.eq(CardInfo.CARD_ID,cardId);
+    cardInfoQueryWrapper.isNotNull(CardInfo.ACCOUNT_CODE);
+    CardInfo queryCardInfo = cardInfoDao.getOne(cardInfoQueryWrapper);
+    if( null !=  queryCardInfo){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该卡号已经绑定其他账号",null);
+    }
+    //绑定创建卡号信息
+    cardInfo.setAccountCode(account.getAccountCode());
+    cardInfo.setCardStatus(CardStatus.BIND.code());
+    cardInfo.setBindTime(new Date());
+    boolean updateResult = cardInfoDao.updateById(cardInfo);
+    if( updateResult ){
+      account.setBinding(AccountBindStatus.BIND.getCode());
+    }
+    boolean accountUpdate = accountDao.updateById(account);
+    return accountUpdate && updateResult;
   }
 }

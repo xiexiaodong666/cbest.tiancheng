@@ -11,6 +11,7 @@ import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -44,6 +45,7 @@ public class MerInfoController  implements IController {
     private FileUploadServiceUtil fileUploadService;
 
     @GetMapping("/")
+    @ApiOperation("查询商户基本额度信息")
     @MerchantUser
     public R<SettleMerInfoResp> getAccountInfo(){
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
@@ -56,6 +58,7 @@ public class MerInfoController  implements IController {
 
 
     @GetMapping("/page")
+    @ApiOperation("分页商户账户明细")
     @MerchantUser
     public R<BasePageVo<SettleMerTransDetailResp>> getAccountTransPageDetail(SettleMerTransDetailPageReq settleMerTransDetailPageReq){
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
@@ -66,6 +69,7 @@ public class MerInfoController  implements IController {
         return R.success(settleAccountTransDetailRespPage);
     }
 
+    @ApiOperation("导出商户账户明细")
     @GetMapping("/excelExport")
     @MerchantUser
     public R<String> getAccountTransDetail(SettleMerTransDetailReq settleMerTransDetailReq){
@@ -82,6 +86,6 @@ public class MerInfoController  implements IController {
         } catch (IOException e) {
             throw new BusiException(null, "文件导出异常", null);
         }
-        return success(path);
+        return success(fileUploadService.getFileServerUrl(path));
     }
 }

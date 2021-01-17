@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,22 +20,28 @@ import java.util.Date;
 public class SettleMerTransDetailResp {
 
     @ApiModelProperty(value = "交易流水号")
+    @ExcelProperty(value = "交易流水号")
     private String transNo;
 
 
     @ApiModelProperty(value = "交易日期")
+    @ExcelProperty(value = "交易日期")
     private Date transTime;
 
     @ApiModelProperty(value = "出入账类型 in-入账 out-出账")
+    @ExcelProperty(value = "出入账类型")
     private String inOrOutType;
 
     @ApiModelProperty(value = "所属类型")
+    @ExcelProperty(value = "所属类型")
     private String transType;
 
     @ApiModelProperty(value = "出入账金额")
+    @ExcelProperty(value = "出入账金额")
     private BigDecimal inOrOutAmount;
 
     @ApiModelProperty(value = "总金额")
+    @ExcelProperty(value = "总金额")
     private BigDecimal allAmount;
 
 }

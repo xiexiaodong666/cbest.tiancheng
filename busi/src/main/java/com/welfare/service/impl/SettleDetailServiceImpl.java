@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
+import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dto.MerTransDetailDTO;
@@ -13,6 +14,7 @@ import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.mapper.MerchantBillDetailMapper;
 import com.welfare.persist.mapper.MerchantCreditMapper;
 import com.welfare.persist.mapper.MonthSettleMapper;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -131,8 +134,27 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     public void buildSettle(WelfareSettleDetailReq welfareSettleDetailReq) {
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
+        welfareSettleDetailQuery.setPosOnlines(posOnlines);
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
         monthSettleMapper.insert(monthSettle);
+
+        welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
+        List<Long> idList;
+        do {
+            idList = settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
+                return welfareSettleDetailDTO.getId();
+            }).collect(Collectors.toList());
+
+            if(!idList.isEmpty()){
+                SettleDetail settleDetail = new SettleDetail();
+                settleDetail.setSettleNo(monthSettle.getSettleNo());
+                settleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
+                settleDetailMapper.update(settleDetail, Wrappers.<SettleDetail>lambdaUpdate()
+                        .in(SettleDetail::getId, idList));
+            }else{
+                break;
+            }
+        }while(true);
     }
 
     @Override
@@ -181,7 +203,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         List<SettleMerTransDetailResp> settleMerTransDetailRespList = merchantBillDetailMapper.getMerTransDetail(merTransDetailQuery).stream()
                 .map(merTransDetailDTO -> {
                     SettleMerTransDetailResp settleMerTransDetailRespTemp = new SettleMerTransDetailResp();
-                    BeanUtils.copyProperties(merTransDetailDTO, settleMerTransDetailReq);
+                    BeanUtils.copyProperties(merTransDetailDTO, settleMerTransDetailRespTemp);
                     return settleMerTransDetailRespTemp;
                 }).collect(Collectors.toList());
 

@@ -134,7 +134,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("新增员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), JSON.toJSONString(merchantUser), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "新增员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -188,7 +188,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("批量员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), JSON.toJSONString(merchantUser), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "批量员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -254,7 +254,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("修改员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "修改员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -321,7 +321,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("批量修改员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "批量修改员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -399,7 +399,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
         } catch (Exception e) {
             log.error("审批员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "审批员工账号申请失败", e);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();

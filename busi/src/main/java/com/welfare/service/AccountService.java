@@ -79,6 +79,7 @@ public interface AccountService {
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
   List<Account> queryByAccountTypeCode(String accountTypeCode);
   List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId);
-  Account findByPhoneAndMerCode(String phone,String merCode);
 
+  boolean bindingCard(String accountCode,String cardId);
+  Account findByPhoneAndMerCode(String phone,String merCode);
 }

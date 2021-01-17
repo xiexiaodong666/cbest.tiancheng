@@ -57,6 +57,11 @@ public class CardController implements IController {
     CardInfo cardInfo = cardInfoService.getByCardNo(cardNo);
     return success(cardInfo);
   }
+  @GetMapping("/byMagneticStripe")
+  @ApiOperation("根据卡号获取卡信息")
+  public R<CardInfo> queryCardInfoByMagneticStripe(@RequestParam("magneticStripe")@ApiParam("磁条号") String magneticStripe) {
+    return cardFeignClient.queryCardInfoByMagneticStripe(magneticStripe);
+  }
 
   @GetMapping("/apply/{applyCode}")
   @ApiOperation("根据批次号获取卡信息")

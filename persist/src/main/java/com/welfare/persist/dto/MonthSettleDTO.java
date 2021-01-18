@@ -49,7 +49,9 @@ public class MonthSettleDTO {
 
     private String settleStatisticsInfo;
 
-    private Date settleStartDay;
+    private Date settleStartTime;
 
-    private Date settleEndDay;
+    private Date settleEndTime;
+
+    private Date createTime;
 }

@@ -3,12 +3,15 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.CardApplyMediumEnum;
 import com.welfare.common.enums.CardApplyTypeEnum;
+import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.CardApplyDTO;
 import com.welfare.persist.dto.query.CardApplyAddReq;
 import com.welfare.persist.dto.query.CardApplyUpdateReq;
 import com.welfare.persist.entity.CardApply;
+import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.service.CardApplyService;
 import com.welfare.service.MerchantService;
@@ -50,6 +53,7 @@ public class CardApplyController implements IController {
   private final MerchantService merchantService;
   private final FileUploadService fileUploadService;
   private final CardApplyConverter cardApplyConverter;
+  private final CardInfoDao cardInfoDao;
 
   @GetMapping("/list")
   @ApiOperation("分页查询卡片列表")
@@ -86,6 +90,13 @@ public class CardApplyController implements IController {
 
     if (merchant != null) {
       cardApplyDTO.setMerName(merchant.getMerName());
+    }
+    QueryWrapper<CardInfo> queryWrapperCardInfo = new QueryWrapper<>();
+    queryWrapperCardInfo.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
+    queryWrapperCardInfo.ne(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.NEW.code());
+    List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapperCardInfo);
+    if (CollectionUtils.isEmpty(cardInfoList)) {
+      cardApplyDTO.setCanChange(Boolean.TRUE);
     }
 
     return success(cardApplyDTO);

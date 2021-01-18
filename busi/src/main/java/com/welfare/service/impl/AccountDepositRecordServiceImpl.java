@@ -37,6 +37,7 @@ import com.welfare.service.remote.entity.CbestPayBaseResp;
 import com.welfare.service.remote.entity.CbestPayRespStatusConstant;
 import com.welfare.service.remote.entity.CreateWXH5TradeNotifyResp;
 import com.welfare.service.remote.entity.CreateWXH5TradeResp;
+import com.welfare.service.remote.entity.TradeCancelReq;
 import com.welfare.service.remote.entity.TradeQueryReq;
 import com.welfare.service.remote.service.CbestPayService;
 import java.math.BigDecimal;
@@ -204,12 +205,6 @@ public class AccountDepositRecordServiceImpl extends
         accountDepositRecord
             .setPayStatus(AccountRechargePaymentStatusEnum.PAYMENT_SUCCESS.getCode());
         accountDepositRecord.setPayTime(DateUtil.date());
-        Deposit deposit = buildDeposit(accountDepositRecord);
-        depositService.deposit(deposit);
-        accountDepositRecord
-            .setRechargeStatus(
-                AccountRechargeStatusEnum.RECHARGE_SUCCESS.getCode());
-        accountDepositRecord.setDepositTime(DateUtil.date());
         updateById(accountDepositRecord);
     }
 
@@ -238,12 +233,6 @@ public class AccountDepositRecordServiceImpl extends
                     accountDepositRecord
                         .setPayStatus(AccountRechargePaymentStatusEnum.PAYMENT_SUCCESS.getCode());
                     accountDepositRecord.setPayTime(DateUtil.date());
-                    Deposit deposit = buildDeposit(accountDepositRecord);
-                    depositService.deposit(deposit);
-                    accountDepositRecord
-                        .setRechargeStatus(
-                            AccountRechargeStatusEnum.RECHARGE_SUCCESS.getCode());
-                    accountDepositRecord.setDepositTime(DateUtil.date());
                     break;
                 case CbestPayRespStatusConstant
                     .FAIL:
@@ -279,6 +268,62 @@ public class AccountDepositRecordServiceImpl extends
         deposit.setMerAccountTypeCode(MerAccountTypeCode.SELF.code());
         deposit.setChannel(accountDepositRecord.getPayType());
         return deposit;
+    }
+
+    @Override
+    public void execPendingAndFailureRechargeList() {
+        List<AccountDepositRecord> pendingAndFailureRechargeList = list(
+            Wrappers.<AccountDepositRecord>lambdaQuery()
+                .eq(AccountDepositRecord::getPayStatus,
+                    AccountRechargePaymentStatusEnum.PAYMENT_SUCCESS.getCode())
+                .in(AccountDepositRecord::getRechargeStatus,
+                    AccountRechargeStatusEnum.PENDING_RECHARGE.getCode(),
+                    AccountRechargeStatusEnum.RECHARGE_FAILURE.getCode()));
+        if (CollectionUtils.isEmpty(pendingAndFailureRechargeList)) {
+            return;
+        }
+        for (AccountDepositRecord accountDepositRecord : pendingAndFailureRechargeList) {
+            try {
+                Deposit deposit = buildDeposit(accountDepositRecord);
+                depositService.deposit(deposit);
+                accountDepositRecord
+                    .setRechargeStatus(
+                        AccountRechargeStatusEnum.RECHARGE_SUCCESS.getCode());
+                accountDepositRecord.setDepositTime(DateUtil.date());
+                updateById(accountDepositRecord);
+            } catch (BusiException e) {
+                log.error("支付成功后充值业务异常", e);
+                if (DateUtil
+                    .between(accountDepositRecord.getCreateTime(), new Date(),
+                        DateUnit.MINUTE) > 5) {
+                    log.error(StrUtil.format("超过5分钟未充值成功，发起支付冲正-accountDepositRecord:{}" + JSON
+                        .toJSONString(accountDepositRecord)));
+                    //5分支查询还未充值成功，发起支付冲正
+                    String payTradeNo = accountDepositRecord.getPayTradeNo();
+                    log.info(StrUtil.format("支付交易流水号[{}]5分支还未充值成功，调用支付冲正接口", payTradeNo));
+                    TradeCancelReq tradeCancelReq = new TradeCancelReq();
+                    tradeCancelReq.setTradeNo(payTradeNo);
+                    tradeCancelReq
+                        .setGatewayTradeNo(accountDepositRecord.getPayGatewayTradeNo());
+                    String market = accountDepositRecord.getMerCode();
+                    CbestPayBaseBizResp baseBizResp = cbestPayService
+                        .tradeCancel(market, tradeCancelReq);
+                    String tradeCancelBizStatus = baseBizResp.getBizStatus();
+                    if (CbestPayRespStatusConstant
+                        .SUCCESS.equals(tradeCancelBizStatus)) {
+                        accountDepositRecord.setPayStatus(
+                            AccountRechargePaymentStatusEnum.REFUND_SUCCESS.getCode());
+                        updateById(accountDepositRecord);
+                        log.info(StrUtil.format("支付交易流水号[{}]调用支付冲正接口成功", payTradeNo));
+                    } else if (CbestPayRespStatusConstant
+                        .FAIL.equals(tradeCancelBizStatus)) {
+                        log.error(StrUtil.format("支付交易流水号[{}]调用支付冲正接口失败", payTradeNo));
+                    }
+                }
+            } catch (Exception e) {
+                log.error("支付回调后充值其它异常", e);
+            }
+        }
     }
 
 }

@@ -44,7 +44,7 @@ public class MerInfoController  implements IController {
     @Autowired
     private FileUploadServiceUtil fileUploadService;
 
-    @GetMapping("/")
+    @GetMapping("")
     @ApiOperation("查询商户基本额度信息")
     @MerchantUser
     public R<SettleMerInfoResp> getAccountInfo(){

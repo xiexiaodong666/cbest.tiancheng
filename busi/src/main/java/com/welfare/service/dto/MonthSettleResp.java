@@ -2,6 +2,7 @@ package com.welfare.service.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -41,7 +42,10 @@ public class MonthSettleResp {
     private String merCooperationMode;
 
     @ApiModelProperty(value = "创建时间")
-    private String createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
 
     @ApiModelProperty(value = "合作方式名称")
     private String merCooperationModeName;
@@ -71,21 +75,18 @@ public class MonthSettleResp {
     private String rebateAmount;
 
     @ApiModelProperty(value = "结算周期start")
-    private Date settleStartDay;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JSONField(format = "yyyy-MM-dd")
+    private Date settleStartTime;
 
     @ApiModelProperty(value = "结算周期end")
-    private Date settleEndDay;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JSONField(format = "yyyy-MM-dd")
+    private Date settleEndTime;
 
-    private List<settleAccountInfo> settleAccountInfoList;
+    private List<SettleStatisticsInfoDTO> settleStatisticsInfoList;
 
-
-    public class settleAccountInfo{
-        @ApiModelProperty(value = "费用类型编码")
-        private String settleAccountTypeCode;
-        @ApiModelProperty(value = "费用类型名称")
-        private String settleAccountTypeName;
-        @ApiModelProperty(value = "费用类型金额")
-        private BigDecimal amount;
-    }
 
 }

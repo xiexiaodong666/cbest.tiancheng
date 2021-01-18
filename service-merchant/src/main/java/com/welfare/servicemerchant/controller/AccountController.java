@@ -27,6 +27,7 @@ import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -172,7 +173,9 @@ public class AccountController implements IController {
   @ApiOperation("员工账号消费汇总")
   public R<AccountBillDTO> quertBill(
       @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
+      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) {
     return success(accountService.quertBill(accountCode, createTimeStart, createTimeEnd));
   }
@@ -193,7 +196,9 @@ public class AccountController implements IController {
   @GetMapping("/account/bill/export")
   @ApiOperation("员工账号消费汇总导出")
   public R<String> exportAccountBill(@RequestParam @ApiParam("accountCode") String accountCode,
+      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd) throws IOException {
     List<AccountBillDetailDTO> exportList = accountService
         .exportBillDetail(accountCode, createTimeStart, createTimeEnd);

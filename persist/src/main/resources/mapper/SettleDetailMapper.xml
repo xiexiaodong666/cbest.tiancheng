@@ -157,9 +157,11 @@
         t1.mer_code as merCode,
         t1.mer_name as mer_name,
         sum(
-        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' and t1.mer_account_type!='self' then t1.trans_amount
-        when t3.mer_code != t1.mer_code and t1.trans_type='refund' and t1.mer_account_type!='self' then t1.trans_amount*-1
-        else 0 end
+        case
+            when t3.mer_code != t1.mer_code and t4.mer_cooperation_mode = 'PAY_FIRST' and t1.mer_account_type!='self' then 0
+            when t3.mer_code != t1.mer_code and t1.trans_type='consume' and t1.mer_account_type!='self' then t1.trans_amount
+            when t3.mer_code != t1.mer_code and t1.trans_type='refund' and t1.mer_account_type!='self' then t1.trans_amount*-1
+            else 0 end
         ) as unSettleAmount,
         sum(
         case when t3.mer_code != t1.mer_code and t1.trans_type='consume' and t1.mer_account_type='self' then t1.trans_amount
@@ -203,7 +205,9 @@
              else 0 end
         ) as transAmount,
         sum(
-        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
+        case
+             when t3.mer_code != t1.mer_code and t4.mer_cooperation_mode = 'PAY_FIRST' and t1.mer_account_type!='self' then 0
+             when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
              when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
              else 0 end
         ) as settleAmount,
@@ -225,7 +229,26 @@
         'system' as create_user
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
+        <if test="excludeIdList!=null and excludeIdList.size!=0">
+            and t1.id is not in(
+            <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
+            )
+        </if>
         group by t1.mer_code
+    </select>
+
+    <select id="getSettleStatisticsInfoByCondition" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery" resultType="com.welfare.persist.dto.SettleStatisticsInfoDTO">
+        select
+            t1.mer_account_type as settleAccountTypeCode,
+            t1.mer_account_type_name as settleAccountTypeName,
+            sum(
+                case when t1.trans_type='consume' then t1.trans_amount
+                when t1.trans_type='refund' then t1.trans_amount*-1
+                else 0 end
+            ) as amount
+        <include refid="queryListTable"></include>
+        <include refid="queryListCondition"></include>
+        group by t1.mer_code,t1.mer_account_type,t1.mer_account_type_name
     </select>
 
     <select id="getSettleDetailInfo" resultType="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
@@ -245,14 +268,13 @@
         t1.mer_account_type_name as welfareTypeName,
         case when t1.trans_type='consume' then t1.trans_amount
              when t1.trans_type='refund' then 0 end as payAmount,
-        t1.trans_amount-t1.trans_amount*IFNULL(t2.rebate_ratio,0) as settleAmount
+        case
+            when t3.mer_code != t1.mer_code and t4.mer_cooperation_mode = 'PAY_FIRST' and t1.mer_account_type!='self' then 0
+            when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
+            when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
+            else 0 end as settleAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
-        <if test="excludeIdList!=null and excludeIdList.size!=0">
-            and t1.id is not in(
-            <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
-            )
-        </if>
         order by t1.id
         <if test="limit!=null">
             limit #{limit}
@@ -269,6 +291,11 @@
         ) as settleAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
+        <if test="excludeIdList!=null and excludeIdList.size!=0">
+            and t1.id is not in(
+            <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
+            )
+        </if>
         group by t1.mer_code
     </select>
 
@@ -276,6 +303,7 @@
         from settle_detail t1
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
+        left join merchant t4 on t1.mer_code=t4.mer_code and t4.deleted=0
     </sql>
     <sql id="queryListCondition">
         <where>

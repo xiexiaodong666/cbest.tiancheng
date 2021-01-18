@@ -29,8 +29,8 @@ public interface PlatformUserFeignClient {
       @RequestParam("merchant_code") String merchant_code,
       @RequestParam("username") String username,
       @RequestParam("status") Integer status,
-      @RequestParam("start_create_time") Date start_create_time,
-      @RequestParam("end_create_time") Date end_create_time
+      @RequestParam("start_create_time") String start_create_time,
+      @RequestParam("end_create_time") String end_create_time
   );
 
   /**

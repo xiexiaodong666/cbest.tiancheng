@@ -1,6 +1,7 @@
 package com.welfare.persist.mapper;
 
 import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.WelfareSettleDTO;
 import com.welfare.persist.dto.WelfareSettleDetailDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
@@ -66,4 +67,11 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
      * @return
      */
     MonthSettle getSettleByCondition(WelfareSettleDetailQuery welfareSettleDetailQuery);
+
+    /**
+     * 查询结算统计信息
+     * @param welfareSettleDetailQuery
+     * @return
+     */
+    List<SettleStatisticsInfoDTO> getSettleStatisticsInfoByCondition(WelfareSettleDetailQuery welfareSettleDetailQuery);
 }

@@ -320,14 +320,15 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.isEmpty(supplierStore)) {
       throw new BusiException("门店不存在");
     }
-    boolean flag = supplierStoreDao.removeById(id) && merchantAddressService.delete(
+    supplierStoreDao.removeById(id);
+    merchantAddressService.delete(
         SupplierStore.class.getSimpleName(), id);
     //同步商城中台
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(supplierStoreSyncConverter.toD(supplierStore));
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).build());
-    return flag;
+    return Boolean.TRUE;
   }
 
   @Override

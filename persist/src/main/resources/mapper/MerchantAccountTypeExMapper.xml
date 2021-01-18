@@ -12,7 +12,7 @@
         mat.create_time
         FROM
         merchant_account_type mat
-        LEFT JOIN merchant m ON mat.mer_code = m.mer_code
+        LEFT JOIN merchant m ON mat.mer_code = m.mer_code and mat.deleted=0 and m.deleted=0
         GROUP BY
         mat.mer_code
         <where>

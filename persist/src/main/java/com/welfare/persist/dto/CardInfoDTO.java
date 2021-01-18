@@ -1,5 +1,6 @@
 package com.welfare.persist.dto;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import java.util.Date;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.Data;
  * @date 2021/1/13 5:26 PM
  */
 @Data
+@ExcelIgnoreUnannotated
 public class CardInfoDTO {
   /**
    * 卡片id

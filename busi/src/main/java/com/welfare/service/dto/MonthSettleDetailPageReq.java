@@ -44,4 +44,7 @@ public class MonthSettleDetailPageReq extends PageReq {
 
     @ApiModelProperty(value = "门店类型 自营：self，第三方：third")
     private String storeType;
+
+    @ApiModelProperty(value = "消费流水号")
+    private String transNo;
 }

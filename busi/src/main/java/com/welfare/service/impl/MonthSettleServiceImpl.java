@@ -109,8 +109,11 @@ public class MonthSettleServiceImpl implements MonthSettleService {
             return monthSettleResp;
         }).collect(Collectors.toList());
 
-
-        return collect.get(0);
+        if(!monthSettleDTOS.isEmpty()){
+            return collect.get(0);
+        }else{
+            return null;
+        }
     }
 
     @Override

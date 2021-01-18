@@ -98,7 +98,8 @@
 	acstr.store_code AS storeCode,
 	ss.store_name AS storeName,
 	ss.consum_type AS consumType,
-	acstr.scene_consum_type AS sceneConsumType
+	acstr.scene_consum_type AS sceneConsumType,
+	acs.create_time as createTime
 FROM
 	account_consume_scene acs
 	inner JOIN account_consume_scene_store_relation acstr ON acs.id = acstr.account_consume_scene_id

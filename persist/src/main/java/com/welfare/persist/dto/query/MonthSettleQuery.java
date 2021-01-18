@@ -10,6 +10,7 @@ import lombok.Data;
  */
 @Data
 public class MonthSettleQuery{
+    private Long id;
 
     private String merCode;
 

@@ -136,10 +136,10 @@ WHERE a.mer_code = at.mer_code
     WHERE
     abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
-      and acs.create_time <![CDATA[>=]]> #{createTimeStart}
+      and abd.create_time <![CDATA[>=]]> #{createTimeStart}
     </if>
     <if test="createTimeEnd != null ">
-      and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
+      and abd.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
   </select>
 
@@ -165,10 +165,10 @@ WHERE a.mer_code = at.mer_code
     WHERE
     abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
-      and acs.create_time <![CDATA[>=]]> #{createTimeStart}
+      and abd.create_time <![CDATA[>=]]> #{createTimeStart}
     </if>
     <if test="createTimeEnd != null ">
-      and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
+      and abd.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
   </select>
 

@@ -15,7 +15,7 @@
     SELECT
     msr.id as id,
     msr.STATUS as status,
-    m.create_time as createTime,
+    msr.create_time as createTime,
     msr.ramark as ramark,
     msr.mer_code as merCode,
     group_concat( msr.store_code ) as storeCode,
@@ -34,6 +34,7 @@
     <if test="endTime != null ">and msr.create_time &lt;= #{endTime}</if>
     GROUP BY
     msr.mer_code
+    order by    msr.create_time  desc
   </select>
 
   <select id="getMerchantStoreRelationListBySyncStatus"

@@ -26,4 +26,11 @@ public class AccountDeductionDetailDao extends ServiceImpl<AccountDeductionDetai
         queryWrapper.eq(AccountDeductionDetail.TRANS_TYPE,transType);
         return list(queryWrapper);
     }
+
+    public List<AccountDeductionDetail> queryByRelatedTransNoAndTransType(String relatedTransNo, String transType) {
+        QueryWrapper<AccountDeductionDetail> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountDeductionDetail.RELATED_TRANS_NO, relatedTransNo);
+        queryWrapper.eq(AccountDeductionDetail.TRANS_TYPE,transType);
+        return list(queryWrapper);
+    }
 }

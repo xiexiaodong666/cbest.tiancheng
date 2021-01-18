@@ -41,7 +41,7 @@ public class MerchantAccountOperation {
 
         MerchantBillDetail merchantBillDetail = new MerchantBillDetail();
         merchantBillDetail.setBalanceType(operateType.code());
-        merchantBillDetail.setTransAmount(operatedAmount);
+        merchantBillDetail.setTransAmount(incOrDecType.equals(IncOrDecType.INCREASE) ? operatedAmount : operatedAmount.negate());
         merchantBillDetail.setTransType(operateType.code());
         merchantBillDetail.setTransNo(transNo);
         merchantBillDetail.setMerCode(merchantCredit.getMerCode());

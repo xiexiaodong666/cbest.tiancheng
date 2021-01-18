@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -167,15 +168,19 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     BeanUtils.copyProperties(accountConsumeSceneReq, accountConsumeScene);
     validationAccountConsumeScene(accountConsumeScene,false);
     accountConsumeSceneDao.updateById(accountConsumeScene);
+    UpdateWrapper wrapper = new UpdateWrapper();
+    wrapper.eq(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,accountConsumeScene.getId());
+    accountConsumeSceneStoreRelationDao.remove(wrapper);
     List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = new ArrayList<>();
     accountConsumeSceneReq.getAccountConsumeSceneStoreRelationReqList().stream()
         .forEach(accountConsumeSceneStoreRelationReq -> {
           AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation = new AccountConsumeSceneStoreRelation();
           BeanUtils.copyProperties(accountConsumeSceneStoreRelationReq,
               accountConsumeSceneStoreRelation);
+          accountConsumeSceneStoreRelation.setAccountConsumeSceneId(accountConsumeScene.getId());
           accountConsumeSceneStoreRelationList.add(accountConsumeSceneStoreRelation);
         });
-    boolean updateResult = accountConsumeSceneStoreRelationDao.updateBatchById(accountConsumeSceneStoreRelationList);
+    boolean updateResult = accountConsumeSceneStoreRelationDao.saveOrUpdateBatch(accountConsumeSceneStoreRelationList);
     if( updateResult ){
       accountChangeEventRecordService.batchSaveBySceneStoreRelation(accountConsumeSceneStoreRelationList);
       //下发数据

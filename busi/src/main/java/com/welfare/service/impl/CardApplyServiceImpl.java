@@ -127,42 +127,44 @@ public class CardApplyServiceImpl implements CardApplyService {
     CardApply cardApply = cardApplyDao.getById(cardApplyUpdateReq.getId());
     QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
-    queryWrapper.eq(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.WRITTEN.code());
+    queryWrapper.ne(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.NEW.code());
     List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapper);
     if (CollectionUtils.isNotEmpty(cardInfoList)) {
-      throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "卡片已写入，无法再更改信息", null);
-    }
+      if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
+        cardApply.setCardName(cardApplyUpdateReq.getCardName());
+      }
+    } else {
+      if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
+        cardApply.setCardName(cardApplyUpdateReq.getCardName());
+      }
 
-    if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
-      cardApply.setCardName(cardApplyUpdateReq.getCardName());
-    }
+      if (Strings.isNotEmpty(cardApplyUpdateReq.getCardType())) {
+        cardApply.setCardType(cardApplyUpdateReq.getCardType());
+      }
 
-    if (Strings.isNotEmpty(cardApplyUpdateReq.getCardType())) {
-      cardApply.setCardType(cardApplyUpdateReq.getCardType());
-    }
+      if (Strings.isNotEmpty(cardApplyUpdateReq.getCardMedium())) {
+        cardApply.setCardMedium(cardApplyUpdateReq.getCardMedium());
+      }
 
-    if (Strings.isNotEmpty(cardApplyUpdateReq.getCardMedium())) {
-      cardApply.setCardMedium(cardApplyUpdateReq.getCardMedium());
-    }
+      if (cardApplyUpdateReq.getCardNum() != null) {
+        cardApply.setCardNum(cardApplyUpdateReq.getCardNum());
+      }
 
-    if (cardApplyUpdateReq.getCardNum() != null) {
-      cardApply.setCardNum(cardApplyUpdateReq.getCardNum());
-    }
+      if (Strings.isNotEmpty(cardApplyUpdateReq.getIdentificationCode())) {
+        cardApply.setIdentificationCode(cardApplyUpdateReq.getIdentificationCode());
+      }
 
-    if (Strings.isNotEmpty(cardApplyUpdateReq.getIdentificationCode())) {
-      cardApply.setIdentificationCode(cardApplyUpdateReq.getIdentificationCode());
-    }
+      if (cardApplyUpdateReq.getIdentificationLength() != null) {
+        cardApply.setIdentificationLength(cardApplyUpdateReq.getIdentificationLength());
+      }
 
-    if (cardApplyUpdateReq.getIdentificationLength() != null) {
-      cardApply.setIdentificationLength(cardApplyUpdateReq.getIdentificationLength());
-    }
+      if (Strings.isNotEmpty(cardApplyUpdateReq.getMerCode())) {
+        cardApply.setMerCode(cardApplyUpdateReq.getMerCode());
+      }
 
-    if (Strings.isNotEmpty(cardApplyUpdateReq.getMerCode())) {
-      cardApply.setMerCode(cardApplyUpdateReq.getMerCode());
-    }
-
-    if (Strings.isNotEmpty(cardApplyUpdateReq.getRemark())) {
-      cardApply.setRemark(cardApplyUpdateReq.getRemark());
+      if (Strings.isNotEmpty(cardApplyUpdateReq.getRemark())) {
+        cardApply.setRemark(cardApplyUpdateReq.getRemark());
+      }
     }
 
     queryWrapper.clear();

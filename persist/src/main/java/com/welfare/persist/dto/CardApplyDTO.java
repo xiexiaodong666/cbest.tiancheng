@@ -84,4 +84,10 @@ public class CardApplyDTO {
    */
   @ApiModelProperty("备注")
   private String remark;
+
+  /**
+   * 是否可以更改申请卡片信息
+   */
+  @ApiModelProperty("是否可以更改申请卡片信息")
+  private Boolean canChange;
 }

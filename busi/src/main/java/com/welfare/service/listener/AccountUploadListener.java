@@ -2,30 +2,19 @@ package com.welfare.service.listener;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
-import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.dto.AccountUploadDTO;
-import com.welfare.service.sync.event.AccountEvt;
-import com.welfare.service.utils.AccountUtils;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -54,11 +43,9 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
 
   private final SequenceService sequenceService;
 
-  private final AccountChangeEventRecordService accountChangeEventRecordService;
 
   private static StringBuilder uploadInfo = new StringBuilder();
 
-  private final ApplicationContext applicationContext;
 
 
   @Override
@@ -66,31 +53,32 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
     Account account = new Account();
     BeanUtils.copyProperties(accountUploadDTO, account);
     Boolean validate = validationAccount(account);
-    if( validate.booleanValue() == true ){
+    if (validate.booleanValue() == true) {
       Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
       account.setAccountCode(accounCode);
       accountUploadList.add(account);
     }
   }
 
-  private boolean validationAccount(Account account){
+  private boolean validationAccount(Account account) {
     Merchant merchant = merchantService.detailByMerCode(account.getMerCode());
-    if( null == merchant ) {
+    if (null == merchant) {
       uploadInfo.append("不存在的商户:").append(account.getMerCode()).append(";");
       return false;
     }
-    AccountType accountType = accountTypeService.queryByTypeCode(account.getMerCode(),account.getAccountTypeCode());
-    if( null == accountType ){
+    AccountType accountType = accountTypeService
+        .queryByTypeCode(account.getMerCode(), account.getAccountTypeCode());
+    if (null == accountType) {
       uploadInfo.append("不存在的员工类型编码:").append(account.getAccountCode()).append(";");
       return false;
     }
     Department department = departmentService.getByDepartmentCode(account.getStoreCode());
-    if( null ==  department){
+    if (null == department) {
       uploadInfo.append("不存在的员工部门::").append(account.getStoreCode()).append(";");
       return false;
     }
     Account queryAccount = accountService.findByPhone(account.getPhone());
-    if( null != queryAccount ){
+    if (null != queryAccount) {
       uploadInfo.append("员工手机号已经存在:").append(account.getAccountCode()).append(";");
       return false;
     }
@@ -100,15 +88,8 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
   @Override
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
     if (!CollectionUtils.isEmpty(accountUploadList)) {
-      Boolean result = accountService.batchSave(accountUploadList);
-      if (result == true && StringUtils.isEmpty(uploadInfo.toString())) {
-        List<AccountChangeEventRecord> recordList = AccountUtils.getEventList(accountUploadList,AccountChangeType.ACCOUNT_NEW);
-        accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
-        //批量回写
-        List<Map<String,Object>> mapList = AccountUtils.getMaps(recordList);
-        accountService.batchUpdateChangeEventId(mapList);
-        applicationContext.publishEvent( AccountEvt
-            .builder().typeEnum(ShoppingActionTypeEnum.BATCH_ADD).accountList(accountUploadList).build());
+      accountService.batchUpload(accountUploadList);
+      if (StringUtils.isEmpty(uploadInfo.toString())) {
         uploadInfo.append("导入成功");
       }
     }

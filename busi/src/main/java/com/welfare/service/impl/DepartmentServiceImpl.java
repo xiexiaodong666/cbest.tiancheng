@@ -67,7 +67,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             throw new BusiException("部门不存在");
         }
         //顶级部门的父级为机构
-        if(EmptyChecker.isEmpty(department.getDepartmentParent())||"0".equals(department.getDepartmentParent())){
+        if(department.getDepartmentParent().equals(department.getMerCode())){
             Merchant merchant=merchantService.getMerchantByMerCode(department.getMerCode());
             department.setDepartmentParentName(EmptyChecker.isEmpty(merchant)?"":merchant.getMerName());
         }else {

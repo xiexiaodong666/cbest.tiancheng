@@ -157,6 +157,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req) {
     Page<SupplierStoreWithMerchantDTO> pageResult = supplierStoreExMapper.listWithMerchant(
         page, req);
+    dictService.trans(SupplierStoreWithMerchantDTO.class,SupplierStore.class.getSimpleName(),true,pageResult.getRecords().toArray());
     // 消费门店拉取需要过滤已有配置的门店和 移除没有勾选的消费方法
 /*    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
 
@@ -199,9 +200,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.isEmpty(store)) {
       throw new BusiException("门店不存在");
     }
-    //字典转义
-    dictService.trans(
-        SupplierStoreDetailDTO.class, SupplierStore.class.getSimpleName(), true, store);
+    try {
+      Map<String, Boolean> consumeTypeMap = mapper.readValue(
+              store.getConsumType(), Map.class);
+      store.setConsumType(ConsumeTypesUtils.transferStr(consumeTypeMap));
+    }catch (JsonProcessingException e){
+      log.info("消费类型格式错误{}",store.getConsumType());
+    }
     //商户名称
     store.setMerName(merchantService.getMerchantByMerCode(store.getMerCode()).getMerName());
     //自提点地址
@@ -237,6 +242,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
       throw new BusiException("门店编码已存在");
     }
+    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
     SupplierStore save = supplierStoreAddConverter.toE((supplierStore));
     save.setStatus(0);
     save.setStorePath(save.getMerCode() + "-" + save.getStoreCode());
@@ -322,14 +328,15 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.isEmpty(supplierStore)) {
       throw new BusiException("门店不存在");
     }
-    boolean flag = supplierStoreDao.removeById(id) && merchantAddressService.delete(
+    supplierStoreDao.removeById(id);
+    merchantAddressService.delete(
         SupplierStore.class.getSimpleName(), id);
     //同步商城中台
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(supplierStoreSyncConverter.toD(supplierStore));
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).build());
-    return flag;
+    return Boolean.TRUE;
   }
 
   @Override
@@ -337,6 +344,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
     boolean flag2 = true;
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
+      supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
       flag2 = this.syncConsumeType(supplierStore.getStoreCode(), supplierStore.getConsumType());
       accountConsumeSceneStoreRelationService.updateStoreConsumeType(
           supplierStore.getStoreCode(), supplierStore.getConsumType());

@@ -68,6 +68,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -138,7 +139,7 @@ public class AccountServiceImpl implements AccountService {
   public String uploadAccount(MultipartFile multipartFile) {
     try {
       AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,
-          merchantService,departmentService,sequenceService,accountChangeEventRecordService,applicationContext);
+          merchantService,departmentService,sequenceService);
       EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();
@@ -155,7 +156,7 @@ public class AccountServiceImpl implements AccountService {
   public String accountBatchBindCard(MultipartFile multipartFile) {
     try {
       AccountBatchBindCardListener accountBatchBindCardListener = new AccountBatchBindCardListener(
-          cardInfoDao, accountDao, cardApplyDao,cardInfoService);
+          accountDao,cardInfoService,this);
       EasyExcel.read(multipartFile.getInputStream(), AccountBindCardDTO.class,
           accountBatchBindCardListener).sheet().doRead();
       String result = accountBatchBindCardListener.getUploadInfo().toString();
@@ -402,5 +403,32 @@ public class AccountServiceImpl implements AccountService {
     accountQueryWrapper.eq(Account.PHONE,phone);
     accountQueryWrapper.eq(Account.MER_CODE, merCode);
     return accountDao.getOne(accountQueryWrapper);
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void batchBindCard(List<CardInfo> cardInfoList, List<Account> accountList) {
+    if( CollectionUtils.isEmpty(cardInfoList) ||
+        CollectionUtils.isEmpty(accountList)){
+      return;
+    }
+    cardInfoDao.saveBatch(cardInfoList);
+    accountDao.updateBatchById(accountList);
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void batchUpload(List<Account> accountList) {
+    Boolean result = this.batchSave(accountList);
+    if (result == true) {
+      List<AccountChangeEventRecord> recordList = AccountUtils
+          .getEventList(accountList, AccountChangeType.ACCOUNT_NEW);
+      accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
+      //批量回写
+      List<Map<String, Object>> mapList = AccountUtils.getMaps(recordList);
+      this.batchUpdateChangeEventId(mapList);
+      applicationContext.publishEvent(AccountEvt
+          .builder().typeEnum(ShoppingActionTypeEnum.BATCH_ADD).accountList(accountList).build());
+    }
   }
 }

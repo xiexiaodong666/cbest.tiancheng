@@ -34,7 +34,7 @@ FROM
 	card_info ci
 	LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
 	LEFT JOIN merchant m ON m.mer_code = ca.mer_code
-
+    where ci.deleted = 0
     <if test="applyCode != null and applyCode !='' ">and ca.apply_code = #{applyCode}
     </if>
     <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
@@ -106,6 +106,7 @@ WHERE
     card_info ci
     LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code
+    where ci.deleted = 0
 
     <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
     </if>

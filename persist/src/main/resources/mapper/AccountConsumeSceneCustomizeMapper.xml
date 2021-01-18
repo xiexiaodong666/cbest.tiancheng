@@ -50,7 +50,7 @@
       and acs.mer_code = #{merCode}
     </if>
     <if test="accountTypeName != ''  and accountTypeName != null ">
-      and act.type_name = #{accountTypeName}
+      and act.type_name like '${accountTypeName}%'
     </if>
     <if test="status != null ">
       and acs.status = #{status}

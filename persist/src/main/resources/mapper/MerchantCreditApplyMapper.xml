@@ -77,5 +77,6 @@
                 AND ap.approval_time le #{query.approvalTimeEnd}
             </if>
         </where>
+        ORDER BY ap.apply_time DESC
     </select>
 </mapper>

@@ -1,9 +1,8 @@
 spring:
   cache:
     type: redis
-  profiles: dev
   datasource:
-    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: mysql@123
   redis:
@@ -50,7 +49,6 @@ cbest:
     url: http://192.1.30.71:9999/gateway
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
-    notifyUrl: http://xxx/accountDepositRecord/payNotify
 
 exclude-header-interceptor:
   - /swagger*/**

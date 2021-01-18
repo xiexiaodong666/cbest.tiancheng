@@ -1,10 +1,12 @@
 package com.welfare.service.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.Tree;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,6 +56,26 @@ public class TreeUtil<T extends Tree> {
                 });
         if(EmptyChecker.notEmpty(childList)){
             beanTree.setChildren(childList);
+        }
+    }
+
+    /**
+     * 把树形结构铺开
+     * @return
+     */
+    public List<T>  spread(){   //调用的方法入口
+        List<T> spreadList=new ArrayList<>();
+        spreadChild(bodyList, spreadList);
+        return spreadList;
+    }
+
+    private void spreadChild(List<T> list,List<T> spreadList) {
+        for(T t: list){
+            spreadList.add(t);
+            if(EmptyChecker.notEmpty(t.getChildren())){
+                spreadChild(t.getChildren(),spreadList);
+            }
+
         }
     }
 }

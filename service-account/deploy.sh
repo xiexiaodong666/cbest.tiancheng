@@ -1,5 +1,6 @@
 #mvn clean install
 cd ..
+git pull
 mvn clean install
 cd ./service-account || exit
 scp ./target/e-welfare-account.jar root@172.30.37.188:/home/finance/App/e-welfare-account.e-cbest.lotest/release/

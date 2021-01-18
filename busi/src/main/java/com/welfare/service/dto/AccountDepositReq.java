@@ -18,4 +18,7 @@ public class AccountDepositReq {
 
     @ApiModelProperty("付款方式，微信传wechat")
     private String payType;
+
+    @ApiModelProperty("支付通知回调url")
+    private String notifyUrl;
 }

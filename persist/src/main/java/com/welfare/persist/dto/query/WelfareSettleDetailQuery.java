@@ -44,10 +44,18 @@ public class WelfareSettleDetailQuery {
     @ApiModelProperty(value = "需要剔除的id列表")
     private List<Long> excludeIdList;
 
-
+    /**
+     * 最小id
+     */
     private Long minId;
 
+    /**
+     * 查询数据量限制
+     */
     private Integer limit;
 
+    /**
+     * 线上的pos
+     */
     private String posOnlines;
 }

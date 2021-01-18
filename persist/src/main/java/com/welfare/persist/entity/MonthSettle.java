@@ -105,6 +105,19 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     @ApiModelProperty("确定时间")   
     private Date confirmTime;
 
+    /**
+     * 账单开始时间
+     */
+    @ApiModelProperty("账单开始时间")
+    private Date settleStartTime;
+
+    /**
+     * 账单结束时间
+     */
+    @ApiModelProperty("账单结束时间")
+    private Date settleEndTime;
+
+
     @ApiModelProperty("账单账户类型统计信息")
     private String settleStatisticsInfo;
     /**

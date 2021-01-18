@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
@@ -418,7 +419,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         Page<AccountDepositApply> page = new Page<>();
         page.setCurrent(currentPage);
         page.setSize(pageSize);
-        Page<AccountDepositApply> result = accountDepositApplyDao.page(page, QueryHelper.getWrapper(query));
+        QueryWrapper<AccountDepositApply> queryWrapper = QueryHelper.getWrapper(query);
+        queryWrapper.orderByDesc(AccountDepositApply.APPLY_TIME);
+        Page<AccountDepositApply> result = accountDepositApplyDao.page(page, queryWrapper);
         List<AccountDepositApplyInfo> infos = null;
         if (result != null && CollectionUtils.isNotEmpty(result.getRecords())) {
             List<AccountDepositApply> applys = result.getRecords();
@@ -435,7 +438,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
     @Override
     public List<AccountDepositApplyExcelInfo> list(AccountDepositApplyQuery query) {
-        List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
+        QueryWrapper<AccountDepositApply> queryWrapper = QueryHelper.getWrapper(query);
+        queryWrapper.orderByDesc(AccountDepositApply.APPLY_TIME);
+        List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(queryWrapper);
         List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
 //            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());
@@ -594,6 +599,13 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                                  MerchantUserInfo merchantUser, BigDecimal amount){
         if (merchant == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
+        }
+        if (StringUtils.isBlank(merchant.getMerIdentity())) {
+            throw new BusiException("商户没有设置属性！");
+        }
+        List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
+        if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持对属于[客户]的商户充值", null);
         }
         // 判断金额是否超限
         MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUser.getMerchantCode());

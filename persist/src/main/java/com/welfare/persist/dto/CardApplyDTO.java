@@ -1,7 +1,6 @@
 package com.welfare.persist.dto;
 
-import cn.afterturn.easypoi.excel.annotation.Excel;
-import cn.afterturn.easypoi.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -13,6 +12,7 @@ import lombok.Data;
  * @date 2021/1/15 4:17 PM
  */
 @Data
+@ExcelIgnoreUnannotated
 public class CardApplyDTO {
 
   /**
@@ -83,6 +83,5 @@ public class CardApplyDTO {
    * 备注
    */
   @ApiModelProperty("备注")
-  @ExcelIgnore
   private String remark;
 }

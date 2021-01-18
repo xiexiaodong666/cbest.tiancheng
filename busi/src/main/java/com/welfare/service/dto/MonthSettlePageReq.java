@@ -35,4 +35,7 @@ public class MonthSettlePageReq extends PageReq {
     @ApiModelProperty(value = "对账状态:待确认-unconfirmed 已确认-confirmed")
     private String recStatus;
 
+    @ApiModelProperty(value = "发送状态:待发送-unsended 已发送-sended")
+    private String sendStatus;
+
 }

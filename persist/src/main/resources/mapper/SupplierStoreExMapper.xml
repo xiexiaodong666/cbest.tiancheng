@@ -13,7 +13,7 @@
     ss.create_time as createTime
     FROM
     supplier_store ss
-    LEFT JOIN merchant m ON ss.mer_code = m.mer_code
+    LEFT JOIN merchant m ON ss.mer_code = m.mer_code and  m.deleted=0 and  ss.deleted=0
     <where>
       <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and ss.mer_code=#{req.merCode}
@@ -66,7 +66,7 @@
     status ,
     create_time createTime,
     0 as disabled
-    from supplier_store ss
+    from supplier_store ss where ss.deleted=0
     ) temp0
     <where>
       <if test="merCodes != null and merCodes.size()>0">
@@ -92,7 +92,7 @@
     create_time createTime,
     true as disabled
 
-    from merchant m
+    from merchant m where m.deleted=0
 
     ) temp
     <where>

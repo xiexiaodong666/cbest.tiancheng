@@ -11,10 +11,10 @@
     m.mer_type merType,
     m.mer_identity merIdentity,
     m.mer_cooperation_mode merCooperationMode,
-    m.create_time createTime,
     mc.credit_limit creditLimit,
     mc.remaining_limit remainingLimit,
-    mc.current_balance currentBalance
+    mc.current_balance currentBalance,
+    m.create_time createTime
     FROM
     merchant m
     LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code) temp0
@@ -44,13 +44,13 @@
     d.department_name merName,
     d.department_code merCode,
     d.department_parent departmentParent,
-    d.create_time createTime,
-    NULL merType,
+    d.department_type merType,
     NULL merIdentity,
     NULL merCooperationMode,
     NULL creditLimit,
     NULL remainingLimit,
-    NULL currentBalance
+    NULL currentBalance,
+    d.create_time createTime
     FROM
     department d) temp
 

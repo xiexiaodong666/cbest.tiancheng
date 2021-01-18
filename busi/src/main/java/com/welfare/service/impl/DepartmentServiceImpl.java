@@ -92,7 +92,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         String departmentCode;
         //构建path
         departmentCode=sequenceService.nextNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()).toString();
-        if(!department.getDepartmentParent().equals(department.getMerCode())){
+        if(department.getDepartmentParent().equals(department.getMerCode())){
             save.setDepartmentPath(department.getDepartmentParent()+"-"+departmentCode);
         }else{
             Department parent=this.getByDepartmentCode(department.getDepartmentParent());

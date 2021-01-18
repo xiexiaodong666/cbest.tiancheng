@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -103,7 +104,7 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/export-list")
     @ApiOperation("导出供应商门店列表")
-    public R exportList(StorePageReq req) throws IOException {
+    public R exportList(@RequestBody(required = false) StorePageReq req) throws IOException {
         return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(supplierStoreService.exportList(req), SupplierStoreWithMerchantDTO.class,"门店导出")));
 
     }

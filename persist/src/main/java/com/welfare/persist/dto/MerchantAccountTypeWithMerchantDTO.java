@@ -16,7 +16,11 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 public class MerchantAccountTypeWithMerchantDTO {
-
+    /**
+     * id
+     */
+    @ApiModelProperty("id")
+    private Long id;
     /**
      * 商户
      */

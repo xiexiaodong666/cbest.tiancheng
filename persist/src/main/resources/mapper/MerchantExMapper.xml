@@ -19,22 +19,22 @@
     merchant m
     LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code) temp0
     <where>
-      <if test="req.merCode!=null and req.merCode!=''">
+      <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and temp0.departmentCode=#{req.merCode}
       </if>
-      <if test="req.merName!=null and req.merName!=''">
+      <if test="req!=null and req.merName!=null and req.merName!=''">
         and temp0.departmentName like concat('%',#{req.merCode},'%')
       </if>
-      <if test="req.merType!=null and req.merType!=''">
+      <if test="req!=null and req.merType!=null and req.merType!=''">
         and temp0.merType=#{req.merType}
       </if>
-      <if test="req.merCooperationMode!=null and req.merCooperationMode!=''">
+      <if test="req!=null and req.merCooperationMode!=null and req.merCooperationMode!=''">
         and temp0.merCooperationMode=#{req.merCooperationMode}
       </if>
-      <if test="req.startTime!=null">
+      <if test="req!=null and req.startTime!=null">
         and temp0.createTime &gt;= #{req.startTime}
       </if>
-      <if test="req.endTime!=null">
+      <if test="req!=null and req.endTime!=null">
         and temp0.createTime &lt;= #{req.endTime}
       </if>
     </where>
@@ -55,22 +55,22 @@
     department d) temp
 
     <where>
-      <if test="req.merCode!=null and req.merCode!=''">
+      <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and temp.departmentCode=#{req.merCode}
       </if>
-      <if test="req.merName!=null and req.merName!=''">
+      <if test="req!=null and req.merName!=null and req.merName!=''">
         and temp.departmentName like concat('%',#{req.merCode},'%')
       </if>
-      <if test="req.merType!=null and req.merType!=''">
+      <if test="req!=null and req.merType!=null and req.merType!=''">
         and temp.merType=#{req.merType}
       </if>
-      <if test="req.merCooperationMode!=null and req.merCooperationMode!=''">
+      <if test="req!=null and req.merCooperationMode!=null and req.merCooperationMode!=''">
         and temp.merCooperationMode=#{req.merCooperationMode}
       </if>
-      <if test="req.startTime!=null">
+      <if test="req!=null and req.startTime!=null">
         and temp.createTime &gt;= #{req.startTime}
       </if>
-      <if test="req.endTime!=null">
+      <if test="req!=null and req.endTime!=null">
         and temp.createTime &lt;= #{req.endTime}
       </if>
     </where>

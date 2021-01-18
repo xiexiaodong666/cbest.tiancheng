@@ -6,6 +6,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.CardInfoDao;
+import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.mapper.CardInfoMapper;
@@ -46,10 +47,9 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public List<CardInfo> listByApplyCode(String applyCode, Integer status) {
-    QueryWrapper<CardInfo> wrapper = new QueryWrapper<>();
-    wrapper.eq(CardInfo.APPLY_CODE, applyCode).eq(CardInfo.CARD_STATUS, status);
-    return cardInfoDao.list(wrapper);
+  public List<CardInfoApiDTO> listByApplyCode(String applyCode, Integer status) {
+
+    return cardInfoMapper.listByApplyCode(applyCode, status);
   }
 
   @Override

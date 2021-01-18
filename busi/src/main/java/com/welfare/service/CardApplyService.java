@@ -27,7 +27,7 @@ public interface CardApplyService {
   List<CardApplyDTO> exportCardApplys(String cardName,String merCode, String cardType, String cardMedium,
       Integer status, Date startTime,Date endTime);
 
-  CardApply getMerchantStoreRelationById(
+  CardApply getCardApplyById(
       QueryWrapper<CardApply> queryWrapper);
 
   boolean add(CardApplyAddReq cardApplyAddReq);

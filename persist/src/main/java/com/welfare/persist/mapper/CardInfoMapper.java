@@ -2,6 +2,7 @@ package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
 import java.util.Date;
@@ -20,6 +21,9 @@ import org.apache.ibatis.annotations.Param;
 public interface CardInfoMapper extends BaseMapper<CardInfo> {
 
   public String getCardId(@Param("merCode") String merCode);
+
+  public List<CardInfoApiDTO> listByApplyCode(@Param("applyCode") String applyCode,
+      @Param("status") Integer status);
 
   public Page<CardInfoDTO> list(Page<CardInfo> page, @Param("applyCode") String applyCode,
       @Param("cardName") String cardName,

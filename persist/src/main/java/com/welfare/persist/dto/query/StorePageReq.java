@@ -31,4 +31,7 @@ public class StorePageReq {
 
     @ApiModelProperty("结束时间")
     private Date endTime;
+
+    @ApiModelProperty("门店编码集合")
+    private List<String> storeCodes;
 }

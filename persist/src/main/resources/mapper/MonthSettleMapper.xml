@@ -29,6 +29,10 @@
         <result property="rebateAmount" column="rebate_amount"/>
         <result property="rebate" column="rebate"/>
         <result property="realAmount" column="real_amount"/>
+        <result property="settleStartTime" column="settle_start_time"/>
+        <result property="settleEndTime" column="settle_end_time"/>
+        <result property="settleStatisticsInfo" column="settle_statistics_info"/>
+        <result property="createTime" column="create_time"/>
     </resultMap>
 
     <select id="selectMonthSettle" resultMap="monthSettleDTO" parameterType="com.welfare.persist.dto.query.MonthSettleQuery">
@@ -47,6 +51,10 @@
          t1.confirm_time,
          t1.rebate_amount,
          t2.mer_cooperation_mode,
+         t1.settle_start_time,
+         t1.settle_end_time,
+         t1.settle_statistics_info,
+         t1.create_time,
          case when t2.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
               when t2.mer_cooperation_mode = 'PAYED' then '后付费' end as mer_cooperation_mode_name
         from month_settle t1

@@ -15,6 +15,7 @@ import com.welfare.common.util.MerchantUserHolder;
 import  com.welfare.persist.dao.MonthSettleDao;
 import com.welfare.persist.dto.MonthSettleDTO;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
@@ -79,8 +80,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
             BeanUtils.copyProperties(monthSettleDTO, monthSettleResp);
             String settleStatisticsInfo = monthSettleDTO.getSettleStatisticsInfo();
             if(StringUtils.isNotBlank(settleStatisticsInfo)){
-                List<MonthSettleResp.settleAccountInfo> settleAccountInfos = JSON.parseArray(settleStatisticsInfo, MonthSettleResp.settleAccountInfo.class);
-                monthSettleResp.setSettleAccountInfoList(settleAccountInfos);
+                List<SettleStatisticsInfoDTO> settleAccountInfos = JSON.parseArray(settleStatisticsInfo, SettleStatisticsInfoDTO.class);
+                monthSettleResp.setSettleStatisticsInfoList(settleAccountInfos);
             }
             return monthSettleResp;
         }).collect(Collectors.toList()));

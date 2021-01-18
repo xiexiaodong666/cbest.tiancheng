@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
@@ -9,6 +10,7 @@ import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dto.MerTransDetailDTO;
+import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
@@ -136,6 +138,10 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
+        
+        List<SettleStatisticsInfoDTO> settleStatisticsInfoDTOList = settleDetailMapper.getSettleStatisticsInfoByCondition(welfareSettleDetailQuery);
+        monthSettle.setSettleStatisticsInfo(JSONObject.toJSONString(settleStatisticsInfoDTOList));
+
         monthSettleMapper.insert(monthSettle);
 
         welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);

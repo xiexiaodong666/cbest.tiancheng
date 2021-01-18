@@ -24,4 +24,6 @@ public class MonthSettleQuery{
     private String settleStatus;
 
     private String recStatus;
+
+    private String sendStatus;
 }

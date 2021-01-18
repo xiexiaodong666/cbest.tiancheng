@@ -99,8 +99,10 @@ public class PaymentServiceImpl implements PaymentService {
         String paymentScene = paymentRequest.calculatePaymentScene();
         AccountConsumeScene accountConsumeScene = accountConsumeSceneDao
                 .getOneByAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
+        Assert.notNull(accountConsumeScene,"未找到该账户的可用交易场景配置");
         AccountConsumeSceneStoreRelation sceneStoreRelation = accountConsumeSceneStoreRelationDao
                 .getOneBySceneIdAndStoreNo(accountConsumeScene.getId(), paymentRequest.getStoreNo());
+        Assert.notNull(sceneStoreRelation,"未找到该门店的可用交易场景配置");
         List<String> sceneConsumeTypes = Arrays.asList(sceneStoreRelation.getSceneConsumType().split(","));
         if(!sceneConsumeTypes.contains(paymentScene)){
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景:"+paymentScene,null);

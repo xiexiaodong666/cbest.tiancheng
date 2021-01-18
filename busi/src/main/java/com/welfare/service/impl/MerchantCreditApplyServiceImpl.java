@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.UserInfo;
@@ -24,6 +25,7 @@ import com.welfare.service.utils.PageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -255,7 +257,11 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
         }
         WelfareConstant.MerCreditType type = WelfareConstant.MerCreditType.findByCode(typeStr);
-        if (!merchant.getMerIdentity().equals(MerIdentityEnum.customer.getCode())) {
+        if (StringUtils.isBlank(merchant.getMerIdentity())) {
+            throw new BusiException("商户没有设置属性！");
+        }
+        List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
+        if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持[客户]充值", null);
         }
         if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payFirt.getCode())) {

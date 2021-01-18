@@ -140,7 +140,7 @@ public class MonthSettleController implements IController {
     public R settlementDetailDealTask(String date){
         Map params = new HashMap<>();
         params.put("date", date);
-        settlementDetailDealTask.execute(JSON.toJSONString(date));
+        settlementDetailDealTask.execute(JSON.toJSONString(params));
         return R.success();
     }
 
@@ -149,7 +149,7 @@ public class MonthSettleController implements IController {
     public R settlementBillBuildTask(String date){
         Map params = new HashMap<>();
         params.put("date", date);
-        settlementBillBuildTask.execute(JSON.toJSONString(date));
+        settlementBillBuildTask.execute(JSON.toJSONString(params));
         return R.success();
     }
 

@@ -117,7 +117,7 @@ public class AccountController implements IController {
 
   @PostMapping("/delete")
   @ApiOperation("删除员工账号")
-  public R<Boolean> delete(@RequestParam(required = true) @ApiParam("id") String id) {
+  public R<Boolean> delete(@RequestBody(required = true) @ApiParam("id") String id) {
     try {
       return success(accountService.delete(Long.parseLong(id)));
     } catch (BusiException be) {
@@ -128,8 +128,8 @@ public class AccountController implements IController {
 
   @PostMapping("/updateAccountStatus")
   @ApiOperation("激活或锁定账号")
-  public R<Boolean> updateAccountStatus(@RequestParam(required = true) @ApiParam("id") String id,
-      @RequestParam(required = true) @ApiParam("accountStatus") Integer accountStatus) {
+  public R<Boolean> updateAccountStatus(@RequestBody(required = true) @ApiParam("id") String id,
+      @RequestBody(required = true) @ApiParam("accountStatus") Integer accountStatus) {
 
     try {
       return success(accountService.active(Long.parseLong(id), accountStatus));

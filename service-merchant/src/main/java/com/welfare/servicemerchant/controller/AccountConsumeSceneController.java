@@ -121,8 +121,8 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/updateStatus")
   @ApiOperation("激活")
-  public R<Boolean> updateStatus(@RequestParam(required = true) @ApiParam("id") String id,
-      @RequestParam(required = false) @ApiParam("使用状态") Integer status) {
+  public R<Boolean> updateStatus(@RequestBody(required = true) @ApiParam("id") String id,
+      @RequestBody(required = false) @ApiParam("使用状态") Integer status) {
     try {
       return success(accountConsumeSceneService.updateStatus(Long.parseLong(id), status));
     } catch (BusiException be) {
@@ -132,7 +132,7 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/delete")
   @ApiOperation("删除员工消费配置")
-  public R<Boolean> delete(@RequestParam(required = true) @ApiParam("id") String id) {
+  public R<Boolean> delete(@RequestBody(required = true) @ApiParam("id") String id) {
     try {
       return success(accountConsumeSceneService.delete(Long.parseLong(id)));
     }catch (BusiException be){

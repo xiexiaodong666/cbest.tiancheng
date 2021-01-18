@@ -1,11 +1,6 @@
 package com.welfare.service;
 
-import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
-import com.welfare.service.operator.payment.domain.PaymentOperation;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * Description: 扣款相关service
@@ -22,7 +17,7 @@ public interface PaymentService {
      * @param paymentRequest
      * @return
      */
-    List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest);
+    PaymentRequest paymentRequest(PaymentRequest paymentRequest);
 
     /**
      * 查询支付结果

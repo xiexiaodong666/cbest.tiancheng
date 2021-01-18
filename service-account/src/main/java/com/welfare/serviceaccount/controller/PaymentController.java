@@ -33,21 +33,21 @@ public class PaymentController implements IController {
     @PostMapping("/online")
     @ApiOperation("线上支付")
     public R<OnlinePaymentRequest> newOnlinePaymentRequest(@RequestBody OnlinePaymentRequest paymentRequest) {
-        paymentService.handlePayRequest(paymentRequest);
+        paymentService.paymentRequest(paymentRequest);
         return success(paymentRequest);
     }
 
     @PostMapping("/barcode")
     @ApiOperation("条码支付")
     public R<BarcodePaymentRequest> newBarcodePaymentRequest(@RequestBody BarcodePaymentRequest paymentRequest) {
-        paymentService.handlePayRequest(paymentRequest);
+        paymentService.paymentRequest(paymentRequest);
         return success(paymentRequest);
     }
 
     @PostMapping("/card")
     @ApiOperation("刷卡支付")
     public R<CardPaymentRequest> newCardPaymentRequest(@RequestBody CardPaymentRequest paymentRequest) {
-        paymentService.handlePayRequest(paymentRequest);
+        paymentService.paymentRequest(paymentRequest);
         return success(paymentRequest);
     }
 

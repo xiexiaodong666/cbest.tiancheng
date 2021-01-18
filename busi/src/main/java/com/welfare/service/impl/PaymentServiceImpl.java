@@ -1,5 +1,7 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -27,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SELF;
-import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
 
 /**
  * Description:
@@ -55,7 +56,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest) {
+    @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#payentRequest.transNo")
+    public PaymentRequest paymentRequest(PaymentRequest paymentRequest) {
+        PaymentRequest requestHandled = queryResult(paymentRequest.getTransNo());
+        if(requestHandled.getPaymentStatus().equals(WelfareConstant.AsyncStatus.SUCCEED.code())){
+            log.warn("重复的支付请求，直接返回已经处理完成的request{}", JSON.toJSONString(requestHandled));
+            return requestHandled;
+        }
         Long accountCode = paymentRequest.calculateAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
         //chargePaymentScene(paymentRequest, account);
@@ -74,7 +81,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAccountName(account.getAccountName());
             paymentRequest.setAccountBalance(account.getAccountBalance());
             paymentRequest.setAccountCredit(account.getSurplusQuota());
-            return paymentOperations;
+            return paymentRequest;
         } finally {
             merAccountLock.unlock();
         }
@@ -262,8 +269,8 @@ public class PaymentServiceImpl implements PaymentService {
                     .collect(Collectors.toMap(MerchantBillDetail::getBalanceType, merchantBillDetail -> merchantBillDetail));
             MerchantBillDetail currentBalanceDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.CURRENT_BALANCE.code());
             MerchantBillDetail remainingLimitDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.REMAINING_LIMIT.code());
-            accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount());
-            accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount());
+            accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount().abs());
+            accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount().abs());
         }
 
 

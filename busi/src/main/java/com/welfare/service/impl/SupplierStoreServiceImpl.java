@@ -157,6 +157,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req) {
     Page<SupplierStoreWithMerchantDTO> pageResult = supplierStoreExMapper.listWithMerchant(
         page, req);
+    dictService.trans(SupplierStoreWithMerchantDTO.class,SupplierStore.class.getSimpleName(),true,pageResult.getRecords().toArray());
     // 消费门店拉取需要过滤已有配置的门店和 移除没有勾选的消费方法
 /*    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
 
@@ -199,9 +200,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.isEmpty(store)) {
       throw new BusiException("门店不存在");
     }
-    //字典转义
-    dictService.trans(
-        SupplierStoreDetailDTO.class, SupplierStore.class.getSimpleName(), true, store);
     //商户名称
     store.setMerName(merchantService.getMerchantByMerCode(store.getMerCode()).getMerName());
     //自提点地址

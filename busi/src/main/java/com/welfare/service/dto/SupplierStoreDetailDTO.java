@@ -78,7 +78,6 @@ public class SupplierStoreDetailDTO {
      * 更新日期
      */
     @ApiModelProperty("更新日期")  
-    @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 外部编码

@@ -19,6 +19,18 @@ public class SupplierStoreWithMerchantDTO {
      */
     @ApiModelProperty("id")
 	private Long id;
+
+    /**
+     * 门店状态
+     */
+    @ApiModelProperty("status")
+    private String status;
+
+    /**
+     * 门店状态转义
+     */
+    @ApiModelProperty("statusName")
+    private String statusName;
     /**
      * 商户代码
      */
@@ -57,16 +69,6 @@ public class SupplierStoreWithMerchantDTO {
     @ApiModelProperty("虚拟收银机号")
     private String cashierNo;
 
-    /**
-     * 消费方式
-     */
-    @ApiModelProperty("消费方式,json"
-        + "{"
-        + "  \"O2O\": true,"
-        + "  \"ONLINE_MALL\": true,"
-        + "  \"SHOP_CONSUMPTION\": false"
-        + "}")
-    private String consumType;
     /**
      * 创建人
      */

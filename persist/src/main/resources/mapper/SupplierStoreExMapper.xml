@@ -4,7 +4,7 @@
 <mapper namespace="com.welfare.persist.mapper.SupplierStoreExMapper">
   <select id="listWithMerchant" resultType="com.welfare.persist.dto.SupplierStoreWithMerchantDTO">
     SELECT
-    m.id as id,
+    ss.id as id,
     store_code as storeCode,
     store_name as storeName,
     m.mer_name as merName,
@@ -95,5 +95,14 @@
     from merchant m
 
     ) temp
+    <where>
+      <if test="merCodes != null and merCodes.size()>0">
+        and temp.merCode in
+        <foreach item="item" index="index" collection="merCodes" open="(" separator=","
+                 close=")">
+          #{item}
+        </foreach>
+      </if>
+    </where>
   </select>
 </mapper>

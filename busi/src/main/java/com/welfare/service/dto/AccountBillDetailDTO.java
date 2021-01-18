@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import lombok.Data;
 
 /**
@@ -50,6 +51,6 @@ public class AccountBillDetailDTO implements Serializable {
    */
   @ApiModelProperty("创建时间(日期)")
   @ExcelProperty(value = "创建时间")
-  private String createTime;
+  private Date createTime;
 
 }

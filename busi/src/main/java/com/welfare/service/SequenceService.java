@@ -27,7 +27,7 @@ public interface SequenceService {
      * @param sequenceType
      * @return
      */
-    String nextFullNo(String sequenceType, String prefix, Long startId);
+    String nextFullNo(String sequenceType, String prefix, Long startId, int num);
 
     /**
      * 生成下一个序列号
@@ -37,5 +37,5 @@ public interface SequenceService {
      * @return
      */
 
-    Long nextNo(String sequenceType, String prefix, Long startId);
+    Long nextNo(String sequenceType, String prefix, Long startId, int num);
 }

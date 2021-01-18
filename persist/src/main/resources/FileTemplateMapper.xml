@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.FileTemplateMapper">
+    <sql id="tableName">
+        file_template
+    </sql>
+
+    <sql id="baseColumn">
+        id,file_type,url,deleted,create_user,create_time,update_user,update_time,version
+    </sql>
+
+</mapper>

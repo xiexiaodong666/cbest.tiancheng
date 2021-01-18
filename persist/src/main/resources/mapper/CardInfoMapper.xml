@@ -57,7 +57,6 @@ FROM
     <if test="bindStartTime != null ">and ci.bind_time &gt;= #{bindStartTime}</if>
     <if test="bindEndTime != null ">and ci.bind_time &lt;= #{bindEndTime}</if>
 
-    order by ci.create_time desc
   </select>
 
   <select id="listByApplyCode" resultType="com.welfare.persist.dto.CardInfoApiDTO">

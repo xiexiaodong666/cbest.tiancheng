@@ -25,4 +25,7 @@ public interface AccountDepositRecordService extends IService<AccountDepositReco
     void payNotify(CbestPayBaseResp resp);
 
     void execPendingPaymentList();
+
+    void execPendingAndFailureRechargeList();
+
 }

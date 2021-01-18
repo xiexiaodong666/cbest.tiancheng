@@ -29,8 +29,11 @@
       <if test="req.endTime!=null">
         and ss.create_time &lt;= #{req.endTime}
       </if>
+      <if test="req.status!=null">
+        and ss.status = #{req.status}
+      </if>
       <if test="req.storeCodes != null and req.storeCodes.size()>0">
-        and ss.store_code not in
+        and ss.store_code  in
         <foreach close=")" collection="req.storeCodes" item="item" open="(" separator=", ">
           #{item}
         </foreach>

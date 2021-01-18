@@ -155,7 +155,7 @@ public class AccountServiceImpl implements AccountService {
   public String accountBatchBindCard(MultipartFile multipartFile) {
     try {
       AccountBatchBindCardListener accountBatchBindCardListener = new AccountBatchBindCardListener(
-          cardInfoDao, accountDao, cardApplyDao);
+          cardInfoDao, accountDao, cardApplyDao,cardInfoService);
       EasyExcel.read(multipartFile.getInputStream(), AccountBindCardDTO.class,
           accountBatchBindCardListener).sheet().doRead();
       String result = accountBatchBindCardListener.getUploadInfo().toString();
@@ -383,11 +383,7 @@ public class AccountServiceImpl implements AccountService {
     if (null == cardInfo) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号不存在", null);
     }
-    QueryWrapper<CardInfo> cardInfoQueryWrapper = new QueryWrapper();
-    cardInfoQueryWrapper.eq(CardInfo.CARD_ID, cardId);
-    cardInfoQueryWrapper.isNotNull(CardInfo.ACCOUNT_CODE);
-    CardInfo queryCardInfo = cardInfoDao.getOne(cardInfoQueryWrapper);
-    if (null != queryCardInfo) {
+    if (cardInfoService.cardIsBind(cardId)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
     }
     //绑定创建卡号信息

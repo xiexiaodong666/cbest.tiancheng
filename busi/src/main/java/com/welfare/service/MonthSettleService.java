@@ -25,6 +25,8 @@ public interface MonthSettleService {
      */
     BasePageVo<MonthSettleResp> pageQuery(MonthSettlePageReq monthSettleReqDto);
 
+    MonthSettleResp queryById(Long id);
+
     /**
      * 根据主键账单id、部分限制条件，分页查询月账单明细
      * @param monthSettleDetailReq

@@ -60,6 +60,9 @@
         from month_settle t1
         LEFT JOIN merchant t2 on t1.mer_code = t2.mer_code
         <where>
+            <if test="id!=null and id!=''">
+                and t1.id = #{id}
+            </if>
             <if test="merCode!=null and merCode!=''">
                 and t1.mer_code = #{merCode}
             </if>

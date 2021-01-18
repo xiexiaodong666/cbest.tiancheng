@@ -91,6 +91,29 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
+    public MonthSettleResp queryById(Long id) {
+
+        MonthSettleQuery monthSettleQuery = new MonthSettleQuery();
+        monthSettleQuery.setId(id);
+
+        List<MonthSettleDTO> monthSettleDTOS = monthSettleMapper.selectMonthSettle(monthSettleQuery);
+
+        List<MonthSettleResp> collect = monthSettleDTOS.stream().map(monthSettleDTO -> {
+            MonthSettleResp monthSettleResp = new MonthSettleResp();
+            BeanUtils.copyProperties(monthSettleDTO, monthSettleResp);
+            String settleStatisticsInfo = monthSettleDTO.getSettleStatisticsInfo();
+            if (StringUtils.isNotBlank(settleStatisticsInfo)) {
+                List<SettleStatisticsInfoDTO> settleAccountInfos = JSON.parseArray(settleStatisticsInfo, SettleStatisticsInfoDTO.class);
+                monthSettleResp.setSettleStatisticsInfoList(settleAccountInfos);
+            }
+            return monthSettleResp;
+        }).collect(Collectors.toList());
+
+
+        return collect.get(0);
+    }
+
+    @Override
     public BasePageVo<MonthSettleDetailResp> pageQueryMonthSettleDetail(Long id, MonthSettleDetailPageReq monthSettleDetailPageReq) {
         MonthSettleDetailReq monthSettleDetailReq = new MonthSettleDetailReq();
         BeanUtils.copyProperties(monthSettleDetailPageReq, monthSettleDetailReq);

@@ -229,6 +229,11 @@
         'system' as create_user
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
+        <if test="excludeIdList!=null and excludeIdList.size!=0">
+            and t1.id is not in(
+            <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
+            )
+        </if>
         group by t1.mer_code
     </select>
 
@@ -270,11 +275,6 @@
             else 0 end as settleAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
-        <if test="excludeIdList!=null and excludeIdList.size!=0">
-            and t1.id is not in(
-            <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
-            )
-        </if>
         order by t1.id
         <if test="limit!=null">
             limit #{limit}
@@ -291,6 +291,11 @@
         ) as settleAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
+        <if test="excludeIdList!=null and excludeIdList.size!=0">
+            and t1.id is not in(
+            <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
+            )
+        </if>
         group by t1.mer_code
     </select>
 

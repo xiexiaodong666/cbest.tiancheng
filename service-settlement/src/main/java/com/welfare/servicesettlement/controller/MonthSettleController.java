@@ -70,6 +70,14 @@ public class MonthSettleController implements IController {
         return success(monthSettleRespDtoPage);
     }
 
+    @GetMapping("/list/{id}")
+    @ApiOperation("根据id查询结算账单")
+    public R<MonthSettleResp> pageQuery(@PathVariable("id")Long id){
+
+        MonthSettleResp monthSettleResp =  monthSettleService.queryById(id);
+        return success(monthSettleResp);
+    }
+
 
     @GetMapping("/{id}")
     @ApiOperation("分页查询结算账单明细列表")

@@ -3,6 +3,7 @@
 <mapper namespace="com.welfare.persist.mapper.MerchantAccountTypeExMapper">
     <select id="listWithMerchant" resultType="com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO">
         SELECT
+        mat.id as id,
         m.mer_name AS merName,
         mat.mer_code AS merCode,
         count( mat.mer_account_type_code ) count,

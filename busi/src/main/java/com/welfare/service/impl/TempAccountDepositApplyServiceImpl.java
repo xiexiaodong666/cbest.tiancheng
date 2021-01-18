@@ -141,6 +141,6 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
 
   @Override
   public AccountApplyTotalDTO getUserCountAndTotalmount(String fileId) {
-    return tempAccountDepositApplyDao.getBaseMapper().getUserCountAndTotalmount(fileId);
+    return tempAccountDepositApplyDao.getBaseMapper().getUserCountAndTotalAmount(fileId);
   }
 }

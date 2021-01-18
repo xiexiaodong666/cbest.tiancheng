@@ -13,6 +13,6 @@ public class CbestPayConfig {
 
     private String appKey;
 
-    private String notifyUrl;
+
 
 }

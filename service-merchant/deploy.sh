@@ -1,3 +1,4 @@
+git pull
 mvn clean install
 
 scp ./service-merchant/target/e-welfare-merchant.jar root@172.30.37.188:/home/finance/App/e-welfare-merchant.e-cbest.lotest/release/

@@ -64,6 +64,10 @@ public class AccountBatchBindCardListener extends AnalysisEventListener<AccountB
       uploadInfo.append("卡号:").append(accountBindCardDTO.getCardId()).append("已经绑定其他账号;");
       return;
     }
+    if( cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue() ){
+      uploadInfo.append("卡号:").append(accountBindCardDTO.getCardId()).append("请确认该卡片状态;");
+      return;
+    }
     cardInfo.setAccountCode(account.getAccountCode());
     cardInfo.setBindTime(new Date());
     cardInfo.setCardStatus(CardStatus.BIND.code());

@@ -120,6 +120,7 @@ public class RefundServiceImpl implements RefundService {
         refundRequest.setAccountCredit(account.getSurplusQuota());
         refundRequest.setAccountCode(account.getAccountCode());
         refundRequest.setAccountName(account.getAccountName());
+        refundRequest.setMerCode(account.getMerCode());
         refundRequest.setRefundStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
     }
 
@@ -158,6 +159,7 @@ public class RefundServiceImpl implements RefundService {
             refundRequest.setAccountCredit(account.getSurplusQuota());
             refundRequest.setAccountCode(account.getAccountCode());
             refundRequest.setAccountName(account.getAccountName());
+            refundRequest.setMerCode(account.getMerCode());
         }
         return refundRequest;
     }

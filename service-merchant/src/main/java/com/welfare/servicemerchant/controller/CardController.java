@@ -162,7 +162,7 @@ public class CardController implements IController {
 
     QueryWrapper<Merchant> queryWrapperM = new QueryWrapper<>();
 
-    queryWrapperM.eq(Merchant.MER_CODE, cardApply.getApplyCode());
+    queryWrapperM.eq(Merchant.MER_CODE, cardApply.getMerCode());
 
     Merchant merchant = merchantService.getMerchantByMerCode(queryWrapperM);
 

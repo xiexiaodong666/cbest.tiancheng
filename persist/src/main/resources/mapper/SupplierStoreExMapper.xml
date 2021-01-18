@@ -3,7 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.SupplierStoreExMapper">
   <select id="listWithMerchant" resultType="com.welfare.persist.dto.SupplierStoreWithMerchantDTO">
-    SELECT
+    select * from (SELECT
     ss.id as id,
     store_code as storeCode,
     store_name as storeName,
@@ -13,7 +13,7 @@
     ss.create_time as createTime
     FROM
     supplier_store ss
-    LEFT JOIN merchant m ON ss.mer_code = m.mer_code and  m.deleted=0 and  ss.deleted=0
+    LEFT JOIN merchant m ON ss.mer_code = m.mer_code and m.deleted=0 and ss.deleted=0
     <where>
       <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and ss.mer_code=#{req.merCode}
@@ -34,12 +34,13 @@
         and ss.status = #{req.status}
       </if>
       <if test="req!=null and req.storeCodes != null and req.storeCodes.size()>0">
-        and ss.store_code  in
+        and ss.store_code in
         <foreach close=")" collection="req.storeCodes" item="item" open="(" separator=", ">
           #{item}
         </foreach>
       </if>
     </where>
+    ) temp ORDER BY temp.createTime desc
   </select>
 
   <select id="queryMerSupplierStoreDTList" resultType="com.welfare.persist.dto.MerSupplierStoreDTO">

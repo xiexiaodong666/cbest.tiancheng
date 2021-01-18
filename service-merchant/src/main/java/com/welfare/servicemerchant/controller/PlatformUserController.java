@@ -51,8 +51,8 @@ public class PlatformUserController {
       @RequestParam(required = false) String merchant_code,
       @RequestParam(required = false) String username,
       @RequestParam(required = false) Integer status,
-      @RequestParam(required = false) Date start_create_time,
-      @RequestParam(required = false) Date end_create_time
+      @RequestParam(required = false) String start_create_time,
+      @RequestParam(required = false) String end_create_time
   ) {
     PlatformUserResponse<PlatformUserDataResponse<ShoppingPlatformUser>> response = platformUserFeignClient.getPlatformUserList(
         size, current, merchant_code, username, status, start_create_time, end_create_time);
@@ -135,8 +135,8 @@ public class PlatformUserController {
       @RequestParam(required = false) String username,
       @RequestParam(required = false) Integer status,
       @RequestParam(required = false) String merchant_code,
-      @RequestParam(required = false) Date start_create_time,
-      @RequestParam(required = false) Date end_create_time
+      @RequestParam(required = false) String start_create_time,
+      @RequestParam(required = false) String end_create_time
   ) throws IOException {
     List<ShoppingPlatformUser> platformUserList = new ArrayList<>();
 

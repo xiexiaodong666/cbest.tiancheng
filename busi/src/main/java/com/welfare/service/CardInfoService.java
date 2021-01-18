@@ -65,4 +65,6 @@ public interface CardInfoService {
       String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
       Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
       Date bindEndTime);
+
+  boolean cardIsBind(String cardId);
 }

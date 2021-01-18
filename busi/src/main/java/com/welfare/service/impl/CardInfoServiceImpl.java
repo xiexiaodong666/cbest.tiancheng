@@ -100,4 +100,17 @@ public class CardInfoServiceImpl implements CardInfoService {
                                endTime, bindStartTime, bindEndTime
     );
   }
+
+  @Override
+  public boolean cardIsBind(String cardId) {
+    QueryWrapper<CardInfo> cardInfoQueryWrapper = new QueryWrapper();
+    cardInfoQueryWrapper.eq(CardInfo.CARD_ID, cardId);
+    cardInfoQueryWrapper.isNotNull(CardInfo.ACCOUNT_CODE);
+    CardInfo queryCardInfo = cardInfoDao.getOne(cardInfoQueryWrapper);
+    if( null == queryCardInfo ){
+      return false;
+    }else{
+      return true;
+    }
+  }
 }

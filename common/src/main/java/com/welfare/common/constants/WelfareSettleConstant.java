@@ -164,5 +164,5 @@ public class WelfareSettleConstant {
     }
 
 
-    public static final Integer LIMIT = 5000;
+    public static final Integer LIMIT = 2000;
 }

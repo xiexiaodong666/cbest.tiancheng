@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@ControllerAdvice(value = {"com.welfare.controller","com.welfare.serviceaccount.controller","com.welfare.servicemerchant.controller"})
+@ControllerAdvice(value = {"com.welfare.controller","com.welfare.serviceaccount.controller","com.welfare.servicemerchant.controller","com.welfare.servicesettlement.controller"})
 public class ExceptionController implements IController {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionController.class);
 

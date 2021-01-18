@@ -18,7 +18,11 @@
                  when trans_amount&lt;0 then 'out' end as inOrOutType,
             trans_type as  transType,
             trans_amount as inOrOutAmount,
-            current_balance+remaining_limit+rebate_limit as allAmount
+            case when trans_type='rechargeLimit' then recharge_limit
+                 when trans_type='currentBalance' then current_balance
+                 when trans_type='creditLimit' then credit_limit
+                 when trans_type='remainingLimit' then remaining_limit
+                 when trans_type='rebateLimit' then rebate_limit end as allAmount
         from merchant_bill_detail
         <where>
             <if test="merCode!=null and merCode!=''">

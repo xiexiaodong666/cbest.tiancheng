@@ -74,23 +74,6 @@ public class MonthSettleServiceImpl implements MonthSettleService {
             return monthSettleRespPage;
         }
 
-        Map<String, Object> summaryInfo = monthSettleMapper.selectMonthSettleSummaryInfo(monthSettleQuery);
-        String minSettleMonth = (String)summaryInfo.get("minSettleMonth");
-        String maxSettleMonth = (String)summaryInfo.get("maxSettleMonth");
-
-        Date dayMaxByMontStr = null;
-        Date dayMinByMonthStr = null;
-        try {
-            dayMaxByMontStr = DateUtil.getDayMaxByMontStr(maxSettleMonth);
-            dayMinByMonthStr = DateUtil.getDayMinByMonthStr(minSettleMonth);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        summaryInfo.put("billStartDay", DateUtil.dateTime2Str(dayMinByMonthStr, DateUtil.DEFAULT_DATE_FORMAT));
-        summaryInfo.put("billEndDay", DateUtil.dateTime2Str(dayMaxByMontStr, DateUtil.DEFAULT_DATE_FORMAT));
-
-
         monthSettleRespPage.setRecords(monthSettleDTOPageInfo.getList().stream().map(monthSettleDTO -> {
             MonthSettleResp monthSettleResp = new MonthSettleResp();
             BeanUtils.copyProperties(monthSettleDTO, monthSettleResp);
@@ -102,7 +85,6 @@ public class MonthSettleServiceImpl implements MonthSettleService {
             return monthSettleResp;
         }).collect(Collectors.toList()));
 
-        monthSettleRespPage.setExt(summaryInfo);
 
         return monthSettleRespPage;
     }
@@ -222,25 +204,9 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         MonthSettleDetailQuery monthSettleDetailQuery = new MonthSettleDetailQuery();
         BeanUtils.copyProperties(monthSettleDetailReq, monthSettleDetailQuery);
-        monthSettleDetailQuery.setMerCode(monthSettle.getMerCode());
 
-        //限制查询起始结束时间
-        String settleMonth = monthSettle.getSettleMonth();
-        Date dayMax = null;
-        Date dayMin = null;
-        try {
-            dayMax = DateUtil.getDayMaxByMontStr(settleMonth);
-            dayMin = DateUtil.getDayMinByMonthStr(settleMonth);
-        } catch (ParseException e) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"参数异常，错误到月份格式："+settleMonth, null);
-        }
-        if(monthSettleDetailReq.getStartTime() == null || monthSettleDetailReq.getStartTime().before(dayMin)){
-            monthSettleDetailQuery.setStartTime(dayMin);
-        }
-        if(monthSettleDetailReq.getEndTime() == null || monthSettleDetailReq.getEndTime().after(dayMax)){
-            monthSettleDetailQuery.setEndTime(dayMax);
-        }
         monthSettleDetailQuery.setPosOnlines(posOnlines);
+        monthSettleDetailQuery.setSettleNo(monthSettle.getSettleNo());
         return monthSettleDetailQuery;
     }
 }

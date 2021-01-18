@@ -17,7 +17,7 @@
     m.create_time createTime
     FROM
     merchant m
-    LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code) temp0
+    LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code ORDER BY m.create_time desc) temp0
     <where>
       <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and temp0.departmentCode=#{req.merCode}
@@ -52,7 +52,7 @@
     NULL currentBalance,
     d.create_time createTime
     FROM
-    department d) temp
+    department d ORDER BY d.create_time desc) temp
 
     <where>
       <if test="req!=null and req.merCode!=null and req.merCode!=''">

@@ -40,7 +40,7 @@ public abstract class PaymentRequest {
     private BigDecimal amount = BigDecimal.ZERO;
     @ApiModelProperty("是否离线，用于区分是离线支付还是在线支付")
     private Boolean offline;
-    @ApiModelProperty("支付状态，0：新增，1：处理中，2：处理成功，-1：处理失败")
+    @ApiModelProperty("支付状态，0：新增，1：处理中，2：处理成功，3:已退款，-1：处理失败")
     private Integer paymentStatus;
     @ApiModelProperty("账户号")
     private Long accountCode;
@@ -52,6 +52,8 @@ public abstract class PaymentRequest {
     private BigDecimal accountCredit;
     @ApiModelProperty("支付时间")
     private Date paymentDate;
+    @ApiModelProperty("退款交易流水号,返回参数")
+    private String refundTransNo;
 
     public String calculatePaymentScene(){
         String consumeType = o2oOrOnlineShopping(machineNo);

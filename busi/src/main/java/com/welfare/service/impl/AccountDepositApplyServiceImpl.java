@@ -419,7 +419,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         Page<AccountDepositApply> page = new Page<>();
         page.setCurrent(currentPage);
         page.setSize(pageSize);
-        Page<AccountDepositApply> result = accountDepositApplyDao.page(page, QueryHelper.getWrapper(query));
+        QueryWrapper<AccountDepositApply> queryWrapper = QueryHelper.getWrapper(query);
+        queryWrapper.orderByDesc(AccountDepositApply.APPLY_TIME);
+        Page<AccountDepositApply> result = accountDepositApplyDao.page(page, queryWrapper);
         List<AccountDepositApplyInfo> infos = null;
         if (result != null && CollectionUtils.isNotEmpty(result.getRecords())) {
             List<AccountDepositApply> applys = result.getRecords();
@@ -436,7 +438,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
     @Override
     public List<AccountDepositApplyExcelInfo> list(AccountDepositApplyQuery query) {
-        List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(QueryHelper.getWrapper(query));
+        QueryWrapper<AccountDepositApply> queryWrapper = QueryHelper.getWrapper(query);
+        queryWrapper.orderByDesc(AccountDepositApply.APPLY_TIME);
+        List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(queryWrapper);
         List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
 //            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());

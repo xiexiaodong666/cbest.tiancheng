@@ -3,7 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.MerchantExMapper">
   <select id="listWithCredit" resultType="com.welfare.persist.dto.MerchantWithCreditDTO">
-    select * from (SELECT
+    select * from (select * from (SELECT
     m.id id,
     m.mer_name merName,
     m.mer_code merCode,
@@ -17,13 +17,13 @@
     m.create_time createTime
     FROM
     merchant m
-    LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code and mc.deleted=0 and m.deleted=0 ORDER BY m.create_time asc) temp0
+    LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code and mc.deleted=0 and m.deleted=0 ) temp0
     <where>
       <if test="req!=null and req.merCode!=null and req.merCode!=''">
-        and temp0.departmentCode=#{req.merCode}
+        and temp0.merCode=#{req.merCode}
       </if>
       <if test="req!=null and req.merName!=null and req.merName!=''">
-        and temp0.departmentName like concat('%',#{req.merCode},'%')
+        and temp0.merName like concat('%',#{req.merCode},'%')
       </if>
       <if test="req!=null and req.merType!=null and req.merType!=''">
         and temp0.merType=#{req.merType}
@@ -52,14 +52,14 @@
     NULL currentBalance,
     d.create_time createTime
     FROM
-    department d where d.deleted=0  ORDER BY d.create_time asc) temp
+    department d where d.deleted=0  ) temp
 
     <where>
       <if test="req!=null and req.merCode!=null and req.merCode!=''">
-        and temp.departmentCode=#{req.merCode}
+        and temp.merCode=#{req.merCode}
       </if>
       <if test="req!=null and req.merName!=null and req.merName!=''">
-        and temp.departmentName like concat('%',#{req.merCode},'%')
+        and temp.merName like concat('%',#{req.merCode},'%')
       </if>
       <if test="req!=null and req.merType!=null and req.merType!=''">
         and temp.merType=#{req.merType}
@@ -74,5 +74,6 @@
         and temp.createTime &lt;= #{req.endTime}
       </if>
     </where>
+    )temp3 ORDER BY temp3.createTime desc
   </select>
 </mapper>

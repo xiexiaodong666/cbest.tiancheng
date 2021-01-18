@@ -18,6 +18,7 @@ import com.welfare.common.enums.AccountRechargePaymentStatusEnum;
 import com.welfare.common.enums.AccountRechargeStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.AccountUserHolder;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountDepositRecord;
 import com.welfare.persist.mapper.AccountDepositRecordMapper;
@@ -80,8 +81,8 @@ public class AccountDepositRecordServiceImpl extends
         if (accountPayTypeEnum == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "支付方式有误", null);
         }
-
-        Account account = accountService.getByAccountCode(req.getAccountCode());
+        Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
+        Account account = accountService.getByAccountCode(accountCode);
         if (account == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "获取用户信息失败", null);
         }
@@ -95,7 +96,7 @@ public class AccountDepositRecordServiceImpl extends
         BigDecimal rechargeAmount = req.getRechargeAmount();
         createWXH5TradeReq.setTradeNo(payTradeNo);
         createWXH5TradeReq.setAmount(amountToFen(rechargeAmount));
-        createWXH5TradeReq.setNotifyUrl(cbestPayConfig.getNotifyUrl());
+        createWXH5TradeReq.setNotifyUrl(req.getNotifyUrl());
         String market = req.getMerCode();
 
         CbestPayBaseBizResp resp = cbestPayService.createWXH5Trade(market, createWXH5TradeReq);
@@ -125,9 +126,9 @@ public class AccountDepositRecordServiceImpl extends
         accountDepositRecord.setPayChannelTradeNo(createWXH5TradeResp.getChannelTradeNo());
 
         boolean saved = save(accountDepositRecord);
-        if (saved) {
+        if (!saved) {
             log.error(StrUtil.format("保存支付信息失败-入参：{}", JSON.toJSONString(req)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "保存支付信息失败", null);
         }
         //返回支付流水号和支付链接
         AccountDepositDTO accountDepositDTO = new AccountDepositDTO();

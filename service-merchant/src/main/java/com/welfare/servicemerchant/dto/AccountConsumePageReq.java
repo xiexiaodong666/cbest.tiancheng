@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -36,10 +37,12 @@ public class AccountConsumePageReq implements Serializable {
    * 创建时间_start
    */
   @ApiModelProperty("创建时间_start")
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTimeStart;
   /**
    * 创建时间_end
    */
   @ApiModelProperty("创建时间_end")
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTimeEnd;
 }

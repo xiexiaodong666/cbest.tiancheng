@@ -9,6 +9,7 @@ import com.welfare.persist.entity.AccountType;
 import com.welfare.service.AccountTypeService;
 import com.welfare.service.converter.AccountTypeConverter;
 import com.welfare.service.dto.AccountTypeDTO;
+import com.welfare.servicemerchant.dto.UpdateStatusReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -110,9 +111,9 @@ public class AccountTypeController implements IController {
 
   @PostMapping("/delete")
   @ApiOperation("删除员工类型")
-  public R<Boolean> delete(@RequestBody(required = true) @ApiParam("id") String id){
+  public R<Boolean> delete(@RequestBody UpdateStatusReq updateStatusReq){
     try {
-      return success(accountTypeService.delete(Long.parseLong(id)));
+      return success(accountTypeService.delete(Long.parseLong(updateStatusReq.getId())));
     }catch (BusiException be){
       return R.fail(be.getMessage());
     }

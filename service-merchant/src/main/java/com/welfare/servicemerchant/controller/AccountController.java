@@ -13,6 +13,7 @@ import com.welfare.service.dto.AccountDetailDTO;
 import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountReq;
+import com.welfare.servicemerchant.dto.UpdateStatusReq;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -117,9 +118,9 @@ public class AccountController implements IController {
 
   @PostMapping("/delete")
   @ApiOperation("删除员工账号")
-  public R<Boolean> delete(@RequestBody(required = true) @ApiParam("id") String id) {
+  public R<Boolean> delete(@RequestBody UpdateStatusReq updateStatusReq) {
     try {
-      return success(accountService.delete(Long.parseLong(id)));
+      return success(accountService.delete(Long.parseLong(updateStatusReq.getId())));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }
@@ -128,11 +129,10 @@ public class AccountController implements IController {
 
   @PostMapping("/updateAccountStatus")
   @ApiOperation("激活或锁定账号")
-  public R<Boolean> updateAccountStatus(@RequestBody(required = true) @ApiParam("id") String id,
-      @RequestBody(required = true) @ApiParam("accountStatus") Integer accountStatus) {
+  public R<Boolean> updateAccountStatus(@RequestBody UpdateStatusReq updateStatusReq) {
 
     try {
-      return success(accountService.active(Long.parseLong(id), accountStatus));
+      return success(accountService.active(Long.parseLong(updateStatusReq.getId()), updateStatusReq.getAccountStatus()));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }

@@ -60,7 +60,8 @@ public class PaymentServiceImpl implements PaymentService {
     @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
     public PaymentRequest paymentRequest(PaymentRequest paymentRequest) {
         PaymentRequest requestHandled = queryResult(paymentRequest.getTransNo());
-        if(requestHandled.getPaymentStatus().equals(WelfareConstant.AsyncStatus.SUCCEED.code())){
+        if(WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
+                ||WelfareConstant.AsyncStatus.REVERSED.code().equals(requestHandled.getPaymentStatus())){
             log.warn("重复的支付请求，直接返回已经处理完成的request{}", JSON.toJSONString(requestHandled));
             BeanUtils.copyProperties(requestHandled,paymentRequest);
             return requestHandled;

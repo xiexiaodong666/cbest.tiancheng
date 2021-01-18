@@ -37,4 +37,6 @@ public class RefundRequest {
     private BigDecimal accountBalance;
     @ApiModelProperty("账户信用额度(返回参数)")
     private BigDecimal accountCredit;
+    @ApiModelProperty("商户编码")
+    private String merCode;
 }

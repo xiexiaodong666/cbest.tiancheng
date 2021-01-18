@@ -111,7 +111,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if(Strings.isNotEmpty(merCode)) {
       merCodes.add(merCode);
     }
-    List<SupplierStore> supplierStores = supplierStoreExMapper.listUnionMerchant(merCodes);
+    List<SupplierStore> supplierStores;
     // 消费门店配置拉取
     if(SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(source)) {
       MerchantReq req = new MerchantReq();
@@ -138,6 +138,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         }
 
       }
+    } else {
+      supplierStores = supplierStoreExMapper.listUnionMerchant(merCodes);
     }
 
 

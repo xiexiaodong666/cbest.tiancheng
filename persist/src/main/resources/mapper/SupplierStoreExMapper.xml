@@ -64,7 +64,8 @@
     remark ,
     consum_type consumType,
     status ,
-    create_time createTime
+    create_time createTime,
+    0 as disabled
     from supplier_store ss
     ) temp0
     <where>
@@ -83,12 +84,14 @@
     mer_code merCode,
     mer_code storeCode,
     mer_name storeName,
-    0 storeParent,
+    false storeParent,
     mer_code storePath,
     remark ,
     null consumType,
     status ,
-    create_time createTime
+    create_time createTime,
+    true as disabled
+
     from merchant m
 
     ) temp

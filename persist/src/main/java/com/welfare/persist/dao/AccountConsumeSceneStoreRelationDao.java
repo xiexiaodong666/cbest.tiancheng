@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 员工消费场景关联门店(account_consume_scene_store_relation)数据DAO
  *
@@ -25,5 +27,12 @@ public class AccountConsumeSceneStoreRelationDao extends
         queryWrapper.eq(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,sceneId)
                 .eq(AccountConsumeSceneStoreRelation.STORE_CODE,storeNo);
         return getOne(queryWrapper);
+    }
+
+    public List<AccountConsumeSceneStoreRelation> queryBySceneIdsAndStoreNo(List<Long> sceneIds, String storeNo){
+        QueryWrapper<AccountConsumeSceneStoreRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,sceneIds)
+                .eq(AccountConsumeSceneStoreRelation.STORE_CODE,storeNo);
+        return list(queryWrapper);
     }
 }

@@ -200,6 +200,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.isEmpty(store)) {
       throw new BusiException("门店不存在");
     }
+    try {
+      Map<String, Boolean> consumeTypeMap = mapper.readValue(
+              store.getConsumType(), Map.class);
+      store.setConsumType(ConsumeTypesUtils.transferStr(consumeTypeMap));
+    }catch (JsonProcessingException e){
+      log.info("消费类型格式错误{}",store.getConsumType());
+    }
     //商户名称
     store.setMerName(merchantService.getMerchantByMerCode(store.getMerCode()).getMerName());
     //自提点地址
@@ -235,6 +242,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
       throw new BusiException("门店编码已存在");
     }
+    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
     SupplierStore save = supplierStoreAddConverter.toE((supplierStore));
     save.setStatus(0);
     save.setStorePath(save.getMerCode() + "-" + save.getStoreCode());
@@ -336,6 +344,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
     boolean flag2 = true;
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
+      supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
       flag2 = this.syncConsumeType(supplierStore.getStoreCode(), supplierStore.getConsumType());
       accountConsumeSceneStoreRelationService.updateStoreConsumeType(
           supplierStore.getStoreCode(), supplierStore.getConsumType());

@@ -119,7 +119,9 @@ public class MerchantStoreRelationController implements IController {
 
     MerchantStoreRelationDetailDTO merchantStoreRelationDetailDTO = convertMerchantStoreRelationDetailDTO(
         merchantStoreRelationList);
-    merchantStoreRelationDetailDTO.setMerName(merchant.getMerName());
+    if(merchant != null) {
+      merchantStoreRelationDetailDTO.setMerName(merchant.getMerName());
+    }
     merchantStoreRelationDetailDTO.setMerCode(merchantStoreRelation.getMerCode());
     merchantStoreRelationDetailDTO.setRamark(merchantStoreRelation.getRamark());
 

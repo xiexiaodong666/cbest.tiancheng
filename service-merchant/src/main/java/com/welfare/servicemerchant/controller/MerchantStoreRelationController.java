@@ -215,13 +215,12 @@ public class MerchantStoreRelationController implements IController {
 
       String storeCodes = merchantStoreRelationDTO.getStoreCode();
       String storeAlias = merchantStoreRelationDTO.getStoreAlias();
+      String[] storeCodeArray = storeCodes.split(",");
+      String[] storeAliaArray = storeAlias.split(",");
 
       if (Strings.isNotEmpty(storeCodes) && Strings.isNotEmpty(storeAlias)
-          && storeAlias.length() == storeCodes.length()) {
+          && storeCodeArray.length == storeAliaArray.length) {
         List<AdminMerchantStore> merchantStores = new ArrayList<>();
-
-        String[] storeCodeArray = storeCodes.split(",");
-        String[] storeAliaArray = storeAlias.split(",");
 
         for (int i = 0; i < storeCodeArray.length; i++) {
           AdminMerchantStore adminMerchantStore = new AdminMerchantStore();

@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -24,6 +26,7 @@ import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountType;
+import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper;
@@ -32,6 +35,7 @@ import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountService;
 import com.welfare.service.AccountTypeService;
+import com.welfare.service.CardInfoService;
 import com.welfare.service.DepartmentService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
@@ -64,6 +68,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -91,6 +96,7 @@ public class AccountServiceImpl implements AccountService {
   private final MerchantService merchantService;
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
+  private final CardInfoService cardInfoService;
   @Autowired
   private  AccountChangeEventRecordService accountChangeEventRecordService;
   private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
@@ -133,7 +139,7 @@ public class AccountServiceImpl implements AccountService {
   public String uploadAccount(MultipartFile multipartFile) {
     try {
       AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,
-          merchantService,departmentService,sequenceService,accountChangeEventRecordService,applicationContext);
+          merchantService,departmentService,sequenceService);
       EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();
@@ -150,7 +156,7 @@ public class AccountServiceImpl implements AccountService {
   public String accountBatchBindCard(MultipartFile multipartFile) {
     try {
       AccountBatchBindCardListener accountBatchBindCardListener = new AccountBatchBindCardListener(
-          cardInfoDao, accountDao, cardApplyDao);
+          accountDao,cardInfoService,this);
       EasyExcel.read(multipartFile.getInputStream(), AccountBindCardDTO.class,
           accountBatchBindCardListener).sheet().doRead();
       String result = accountBatchBindCardListener.getUploadInfo().toString();
@@ -368,10 +374,61 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
+  public boolean bindingCard(String accountCode, String cardId) {
+    Account account = this.getByAccountCode(Long.parseLong(accountCode));
+    if (null == account) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+    }
+    CardInfo cardInfo = cardInfoService.getByCardNo(cardId);
+    if (null == cardInfo) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号不存在", null);
+    }
+    if (cardInfoService.cardIsBind(cardId)) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
+    }
+    //绑定创建卡号信息
+    cardInfo.setAccountCode(account.getAccountCode());
+    cardInfo.setCardStatus(CardStatus.BIND.code());
+    cardInfo.setBindTime(new Date());
+    boolean updateResult = cardInfoDao.updateById(cardInfo);
+    if (updateResult) {
+      account.setBinding(AccountBindStatus.BIND.getCode());
+    }
+    boolean accountUpdate = accountDao.updateById(account);
+    return accountUpdate && updateResult;
+  }
   public Account findByPhoneAndMerCode(String phone, String merCode) {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
     accountQueryWrapper.eq(Account.PHONE,phone);
     accountQueryWrapper.eq(Account.MER_CODE, merCode);
     return accountDao.getOne(accountQueryWrapper);
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void batchBindCard(List<CardInfo> cardInfoList, List<Account> accountList) {
+    if( CollectionUtils.isEmpty(cardInfoList) ||
+        CollectionUtils.isEmpty(accountList)){
+      return;
+    }
+    cardInfoDao.saveBatch(cardInfoList);
+    accountDao.updateBatchById(accountList);
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void batchUpload(List<Account> accountList) {
+    Boolean result = this.batchSave(accountList);
+    if (result == true) {
+      List<AccountChangeEventRecord> recordList = AccountUtils
+          .getEventList(accountList, AccountChangeType.ACCOUNT_NEW);
+      accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
+      //批量回写
+      List<Map<String, Object>> mapList = AccountUtils.getMaps(recordList);
+      this.batchUpdateChangeEventId(mapList);
+      applicationContext.publishEvent(AccountEvt
+          .builder().typeEnum(ShoppingActionTypeEnum.BATCH_ADD).accountList(accountList).build());
+    }
   }
 }

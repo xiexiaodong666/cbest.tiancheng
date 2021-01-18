@@ -6,6 +6,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.CardInfoDao;
+import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.mapper.CardInfoMapper;
@@ -46,22 +47,30 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public List<CardInfo> listByApplyCode(String applyCode, Integer status) {
-    QueryWrapper<CardInfo> wrapper = new QueryWrapper<>();
-    wrapper.eq(CardInfo.APPLY_CODE, applyCode).eq(CardInfo.CARD_STATUS, status);
-    return cardInfoDao.list(wrapper);
+  public List<CardInfoApiDTO> listByApplyCode(String applyCode, Integer status) {
+
+    return cardInfoMapper.listByApplyCode(applyCode, status);
   }
 
   @Override
   public CardInfo updateWritten(CardInfo cardInfo) {
-    cardInfo.setCardStatus(WelfareConstant.CardStatus.WRITTEN.code());
-    cardInfo.setWrittenTime(new Date());
 
-    if (cardInfoDao.updateById(cardInfo)) {
-      return cardInfo;
-    } else {
+    cardInfo = cardInfoDao.getById(cardInfo.getId());
+    if(cardInfo == null) {
       throw new BusiException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
     }
+    if(WelfareConstant.CardStatus.NEW.code().equals(cardInfo.getCardStatus())) {
+      cardInfo.setCardStatus(WelfareConstant.CardStatus.WRITTEN.code());
+      cardInfo.setWrittenTime(new Date());
+
+      if (cardInfoDao.saveOrUpdate(cardInfo)) {
+        return cardInfo;
+      } else {
+        throw new BusiException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
+      }
+    }
+
+    return cardInfo;
   }
 
   @Override
@@ -90,5 +99,18 @@ public class CardInfoServiceImpl implements CardInfoService {
                                writtenEndTime, startTime,
                                endTime, bindStartTime, bindEndTime
     );
+  }
+
+  @Override
+  public boolean cardIsBind(String cardId) {
+    QueryWrapper<CardInfo> cardInfoQueryWrapper = new QueryWrapper();
+    cardInfoQueryWrapper.eq(CardInfo.CARD_ID, cardId);
+    cardInfoQueryWrapper.isNotNull(CardInfo.ACCOUNT_CODE);
+    CardInfo queryCardInfo = cardInfoDao.getOne(cardInfoQueryWrapper);
+    if( null == queryCardInfo ){
+      return false;
+    }else{
+      return true;
+    }
   }
 }

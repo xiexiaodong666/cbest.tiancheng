@@ -135,6 +135,13 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     @ApiModelProperty("门店同步到商城状态")   
     private Integer syncStatus;
 
+    /**
+     * disabled false 门店 true 商户
+     */
+    @ApiModelProperty("type 1商户，2门店")
+    @TableField(exist = false)
+    private Boolean disabled;
+
 //以下为列明常量
 
     /**

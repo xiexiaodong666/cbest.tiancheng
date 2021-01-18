@@ -1,6 +1,10 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDao;
@@ -48,13 +52,29 @@ public class RefundServiceImpl implements RefundService {
     private final AccountService accountService;
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountDao accountDao;
-    private final AccountAmountTypeService accountAmountTypeService;
     private final MerchantCreditService merchantCreditService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DistributedLock(lockPrefix = "e-welfare-refund::", lockKey = "#refundRequest.originalTransNo")
     public void handleRefundRequest(RefundRequest refundRequest) {
         String originalTransNo = refundRequest.getOriginalTransNo();
+        List<AccountDeductionDetail> refundDeductionDetailInDb = accountDeductionDetailDao
+                .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
+        if(!CollectionUtils.isEmpty(refundDeductionDetailInDb)){
+            String transNoInDb = refundDeductionDetailInDb.get(0).getTransNo();
+            if(refundRequest.getTransNo().equals(transNoInDb)){
+                RefundRequest refundRequestInDb = queryResult(transNoInDb);
+                log.warn("交易已经处理过，直接返回处理结果:{}", JSON.toJSONString(refundRequestInDb));
+                BeanUtils.copyProperties(refundRequestInDb,refundRequest);
+                return;
+            }else{
+                throw new BusiException(
+                        ExceptionCode.ILLEGALITY_ARGURMENTS,"交易已经通过transNo:"+ transNoInDb +"退款",null
+                );
+            }
+
+        }
         List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao.queryByTransNoAndTransType(
                 originalTransNo,
                 WelfareConstant.TransType.CONSUME.code()

@@ -74,7 +74,7 @@ public class MerchantController implements IController {
     }
     @PostMapping("/export-list")
     @ApiOperation("导出商户列表")
-    public R<String> exportList(@RequestBody MerchantPageReq merchantPageReq) throws IOException {
+    public R<String> exportList(@RequestBody(required = false) MerchantPageReq merchantPageReq) throws IOException {
         return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(merchantService.exportList(merchantPageReq), MerchantWithCreditAndTreeDTO.class,"商户导出")));
     }
 }

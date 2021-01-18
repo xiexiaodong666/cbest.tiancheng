@@ -11,30 +11,30 @@
     m.mer_type merType,
     m.mer_identity merIdentity,
     m.mer_cooperation_mode merCooperationMode,
-    m.create_time createTime,
     mc.credit_limit creditLimit,
     mc.remaining_limit remainingLimit,
-    mc.current_balance currentBalance
+    mc.current_balance currentBalance,
+    m.create_time createTime
     FROM
     merchant m
-    LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code) temp0
+    LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code and mc.deleted=0 and m.deleted=0 ORDER BY m.create_time asc) temp0
     <where>
-      <if test="req.merCode!=null and req.merCode!=''">
+      <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and temp0.departmentCode=#{req.merCode}
       </if>
-      <if test="req.merName!=null and req.merName!=''">
+      <if test="req!=null and req.merName!=null and req.merName!=''">
         and temp0.departmentName like concat('%',#{req.merCode},'%')
       </if>
-      <if test="req.merType!=null and req.merType!=''">
+      <if test="req!=null and req.merType!=null and req.merType!=''">
         and temp0.merType=#{req.merType}
       </if>
-      <if test="req.merCooperationMode!=null and req.merCooperationMode!=''">
+      <if test="req!=null and req.merCooperationMode!=null and req.merCooperationMode!=''">
         and temp0.merCooperationMode=#{req.merCooperationMode}
       </if>
-      <if test="req.startTime!=null">
+      <if test="req!=null and req.startTime!=null">
         and temp0.createTime &gt;= #{req.startTime}
       </if>
-      <if test="req.endTime!=null">
+      <if test="req!=null and req.endTime!=null">
         and temp0.createTime &lt;= #{req.endTime}
       </if>
     </where>
@@ -44,33 +44,33 @@
     d.department_name merName,
     d.department_code merCode,
     d.department_parent departmentParent,
-    d.create_time createTime,
-    NULL merType,
+    d.department_type merType,
     NULL merIdentity,
     NULL merCooperationMode,
     NULL creditLimit,
     NULL remainingLimit,
-    NULL currentBalance
+    NULL currentBalance,
+    d.create_time createTime
     FROM
-    department d) temp
+    department d where d.deleted=0  ORDER BY d.create_time asc) temp
 
     <where>
-      <if test="req.merCode!=null and req.merCode!=''">
+      <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and temp.departmentCode=#{req.merCode}
       </if>
-      <if test="req.merName!=null and req.merName!=''">
+      <if test="req!=null and req.merName!=null and req.merName!=''">
         and temp.departmentName like concat('%',#{req.merCode},'%')
       </if>
-      <if test="req.merType!=null and req.merType!=''">
+      <if test="req!=null and req.merType!=null and req.merType!=''">
         and temp.merType=#{req.merType}
       </if>
-      <if test="req.merCooperationMode!=null and req.merCooperationMode!=''">
+      <if test="req!=null and req.merCooperationMode!=null and req.merCooperationMode!=''">
         and temp.merCooperationMode=#{req.merCooperationMode}
       </if>
-      <if test="req.startTime!=null">
+      <if test="req!=null and req.startTime!=null">
         and temp.createTime &gt;= #{req.startTime}
       </if>
-      <if test="req.endTime!=null">
+      <if test="req!=null and req.endTime!=null">
         and temp.createTime &lt;= #{req.endTime}
       </if>
     </where>

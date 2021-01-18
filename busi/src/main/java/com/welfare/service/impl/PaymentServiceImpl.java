@@ -1,5 +1,7 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -27,7 +30,6 @@ import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SELF;
-import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
 
 /**
  * Description:
@@ -55,10 +57,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<PaymentOperation> handlePayRequest(PaymentRequest paymentRequest) {
+    @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
+    public PaymentRequest paymentRequest(PaymentRequest paymentRequest) {
+        PaymentRequest requestHandled = queryResult(paymentRequest.getTransNo());
+        if(requestHandled.getPaymentStatus().equals(WelfareConstant.AsyncStatus.SUCCEED.code())){
+            log.warn("重复的支付请求，直接返回已经处理完成的request{}", JSON.toJSONString(requestHandled));
+            BeanUtils.copyProperties(requestHandled,paymentRequest);
+            return requestHandled;
+        }
         Long accountCode = paymentRequest.calculateAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
-        //chargePaymentScene(paymentRequest, account);
+        chargePaymentScene(paymentRequest, account);
 
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         merAccountLock.lock();
@@ -74,22 +83,29 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAccountName(account.getAccountName());
             paymentRequest.setAccountBalance(account.getAccountBalance());
             paymentRequest.setAccountCredit(account.getSurplusQuota());
-            return paymentOperations;
+            return paymentRequest;
         } finally {
             merAccountLock.unlock();
         }
 
     }
 
+    /**
+     * 判断消费场景是否符合配置
+     * @param paymentRequest
+     * @param account
+     */
     private void chargePaymentScene(PaymentRequest paymentRequest, Account account) {
         String paymentScene = paymentRequest.calculatePaymentScene();
         AccountConsumeScene accountConsumeScene = accountConsumeSceneDao
                 .getOneByAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
+        Assert.notNull(accountConsumeScene,"未找到该账户的可用交易场景配置");
         AccountConsumeSceneStoreRelation sceneStoreRelation = accountConsumeSceneStoreRelationDao
                 .getOneBySceneIdAndStoreNo(accountConsumeScene.getId(), paymentRequest.getStoreNo());
+        Assert.notNull(sceneStoreRelation,"未找到该门店的可用交易场景配置");
         List<String> sceneConsumeTypes = Arrays.asList(sceneStoreRelation.getSceneConsumType().split(","));
         if(!sceneConsumeTypes.contains(paymentScene)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景",null);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景:"+paymentScene,null);
         }
     }
 
@@ -262,8 +278,8 @@ public class PaymentServiceImpl implements PaymentService {
                     .collect(Collectors.toMap(MerchantBillDetail::getBalanceType, merchantBillDetail -> merchantBillDetail));
             MerchantBillDetail currentBalanceDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.CURRENT_BALANCE.code());
             MerchantBillDetail remainingLimitDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.REMAINING_LIMIT.code());
-            accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount());
-            accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount());
+            accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount().abs());
+            accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount().abs());
         }
 
 

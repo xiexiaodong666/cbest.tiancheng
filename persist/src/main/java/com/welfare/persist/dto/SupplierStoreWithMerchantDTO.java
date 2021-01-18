@@ -1,5 +1,7 @@
 package com.welfare.persist.dto;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,6 +14,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
+@ExcelIgnoreUnannotated
 public class SupplierStoreWithMerchantDTO {
 
     /**
@@ -19,20 +22,36 @@ public class SupplierStoreWithMerchantDTO {
      */
     @ApiModelProperty("id")
 	private Long id;
+
+    /**
+     * 门店状态
+     */
+    @ApiModelProperty("status")
+    private String status;
+
+    /**
+     * 门店状态转义
+     */
+    @ApiModelProperty("statusName")
+    @ExcelProperty(value = "门店状态",index = 4)
+    private String statusName;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")  
+    @ApiModelProperty("商户代码")
+    @ExcelProperty(value = "商户代码",index = 2)
     private String merCode;
     /**
      * 门店代码
      */
-    @ApiModelProperty("门店代码")  
+    @ApiModelProperty("门店代码")
+    @ExcelProperty(value = "门店代码",index = 0)
     private String storeCode;
     /**
      * 门店名称
      */
-    @ApiModelProperty("门店名称")  
+    @ApiModelProperty("门店名称")
+    @ExcelProperty(value = "门店名称",index = 1)
     private String storeName;
     /**
      * 门店层级
@@ -58,16 +77,6 @@ public class SupplierStoreWithMerchantDTO {
     private String cashierNo;
 
     /**
-     * 消费方式
-     */
-    @ApiModelProperty("消费方式,json"
-        + "{"
-        + "  \"O2O\": true,"
-        + "  \"ONLINE_MALL\": true,"
-        + "  \"SHOP_CONSUMPTION\": false"
-        + "}")
-    private String consumType;
-    /**
      * 创建人
      */
     @ApiModelProperty("创建人")  
@@ -75,7 +84,8 @@ public class SupplierStoreWithMerchantDTO {
     /**
      * 创建日期
      */
-    @ApiModelProperty("创建日期")  
+    @ApiModelProperty("创建日期")
+    @ExcelProperty(value = "门店状态",index = 5)
     private Date createTime;
     /**
      * 更新人
@@ -86,7 +96,6 @@ public class SupplierStoreWithMerchantDTO {
      * 更新日期
      */
     @ApiModelProperty("更新日期")  
-    @TableField(update = "now()")
 	private Date updateTime;
     /**
      * 外部编码
@@ -98,6 +107,7 @@ public class SupplierStoreWithMerchantDTO {
      * 商户名称
      */
     @ApiModelProperty("商户名称")
+    @ExcelProperty(value = "商户名称",index = 3)
     private String merName;
 
 }

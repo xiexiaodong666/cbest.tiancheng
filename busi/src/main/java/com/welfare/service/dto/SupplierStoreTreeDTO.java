@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -71,5 +72,11 @@ public class SupplierStoreTreeDTO extends Tree{
      */
     @ApiModelProperty("创建日期")  
     private Date createTime;
+
+    /**
+     * disabled false 门店 true 商户
+     */
+    @ApiModelProperty("type 1商户，2门店")
+    private Boolean disabled;
 
 }

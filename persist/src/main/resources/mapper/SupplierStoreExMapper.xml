@@ -4,6 +4,7 @@
 <mapper namespace="com.welfare.persist.mapper.SupplierStoreExMapper">
   <select id="listWithMerchant" resultType="com.welfare.persist.dto.SupplierStoreWithMerchantDTO">
     SELECT
+    ss.id as id,
     store_code as storeCode,
     store_name as storeName,
     m.mer_name as merName,
@@ -12,25 +13,28 @@
     ss.create_time as createTime
     FROM
     supplier_store ss
-    LEFT JOIN merchant m ON ss.mer_code = m.mer_code
+    LEFT JOIN merchant m ON ss.mer_code = m.mer_code and  m.deleted=0 and  ss.deleted=0
     <where>
-      <if test="req.merCode!=null and req.merCode!=''">
+      <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and ss.mer_code=#{req.merCode}
       </if>
-      <if test="req.storeName!=null and req.storeName!=''">
+      <if test="req!=null and req.storeName!=null and req.storeName!=''">
         and ss.storeName like concat('%',#{req.storeName},'%')
       </if>
-      <if test="req.storeCode!=null and req.storeCode!=''">
+      <if test="req!=null and req.storeCode!=null and req.storeCode!=''">
         and ss.store_code=#{req.storeCode}
       </if>
-      <if test="req.startTime!=null">
+      <if test="req!=null and req.startTime!=null">
         and ss.create_time &gt;= #{req.startTime}
       </if>
-      <if test="req.endTime!=null">
+      <if test="req!=null and req.endTime!=null">
         and ss.create_time &lt;= #{req.endTime}
       </if>
-      <if test="req.storeCodes != null and req.storeCodes.size()>0">
-        and ss.store_code not in
+      <if test="req!=null and req.status!=null">
+        and ss.status = #{req.status}
+      </if>
+      <if test="req!=null and req.storeCodes != null and req.storeCodes.size()>0">
+        and ss.store_code  in
         <foreach close=")" collection="req.storeCodes" item="item" open="(" separator=", ">
           #{item}
         </foreach>
@@ -60,8 +64,9 @@
     remark ,
     consum_type consumType,
     status ,
-    create_time createTime
-    from supplier_store ss
+    create_time createTime,
+    0 as disabled
+    from supplier_store ss where ss.deleted=0
     ) temp0
     <where>
       <if test="merCodes != null and merCodes.size()>0">
@@ -79,14 +84,25 @@
     mer_code merCode,
     mer_code storeCode,
     mer_name storeName,
-    0 storeParent,
+    false storeParent,
     mer_code storePath,
     remark ,
     null consumType,
     status ,
-    create_time createTime
-    from merchant m
+    create_time createTime,
+    true as disabled
+
+    from merchant m where m.deleted=0
 
     ) temp
+    <where>
+      <if test="merCodes != null and merCodes.size()>0">
+        and temp.merCode in
+        <foreach item="item" index="index" collection="merCodes" open="(" separator=","
+                 close=")">
+          #{item}
+        </foreach>
+      </if>
+    </where>
   </select>
 </mapper>

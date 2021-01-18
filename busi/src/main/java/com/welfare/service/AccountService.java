@@ -7,6 +7,7 @@ import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
@@ -79,6 +80,9 @@ public interface AccountService {
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
   List<Account> queryByAccountTypeCode(String accountTypeCode);
   List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId);
-  Account findByPhoneAndMerCode(String phone,String merCode);
 
+  boolean bindingCard(String accountCode,String cardId);
+  Account findByPhoneAndMerCode(String phone,String merCode);
+  void batchBindCard(List<CardInfo> cardInfoList,List<Account> accountList);
+  void batchUpload(List<Account> accountList);
 }

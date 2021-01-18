@@ -16,6 +16,7 @@ import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.service.dto.AccountConsumeSceneReq;
 import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
 import com.welfare.servicemerchant.dto.AccountConsumePageReq;
+import com.welfare.servicemerchant.dto.UpdateStatusReq;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -121,10 +122,10 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/updateStatus")
   @ApiOperation("激活")
-  public R<Boolean> updateStatus(@RequestParam(required = true) @ApiParam("id") String id,
-      @RequestParam(required = false) @ApiParam("使用状态") Integer status) {
+  public R<Boolean> updateStatus(@RequestBody UpdateStatusReq updateStatusReq) {
     try {
-      return success(accountConsumeSceneService.updateStatus(Long.parseLong(id), status));
+      return success(accountConsumeSceneService.updateStatus(Long.parseLong(updateStatusReq.getId()),
+          updateStatusReq.getConsumeSceneStatus()));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }
@@ -132,9 +133,9 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/delete")
   @ApiOperation("删除员工消费配置")
-  public R<Boolean> delete(@RequestParam(required = true) @ApiParam("id") String id) {
+  public R<Boolean> delete(@RequestBody UpdateStatusReq updateStatusReq) {
     try {
-      return success(accountConsumeSceneService.delete(Long.parseLong(id)));
+      return success(accountConsumeSceneService.delete(Long.parseLong(updateStatusReq.getId())));
     }catch (BusiException be){
       return R.fail(be.getMessage());
     }

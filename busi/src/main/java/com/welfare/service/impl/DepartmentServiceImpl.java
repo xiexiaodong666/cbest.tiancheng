@@ -67,7 +67,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             throw new BusiException("部门不存在");
         }
         //顶级部门的父级为机构
-        if(EmptyChecker.isEmpty(department.getDepartmentParent())||"0".equals(department.getDepartmentParent())){
+        if(department.getDepartmentParent().equals(department.getMerCode())){
             Merchant merchant=merchantService.getMerchantByMerCode(department.getMerCode());
             department.setDepartmentParentName(EmptyChecker.isEmpty(merchant)?"":merchant.getMerName());
         }else {
@@ -92,7 +92,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         String departmentCode;
         //构建path
         departmentCode=sequenceService.nextNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()).toString();
-        if(!department.getDepartmentParent().equals(department.getMerCode())){
+        if(department.getDepartmentParent().equals(department.getMerCode())){
             save.setDepartmentPath(department.getDepartmentParent()+"-"+departmentCode);
         }else{
             Department parent=this.getByDepartmentCode(department.getDepartmentParent());

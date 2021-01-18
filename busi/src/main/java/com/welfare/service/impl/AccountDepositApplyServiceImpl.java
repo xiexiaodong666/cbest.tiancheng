@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
@@ -594,6 +595,13 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                                  MerchantUserInfo merchantUser, BigDecimal amount){
         if (merchant == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
+        }
+        if (StringUtils.isBlank(merchant.getMerIdentity())) {
+            throw new BusiException("商户没有设置属性！");
+        }
+        List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
+        if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持对属于[客户]的商户充值", null);
         }
         // 判断金额是否超限
         MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUser.getMerchantCode());

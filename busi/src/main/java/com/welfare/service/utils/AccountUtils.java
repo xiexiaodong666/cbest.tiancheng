@@ -51,7 +51,7 @@ public class AccountUtils {
 
   private static EmployerDTO assemableEmployerDTO(AccountSyncDTO accountSyncDTO) {
     EmployerDTO employerDTO = new EmployerDTO();
-    employerDTO.setEmployerId(String.valueOf(accountSyncDTO.getId()));
+    employerDTO.setEmployerId(String.valueOf(accountSyncDTO.getAccountCode()));
     employerDTO.setEmployerRole(accountSyncDTO.getAccountTypeCode());
     employerDTO.setPartnerCode(accountSyncDTO.getMerCode());
     //accountSyncDTO.getMerchantId()

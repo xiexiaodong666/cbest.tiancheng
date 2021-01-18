@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -56,16 +57,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#payentRequest.transNo")
+    @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
     public PaymentRequest paymentRequest(PaymentRequest paymentRequest) {
         PaymentRequest requestHandled = queryResult(paymentRequest.getTransNo());
         if(requestHandled.getPaymentStatus().equals(WelfareConstant.AsyncStatus.SUCCEED.code())){
             log.warn("重复的支付请求，直接返回已经处理完成的request{}", JSON.toJSONString(requestHandled));
+            BeanUtils.copyProperties(requestHandled,paymentRequest);
             return requestHandled;
         }
         Long accountCode = paymentRequest.calculateAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
-        //chargePaymentScene(paymentRequest, account);
+        chargePaymentScene(paymentRequest, account);
 
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         merAccountLock.lock();
@@ -88,6 +90,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
+    /**
+     * 判断消费场景是否符合配置
+     * @param paymentRequest
+     * @param account
+     */
     private void chargePaymentScene(PaymentRequest paymentRequest, Account account) {
         String paymentScene = paymentRequest.calculatePaymentScene();
         AccountConsumeScene accountConsumeScene = accountConsumeSceneDao
@@ -96,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .getOneBySceneIdAndStoreNo(accountConsumeScene.getId(), paymentRequest.getStoreNo());
         List<String> sceneConsumeTypes = Arrays.asList(sceneStoreRelation.getSceneConsumType().split(","));
         if(!sceneConsumeTypes.contains(paymentScene)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景",null);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景:"+paymentScene,null);
         }
     }
 

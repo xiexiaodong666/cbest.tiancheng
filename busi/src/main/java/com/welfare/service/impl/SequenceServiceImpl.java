@@ -48,14 +48,14 @@ public class SequenceServiceImpl implements SequenceService {
     }
 
     @Override
-    public String nextFullNo(String sequenceType, String prefix, Long startId) {
-        Sequence next = next(sequenceType, prefix, startId);
+    public String nextFullNo(String sequenceType, String prefix, Long startId, int num) {
+        Sequence next = next(sequenceType, prefix, startId, num);
         return next.getPrefix() + next.getSequenceNo();
     }
 
     @Override
-    public Long nextNo(String sequenceType, String prefix, Long startId) {
-        Sequence next = next(sequenceType, prefix, startId);
+    public Long nextNo(String sequenceType, String prefix, Long startId, int num) {
+        Sequence next = next(sequenceType, prefix, startId, num);
         return next.getSequenceNo();
     }
 
@@ -80,7 +80,7 @@ public class SequenceServiceImpl implements SequenceService {
     }
 
 
-    private Sequence next(String sequenceType, String prefix, Long startId) {
+    private Sequence next(String sequenceType, String prefix, Long startId ,int num) {
         RLock lock = redissonClient.getFairLock(SEQUENCE_GENERATE + ":" + sequenceType);
         lock.lock();
         try{
@@ -90,13 +90,13 @@ public class SequenceServiceImpl implements SequenceService {
             Sequence sequence = sequenceDao.getOne(queryWrapper);
             if(sequence == null) {
                 sequence = new Sequence();
-                sequence.setSequenceNo(startId);
+                sequence.setSequenceNo(startId + num);
                 sequence.setPrefix(prefix);
                 sequence.setSequenceType(sequenceType);
 
                 sequenceDao.save(sequence);
             } else {
-                sequence.setSequenceNo(sequence.getSequenceNo() + 1);
+                sequence.setSequenceNo(sequence.getSequenceNo() + num);
                 sequenceDao.updateById(sequence);
             }
             return sequence;

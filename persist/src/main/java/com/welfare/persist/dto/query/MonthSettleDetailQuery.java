@@ -35,4 +35,6 @@ public class MonthSettleDetailQuery{
     private String posOnlines;
 
     private String settleNo;
+
+    private String transNo;
 }

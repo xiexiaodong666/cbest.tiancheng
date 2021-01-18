@@ -178,7 +178,7 @@ public class CardController implements IController {
     cardInfoDTO.setCreateTime(cardInfo.getCreateTime());
     cardInfoDTO.setWrittenTime(cardInfo.getWrittenTime());
     cardInfoDTO.setBindTime(cardInfo.getBindTime());
-    cardInfoDTO.setAccountCode(String.valueOf(cardInfo.getAccountCode()));
+    cardInfoDTO.setAccountCode(cardInfo.getAccountCode());
 
     return success(cardInfoDTO);
   }

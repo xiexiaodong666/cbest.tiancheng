@@ -60,10 +60,10 @@ public class PaymentServiceImpl implements PaymentService {
     @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
     public PaymentRequest paymentRequest(PaymentRequest paymentRequest) {
         PaymentRequest requestHandled = queryResult(paymentRequest.getTransNo());
-        if(WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
-                ||WelfareConstant.AsyncStatus.REVERSED.code().equals(requestHandled.getPaymentStatus())){
+        if (WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
+                || WelfareConstant.AsyncStatus.REVERSED.code().equals(requestHandled.getPaymentStatus())) {
             log.warn("重复的支付请求，直接返回已经处理完成的request{}", JSON.toJSONString(requestHandled));
-            BeanUtils.copyProperties(requestHandled,paymentRequest);
+            BeanUtils.copyProperties(requestHandled, paymentRequest);
             return requestHandled;
         }
         Long accountCode = paymentRequest.calculateAccountCode();
@@ -93,6 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     /**
      * 判断消费场景是否符合配置
+     *
      * @param paymentRequest
      * @param account
      */
@@ -100,13 +101,13 @@ public class PaymentServiceImpl implements PaymentService {
         String paymentScene = paymentRequest.calculatePaymentScene();
         AccountConsumeScene accountConsumeScene = accountConsumeSceneDao
                 .getOneByAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
-        Assert.notNull(accountConsumeScene,"未找到该账户的可用交易场景配置");
+        Assert.notNull(accountConsumeScene, "未找到该账户的可用交易场景配置");
         AccountConsumeSceneStoreRelation sceneStoreRelation = accountConsumeSceneStoreRelationDao
                 .getOneBySceneIdAndStoreNo(accountConsumeScene.getId(), paymentRequest.getStoreNo());
-        Assert.notNull(sceneStoreRelation,"未找到该门店的可用交易场景配置");
+        Assert.notNull(sceneStoreRelation, "未找到该门店的可用交易场景配置");
         List<String> sceneConsumeTypes = Arrays.asList(sceneStoreRelation.getSceneConsumType().split(","));
-        if(!sceneConsumeTypes.contains(paymentScene)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景:"+paymentScene,null);
+        if (!sceneConsumeTypes.contains(paymentScene)) {
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + paymentScene, null);
         }
     }
 
@@ -122,12 +123,12 @@ public class PaymentServiceImpl implements PaymentService {
         );
         CardPaymentRequest paymentRequest = new CardPaymentRequest();
         paymentRequest.setTransNo(transNo);
-        if(CollectionUtils.isEmpty(accountDeductionDetails)){
+        if (CollectionUtils.isEmpty(accountDeductionDetails)) {
             paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.FAILED.code());
-        }else{
-            if(CollectionUtils.isEmpty(refundDeductionDetails)){
+        } else {
+            if (CollectionUtils.isEmpty(refundDeductionDetails)) {
                 paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-            }else{
+            } else {
                 paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.REVERSED.code());
                 paymentRequest.setRefundTransNo(refundDeductionDetails.get(0).getTransNo());
             }
@@ -139,7 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setCardNo(firstAccountBillDetail.getCardId());
             BigDecimal amount = accountDeductionDetails.stream()
                     .map(AccountBillDetail::getTransAmount)
-                    .reduce(BigDecimal.ZERO,BigDecimal::add);
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
             paymentRequest.setAmount(amount);
 
             Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
@@ -167,7 +168,7 @@ public class PaymentServiceImpl implements PaymentService {
             List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                     .collect(Collectors.toList());
             for (AccountAmountDO accountAmountDO : accountAmountDOList) {
-                if(BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance())==0){
+                if (BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance()) == 0) {
                     //当前的accountType没钱，则继续下一个账户
                     continue;
                 }
@@ -205,7 +206,6 @@ public class PaymentServiceImpl implements PaymentService {
         accountDeductionDetailDao.saveBatch(deductionDetails);
         accountAmountTypeDao.saveOrUpdateBatch(accountTypes);
     }
-
 
 
     private PaymentOperation decrease(AccountAmountDO accountAmountDO,
@@ -266,31 +266,24 @@ public class PaymentServiceImpl implements PaymentService {
         accountDeductionDetail.setTransAmount(operatedAmount);
         accountDeductionDetail.setTransTime(paymentRequest.getPaymentDate());
         accountDeductionDetail.setStoreCode(paymentRequest.getStoreNo());
-        if(paymentRequest instanceof CardPaymentRequest){
+        if (paymentRequest instanceof CardPaymentRequest) {
             accountDeductionDetail.setCardId(paymentRequest.getCardNo());
         }
-        if (SELF.code().equals(accountAmountType.getMerAccountTypeCode())) {
-            accountDeductionDetail.setSelfDeductionAmount(operatedAmount);
-            accountDeductionDetail.setMerDeductionAmount(BigDecimal.ZERO);
-            accountDeductionDetail.setMerDeductionCreditAmount(BigDecimal.ZERO);
-            paymentOperation.setMerchantAccountOperations(Collections.emptyList());
-        } else {
-            accountDeductionDetail.setSelfDeductionAmount(BigDecimal.ZERO);
-            accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
-            //非自主充值，需要扣减商户账户
-            List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.doOperateAccount(
-                    account.getMerCode(),
-                    operatedAmount,
-                    paymentRequest.getTransNo(),
-                    currentBalanceOperator);
-            paymentOperation.setMerchantAccountOperations(merchantAccountOperations);
-            Map<String, MerchantBillDetail> merBillDetailMap = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
-                    .collect(Collectors.toMap(MerchantBillDetail::getBalanceType, merchantBillDetail -> merchantBillDetail));
-            MerchantBillDetail currentBalanceDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.CURRENT_BALANCE.code());
-            MerchantBillDetail remainingLimitDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.REMAINING_LIMIT.code());
-            accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount().abs());
-            accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount().abs());
-        }
+
+        accountDeductionDetail.setSelfDeductionAmount(SELF.code().equals(accountAmountType.getMerAccountTypeCode())?operatedAmount:BigDecimal.ZERO);
+        accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
+        List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.doOperateAccount(
+                account.getMerCode(),
+                operatedAmount,
+                paymentRequest.getTransNo(),
+                currentBalanceOperator);
+        paymentOperation.setMerchantAccountOperations(merchantAccountOperations);
+        Map<String, MerchantBillDetail> merBillDetailMap = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
+                .collect(Collectors.toMap(MerchantBillDetail::getBalanceType, merchantBillDetail -> merchantBillDetail));
+        MerchantBillDetail currentBalanceDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.CURRENT_BALANCE.code());
+        MerchantBillDetail remainingLimitDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.REMAINING_LIMIT.code());
+        accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount().abs());
+        accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount().abs());
 
 
         return accountDeductionDetail;

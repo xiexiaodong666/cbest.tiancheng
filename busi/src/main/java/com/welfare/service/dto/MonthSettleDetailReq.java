@@ -37,4 +37,7 @@ public class MonthSettleDetailReq{
 
     @ApiModelProperty(value = "最小序号")
     private Long minId;
+
+    @ApiModelProperty(value = "消费流水号")
+    private String transNo;
 }

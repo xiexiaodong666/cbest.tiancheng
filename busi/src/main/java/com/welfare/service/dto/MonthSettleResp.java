@@ -32,6 +32,9 @@ public class MonthSettleResp {
     @ApiModelProperty(value = "商户名称")
     private String merName;
 
+    @ApiModelProperty(value = "账单实际金额")
+    private String transAmount;
+
     @ApiModelProperty(value = "结算金额")
     private String settleAmount;
 

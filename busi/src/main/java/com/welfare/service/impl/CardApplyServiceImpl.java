@@ -6,8 +6,8 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.SequenceTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.UserInfoHolder;
 import com.welfare.common.util.GenerateCodeUtil;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.CardApplyDTO;
@@ -52,7 +52,7 @@ public class CardApplyServiceImpl implements CardApplyService {
   // 卡片规则 TC01 + 客户商户编号（4位）+  9位自增（从100000001开始
 
   private final static String prefix = "TC01";
-  private final static Long startId = 100000001L;
+  private final static Long startId = 100000000L;
 
 
   @Override
@@ -101,13 +101,18 @@ public class CardApplyServiceImpl implements CardApplyService {
     cardApply.setDeleted(false);
     cardApply.setStatus(1);
 
+    Integer cardNum = cardApplyAddReq.getCardNum();
+
     List<CardInfo> cardInfoList = new ArrayList<>();
-    // String cardId = cardInfoMapper.getCardId(cardApplyAddReq.getMerCode());
-    for (int i = 0; i < cardApplyAddReq.getCardNum(); i++) {
+    Long writeCardId = sequenceService.nextNo(
+        SequenceTypeEnum.CARDID.getCode(), cardApplyAddReq.getMerCode(), startId,
+        cardNum
+    );
+
+    for (int i = 0; i < cardNum; i++) {
       CardInfo cardInfo = new CardInfo();
       cardInfo.setApplyCode(cardApply.getApplyCode());
-      Long writeCardId = sequenceService.nextNo(
-          SequenceTypeEnum.CARDID.getCode(), cardApplyAddReq.getMerCode(), startId);
+
       cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
       cardInfo.setCardType(cardApply.getCardType());
       cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());
@@ -116,7 +121,9 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardInfo.setCreateUser(cardApply.getCreateUser());
 
       cardInfoList.add(cardInfo);
+      writeCardId--;
     }
+    
 
     return cardApplyDao.save(cardApply) && cardInfoDao.saveBatch(cardInfoList);
   }
@@ -172,9 +179,9 @@ public class CardApplyServiceImpl implements CardApplyService {
     cardInfoList = cardInfoDao.list(queryWrapper);
     boolean saveCardApply = cardApplyDao.saveOrUpdate(cardApply);
     boolean updateCardInfo = true;
-    if(CollectionUtils.isNotEmpty(cardInfoList)) {
-      for (CardInfo cardInfo:
-      cardInfoList) {
+    if (CollectionUtils.isNotEmpty(cardInfoList)) {
+      for (CardInfo cardInfo :
+          cardInfoList) {
         cardInfo.setCardType(cardApply.getCardType());
       }
       updateCardInfo = cardInfoDao.saveOrUpdateBatch(cardInfoList);
@@ -186,6 +193,13 @@ public class CardApplyServiceImpl implements CardApplyService {
   public boolean updateStatus(Long id, Integer delete, Integer status) {
     CardApply cardApply = cardApplyDao.getById(id);
     if (delete != null) {
+      QueryWrapper<CardInfo> queryWrapperCardInfo = new QueryWrapper<>();
+      queryWrapperCardInfo.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
+      queryWrapperCardInfo.ne(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.NEW.code());
+      List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapperCardInfo);
+      if (CollectionUtils.isNotEmpty(cardInfoList)) {
+        throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "卡片已被写入或者绑定, 不能删除", null);
+      }
       cardApply.setDeleted(delete != 0);
     }
     if (status != null) {

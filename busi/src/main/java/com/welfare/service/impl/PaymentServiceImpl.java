@@ -115,12 +115,21 @@ public class PaymentServiceImpl implements PaymentService {
                 transNo,
                 WelfareConstant.TransType.CONSUME.code()
         );
+        List<AccountDeductionDetail> refundDeductionDetails = accountDeductionDetailDao.queryByRelatedTransNoAndTransType(
+                transNo,
+                WelfareConstant.TransType.REFUND.code()
+        );
         CardPaymentRequest paymentRequest = new CardPaymentRequest();
         paymentRequest.setTransNo(transNo);
         if(CollectionUtils.isEmpty(accountDeductionDetails)){
             paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.FAILED.code());
         }else{
-            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            if(CollectionUtils.isEmpty(refundDeductionDetails)){
+                paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            }else{
+                paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.REVERSED.code());
+                paymentRequest.setRefundTransNo(refundDeductionDetails.get(0).getTransNo());
+            }
             AccountBillDetail firstAccountBillDetail = accountDeductionDetails.get(0);
             paymentRequest.setStoreNo(firstAccountBillDetail.getStoreCode());
             paymentRequest.setAccountCode(firstAccountBillDetail.getAccountCode());

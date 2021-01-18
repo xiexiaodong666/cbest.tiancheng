@@ -63,5 +63,5 @@ public class CardInfoDTO {
    * 绑定账号
    */
   @ExcelProperty(value ="绑定账号")
-  private String accountCode;
+  private Long accountCode;
 }

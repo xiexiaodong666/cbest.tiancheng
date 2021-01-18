@@ -248,7 +248,7 @@ public class WelfareConstant {
         /**
          *  异步状态
          */
-        NEW(0,"新增"),HANDLING(1,"处理中"),SUCCEED(2,"成功"),FAILED(-1,"失败");
+        NEW(0,"新增"),HANDLING(1,"处理中"),SUCCEED(2,"成功"),FAILED(-1,"失败"),REVERSED(3,"已逆向操作");
 
         private final Integer code;
         private final String desc;

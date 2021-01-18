@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.MerchantAccountTypeExMapper">
     <select id="listWithMerchant" resultType="com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO">
-        SELECT
+        select *from(SELECT
         mat.id as id,
         m.mer_name AS merName,
         mat.mer_code AS merCode,
         count( mat.mer_account_type_code ) count,
         GROUP_CONCAT( mer_account_type_name ) merAccountTypeName,
         mat.remark,
-        mat.create_time
+        mat.create_time createTime
         FROM
         merchant_account_type mat
         LEFT JOIN merchant m ON mat.mer_code = m.mer_code and mat.deleted=0 and m.deleted=0
@@ -29,6 +29,7 @@
                 and mat.create_time &lt;= #{req.endTime}
             </if>
         </where>
+        )temp  ORDER BY temp.createTime desc
     </select>
 
 </mapper>

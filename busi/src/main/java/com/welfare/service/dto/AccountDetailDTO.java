@@ -3,6 +3,7 @@ package com.welfare.service.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
+import java.util.Date;
 import lombok.Data;
 
 /**
@@ -87,6 +88,9 @@ public class AccountDetailDTO {
    */
   @ApiModelProperty("手机号")
   private String phone;
-
-
+  /**
+   * 创建时间
+   */
+  @ApiModelProperty("创建时间")
+  private Date createTime;
 }

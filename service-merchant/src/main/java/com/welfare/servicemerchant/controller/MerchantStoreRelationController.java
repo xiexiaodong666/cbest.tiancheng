@@ -130,7 +130,6 @@ public class MerchantStoreRelationController implements IController {
 
   @PostMapping
   @ApiOperation("新增消费门店配置")
-  @ApiUser
   public R<Boolean> addMerchantStore(@RequestBody MerchantStoreRelationAddReq relationAddReq) {
 
     return success(merchantStoreRelationService.add(relationAddReq));
@@ -156,7 +155,6 @@ public class MerchantStoreRelationController implements IController {
 
   @PostMapping("/export")
   @ApiOperation("导出消费门店配置(返回文件下载地址)")
-  @MerchantUser
   public R<String> export(
       @RequestParam(required = false) @ApiParam("商户名称") String merName,
       @RequestParam(required = false) @ApiParam("使用状态") String status,

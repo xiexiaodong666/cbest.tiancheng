@@ -25,7 +25,7 @@ public class PlatformUserFallback implements FallbackFactory<PlatformUserFeignCl
 
       @Override
       public PlatformUserResponse<PlatformUserDataResponse<ShoppingPlatformUser>> getPlatformUserList(
-          int pageSize, int page, String merchat_code, String username,Integer status,Date start_create_time, Date end_create_time) {
+          int pageSize, int page, String merchat_code, String username,Integer status,String start_create_time, String end_create_time) {
         log.error("获取商户用户失败",cause);
         PlatformUserResponse response= new PlatformUserResponse(500,cause.getMessage(),null);
         return response;

@@ -213,7 +213,9 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public List<MerchantWithCreditAndTreeDTO> exportList(MerchantPageReq merchantPageReq) {
         List<MerchantWithCreditAndTreeDTO> list = this.tree( merchantPageReq);
-        return list;
+        TreeUtil treeUtil=new TreeUtil(list,"0");
+
+        return treeUtil.spread();
     }
 
     @Override

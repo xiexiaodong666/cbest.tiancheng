@@ -16,8 +16,11 @@ import com.welfare.service.remote.entity.UserRoleBinding;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 import com.welfare.service.sync.event.AccountEvt;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -85,19 +88,19 @@ public class AccountConsumeSceneHandler {
     UserRoleBinding userRoleBinding = new UserRoleBinding();
 
     List<StoreBinding> bindings = new LinkedList<>();
-    List<String> employeeRoles = new LinkedList<>();
+    HashMap<String,String> employeeRoles = new HashMap<String,String>();
     AccountConsumeScene accountConsumeScene =null;
     for( AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation :  relationList){
       Long sceneId = accountConsumeSceneStoreRelation.getAccountConsumeSceneId();
       accountConsumeScene = accountConsumeSceneDao.getById(sceneId);
-      employeeRoles.add(accountConsumeScene.getAccountTypeCode());
+      employeeRoles.put(accountConsumeScene.getAccountTypeCode(),accountConsumeScene.getAccountTypeCode());
       StoreBinding storeBinding = new StoreBinding();
       String[] array = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
       storeBinding.setConsumeTypes(Arrays.asList(array));
       storeBinding.setStoreCode(accountConsumeSceneStoreRelation.getStoreCode());
       bindings.add(storeBinding);
     }
-    userRoleBinding.setEmployeeRoles(employeeRoles);
+    userRoleBinding.setEmployeeRoles(new ArrayList<>(employeeRoles.keySet()));
     userRoleBinding.setBindings(bindings);
     userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
     userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0 ? true : false);

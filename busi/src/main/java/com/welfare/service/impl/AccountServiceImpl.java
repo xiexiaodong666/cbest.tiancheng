@@ -387,6 +387,9 @@ public class AccountServiceImpl implements AccountService {
     if (cardInfoService.cardIsBind(cardId)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
     }
+    if( cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue() ){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请确认该卡片状态", null);
+    }
     //绑定创建卡号信息
     cardInfo.setAccountCode(account.getAccountCode());
     cardInfo.setCardStatus(CardStatus.BIND.code());

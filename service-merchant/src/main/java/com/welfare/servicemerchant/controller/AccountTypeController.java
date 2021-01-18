@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,7 +53,9 @@ public class AccountTypeController implements IController {
       @RequestParam(required = false) @ApiParam("商户代码") String merCode,
       @RequestParam(required = false) @ApiParam("类型编码") String typeCode,
       @RequestParam(required = false) @ApiParam("类型名称") String typeName,
+      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
+      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
       @RequestParam(required = false) @ApiParam("创建时间_end") Date createTimeEnd){
     Page<AccountTypeMapperDTO> page = new Page(currentPage,pageSize);
     Page<AccountTypeDTO> accountTypePage = accountTypeService.getPageDTO(page, merCode,typeCode,

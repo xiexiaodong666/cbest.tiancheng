@@ -18,10 +18,10 @@ public class SettleMerInfoResp {
     private String merCode;
 
     @ApiModelProperty(value = "充值额度")
-    private String rechargeLimit;
+    private BigDecimal rechargeLimit;
 
     @ApiModelProperty(value = "消费余额")
-    private String transAmount;
+    private BigDecimal transAmount;
 
     @ApiModelProperty(value = "信用额度")
     private BigDecimal creditLimit;

@@ -67,8 +67,8 @@ public class AccountDepositApplyController implements IController {
   @GetMapping("/detail")
   @ApiOperation("查询账号额度申请详情")
   @MerchantUser
-  public R<AccountDepositApplyDetailInfo> detail(@RequestParam @ApiParam(name = "申请id", required = true) Long id){
-    return success(depositApplyService.detail(id));
+  public R<AccountDepositApplyDetailInfo> detail(@RequestParam @ApiParam(name = "申请id", required = true) String id){
+    return success(depositApplyService.detail(Long.parseLong(id)));
   }
 
   @GetMapping("/batch-item")
@@ -90,15 +90,15 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/update")
   @ApiOperation("修改账号额度申请(单个)")
   @MerchantUser
-  public R<Long> update(@Validated @RequestBody DepositApplyUpdateRequest requst){
-    return success(depositApplyService.updateOne(requst, MerchantUserHolder.getMerchantUser()));
+  public R<String> update(@Validated @RequestBody DepositApplyUpdateRequest requst){
+    return success(depositApplyService.updateOne(requst, MerchantUserHolder.getMerchantUser())+"");
   }
 
   @PostMapping("/batch-update")
   @ApiOperation("修改账号额度申请(批量)")
   @MerchantUser
-  public R<Long> batchUpdate(@RequestParam @ApiParam(name = "申请id）",required = true) Long id,
-                             @RequestParam @ApiParam(name = "文件id",required = true) String fileId,
+  public R<String> batchUpdate(@RequestParam @ApiParam(name = "申请id）",required = true) String id,
+                             @RequestParam(required = false) @ApiParam(name = "文件id") String fileId,
                              @RequestParam(required = false) @ApiParam("申请备注") String applyRemark,
                              @RequestParam(required = false) @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
                              @RequestParam(required = false) @ApiParam(name = "福利类型名称",required = true) String merAccountTypeName) {
@@ -107,7 +107,7 @@ public class AccountDepositApplyController implements IController {
     requst.setApplyRemark(applyRemark);
     requst.setMerAccountTypeCode(merAccountTypeCode);
     requst.setMerAccountTypeName(merAccountTypeName);
-    return success(depositApplyService.updateBatch(requst, fileId, MerchantUserHolder.getMerchantUser()));
+    return success(depositApplyService.updateBatch(requst, fileId, MerchantUserHolder.getMerchantUser())+"");
   }
 
   @PostMapping("/export")
@@ -122,21 +122,21 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/approval")
   @ApiOperation("审批账号额度申请")
   @MerchantUser
-  public R<Long> approval(@Validated@RequestBody AccountDepositApprovalRequest request){
-    return success(depositApplyService.approval(request));
+  public R<String> approval(@Validated@RequestBody AccountDepositApprovalRequest request){
+    return success(depositApplyService.approval(request)+"");
   }
 
   @PostMapping("/save")
   @ApiOperation("新增额度申请(单个)")
   @MerchantUser
-  public R<Long> save(@Validated@RequestBody DepositApplyRequest request){
-    return success(depositApplyService.saveOne(request, MerchantUserHolder.getMerchantUser()));
+  public R<String> save(@Validated@RequestBody DepositApplyRequest request){
+    return success(depositApplyService.saveOne(request, MerchantUserHolder.getMerchantUser())+"");
   }
 
   @PostMapping("/batch-save")
   @ApiOperation("新增额度申请(批量)")
   @MerchantUser
-  public R<Long> batchSave(@RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId,
+  public R<String> batchSave(@RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId,
                            @RequestParam @ApiParam(name = "文件id",required = true)String fileId,
                            @RequestParam @ApiParam("申请备注") String applyRemark,
                            @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
@@ -147,11 +147,12 @@ public class AccountDepositApplyController implements IController {
     request.setApplyRemark(applyRemark);
     request.setMerAccountTypeCode(merAccountTypeCode);
     request.setMerAccountTypeName(merAccountTypeName);
-    return success(depositApplyService.saveBatch(request, fileId, MerchantUserHolder.getMerchantUser()));
+    return success(depositApplyService.saveBatch(request, fileId, MerchantUserHolder.getMerchantUser())+"");
   }
 
   @PostMapping("/upload")
   @ApiOperation("上传申请excel文件(上传后返回fileId)")
+  @MerchantUser
   public R<String> upload(@RequestPart(name = "file")@ApiParam(name = "file",required = true)MultipartFile multipartFile,
                           @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId) throws IOException {
     return success(tempAccountDepositApplyService.upload(multipartFile, requestId, executor));

@@ -23,7 +23,7 @@ public class AccountDepositApplyQuery extends PageReq{
    * 申请人
    */
   @ApiModelProperty("申请人")
-  @Query(type = Query.Type.INNER_LIKE)
+  @Query(type = Query.Type.RIGHT_LIKE)
   private String applyUser;
 
   /**
@@ -37,7 +37,7 @@ public class AccountDepositApplyQuery extends PageReq{
    * 审批人
    */
   @ApiModelProperty("审批人")
-  @Query(type = Query.Type.INNER_LIKE)
+  @Query(type = Query.Type.RIGHT_LIKE)
   private String approvalUser;
 
   /**

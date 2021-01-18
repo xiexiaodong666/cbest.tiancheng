@@ -76,7 +76,7 @@ public class MerchantAccountTypeController implements IController {
     }
     @PostMapping("/export-list")
     @ApiOperation("导出商户列表")
-    public R<String> exportList(@RequestBody MerchantAccountTypePageReq pageReq)throws IOException {
+    public R<String> exportList(@RequestBody(required = false) MerchantAccountTypePageReq pageReq)throws IOException {
         return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(merchantAccountTypeService.exportList(pageReq), MerchantAccountTypeWithMerchantDTO.class,"福利类型导出")));
 
     }

@@ -18,6 +18,7 @@ import com.welfare.persist.dto.query.OrderPageQuery;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.persist.mapper.OrderInfoMapper;
+import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.OrderService;
 import com.welfare.service.dto.ConsumeTypeJson;
@@ -42,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import springfox.documentation.spring.web.json.Json;
 
 import java.math.BigDecimal;
@@ -77,6 +79,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SettleDetailDao settleDetailDao;
     @Autowired
+    private SettleDetailMapper settleDetailMapper;
+    @Autowired
     private ProductInfoDao productInfoDao;
     @Autowired
     private DictDao dictDao;
@@ -86,6 +90,14 @@ public class OrderServiceImpl implements OrderService {
     private AccountMapper accountMapper;
     @Value("${cbest.pay.card.code:5065}")
     private String cardPayCode;
+    @Value("${spring.kafka.servers:192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667}")
+    private String servers;
+    @Value("${spring.kafka.group-id:welfare}")
+    private String groupId;
+    @Value("${spring.kafka.offset:earliest}")
+    private String offsetRest;
+    @Value("${spring.kafka.topic:order-info}")
+    private String topic;
 
     private static boolean RUN = false;
 
@@ -337,6 +349,7 @@ public class OrderServiceImpl implements OrderService {
         return orderInfoList;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void syncOrderData() {
         //获取所有商户数据
@@ -422,6 +435,7 @@ public class OrderServiceImpl implements OrderService {
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.setOrderId(item.getOrderId());
             orderInfo.setPayCode(cardPayCode);
+            orderInfo.setGoods(item.getGoods());
             orderInfo.setPayName("员工卡");
             orderInfo.setTransType(item.getTransType());
             orderInfo.setTransTypeName(WelfareConstant.TransType.valueOf(item.getTransType().toUpperCase()).desc());
@@ -451,68 +465,96 @@ public class OrderServiceImpl implements OrderService {
                                             Map<String , String> payMap ,
                                             List<String> rebateStoreList,
                                             List<String> noRebateStoreList) {
-        if (RUN){
-            log.info("上一个任务任然在运行");
-            return;
-        }
-        RUN = true;
-
         //根据上面的配置，新增消费者对象
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(getPreperties());
         // 订阅topic-user topic
-        consumer.subscribe(Collections.singletonList("order_info"));
-        while (true) {
-            //  从服务器开始拉取数据
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
-            log.info("拉到kafka数据{}条" , records.count());
-            for (ConsumerRecord<String, String> record : records){
-                String value = record.value();
-                if (StringUtils.isBlank(value))
-                    continue;
-                MessageData messageData = JSONObject.toJavaObject(JSON.parseObject(value) , MessageData.class);
-                Date orderTime = strToDate(messageData.getHeader().getBEGINTIMESTAMP()+"");
-                System.out.println(String.format(record.topic() +
-                                "一条新消息 offset = %d, key = %s, value = %s", record.offset(),
-                        record.key(), record.value()));
-                if (new Date().getTime() <= orderTime.getTime() ){
-                    log.info("订单不处理，订单时间 {}" , messageData.getHeader().getBEGINTIMESTAMP());
-                    continue;
-                }
-                //线上数据不处理
-                if (isOnline(messageData.getHeader().getOPERATORID())){
-                    continue;
-                }
-                //获取订单消费明细
-                String storeCode = messageData.getHeader().getRETAILSTOREID();
-                //判断门店是否再返利配置表中，再判断该门店配置了哪类返利类型(可能同一个门店在不同的商户上面配置的返利类型不一样)
-                //从最大的返利配置开始匹配
-                //1 先配置所有方式返利门店
-                //2 在配置其他方式返利门店
-                //最后配置没有返利门店
-                if (rebateStoreList.contains(storeCode)){
-                    //该门店配置了返利门店，并且返利类型是其他支付方式和全部方式返利，此时处理所有订单(员工卡、非员工卡)
-                    //处理成订单  &  支付数据
-                    OrderInfo orderInfo = getOrderInfo(messageData , storeAndNameMap , storeAndMerchantMap , false);
-                    if (orderInfo != null){
-                        List<OrderInfo> list1 = new ArrayList<>();
-                        list1.add(orderInfo);
-                        int i = orderMapper.saveOrUpdate(list1);
-                        List<SettleDetail> settleDetailList = getSettleDetail(messageData , storeAndNameMap ,
-                                storeAndMerchantMap , payMap);
-                        boolean b = settleDetailDao.saveBatch(settleDetailList);
+        consumer.subscribe(Collections.singletonList(topic));
+        Long startTime = System.currentTimeMillis();
+        List<OrderInfo> orderInfoList = new ArrayList<>();
+        List<SettleDetail> settleDetailList = new ArrayList<>();
+        try{
+            while (true) {
+                //  从服务器开始拉取数据
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
+                log.info("拉到kafka数据{}条" , records.count());
+                for (ConsumerRecord<String, String> record : records){
+                    String value = record.value();
+                    if (StringUtils.isBlank(value))
+                        continue;
+                    MessageData messageData = JSONObject.toJavaObject(JSON.parseObject(value) , MessageData.class);
+                    Date orderTime = strToDate(messageData.getHeader().getBEGINTIMESTAMP()+"");
+                    //线上数据不处理
+                    if (isOnline(messageData.getHeader().getOPERATORID())){
+                        continue;
                     }
-                }else if (noRebateStoreList.contains(storeCode)){
-                    //该门店没有配置返利，只处理员工卡消费小票
-                    OrderInfo orderInfo = getOrderInfo(messageData , storeAndNameMap , storeAndMerchantMap , true);
-                    if (orderInfo != null){
-                        List<OrderInfo> list1 = new ArrayList<>();
-                        list1.add(orderInfo);
-                        int i = orderMapper.saveOrUpdate(list1);
+                    //获取订单消费明细
+                    String storeCode = messageData.getHeader().getRETAILSTOREID();
+                    //判断门店是否再返利配置表中，再判断该门店配置了哪类返利类型(可能同一个门店在不同的商户上面配置的返利类型不一样)
+                    //从最大的返利配置开始匹配
+                    //1 先配置所有方式返利门店
+                    //2 在配置其他方式返利门店
+                    //最后配置没有返利门店
+                    if (rebateStoreList.contains(storeCode)){
+                        //该门店配置了返利门店，并且返利类型是其他支付方式和全部方式返利，此时处理所有订单(员工卡、非员工卡)
+                        //处理成订单  &  支付数据
+                        OrderInfo orderInfo = getOrderInfo(messageData , storeAndNameMap , storeAndMerchantMap , false);
+                        if (orderInfo != null){
+//                            List<OrderInfo> list1 = new ArrayList<>();
+                            orderInfoList.add(orderInfo);
+//                            int i = orderMapper.saveOrUpdate(list1);
+                            //明细结算
+                            List<SettleDetail> settleDetails = getSettleDetail(messageData , storeAndNameMap ,
+                                    storeAndMerchantMap , payMap);
+                            if (settleDetails != null && settleDetails.size() > 0)
+                                settleDetailList.addAll(settleDetails);
+//                            boolean b = settleDetailDao.saveBatch(settleDetailList);
+                        }
+                    }else if (noRebateStoreList.contains(storeCode)){
+                        //该门店没有配置返利，只处理员工卡消费小票
+                        OrderInfo orderInfo = getOrderInfo(messageData , storeAndNameMap , storeAndMerchantMap , true);
+                        if (orderInfo != null)
+                            orderInfoList.add(orderInfo);
+//                        {
+//                            List<OrderInfo> list1 = new ArrayList<>();
+//                            list1.add(orderInfo);
+//                            int i = orderMapper.saveOrUpdate(list1);
+//                        }
+                    }else {
+                        //该门店没有和任何商户配置消费场景
                     }
-                }else {
-                    //该门店没有和任何商户配置消费场景
+                }
+                /**
+                 * 结束本次数据同步，有下面三种情况:
+                 * 1 当本次同步的订单数据量 大于 1000
+                 * 2 当本次同步的结算明细数据量 大于 2000
+                 * 3 当循环时间到达 5分钟时
+                 */
+                if (orderInfoList.size() > 1000
+                        || settleDetailList.size() > 2000
+                        || (System.currentTimeMillis() - startTime) > 5 * 60 * 1000 ){
+                    //保存订单数据
+                    if(orderInfoList.size() > 0){
+                        int count = orderMapper.saveOrUpdate(orderInfoList);
+                        log.info("kafka订单数据保存到数据库{}条" , count);
+                    }else {
+                        log.info("kafka订单中没有满足条件的数据");
+                    }
+                    //保存结算明细数据
+                    if (settleDetailList.size() > 0){
+                        boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
+                        log.info("kafka明细结算数据保存到数据库{}条{}" , settleDetailList.size() , flag == true? "成功" : "失败");
+                    }else {
+                        log.info("kafka明细结算数据中没有满足条件的数据");
+                    }
+                    consumer.commitAsync();
+                    break;
                 }
             }
+        }catch (Exception ex){
+            log.error("解析小票异常:" ,ex);
+            throw ex;
+        }finally {
+            consumer.close();
         }
     }
     /**
@@ -733,16 +775,16 @@ public class OrderServiceImpl implements OrderService {
         Properties props = new Properties();
 
         // 必须设置的属性
-        props.put("bootstrap.servers", "192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667");
+        props.put("bootstrap.servers", servers);
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put("group.id", "welfare");
+        props.put("group.id", groupId);
 
         // 可选设置属性
 
         //提交方式配置
         // 自动提交offset,每1s提交一次（提交后的消息不再消费，避免重复消费问题）
-        props.put("enable.auto.commit", "true");//自动提交offset:true【PS：只有当消息提交后，此消息才不会被再次接受到】
+        props.put("enable.auto.commit", "false");//自动提交offset:true【PS：只有当消息提交后，此消息才不会被再次接受到】
         props.put("auto.commit.interval.ms", "1000");//自动提交的间隔
 
         //消费方式配置
@@ -751,18 +793,12 @@ public class OrderServiceImpl implements OrderService {
          * latest： 当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，消费新产生的该分区下的数据
          * none： topic各分区都存在已提交的offset时，从offset后开始消费；只要有一个分区不存在已提交的offset，则抛出异常
          */
-        props.put("auto.offset.reset", "earliest");//earliest：当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，从头开始消费
+        props.put("auto.offset.reset", offsetRest);//earliest：当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，从头开始消费
 
         //拉取消息设置
         props.put("max.poll.records", "100");//每次poll操作最多拉取多少条消息（一般不主动设置，取默认的就好）
         return props;
     }
-
-    /*private String dateToStr(String date){
-        String reg = "(\\d{4})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})";
-        date = date.replaceAll(reg, "$1-$2-$3 $4:$5:$6");
-        return date;
-    }*/
 
     private Date strToDate(String datetime){
         Date date = DateTime.of(datetime , "yyyyMMddHHmmss");
@@ -775,11 +811,5 @@ public class OrderServiceImpl implements OrderService {
     class ItemKV{
         private String code;
         private String name;
-    }
-
-    public static void main(String[] args) {
-        String value = "{\"header\":{\"ZYTBJ\":\"1\",\"BEGINTIMESTAMP\":\"20200612092400\",\"OPERATORID\":\"11-70010554\",\"PARTNERID\":\"70010554\",\"AUART\":\"1\",\"BUSINESSDAYDATE\":\"20200612092400\",\"ENDTIMESTAMP\":\"20200612092400\",\"WORKSTATIONID\":\"0003\",\"RETAILSTOREIDBG\":\"1\",\"RETAILSTOREID\":\"6004\",\"TRANSNUMBER\":\"600433466732\",\"TRANSTYPECODE\":\"1\"},\"item1\":{\"CUSTOMERDETAILS\":\"00\"},\"item2List\":[{\"CONS_PROCG\":\"4\",\"SALESAMOUNT\":\"150\",\"SERIALNUMBER\":\"0\",\"LGORT\":\"\",\"RETAILQUANTITY\":\"1\",\"ACTUALUNITPRICE\":\"150\",\"OTRANSNUMBER\":\"01\",\"CUSTCARDNUMBER\":\"0103843800\",\"RETAILNUMBER\":\"1\",\"ZZGHN\":\"60040073\",\"CUSTCARDTYPE\":\"N\",\"ENTRYMETHODCODE\":\"\",\"PLU\":\"60242929\",\"ZZDANHAO\":\"\",\"ZTDQIMEI\":\"\",\"PROMOTIONID\":\"0\",\"RECNNR\":\"1072468\",\"LOYNUMBER\":\"1\",\"RETAILTYPECODE\":\"1\",\"ITEMID\":\"60242929\"}],\"item8List\":[{\"TENDERTYPECODE\":\"5001\",\"TENDERNUMBER\":\"1\",\"TENDERAMOUNT\":\"150\",\"ACCOUNTNUMBER\":\"\",\"REFERENCEID\":\"0\"}],\"origin\":\"FJ\"}";
-        MessageData messageData = JSONObject.toJavaObject(JSON.parseObject(value) , MessageData.class);
-        System.out.println(messageData);
     }
 }

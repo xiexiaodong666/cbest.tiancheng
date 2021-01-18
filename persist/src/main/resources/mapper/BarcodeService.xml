@@ -9,4 +9,41 @@
         id,mer_code,trans_no,trans_type,balance_type,trans_amount,recharge_limit,current_balance,credit_limit,remaining_limit,rebate_limit,create_user,create_time,update_user,update_time,version
     </sql>
 
+
+    <select id="getMerTransDetail" parameterType="com.welfare.persist.dto.query.MerTransDetailQuery" resultType="com.welfare.persist.dto.MerTransDetailDTO">
+        select
+            trans_no as transNo,
+            create_time as transTime,
+            case when trans_amount&gt;0 then 'in'
+                 when trans_amount&lt;0 then 'out' end as inOrOutType,
+            trans_type as  transType,
+            trans_amount as inOrOutAmount,
+            current_balance+remaining_limit+rebate_limit as allAmount
+        from merchant_bill_detail
+        <where>
+            <if test="merCode!=null and merCode!=''">
+                and mer_code=#{merCode}
+            </if>
+            <if test="inOrOutType!=null and inOrOutType!=''">
+                 <choose>
+                     <when test="inOrOutType=='in'">
+                         and trans_amount&gt;0
+                     </when>
+                     <when test="inOrOutType=='out'">
+                         and trans_amount&lt;0
+                     </when>
+                 </choose>
+            </if>
+            <if test="transType!=null and transType!=''">
+                and trans_type=#{transType}
+            </if>
+            <if test="startTime!=null">
+                and create_time &gt;=#{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime!=null">
+                and create_time &lt;=#{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+
+    </select>
 </mapper>

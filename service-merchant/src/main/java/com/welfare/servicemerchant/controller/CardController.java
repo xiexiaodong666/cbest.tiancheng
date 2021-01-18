@@ -3,6 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.CardInfo;
@@ -53,24 +54,48 @@ public class CardController implements IController {
 
   @GetMapping("/{cardNo}")
   @ApiOperation("根据卡号获取卡信息")
-  public R<CardInfo> queryCardInfo(@PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo) {
+  public R<CardInfoApiDTO> queryCardInfo(
+      @PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo) {
     CardInfo cardInfo = cardInfoService.getByCardNo(cardNo);
-    return success(cardInfo);
+    CardApply cardApply = applyService.queryByApplyCode(cardInfo.getApplyCode());
+    Merchant merchant = merchantService.queryByCode(cardApply.getMerCode());
+    CardInfoApiDTO cardInfoApiDTO = tranferToCardInfoApiDTO(cardInfo, cardApply);
+
+    cardInfoApiDTO.setMerName(merchant.getMerName());
+    return success(cardInfoApiDTO);
+  }
+
+  @GetMapping("/byMagneticStripe")
+  @ApiOperation("根据卡号获取卡信息")
+  public R<CardInfoApiDTO> queryCardInfoByMagneticStripe(
+      @RequestParam("magneticStripe") @ApiParam("磁条号") String magneticStripe) {
+    CardInfo cardInfo = cardInfoService.getByMagneticStripe(magneticStripe);
+    CardApply cardApply = applyService.queryByApplyCode(cardInfo.getApplyCode());
+    Merchant merchant = merchantService.queryByCode(cardApply.getMerCode());
+    CardInfoApiDTO cardInfoApiDTO = tranferToCardInfoApiDTO(cardInfo, cardApply);
+
+    cardInfoApiDTO.setMerName(merchant.getMerName());
+    return success(cardInfoApiDTO);
   }
 
   @GetMapping("/apply/{applyCode}")
   @ApiOperation("根据批次号获取卡信息")
-  public R<List<CardInfo>> queryCardInfoByBatchNo(
+  public R<List<CardInfoApiDTO>> queryCardInfoByBatchNo(
       @PathVariable(value = "applyCode") @ApiParam("制卡申请号（批次号）") String applyCode) {
-    List<CardInfo> cardInfos = cardInfoService.listByApplyCode(
+    List<CardInfoApiDTO> cardInfos = cardInfoService.listByApplyCode(
         applyCode, WelfareConstant.CardStatus.NEW.code());
     return success(cardInfos);
   }
 
   @PutMapping("/written")
-  public R<CardInfo> updateToWritten(@RequestBody CardInfo cardInfo) {
+  public R<CardInfoApiDTO> updateToWritten(@RequestBody CardInfo cardInfo) {
     CardInfo result = cardInfoService.updateWritten(cardInfo);
-    return success(result);
+    CardApply cardApply = applyService.queryByApplyCode(result.getApplyCode());
+    Merchant merchant = merchantService.queryByCode(cardApply.getMerCode());
+    CardInfoApiDTO cardInfoApiDTO = tranferToCardInfoApiDTO(result, cardApply);
+    cardInfoApiDTO.setMerName(merchant.getMerName());
+
+    return success(cardInfoApiDTO);
   }
 
   @GetMapping("/admin/list")
@@ -116,10 +141,11 @@ public class CardController implements IController {
       @RequestParam(required = false) @ApiParam("绑定查询结束时间") Date bindEndTime) throws IOException {
 
     List<CardInfoDTO> exportList = cardInfoService.exportCardInfo(cardName,
-                                   merCode, cardType, cardMedium,
-                                   cardStatus, writtenStartTime,
-                                   writtenEndTime, startTime,
-                                   endTime, bindStartTime, bindEndTime
+                                                                  merCode, cardType, cardMedium,
+                                                                  cardStatus, writtenStartTime,
+                                                                  writtenEndTime, startTime,
+                                                                  endTime, bindStartTime,
+                                                                  bindEndTime
     );
     String path = fileUploadService.uploadExcelFile(exportList, CardInfoDTO.class, "卡片信息");
     return success(fileUploadService.getFileServerUrl(path));
@@ -146,7 +172,7 @@ public class CardController implements IController {
     cardInfoDTO.setCardType(cardInfo.getCardType());
     cardInfoDTO.setCardMedium(cardApply.getCardMedium());
     cardInfoDTO.setCardStatus(cardInfo.getCardStatus());
-    if(merchant != null) {
+    if (merchant != null) {
       cardInfoDTO.setMerName(merchant.getMerName());
     }
     cardInfoDTO.setCreateTime(cardInfo.getCreateTime());
@@ -155,6 +181,31 @@ public class CardController implements IController {
     cardInfoDTO.setAccountCode(String.valueOf(cardInfo.getAccountCode()));
 
     return success(cardInfoDTO);
+  }
+
+  private CardInfoApiDTO tranferToCardInfoApiDTO(CardInfo cardInfo, CardApply cardApply) {
+    CardInfoApiDTO cardInfoApiDTO = new CardInfoApiDTO();
+
+    cardInfoApiDTO.setId(cardInfo.getId());
+    cardInfoApiDTO.setApplyCode(cardInfo.getApplyCode());
+    cardInfoApiDTO.setCardId(cardInfo.getCardId());
+    cardInfoApiDTO.setCardName(cardApply.getCardName());
+    cardInfoApiDTO.setCardType(cardApply.getCardType());
+    cardInfoApiDTO.setCardStatus(cardInfo.getCardStatus());
+    cardInfoApiDTO.setDeleted(cardInfo.getDeleted());
+    cardInfoApiDTO.setCreateUser(cardInfo.getCreateUser());
+    cardInfoApiDTO.setCreateTime(cardInfo.getCreateTime());
+    cardInfoApiDTO.setUpdateUser(cardInfo.getUpdateUser());
+    cardInfoApiDTO.setUpdateTime(cardInfo.getUpdateTime());
+    cardInfoApiDTO.setAccountCode(cardInfo.getAccountCode());
+    cardInfoApiDTO.setVersion(cardInfo.getVersion());
+    cardInfoApiDTO.setMagneticStripe(cardInfo.getMagneticStripe());
+    cardInfoApiDTO.setWrittenTime(cardInfo.getWrittenTime());
+    cardInfoApiDTO.setBindTime(cardInfo.getBindTime());
+    cardInfoApiDTO.setCardMedium(cardApply.getCardMedium());
+    cardInfoApiDTO.setMerCode(cardApply.getMerCode());
+
+    return cardInfoApiDTO;
   }
 
 }

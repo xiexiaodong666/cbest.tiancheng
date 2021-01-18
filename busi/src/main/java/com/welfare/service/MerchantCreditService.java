@@ -71,6 +71,10 @@ public interface MerchantCreditService {
   void setAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
 
 
-  //void restoreRemainingLimit(RestoreRemainingLimitReq req)
+  /**
+   * 恢复剩余信用额度
+   * @param req
+   */
+  void restoreRemainingLimit(RestoreRemainingLimitReq req);
 
 }

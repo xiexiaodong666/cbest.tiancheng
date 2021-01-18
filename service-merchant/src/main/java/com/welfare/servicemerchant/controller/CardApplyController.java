@@ -76,7 +76,7 @@ public class CardApplyController implements IController {
   public R<CardApplyDTO> detail(@RequestParam(required = true) @ApiParam("申请卡片id") Long id) {
     QueryWrapper<CardApply> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(CardApply.ID, id);
-    CardApply cardApply = cardApplyService.getMerchantStoreRelationById(queryWrapper);
+    CardApply cardApply = cardApplyService.getCardApplyById(queryWrapper);
     QueryWrapper<Merchant> queryWrapperM = new QueryWrapper<>();
 
     queryWrapperM.eq(Merchant.MER_CODE, cardApply.getMerCode());

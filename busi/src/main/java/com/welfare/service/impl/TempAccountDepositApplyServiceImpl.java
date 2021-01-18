@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.TempAccountDepositApplyDao;
 import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
@@ -15,6 +17,7 @@ import com.welfare.service.AccountService;
 import com.welfare.service.TempAccountDepositApplyService;
 import com.welfare.service.dto.AccountDepositRequest;
 import com.welfare.service.listener.DepositApplyUploadListener;
+import com.welfare.service.sync.handler.MerchantHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -86,6 +89,9 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   @Override
   public String upload(MultipartFile multipartFile, String requestId, ThreadPoolExecutor executor) {
     String fileId = getFileIdByRequestId(requestId);
+    if (StringUtils.isBlank(MerchantUserHolder.getMerchantUser().getMerchantCode())) {
+      throw new BusiException("商户编码不能为空");
+    }
     if (StringUtils.isNotBlank(fileId)) {
       return fileId;
     }
@@ -100,7 +106,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
         }
         fileId = UUID.randomUUID().toString();
         DepositApplyUploadListener listener = new DepositApplyUploadListener(this, requestId ,
-                fileId, accountService, executor);
+                fileId, accountService, executor, MerchantUserHolder.getMerchantUser().getMerchantCode());
         EasyExcel.read(multipartFile.getInputStream(), AccountDepositRequest.class, listener).sheet().doRead();
         log.info("批量导入员工账号存储申请完成. requestId:{} fileId:{}", requestId, fileId);
 //        Page<TempAccountDepositApplyDTO> page = pageByFileIdByExistAccount(1 , 1, fileId);
@@ -113,7 +119,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
       }
     } catch (Exception e) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "上传账号存款申请临时文件错误", e);
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
     } finally {
       if (lock.isHeldByCurrentThread()) {
         lock.unlock();
@@ -135,6 +141,6 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
 
   @Override
   public AccountApplyTotalDTO getUserCountAndTotalmount(String fileId) {
-    return tempAccountDepositApplyDao.getBaseMapper().getUserCountAndTotalmount(fileId);
+    return tempAccountDepositApplyDao.getBaseMapper().getUserCountAndTotalAmount(fileId);
   }
 }

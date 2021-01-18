@@ -2,6 +2,7 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
 import java.util.Date;
@@ -22,9 +23,15 @@ public interface CardInfoService {
   CardInfo getByCardNo(String cardNo);
 
   /**
+   * 根据磁条号获取卡信息
+   * @param magneticStripe
+   * @return
+   */
+  CardInfo getByMagneticStripe(String magneticStripe);
+  /**
    * 根据申请号查询出所有
    */
-  List<CardInfo> listByApplyCode(String applyCode, Integer status);
+  List<CardInfoApiDTO> listByApplyCode(String applyCode, Integer status);
 
   /**
    * 更新卡信息为已写入
@@ -58,4 +65,6 @@ public interface CardInfoService {
       String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
       Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
       Date bindEndTime);
+
+  boolean cardIsBind(String cardId);
 }

@@ -111,7 +111,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if(Strings.isNotEmpty(merCode)) {
       merCodes.add(merCode);
     }
-    List<SupplierStore> supplierStores = supplierStoreExMapper.listUnionMerchant(merCodes);
+    List<SupplierStore> supplierStores;
     // 消费门店配置拉取
     if(SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(source)) {
       MerchantReq req = new MerchantReq();
@@ -124,15 +124,22 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       for (SupplierStore s :
           supplierStores) {
         try {
-          Map<String, Boolean> consumeTypeMap = mapper.readValue(
-              s.getConsumType(), Map.class);
-          ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
-          s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+          if(Strings.isNotEmpty(s.getConsumType())) {
+            Map<String, Boolean> consumeTypeMap = mapper.readValue(
+                s.getConsumType(), Map.class);
+            ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
+            s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+          } else {
+            log.error(s.getConsumType()+"########");
+          }
+
         } catch (JsonProcessingException e) {
           log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
         }
 
       }
+    } else {
+      supplierStores = supplierStoreExMapper.listUnionMerchant(merCodes);
     }
 
 

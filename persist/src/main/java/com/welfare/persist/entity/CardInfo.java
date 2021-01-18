@@ -114,16 +114,6 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      */
     @ApiModelProperty("绑定时间")   
     private Date bindTime;
-    /**
-     * 卡介质
-     */
-    @ApiModelProperty("卡介质")   
-    private String cardMedium;
-    /**
-     * 商户代码
-     */
-    @ApiModelProperty("商户代码")   
-    private String merCode;
 
 //以下为列明常量
 
@@ -187,13 +177,5 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
     * 绑定时间
     */
     public static final String BIND_TIME = "bind_time";
-    /**
-    * 卡介质
-    */
-    public static final String CARD_MEDIUM = "card_medium";
-    /**
-    * 商户代码
-    */
-    public static final String MER_CODE = "mer_code";
 
 }

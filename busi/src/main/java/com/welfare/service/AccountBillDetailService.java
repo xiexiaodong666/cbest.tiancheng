@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
 import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.dto.Deposit;
@@ -23,7 +24,7 @@ public interface AccountBillDetailService {
      * @param deposit
      * @param accountAmountType
      */
-    void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType);
+    void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType, Account account);
 
     /**
      * 根据流水号查询

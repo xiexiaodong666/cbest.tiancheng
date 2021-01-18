@@ -29,6 +29,7 @@
 
     <select id="getSettleDetailFromAccountDetail" parameterType="Map" resultType="com.welfare.persist.entity.SettleDetail">
         select
+        t1.id as id,
         null as orderId,
         t1.trans_no as transNo,
         t1.account_code as accountCode,
@@ -100,7 +101,7 @@
                  when t1.trans_type='refund' then t1.trans_amount end as refund_amount,
             case when t1.trans_type='consume' then t1.trans_amount
                  when t1.trans_type='refund' then 0 end as real_amount,
-            t1.trans_amount*t2.rebate_ratio as settle_amount
+            t1.trans_amount-t1.trans_amount*IFNULL(t2.rebate_ratio,0) as settle_amount
         from settle_detail t1
         left join merchant_store_relation t2
         on t1.mer_code = t2.mer_code and t1.store_code = t2.store_code and t2.status=0
@@ -158,6 +159,11 @@
         when t3.mer_code != t1.mer_code and t1.trans_type='refund' and t1.mer_account_type='self' then t1.trans_amount*-1
         else 0 end
         ) as unSettleSelfAmount,
+        sum(
+        case when t1.trans_type='consume' then 1
+             when t1.trans_type='refund' then -1
+        else 0 end
+        ) as orderNum,
         t5.rebate_limit as rebateAmount,
         t4.mer_cooperation_mode as merCooperationMode,
         case when t4.mer_cooperation_mode = 'payFirt' then '先付费'
@@ -166,7 +172,7 @@
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code and t4.deleted=0
-        left join merchant_credit t5 on t1.mer_code = t5.mer_code t5.deleted=0
+        left join merchant_credit t5 on t1.mer_code = t5.mer_code and t5.deleted=0
         where t1.settle_flag = 'unsettled'
         <if test="merCode!=null and merCode!=''">
             and t1.mer_code=#{merCode}
@@ -196,8 +202,7 @@
         ) as settleAmount,
         case when t3.mer_code != t1.mer_code and t1.trans_type='consume' and t1.mer_account_type='self' then t1.trans_amount
              when  t3.mer_code != t1.mer_code and t1.trans_type='refund' and mer_account_type='self' then t1.trans_amount*-1
-             else 0 end
-        ) as settleSelfAmount,
+             else 0 end as settleSelfAmount,
         sum(
         case when t2.rebate_type='all' and t1.trans_type='consume' then rebate_ratio/100*trans_amount
              when t2.rebate_type='all' and t1.trans_type='refund' then rebate_ratio/100*trans_amount*-1
@@ -283,13 +288,14 @@
         t1.mer_account_type_name as welfareTypeName,
         case when t1.trans_type='consume' then t1.trans_amount
              when t1.trans_type='refund' then 0 end as payAmount,
-        t1.trans_amount*t2.rebate_ratio as settleAmount
+        t1.trans_amount-t1.trans_amount*IFNULL(t2.rebate_ratio,0) as settleAmount
         from settle_detail t1
         left join merchant_store_relation t2
         on t1.mer_code = t2.mer_code and t1.store_code = t2.store_code and t2.status=0
         left join supplier_store t3
         on t1.store_code = t3.store_code and t3.status=0
         <where>
+            and settle_flag='unsettled'
             <if test="orderNo!=null and orderNo!=''">
                 and t1.order_id = #{orderNo}
             </if>
@@ -307,6 +313,9 @@
             </if>
             <if test="welfareTypeCode!=null and welfareTypeCode!=''">
                 and t1.mer_account_type = #{welfareTypeCode}
+            </if>
+            <if test="transNo!=null and transNo!=''">
+                and t1.trans_no=#{transNo}
             </if>
             <if test="merCode!=null and merCode!=''">
                 and t1.mer_code = #{merCode}
@@ -333,8 +342,8 @@
     <select id="getSettleDetailExtInfo" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery" resultType="map">
         select
         sum(
-        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
-        when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
+        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount-t1.trans_amount*IFNULL(t2.rebate_ratio,0)
+        when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1+t1.trans_amount*IFNULL(t2.rebate_ratio,0)
         else 0 end
         ) as settleAmount
         from settle_detail t1
@@ -359,14 +368,6 @@
             <if test="welfareTypeCode!=null and welfareTypeCode!=''">
                 and t1.mer_account_type = #{welfareTypeCode}
             </if>
-            <choose>
-                <when test="storeType=='self'">
-                    and t3.mer_code = t1.mer_code
-                </when>
-                <when test="storeType=='third'">
-                    and t3.mer_code != t1.mer_code
-                </when>
-            </choose>
             <if test="transNo!=null and transNo!=''">
                 and t1.trans_no=#{transNo}
             </if>
@@ -381,6 +382,14 @@
             <if test="limit!=null">
                 limit ${limit}
             </if>
+            <choose>
+                <when test="storeType=='self'">
+                    and t3.mer_code = t1.mer_code
+                </when>
+                <when test="storeType=='third'">
+                    and t3.mer_code != t1.mer_code
+                </when>
+            </choose>
         </where>
         group by t1.mer_code
     </select>

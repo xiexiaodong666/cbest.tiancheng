@@ -1,20 +1,27 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
+import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dao.MerchantBillDetailDao;
 import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.entity.MerchantBillDetail;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.service.MerchantBillDetailService;
 import com.welfare.service.MerchantCreditService;
+import com.welfare.service.MerchantService;
+import com.welfare.service.dto.RestoreRemainingLimitReq;
 import com.welfare.service.operator.merchant.*;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +32,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.RedisKeyConstant.RESTORE_REMAINING_LIMIT_REQUEST_ID;
 import static com.welfare.common.constants.WelfareConstant.MerCreditType.*;
 
 /**
@@ -49,7 +57,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final RebateLimitOperator rebateLimitOperator;
     private final MerchantBillDetailDao merchantBillDetailDao;
     private final SelfDepositBalanceOperator selfDepositBalanceOperator;
+    @Autowired
+    private  MerchantService merchantService;
     private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
+    private final MerchantBillDetailService merchantBillDetailService;
 
 
 
@@ -132,6 +143,31 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                     .map(MerchantAccountOperation::getMerchantBillDetail)
                     .collect(Collectors.toList());
             merchantBillDetailDao.saveBatch(merchantBillDetails);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void restoreRemainingLimit(RestoreRemainingLimitReq req) {
+        if (merchantService.queryByCode(req.getMerCode())== null) {
+            throw new BusiException("商户不存在");
+        }
+        if (req.getAmount() == null) {
+            return;
+        }
+        List<MerchantBillDetail> details = merchantBillDetailService.findByTransNoAndTransType(req.getTransNo(),MerCreditType.REMAINING_LIMIT.code());
+        if (CollectionUtils.isNotEmpty(details)) {
+            return;
+        }
+        RLock lock = redissonClient.getFairLock(RESTORE_REMAINING_LIMIT_REQUEST_ID + ":" + req.getTransNo());
+        lock.lock();
+        try{
+            details = merchantBillDetailService.findByTransNoAndTransType(req.getTransNo(),MerCreditType.REMAINING_LIMIT.code());
+            if (CollectionUtils.isNotEmpty(details)) {
+                return;
+            }
+            increaseAccountType(req.getMerCode(),MerCreditType.REMAINING_LIMIT,req.getAmount(),req.getTransNo());
         } finally {
             lock.unlock();
         }

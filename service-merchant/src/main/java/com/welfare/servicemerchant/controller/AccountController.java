@@ -200,4 +200,14 @@ public class AccountController implements IController {
     String path = fileUploadService.uploadExcelFile(exportList, AccountBillDetailDTO.class, "账户明细");
     return success(fileUploadService.getFileServerUrl(path));
   }
+  @GetMapping("/account/binding")
+  @ApiOperation("绑卡")
+  public R<Boolean> bindingCard(@RequestParam @ApiParam("accountCode") String accountCode,
+      @RequestParam @ApiParam("cardId") String cardId){
+    try {
+      return success(accountService.bindingCard(accountCode,cardId));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
+  }
 }

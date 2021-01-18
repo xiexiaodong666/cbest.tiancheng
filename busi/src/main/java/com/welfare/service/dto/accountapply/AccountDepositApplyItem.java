@@ -31,6 +31,12 @@ public class AccountDepositApplyItem {
   private Long accountCode;
 
   /**
+   * 手机号
+   */
+  @ApiModelProperty("手机号")
+  private String phone;
+
+  /**
    * 充值金额
    */
   @ApiModelProperty("充值金额")

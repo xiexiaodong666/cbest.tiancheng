@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -16,19 +17,15 @@ import java.math.BigDecimal;
 @Data
 public class RestoreRemainingLimitReq {
 
-  @ApiModelProperty("请求id")
-  @NotEmpty(message = "请求id不能为空")
-  private String requestId;
-
-  @ApiModelProperty("商户编码")
+  @ApiModelProperty(value = "商户编码",required = true)
   @NotEmpty(message = "商户编码不能为空")
   private String merCode;
 
-  @ApiModelProperty("流水号")
-  @NotEmpty(message = "流水号不能为空")
+  @ApiModelProperty(value = "结算单号",required = true)
+  @NotEmpty(message = "结算单号不能为空")
   private String transNo;
 
-  @ApiModelProperty("本次恢复金额(不能小于0)")
+  @ApiModelProperty(value = "本次恢复金额(不能小于0)",required = true)
   @DecimalMin(message = "金额不能小于0",value = "0")
   private BigDecimal amount;
 }

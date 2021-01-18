@@ -1,6 +1,7 @@
 package com.welfare.service.dto;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -28,8 +29,9 @@ public class WelfareSettleDetailResp {
     @ApiModelProperty(value = "订单号")
     private String orderNO;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "交易时间")
     @ApiModelProperty(value = "交易时间")
     private Date transTime;

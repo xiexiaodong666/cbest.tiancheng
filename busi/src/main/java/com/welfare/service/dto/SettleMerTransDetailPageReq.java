@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -17,7 +16,7 @@ import java.util.Date;
  * @desc
  */
 @Data
-public class SettleMerTransDetailReq{
+public class SettleMerTransDetailPageReq extends PageReq {
 
     @ApiModelProperty(value = "出入账类型 in-入账 out-出账")
     private String inOrOutType;

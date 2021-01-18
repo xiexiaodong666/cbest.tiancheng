@@ -25,5 +25,5 @@ public interface TempAccountDepositApplyMapper extends BaseMapper<TempAccountDep
 
   List<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(@Param("fileId") String fileId);
 
-  AccountApplyTotalDTO getUserCountAndTotalmount(@Param("fileId") String fileId);
+  AccountApplyTotalDTO getUserCountAndTotalAmount(@Param("fileId") String fileId);
 }

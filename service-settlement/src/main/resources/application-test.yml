@@ -2,7 +2,7 @@ spring:
   profiles: test
   datasource:
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: mysql@123
     type: com.alibaba.druid.pool.DruidDataSource

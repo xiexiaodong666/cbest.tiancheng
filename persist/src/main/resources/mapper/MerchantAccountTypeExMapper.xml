@@ -15,16 +15,16 @@
         GROUP BY
         mat.mer_code
         <where>
-            <if test="req.merCode!=null and req.merCode!=''">
+            <if test="req!=null and req.merCode!=null and req.merCode!=''">
                 and mat.mer_code=#{req.merCode}
             </if>
-            <if test="req.merName!=null and req.merName!=''">
+            <if test="req!=null and req.merName!=null and req.merName!=''">
                 and m.mer_mame like concat('%',#{req.merName},'%')
             </if>
-            <if test="req.startTime!=null">
+            <if test="req!=null and req.startTime!=null">
                 and mat.create_time &gt;= #{req.startTime}
             </if>
-            <if test="req.endTime!=null">
+            <if test="req!=null and req.endTime!=null">
                 and mat.create_time &lt;= #{req.endTime}
             </if>
         </where>

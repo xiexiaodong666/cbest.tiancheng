@@ -1,3 +1,4 @@
+git pull
 mvn clean install
 
 scp ./target/e-welfare-settlement.jar root@172.30.37.188:/home/finance/App/e-welfare-settlement.e-cbest.lotest/release/

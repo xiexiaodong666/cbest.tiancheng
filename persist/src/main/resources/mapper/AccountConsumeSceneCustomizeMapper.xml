@@ -106,7 +106,7 @@ FROM
 	inner JOIN supplier_store ss ON acstr.store_code = ss.store_code
 	inner JOIN account_type act ON act.type_code = acs.account_type_code
 WHERE
-	acs.id = #{id}
+	acs.id = #{id} and acstr.deleted = 0
 	</select>
 
   <select id = "getCountByMerCodeAndAccountTypeAndStoreCode" resultType="Integer">

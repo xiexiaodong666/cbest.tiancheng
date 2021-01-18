@@ -41,6 +41,7 @@
          t1.settle_no,
          t1.settle_month,
          t1.mer_code,
+         t2.mer_name,
          t1.trans_amount,
          t1.settle_amount,
          t1.order_num,

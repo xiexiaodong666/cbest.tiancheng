@@ -52,7 +52,7 @@ public class WelfareSettleController implements IController {
 
     @PostMapping("/detail")
     @ApiOperation("分页查询商户未结算账单明细列表")
-    public R<Page<WelfareSettleDetailResp>> pageQueryMonthSettleDetail(WelfareSettleDetailPageReq welfareSettleDetailPageReq){
+    public R<Page<WelfareSettleDetailResp>> pageQueryMonthSettleDetail(@RequestBody WelfareSettleDetailPageReq welfareSettleDetailPageReq){
 
         BasePageVo<WelfareSettleDetailResp> welfareSettleDetailRespBasePageVo =  settleDetailService.queryWelfareSettleDetailPage(welfareSettleDetailPageReq);
 
@@ -61,7 +61,7 @@ public class WelfareSettleController implements IController {
 
     @PostMapping("/detail/export")
     @ApiOperation("未结算账单明细导出")
-    public Object exportMonthSettleDetail(WelfareSettleDetailReq welfareSettleDetailReq, HttpServletResponse response){
+    public Object exportMonthSettleDetail(@RequestBody WelfareSettleDetailReq welfareSettleDetailReq, HttpServletResponse response){
 
 
         List<WelfareSettleDetailResp> welfareSettleDetailRespList = new ArrayList<>();
@@ -88,7 +88,7 @@ public class WelfareSettleController implements IController {
 
     @PostMapping("/buildSettle")
     @ApiOperation("按条件生成结算单")
-    public R<Page<WelfareSettleDetailResp>> buildSettle(WelfareSettleDetailReq welfareSettleDetailReq){
+    public R<Page<WelfareSettleDetailResp>> buildSettle(@RequestBody WelfareSettleDetailReq welfareSettleDetailReq){
 
         settleDetailService.buildSettle(welfareSettleDetailReq);
 

@@ -36,9 +36,9 @@ public class WelfareSettleDetailReq{
     private Date startTime;
 
     @ApiModelProperty(value = "结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
-    @JSONField(format = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
     @ApiModelProperty(value = "福利类型")

@@ -47,8 +47,8 @@
          t1.confirm_time,
          t1.rebate_amount,
          t2.mer_cooperation_mode,
-         case when t2.mer_cooperation_mode = 'payFirt' then '先付费'
-              when t2.mer_cooperation_mode = 'payed' then '后付费' end as mer_cooperation_mode_name
+         case when t2.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
+              when t2.mer_cooperation_mode = 'PAYED' then '后付费' end as mer_cooperation_mode_name
         from month_settle t1
         LEFT JOIN merchant t2 on t1.mer_code = t2.mer_code
         <where>
@@ -73,6 +73,9 @@
             </if>
             <if test="recStatus!=null and recStatus!=''">
                 and t1.rec_status = #{recStatus}
+            </if>
+            <if test="sendStatus!=null and sendStatus!=''">
+                and t1.send_status = #{sendStatus}
             </if>
         </where>
     </select>

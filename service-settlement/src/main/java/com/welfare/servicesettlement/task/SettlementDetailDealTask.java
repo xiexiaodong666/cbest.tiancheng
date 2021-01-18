@@ -65,7 +65,7 @@ public class SettlementDetailDealTask extends IJobHandler {
         log.info("请求参数：{}",param);
 
         Date today = new Date();
-        if(StringUtils.isEmpty(param)){
+        if(!StringUtils.isEmpty(param)){
             JSONObject jsonObject = JSON.parseObject(param);
             try {
                 String date = jsonObject.getString("date");

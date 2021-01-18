@@ -27,6 +27,7 @@
     AND acs.mer_code = ss.mer_code
     inner JOIN account_type act ON act.type_code = acs.account_type_code
     where acs.deleted =0 and acstr.deleted= 0 and ss.deleted = 0
+    and acs.mer_code = act.mer_code
   </sql>
 
 
@@ -46,6 +47,7 @@
     AND acs.mer_code = ss.mer_code
     inner JOIN account_type act ON act.type_code = acs.account_type_code
     where acs.deleted =0 and acstr.deleted= 0 and ss.deleted = 0
+    and acs.mer_code = act.mer_code
     <if test=" merCode !='' and merCode != null ">
       and acs.mer_code = #{merCode}
     </if>

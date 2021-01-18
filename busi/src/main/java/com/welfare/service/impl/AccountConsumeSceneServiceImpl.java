@@ -103,7 +103,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
       BeanUtils.copyProperties(accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeScene.setAccountTypeCode(accountTypeCode);
-      accountConsumeScene.setStatus(0);
+      accountConsumeScene.setStatus(1);
       validationAccountConsumeScene(accountConsumeScene,true);
       accountConsumeSceneDao.save(accountConsumeScene);
       List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = getAccountConsumeSceneStoreRelations(

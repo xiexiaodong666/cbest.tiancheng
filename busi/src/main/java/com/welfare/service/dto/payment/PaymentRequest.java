@@ -1,17 +1,19 @@
 package com.welfare.service.dto.payment;
 
-import com.welfare.common.constants.WelfareConstant;
+import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
+import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.SpringBeanUtils;
-import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.SupplierStore;
+import com.welfare.service.dto.ConsumeTypeJson;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -52,22 +54,26 @@ public abstract class PaymentRequest {
     private Date paymentDate;
 
     public String calculatePaymentScene(){
-        if (!StringUtil.startsWithNumber(storeNo)) {
-            //非数字开头的门店，供应商线下消费
-            return WelfareConstant.PaymentScene.OFFLINE_SUPPLIER.code();
-        } else if(isVirtualMachineNo(machineNo)){
-            //特殊支付机器号，重百线上
-            return WelfareConstant.PaymentScene.ONLINE_STORE.code();
-        } else {
-            //其余情况，重百线下
-            return WelfareConstant.PaymentScene.OFFLINE_CBEST.code();
-        }
+        String consumeType = o2oOrOnlineShopping(machineNo);
+        //不是O2O或者ONLINE_SHOPPING,则为到店消费
+        return consumeType == null ? ConsumeTypeEnum.SHOP_SHOPPING.getCode() :consumeType;
     }
 
-    private boolean isVirtualMachineNo(String machineNo) {
+    /**
+     * 是不是O2O或者ONLINE_SHOPPING
+     * @param machineNo
+     * @return
+     */
+    private String o2oOrOnlineShopping(String machineNo) {
         SupplierStoreDao supplierStoreDao = SpringBeanUtils.getBean(SupplierStoreDao.class);
         SupplierStore oneByCashierNo = supplierStoreDao.getOneByCashierNo(machineNo);
-        return !Objects.isNull(oneByCashierNo);
+        if(Objects.isNull(oneByCashierNo)){
+            return null;
+        }else{
+            String consumType = oneByCashierNo.getConsumType();
+            ConsumeTypeJson consumeTypeJson = JSON.parseObject(consumType,ConsumeTypeJson.class);
+            return consumeTypeJson.getOnlineMall()?ConsumeTypeEnum.ONLINE_MALL.getCode():ConsumeTypeEnum.O2O.getCode();
+        }
     }
 
 

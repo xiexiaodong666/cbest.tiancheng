@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Long accountCode = paymentRequest.calculateAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
-        //chargePaymentScene(paymentRequest, account);
+        chargePaymentScene(paymentRequest, account);
 
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         merAccountLock.lock();
@@ -90,6 +90,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
+    /**
+     * 判断消费场景是否符合配置
+     * @param paymentRequest
+     * @param account
+     */
     private void chargePaymentScene(PaymentRequest paymentRequest, Account account) {
         String paymentScene = paymentRequest.calculatePaymentScene();
         AccountConsumeScene accountConsumeScene = accountConsumeSceneDao
@@ -98,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .getOneBySceneIdAndStoreNo(accountConsumeScene.getId(), paymentRequest.getStoreNo());
         List<String> sceneConsumeTypes = Arrays.asList(sceneStoreRelation.getSceneConsumType().split(","));
         if(!sceneConsumeTypes.contains(paymentScene)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景",null);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"当前用户不支持此消费场景:"+paymentScene,null);
         }
     }
 

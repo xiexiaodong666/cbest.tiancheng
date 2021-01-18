@@ -1,4 +1,6 @@
 spring:
+  cache:
+    type: redis
   datasource:
     url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
     username: root
@@ -20,13 +22,15 @@ spring:
         - 192.1.30.186:7004
         - 192.1.30.186:7005
     database: 0
+    #password: msxfMarketing
 logging:
   file:
     path: /home/finance/Logs/e-welfare-account.e-cbest.lotest
   level:
     root: info
-#encrypt:
-  #file: ${config.file:file:/home/finance/Config/e-welfare-account.e-cbest.lotest/config-test.properties}
+    com.welfare.persist.mapper: debug
+encrypt:
+  file: ${config.file:classpath:config/config.properties}
 e-welfare:
   distributed-lock:
     enabled: true
@@ -37,6 +41,8 @@ mybatis-plus:
       logic-not-delete-value: 0
 platformUser:
   url:
+shopping:
+  url:
 
 cbest:
   pay:
@@ -44,3 +50,15 @@ cbest:
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
     notifyUrl: http://xxx/accountDepositRecord/payNotify
+
+exclude-header-interceptor:
+  - /swagger*/**
+  - /doc.html*
+  - /error*
+  - /index
+  - /**/*.css
+  - /**/*.js
+  - /**/*.png
+  - /**/*.jpg
+  - /**/*.jpeg
+  - /**/*.ico

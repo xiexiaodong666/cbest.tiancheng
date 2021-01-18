@@ -269,14 +269,9 @@ public class PaymentServiceImpl implements PaymentService {
         if (paymentRequest instanceof CardPaymentRequest) {
             accountDeductionDetail.setCardId(paymentRequest.getCardNo());
         }
-        if (SELF.code().equals(accountAmountType.getMerAccountTypeCode())) {
-            accountDeductionDetail.setSelfDeductionAmount(operatedAmount);
-            accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
-        } else {
-            accountDeductionDetail.setSelfDeductionAmount(BigDecimal.ZERO);
-            accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
-            //非自主充值，需要扣减商户账户
-        }
+
+        accountDeductionDetail.setSelfDeductionAmount(SELF.code().equals(accountAmountType.getMerAccountTypeCode())?operatedAmount:BigDecimal.ZERO);
+        accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
         List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.doOperateAccount(
                 account.getMerCode(),
                 operatedAmount,

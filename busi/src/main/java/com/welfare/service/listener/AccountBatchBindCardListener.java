@@ -12,6 +12,7 @@ import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.CardInfo;
+import com.welfare.service.AccountService;
 import com.welfare.service.CardInfoService;
 import com.welfare.service.dto.AccountBindCardDTO;
 import java.util.Date;
@@ -34,33 +35,26 @@ public class AccountBatchBindCardListener extends AnalysisEventListener<AccountB
   List<CardInfo> cardInfoList = new LinkedList<CardInfo>();
   List<Account> accountList = new LinkedList<Account>();
 
-  private CardInfoDao cardInfoDao;
   private AccountDao accountDao;
-  private CardApplyDao cardApplyDao;
   private CardInfoService cardInfoService;
+  private AccountService accountService;
   private static StringBuilder  uploadInfo = new StringBuilder();
 
-  public AccountBatchBindCardListener(CardInfoDao cardInfoDao,
-      AccountDao accountDao, CardApplyDao cardApplyDao,CardInfoService cardInfoService) {
-    this.cardInfoDao = cardInfoDao;
+  public AccountBatchBindCardListener(AccountDao accountDao,CardInfoService cardInfoService,AccountService accountService) {
     this.accountDao = accountDao;
-    this.cardApplyDao = cardApplyDao;
     this.cardInfoService = cardInfoService;
+    this.accountService = accountService;
   }
 
   @Override
   public void invoke(AccountBindCardDTO accountBindCardDTO, AnalysisContext analysisContext) {
-    //TODO cardINfo 修改状态以及员工账号信息
-    //TODO account 修改账号绑定状态
     QueryWrapper<Account> accountQueryWrapper = new  QueryWrapper<Account>();
-    accountQueryWrapper.eq(Account.ACCOUNT_CODE,accountBindCardDTO.getAccountCode());
+    accountQueryWrapper.eq(Account.ACCOUNT_CODE,Long.parseLong(accountBindCardDTO.getAccountCode()));
     Account account = accountDao.getOne(accountQueryWrapper);
     if( null == account ){
       uploadInfo.append("员工账号:").append(accountBindCardDTO.getAccountCode()).append("不存在;");
       return;
     }
-    account.setBinding(AccountBindStatus.BIND.getCode());
-    accountList.add(account);
     CardInfo cardInfo = cardInfoService.getByCardNo(accountBindCardDTO.getCardId());
     if( null ==  cardInfo){
       uploadInfo.append("卡号:").append(accountBindCardDTO.getCardId()).append("不存在;");
@@ -70,25 +64,24 @@ public class AccountBatchBindCardListener extends AnalysisEventListener<AccountB
       uploadInfo.append("卡号:").append(accountBindCardDTO.getCardId()).append("已经绑定其他账号;");
       return;
     }
+    cardInfo.setAccountCode(account.getAccountCode());
     cardInfo.setBindTime(new Date());
     cardInfo.setCardStatus(CardStatus.BIND.code());
     cardInfoList.add(cardInfo);
+    account.setBinding(AccountBindStatus.BIND.getCode());
+    accountList.add(account);
   }
 
   @Override
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
     if(!CollectionUtils.isEmpty(cardInfoList)){
-      Boolean result = cardInfoDao.saveBatch(cardInfoList);
-      updateAccountBindStatus();
-      if( result == true && StringUtils.isEmpty(uploadInfo.toString()) ){
+      accountService.batchBindCard(cardInfoList,accountList);
+      if(StringUtils.isEmpty(uploadInfo.toString()) ){
         uploadInfo.append("导入成功");
       }
     }
   }
 
-  private void updateAccountBindStatus() {
-    accountDao.updateBatchById(accountList);
-  }
 
   public StringBuilder getUploadInfo() {
     return uploadInfo;

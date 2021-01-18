@@ -2,6 +2,8 @@ package com.welfare.persist.dto.query;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author qiang.deng
  * @version 1.0.0
@@ -21,6 +23,10 @@ public class MonthSettleQuery{
     private String endMonthStr;
 
     private String merCooperationMode;
+
+    private Date startTime;
+
+    private Date endTime;
 
     private String settleStatus;
 

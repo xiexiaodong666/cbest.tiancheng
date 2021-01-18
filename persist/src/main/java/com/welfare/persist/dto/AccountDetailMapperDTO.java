@@ -37,6 +37,10 @@ public class AccountDetailMapperDTO {
    */
   private String accountTypeName;
   /**
+   * 员工类型code
+   */
+  private String accountTypeCode;
+  /**
    * 所属部门
    */
   private String departmentCode;

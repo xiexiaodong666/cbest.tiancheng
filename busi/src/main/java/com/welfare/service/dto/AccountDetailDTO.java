@@ -35,6 +35,11 @@ public class AccountDetailDTO {
   /**
    * 员工类型编码名称
    */
+  @ApiModelProperty("员工类型编码")
+  private String accountTypeCode;
+  /**
+   * 员工类型编码名称
+   */
   @ApiModelProperty("员工类型编码名称")
   private String accountTypeName;
   /**

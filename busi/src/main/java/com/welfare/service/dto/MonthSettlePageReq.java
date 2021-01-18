@@ -1,9 +1,14 @@
 package com.welfare.service.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.welfare.common.base.RequestPage;
 import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 /**
  * @author qiang.deng
@@ -25,6 +30,18 @@ public class MonthSettlePageReq extends PageReq {
 
     @ApiModelProperty(value = "结束月份 yyyy-MM")
     private String endMonthStr;
+
+    @ApiModelProperty(value = "起始时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JSONField(format = "yyyy-MM-dd")
+    private Date startTime;
+
+    @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JSONField(format = "yyyy-MM-dd HH:mm")
+    private Date endTime;
 
     @ApiModelProperty(value = "合作方式")
     private String merCooperationMode;

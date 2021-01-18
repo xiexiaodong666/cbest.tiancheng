@@ -75,7 +75,12 @@
             <if test="endMonthStr!=null and endMonthStr!=''">
                 and t1.settle_month &gt;=#{endMonthStr}
             </if>
-
+            <if test="endTime!=null and endTime!=''">
+                and t1.create_time &lt;=#{endTime}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                and t1.create_time &gt;=#{startTime}
+            </if>
             <if test="merCooperationMode!=null and merCooperationMode!=''">
                 and t2.mer_cooperation_mode = #{merCooperationMode}
             </if>
@@ -113,6 +118,13 @@
             <if test="endMonthStr!=null and endMonthStr!=''">
                 and t1.settle_month &gt;=#{endMonthStr}
             </if>
+            <if test="endTime!=null and endTime!=''">
+                and t1.create_time &lt;=#{endTime}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                and t1.create_time &gt;=#{startTime}
+            </if>
+
             <if test="merCooperationMode!=null and merCooperationMode!=''">
                 and t2.mer_cooperation_mode = #{merCooperationMode}
             </if>

@@ -95,5 +95,14 @@
     from merchant m
 
     ) temp
+    <where>
+      <if test="merCodes != null and merCodes.size()>0">
+        and temp.merCode in
+        <foreach item="item" index="index" collection="merCodes" open="(" separator=","
+                 close=")">
+          #{item}
+        </foreach>
+      </if>
+    </where>
   </select>
 </mapper>

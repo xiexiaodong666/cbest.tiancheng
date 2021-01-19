@@ -1,6 +1,7 @@
 package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import java.math.BigDecimal;
 import lombok.Data;
 
 /**
@@ -55,6 +56,6 @@ public class AdminMerchantStore {
    * 返利比率
    */
   @ApiModelProperty("返利比率")
-  private Integer rebateRatio;
+  private BigDecimal rebateRatio;
 
 }

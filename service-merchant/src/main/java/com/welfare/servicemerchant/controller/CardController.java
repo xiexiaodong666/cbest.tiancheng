@@ -3,6 +3,8 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.CardApplyMediumEnum;
+import com.welfare.common.enums.CardApplyTypeEnum;
 import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardApply;
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -147,7 +150,21 @@ public class CardController implements IController {
                                                                   endTime, bindStartTime,
                                                                   bindEndTime
     );
+    for (CardInfoDTO cardInfoDTO:
+    exportList) {
+      if(Strings.isNotEmpty(cardInfoDTO.getCardMedium())) {
+        cardInfoDTO.setCardMedium(CardApplyMediumEnum.valueOf(cardInfoDTO.getCardMedium()).getDesc());
+      }
+
+      if(Strings.isNotEmpty(cardInfoDTO.getCardType())) {
+        cardInfoDTO.setCardType(CardApplyTypeEnum.valueOf(cardInfoDTO.getCardType()).getDesc());
+      }
+    }
+
+
     String path = fileUploadService.uploadExcelFile(exportList, CardInfoDTO.class, "卡片信息");
+    // wait gc
+    exportList.clear();
     return success(fileUploadService.getFileServerUrl(path));
 
   }
@@ -169,7 +186,7 @@ public class CardController implements IController {
     CardInfoDTO cardInfoDTO = new CardInfoDTO();
     cardInfoDTO.setCardId(cardInfo.getCardId());
     cardInfoDTO.setCardName(cardApply.getCardName());
-    cardInfoDTO.setCardType(cardInfo.getCardType());
+    cardInfoDTO.setCardType(cardApply.getCardType());
     cardInfoDTO.setCardMedium(cardApply.getCardMedium());
     cardInfoDTO.setCardStatus(cardInfo.getCardStatus());
     if (merchant != null) {

@@ -170,8 +170,8 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
                 }
                 validationParmas(apply.getApplyType(), apply.getMerCode());
-                apply.setApprovalRemark(request.getApplyRemark());
-                apply.setApprovalUser(request.getApprovalUser());
+                apply.setApprovalRemark(request.getApprovalRemark());
+                apply.setApprovalUser(user.getUserName());
                 apply.setApprovalStatus(request.getApprovalStatus().getCode());
                 apply.setApprovalTime(new Date());
                 merchantCreditApplyDao.saveOrUpdate(apply);

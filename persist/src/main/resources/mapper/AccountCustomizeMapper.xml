@@ -67,7 +67,8 @@
     a.surplus_quota AS surplusQuota,
     GROUP_CONCAT(ci.card_id) AS cardId,
     a.account_balance AS accountBalance,
-    a.binding
+    a.binding,
+    a.phone
     FROM
     account a
     left JOIN merchant m on a.mer_code = m.mer_code
@@ -253,7 +254,8 @@ LIMIT #{size}
     a.surplus_quota AS surplusQuota,
     a.account_balance AS accountBalance,
     a.remark,
-    a.phone
+    a.phone,
+    a.binding
     FROM
     account a
     LEFT JOIN department d ON a.store_code = d.department_code

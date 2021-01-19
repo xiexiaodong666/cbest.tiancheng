@@ -121,4 +121,10 @@ public class AccountDTO implements Serializable {
   @ApiModelProperty("是否绑卡(1绑定0未绑定)")
   private Integer binding;
 
+  /**
+   * 员工手机号
+   */
+  @ApiModelProperty("员工手机号")
+  private String phone;
+
 }

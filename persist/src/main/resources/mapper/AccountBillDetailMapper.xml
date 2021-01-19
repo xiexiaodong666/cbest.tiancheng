@@ -9,21 +9,40 @@
         id,account_code,card_id,bill_no,order_time,bill_type,store_code,real_amount,account_balance,pos,create_user,create_time,payment_type,update_user,update_time,flag,version
     </sql>
 
-    <select id="selectAccountBillDetailSimpleList" resultType="com.welfare.persist.dto.AccountBillDetailSimpleDTO" parameterType="com.welfare.persist.dto.query.AccountBillDetailSimpleReq">
+    <resultMap id="accountBillDetailSimpleDTO" type="com.welfare.persist.dto.AccountBillDetailSimpleDTO" >
+        <id column="adbid"/>
+        <result property="storeCode" column="store_code"/>
+        <result property="storeName" column="store_name"/>
+        <result property="transType" column="trans_type"/>
+        <result property="transAmount" column="trans_amount"/>
+        <result property="transTime" column="trans_time"/>
+        <collection property="deductionList" ofType="com.welfare.persist.dto.AccountBillDetailSimpleDeductionDTO">
+            <id column="adedid"/>
+            <result property="merAccountTypeName" column="mer_account_type_name"/>
+            <result property="accountDeductionAmount" column="account_deduction_amount"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectAccountBillDetailSimpleList" resultMap="accountBillDetailSimpleDTO" parameterType="com.welfare.persist.dto.query.AccountBillDetailSimpleReq">
         SELECT
+        abd.id AS adbid,
         abd.store_code,
         ss.store_name,
         abd.trans_type,
         abd.trans_amount,
         abd.trans_time,
+        aded.id as adedid,
         mat.mer_account_type_name,
         aded.account_deduction_amount
         FROM
         account_bill_detail abd
         JOIN account_deduction_detail aded ON abd.trans_no = aded.trans_no
-        JOIN supplier_store ss ON abd.store_code = abd.store_code
+        JOIN supplier_store ss ON abd.store_code = ss.store_code
         JOIN merchant_account_type mat ON aded.mer_account_type = mat.mer_account_type_code
         <where>
+            <if test="accountCode != null">
+                AND abd.account_code = #{accountCode}
+            </if>
             <if test="startTransTime != null ">
                 <![CDATA[AND abd.trans_time >= #{startTransTime}]]>
             </if>
@@ -31,7 +50,7 @@
                 <![CDATA[AND abd.trans_time <= #{endTransTime}]]>
             </if>
         </where>
-        GROUP BY abd.trans_time DESC
+        ORDER BY abd.trans_time DESC
     </select>
 
 </mapper>

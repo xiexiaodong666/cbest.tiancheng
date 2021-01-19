@@ -3,11 +3,15 @@ package com.welfare.servicesettlement.controller;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.domain.UserInfo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.*;
@@ -62,7 +66,7 @@ public class MonthSettleController implements IController {
 
         //商户用户只能查询本商户数据
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
-        if(merchantUser!=null && StringUtils.isEmpty(merchantUser.getMerchantCode())){
+        if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
             monthSettleReqDto.setMerCode(merchantUser.getMerchantCode());
         }
 
@@ -73,6 +77,8 @@ public class MonthSettleController implements IController {
     @GetMapping("/list/{id}")
     @ApiOperation("根据id查询结算账单")
     public R<MonthSettleResp> pageQuery(@PathVariable("id")Long id){
+
+        authMerchant(id);
 
         MonthSettleResp monthSettleResp =  monthSettleService.queryById(id);
         return success(monthSettleResp);
@@ -122,25 +128,37 @@ public class MonthSettleController implements IController {
 
     @PutMapping("/{id}/send")
     @ApiOperation("平台发送账单")
+    @ApiUser
     public R monthSettleSend(@PathVariable("id")Long id){
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        if(userInfo==null){
+            throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
+        }
         Integer count = monthSettleService.monthSettleSend(id);
-        return count == 1 ? R.success():R.fail("操作失败");
-
+        return count == 1 ? R.success():R.fail("发送账单失败,请检查账单状态");
     }
 
     @PutMapping("/{id}/confirm")
     @ApiOperation("商户确认账单")
+    @MerchantUser
     public R monthSettleConfirm(@PathVariable("id")Long id){
+        authMerchant(id);
         Integer count = monthSettleService.monthSettleConfirm(id);
-        return count == 1 ? R.success():R.fail("操作失败");
+        return count == 1 ? R.success():R.fail("确认账单失败,请检查账单状态");
     }
 
 
     @PutMapping("/{id}/finish")
     @ApiOperation("平台确认账单完成")
+    @ApiUser
     public R monthSettleFinish(@PathVariable("id")Long id){
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        if(userInfo==null){
+            throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
+        }
+
         Integer count = monthSettleService.monthSettleFinish(id);
-        return count == 1 ? R.success():R.fail("操作失败");
+        return count == 1 ? R.success():R.fail("账单完成失败,请检查账单状态");
     }
 
     @GetMapping("/settlementDetailDealTask")
@@ -168,9 +186,9 @@ public class MonthSettleController implements IController {
     private void authMerchant(Long id){
         MonthSettle monthSettleById = monthSettleService.getMonthSettleById(id);
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
-        if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getUserCode())){
-            if(!monthSettleById.getMerCode().equals(merchantUser.getUserCode())){
-                throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前商户无其它商户数据权限",null);
+        if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
+            if(!monthSettleById.getMerCode().equals(merchantUser.getMerchantCode())){
+                throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前商户无此数据权限",null);
             }
         }
     }

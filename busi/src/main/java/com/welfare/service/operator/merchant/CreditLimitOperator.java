@@ -88,7 +88,6 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
     );
     operations.add(remainingLimitOperator);
     // 加剩余信用额度
-    merchantCredit.setRemainingLimit(remainingLimit.add(amountLeftToBeIncrease));
     List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo);
     operations.addAll(moreOperations);
     return operations;

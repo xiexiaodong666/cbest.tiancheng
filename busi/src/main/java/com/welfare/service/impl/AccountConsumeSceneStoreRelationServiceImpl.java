@@ -3,11 +3,16 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.gson.Gson;
 import com.welfare.common.constants.AccountChangeType;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
+import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.persist.mapper.AccountConsumeSceneMapper;
+import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
@@ -19,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +41,7 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
 
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
   private final AccountCustomizeMapper accountCustomizeMapper;
+  private final AccountConsumeSceneStoreRelationMapper accountConsumeSceneStoreRelationMapper;
   private final AccountChangeEventRecordService accountChangeEventRecordService;
 
   @Override
@@ -43,16 +50,14 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     wrapper.eq(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,accountConsumeSceneId);
     return accountConsumeSceneStoreRelationDao.list(wrapper);
   }
-  public List<AccountConsumeSceneStoreRelation> getListByStoreCode(String storeCode){
-    QueryWrapper<AccountConsumeSceneStoreRelation> wrapper = new QueryWrapper();
-    wrapper.eq(AccountConsumeSceneStoreRelation.STORE_CODE,storeCode);
-    return accountConsumeSceneStoreRelationDao.list(wrapper);
+  public List<AccountConsumeSceneStoreRelation> getListByStoreCode(String merCode,String storeCode){
+    return accountConsumeSceneStoreRelationMapper.queryRelationDetail(merCode,storeCode);
   }
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public void updateStoreConsumeType( String storeCode, String consumeType) {
-    List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelations = this.getListByStoreCode(storeCode);
+  public void updateStoreConsumeType( String merCode,String storeCode, String consumeType) {
+    List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelations = this.getListByStoreCode(merCode,storeCode);
     if(CollectionUtils.isEmpty(accountConsumeSceneStoreRelations)){
       return;
     }
@@ -71,6 +76,9 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
             sb.append(",").append(type);
           }
         }
+      }
+      if(StringUtils.isBlank(sb)){
+        throw  new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景配置了对应得消费方式",null);
       }
       if( !sb.toString().equals(accountConsumeSceneStoreRelation.getSceneConsumType())){
         accountConsumeSceneStoreRelation.setSceneConsumType(sb.toString());

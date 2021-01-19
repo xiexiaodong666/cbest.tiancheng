@@ -30,6 +30,7 @@ import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -220,5 +221,13 @@ public class AccountController implements IController {
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }
+  }
+
+
+  @GetMapping("/detailByPhoneAndMerCode")
+  @ApiOperation("通过手机号查询当前商户下的员工账号详情")
+  @MerchantUser
+  public R<AccountDetailDTO> detailByPhoneAndMer(@RequestParam(required = false) @ApiParam(value = "员工手机号" ,required = false)  String phone){
+    return success(accountService.queryDetailPhoneAndMer(phone));
   }
 }

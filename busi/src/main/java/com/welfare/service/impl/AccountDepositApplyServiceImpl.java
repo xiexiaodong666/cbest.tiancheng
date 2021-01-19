@@ -118,8 +118,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 validationParmas(request,merchant,merchantUser,request.getInfo().getRechargeAmount());
                 // 初始化主表
                 apply = depositApplyConverter.toAccountDepositApply(request);
-                if (accountService.findByPhone(request.getInfo().getPhone()) == null) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在！", null);
+                Account account = accountService.findByPhoneAndMerCode(request.getInfo().getPhone(), merchantUser.getMerchantCode());
+                if (account == null) {
+                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("商户下没有[%s]员工！", request.getInfo().getPhone()), null);
                 }
                 initAccountDepositApply(apply, request, merchant, merchantUser);
                 // 设置充值人数

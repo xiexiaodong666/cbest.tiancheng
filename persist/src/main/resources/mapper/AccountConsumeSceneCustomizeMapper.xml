@@ -13,7 +13,7 @@
     </sql>
   <sql id="pageAndExport">
      SELECT
-    GROUP_CONCAT( CONCAT( ss.store_name, "-", ss.store_code ) ) AS storeInfo,
+    GROUP_CONCAT( CONCAT( msr.store_alias, "-", msr.store_code ) ) AS storeInfo,
     act.type_name AS accountTypeName,
     acs.id,
     acs.STATUS,
@@ -27,17 +27,17 @@
     FROM
     account_consume_scene acs
     inner join account_consume_scene_store_relation acstr on acs.id = acstr.account_consume_scene_id
-    inner JOIN supplier_store ss ON acstr.store_code = ss.store_code
-    AND acs.mer_code = ss.mer_code
+    inner JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code
+    AND acs.mer_code = msr.mer_code
     inner JOIN account_type act ON act.type_code = acs.account_type_code
-    where acs.deleted =0 and acstr.deleted= 0 and ss.deleted = 0
-    and acs.mer_code = act.mer_code
+    where acs.deleted =0 and acstr.deleted= 0 and msr.deleted = 0
+    and acs.mer_code = act.mer_code and acs.mer_code = msr.mer_code
   </sql>
 
 
   <select id="getPageDTO" resultType="com.welfare.persist.dto.AccountConsumeScenePageDTO">
     SELECT
-    GROUP_CONCAT( CONCAT( ss.store_name, "-", ss.store_code ) ) AS storeInfo,
+    GROUP_CONCAT( CONCAT( msr.store_alias, "-", msr.store_code ) ) AS storeInfo,
     act.type_name AS accountTypeName,
     acs.id,
     acs.STATUS,
@@ -51,11 +51,11 @@
     FROM
     account_consume_scene acs
     inner join account_consume_scene_store_relation acstr on acs.id = acstr.account_consume_scene_id
-    inner JOIN supplier_store ss ON acstr.store_code = ss.store_code
-    AND acs.mer_code = ss.mer_code
+    inner JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code
+    AND acs.mer_code = msr.mer_code
     inner JOIN account_type act ON act.type_code = acs.account_type_code
-    where acs.deleted =0 and acstr.deleted= 0 and ss.deleted = 0
-    and acs.mer_code = act.mer_code
+    where acs.deleted =0 and acstr.deleted= 0 and msr.deleted = 0
+    and acs.mer_code = act.mer_code and acs.mer_code = msr.mer_code
     <if test=" merCode !='' and merCode != null ">
       and acs.mer_code = #{merCode}
     </if>
@@ -108,14 +108,14 @@
 	acs.deleted,
 	acstr.id as acstrId,
 	acstr.store_code AS storeCode,
-	ss.store_name AS storeName,
-	ss.consum_type AS consumType,
+	msr.store_alias AS storeName,
+	msr.consum_type AS consumType,
 	acstr.scene_consum_type AS sceneConsumType,
 	acs.create_time as createTime
 FROM
 	account_consume_scene acs
 	inner JOIN account_consume_scene_store_relation acstr ON acs.id = acstr.account_consume_scene_id
-	inner JOIN supplier_store ss ON acstr.store_code = ss.store_code
+	inner JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code
 	inner JOIN account_type act ON act.type_code = acs.account_type_code
 WHERE
 	acs.id = #{id} and acstr.deleted = 0

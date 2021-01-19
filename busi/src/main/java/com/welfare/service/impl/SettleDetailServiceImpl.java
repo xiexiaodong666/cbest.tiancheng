@@ -140,16 +140,16 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
         
         List<SettleStatisticsInfoDTO> settleStatisticsInfoDTOList = settleDetailMapper.getSettleStatisticsInfoByCondition(welfareSettleDetailQuery);
-        monthSettle.setSettleStatisticsInfo(JSONObject.toJSONString(settleStatisticsInfoDTOList));
+        if(!settleStatisticsInfoDTOList.isEmpty()){
+            monthSettle.setSettleStatisticsInfo(JSONObject.toJSONString(settleStatisticsInfoDTOList));
+        }
 
         monthSettleMapper.insert(monthSettle);
 
         welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         List<Long> idList;
         do {
-            idList = settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
-                return welfareSettleDetailDTO.getId();
-            }).collect(Collectors.toList());
+            idList = settleDetailMapper.getSettleDetailIdList(welfareSettleDetailQuery);
 
             if(!idList.isEmpty()){
                 SettleDetail settleDetail = new SettleDetail();

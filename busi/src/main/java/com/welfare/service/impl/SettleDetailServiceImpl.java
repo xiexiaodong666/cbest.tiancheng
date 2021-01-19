@@ -14,6 +14,7 @@ import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.entity.SettleDetail;
@@ -214,5 +215,13 @@ public class SettleDetailServiceImpl implements SettleDetailService {
                 }).collect(Collectors.toList());
 
         return settleMerTransDetailRespList;
+    }
+
+    @Override
+    @Transactional
+    public void merRebate(Merchant merchant) {
+        //查询该商户返点信息
+
+        //修改数据
     }
 }

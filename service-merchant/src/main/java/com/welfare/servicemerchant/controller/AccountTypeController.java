@@ -1,7 +1,9 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountTypeMapperDTO;
 import com.welfare.persist.dto.MerSupplierStoreDTO;
 import com.welfare.persist.dto.query.AccountTypeReq;
@@ -91,9 +93,11 @@ public class AccountTypeController implements IController {
 
   @PostMapping("/save")
   @ApiOperation("新增员工类型")
+  @MerchantUser
   public R<Boolean> save(@RequestBody AccountTypeReq accountTypeReq){
     try{
       AccountType accountType = accountTypeConverter.toEntity(accountTypeReq);
+      accountType.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountTypeService.save(accountType));
     }catch (BusiException be){
       return R.fail(be.getMessage());
@@ -103,9 +107,11 @@ public class AccountTypeController implements IController {
 
   @PostMapping("/update")
   @ApiOperation("修改员工类型")
+  @MerchantUser
   public R<Boolean> update(@RequestBody AccountTypeReq accountTypeReq){
     try {
       AccountType accountType = accountTypeConverter.toEntity(accountTypeReq);
+      accountType.setUpdateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountTypeService.update(accountType));
     }catch (BusiException be){
       return R.fail(be.getMessage());

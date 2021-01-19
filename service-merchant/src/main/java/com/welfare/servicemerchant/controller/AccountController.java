@@ -1,7 +1,9 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
@@ -92,10 +94,12 @@ public class AccountController implements IController {
 
   @PostMapping("/save")
   @ApiOperation("新增员工账号")
+  @MerchantUser
   public R<Boolean> save(@RequestBody AccountReq accountReq) {
     try {
       Account account = new Account();
       BeanUtils.copyProperties(accountReq, account);
+      account.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
       account.setStoreCode(accountReq.getDepartmentCode());
       return success(accountService.save(account));
     } catch (BusiException be) {
@@ -106,11 +110,13 @@ public class AccountController implements IController {
 
   @PostMapping("/update")
   @ApiOperation("修改员工账号")
+  @MerchantUser
   public R<Boolean> update(@RequestBody AccountReq accountReq) {
     try {
       Account account = new Account();
       BeanUtils.copyProperties(accountReq, account);
       account.setStoreCode(accountReq.getDepartmentCode());
+      account.setUpdateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountService.update(account));
     } catch (BusiException be) {
       return R.fail(be.getMessage());

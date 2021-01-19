@@ -165,6 +165,7 @@ public class PlatformUserController {
 
     String path = fileUploadService.uploadExcelFile(
         platformUserList, ShoppingPlatformUser.class, "商户用户列表");
+    platformUserList.clear();
     return success(fileUploadService.getFileServerUrl(path));
 
   }

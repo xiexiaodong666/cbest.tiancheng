@@ -156,6 +156,7 @@ public class CardApplyController implements IController {
       }
     }
     String path = fileUploadService.uploadExcelFile(exportList, CardApplyDTO.class, "申请卡片列表");
+    exportList.clear();
     return success(fileUploadService.getFileServerUrl(path));
   }
 

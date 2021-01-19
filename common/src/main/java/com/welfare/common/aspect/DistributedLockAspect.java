@@ -56,7 +56,6 @@ public class DistributedLockAspect {
             context.setVariable(parameters[i].getName(),args[i]);
             context.setVariable(String.valueOf(i),args[i]);
         }
-        String realKey = expression.getValue(context,String.class);
-        return realKey;
+        return expression.getValue(context,String.class);
     }
 }

@@ -45,7 +45,7 @@ public class DepartmentController implements IController {
     @GetMapping("/list")
     @ApiOperation("根据商户代码查询商户部门列表（不分页）")
     @MerchantUser
-    public R<List<DepartmentDTO>> list(@Valid DepartmentReq req){
+    public R<List<DepartmentDTO>> list( DepartmentReq req){
         return R.success(departmentConverter.toD(departmentService.list(req)));
     }
 
@@ -63,13 +63,13 @@ public class DepartmentController implements IController {
 
     @PostMapping("/add")
     @ApiOperation("新增部门")
-    public R add(@RequestBody DepartmentAddDTO department){
+    public R add(@RequestBody@Valid  DepartmentAddDTO department){
         return R.status(departmentService.add(department),"新增失败");
     }
 
     @PostMapping("/update")
     @ApiOperation("修改部门")
-    public R update(@RequestBody DepartmentUpdateDTO department){
+    public R update(@RequestBody@Valid  DepartmentUpdateDTO department){
         return R.status(departmentService.update(department),"修改失败");
     }
     @PostMapping("/batch-add")

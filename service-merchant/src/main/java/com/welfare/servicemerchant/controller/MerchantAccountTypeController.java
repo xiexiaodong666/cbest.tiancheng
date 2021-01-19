@@ -66,12 +66,12 @@ public class MerchantAccountTypeController implements IController {
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")
-    public R add(@RequestBody MerchantAccountTypeAddDTO merchantAccountType){
+    public R add(@RequestBody @Valid MerchantAccountTypeAddDTO merchantAccountType){
         return R.status(merchantAccountTypeService.add(merchantAccountType),"新增失败");
     }
     @PostMapping("/update")
     @ApiOperation("编辑商户")
-    public R update(@RequestBody MerchantAccountTypeUpdateDTO merchantAccountType){
+    public R update(@RequestBody@Valid  MerchantAccountTypeUpdateDTO merchantAccountType){
         return R.status(merchantAccountTypeService.update(merchantAccountType),"更新失败");
     }
     @PostMapping("/export-list")

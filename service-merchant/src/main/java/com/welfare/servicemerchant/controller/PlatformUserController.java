@@ -3,6 +3,7 @@ package com.welfare.servicemerchant.controller;
 import static net.dreamlu.mica.core.result.R.success;
 
 import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.service.remote.PlatformUserFeignClient;
 import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.remote.entity.PlatformUserDataResponse;
@@ -85,7 +86,7 @@ public class PlatformUserController {
   @ApiUser
   PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
 
-    return platformUserFeignClient.addPlatformUser(transferShoppingPlatformUser(platformUser));
+    return platformUserFeignClient.addPlatformUser(transferShoppingPlatformUser(platformUser, 1));
   }
 
   /**
@@ -96,7 +97,7 @@ public class PlatformUserController {
   @ApiUser
   PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
 
-    return platformUserFeignClient.updatePlatformUser(transferShoppingPlatformUser(platformUser));
+    return platformUserFeignClient.updatePlatformUser(transferShoppingPlatformUser(platformUser,2));
   }
 
 
@@ -128,7 +129,7 @@ public class PlatformUserController {
       @RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUserStatus(
-        transferShoppingPlatformUser(platformUser));
+        transferShoppingPlatformUser(platformUser, 2));
   }
 
 
@@ -195,7 +196,13 @@ public class PlatformUserController {
     return platformUser;
   }
 
-  private ShoppingPlatformUser transferShoppingPlatformUser(PlatformUser platformUser) {
+  /**
+   *
+   * @param platformUser
+   * @param action 1 新增 2 修改
+   * @return
+   */
+  private ShoppingPlatformUser transferShoppingPlatformUser(PlatformUser platformUser, Integer action) {
     ShoppingPlatformUser shoppingPlatformUser = new ShoppingPlatformUser();
 
     shoppingPlatformUser.setId(platformUser.getId());
@@ -206,9 +213,12 @@ public class PlatformUserController {
     shoppingPlatformUser.setMerchant_code(platformUser.getMerchantCode());
     shoppingPlatformUser.setStatus(platformUser.getStatus());
     shoppingPlatformUser.setRemark(platformUser.getRemark());
-    shoppingPlatformUser.setCreated_by(platformUser.getCreatedBy());
-    shoppingPlatformUser.setUpdated_by(platformUser.getUpdatedBy());
-    shoppingPlatformUser.setCreated_at(platformUser.getCreatedAt());
+    if(action == 1) {
+      shoppingPlatformUser.setCreated_by(UserInfoHolder.getUserInfo().getUserName());
+    }
+    if(action == 2) {
+      shoppingPlatformUser.setUpdated_by(UserInfoHolder.getUserInfo().getUserName());
+    }
 
     return shoppingPlatformUser;
   }

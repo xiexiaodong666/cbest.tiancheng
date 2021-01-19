@@ -49,11 +49,6 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
     @ApiModelProperty("卡号")   
     private String cardId;
     /**
-     * 卡类型
-     */
-    @ApiModelProperty("卡类型")   
-    private String cardType;
-    /**
      * 卡状态
      */
     @ApiModelProperty("卡状态")   
@@ -129,10 +124,7 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
     * 卡号
     */
     public static final String CARD_ID = "card_id";
-    /**
-    * 卡类型
-    */
-    public static final String CARD_TYPE = "card_type";
+
     /**
     * 卡状态
     */

@@ -114,7 +114,6 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardInfo.setApplyCode(cardApply.getApplyCode());
 
       cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
-      cardInfo.setCardType(cardApply.getCardType());
       cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());
       cardInfo.setCardStatus(WelfareConstant.CardStatus.NEW.code());
       cardInfo.setDeleted(false);
@@ -167,19 +166,9 @@ public class CardApplyServiceImpl implements CardApplyService {
       }
     }
 
-    queryWrapper.clear();
-    queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
-    cardInfoList = cardInfoDao.list(queryWrapper);
     boolean saveCardApply = cardApplyDao.saveOrUpdate(cardApply);
-    boolean updateCardInfo = true;
-    if (CollectionUtils.isNotEmpty(cardInfoList)) {
-      for (CardInfo cardInfo :
-          cardInfoList) {
-        cardInfo.setCardType(cardApply.getCardType());
-      }
-      updateCardInfo = cardInfoDao.saveOrUpdateBatch(cardInfoList);
-    }
-    return saveCardApply && updateCardInfo;
+
+    return saveCardApply;
   }
 
   @Override

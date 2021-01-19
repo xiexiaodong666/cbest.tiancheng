@@ -169,7 +169,7 @@ public class CardController implements IController {
     CardInfoDTO cardInfoDTO = new CardInfoDTO();
     cardInfoDTO.setCardId(cardInfo.getCardId());
     cardInfoDTO.setCardName(cardApply.getCardName());
-    cardInfoDTO.setCardType(cardInfo.getCardType());
+    cardInfoDTO.setCardType(cardApply.getCardType());
     cardInfoDTO.setCardMedium(cardApply.getCardMedium());
     cardInfoDTO.setCardStatus(cardInfo.getCardStatus());
     if (merchant != null) {

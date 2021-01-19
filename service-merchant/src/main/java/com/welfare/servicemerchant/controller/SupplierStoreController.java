@@ -1,6 +1,7 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
@@ -99,6 +100,7 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/update")
     @ApiOperation("编辑供应商门店")
+    @ApiUser
     public R update(@RequestBody@Valid  SupplierStoreUpdateDTO supplierStore){
         return R.status(supplierStoreService.update(supplierStore),"编辑失败失败");
 

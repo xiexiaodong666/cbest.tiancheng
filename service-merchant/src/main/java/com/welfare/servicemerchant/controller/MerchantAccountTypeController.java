@@ -1,6 +1,7 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
@@ -71,6 +72,7 @@ public class MerchantAccountTypeController implements IController {
     }
     @PostMapping("/update")
     @ApiOperation("编辑商户")
+    @ApiUser
     public R update(@RequestBody@Valid  MerchantAccountTypeUpdateDTO merchantAccountType){
         return R.status(merchantAccountTypeService.update(merchantAccountType),"更新失败");
     }

@@ -58,7 +58,6 @@ public class MerchantUpdateDTO {
    * 更新人
    */
   @ApiModelProperty("更新人")
-  @NotBlank
   private String updateUser;
 
 

@@ -175,7 +175,7 @@
             'system' as create_user
         from settle_detail t1
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code
-        left join supplier_store t3 on t1.store_code = t3.store_code and t3.status=0
+        left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         <where>
             <if test="startTime!=null">
                 and t1.trans_time &gt;=#{startTime,jdbcType=TIMESTAMP}

@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -22,6 +23,8 @@ import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.dto.*;
+import com.welfare.service.remote.MerchantCreditFeign;
+import com.welfare.service.remote.entity.MerchantCreditResp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.MonthSettleService;
@@ -58,6 +61,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     private final MonthSettleDao monthSettleDao;
     @Value("${pos.onlines:1001}")
     private String posOnlines;
+    @Autowired
+    private MerchantCreditFeign merchantCreditFeign;
 
 
     @Override
@@ -186,19 +191,31 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer monthSettleFinish(Long id) {
+        MonthSettle monthSettleTemp = monthSettleMapper.selectById(id);
+
         //修改账单结算状态为已结算
         MonthSettle monthSettle = new MonthSettle();
         monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
 
-        return monthSettleMapper.update(monthSettle,
+        int i = monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()
                         .eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
                         .eq(MonthSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
                         .eq(MonthSettle::getId, id)
         );
 
-        //todo 调用额度恢复接口恢复额度（剔除自主充值的金额）
+        RestoreRemainingLimitReq restoreRemainingLimitReq = new RestoreRemainingLimitReq();
+        restoreRemainingLimitReq.setMerCode(monthSettleTemp.getMerCode());
+        restoreRemainingLimitReq.setAmount(monthSettleTemp.getSettleAmount().subtract(monthSettleTemp.getSettleSelfAmount()));
+        restoreRemainingLimitReq.setTransNo(monthSettleTemp.getSettleNo());
+        log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
+        MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq);
+        if(merchantCreditResp.getCode()!=1){
+            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "恢复商户授信额度失败", null);
+        }
+        return i;
     }
 
     @Override

@@ -38,7 +38,7 @@
         t3.mer_code as merCode,
         t3.mer_name as merName,
         t1.store_code as storeCode,
-        t4.store_code as storeName,
+        t4.store_alias as storeName,
         t1.trans_time as transTime,
         t1.pos as pos,
         t1.pay_code as payCode,
@@ -60,7 +60,7 @@
         from account_deduction_detail t1
         left join account t2 on t1.account_code=t2.account_code
         left join merchant t3 on t2.mer_code=t3.mer_code
-        left join supplier_store t4 on t1.store_code = t4.store_code and t2.mer_code=t4.mer_code
+        left join merchant_store_relation t4 on t1.store_code = t4.store_code and t2.mer_code=t4.mer_code
         left join merchant_account_type t5 on t2.mer_code = t5.mer_code and t1.mer_account_type=t5.mer_account_type_code
         <where>
             <if test="minId!=null">
@@ -107,10 +107,7 @@
                  when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
             else 0 end as settle_amount
         from settle_detail t1
-        left join merchant_store_relation t2
-        on t1.mer_code = t2.mer_code and t1.store_code = t2.store_code and t2.deleted=0
-        left join supplier_store t3
-        on t1.store_code = t3.store_code and t3.deleted=0
+        left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         <where>
             <if test="settleNo!=null and settleNo!=''">
                 and t1.settle_no = #{settleNo}
@@ -288,14 +285,16 @@
     <select id="getSettleDetailExtInfo" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery" resultType="map">
         select
         sum(
-        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
-        when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount
+        case
+            when t3.mer_code != t1.mer_code and t4.mer_cooperation_mode = 'PAY_FIRST' and t1.mer_account_type!='self' then 0
+            when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.trans_amount
+            when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.trans_amount*-1
         else 0 end
         ) as settleAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
         <if test="excludeIdList!=null and excludeIdList.size!=0">
-            and t1.id is not in(
+            and t1.id not in (
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
             )
         </if>

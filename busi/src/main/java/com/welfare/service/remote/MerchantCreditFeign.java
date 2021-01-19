@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "=merchantCredit", url = "${merchant.url:http://172.30.37.188:10016}", fallbackFactory = MerchantCreditFallback.class)
+@FeignClient(value = "merchantCredit", url = "${merchant.url:http://172.30.37.188:10016}", fallbackFactory = MerchantCreditFallback.class)
 public interface MerchantCreditFeign {
 
 

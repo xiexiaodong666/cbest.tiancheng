@@ -71,6 +71,15 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettleQuery monthSettleQuery = new MonthSettleQuery();
         BeanUtils.copyProperties(monthSettleReqDto, monthSettleQuery);
 
+        //传入的日期，修订未当日最大和当日最小值
+        if(monthSettleReqDto.getStartTime()!=null){
+            monthSettleQuery.setStartTime(DateUtil.getDayMin(monthSettleReqDto.getStartTime(), 0));
+        }
+        if(monthSettleReqDto.getEndTime()!=null){
+            monthSettleQuery.setEndTime(DateUtil.getDayMax(monthSettleReqDto.getEndTime(), 0));
+        }
+
+
         PageInfo<MonthSettleDTO> monthSettleDTOPageInfo = PageHelper.startPage(monthSettleReqDto.getCurrent(),monthSettleReqDto.getSize())
                 .doSelectPageInfo(() -> monthSettleMapper.selectMonthSettle(monthSettleQuery));
 

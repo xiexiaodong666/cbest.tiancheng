@@ -288,13 +288,29 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  public boolean batchAdd(List<SupplierStore> list) {
-    boolean flag = supplierStoreDao.saveBatch(list);
+  public boolean batchAdd(List<SupplierStoreAddDTO> list) {
+    List<SupplierStoreSyncDTO> syncList=new ArrayList<>();
+    for(SupplierStoreAddDTO supplierStoreAddDTO: list){
+      SupplierStore save = supplierStoreAddConverter.toE((supplierStoreAddDTO));
+      save.setStatus(0);
+      save.setStorePath(save.getMerCode()+"-"+save.getStoreCode());
+      save.setStoreParent(save.getMerCode());
+      supplierStoreDao.save(save);
+      SupplierStoreSyncDTO syncDTO= supplierStoreSyncConverter.toD(save);
+      if(EmptyChecker.notEmpty(supplierStoreAddDTO.getAddressList())){
+        supplierStoreAddDTO.getAddressList().forEach(item->item.setRelatedId(save.getId()));
+        merchantAddressService.saveOrUpdateBatch(
+                supplierStoreAddDTO.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
+        syncDTO.setAddressList(supplierStoreAddDTO.getAddressList());
+      }
+      syncList.add(syncDTO);
+    }
+
     //同步商城中台
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(supplierStoreSyncConverter.toD(list))
+        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList)
                                         .build());
-    return flag;
+    return Boolean.TRUE;
   }
 
   public List<SupplierStore> list(QueryWrapper<SupplierStore> queryWrapper) {
@@ -312,7 +328,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         Collectors.toMap(DictDTO::getDictCode, item -> false));
     try {
       SupplierStoreListener listener = new SupplierStoreListener(
-          merchantService, this, JSON.toJSONString(map));
+          merchantService, this );
       EasyExcel.read(multipartFile.getInputStream(), SupplierStoreImportDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();

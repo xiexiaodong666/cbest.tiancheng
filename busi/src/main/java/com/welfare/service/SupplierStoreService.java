@@ -62,7 +62,7 @@ public interface SupplierStoreService {
      */
     boolean activate(SupplierStoreActivateReq storeActivateReq);
 
-    boolean batchAdd(List<SupplierStore> list);
+    boolean batchAdd(List<SupplierStoreAddDTO> list);
 
     List<SupplierStore> list(QueryWrapper<SupplierStore> queryWrapper);
 

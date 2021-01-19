@@ -81,7 +81,7 @@ public class MerchantController implements IController {
     public R update(@RequestBody @Valid MerchantUpdateDTO merchant){
         if(MerIdentityEnum.customer.equals( merchant.getMerType())
                 && EmptyChecker.isEmpty(merchant.getAddressList())){
-            throw new BusiException("身份属性为客户时，收获地址必填");
+            throw new BusiException("身份属性为客户时，收货地址必填");
         }
         return R.status(merchantService.update(merchant),"更新失败");
     }

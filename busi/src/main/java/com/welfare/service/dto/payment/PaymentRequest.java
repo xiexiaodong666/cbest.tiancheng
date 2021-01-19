@@ -74,7 +74,7 @@ public abstract class PaymentRequest {
         }else{
             String consumType = oneByCashierNo.getConsumType();
             ConsumeTypeJson consumeTypeJson = JSON.parseObject(consumType,ConsumeTypeJson.class);
-            return consumeTypeJson.getOnlineMall()?ConsumeTypeEnum.ONLINE_MALL.getCode():ConsumeTypeEnum.O2O.getCode();
+            return consumeTypeJson.getONLINE_MALL()?ConsumeTypeEnum.ONLINE_MALL.getCode():ConsumeTypeEnum.O2O.getCode();
         }
     }
 

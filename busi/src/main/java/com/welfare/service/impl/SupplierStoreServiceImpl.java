@@ -56,8 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -65,9 +63,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.constraints.NotBlank;
 
 /**
  * 供应商门店服务接口实现
@@ -102,7 +99,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   public List<SupplierStore> list(SupplierStoreListReq req) {
-    QueryWrapper<SupplierStore> q=QueryHelper.getWrapper(req);
+    QueryWrapper<SupplierStore> q = QueryHelper.getWrapper(req);
     q.orderByDesc(SupplierStore.CREATE_TIME);
     return supplierStoreDao.list(q);
   }
@@ -110,12 +107,12 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   public List<SupplierStoreTreeDTO> tree(String merCode, String source) {
     Set<String> merCodes = new HashSet<>();
-    if(Strings.isNotEmpty(merCode)) {
+    if (Strings.isNotEmpty(merCode)) {
       merCodes.add(merCode);
     }
     List<SupplierStore> supplierStores;
     // 消费门店配置拉取
-    if(SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(source)) {
+    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(source)) {
       MerchantReq req = new MerchantReq();
       req.setMerIdentity(MerIdentityEnum.supplier.getCode());
       List<Merchant> merchantList = merchantService.list(req);
@@ -126,13 +123,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       for (SupplierStore s :
           supplierStores) {
         try {
-          if(Strings.isNotEmpty(s.getConsumType())) {
+          if (Strings.isNotEmpty(s.getConsumType())) {
             Map<String, Boolean> consumeTypeMap = mapper.readValue(
                 s.getConsumType(), Map.class);
             ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
             s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
           } else {
-            log.error(s.getConsumType()+"########");
+            log.error(s.getConsumType() + "########");
           }
 
         } catch (JsonProcessingException e) {
@@ -144,9 +141,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       supplierStores = supplierStoreExMapper.listUnionMerchant(merCodes);
     }
 
-
-    List<SupplierStoreTreeDTO> treeDTOS=supplierStoreTreeConverter.toD(supplierStores);
-    treeDTOS.forEach(item->{
+    List<SupplierStoreTreeDTO> treeDTOS = supplierStoreTreeConverter.toD(supplierStores);
+    treeDTOS.forEach(item -> {
       item.setParentCode(item.getStoreParent());
       item.setCode(item.getStoreCode());
 
@@ -159,7 +155,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public Page<SupplierStoreWithMerchantDTO> page(Page page, StorePageReq req) {
     Page<SupplierStoreWithMerchantDTO> pageResult = supplierStoreExMapper.listWithMerchant(
         page, req);
-    dictService.trans(SupplierStoreWithMerchantDTO.class,SupplierStore.class.getSimpleName(),true,pageResult.getRecords().toArray());
+    dictService.trans(SupplierStoreWithMerchantDTO.class, SupplierStore.class.getSimpleName(), true,
+                      pageResult.getRecords().toArray()
+    );
     // 消费门店拉取需要过滤已有配置的门店和 移除没有勾选的消费方法
 /*    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
 
@@ -204,10 +202,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     try {
       Map<String, Boolean> consumeTypeMap = mapper.readValue(
-              store.getConsumType(), Map.class);
+          store.getConsumType(), Map.class);
       store.setConsumType(ConsumeTypesUtils.transferStr(consumeTypeMap));
-    }catch (JsonProcessingException e){
-      log.info("消费类型格式错误{}",store.getConsumType());
+    } catch (JsonProcessingException e) {
+      log.info("消费类型格式错误{}", store.getConsumType());
     }
     //商户名称
     store.setMerName(merchantService.getMerchantByMerCode(store.getMerCode()).getMerName());
@@ -234,17 +232,19 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreAddDTO supplierStore) {
-    Merchant merchant=merchantService.detailByMerCode(supplierStore.getMerCode());
-    if(EmptyChecker.isEmpty(merchant)){
+    Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
+    if (EmptyChecker.isEmpty(merchant)) {
       throw new BusiException("商户不存在");
     }
-    if(!Arrays.asList(merchant.getMerIdentity().split(",")).contains(MerIdentityEnum.supplier.getCode())){
+    if (!Arrays.asList(merchant.getMerIdentity().split(",")).contains(
+        MerIdentityEnum.supplier.getCode())) {
       throw new BusiException("非供应商门店");
     }
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
       throw new BusiException("门店编码已存在");
     }
-    supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
+    supplierStore.setConsumType(
+        JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
     SupplierStore save = supplierStoreAddConverter.toE((supplierStore));
     save.setStatus(0);
     save.setStorePath(save.getMerCode() + "-" + save.getStoreCode());
@@ -252,7 +252,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
-    SupplierStoreSyncDTO detailDTO=supplierStoreSyncConverter.toD(save);
+    SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(save);
     detailDTO.setId(save.getId());
     detailDTO.setAddressList(supplierStore.getAddressList());
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
@@ -274,11 +274,11 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.updateById(supplierStore);
     //同步商城中台
     //更新需要全量数据传过去，这里需要再查一次门店的 地址数据
-    SupplierStoreSyncDTO sync=supplierStoreSyncConverter.toD(supplierStore);
-    MerchantAddressReq merchantAddressReq =new MerchantAddressReq();
+    SupplierStoreSyncDTO sync = supplierStoreSyncConverter.toD(supplierStore);
+    MerchantAddressReq merchantAddressReq = new MerchantAddressReq();
     merchantAddressReq.setRelatedType(SupplierStore.class.getSimpleName());
     merchantAddressReq.setRelatedId(sync.getId());
-    List<MerchantAddressDTO> syncAddress=merchantAddressService.list(merchantAddressReq);
+    List<MerchantAddressDTO> syncAddress = merchantAddressService.list(merchantAddressReq);
     sync.setAddressList(syncAddress);
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(sync);
@@ -346,19 +346,18 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
     boolean flag2 = true;
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
-      supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
+      supplierStore.setConsumType(
+          JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
       flag2 = this.syncConsumeType(supplierStore.getStoreCode(), supplierStore.getConsumType());
-      accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          supplierStore.getStoreCode(), supplierStore.getConsumType());
     }
     SupplierStore update = this.buildUpdate(supplierStore);
     update.setStoreParent(update.getMerCode());
-    boolean flag = 1==supplierStoreDao.updateAllColumnById(update);
+    boolean flag = 1 == supplierStoreDao.updateAllColumnById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
     //同步商城中台
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
-    SupplierStoreSyncDTO detailDTO=supplierStoreSyncConverter.toD(update);
+    SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(update);
     detailDTO.setAddressList(supplierStore.getAddressList());
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
@@ -366,9 +365,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     return flag && flag2 && flag3;
   }
 
-  private SupplierStore buildUpdate(SupplierStoreUpdateDTO update){
-    SupplierStore entity=supplierStoreDao.getById(update.getId());
-    if(EmptyChecker.isEmpty(entity)){
+  private SupplierStore buildUpdate(SupplierStoreUpdateDTO update) {
+    SupplierStore entity = supplierStoreDao.getById(update.getId());
+    if (EmptyChecker.isEmpty(entity)) {
       throw new BusiException("id不存在");
     }
     entity.setMerCode(update.getMerCode());
@@ -409,13 +408,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
       for (MerchantStoreRelation storeRelation :
           storeRelationList) {
-        Map<String, String> consumeTypeMap = mapper.readValue(
+        Map<String, Boolean> consumeTypeMap = mapper.readValue(
             storeRelation.getConsumType(), Map.class);
+
         if (!isSelectO2O) {
           consumeTypeMap.remove(ConsumeTypeEnum.O2O.getCode());
         } else {
           if (!consumeTypeMap.containsKey(ConsumeTypeEnum.O2O.getCode())) {
-            consumeTypeMap.put(ConsumeTypeEnum.O2O.getCode(), "false");
+            consumeTypeMap.put(ConsumeTypeEnum.O2O.getCode(), false);
           }
         }
 
@@ -423,7 +423,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
           consumeTypeMap.remove(ConsumeTypeEnum.ONLINE_MALL.getCode());
         } else {
           if (!consumeTypeMap.containsKey(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
-            consumeTypeMap.put(ConsumeTypeEnum.ONLINE_MALL.getCode(), "false");
+            consumeTypeMap.put(ConsumeTypeEnum.ONLINE_MALL.getCode(), false);
           }
         }
 
@@ -431,10 +431,33 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
           consumeTypeMap.remove(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
         } else {
           if (!consumeTypeMap.containsKey(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
-            consumeTypeMap.put(ConsumeTypeEnum.SHOP_SHOPPING.getCode(), "false");
+            consumeTypeMap.put(ConsumeTypeEnum.SHOP_SHOPPING.getCode(), false);
           }
         }
 
+        isSelectO2O = true;
+        isSelectOnlineMall = true;
+        isSelectShopShopping = true;
+
+        if (consumeTypeMap.get(ConsumeTypeEnum.O2O.getCode()) == null || !consumeTypeMap.get(
+            ConsumeTypeEnum.O2O.getCode())) {
+          isSelectO2O = false;
+        }
+
+        if (consumeTypeMap.get(ConsumeTypeEnum.ONLINE_MALL.getCode()) == null || !consumeTypeMap
+            .get(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
+          isSelectOnlineMall = false;
+        }
+
+        if (consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode()) == null || !consumeTypeMap
+            .get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+          isSelectShopShopping = false;
+        }
+
+        Assert.isTrue(
+            isSelectO2O || isSelectOnlineMall || isSelectShopShopping,
+            "消费门店下消费方法不能全被置为空"
+        );
         storeRelation.setConsumType(mapper.writeValueAsString(consumeTypeMap));
       }
     } catch (JsonProcessingException e) {

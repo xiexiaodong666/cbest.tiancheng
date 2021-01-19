@@ -14,6 +14,7 @@ import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
@@ -433,5 +434,17 @@ public class AccountServiceImpl implements AccountService {
       applicationContext.publishEvent(AccountEvt
           .builder().typeEnum(ShoppingActionTypeEnum.BATCH_ADD).accountList(accountList).build());
     }
+  }
+
+  @Override
+  public AccountDetailDTO queryDetailPhoneAndMer(String phone) {
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailPhoneAndMer(phone,
+            MerchantUserHolder.getMerchantUser().getMerchantCode());
+    if (accountDetailMapperDTO == null) {
+      return null;
+    }
+    AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
+    BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
+    return accountDetailDTO;
   }
 }

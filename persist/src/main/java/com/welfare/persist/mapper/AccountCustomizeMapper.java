@@ -58,4 +58,6 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
 
   List<Account> queryByConsumeSceneIdList(List<Long> list);
+
+  AccountDetailMapperDTO queryDetailPhoneAndMer(@Param("phone") String phone, @Param("merCode") String merCode);
 }

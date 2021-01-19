@@ -22,6 +22,7 @@ import com.welfare.service.SequenceService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -174,6 +175,7 @@ public class CardApplyServiceImpl implements CardApplyService {
   @Override
   public boolean updateStatus(Long id, Integer delete, Integer status) {
     CardApply cardApply = cardApplyDao.getById(id);
+    boolean isDeletedCardInfo = true;
     if (delete != null) {
       QueryWrapper<CardInfo> queryWrapperCardInfo = new QueryWrapper<>();
       queryWrapperCardInfo.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
@@ -181,6 +183,12 @@ public class CardApplyServiceImpl implements CardApplyService {
       List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapperCardInfo);
       if (CollectionUtils.isNotEmpty(cardInfoList)) {
         throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "卡片已被写入或者绑定, 不能删除", null);
+      } else {
+        queryWrapperCardInfo.clear();
+        queryWrapperCardInfo.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
+        cardInfoList = cardInfoDao.list(queryWrapperCardInfo);
+        List<Long> ids = cardInfoList.stream().map(c -> c.getId()).collect(Collectors.toList());
+        isDeletedCardInfo =  cardInfoDao.removeByIds(ids);
       }
       cardApply.setDeleted(delete != 0);
     }
@@ -188,7 +196,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardApply.setStatus(status);
     }
 
-    return cardApplyDao.saveOrUpdate(cardApply);
+    return cardApplyDao.saveOrUpdate(cardApply) && isDeletedCardInfo;
   }
 
   @Override

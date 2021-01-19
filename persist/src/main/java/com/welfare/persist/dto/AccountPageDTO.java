@@ -29,4 +29,5 @@ public class AccountPageDTO {
   private String cardId;
   private BigDecimal accountBalance;
   private Integer binding;
+  private String phone;
 }

@@ -27,10 +27,7 @@ public class AccountDetailMapperDTO {
    */
   private String accountStatus;
 
-  /**
-   * 是否激活
-   */
-  private Integer active;
+
 
   /**
    * 员工类型编码名称
@@ -80,4 +77,9 @@ public class AccountDetailMapperDTO {
   private String remark;
 
   private String phone;
+
+  /**
+   * 是否激活
+   */
+  private Integer binding;
 }

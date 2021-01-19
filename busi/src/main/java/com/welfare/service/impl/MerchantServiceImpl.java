@@ -6,11 +6,13 @@ import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
+import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
+import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.MerchantStoreRelation;
@@ -80,6 +82,7 @@ public class MerchantServiceImpl implements MerchantService {
     private final ApplicationContext applicationContext;
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantWithCreditConverter merchantWithCreditConverter;
+    private final MerchantAccountTypeDao merchantAccountTypeDao;
 
 
 
@@ -88,6 +91,14 @@ public class MerchantServiceImpl implements MerchantService {
         QueryWrapper<Merchant> q=QueryHelper.getWrapper(req);
         q.orderByDesc(Merchant.CREATE_TIME);
         List<Merchant> list = merchantDao.list(q);
+        if(req.isMerAccountTypeFlag()){
+            QueryWrapper<MerchantAccountType> groupWapper=new QueryWrapper<>();
+            List<MerchantAccountType> types=merchantAccountTypeDao.list(groupWapper.groupBy(MerchantAccountType.MER_CODE));
+            if(EmptyChecker.notEmpty(types)){
+                List<String> merCodes=types.stream().map(item->item.getMerCode()).collect(Collectors.toList());
+                list=list.stream().filter(item->!merCodes.contains(item.getMerCode())).collect(Collectors.toList());
+            }
+        }
         if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
 
             QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();

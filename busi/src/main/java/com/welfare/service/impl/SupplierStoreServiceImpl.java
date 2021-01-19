@@ -348,8 +348,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
       supplierStore.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
       flag2 = this.syncConsumeType(supplierStore.getStoreCode(), supplierStore.getConsumType());
-      accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          supplierStore.getStoreCode(), supplierStore.getConsumType());
     }
     SupplierStore update = this.buildUpdate(supplierStore);
     update.setStoreParent(update.getMerCode());

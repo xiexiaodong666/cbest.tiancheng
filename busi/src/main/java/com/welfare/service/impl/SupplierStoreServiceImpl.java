@@ -435,11 +435,28 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
           }
         }
 
-        Assert.isTrue(consumeTypeMap.get(ConsumeTypeEnum.O2O.getCode()) || consumeTypeMap
-                          .get(ConsumeTypeEnum.ONLINE_MALL.getCode()) || consumeTypeMap
-                          .get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())
-            ,
-                      "消费门店下消费方法不能全被置为空"
+        isSelectO2O = true;
+        isSelectOnlineMall = true;
+        isSelectShopShopping = true;
+
+        if (consumeTypeMap.get(ConsumeTypeEnum.O2O.getCode()) == null || !consumeTypeMap.get(
+            ConsumeTypeEnum.O2O.getCode())) {
+          isSelectO2O = false;
+        }
+
+        if (consumeTypeMap.get(ConsumeTypeEnum.ONLINE_MALL.getCode()) == null || !consumeTypeMap
+            .get(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
+          isSelectOnlineMall = false;
+        }
+
+        if (consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode()) == null || !consumeTypeMap
+            .get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+          isSelectShopShopping = false;
+        }
+
+        Assert.isTrue(
+            isSelectO2O || isSelectOnlineMall || isSelectShopShopping,
+            "消费门店下消费方法不能全被置为空"
         );
         storeRelation.setConsumType(mapper.writeValueAsString(consumeTypeMap));
       }

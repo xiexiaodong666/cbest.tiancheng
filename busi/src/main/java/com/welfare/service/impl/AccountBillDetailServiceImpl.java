@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
 import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
@@ -11,6 +12,7 @@ import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.dto.Deposit;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountBillDetailService;
@@ -24,13 +26,14 @@ import java.util.Calendar;
  * 用户流水明细服务接口实现
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
  * @description 由 Mybatisplus Code Generator 创建
+ * @since 2021-01-06 13:49:25
  */
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AccountBillDetailServiceImpl implements AccountBillDetailService {
+
     private final AccountBillDetailDao accountBillDetailDao;
 
     /**
@@ -38,8 +41,10 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
      */
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
+
     @Override
-    public void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType, Account account) {
+    public void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType,
+        Account account) {
         AccountBillDetail accountBillDetail = new AccountBillDetail();
         Long accountCode = deposit.getAccountCode();
         BigDecimal amount = deposit.getAmount();
@@ -59,7 +64,7 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
     @Override
     public AccountBillDetail queryByTransNo(String transNo) {
         QueryWrapper<AccountBillDetail> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(AccountBillDetail.TRANS_NO,transNo);
+        queryWrapper.eq(AccountBillDetail.TRANS_NO, transNo);
         return accountBillDetailDao.getOne(queryWrapper);
     }
 
@@ -68,6 +73,12 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         AccountBillDetailSimpleReq accountBillDetailSimpleReq) {
         List<AccountBillDetailSimpleDTO> accountBillDetailSimpleDTOList = accountBillDetailDao
             .getBaseMapper().selectAccountBillDetailSimpleList(accountBillDetailSimpleReq);
+        accountBillDetailSimpleDTOList = accountBillDetailSimpleDTOList.stream()
+            .map(accountBillDetailSimpleDTO -> {
+                accountBillDetailSimpleDTO.setTransTypeName(TransType
+                    .valueOf(accountBillDetailSimpleDTO.getTransType().toUpperCase()).desc());
+                return accountBillDetailSimpleDTO;
+            }).collect(Collectors.toList());
         return accountBillDetailSimpleDTOList;
     }
 }

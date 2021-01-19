@@ -61,3 +61,16 @@ exclude-header-interceptor:
   - /**/*.jpg
   - /**/*.jpeg
   - /**/*.ico
+feign:
+  hystrix:
+    enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 300000

@@ -32,13 +32,13 @@ public class DistributedLockAspect {
     private final RedissonClient redissonClient;
 
     @Around("@annotation(distributedLock)")
-    public void before(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) throws Throwable {
+    public Object before(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) throws Throwable {
         String lockPrefix = distributedLock.lockPrefix();
         String lockKey = getLockKey(joinPoint, distributedLock);
         RLock lock = redissonClient.getLock(lockPrefix + lockKey);
         lock.lock();
         try{
-            joinPoint.proceed();
+            return joinPoint.proceed();
         } finally {
             lock.unlock();
         }

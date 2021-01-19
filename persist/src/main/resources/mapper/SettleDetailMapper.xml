@@ -230,7 +230,7 @@
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
         <if test="excludeIdList!=null and excludeIdList.size!=0">
-            and t1.id is not in(
+            and t1.id not in(
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
             )
         </if>

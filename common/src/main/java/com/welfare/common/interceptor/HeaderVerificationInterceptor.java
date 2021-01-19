@@ -86,7 +86,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
     private void setMerchantUserToContext(Object handler, HttpServletRequest request) {
         MerchantUser merchantUser = ((HandlerMethod) handler).getMethodAnnotation(MerchantUser.class);
         String merchantUserInfo = request.getHeader(WelfareConstant.Header.MERCHANT_USER.code());
-        if (merchantUser != null || StringUtils.isEmpty(merchantUserInfo)) {
+        if (merchantUser != null || !StringUtils.isEmpty(merchantUserInfo)) {
             if(merchantUser != null && StringUtils.isEmpty(merchantUserInfo)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"merchantUser required for http header");
             }

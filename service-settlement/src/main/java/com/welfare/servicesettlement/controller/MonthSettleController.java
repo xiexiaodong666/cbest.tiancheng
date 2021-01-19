@@ -62,7 +62,6 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/page")
     @ApiOperation("分页查询结算账单列表")
-    @MerchantUser
     public R<BasePageVo<MonthSettleResp>> pageQuery(MonthSettlePageReq monthSettleReqDto){
 
         //商户用户只能查询本商户数据
@@ -77,7 +76,6 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/list/{id}")
     @ApiOperation("根据id查询结算账单")
-    @MerchantUser
     public R<MonthSettleResp> pageQuery(@PathVariable("id")Long id){
 
         authMerchant(id);
@@ -88,7 +86,6 @@ public class MonthSettleController implements IController {
 
 
     @GetMapping("/{id}")
-    @MerchantUser
     @ApiOperation("分页查询结算账单明细列表")
     public R<Page<MonthSettleDetailResp>> pageQueryMonthSettleDetail(@PathVariable("id")Long id, MonthSettleDetailPageReq monthSettleDetailReq){
 
@@ -101,7 +98,6 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/{id}/export")
     @ApiOperation("结算账单明细导出")
-    @MerchantUser
     public Object exportMonthSettleDetail(@PathVariable("id")Long id, MonthSettleDetailReq monthSettleDetailReq, HttpServletResponse response){
 
         authMerchant(id);

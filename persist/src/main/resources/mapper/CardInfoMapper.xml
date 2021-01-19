@@ -45,7 +45,7 @@ FROM
     </if>
     <if test="cardMedium != null and cardMedium !='' ">and ca.card_medium = #{cardMedium}
     </if>
-    <if test="cardStatus != null  ">and ci.card_statu = #{cardStatus}
+    <if test="cardStatus != null  ">and ci.card_status = #{cardStatus}
     </if>
 
     <if test="writtenStartTime != null ">and ci.written_time &gt;= #{writtenStartTime}</if>

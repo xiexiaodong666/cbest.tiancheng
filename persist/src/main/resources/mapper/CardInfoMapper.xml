@@ -22,7 +22,7 @@
   SELECT
 	ci.card_id as cardId,
 	ca.card_name as cardName,
-	ci.card_type as cardType,
+	ca.card_type as cardType,
 	ca.card_medium as cardMedium,
 	ci.card_status as cardStatus,
 	m.mer_name as merName,
@@ -41,7 +41,7 @@ FROM
     </if>
     <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
     </if>
-    <if test="cardType != null and cardType !='' ">and ci.card_type = #{cardType}
+    <if test="cardType != null and cardType !='' ">and ca.card_type = #{cardType}
     </if>
     <if test="cardMedium != null and cardMedium !='' ">and ca.card_medium = #{cardMedium}
     </if>

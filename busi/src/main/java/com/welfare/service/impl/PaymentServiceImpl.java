@@ -99,13 +99,17 @@ public class PaymentServiceImpl implements PaymentService {
      */
     private void chargePaymentScene(PaymentRequest paymentRequest, Account account) {
         String paymentScene = paymentRequest.calculatePaymentScene();
-        AccountConsumeScene accountConsumeScene = accountConsumeSceneDao
-                .getOneByAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
-        Assert.notNull(accountConsumeScene, "未找到该账户的可用交易场景配置");
-        AccountConsumeSceneStoreRelation sceneStoreRelation = accountConsumeSceneStoreRelationDao
-                .getOneBySceneIdAndStoreNo(accountConsumeScene.getId(), paymentRequest.getStoreNo());
-        Assert.notNull(sceneStoreRelation, "未找到该门店的可用交易场景配置");
-        List<String> sceneConsumeTypes = Arrays.asList(sceneStoreRelation.getSceneConsumType().split(","));
+        List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
+                .getAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
+        Assert.isTrue(!CollectionUtils.isEmpty(accountConsumeScenes), "未找到该账户的可用交易场景配置");
+        List<Long> sceneIds = accountConsumeScenes.stream().map(AccountConsumeScene::getId).collect(Collectors.toList());
+        List<AccountConsumeSceneStoreRelation> sceneStoreRelations = accountConsumeSceneStoreRelationDao
+                .queryBySceneIdsAndStoreNo(sceneIds, paymentRequest.getStoreNo());
+        Assert.isTrue(!CollectionUtils.isEmpty(sceneStoreRelations), "未找到该门店的可用交易场景配置");
+        List<String> sceneConsumeTypes = sceneStoreRelations.stream().map(relation -> Arrays.asList(relation.getSceneConsumType().split(",")))
+                .flatMap(Collection::stream)
+                .distinct()
+                .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + paymentScene, null);
         }

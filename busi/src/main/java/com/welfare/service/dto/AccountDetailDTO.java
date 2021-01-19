@@ -98,4 +98,10 @@ public class AccountDetailDTO {
    */
   @ApiModelProperty("创建时间")
   private Date createTime;
+
+  /**
+   * 是否绑卡(1绑定0未绑定)
+   */
+  @ApiModelProperty("是否绑卡(1绑定0未绑定)")
+  private Integer binding;
 }

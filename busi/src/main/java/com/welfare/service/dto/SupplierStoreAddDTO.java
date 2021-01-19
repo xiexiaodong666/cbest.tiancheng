@@ -3,6 +3,7 @@ package com.welfare.service.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -37,7 +38,8 @@ public class SupplierStoreAddDTO {
     /**
      * 备注
      */
-    @ApiModelProperty("备注")  
+    @ApiModelProperty("备注")
+    @Length(max = 50)
     private String remark;
     /**
      * 消费方式

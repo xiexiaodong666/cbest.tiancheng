@@ -56,6 +56,10 @@
     a.account_name AS accountName,
     a.account_code AS accountCode,
     a.account_status AS accountStatus,
+    case a.account_status
+    when 1 then '正常'
+    when 2 then '禁用'
+    end as accountStatusString,
     d.department_code AS departmentCode,
     d.department_name AS departmentName,
     at.type_name AS accountTypeName,
@@ -63,7 +67,8 @@
     a.surplus_quota AS surplusQuota,
     GROUP_CONCAT(ci.card_id) AS cardId,
     a.account_balance AS accountBalance,
-    a.binding
+    a.binding,
+    a.phone
     FROM
     account a
     left JOIN merchant m on a.mer_code = m.mer_code
@@ -93,6 +98,7 @@
       and ci.card_id = #{cardId}
     </if>
     GROUP BY a.account_code
+    order by a.create_time desc
   </select>
 
 
@@ -128,7 +134,19 @@ WHERE a.mer_code = at.mer_code
     SELECT
     ss.store_name AS storeName,
     abd.trans_type AS transType,
-    abd.trans_amount AS transAmount,
+    CASE
+    when abd.trans_type = 'deposit' then "充值"
+    when abd.trans_type = 'consume' then "消费"
+    when abd.trans_type = 'refund' then "退款"
+    END as transTypeString,
+    CASE
+    WHEN abd.trans_type = 'deposit' THEN
+    trans_amount
+    WHEN abd.trans_type = 'consume' THEN
+    trans_amount * ( - 1 )
+    WHEN abd.trans_type = 'refund' THEN
+    trans_amount
+    END  AS transAmount,
     abd.create_time AS createTime,
     abd.account_balance AS accountBalance
     FROM
@@ -236,7 +254,8 @@ LIMIT #{size}
     a.surplus_quota AS surplusQuota,
     a.account_balance AS accountBalance,
     a.remark,
-    a.phone
+    a.phone,
+    a.binding
     FROM
     account a
     LEFT JOIN department d ON a.store_code = d.department_code

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -46,7 +47,8 @@ public class SupplierStoreUpdateDTO {
     /**
      * 备注
      */
-    @ApiModelProperty("备注")  
+    @ApiModelProperty("备注")
+    @Length(max = 50)
     private String remark;
     /**
      * 消费方式
@@ -58,7 +60,6 @@ public class SupplierStoreUpdateDTO {
      * 更新人
      */
     @ApiModelProperty("更新人")
-    @NotBlank
     private String updateUser;
     /**
      * 外部编码

@@ -85,7 +85,9 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public List<Merchant> list(MerchantReq req) {
-        List<Merchant> list = merchantDao.list(QueryHelper.getWrapper(req));
+        QueryWrapper<Merchant> q=QueryHelper.getWrapper(req);
+        q.orderByDesc(Merchant.CREATE_TIME);
+        List<Merchant> list = merchantDao.list(q);
         if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
 
             QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
@@ -99,6 +101,7 @@ public class MerchantServiceImpl implements MerchantService {
                 Set<String> merCodeSet = new HashSet<>(merCodeList);
                 QueryWrapper<Merchant> queryWrapperMerchant = new QueryWrapper<>();
                 queryWrapperMerchant.notIn(Merchant.MER_CODE, merCodeSet);
+                queryWrapperMerchant.orderByDesc(Merchant.CREATE_TIME);
                 list = merchantDao.list(queryWrapperMerchant);
             }
         }
@@ -155,7 +158,7 @@ public class MerchantServiceImpl implements MerchantService {
         }
         List<MerchantWithCreditAndTreeDTO> treeDTOList=merchantWithCreditConverter.toD(list);
         treeDTOList.forEach(item->{
-            item.setCode(item.getMerCode());
+            item.setCode(item.getSelfCode());
             item.setParentCode(item.getDepartmentParent());
         });
         dictService.trans(MerchantWithCreditAndTreeDTO.class, Merchant.class.getSimpleName(), true, treeDTOList.toArray());

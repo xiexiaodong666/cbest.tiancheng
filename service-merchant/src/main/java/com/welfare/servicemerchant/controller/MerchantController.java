@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.controller;
 
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.service.MerchantService;
 import com.welfare.persist.dto.query.MerchantPageReq;
@@ -64,12 +65,13 @@ public class MerchantController implements IController {
     }
     @PostMapping("/add")
     @ApiOperation("新增商户")
-    public R add(@RequestBody MerchantAddDTO merchant){
+    public R add(@RequestBody @Valid MerchantAddDTO merchant){
         return R.status(merchantService.add(merchant),"新增失败");
     }
     @PostMapping("/update")
     @ApiOperation("编辑商户")
-    public R update(@RequestBody MerchantUpdateDTO merchant){
+    @ApiUser
+    public R update(@RequestBody @Valid MerchantUpdateDTO merchant){
         return R.status(merchantService.update(merchant),"更新失败");
     }
     @PostMapping("/export-list")

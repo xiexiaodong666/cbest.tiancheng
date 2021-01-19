@@ -2,6 +2,8 @@ package com.welfare.servicemerchant.controller;
 
 import static net.dreamlu.mica.core.result.R.success;
 
+import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.service.remote.PlatformUserFeignClient;
 import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.remote.entity.PlatformUserDataResponse;
@@ -45,6 +47,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/list", method = RequestMethod.GET)
   @ApiOperation("获取商户用户列表")
+  @ApiUser
   PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
       @RequestParam int current,
       @RequestParam int size,
@@ -80,9 +83,10 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("新增商户用户")
+  @ApiUser
   PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
 
-    return platformUserFeignClient.addPlatformUser(transferShoppingPlatformUser(platformUser));
+    return platformUserFeignClient.addPlatformUser(transferShoppingPlatformUser(platformUser, 1));
   }
 
   /**
@@ -90,9 +94,10 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("修改商户用户")
+  @ApiUser
   PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
 
-    return platformUserFeignClient.updatePlatformUser(transferShoppingPlatformUser(platformUser));
+    return platformUserFeignClient.updatePlatformUser(transferShoppingPlatformUser(platformUser,2));
   }
 
 
@@ -101,6 +106,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/detail", method = RequestMethod.GET)
   @ApiOperation("详情")
+  @ApiUser
   PlatformUserResponse<PlatformUser> getPlatformUserDetail(
       @RequestParam("id") Long id) {
     PlatformUserResponse<ShoppingPlatformUser> response = platformUserFeignClient
@@ -118,11 +124,12 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/update-status", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("锁定/解锁")
+  @ApiUser
   PlatformUserResponse<Boolean> updatePlatformUserStatus(
       @RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUserStatus(
-        transferShoppingPlatformUser(platformUser));
+        transferShoppingPlatformUser(platformUser, 2));
   }
 
 
@@ -131,6 +138,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/export", method = RequestMethod.GET)
   @ApiOperation("导出商户用户列表")
+  @ApiUser
   R<String> export(
       @RequestParam(required = false) String username,
       @RequestParam(required = false) Integer status,
@@ -165,6 +173,7 @@ public class PlatformUserController {
 
     String path = fileUploadService.uploadExcelFile(
         platformUserList, ShoppingPlatformUser.class, "商户用户列表");
+    platformUserList.clear();
     return success(fileUploadService.getFileServerUrl(path));
 
   }
@@ -187,7 +196,13 @@ public class PlatformUserController {
     return platformUser;
   }
 
-  private ShoppingPlatformUser transferShoppingPlatformUser(PlatformUser platformUser) {
+  /**
+   *
+   * @param platformUser
+   * @param action 1 新增 2 修改
+   * @return
+   */
+  private ShoppingPlatformUser transferShoppingPlatformUser(PlatformUser platformUser, Integer action) {
     ShoppingPlatformUser shoppingPlatformUser = new ShoppingPlatformUser();
 
     shoppingPlatformUser.setId(platformUser.getId());
@@ -198,9 +213,12 @@ public class PlatformUserController {
     shoppingPlatformUser.setMerchant_code(platformUser.getMerchantCode());
     shoppingPlatformUser.setStatus(platformUser.getStatus());
     shoppingPlatformUser.setRemark(platformUser.getRemark());
-    shoppingPlatformUser.setCreated_by(platformUser.getCreatedBy());
-    shoppingPlatformUser.setUpdated_by(platformUser.getUpdatedBy());
-    shoppingPlatformUser.setCreated_at(platformUser.getCreatedAt());
+    if(action == 1) {
+      shoppingPlatformUser.setCreated_by(UserInfoHolder.getUserInfo().getUserName());
+    }
+    if(action == 2) {
+      shoppingPlatformUser.setUpdated_by(UserInfoHolder.getUserInfo().getUserName());
+    }
 
     return shoppingPlatformUser;
   }

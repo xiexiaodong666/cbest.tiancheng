@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 员工消费场景配置(account_consume_scene)数据DAO
  *
@@ -22,5 +24,12 @@ public class AccountConsumeSceneDao extends ServiceImpl<AccountConsumeSceneMappe
         queryWrapper.eq(AccountConsumeScene.ACCOUNT_TYPE_CODE,accountType)
                 .eq(AccountConsumeScene.MER_CODE,merCode);
         return getOne(queryWrapper);
+    }
+
+    public List<AccountConsumeScene> getAccountTypeAndMerCode(String accountType, String merCode){
+        QueryWrapper<AccountConsumeScene> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountConsumeScene.ACCOUNT_TYPE_CODE,accountType)
+                .eq(AccountConsumeScene.MER_CODE,merCode);
+        return list(queryWrapper);
     }
 }

@@ -64,7 +64,7 @@ public class MerchantAccountTypeWithMerchantDTO {
      * 备注
      */
     @ApiModelProperty("备注")
-    @ExcelProperty(value = "创建时间",index =5)
+    @ExcelProperty(value = "备注",index =5)
     private String remark;
 
 

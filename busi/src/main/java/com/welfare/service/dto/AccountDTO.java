@@ -64,8 +64,12 @@ public class AccountDTO implements Serializable {
    * 账号状态
    */
   @ApiModelProperty("账号状态")
-  @ExcelProperty(value = "账号状态(1正常2禁用)")
   private String accountStatus;
+  /**
+   * 账号状态文字
+   */
+  @ExcelProperty(value = "账号状态(1正常2禁用)")
+  private String accountStatusString;
   /**
    * 所属部门
    */
@@ -115,7 +119,12 @@ public class AccountDTO implements Serializable {
    * 是否绑卡(1绑定0未绑定)
    */
   @ApiModelProperty("是否绑卡(1绑定0未绑定)")
-  @ExcelProperty(value = "是否绑卡(1绑定0未绑定)")
   private Integer binding;
+
+  /**
+   * 员工手机号
+   */
+  @ApiModelProperty("员工手机号")
+  private String phone;
 
 }

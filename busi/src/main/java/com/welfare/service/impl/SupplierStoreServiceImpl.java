@@ -102,7 +102,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   public List<SupplierStore> list(SupplierStoreListReq req) {
-    return supplierStoreDao.list(QueryHelper.getWrapper(req));
+    QueryWrapper<SupplierStore> q=QueryHelper.getWrapper(req);
+    q.orderByDesc(SupplierStore.CREATE_TIME);
+    return supplierStoreDao.list(q);
   }
 
   @Override
@@ -398,12 +400,12 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
 
     try {
-      Map<String, String> map = mapper.readValue(consumeType, Map.class);
-      boolean isSelectO2O = Boolean.parseBoolean(map.get(ConsumeTypeEnum.O2O.getCode()));
-      boolean isSelectOnlineMall = Boolean.parseBoolean(
-          map.get(ConsumeTypeEnum.ONLINE_MALL.getCode()));
-      boolean isSelectShopShopping = Boolean.parseBoolean(
-          map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode()));
+      Map<String, Boolean> map = mapper.readValue(consumeType, Map.class);
+      boolean isSelectO2O = map.get(ConsumeTypeEnum.O2O.getCode());
+      boolean isSelectOnlineMall =
+          map.get(ConsumeTypeEnum.ONLINE_MALL.getCode());
+      boolean isSelectShopShopping =
+          map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
 
       for (MerchantStoreRelation storeRelation :
           storeRelationList) {

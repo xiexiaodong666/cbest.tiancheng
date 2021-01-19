@@ -57,7 +57,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         if(EmptyChecker.isEmpty(req.getMerCode())){
             req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
         }
-        return departmentDao.list(QueryHelper.getWrapper(req));
+        QueryWrapper<Department> q=QueryHelper.getWrapper(req);
+        q.orderByDesc(Department.CREATE_TIME);
+        return departmentDao.list(q);
     }
 
     @Override

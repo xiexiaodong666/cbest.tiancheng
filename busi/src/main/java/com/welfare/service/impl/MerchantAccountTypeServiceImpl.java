@@ -52,7 +52,9 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
 
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
-        return merchantAccountTypeDao.list(QueryHelper.getWrapper(req));
+        QueryWrapper q=QueryHelper.getWrapper(req);
+        q.orderByDesc(MerchantAccountType.CREATE_TIME);
+        return merchantAccountTypeDao.list(q);
     }
 
     @Override

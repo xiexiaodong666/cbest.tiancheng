@@ -30,7 +30,6 @@ public class DepartmentAddDTO {
      * 部门编码
      */
     @ApiModelProperty("部门编码")
-    @NotBlank
     private String departmentCode;
     /**
      * 部门父级

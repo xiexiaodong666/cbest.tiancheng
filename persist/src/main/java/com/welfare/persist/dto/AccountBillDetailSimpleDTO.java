@@ -20,6 +20,9 @@ public class AccountBillDetailSimpleDTO {
     @ApiModelProperty("交易类型")
     private String transType;
 
+    @ApiModelProperty("交易类型名称")
+    private String transTypeName;
+
     @ApiModelProperty("交易总金额")
     private BigDecimal transAmount;
 

@@ -45,16 +45,19 @@
 
   <select id="queryMerSupplierStoreDTList" resultType="com.welfare.persist.dto.MerSupplierStoreDTO">
          SELECT
-         mer_code as merCode,
-        store_code as storeCode,
-        store_name as storeName,
-        consum_type as consumType
-        from supplier_store
-        where deleted = 0 and consum_type like"%true%" and mer_code=#{merCode}
+				msr.mer_code as merCode,
+        msr.store_code as storeCode,
+        msr.store_alias as storeName,
+        msr.consum_type as consumType
+    FROM
+    merchant_store_relation msr
+    LEFT JOIN merchant m ON m.mer_code = msr.mer_code
+    where
+    msr.deleted != 1 and consum_type like"%true%" and msr.mer_code=#{merCode}
     </select>
 
   <select id="listUnionMerchant" resultType="com.welfare.persist.entity.SupplierStore">
-    select * from (
+    select * from (select * from (
     select
     id,
     mer_code merCode,
@@ -105,5 +108,6 @@
         </foreach>
       </if>
     </where>
+    )temp3 order by temp3.createTime desc
   </select>
 </mapper>

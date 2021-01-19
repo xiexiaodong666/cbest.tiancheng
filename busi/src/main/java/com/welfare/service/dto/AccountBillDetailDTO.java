@@ -28,9 +28,15 @@ public class AccountBillDetailDTO implements Serializable {
   /**
    * 交易类型
    */
-  @ApiModelProperty("交易类型(出入账)")
-  @ExcelProperty(value = "交易类型(消费、退款、充值等)")
+  @ApiModelProperty("交易类型(消费、退款、充值等)")
+  @ExcelProperty(value = "交易类型(出入账)code")
   private String transType;
+
+  /**
+   * 交易类型文字
+   */
+  @ExcelProperty(value = "交易类型value")
+  private String transTypeString;
 
   /**
    * 交易总金额

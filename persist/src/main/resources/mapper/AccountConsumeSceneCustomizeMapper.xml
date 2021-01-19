@@ -17,6 +17,10 @@
     act.type_name AS accountTypeName,
     acs.id,
     acs.STATUS,
+    case acs.STATUS
+		when 1 then '正常'
+		when 2 then '禁用'
+		end as statusString,
     acs.create_time AS createTime,
     acs.remark,
     acs.mer_code as merCode
@@ -37,6 +41,10 @@
     act.type_name AS accountTypeName,
     acs.id,
     acs.STATUS,
+    case acs.STATUS
+    when 1 then '正常'
+    when 2 then '禁用'
+    end as statusString,
     acs.create_time AS createTime,
     acs.remark,
     acs.mer_code as merCode
@@ -64,6 +72,7 @@
       and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
     GROUP BY acs.account_type_code,acs.mer_code
+    order by acs.create_time desc
   </select>
 
 
@@ -76,7 +85,8 @@
     <result property="status" column="STATUS"/>
     <result property="createTime" column="createTime"/>
     <result property="deleted" column="deleted"/>
-    <collection property="accountConsumeStoreRelationDTOListDTOList" ofType="com.welfare.persist.dto.AccountConsumeStoreRelationDTO">
+    <collection property="accountConsumeStoreRelationDTOListDTOList"
+      ofType="com.welfare.persist.dto.AccountConsumeStoreRelationDTO">
       <id property="id" column="acstrId"/>
       <result property="storeCode" column="storeCode"/>
       <result property="storeName" column="storeName"/>
@@ -111,7 +121,7 @@ WHERE
 	acs.id = #{id} and acstr.deleted = 0
 	</select>
 
-  <select id = "getCountByMerCodeAndAccountTypeAndStoreCode" resultType="Integer">
+  <select id="getCountByMerCodeAndAccountTypeAndStoreCode" resultType="Integer">
     SELECT
 	count( 1 )
 FROM

@@ -20,6 +20,7 @@ public class AccountPageDTO {
   @JsonSerialize(using = ToStringSerializer.class)
   private String accountCode;
   private String accountStatus;
+  private String accountStatusString;
   private String departmentCode;
   private String departmentName;
   private String accountTypeName;
@@ -28,4 +29,5 @@ public class AccountPageDTO {
   private String cardId;
   private BigDecimal accountBalance;
   private Integer binding;
+  private String phone;
 }

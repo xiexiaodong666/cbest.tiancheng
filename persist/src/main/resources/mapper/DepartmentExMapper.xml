@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.DepartmentExMapper">
     <select id="listUnionMerchant" resultType="com.welfare.persist.dto.DepartmentUnionMerchant">
-        select * from (SELECT
+        select * from (select * from (SELECT
         m.id id,
         m.mer_name departmentName,
         m.mer_code departmentCode,
@@ -34,5 +34,6 @@
                 and temp.merCode=#{merCode}
             </if>
         </where>
+        )temp3 order by temp3.createTime desc
     </select>
 </mapper>

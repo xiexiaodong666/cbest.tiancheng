@@ -3,6 +3,9 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.gson.Gson;
 import com.welfare.common.constants.AccountChangeType;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +75,9 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
             sb.append(",").append(type);
           }
         }
+      }
+      if(StringUtils.isBlank(sb)){
+        throw  new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景配置了对应得消费方式",null);
       }
       if( !sb.toString().equals(accountConsumeSceneStoreRelation.getSceneConsumType())){
         accountConsumeSceneStoreRelation.setSceneConsumType(sb.toString());

@@ -176,6 +176,8 @@ public class CardApplyServiceImpl implements CardApplyService {
   public boolean updateStatus(Long id, Integer delete, Integer status) {
     CardApply cardApply = cardApplyDao.getById(id);
     boolean isDeletedCardInfo = true;
+    boolean isDeletedCardApply = true;
+
     if (delete != null) {
       QueryWrapper<CardInfo> queryWrapperCardInfo = new QueryWrapper<>();
       queryWrapperCardInfo.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
@@ -190,13 +192,15 @@ public class CardApplyServiceImpl implements CardApplyService {
         List<Long> ids = cardInfoList.stream().map(c -> c.getId()).collect(Collectors.toList());
         isDeletedCardInfo =  cardInfoDao.removeByIds(ids);
       }
-      cardApply.setDeleted(delete != 0);
+      if(delete !=0) {
+        isDeletedCardApply = cardApplyDao.removeById(cardApply.getId());
+      }
     }
     if (status != null) {
       cardApply.setStatus(status);
     }
 
-    return cardApplyDao.saveOrUpdate(cardApply) && isDeletedCardInfo;
+    return isDeletedCardApply && isDeletedCardInfo;
   }
 
   @Override

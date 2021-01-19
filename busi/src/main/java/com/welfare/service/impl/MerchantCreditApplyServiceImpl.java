@@ -245,6 +245,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 info.setMerCooperationMode(MerCooperationModeEnum.getByCode(info.getMerCooperationMode()).getDesc());
                 info.setApplyType(WelfareConstant.MerCreditType.findByCode(info.getApplyType()).desc());
                 info.setApprovalStatus(ApprovalStatus.getByCode(info.getApprovalStatus()).getValue());
+                info.setId(String.valueOf(dto.getId()));
                 infos.add(info);
             });
         }

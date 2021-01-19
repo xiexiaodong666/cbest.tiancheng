@@ -420,6 +420,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         page.setCurrent(currentPage);
         page.setSize(pageSize);
         QueryWrapper<AccountDepositApply> queryWrapper = QueryHelper.getWrapper(query);
+        queryWrapper.eq(AccountDepositApply.MER_CODE, MerchantUserHolder.getMerchantUser().getMerchantCode());
         queryWrapper.orderByDesc(AccountDepositApply.APPLY_TIME);
         Page<AccountDepositApply> result = accountDepositApplyDao.page(page, queryWrapper);
         List<AccountDepositApplyInfo> infos = null;
@@ -439,6 +440,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     @Override
     public List<AccountDepositApplyExcelInfo> list(AccountDepositApplyQuery query) {
         QueryWrapper<AccountDepositApply> queryWrapper = QueryHelper.getWrapper(query);
+        queryWrapper.eq(AccountDepositApply.MER_CODE, MerchantUserHolder.getMerchantUser().getMerchantCode());
         queryWrapper.orderByDesc(AccountDepositApply.APPLY_TIME);
         List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(queryWrapper);
         List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);

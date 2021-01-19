@@ -7,6 +7,7 @@
     m.id id,
     m.mer_name merName,
     m.mer_code merCode,
+    m.mer_code code,
     0 departmentParent,
     m.mer_type merType,
     m.mer_identity merIdentity,
@@ -42,7 +43,8 @@
     select * from (SELECT
     d.id id,
     d.department_name merName,
-    d.department_code merCode,
+    d.mer_code merCode,
+    d.department_code code,
     d.department_parent departmentParent,
     d.department_type merType,
     NULL merIdentity,

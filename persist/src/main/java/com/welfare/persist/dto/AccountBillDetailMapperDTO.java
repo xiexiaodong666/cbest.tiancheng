@@ -13,6 +13,7 @@ import lombok.Data;
 public class AccountBillDetailMapperDTO {
   private String storeName;
   private String transType;
+  private String transTypeString;
   private BigDecimal transAmount;
   private Date createTime;
   private BigDecimal  accountBalance;

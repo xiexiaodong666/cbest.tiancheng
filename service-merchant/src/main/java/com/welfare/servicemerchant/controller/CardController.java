@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.CardApplyMediumEnum;
 import com.welfare.common.enums.CardApplyTypeEnum;
@@ -57,6 +58,7 @@ public class CardController implements IController {
 
   @GetMapping("/{cardNo}")
   @ApiOperation("根据卡号获取卡信息")
+  @ApiUser
   public R<CardInfoApiDTO> queryCardInfo(
       @PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo) {
     CardInfo cardInfo = cardInfoService.getByCardNo(cardNo);
@@ -70,6 +72,7 @@ public class CardController implements IController {
 
   @GetMapping("/byMagneticStripe")
   @ApiOperation("根据卡号获取卡信息")
+  @ApiUser
   public R<CardInfoApiDTO> queryCardInfoByMagneticStripe(
       @RequestParam("magneticStripe") @ApiParam("磁条号") String magneticStripe) {
     CardInfo cardInfo = cardInfoService.getByMagneticStripe(magneticStripe);
@@ -83,6 +86,7 @@ public class CardController implements IController {
 
   @GetMapping("/apply/{applyCode}")
   @ApiOperation("根据批次号获取卡信息")
+  @ApiUser
   public R<List<CardInfoApiDTO>> queryCardInfoByBatchNo(
       @PathVariable(value = "applyCode") @ApiParam("制卡申请号（批次号）") String applyCode) {
     List<CardInfoApiDTO> cardInfos = cardInfoService.listByApplyCode(
@@ -91,6 +95,7 @@ public class CardController implements IController {
   }
 
   @PutMapping("/written")
+  @ApiUser
   public R<CardInfoApiDTO> updateToWritten(@RequestBody CardInfo cardInfo) {
     CardInfo result = cardInfoService.updateWritten(cardInfo);
     CardApply cardApply = applyService.queryByApplyCode(result.getApplyCode());
@@ -103,6 +108,7 @@ public class CardController implements IController {
 
   @GetMapping("/admin/list")
   @ApiOperation("根据卡号获取卡信息")
+  @ApiUser
   public R<Page<CardInfoDTO>> queryCardInfo(
       @RequestParam @ApiParam("当前页") Integer current,
       @RequestParam @ApiParam("单页大小") Integer size,
@@ -130,6 +136,7 @@ public class CardController implements IController {
 
   @GetMapping("/export")
   @ApiOperation("导出卡片信息")
+  @ApiUser
   public R<String> exportCardInfo(
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,
@@ -171,6 +178,7 @@ public class CardController implements IController {
 
   @GetMapping("/admin/{cardNo}")
   @ApiOperation("后台根据卡号获取卡信息")
+  @ApiUser
   public R<CardInfoDTO> queryCardInfoAdmin(
       @PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo) {
     CardInfo cardInfo = cardInfoService.getByCardNo(cardNo);

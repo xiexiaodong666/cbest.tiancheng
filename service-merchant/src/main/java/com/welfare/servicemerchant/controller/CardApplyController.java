@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.CardApplyMediumEnum;
@@ -57,6 +58,7 @@ public class CardApplyController implements IController {
 
   @GetMapping("/list")
   @ApiOperation("分页查询卡片列表")
+  @ApiUser
   public R<Page<CardApplyDTO>> apiPageQuery(
       @RequestParam @ApiParam("当前页") Integer current,
       @RequestParam @ApiParam("单页大小") Integer size,
@@ -77,6 +79,7 @@ public class CardApplyController implements IController {
 
   @GetMapping("/detail")
   @ApiOperation("查看申请卡片详情")
+  @ApiUser
   public R<CardApplyDTO> detail(@RequestParam(required = true) @ApiParam("申请卡片id") Long id) {
     QueryWrapper<CardApply> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(CardApply.ID, id);
@@ -104,6 +107,7 @@ public class CardApplyController implements IController {
 
   @PostMapping
   @ApiOperation("新增卡片")
+  @ApiUser
   public R<Boolean> add(@RequestBody CardApplyAddReq cardApplyAddReq) {
 
     return success(cardApplyService.add(cardApplyAddReq));
@@ -111,6 +115,7 @@ public class CardApplyController implements IController {
 
   @PutMapping
   @ApiOperation("修改卡片")
+  @ApiUser
   public R<Boolean> update(@RequestBody CardApplyUpdateReq cardApplyUpdateReq) {
 
     return success(cardApplyService.update(cardApplyUpdateReq));
@@ -118,6 +123,7 @@ public class CardApplyController implements IController {
 
   @PutMapping("/status")
   @ApiOperation("删除/禁用/启动卡片")
+  @ApiUser
   public R<Boolean> updateStatus(
       @RequestParam(required = true) @ApiParam("id") Long id,
       @RequestParam(required = false) @ApiParam("1 删除") Integer delete,
@@ -129,6 +135,7 @@ public class CardApplyController implements IController {
 
   @GetMapping("/export")
   @ApiOperation("导出卡片列表(返回文件下载地址)")
+  @ApiUser
   public R<String> export(
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,

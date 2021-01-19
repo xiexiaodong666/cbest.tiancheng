@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.controller;
 
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.persist.entity.Department;
 import com.welfare.service.DepartmentService;
@@ -69,6 +70,7 @@ public class DepartmentController implements IController {
 
     @PostMapping("/update")
     @ApiOperation("修改部门")
+    @ApiUser
     public R update(@RequestBody@Valid  DepartmentUpdateDTO department){
         return R.status(departmentService.update(department),"修改失败");
     }

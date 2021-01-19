@@ -57,6 +57,7 @@ public class MerchantStoreRelationController implements IController {
 
   @GetMapping("/api/list")
   @ApiOperation("api分页查询消费门店配置列表")
+  @ApiUser
   public R<Page<MerchantStoreRelation>> apiPageQuery(
       @RequestParam @ApiParam("当前页") Integer current,
       @RequestParam @ApiParam("单页大小") Integer size,
@@ -78,6 +79,7 @@ public class MerchantStoreRelationController implements IController {
 
   @GetMapping("/admin/list")
   @ApiOperation("后台分页查询消费门店配置列表")
+  @ApiUser
   public R<Page<AdminMerchantStoreRelationDTO>> adminPageQuery(
       @RequestParam @ApiParam("当前页") Integer current,
       @RequestParam @ApiParam("单页大小") Integer size,
@@ -99,6 +101,7 @@ public class MerchantStoreRelationController implements IController {
 
   @GetMapping("/detail")
   @ApiOperation("后台查询消费门店详情")
+  @ApiUser
   public R<MerchantStoreRelationDetailDTO> detail(
       @RequestParam(required = true) @ApiParam("消费场景门店id") Long id) {
 
@@ -130,6 +133,7 @@ public class MerchantStoreRelationController implements IController {
 
   @PostMapping
   @ApiOperation("新增消费门店配置")
+  @ApiUser
   public R<Boolean> addMerchantStore(@RequestBody MerchantStoreRelationAddReq relationAddReq) {
 
     return success(merchantStoreRelationService.add(relationAddReq));
@@ -137,6 +141,7 @@ public class MerchantStoreRelationController implements IController {
 
   @PutMapping
   @ApiOperation("修改消费门店配置")
+  @ApiUser
   public R<Boolean> updateMerchantStore(
       @RequestBody MerchantStoreRelationUpdateReq relationUpadateReq) {
 
@@ -145,6 +150,7 @@ public class MerchantStoreRelationController implements IController {
 
   @PutMapping("/status")
   @ApiOperation("删除/禁用/启动门店配置")
+  @ApiUser
   public R<Boolean> updateMerchantStoreStatus(
       @RequestParam(required = true) @ApiParam("消费场景门店id") Long id,
       @RequestParam(required = false) @ApiParam("1删除") Integer delete,
@@ -155,6 +161,7 @@ public class MerchantStoreRelationController implements IController {
 
   @PostMapping("/export")
   @ApiOperation("导出消费门店配置(返回文件下载地址)")
+  @ApiUser
   public R<String> export(
       @RequestParam(required = false) @ApiParam("商户名称") String merName,
       @RequestParam(required = false) @ApiParam("使用状态") String status,

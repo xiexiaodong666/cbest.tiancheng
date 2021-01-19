@@ -88,6 +88,7 @@ WHERE
   ci.apply_code = #{applyCode} and
   ci.card_status = #{status} and
 	ci.deleted = 0
+	order by ci.card_id
   </select>
 
   <select id="exportCardInfo" resultType="com.welfare.persist.dto.CardInfoDTO">

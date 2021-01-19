@@ -2,7 +2,9 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountChangeEventRecordDao;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
@@ -102,8 +104,10 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/save")
   @ApiOperation("新增员工消费配置")
+  @MerchantUser
   public R<Boolean> save(@RequestBody AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
     try {
+      accountConsumeSceneAddReq.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountConsumeSceneService.save(accountConsumeSceneAddReq));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
@@ -112,8 +116,10 @@ public class AccountConsumeSceneController implements IController {
 
   @PostMapping("/update")
   @ApiOperation("修改员工消费配置")
+  @MerchantUser
   public R<Boolean> update(@RequestBody AccountConsumeSceneReq accountConsumeSceneReq) {
     try {
+      accountConsumeSceneReq.setUpdateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountConsumeSceneService.update(accountConsumeSceneReq));
     } catch (BusiException be) {
       return R.fail(be.getMessage());

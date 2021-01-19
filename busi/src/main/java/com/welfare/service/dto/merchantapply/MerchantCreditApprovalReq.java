@@ -33,10 +33,10 @@ public class MerchantCreditApprovalReq {
   private ApprovalStatus approvalStatus;
 
   /**
-   * 申请备注
+   * 审批备注
    */
-  @ApiModelProperty("申请备注")
-  private String applyRemark;
+  @ApiModelProperty("审批备注")
+  private String approvalRemark;
 
   /**
    * 审批人

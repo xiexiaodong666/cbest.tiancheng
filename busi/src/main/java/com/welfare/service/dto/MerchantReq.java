@@ -35,4 +35,10 @@ public class MerchantReq {
     @ApiModelProperty("来源")
     private String source;
 
+    /**
+     * 是否需要过滤已经有福利类型的商户
+     */
+    @ApiModelProperty("是否需要过滤已经有福利类型的商户")
+    private boolean merAccountTypeFlag;
+
 }

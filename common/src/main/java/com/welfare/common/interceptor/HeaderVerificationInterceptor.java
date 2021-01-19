@@ -85,9 +85,9 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
      */
     private void setMerchantUserToContext(Object handler, HttpServletRequest request) {
         MerchantUser merchantUser = ((HandlerMethod) handler).getMethodAnnotation(MerchantUser.class);
-        if (merchantUser != null) {
-            String merchantUserInfo = request.getHeader(WelfareConstant.Header.MERCHANT_USER.code());
-            if(StringUtils.isEmpty(merchantUserInfo)){
+        String merchantUserInfo = request.getHeader(WelfareConstant.Header.MERCHANT_USER.code());
+        if (merchantUser != null || !StringUtils.isEmpty(merchantUserInfo)) {
+            if(merchantUser != null && StringUtils.isEmpty(merchantUserInfo)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"merchantUser required for http header");
             }
             try {
@@ -104,9 +104,9 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
 
     private void setAccountUserToContext(Object handler, HttpServletRequest request) {
         AccountUser accountUser = ((HandlerMethod) handler).getMethodAnnotation(AccountUser.class);
-        if (accountUser != null) {
-            String accountUserInfo = request.getHeader(Header.ACCOUNT_USER.code());
-            if(StringUtils.isEmpty(accountUserInfo)){
+        String accountUserInfo = request.getHeader(Header.ACCOUNT_USER.code());
+        if (accountUser != null || !StringUtils.isEmpty(accountUserInfo)) {
+            if(accountUser != null && StringUtils.isEmpty(accountUserInfo)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"accountUser required for http header");
             }
             try {

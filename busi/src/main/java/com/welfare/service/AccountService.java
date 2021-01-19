@@ -85,4 +85,5 @@ public interface AccountService {
   Account findByPhoneAndMerCode(String phone,String merCode);
   void batchBindCard(List<CardInfo> cardInfoList,List<Account> accountList);
   void batchUpload(List<Account> accountList);
+  AccountDetailDTO queryDetailPhoneAndMer(String phone);
 }

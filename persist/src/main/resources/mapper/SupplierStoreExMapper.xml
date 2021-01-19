@@ -19,7 +19,7 @@
         and ss.mer_code=#{req.merCode}
       </if>
       <if test="req!=null and req.storeName!=null and req.storeName!=''">
-        and ss.storeName like concat('%',#{req.storeName},'%')
+        and ss.store_name like concat('%',#{req.storeName},'%')
       </if>
       <if test="req!=null and req.storeCode!=null and req.storeCode!=''">
         and ss.store_code=#{req.storeCode}

@@ -19,22 +19,25 @@
 
 
   <select id="list" resultType="com.welfare.persist.dto.CardInfoDTO">
-  SELECT
-	ci.card_id as cardId,
-	ca.card_name as cardName,
-	ca.card_type as cardType,
-	ca.card_medium as cardMedium,
-	ci.card_status as cardStatus,
-	m.mer_name as merName,
-	ci.create_time as createTime,
-	ci.written_time as writtenTime,
-	ci.bind_time as bindTime,
-	ci.account_code as accountCode
-FROM
-	card_info ci
-	LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
-	LEFT JOIN merchant m ON m.mer_code = ca.mer_code
+    SELECT
+    ci.card_id as cardId,
+    ca.card_name as cardName,
+    ca.card_type as cardType,
+    ca.card_medium as cardMedium,
+    ci.card_status as cardStatus,
+    m.mer_name as merName,
+    ci.create_time as createTime,
+    ci.written_time as writtenTime,
+    ci.bind_time as bindTime,
+    ci.account_code as accountCode
+    FROM
+    card_info ci
+    LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
+    LEFT JOIN merchant m ON m.mer_code = ca.mer_code
     where ci.deleted = 0
+    <if test="cardId != null ">
+      and ci.card_id = #{cardId}
+    </if>
     <if test="applyCode != null and applyCode !='' ">and ca.apply_code = #{applyCode}
     </if>
     <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
@@ -108,7 +111,9 @@ WHERE
     LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code
     where ci.deleted = 0
-
+    <if test="cardId != null ">
+      and ci.card_id = #{cardId}
+    </if>
     <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
     </if>
     <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}

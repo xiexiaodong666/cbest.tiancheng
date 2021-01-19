@@ -25,7 +25,7 @@ public interface CardInfoMapper extends BaseMapper<CardInfo> {
   public List<CardInfoApiDTO> listByApplyCode(@Param("applyCode") String applyCode,
       @Param("status") Integer status);
 
-  public Page<CardInfoDTO> list(Page<CardInfo> page, @Param("applyCode") String applyCode,
+  public Page<CardInfoDTO> list(Page<CardInfo> page,@Param("carId")  Long carId,@Param("applyCode") String applyCode,
       @Param("cardName") String cardName,
       @Param("merCode") String merCode,
       @Param("cardType") String cardType, @Param("cardMedium") String cardMedium,
@@ -34,7 +34,7 @@ public interface CardInfoMapper extends BaseMapper<CardInfo> {
       @Param("endTime") Date endTime, @Param("bindStartTime") Date bindStartTime,
       @Param("bindEndTime") Date bindEndTime);
 
-  public List<CardInfoDTO> exportCardInfo(@Param("cardName") String cardName,
+  public List<CardInfoDTO> exportCardInfo(@Param("carId")  Long carId, @Param("cardName") String cardName,
       @Param("merCode") String merCode, @Param("cardType") String cardType,
       @Param("cardMedium") String cardMedium, @Param("cardStatus") Integer cardStatus,
       @Param("writtenStartTime") Date writtenStartTime,

@@ -10,7 +10,9 @@ import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
+import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.persist.mapper.AccountConsumeSceneMapper;
+import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
@@ -39,6 +41,7 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
 
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
   private final AccountCustomizeMapper accountCustomizeMapper;
+  private final AccountConsumeSceneStoreRelationMapper accountConsumeSceneStoreRelationMapper;
   private final AccountChangeEventRecordService accountChangeEventRecordService;
 
   @Override
@@ -48,9 +51,7 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     return accountConsumeSceneStoreRelationDao.list(wrapper);
   }
   public List<AccountConsumeSceneStoreRelation> getListByStoreCode(String merCode,String storeCode){
-    QueryWrapper<AccountConsumeSceneStoreRelation> wrapper = new QueryWrapper();
-    wrapper.eq(AccountConsumeSceneStoreRelation.STORE_CODE,storeCode);
-    return accountConsumeSceneStoreRelationDao.list(wrapper);
+    return accountConsumeSceneStoreRelationMapper.queryRelationDetail(merCode,storeCode);
   }
 
   @Override

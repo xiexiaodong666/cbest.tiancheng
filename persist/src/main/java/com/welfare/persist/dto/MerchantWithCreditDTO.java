@@ -18,6 +18,7 @@ public class MerchantWithCreditDTO {
 
   @ApiModelProperty("id")
   private Long id;
+  private String selfCode;
   /**
    * 商户名称
    */

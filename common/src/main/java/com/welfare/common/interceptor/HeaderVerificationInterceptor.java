@@ -68,7 +68,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
 
         ApiUser apiUser = ((HandlerMethod) handler).getMethodAnnotation(ApiUser.class);
         if (apiUser != null) {
-            String apiUserInfo = request.getHeader(WelfareConstant.Header.API_USER.code());
+          /*  String apiUserInfo = request.getHeader(WelfareConstant.Header.API_USER.code());
             if(StringUtils.isEmpty(apiUserInfo)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"apiUser required for http header");
             }
@@ -76,7 +76,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
                 UserInfoHolder.setApiUserInfoLocal(JSON.parseObject(new String(apiUserInfo.getBytes("ISO-8859-1"),"utf8"), UserInfo.class));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
     }
 

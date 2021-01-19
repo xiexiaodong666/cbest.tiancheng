@@ -151,19 +151,19 @@ public class OrderServiceImpl implements OrderService {
                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
                    //配置了返利，此时检测是否配置类线下门店消费
                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                   if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()){
+                   if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()){
                        //配置了线下消费场景
                        allRebateStoreList.add(item.getStoreCode());
                    }
                }else if ("OTHER_PAY".equals(rebateType)){
                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                   if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()) {
+                   if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                        //配置了线下消费场景
                        otherRebateStoreList.add(item.getStoreCode());
                    }
                }else if("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                   if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()) {
+                   if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                        //配置了线下消费场景
                        cardRebateStoreList.add(item.getStoreCode());
                    }
@@ -238,19 +238,19 @@ public class OrderServiceImpl implements OrderService {
                         || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
                     //配置了返利，此时检测是否配置类线下门店消费
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()){
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()){
                         //配置了线下消费场景
                         allRebateStoreList.add(item.getStoreCode());
                     }
                 }else if ("OTHER_PAY".equals(rebateType)){
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()) {
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         otherRebateStoreList.add(item.getStoreCode());
                     }
                 }else if("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()) {
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         cardRebateStoreList.add(item.getStoreCode());
                     }
@@ -309,19 +309,19 @@ public class OrderServiceImpl implements OrderService {
                         || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
                     //配置了返利，此时检测是否配置类线下门店消费
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()){
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()){
                         //配置了线下消费场景
                         allRebateStoreList.add(item.getStoreCode());
                     }
                 }else if ("OTHER_PAY".equals(rebateType)){
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()) {
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         otherRebateStoreList.add(item.getStoreCode());
                     }
                 }else if("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()) {
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         cardRebateStoreList.add(item.getStoreCode());
                     }
@@ -385,13 +385,13 @@ public class OrderServiceImpl implements OrderService {
                         || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
                     //配置了返利，此时检测是否配置类线下门店消费
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()){
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()){
                         //配置了线下消费场景
                         rebateStoreList.add(item.getStoreCode());
                     }
                 }else if ("OTHER_PAY".equals(rebateType)){
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getShopConsumption() != null && consumeTypeJson.getShopConsumption().booleanValue()) {
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         rebateStoreList.add(item.getStoreCode());
                     }

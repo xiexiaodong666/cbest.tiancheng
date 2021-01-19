@@ -171,7 +171,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 }
                 validationParmas(apply.getApplyType(), apply.getMerCode());
                 apply.setApprovalRemark(request.getApprovalRemark());
-                apply.setApprovalUser(request.getApprovalUser());
+                apply.setApprovalUser(user.getUserName());
                 apply.setApprovalStatus(request.getApprovalStatus().getCode());
                 apply.setApprovalTime(new Date());
                 merchantCreditApplyDao.saveOrUpdate(apply);

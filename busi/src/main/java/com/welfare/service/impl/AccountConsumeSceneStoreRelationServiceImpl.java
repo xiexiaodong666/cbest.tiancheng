@@ -47,7 +47,7 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     wrapper.eq(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,accountConsumeSceneId);
     return accountConsumeSceneStoreRelationDao.list(wrapper);
   }
-  public List<AccountConsumeSceneStoreRelation> getListByStoreCode(String storeCode){
+  public List<AccountConsumeSceneStoreRelation> getListByStoreCode(String merCode,String storeCode){
     QueryWrapper<AccountConsumeSceneStoreRelation> wrapper = new QueryWrapper();
     wrapper.eq(AccountConsumeSceneStoreRelation.STORE_CODE,storeCode);
     return accountConsumeSceneStoreRelationDao.list(wrapper);
@@ -55,8 +55,8 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public void updateStoreConsumeType( String storeCode, String consumeType) {
-    List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelations = this.getListByStoreCode(storeCode);
+  public void updateStoreConsumeType( String merCode,String storeCode, String consumeType) {
+    List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelations = this.getListByStoreCode(merCode,storeCode);
     if(CollectionUtils.isEmpty(accountConsumeSceneStoreRelations)){
       return;
     }

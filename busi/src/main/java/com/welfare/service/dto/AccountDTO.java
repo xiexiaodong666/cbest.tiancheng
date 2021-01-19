@@ -31,7 +31,6 @@ public class AccountDTO implements Serializable {
    */
   @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
   @TableId
-  @ExcelProperty(value = "id")
   private Long id;
 
   /**
@@ -57,8 +56,14 @@ public class AccountDTO implements Serializable {
    * 员工账号
    */
   @ApiModelProperty("员工账号")
-  @ExcelProperty(value = "员工账号")
+  @ExcelProperty(value = "账号编码")
   private String accountCode;
+  /**
+   * 员工手机号
+   */
+  @ApiModelProperty("员工手机号")
+  @ExcelProperty(value = "员工手机号")
+  private String phone;
 
   /**
    * 账号状态
@@ -95,11 +100,17 @@ public class AccountDTO implements Serializable {
   @ApiModelProperty("最大授权额度")
   @ExcelProperty(value = "最大授权额度")
   private BigDecimal maxQuota;
+
+  /**
+   * 已用授权额度
+   */
+  @ExcelProperty(value = "已用授权额度")
+  private BigDecimal usedQuota;
+
   /**
    * 剩余授权额度
    */
   @ApiModelProperty("剩余授权额度")
-  @ExcelProperty(value = "剩余授权额度")
   private BigDecimal surplusQuota;
   /**
    * 员工卡号
@@ -121,10 +132,10 @@ public class AccountDTO implements Serializable {
   @ApiModelProperty("是否绑卡(1绑定0未绑定)")
   private Integer binding;
 
-  /**
-   * 员工手机号
-   */
-  @ApiModelProperty("员工手机号")
-  private String phone;
-
+  public BigDecimal getUsedQuota() {
+    if(  null != maxQuota && null != surplusQuota){
+      return maxQuota.subtract(surplusQuota);
+    }
+    return usedQuota;
+  }
 }

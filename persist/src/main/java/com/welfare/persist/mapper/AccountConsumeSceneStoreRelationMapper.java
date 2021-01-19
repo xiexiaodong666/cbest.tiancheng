@@ -2,7 +2,9 @@ package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 员工消费场景关联门店(account_consume_scene_store_relation)数据Mapper
@@ -13,5 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface AccountConsumeSceneStoreRelationMapper extends BaseMapper<AccountConsumeSceneStoreRelation> {
-
+  public List<AccountConsumeSceneStoreRelation> queryRelationDetail(
+      @Param("merCode")String merCode,@Param("storeCode")String storeCode);
 }

@@ -136,6 +136,7 @@ public class CardApplyServiceImpl implements CardApplyService {
     queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
     queryWrapper.ne(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.NEW.code());
     List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapper);
+    // 已写卡或者绑卡的卡只能修改 卡名称
     if (CollectionUtils.isNotEmpty(cardInfoList)) {
       if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
         cardApply.setCardName(cardApplyUpdateReq.getCardName());
@@ -153,20 +154,12 @@ public class CardApplyServiceImpl implements CardApplyService {
         cardApply.setCardMedium(cardApplyUpdateReq.getCardMedium());
       }
 
-      if (cardApplyUpdateReq.getCardNum() != null) {
-        cardApply.setCardNum(cardApplyUpdateReq.getCardNum());
-      }
-
       if (Strings.isNotEmpty(cardApplyUpdateReq.getIdentificationCode())) {
         cardApply.setIdentificationCode(cardApplyUpdateReq.getIdentificationCode());
       }
 
       if (cardApplyUpdateReq.getIdentificationLength() != null) {
         cardApply.setIdentificationLength(cardApplyUpdateReq.getIdentificationLength());
-      }
-
-      if (Strings.isNotEmpty(cardApplyUpdateReq.getMerCode())) {
-        cardApply.setMerCode(cardApplyUpdateReq.getMerCode());
       }
 
       if (Strings.isNotEmpty(cardApplyUpdateReq.getRemark())) {

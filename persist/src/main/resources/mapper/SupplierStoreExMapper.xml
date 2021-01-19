@@ -54,7 +54,7 @@
     </select>
 
   <select id="listUnionMerchant" resultType="com.welfare.persist.entity.SupplierStore">
-    select * from (
+    select * from (select * from (
     select
     id,
     mer_code merCode,
@@ -105,5 +105,6 @@
         </foreach>
       </if>
     </where>
+    )temp3 order by temp3.createTime desc
   </select>
 </mapper>

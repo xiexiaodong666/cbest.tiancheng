@@ -85,7 +85,9 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public List<Merchant> list(MerchantReq req) {
-        List<Merchant> list = merchantDao.list(QueryHelper.getWrapper(req));
+        QueryWrapper<Merchant> q=QueryHelper.getWrapper(req);
+        q.orderByDesc(Merchant.CREATE_TIME);
+        List<Merchant> list = merchantDao.list(q);
         if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
 
             QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();

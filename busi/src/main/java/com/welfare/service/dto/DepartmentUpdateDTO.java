@@ -37,7 +37,6 @@ public class DepartmentUpdateDTO {
      * 更新人
      */
     @ApiModelProperty("更新人")
-    @NotBlank
     private String updateUser;
     /**
      * 外部编码

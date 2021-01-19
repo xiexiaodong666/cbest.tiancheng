@@ -7,7 +7,7 @@
     </sql>
 
   <sql id="baseColumn">
-        id,apply_code,card_id,card_type,card_status,flag,create_user,create_time,update_user,update_time,account_id,version
+        id,apply_code,card_id,card_status,flag,create_user,create_time,update_user,update_time,account_id,version
     </sql>
 
 
@@ -22,7 +22,7 @@
   SELECT
 	ci.card_id as cardId,
 	ca.card_name as cardName,
-	ci.card_type as cardType,
+	ca.card_type as cardType,
 	ca.card_medium as cardMedium,
 	ci.card_status as cardStatus,
 	m.mer_name as merName,
@@ -41,7 +41,7 @@ FROM
     </if>
     <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
     </if>
-    <if test="cardType != null and cardType !='' ">and ci.card_type = #{cardType}
+    <if test="cardType != null and cardType !='' ">and ca.card_type = #{cardType}
     </if>
     <if test="cardMedium != null and cardMedium !='' ">and ca.card_medium = #{cardMedium}
     </if>
@@ -71,7 +71,7 @@ FROM
 	ci.version,
 	ci.magnetic_stripe AS magneticStripe,
 	ca.card_name AS cardName,
-	ci.card_type AS cardType,
+	ca.card_type AS cardType,
 	ca.card_medium AS cardMedium,
 	ci.card_status AS cardStatus,
 	m.mer_name AS merName,
@@ -94,7 +94,7 @@ WHERE
     SELECT
     ci.card_id as cardId,
     ca.card_name as cardName,
-    ci.card_type as cardType,
+    ca.card_type as cardType,
     ca.card_medium as cardMedium,
     ci.card_status as cardStatus,
     m.mer_name as merName,
@@ -112,7 +112,7 @@ WHERE
     </if>
     <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
     </if>
-    <if test="cardType != null and cardType !='' ">and ci.card_type = #{cardType}
+    <if test="cardType != null and cardType !='' ">and ca.card_type = #{cardType}
     </if>
     <if test="cardMedium != null and cardMedium !='' ">and ca.card_medium = #{cardMedium}
     </if>

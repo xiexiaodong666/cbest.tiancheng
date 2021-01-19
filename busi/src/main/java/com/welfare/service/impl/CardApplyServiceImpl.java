@@ -114,7 +114,6 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardInfo.setApplyCode(cardApply.getApplyCode());
 
       cardInfo.setCardId(prefix + cardApplyAddReq.getMerCode() + writeCardId);
-      cardInfo.setCardType(cardApply.getCardType());
       cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());
       cardInfo.setCardStatus(WelfareConstant.CardStatus.NEW.code());
       cardInfo.setDeleted(false);
@@ -136,6 +135,7 @@ public class CardApplyServiceImpl implements CardApplyService {
     queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
     queryWrapper.ne(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.NEW.code());
     List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapper);
+    // 已写卡或者绑卡的卡只能修改 卡名称
     if (CollectionUtils.isNotEmpty(cardInfoList)) {
       if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
         cardApply.setCardName(cardApplyUpdateReq.getCardName());
@@ -153,10 +153,6 @@ public class CardApplyServiceImpl implements CardApplyService {
         cardApply.setCardMedium(cardApplyUpdateReq.getCardMedium());
       }
 
-      if (cardApplyUpdateReq.getCardNum() != null) {
-        cardApply.setCardNum(cardApplyUpdateReq.getCardNum());
-      }
-
       if (Strings.isNotEmpty(cardApplyUpdateReq.getIdentificationCode())) {
         cardApply.setIdentificationCode(cardApplyUpdateReq.getIdentificationCode());
       }
@@ -165,28 +161,14 @@ public class CardApplyServiceImpl implements CardApplyService {
         cardApply.setIdentificationLength(cardApplyUpdateReq.getIdentificationLength());
       }
 
-      if (Strings.isNotEmpty(cardApplyUpdateReq.getMerCode())) {
-        cardApply.setMerCode(cardApplyUpdateReq.getMerCode());
-      }
-
       if (Strings.isNotEmpty(cardApplyUpdateReq.getRemark())) {
         cardApply.setRemark(cardApplyUpdateReq.getRemark());
       }
     }
 
-    queryWrapper.clear();
-    queryWrapper.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());
-    cardInfoList = cardInfoDao.list(queryWrapper);
     boolean saveCardApply = cardApplyDao.saveOrUpdate(cardApply);
-    boolean updateCardInfo = true;
-    if (CollectionUtils.isNotEmpty(cardInfoList)) {
-      for (CardInfo cardInfo :
-          cardInfoList) {
-        cardInfo.setCardType(cardApply.getCardType());
-      }
-      updateCardInfo = cardInfoDao.saveOrUpdateBatch(cardInfoList);
-    }
-    return saveCardApply && updateCardInfo;
+
+    return saveCardApply;
   }
 
   @Override

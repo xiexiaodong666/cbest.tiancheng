@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import static net.dreamlu.mica.core.result.R.success;
 
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.service.remote.PlatformUserFeignClient;
 import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.remote.entity.PlatformUserDataResponse;
@@ -45,6 +46,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/list", method = RequestMethod.GET)
   @ApiOperation("获取商户用户列表")
+  @ApiUser
   PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
       @RequestParam int current,
       @RequestParam int size,
@@ -80,6 +82,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("新增商户用户")
+  @ApiUser
   PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.addPlatformUser(transferShoppingPlatformUser(platformUser));
@@ -90,6 +93,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("修改商户用户")
+  @ApiUser
   PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUser(transferShoppingPlatformUser(platformUser));
@@ -101,6 +105,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/detail", method = RequestMethod.GET)
   @ApiOperation("详情")
+  @ApiUser
   PlatformUserResponse<PlatformUser> getPlatformUserDetail(
       @RequestParam("id") Long id) {
     PlatformUserResponse<ShoppingPlatformUser> response = platformUserFeignClient
@@ -118,6 +123,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/update-status", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("锁定/解锁")
+  @ApiUser
   PlatformUserResponse<Boolean> updatePlatformUserStatus(
       @RequestBody PlatformUser platformUser) {
 
@@ -131,6 +137,7 @@ public class PlatformUserController {
    */
   @RequestMapping(value = "/export", method = RequestMethod.GET)
   @ApiOperation("导出商户用户列表")
+  @ApiUser
   R<String> export(
       @RequestParam(required = false) String username,
       @RequestParam(required = false) Integer status,
@@ -165,6 +172,7 @@ public class PlatformUserController {
 
     String path = fileUploadService.uploadExcelFile(
         platformUserList, ShoppingPlatformUser.class, "商户用户列表");
+    platformUserList.clear();
     return success(fileUploadService.getFileServerUrl(path));
 
   }

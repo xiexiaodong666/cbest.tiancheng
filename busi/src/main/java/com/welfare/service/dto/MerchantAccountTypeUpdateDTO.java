@@ -3,6 +3,7 @@ package com.welfare.service.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
@@ -25,6 +26,7 @@ public class MerchantAccountTypeUpdateDTO {
      * 备注
      */
     @ApiModelProperty("备注")
+    @Length(max = 50)
     private String remark;
     @ApiModelProperty("商户编码")
     @NotBlank

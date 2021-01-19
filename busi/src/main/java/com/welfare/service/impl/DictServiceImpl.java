@@ -41,7 +41,9 @@ public class DictServiceImpl implements DictService {
 
     @Override
     public List<DictDTO> getByType(DictReq req) {
-        return dictConverter.toD(dictDao.list(QueryHelper.getWrapper(req)));
+        QueryWrapper<Dict> q=QueryHelper.getWrapper(req);
+        q.orderByAsc(Dict.SORT);
+        return dictConverter.toD(dictDao.list(q));
     }
 
     @Override

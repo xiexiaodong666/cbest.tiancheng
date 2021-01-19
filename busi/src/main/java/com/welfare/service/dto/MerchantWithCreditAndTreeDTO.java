@@ -41,6 +41,11 @@ public class MerchantWithCreditAndTreeDTO extends Tree{
    */
   @ApiModelProperty("商户代码")
   @ExcelProperty(value = "商户代码",index = 1)
+  private String code;
+  /**
+   * 商户代码
+   */
+  @ApiModelProperty("商户代码")
   private String merCode;
   /**
    * 商户类型

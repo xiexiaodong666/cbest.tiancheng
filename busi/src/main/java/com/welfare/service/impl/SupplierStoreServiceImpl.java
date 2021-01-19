@@ -102,7 +102,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Override
   public List<SupplierStore> list(SupplierStoreListReq req) {
-    return supplierStoreDao.list(QueryHelper.getWrapper(req));
+    QueryWrapper<SupplierStore> q=QueryHelper.getWrapper(req);
+    q.orderByDesc(SupplierStore.CREATE_TIME);
+    return supplierStoreDao.list(q);
   }
 
   @Override

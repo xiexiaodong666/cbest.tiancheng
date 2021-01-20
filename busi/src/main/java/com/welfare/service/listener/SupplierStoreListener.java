@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -128,6 +129,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   }
 
   private boolean check() {
+    Map<String,List<String>> groupMap= storeCodeList.stream().collect(Collectors.groupingBy(String::toString));
+    for(Map.Entry<String,List<String>> entry:groupMap.entrySet()){
+      if(entry.getValue().size()>1){
+        uploadInfo.append("excel文件中存在重复的门店代码:").append(entry.getKey()).append(";");
+      }
+    }
     QueryWrapper<SupplierStore> storeQueryWrapper=new QueryWrapper<>();
     storeQueryWrapper.in(SupplierStore.STORE_CODE,storeCodeList);
     List<SupplierStore> stores=storeService.list(storeQueryWrapper);

@@ -83,7 +83,10 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         accountBillDetailSimpleDTOList = accountBillDetailSimpleDTOList.stream()
             .map(accountBillDetailSimpleDTO -> {
                 String channel = accountBillDetailSimpleDTO.getChannel();
-                if(StrUtil.isNotEmpty(channel)) {
+                String transType = accountBillDetailSimpleDTO.getTransType();
+                TransType transTypeEnum = TransType.valueOf(transType.toUpperCase());
+
+                if(transTypeEnum == TransType.DEPOSIT && StrUtil.isNotEmpty(channel)) {
                     Channel channelEnum = Channel.valueOf(channel.toUpperCase());
                     if (channelEnum == Channel.WECHAT || channelEnum == Channel.ALIPAY) {
                         accountBillDetailSimpleDTO.setStoreName(StrUtil

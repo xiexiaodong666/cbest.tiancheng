@@ -18,7 +18,7 @@ public enum  ApprovalStatus {
   private final String code;
   private final String value;
 
-  private ApprovalStatus(String code, String value){
+  ApprovalStatus(String code, String value){
     this.code=code;
     this.value=value;
   }

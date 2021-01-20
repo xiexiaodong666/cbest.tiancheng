@@ -47,7 +47,8 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private List<String> storeCodeList = new LinkedList();
   private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getCode(),ConsumeTypeEnum.ONLINE_MALL.getCode(),ConsumeTypeEnum.SHOP_SHOPPING.getCode()});
 
-
+  public static  final String success="导入成功";
+  public static  final String fail="入库失败";
   private final MerchantService merchantService;
 
   private final SupplierStoreService storeService;
@@ -119,10 +120,10 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       if(flag&&EmptyChecker.notEmpty(uploadInfo)){
         Boolean result = storeService.batchAdd(list);
         if (result == false) {
-          uploadInfo.append("入库失败");
+          uploadInfo.append(fail);
         }
         if( StringUtils.isEmpty(uploadInfo.toString())) {
-          uploadInfo.append("导入成功");
+          uploadInfo.append(success);
         }
       }
 

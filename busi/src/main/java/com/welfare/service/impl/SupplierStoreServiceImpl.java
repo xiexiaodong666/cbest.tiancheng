@@ -34,6 +34,8 @@ import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -236,7 +238,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     if (!Arrays.asList(merchant.getMerIdentity().split(",")).contains(
         MerIdentityEnum.supplier.getCode())) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"非供应商门店",null);
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"非供应商商户",null);
 
     }
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
@@ -340,19 +342,21 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     //查询所有的消费类型字典，用来初始化
     List<DictDTO> dictList = dictService.getByType(req);
     Map<String, Boolean> map = dictList.stream().collect(
-        Collectors.toMap(DictDTO::getDictCode, item -> false));
+            Collectors.toMap(DictDTO::getDictCode, item -> false));
+    SupplierStoreListener listener = new SupplierStoreListener(
+            merchantService, this);
     try {
-      SupplierStoreListener listener = new SupplierStoreListener(
-          merchantService, this );
       EasyExcel.read(multipartFile.getInputStream(), SupplierStoreImportDTO.class, listener).sheet()
-          .doRead();
-      String result = listener.getUploadInfo().toString();
-      listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
-      return result;
-    } catch (Exception e) {
-      log.info("批量新增门店解析 Excel exception:{}", e.getMessage());
+              .doRead();
+    } catch (IOException e) {
+      throw new BusiException("excel解析失败");
     }
-    return "解析失败";
+    String result = listener.getUploadInfo().toString();
+    listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
+    if (!SupplierStoreListener.success.equals(result)) {
+
+    }
+    return result;
   }
 
   @Override
@@ -378,14 +382,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
+    SupplierStore update = this.buildUpdate(supplierStore);
+    update.setStoreParent(update.getMerCode());
     boolean flag2 = true;
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
       supplierStore.setConsumType(
           JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
       flag2 = this.syncConsumeType(supplierStore.getStoreCode(), supplierStore.getConsumType());
     }
-    SupplierStore update = this.buildUpdate(supplierStore);
-    update.setStoreParent(update.getMerCode());
     boolean flag = 1 == supplierStoreDao.updateAllColumnById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
@@ -406,6 +410,16 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     SupplierStore entity = supplierStoreDao.getById(update.getId());
     if (EmptyChecker.isEmpty(entity)) {
       throw new BusiException("id不存在");
+    }
+    if (!update.getStoreCode().equals(entity.getStoreCode())
+            && EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(update.getStoreCode()))) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"门店编码已存在",null);
+
+    }
+    if (EmptyChecker.notEmpty(update.getCashierNo())
+            &&!update.getCashierNo().equals(entity.getCashierNo())
+            &&EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(update.getCashierNo()))) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"虚拟收银机号已存在",null);
     }
     entity.setMerCode(update.getMerCode());
     entity.setCashierNo(update.getCashierNo());

@@ -118,9 +118,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
     } catch (Exception e) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
     } finally {
-      if (lock.isHeldByCurrentThread()) {
-        lock.unlock();
-      }
+      lock.unlock();
     }
   }
 

@@ -119,7 +119,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
     if (!CollectionUtils.isEmpty(list)) {
       boolean flag = check();
-      if(flag&&EmptyChecker.isEmpty(uploadInfo)){
+      if(flag&&EmptyChecker.isEmpty(uploadInfo.toString())){
         Boolean result = storeService.batchAdd(list);
         if (result == false) {
           uploadInfo.append(fail);

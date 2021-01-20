@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

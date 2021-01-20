@@ -5,11 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.MerchantAccountType;
-import com.welfare.service.dto.MerchantAccountTypeAddDTO;
-import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
-import com.welfare.service.dto.MerchantAccountTypeReq;
-import com.welfare.service.dto.MerchantAccountTypeSortReq;
-import com.welfare.service.dto.MerchantAccountTypeUpdateDTO;
+import com.welfare.service.dto.*;
 
 import java.util.List;
 

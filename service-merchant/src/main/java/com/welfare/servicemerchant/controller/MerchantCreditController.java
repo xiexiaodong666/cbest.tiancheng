@@ -1,6 +1,5 @@
 package com.welfare.servicemerchant.controller;
 
-import com.welfare.common.annotation.ApiUser;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
 import io.swagger.annotations.Api;
@@ -12,8 +11,8 @@ import net.dreamlu.mica.core.result.R;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 商户额度信服务控制器

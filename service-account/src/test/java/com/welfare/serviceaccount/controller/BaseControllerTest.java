@@ -1,10 +1,10 @@
 package com.welfare.serviceaccount.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.Header;
 import com.welfare.common.constants.WelfareConstant.HeaderSource;
 import com.welfare.common.domain.AccountUserInfo;
+
 import java.util.HashMap;
 import java.util.Map;
 

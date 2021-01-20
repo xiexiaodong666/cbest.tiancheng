@@ -1,10 +1,10 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.MerchantCreditApplyInfoDTO;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
 import com.welfare.persist.entity.MerchantCreditApply;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

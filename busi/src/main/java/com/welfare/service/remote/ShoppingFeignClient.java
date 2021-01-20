@@ -1,12 +1,6 @@
 package com.welfare.service.remote;
 
-import com.welfare.service.remote.entity.EmployerReqDTO;
-import com.welfare.service.remote.entity.MerchantShoppingReq;
-import com.welfare.service.remote.entity.RoleConsumptionReq;
-import com.welfare.service.remote.entity.RoleConsumptionResp;
-import com.welfare.service.remote.entity.StoreShoppingReq;
-import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
-import com.welfare.service.remote.fallback.PlatformUserFallback;
+import com.welfare.service.remote.entity.*;
 import com.welfare.service.remote.fallback.ShoppingFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;

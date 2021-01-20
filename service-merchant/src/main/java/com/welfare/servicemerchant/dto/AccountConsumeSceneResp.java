@@ -1,10 +1,12 @@
 package com.welfare.servicemerchant.dto;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
 
 /**
  * @author yaoxiao

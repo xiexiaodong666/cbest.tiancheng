@@ -7,20 +7,16 @@ import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.service.AccountService;
-import com.welfare.service.AccountTypeService;
-import com.welfare.service.DepartmentService;
-import com.welfare.service.MerchantService;
-import com.welfare.service.SequenceService;
+import com.welfare.service.*;
 import com.welfare.service.dto.AccountUploadDTO;
-import java.util.LinkedList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author yaoxiao

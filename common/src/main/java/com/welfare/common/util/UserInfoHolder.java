@@ -1,7 +1,7 @@
 package com.welfare.common.util;
 
-import com.welfare.common.domain.UserInfo;
 import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.domain.UserInfo;
 
 import java.util.Objects;
 

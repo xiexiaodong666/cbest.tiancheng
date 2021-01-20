@@ -6,8 +6,9 @@ import com.welfare.persist.dto.AccountTypeMapperDTO;
 import com.welfare.persist.dto.query.AccountTypeReq;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.service.dto.AccountTypeDTO;
-import java.util.List;
 import org.mapstruct.Mapper;
+
+import java.util.List;
 
 /**
  * @author yaoxiao

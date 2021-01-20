@@ -1,9 +1,7 @@
 package com.welfare.servicesettlement.dto;
 
-import com.welfare.servicesettlement.controller.OrderController;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.util.List;

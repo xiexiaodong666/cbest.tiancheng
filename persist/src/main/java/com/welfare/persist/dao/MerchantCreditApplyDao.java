@@ -1,9 +1,9 @@
 package com.welfare.persist.dao;
 
-import com.welfare.persist.entity.MerchantCreditApply;
-import lombok.extern.slf4j.Slf4j;
-import com.welfare.persist.mapper.MerchantCreditApplyMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.welfare.persist.entity.MerchantCreditApply;
+import com.welfare.persist.mapper.MerchantCreditApplyMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 /**

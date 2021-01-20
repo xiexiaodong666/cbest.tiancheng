@@ -1,9 +1,9 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.mapper.AccountTypeMapper;
 import lombok.extern.slf4j.Slf4j;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Repository;
 
 /**

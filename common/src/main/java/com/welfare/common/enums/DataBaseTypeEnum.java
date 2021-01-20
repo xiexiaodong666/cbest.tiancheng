@@ -6,16 +6,12 @@ package com.welfare.common.enums;
  * 多数据源枚举
  */
 public enum DataBaseTypeEnum {
+    /**
+     *
+     */
     MYSQL_DB("mysql","mysql数据源"),
     PRESTO_DB("presto","presto数据源");
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
 
     public String getCode() {
         return code;
@@ -25,9 +21,9 @@ public enum DataBaseTypeEnum {
         return desc;
     }
 
-    private String code;
+    private final String code;
 
-    private String desc;
+    private final String desc;
 
     DataBaseTypeEnum(String code, String desc){
         this.code = code;

@@ -3,6 +3,7 @@ package com.welfare.service;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
+
 import java.util.List;
 
 public interface AccountChangeEventRecordService {

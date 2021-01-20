@@ -96,7 +96,7 @@ public class AccountConsumeSceneHandler {
     userRoleBinding.setBindings(bindings);
     AccountConsumeScene accountConsumeScene =accountConsumeSceneDao.getById(relationList.get(0).getAccountConsumeSceneId());
     userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
-    userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0 ? true : false);
+    userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0);
     return Arrays.asList(userRoleBinding);
   }
 

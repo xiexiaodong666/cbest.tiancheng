@@ -2,9 +2,7 @@ package com.welfare.common.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.welfare.common.result.Result;
 import net.dreamlu.mica.common.support.IController;
-import net.dreamlu.mica.core.result.IResultCode;
 import net.dreamlu.mica.core.result.R;
 import net.dreamlu.mica.core.result.SystemCode;
 import org.apache.commons.lang.StringUtils;

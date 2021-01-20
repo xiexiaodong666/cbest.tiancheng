@@ -57,12 +57,17 @@ public class SupplierStoreDetailDTO {
     @ApiModelProperty("消费方式(前端多个用逗号分隔)")
     private String consumType;
     /**
+     * 消费方式
+     */
+    @ApiModelProperty("消费方式转义")
+    private String consumTypeName;
+
+    /**
      * 创建人
      */
     @ApiModelProperty("创建人")  
     private String createUser;
 
-    private Integer status;
     /**
      * 创建日期
      */

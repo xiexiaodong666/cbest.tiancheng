@@ -35,13 +35,13 @@ public class MonthSettlePageReq extends PageReq {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JSONField(format = "yyyy-MM-dd")
-    private Date startTime;
+    private Date startDay;
 
     @ApiModelProperty(value = "结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JSONField(format = "yyyy-MM-dd")
-    private Date endTime;
+    private Date endDay;
 
     @ApiModelProperty(value = "合作方式")
     private String merCooperationMode;

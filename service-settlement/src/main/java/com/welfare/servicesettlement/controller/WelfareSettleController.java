@@ -79,7 +79,7 @@ public class WelfareSettleController implements IController {
         String path = null;
         try {
             path = fileUploadService.uploadExcelFile(
-                    welfareSettleDetailRespList, WelfareSettleDetailReq.class, "未结算账单明细");
+                    welfareSettleDetailRespList, WelfareSettleDetailResp.class, "未结算账单明细");
         } catch (IOException e) {
             throw new BusiException(null, "文件导出异常", null);
         }

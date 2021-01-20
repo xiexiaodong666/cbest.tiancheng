@@ -74,4 +74,6 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
      * @return
      */
     List<SettleStatisticsInfoDTO> getSettleStatisticsInfoByCondition(WelfareSettleDetailQuery welfareSettleDetailQuery);
+
+    List<Long> getSettleDetailIdList(WelfareSettleDetailQuery welfareSettleDetailQuery);
 }

@@ -3,6 +3,7 @@ package com.welfare.servicesettlement.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author qiang.deng
@@ -77,7 +79,13 @@ public class MerInfoController  implements IController {
         if(merchantUser == null){
             throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
         }
-        List<SettleMerTransDetailResp> settleAccountTransDetailRespPage = settleDetailService.getMerAccountTransDetail(merchantUser.getMerchantCode(), settleMerTransDetailReq);
+        List<SettleMerTransDetailResp> settleAccountTransDetailRespPage = settleDetailService
+                .getMerAccountTransDetail(merchantUser.getMerchantCode(), settleMerTransDetailReq)
+                .stream().map(settleMerTransDetailResp -> {
+                    settleMerTransDetailResp.setInOrOutType(settleMerTransDetailResp.getInOrOutType().equals("in") ? "入账":"出账");
+                    settleMerTransDetailResp.setTransType(WelfareConstant.MerCreditType.findByCode(settleMerTransDetailResp.getTransType()).desc());
+                    return settleMerTransDetailResp;
+                }).collect(Collectors.toList());
 
         String path = null;
         try {

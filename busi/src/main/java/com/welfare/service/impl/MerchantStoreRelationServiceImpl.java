@@ -275,8 +275,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       AdminMerchantStore adminMerchantStore = adminMerchantStoreOptional.get();
 
       // 同步员工消费方法
-     /* accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          m.getMerCode(), adminMerchantStore.getStoreCode(), adminMerchantStore.getConsumType());*/
+     accountConsumeSceneStoreRelationService.updateStoreConsumeType(
+          m.getMerCode(), adminMerchantStore.getStoreCode(), adminMerchantStore.getConsumType());
 
       m.setConsumType(adminMerchantStore.getConsumType());
       m.setStoreCode(adminMerchantStore.getStoreCode());

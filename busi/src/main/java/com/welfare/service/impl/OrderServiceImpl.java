@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -89,28 +90,28 @@ public class OrderServiceImpl implements OrderService {
     private static boolean RUN = false;
 
     @Override
-    public Page<OrderInfo> selectPage(Page page ,OrderReqDto orderReqDto) {
+    public Page<OrderInfo> selectPage(Page page, OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
+        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
         List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
         // 判断用户传入的门店集合是否在上述商户关联门店中
         List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
         List<Integer> storeCodeList = orderReqDto.getStoreIds();
-        if (storeCodeList == null){
+        if (storeCodeList == null) {
             //平台端调用
             merchantStoreRelationList.addAll(merchantStoreRelationList1);
-        }else {
+        } else {
             //商户端调用
-            merchantStoreRelationList1.forEach(item->{
+            merchantStoreRelationList1.forEach(item -> {
                 Integer storeCode = Integer.valueOf(item.getStoreCode());
-                if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)){
+                if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)) {
                     merchantStoreRelationList.add(item);
                 }
             });
         }
         //当没有检测到有配置门店，此时不能查询到订单数据
-        if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1){
+        if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1) {
             Page<OrderInfo> orderInfoPage = new Page<>();
             return orderInfoPage;
         }
@@ -127,45 +128,44 @@ public class OrderServiceImpl implements OrderService {
          * 2.2 只配置了其他方式支付方式返利类型  --收集到otherRebateStoreList
          * 2.3 配置了员工卡支付类型和其他方式支付类型 -- 收集到allRebateStoreList
          */
-        merchantStoreRelationList.forEach(item->{
-           Integer rebate = item.getIsRebate();
-           if (rebate != null && rebate.intValue() == 0){
-               //不返利
+        merchantStoreRelationList.forEach(item -> {
+            Integer rebate = item.getIsRebate();
+            if (rebate != null && rebate.intValue() == 0) {
+                //不返利
                 noRebateStoreList.add(item.getStoreCode());
-           }else {
-               String rebateType = item.getRebateType();
-               if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
-                       || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
-                   //配置了返利，此时检测是否配置类线下门店消费
-                   ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                   if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()){
-                       //配置了线下消费场景
-                       allRebateStoreList.add(item.getStoreCode());
-                   }
-               }else if ("OTHER_PAY".equals(rebateType)){
-                   ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                   if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
-                       //配置了线下消费场景
-                       otherRebateStoreList.add(item.getStoreCode());
-                   }
-               }else if("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
-                   ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                   if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
-                       //配置了线下消费场景
-                       cardRebateStoreList.add(item.getStoreCode());
-                   }
-               }
-               else {
-                   noRebateStoreList.add(item.getStoreCode());
-               }
-           }
+            } else {
+                String rebateType = item.getRebateType();
+                if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
+                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                    //配置了返利，此时检测是否配置类线下门店消费
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
+                        //配置了线下消费场景
+                        allRebateStoreList.add(item.getStoreCode());
+                    }
+                } else if ("OTHER_PAY".equals(rebateType)) {
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
+                        //配置了线下消费场景
+                        otherRebateStoreList.add(item.getStoreCode());
+                    }
+                } else if ("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
+                        //配置了线下消费场景
+                        cardRebateStoreList.add(item.getStoreCode());
+                    }
+                } else {
+                    noRebateStoreList.add(item.getStoreCode());
+                }
+            }
         });
         //构建查询条件
         OrderPageQuery orderPageQuery = new OrderPageQuery();
         orderPageQuery.setOrderId((orderReqDto.getOrderId()));
         orderPageQuery.setAccountName((orderReqDto.getConsumerName()));
-        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null: orderReqDto.getLowPrice().toPlainString());
-        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null: orderReqDto.getHightPrice().toPlainString());
+        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null : orderReqDto.getLowPrice().toPlainString());
+        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
         orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
         orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
         orderPageQuery.setAllRebateStoreList(allRebateStoreList);
@@ -173,33 +173,33 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setOtherRebateStoreList(otherRebateStoreList);
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
 
-        Page<OrderInfo> orderInfoPage =  orderMapper.searchOrder(page , orderPageQuery);
+        Page<OrderInfo> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
         return orderInfoPage;
     }
 
     @Override
-    public List<OrderInfo> selectList(OrderReqDto orderReqDto ) {
+    public List<OrderInfo> selectList(OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
+        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
         List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
         // 判断用户传入的门店集合是否在上述商户关联门店中
         List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
         List<Integer> storeCodeList = orderReqDto.getStoreIds();
-        if (storeCodeList == null){
+        if (storeCodeList == null) {
             //平台端调用
             merchantStoreRelationList.addAll(merchantStoreRelationList1);
-        }else {
+        } else {
             //商户端调用
-            merchantStoreRelationList1.forEach(item->{
+            merchantStoreRelationList1.forEach(item -> {
                 Integer storeCode = Integer.valueOf(item.getStoreCode());
-                if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)){
+                if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)) {
                     merchantStoreRelationList.add(item);
                 }
             });
         }
         //该商户没有配置消费场景，直接返回数据为空
-        if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1){
+        if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1) {
             return null;
         }//没有配置返利门店
         List<String> noRebateStoreList = new ArrayList<>();
@@ -214,35 +214,34 @@ public class OrderServiceImpl implements OrderService {
          * 2.2 只配置了其他方式支付方式返利类型  --收集到otherRebateStoreList
          * 2.3 配置了员工卡支付类型和其他方式支付类型 -- 收集到allRebateStoreList
          */
-        merchantStoreRelationList.forEach(item->{
+        merchantStoreRelationList.forEach(item -> {
             Integer rebate = item.getIsRebate();
-            if (rebate != null && rebate.intValue() == 0){
+            if (rebate != null && rebate.intValue() == 0) {
                 //不返利
                 noRebateStoreList.add(item.getStoreCode());
-            }else {
+            } else {
                 String rebateType = item.getRebateType();
                 if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
-                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
+                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
                     //配置了返利，此时检测是否配置类线下门店消费
-                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()){
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         allRebateStoreList.add(item.getStoreCode());
                     }
-                }else if ("OTHER_PAY".equals(rebateType)){
-                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
+                } else if ("OTHER_PAY".equals(rebateType)) {
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         otherRebateStoreList.add(item.getStoreCode());
                     }
-                }else if("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
-                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
+                } else if ("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         cardRebateStoreList.add(item.getStoreCode());
                     }
-                }
-                else {
+                } else {
                     noRebateStoreList.add(item.getStoreCode());
                 }
             }
@@ -251,8 +250,8 @@ public class OrderServiceImpl implements OrderService {
         OrderPageQuery orderPageQuery = new OrderPageQuery();
         orderPageQuery.setAccountName((orderReqDto.getOrderId()));
         orderPageQuery.setAccountName((orderReqDto.getConsumerName()));
-        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null: orderReqDto.getLowPrice().toPlainString());
-        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null: orderReqDto.getHightPrice().toPlainString());
+        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null : orderReqDto.getLowPrice().toPlainString());
+        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
         orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
         orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
         orderPageQuery.setAllRebateStoreList(allRebateStoreList);
@@ -262,7 +261,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setPageNo(orderReqDto.getCurrent());
         orderPageQuery.setPageSize(orderReqDto.getSize());
 
-        List<OrderInfo> orderInfoList =  orderMapper.searchOrder(orderPageQuery);
+        List<OrderInfo> orderInfoList = orderMapper.searchOrder(orderPageQuery);
         return orderInfoList;
     }
 
@@ -270,7 +269,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderSummary selectSummary(OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED , 0);
+        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
         List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
         //没有配置返利门店
         List<String> noRebateStoreList = new ArrayList<>();
@@ -285,35 +284,34 @@ public class OrderServiceImpl implements OrderService {
          * 2.2 只配置了其他方式支付方式返利类型  --收集到otherRebateStoreList
          * 2.3 配置了员工卡支付类型和其他方式支付类型 -- 收集到allRebateStoreList
          */
-        merchantStoreRelationList.forEach(item->{
+        merchantStoreRelationList.forEach(item -> {
             Integer rebate = item.getIsRebate();
-            if (rebate != null && rebate.intValue() == 0){
+            if (rebate != null && rebate.intValue() == 0) {
                 //不返利
                 noRebateStoreList.add(item.getStoreCode());
-            }else {
+            } else {
                 String rebateType = item.getRebateType();
                 if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
-                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
+                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
                     //配置了返利，此时检测是否配置类线下门店消费
-                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()){
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         allRebateStoreList.add(item.getStoreCode());
                     }
-                }else if ("OTHER_PAY".equals(rebateType)){
-                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
+                } else if ("OTHER_PAY".equals(rebateType)) {
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         otherRebateStoreList.add(item.getStoreCode());
                     }
-                }else if("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
-                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
+                } else if ("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         cardRebateStoreList.add(item.getStoreCode());
                     }
-                }
-                else {
+                } else {
                     noRebateStoreList.add(item.getStoreCode());
                 }
             }
@@ -322,8 +320,8 @@ public class OrderServiceImpl implements OrderService {
         OrderPageQuery orderPageQuery = new OrderPageQuery();
         orderPageQuery.setOrderId((orderReqDto.getOrderId()));
         orderPageQuery.setAccountName((orderReqDto.getConsumerName()));
-        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null: orderReqDto.getLowPrice().toPlainString());
-        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null: orderReqDto.getHightPrice().toPlainString());
+        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null : orderReqDto.getLowPrice().toPlainString());
+        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
         orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
         orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
         orderPageQuery.setAllRebateStoreList(allRebateStoreList);
@@ -332,7 +330,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
 
 
-        OrderSummary orderInfoList =  orderMapper.searchOrderSum(orderPageQuery);
+        OrderSummary orderInfoList = orderMapper.searchOrderSum(orderPageQuery);
         return orderInfoList;
     }
 
@@ -347,75 +345,75 @@ public class OrderServiceImpl implements OrderService {
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
         List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
         //组装<门店编码，门店名称> 、 <门店编码 , 商户信息>
-        Map<String , String> storeAndNameMap = new HashMap<>();
+        Map<String, String> storeAndNameMap = new HashMap<>();
         Map<String, String> storeAndMerchantMap = new HashMap<>();
-        supplierStores.forEach(item->{
-            storeAndNameMap.put(item.getStoreCode() , item.getStoreName());
+        supplierStores.forEach(item -> {
+            storeAndNameMap.put(item.getStoreCode(), item.getStoreName());
             String merchantCode = item.getMerCode();
-            merchantList.forEach(merchant->{
-                if (merchant.getMerCode().equals(merchantCode)){
-                    storeAndMerchantMap.put(item.getStoreCode() , merchantCode + "-" +merchant.getMerName());
+            merchantList.forEach(merchant -> {
+                if (merchant.getMerCode().equals(merchantCode)) {
+                    storeAndMerchantMap.put(item.getStoreCode(), merchantCode + "-" + merchant.getMerName());
                 }
             });
         });
         //配置返利门店并且是配置了其他支付方式或者全部
         List<String> rebateStoreList = new ArrayList<>();
         List<String> noRebateStoreList = new ArrayList<>();
-        merchantStoreRelationList.forEach(item->{
+        merchantStoreRelationList.forEach(item -> {
             Integer rebate = item.getIsRebate();
-            if (rebate != null && rebate.intValue() == 0){
+            if (rebate != null && rebate.intValue() == 0) {
                 //不返利
                 noRebateStoreList.add(item.getStoreCode());
-            }else {
+            } else {
                 String rebateType = item.getRebateType();
                 if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
-                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)){
+                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
                     //配置了返利，此时检测是否配置类线下门店消费
-                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
-                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()){
-                        //配置了线下消费场景
-                        rebateStoreList.add(item.getStoreCode());
-                    }
-                }else if ("OTHER_PAY".equals(rebateType)){
-                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(),ConsumeTypeJson.class);
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
                         rebateStoreList.add(item.getStoreCode());
                     }
-                }else {
+                } else if ("OTHER_PAY".equals(rebateType)) {
+                    ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
+                    if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
+                        //配置了线下消费场景
+                        rebateStoreList.add(item.getStoreCode());
+                    }
+                } else {
                     noRebateStoreList.add(item.getStoreCode());
                 }
             }
         });
 
-       //支付列表
+        //支付列表
         DictReq req = new DictReq();
         req.setDictType("Pay.code");
         List<Dict> payList = dictDao.list(QueryHelper.getWrapper(req));
-        Map<String ,String> payMap = new HashMap<>();
-        payList.forEach(item->{
-            payMap.put(item.getDictCode() , item.getDictName());
+        Map<String, String> payMap = new HashMap<>();
+        payList.forEach(item -> {
+            payMap.put(item.getDictCode(), item.getDictName());
         });
         //将kafka数据写入DB
-        getKafkaOrderToDB(storeAndNameMap , storeAndMerchantMap , payMap ,
-                rebateStoreList , noRebateStoreList);
+        getKafkaOrderToDB(storeAndNameMap, storeAndMerchantMap, payMap,
+                rebateStoreList, noRebateStoreList);
     }
 
     @Override
     public int saveOrUpdateBacth(List<SynOrderDto> orderDtoList) {
         List<OrderInfo> orderInfoList = new ArrayList<>();
-        orderDtoList.forEach(item->{
+        orderDtoList.forEach(item -> {
             //根据查询账户详情
             QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq(Account.ACCOUNT_CODE , item.getAccountCode());
+            queryWrapper.eq(Account.ACCOUNT_CODE, item.getAccountCode());
             Account account = accountMapper.selectOne(queryWrapper);
             //根据门店查询门店名称
             QueryWrapper<SupplierStore> supplierStoreQueryWrapper = new QueryWrapper<>();
-            supplierStoreQueryWrapper.eq(SupplierStore.STORE_CODE , item.getStoreCode());
+            supplierStoreQueryWrapper.eq(SupplierStore.STORE_CODE, item.getStoreCode());
             SupplierStore supplierStore = supplierStoreDao.getOne(supplierStoreQueryWrapper);
             //查询商户数据
             QueryWrapper<Merchant> merchantQueryWrapper = new QueryWrapper<>();
-            merchantQueryWrapper.eq(Merchant.MER_CODE , supplierStore != null ? supplierStore.getMerCode():null);
+            merchantQueryWrapper.eq(Merchant.MER_CODE, supplierStore != null ? supplierStore.getMerCode() : null);
             Merchant merchant = merchantDao.getOne(merchantQueryWrapper);
 
             //构建OrdenInfo对象
@@ -429,11 +427,11 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setCreateTime(new Date());
             orderInfo.setOrderTime(item.getTransTime());
             orderInfo.setAccountCode(item.getAccountCode());
-            orderInfo.setAccountName(account != null ? account.getAccountName():null);
+            orderInfo.setAccountName(account != null ? account.getAccountName() : null);
             orderInfo.setStoreCode(item.getStoreCode());
             orderInfo.setStoreName(supplierStore != null ? supplierStore.getStoreName() : null);
-            orderInfo.setMerchantCode(merchant != null ? merchant.getMerCode():null);
-            orderInfo.setMerchantName(merchant != null ? merchant.getMerName():null);
+            orderInfo.setMerchantCode(merchant != null ? merchant.getMerCode() : null);
+            orderInfo.setMerchantName(merchant != null ? merchant.getMerName() : null);
             orderInfo.setOrderAmount(item.getTransAmount());
             orderInfoList.add(orderInfo);
         });
@@ -444,14 +442,15 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 将kafka数据写入DB
+     *
      * @Return
-     * @Exception 
+     * @Exception
      */
-    private void getKafkaOrderToDB(Map<String , String > storeAndNameMap ,
-                                            Map<String , String> storeAndMerchantMap,
-                                            Map<String , String> payMap ,
-                                            List<String> rebateStoreList,
-                                            List<String> noRebateStoreList) {
+    private void getKafkaOrderToDB(Map<String, String> storeAndNameMap,
+                                   Map<String, String> storeAndMerchantMap,
+                                   Map<String, String> payMap,
+                                   List<String> rebateStoreList,
+                                   List<String> noRebateStoreList) {
         //根据上面的配置，新增消费者对象
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(getPreperties());
         // 订阅topic-user topic
@@ -459,19 +458,19 @@ public class OrderServiceImpl implements OrderService {
         Long startTime = System.currentTimeMillis();
         List<OrderInfo> orderInfoList = new ArrayList<>();
         List<SettleDetail> settleDetailList = new ArrayList<>();
-        try{
+        try {
             while (true) {
                 //  从服务器开始拉取数据
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
-                log.info("拉到kafka数据{}条" , records.count());
-                for (ConsumerRecord<String, String> record : records){
+                log.info("拉到kafka数据{}条", records.count());
+                for (ConsumerRecord<String, String> record : records) {
                     String value = record.value();
                     if (StringUtils.isBlank(value))
                         continue;
-                    MessageData messageData = JSONObject.toJavaObject(JSON.parseObject(value) , MessageData.class);
-                    Date orderTime = strToDate(messageData.getHeader().getBEGINTIMESTAMP()+"");
+                    MessageData messageData = JSONObject.toJavaObject(JSON.parseObject(value), MessageData.class);
+                    Date orderTime = strToDate(messageData.getHeader().getBEGINTIMESTAMP() + "");
                     //线上数据不处理
-                    if (isOnline(messageData.getHeader().getOPERATORID())){
+                    if (isOnline(messageData.getHeader().getOPERATORID())) {
                         continue;
                     }
                     //获取订单消费明细
@@ -481,24 +480,24 @@ public class OrderServiceImpl implements OrderService {
                     //1 先配置所有方式返利门店
                     //2 在配置其他方式返利门店
                     //最后配置没有返利门店
-                    if (rebateStoreList.contains(storeCode)){
+                    if (rebateStoreList.contains(storeCode)) {
                         //该门店配置了返利门店，并且返利类型是其他支付方式和全部方式返利，此时处理所有订单(员工卡、非员工卡)
                         //处理成订单  &  支付数据
-                        OrderInfo orderInfo = getOrderInfo(messageData , storeAndNameMap , storeAndMerchantMap , false);
-                        if (orderInfo != null){
+                        OrderInfo orderInfo = getOrderInfo(messageData, storeAndNameMap, storeAndMerchantMap, false);
+                        if (orderInfo != null) {
 //                            List<OrderInfo> list1 = new ArrayList<>();
                             orderInfoList.add(orderInfo);
 //                            int i = orderMapper.saveOrUpdate(list1);
                             //明细结算
-                            List<SettleDetail> settleDetails = getSettleDetail(messageData , storeAndNameMap ,
-                                    storeAndMerchantMap , payMap);
+                            List<SettleDetail> settleDetails = getSettleDetail(messageData, storeAndNameMap,
+                                    storeAndMerchantMap, payMap);
                             if (settleDetails != null && settleDetails.size() > 0)
                                 settleDetailList.addAll(settleDetails);
 //                            boolean b = settleDetailDao.saveBatch(settleDetailList);
                         }
-                    }else if (noRebateStoreList.contains(storeCode)){
+                    } else if (noRebateStoreList.contains(storeCode)) {
                         //该门店没有配置返利，只处理员工卡消费小票
-                        OrderInfo orderInfo = getOrderInfo(messageData , storeAndNameMap , storeAndMerchantMap , true);
+                        OrderInfo orderInfo = getOrderInfo(messageData, storeAndNameMap, storeAndMerchantMap, true);
                         if (orderInfo != null)
                             orderInfoList.add(orderInfo);
 //                        {
@@ -506,7 +505,7 @@ public class OrderServiceImpl implements OrderService {
 //                            list1.add(orderInfo);
 //                            int i = orderMapper.saveOrUpdate(list1);
 //                        }
-                    }else {
+                    } else {
                         //该门店没有和任何商户配置消费场景
                     }
                 }
@@ -518,48 +517,49 @@ public class OrderServiceImpl implements OrderService {
                  */
                 if (orderInfoList.size() > 1000
                         || settleDetailList.size() > 2000
-                        || (System.currentTimeMillis() - startTime) > 5 * 60 * 1000 ){
+                        || (System.currentTimeMillis() - startTime) > 5 * 60 * 1000) {
                     //保存订单数据
-                    if(orderInfoList.size() > 0){
+                    if (orderInfoList.size() > 0) {
                         int count = orderMapper.saveOrUpdate(orderInfoList);
-                        log.info("kafka订单数据保存到数据库{}条" , count);
-                    }else {
+                        log.info("kafka订单数据保存到数据库{}条", count);
+                    } else {
                         log.info("kafka订单中没有满足条件的数据");
                     }
                     //保存结算明细数据
-                    if (settleDetailList.size() > 0){
+                    if (settleDetailList.size() > 0) {
                         boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
-                        log.info("kafka明细结算数据保存到数据库{}条{}" , settleDetailList.size() , flag == true? "成功" : "失败");
-                    }else {
+                        log.info("kafka明细结算数据保存到数据库{}条{}", settleDetailList.size(), flag == true ? "成功" : "失败");
+                    } else {
                         log.info("kafka明细结算数据中没有满足条件的数据");
                     }
                     consumer.commitAsync();
                     break;
                 }
             }
-        }catch (Exception ex){
-            log.error("解析小票异常:" ,ex);
+        } catch (Exception ex) {
+            log.error("解析小票异常:", ex);
             throw ex;
-        }finally {
+        } finally {
             consumer.close();
         }
     }
+
     /**
      * @param messageData
      * @param storeAndNameMap
      * @param storeAndMerchantMap
      * @param payMap
      * @Return
-     * @Exception 
+     * @Exception
      */
     private List<SettleDetail> getSettleDetail(MessageData messageData, Map<String, String> storeAndNameMap,
-                                         Map<String, String> storeAndMerchantMap , Map<String , String> payMap) {
+                                               Map<String, String> storeAndMerchantMap, Map<String, String> payMap) {
         List<ITEM8> item8List = messageData.getItem8List();
 
         List<SettleDetail> resultList = new ArrayList<>();
         item8List.forEach(item8 -> {
             //排除员工卡支付交易
-            if (!cardPayCode.equals(item8.getTENDERTYPECODE())){
+            if (!cardPayCode.equals(item8.getTENDERTYPECODE())) {
                 SettleDetail settleDetail = new SettleDetail();
                 //这个订单金额
                 BigDecimal amount = getOrderAmount(messageData.getItem8List());
@@ -575,7 +575,7 @@ public class OrderServiceImpl implements OrderService {
                 settleDetail.setStoreName(storeAndNameMap.get(storeCode));
                 settleDetail.setMerCode(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[0]);
                 settleDetail.setMerName(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[1]);
-                settleDetail.setTransTime(strToDate(messageData.getHeader().getBEGINTIMESTAMP()+""));
+                settleDetail.setTransTime(strToDate(messageData.getHeader().getBEGINTIMESTAMP() + ""));
                 //订单中是否包含员工卡支付
                 settleDetail.setPayCode(item8.getTENDERTYPECODE());
                 settleDetail.setPayName(payMap.get(item8.getTENDERTYPECODE()));
@@ -593,16 +593,16 @@ public class OrderServiceImpl implements OrderService {
      * @param messageData
      * @param storeAndNameMap
      * @param storeAndMerchantMap
-     * @param isCardPay 是否只处理员工卡支付订单 true-只处理员工卡  false-其他
+     * @param isCardPay           是否只处理员工卡支付订单 true-只处理员工卡  false-其他
      * @Return
      * @Exception
      */
-    private OrderInfo getOrderInfo(MessageData messageData , Map<String , String > storeAndNameMap ,
-                                   Map<String , String> storeAndMerchantMap , boolean isCardPay) {
+    private OrderInfo getOrderInfo(MessageData messageData, Map<String, String> storeAndNameMap,
+                                   Map<String, String> storeAndMerchantMap, boolean isCardPay) {
         OrderInfo orderInfo = null;
-        if (isCardPay){
+        if (isCardPay) {
             //只处理员工卡数据
-            if (isCardPay(messageData.getItem8List())){
+            if (isCardPay(messageData.getItem8List())) {
                 orderInfo = new OrderInfo();
                 //包含员工卡支付，处理该订单
                 //这个订单金额
@@ -622,17 +622,19 @@ public class OrderServiceImpl implements OrderService {
                 orderInfo.setStoreName(storeAndNameMap.get(storeCode));
                 orderInfo.setMerchantCode(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[0]);
                 orderInfo.setMerchantName(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[1]);
-                 orderInfo.setOrderTime(strToDate(messageData.getHeader().getBEGINTIMESTAMP()+""));
+                orderInfo.setOrderTime(strToDate(messageData.getHeader().getBEGINTIMESTAMP() + ""));
                 //订单中是否包含员工卡支付
                 ItemKV payTypeItem = getPayType(messageData.getItem8List());
-                orderInfo.setPayCode(payTypeItem.getCode());
-                orderInfo.setPayName(payTypeItem.getName());
+                if (Objects.nonNull(payTypeItem)) {
+                    orderInfo.setPayCode(payTypeItem.getCode());
+                    orderInfo.setPayName(payTypeItem.getName());
+                }
                 ItemKV consumTypeItem = getConsumType(messageData.getHeader().getTRANSTYPECODE());
                 orderInfo.setTransType(consumTypeItem.getCode());
                 orderInfo.setTransTypeName(consumTypeItem.getName());
             }
-        }else {
-            orderInfo =new OrderInfo();
+        } else {
+            orderInfo = new OrderInfo();
             //false - 处理所有数据（员工卡和非员工卡订单）
             //这个订单金额
             BigDecimal amount = getOrderAmount(messageData.getItem8List());
@@ -652,7 +654,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setStoreName(storeAndNameMap.get(storeCode));
             orderInfo.setMerchantCode(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[0]);
             orderInfo.setMerchantName(storeAndMerchantMap.get(storeCode) == null ? null : storeAndMerchantMap.get(storeCode).split("-")[1]);
-            orderInfo.setOrderTime(strToDate(messageData.getHeader().getBEGINTIMESTAMP()+""));
+            orderInfo.setOrderTime(strToDate(messageData.getHeader().getBEGINTIMESTAMP() + ""));
 //            orderInfo.setCreateTime(new Date());
             //订单中是否包含员工卡支付
             ItemKV payTypeItem = getPayType(messageData.getItem8List());
@@ -664,35 +666,39 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderInfo;
     }
+
     /**
      * 获取支付方式(员工卡和非员工卡支付)
+     *
      * @Return
-     * @Exception 
+     * @Exception
      */
     private ItemKV getPayType(List<ITEM8> item8List) {
         ItemKV itemKV = null;
         Set<String> payCodeSet = new HashSet<>();
-        if (item8List != null && item8List.size()>0){
+        if (!CollectionUtils.isEmpty(item8List)) {
             item8List.forEach(item8 -> {
                 payCodeSet.add(item8.getTENDERTYPECODE());
             });
-            if (payCodeSet.contains(cardPayCode)){
-                itemKV = new ItemKV(cardPayCode , "员工卡");
+            if (payCodeSet.contains(cardPayCode)) {
+                itemKV = new ItemKV(cardPayCode, "员工卡");
 
-            }else {
-                itemKV = new ItemKV("thrid" , "其他支付方式");
+            } else {
+                itemKV = new ItemKV("thrid", "其他支付方式");
             }
         }
         return itemKV;
     }
+
     /**
      * 判断是否包含卡支付
+     *
      * @Return true-包含卡支付 false-不包含卡支付
-     * @Exception 
+     * @Exception
      */
     private boolean isCardPay(List<ITEM8> item8List) {
         Set<String> payCodeSet = new HashSet<>();
-        if (item8List != null && item8List.size()>0){
+        if (!CollectionUtils.isEmpty(item8List)) {
             item8List.forEach(item8 -> {
                 payCodeSet.add(item8.getTENDERTYPECODE());
             });
@@ -702,12 +708,13 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 获取到订单商品ID
+     *
      * @Return
-     * @Exception 
+     * @Exception
      */
     private List<String> getOrderProduct(List<ITEM2> item2List) {
         List<String> resultList = new ArrayList<>();
-        if (item2List != null && item2List.size() > 0) {
+        if (!CollectionUtils.isEmpty(item2List)) {
             item2List.forEach(item2 -> {
                 resultList.add(item2.getITEMID());
             });
@@ -717,13 +724,15 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 计算订单金额
+     *
      * @Return
-     * @Exception 
+     * @Exception
      */
     private BigDecimal getOrderAmount(List<ITEM8> item8List) {
-        if (item8List != null && item8List.size() > 0){
-            double amount = item8List.stream().mapToDouble(item8 -> item8.getTENDERAMOUNT().doubleValue()).sum();
-            return new BigDecimal(amount);
+        if (!CollectionUtils.isEmpty(item8List)) {
+            return item8List.stream()
+                    .map(ITEM8::getTENDERAMOUNT)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
         return null;
     }
@@ -731,34 +740,37 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 判断线上线下订单
      * 订单11开头为线下订单
+     *
      * @Return true-线上 false-线下
-     * @Exception 
+     * @Exception
      */
-    private boolean isOnline(String chanel){
-        if (StringUtils.isNotBlank(chanel) && chanel.startsWith("11-")){
+    private boolean isOnline(String chanel) {
+        if (StringUtils.isNotBlank(chanel) && chanel.startsWith("11-")) {
             return false;
         }
         return true;
     }
+
     /**
      * 获取消费方式
      * 富基订单 1-消费 N-团购消费  4-退款 Q-团购退款
+     *
      * @Return
-     * @Exception 
+     * @Exception
      */
-    private ItemKV getConsumType(String value){
+    private ItemKV getConsumType(String value) {
         ItemKV itemKV = null;
-        if ("1".equals(value) || "N".equals(value)){
-            itemKV = new ItemKV(WelfareConstant.TransType.CONSUME.code() , WelfareConstant.TransType.CONSUME.desc());
-        }else if("4".equals(value) || "Q".equals(value)){
-            itemKV = new ItemKV(WelfareConstant.TransType.REFUND.code() , WelfareConstant.TransType.REFUND.desc());
-        }else {
-            itemKV = new ItemKV(value , "未知");
+        if ("1".equals(value) || "N".equals(value)) {
+            itemKV = new ItemKV(WelfareConstant.TransType.CONSUME.code(), WelfareConstant.TransType.CONSUME.desc());
+        } else if ("4".equals(value) || "Q".equals(value)) {
+            itemKV = new ItemKV(WelfareConstant.TransType.REFUND.code(), WelfareConstant.TransType.REFUND.desc());
+        } else {
+            itemKV = new ItemKV(value, "未知");
         }
         return itemKV;
     }
 
-    private Properties getPreperties(){
+    private Properties getPreperties() {
         Properties props = new Properties();
 
         // 必须设置的属性
@@ -787,15 +799,15 @@ public class OrderServiceImpl implements OrderService {
         return props;
     }
 
-    private Date strToDate(String datetime){
-        Date date = DateTime.of(datetime , "yyyyMMddHHmmss");
+    private Date strToDate(String datetime) {
+        Date date = DateTime.of(datetime, "yyyyMMddHHmmss");
         return date;
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    class ItemKV{
+    class ItemKV {
         private String code;
         private String name;
     }

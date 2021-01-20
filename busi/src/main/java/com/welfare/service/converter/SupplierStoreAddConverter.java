@@ -2,7 +2,6 @@ package com.welfare.service.converter;
 
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.SupplierStoreAddDTO;
-import com.welfare.service.dto.SupplierStoreDetailDTO;
 import org.mapstruct.Mapper;
 
 /**

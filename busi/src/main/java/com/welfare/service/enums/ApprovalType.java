@@ -17,10 +17,10 @@ public enum ApprovalType {
    */
   BATCH("BATCH","批量");
 
-  private String code;
-  private String value;
+  private final String code;
+  private final String value;
 
-  private ApprovalType(String code, String value){
+  ApprovalType(String code, String value){
     this.code=code;
     this.value=value;
   }
@@ -39,9 +39,4 @@ public enum ApprovalType {
   public String getValue() {
     return value;
   }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
-
 }

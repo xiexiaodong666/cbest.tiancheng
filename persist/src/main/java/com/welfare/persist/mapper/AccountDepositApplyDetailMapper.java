@@ -1,10 +1,10 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

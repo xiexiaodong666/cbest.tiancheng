@@ -1,7 +1,5 @@
 package com.welfare.servicemerchant.controller;
 
-import static net.dreamlu.mica.core.result.R.success;
-
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.service.remote.PlatformUserFeignClient;
@@ -12,19 +10,17 @@ import com.welfare.service.remote.entity.ShoppingPlatformUser;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.dreamlu.mica.core.result.R.success;
 
 /**
  * @author gaorui
@@ -49,7 +45,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/list", method = RequestMethod.GET)
   @ApiOperation("获取商户用户列表")
   @ApiUser
-  PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
+  public PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
       @RequestParam int current,
       @RequestParam int size,
       @RequestParam(required = false) String merchant_code,
@@ -85,7 +81,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("新增商户用户")
   @ApiUser
-  PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
+  public PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.addPlatformUser(transferShoppingPlatformUser(platformUser, 1));
   }
@@ -96,7 +92,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("修改商户用户")
   @ApiUser
-  PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
+  public PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUser(transferShoppingPlatformUser(platformUser,2));
   }
@@ -108,7 +104,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/detail", method = RequestMethod.GET)
   @ApiOperation("详情")
   @ApiUser
-  PlatformUserResponse<PlatformUser> getPlatformUserDetail(
+  public PlatformUserResponse<PlatformUser> getPlatformUserDetail(
       @RequestParam("id") Long id) {
     PlatformUserResponse<ShoppingPlatformUser> response = platformUserFeignClient
         .getPlatformUserDetail(id);
@@ -126,7 +122,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/update-status", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("锁定/解锁")
   @ApiUser
-  PlatformUserResponse<Boolean> updatePlatformUserStatus(
+  public PlatformUserResponse<Boolean> updatePlatformUserStatus(
       @RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUserStatus(
@@ -140,7 +136,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/export", method = RequestMethod.GET)
   @ApiOperation("导出商户用户列表")
   @ApiUser
-  R<String> export(
+  public R<String> export(
       @RequestParam(required = false) String username,
       @RequestParam(required = false) Integer status,
       @RequestParam(required = false) String merchant_code,

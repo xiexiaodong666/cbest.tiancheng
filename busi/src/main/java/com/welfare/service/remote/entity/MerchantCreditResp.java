@@ -1,6 +1,5 @@
 package com.welfare.service.remote.entity;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.poi.ss.formula.functions.T;
 

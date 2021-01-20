@@ -1,7 +1,5 @@
 package com.welfare.common.constants;
 
-import lombok.EqualsAndHashCode;
-
 /**
  * Description:
  *

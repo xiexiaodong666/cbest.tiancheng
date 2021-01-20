@@ -1,8 +1,9 @@
 package com.welfare.persist.dto;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * @author yaoxiao

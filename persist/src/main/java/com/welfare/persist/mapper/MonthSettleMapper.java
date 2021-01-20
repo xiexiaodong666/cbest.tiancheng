@@ -1,11 +1,10 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.welfare.persist.dto.MonthSettleDTO;
-import com.welfare.persist.dto.MonthSettleDetailDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

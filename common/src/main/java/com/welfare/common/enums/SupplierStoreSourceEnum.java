@@ -6,16 +6,11 @@ package com.welfare.common.enums;
  * @date 2021/1/12 8:40 PM
  */
 public enum SupplierStoreSourceEnum {
+  /**
+   *
+   */
   MERCHANT_STORE_RELATION("merchantStoreRelation", "供应商");
 
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public void setDesc(String desc) {
-    this.desc = desc;
-  }
 
   public String getCode() {
     return code;
@@ -25,9 +20,9 @@ public enum SupplierStoreSourceEnum {
     return desc;
   }
 
-  private String code;
+  private final String code;
 
-  private String desc;
+  private final String desc;
 
   SupplierStoreSourceEnum(String code, String desc) {
     this.code = code;

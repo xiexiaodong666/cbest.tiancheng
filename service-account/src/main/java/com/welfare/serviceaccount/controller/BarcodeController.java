@@ -1,11 +1,8 @@
 package com.welfare.serviceaccount.controller;
 
 import com.welfare.common.util.BarcodeUtil;
-import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.SupplierStoreDao;
-import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.BarcodeSalt;
-import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.BarcodeService;
 import com.welfare.service.dto.BarcodeSaltDO;
 import com.welfare.service.dto.payment.PaymentBarcode;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

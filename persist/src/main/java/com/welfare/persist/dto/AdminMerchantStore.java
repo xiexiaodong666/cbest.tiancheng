@@ -1,8 +1,9 @@
 package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import java.math.BigDecimal;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * @author gaorui

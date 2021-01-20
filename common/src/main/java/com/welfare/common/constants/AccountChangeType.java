@@ -1,7 +1,5 @@
 package com.welfare.common.constants;
 
-import lombok.Data;
-
 /**
  * @author yaoxiao
  * @version 0.0.1

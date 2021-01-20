@@ -2,9 +2,10 @@ package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
-import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 员工消费场景关联门店(account_consume_scene_store_relation)数据Mapper

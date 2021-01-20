@@ -3,7 +3,6 @@ package com.welfare.common.util;
 import jodd.util.MathUtil;
 import jodd.util.StringUtil;
 import lombok.SneakyThrows;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

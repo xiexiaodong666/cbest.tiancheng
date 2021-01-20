@@ -3,27 +3,21 @@ package com.welfare.service.listener;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.persist.dao.AccountDao;
-import com.welfare.persist.dao.CardApplyDao;
-import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.AccountService;
 import com.welfare.service.CardInfoService;
 import com.welfare.service.dto.AccountBindCardDTO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.support.BindStatus;
 
 /**
  * @author yaoxiao

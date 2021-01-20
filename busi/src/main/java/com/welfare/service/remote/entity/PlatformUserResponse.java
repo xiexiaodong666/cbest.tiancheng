@@ -1,6 +1,5 @@
 package com.welfare.service.remote.entity;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 

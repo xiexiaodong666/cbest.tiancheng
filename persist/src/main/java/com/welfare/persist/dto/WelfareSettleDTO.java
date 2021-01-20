@@ -3,8 +3,6 @@ package com.welfare.persist.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @author qiang.deng
  * @version 1.0.0

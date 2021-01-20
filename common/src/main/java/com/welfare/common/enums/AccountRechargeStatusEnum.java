@@ -5,13 +5,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum AccountRechargeStatusEnum {
+    /**
+     *
+     */
     PENDING_RECHARGE(200, "待充值"),
     RECHARGE_PROCESSING(201, "充值处理中"),
     RECHARGE_FAILURE(202, "充值失败"),
     RECHARGE_SUCCESS(203, "充值成功");
 
-    private int code;
-    private String name;
+    private final int code;
+    private final String name;
 
     AccountRechargeStatusEnum(int code, String name) {
         this.code = code;

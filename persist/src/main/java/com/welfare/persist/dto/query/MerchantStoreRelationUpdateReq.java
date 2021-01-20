@@ -2,8 +2,9 @@ package com.welfare.persist.dto.query;
 
 import com.welfare.persist.dto.AdminMerchantStore;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author gaorui

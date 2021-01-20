@@ -19,4 +19,8 @@ public interface MerchantAddressService {
     List<MerchantAddressDTO> list(MerchantAddressReq merchantAddressReq);
     boolean saveOrUpdateBatch(List<MerchantAddressDTO> list,String relatedType,Long relatedId);
     boolean delete(String relatedType,Long relatedId);
+
+
+    boolean batchDeleteAndSave(List<MerchantAddressDTO> list,String relatedType);
+    boolean batchDelete(String relatedType,List<Long>relatedIdList);
 }

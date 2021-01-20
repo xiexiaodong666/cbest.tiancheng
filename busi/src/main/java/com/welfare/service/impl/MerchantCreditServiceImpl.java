@@ -147,6 +147,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void restoreRemainingLimit(RestoreRemainingLimitReq req) {
         if (merchantService.queryByCode(req.getMerCode())== null) {
             throw new BusiException("商户不存在");

@@ -39,9 +39,7 @@ public class IndexController {
         }
 
 
-        int i = 1 / 0;
-
-        return "success";
+        throw new RuntimeException("error");
     }
 
 }

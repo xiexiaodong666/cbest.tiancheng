@@ -584,8 +584,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
 
       List<RoleConsumptionListReq> roleConsumptionListReqList = new ArrayList<>();
-      RoleConsumptionListReq roleConsumptionListReq = new RoleConsumptionListReq();
 
+      RoleConsumptionListReq roleConsumptionListReq = new RoleConsumptionListReq();
+      roleConsumptionListReqList.add(roleConsumptionListReq);
       roleConsumptionReq.setList(roleConsumptionListReqList);
 
       List<RoleConsumptionBindingsReq> roleConsumptionBindingsReqList = new ArrayList<>();

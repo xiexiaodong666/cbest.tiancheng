@@ -3,6 +3,7 @@ package com.welfare.service.sync.event;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.MerchantSyncDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,8 @@ public class MerchantEvt implements BusEvent {
 
   @Override
   public Long getSearchKey2() {
-    if(merchantDetailDTOList.size()==1){
+    if(EmptyChecker.notEmpty(merchantDetailDTOList)
+            &&merchantDetailDTOList.size()==1){
       return merchantDetailDTOList.get(0).getId();
     }
     return null;

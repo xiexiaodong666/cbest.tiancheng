@@ -60,7 +60,7 @@ public class MerchantHandler  {
         MerchantShoppingReq req = new MerchantShoppingReq();
         req.setActionType(typeEnum.getCode());
         req.setTimestamp(new Date());
-        req.setRequestId(GenerateCodeUtil.UUID());
+        req.setRequestId(evt.getUserToken().toString());
         List<MerchantShoppingReq.ListBean> list = new ArrayList<>();
         List<String> merCodeList = new ArrayList<>();
         for (MerchantSyncDTO merchant : merchantDetailDTOList) {

@@ -2,6 +2,7 @@ package com.welfare.service.sync.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.SupplierStoreSyncDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +31,8 @@ public class SupplierStoreEvt implements BusEvent {
 
     @Override
     public Long getSearchKey2() {
-        if(supplierStoreDetailDTOS.size()==1){
+        if(EmptyChecker.notEmpty(supplierStoreDetailDTOS)
+                &&supplierStoreDetailDTOS.size()==1){
             return supplierStoreDetailDTOS.get(0).getId();
         }
         return null;

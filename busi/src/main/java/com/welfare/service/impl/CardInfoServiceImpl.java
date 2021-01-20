@@ -74,7 +74,7 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, Long cardId, String applyCode, String cardName,
+  public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardId, String applyCode, String cardName,
       String merCode,
       String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
       Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
@@ -90,7 +90,7 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public List<CardInfoDTO> exportCardInfo(Long cardId, String cardName, String merCode, String cardType,
+  public List<CardInfoDTO> exportCardInfo(String cardId, String cardName, String merCode, String cardType,
       String cardMedium, Integer cardStatus, Date writtenStartTime, Date writtenEndTime,
       Date startTime, Date endTime, Date bindStartTime, Date bindEndTime) {
     return cardInfoMapper.exportCardInfo(cardId,cardName,

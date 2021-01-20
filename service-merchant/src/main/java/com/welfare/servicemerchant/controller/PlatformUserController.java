@@ -41,6 +41,7 @@ public class PlatformUserController {
   private final PlatformUserFeignClient platformUserFeignClient;
   private final static Integer size = 1000;
   private final FileUploadService fileUploadService;
+  private final static long sleepTime = 3000;
 
   /**
    * 获取商户用户列表
@@ -151,7 +152,7 @@ public class PlatformUserController {
     Integer current = 1;
     while (true) {
       try {
-        Thread.sleep(3 * 1000);
+        Thread.sleep(sleepTime);
         PlatformUserResponse<PlatformUserDataResponse<ShoppingPlatformUser>> response = platformUserFeignClient
             .getPlatformUserList(
                 size, current, merchant_code, username, status, start_create_time, end_create_time);

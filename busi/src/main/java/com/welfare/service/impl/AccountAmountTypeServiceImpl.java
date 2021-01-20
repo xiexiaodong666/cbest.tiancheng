@@ -3,15 +3,15 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountDao;
-import com.welfare.persist.entity.*;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.AccountChangeEventRecord;
+import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.*;
 import com.welfare.service.dto.Deposit;
-import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
-import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
-import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
 
 /**
  * @author duanhy

@@ -1,8 +1,9 @@
 package com.welfare.service.dto;
 
-import java.io.Serializable;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * @author yaoxiao

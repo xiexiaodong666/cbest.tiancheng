@@ -10,52 +10,28 @@ import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
-import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.dto.query.MerchantPageReq;
-import com.welfare.persist.entity.MerchantAccountType;
-import com.welfare.persist.entity.MerchantAddress;
-import com.welfare.persist.entity.MerchantCredit;
-import com.welfare.persist.entity.MerchantStoreRelation;
+import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.MerchantExMapper;
-import com.welfare.service.DictService;
-import com.welfare.service.MerchantAddressService;
-import com.welfare.service.MerchantCreditService;
-import com.welfare.service.SequenceService;
+import com.welfare.service.*;
 import com.welfare.service.converter.MerchantAddConverter;
 import com.welfare.service.converter.MerchantDetailConverter;
 import com.welfare.service.converter.MerchantSyncConverter;
 import com.welfare.service.converter.MerchantWithCreditConverter;
-import com.welfare.service.dto.MerchantAddDTO;
-import com.welfare.service.dto.MerchantAddressDTO;
-import com.welfare.service.dto.MerchantAddressReq;
-import com.welfare.service.dto.MerchantDetailDTO;
-import com.welfare.service.dto.MerchantReq;
-import com.welfare.service.dto.MerchantSyncDTO;
-import com.welfare.service.dto.MerchantUpdateDTO;
-import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
+import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.sync.event.MerchantEvt;
 import com.welfare.service.utils.TreeUtil;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import io.swagger.annotations.ApiModelProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.welfare.service.MerchantService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 商户信息服务接口实现

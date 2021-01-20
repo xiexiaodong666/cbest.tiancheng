@@ -1,8 +1,9 @@
 package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import java.math.BigDecimal;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 public class AccountDepositReq {

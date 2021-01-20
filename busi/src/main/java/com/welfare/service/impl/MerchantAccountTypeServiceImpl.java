@@ -9,18 +9,13 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
-import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.MerchantAccountTypeDetailConverter;
-import com.welfare.service.dto.MerchantAccountTypeAddDTO;
-import com.welfare.service.dto.MerchantAccountTypeDetailDTO;
-import com.welfare.service.dto.MerchantAccountTypeReq;
-import com.welfare.service.dto.MerchantAccountTypeSortReq;
-import com.welfare.service.dto.MerchantAccountTypeUpdateDTO;
+import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**

@@ -2,7 +2,6 @@ package com.welfare.service.dto;
 
 import com.welfare.common.annotation.Query;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

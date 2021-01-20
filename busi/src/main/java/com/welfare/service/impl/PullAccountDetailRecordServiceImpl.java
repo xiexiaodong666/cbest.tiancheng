@@ -3,7 +3,6 @@ package com.welfare.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.util.DateUtil;
-import com.welfare.persist.dao.PullAccountDetailRecordDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.entity.PullAccountDetailRecord;
 import com.welfare.persist.entity.SettleDetail;

@@ -1,6 +1,5 @@
 package com.welfare.service.dto.order;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

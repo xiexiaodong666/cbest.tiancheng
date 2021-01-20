@@ -11,14 +11,15 @@ import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
-import  com.welfare.persist.dao.AccountDepositApplyDao;
+import com.welfare.persist.dao.AccountDepositApplyDao;
 import com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.converter.AccountDepositApplyConverter;
 import com.welfare.service.converter.DepositApplyDetailConverter;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.AccountDepositRequest;
+import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.accountapply.*;
 import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.enums.ApprovalType;
@@ -36,9 +37,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * 账户充值申请服务接口实现

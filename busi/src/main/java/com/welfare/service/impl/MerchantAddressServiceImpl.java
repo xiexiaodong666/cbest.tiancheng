@@ -2,15 +2,15 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.util.EmptyChecker;
-import  com.welfare.persist.dao.MerchantAddressDao;
+import com.welfare.persist.dao.MerchantAddressDao;
 import com.welfare.persist.entity.MerchantAddress;
+import com.welfare.service.MerchantAddressService;
 import com.welfare.service.converter.MerchantAddressConverter;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.welfare.service.MerchantAddressService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

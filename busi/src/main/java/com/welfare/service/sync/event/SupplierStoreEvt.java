@@ -2,7 +2,6 @@ package com.welfare.service.sync.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.service.dto.SupplierStoreDetailDTO;
 import com.welfare.service.dto.SupplierStoreSyncDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

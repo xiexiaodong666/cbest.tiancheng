@@ -1,7 +1,6 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.reflect.Reflection;
 import com.welfare.persist.dao.SequenceDao;
 import com.welfare.persist.entity.Sequence;
 import com.welfare.service.SequenceService;
@@ -13,11 +12,6 @@ import org.apache.el.util.ReflectionUtil;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Objects;
 
 import static com.welfare.common.constants.RedisKeyConstant.SEQUENCE_GENERATE;
 

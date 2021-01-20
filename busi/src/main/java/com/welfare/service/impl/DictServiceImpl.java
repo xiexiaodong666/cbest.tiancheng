@@ -6,6 +6,7 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.DictDao;
 import com.welfare.persist.entity.Dict;
+import com.welfare.service.DictService;
 import com.welfare.service.converter.DictConverter;
 import com.welfare.service.dto.DictDTO;
 import com.welfare.service.dto.DictReq;
@@ -13,7 +14,6 @@ import com.welfare.service.dto.FieldMethodDTO;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.welfare.service.DictService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 

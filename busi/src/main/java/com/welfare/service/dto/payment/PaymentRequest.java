@@ -1,9 +1,7 @@
 package com.welfare.service.dto.payment;
 
 import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
 import com.welfare.common.enums.ConsumeTypeEnum;
-import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.SupplierStore;
@@ -13,7 +11,6 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Map;
 import java.util.Objects;
 
 /**

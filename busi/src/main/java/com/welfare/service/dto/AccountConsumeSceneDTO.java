@@ -3,9 +3,10 @@ package com.welfare.service.dto;
 import com.welfare.persist.dto.AccountConsumeStoreRelationDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
 
 /**
  * @author yaoxiao

@@ -3,15 +3,15 @@ package com.welfare.service.sync.event;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
-import java.util.List;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.killbill.bus.api.BusEvent;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author yaoxiao

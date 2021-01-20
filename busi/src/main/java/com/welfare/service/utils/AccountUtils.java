@@ -6,13 +6,10 @@ import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.service.remote.entity.EmployerDTO;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
+
+import java.util.*;
 
 /**
  * @author yaoxiao

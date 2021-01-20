@@ -135,8 +135,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean batchAdd(List<Department> list) {
-         departmentDao.saveBatch(list);
-        return true;
+        return departmentDao.saveBatch(list);
     }
 
     @Override

@@ -51,6 +51,7 @@ import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -290,23 +291,28 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
   @Transactional(rollbackFor = Exception.class)
   public boolean batchAdd(List<SupplierStoreAddDTO> list) {
-    List<SupplierStoreSyncDTO> syncList=new ArrayList<>();
-    for(SupplierStoreAddDTO supplierStoreAddDTO: list){
-      SupplierStore save = supplierStoreAddConverter.toE((supplierStoreAddDTO));
-      save.setStatus(0);
-      save.setStorePath(save.getMerCode()+"-"+save.getStoreCode());
-      save.setStoreParent(save.getMerCode());
-      supplierStoreDao.save(save);
-      SupplierStoreSyncDTO syncDTO= supplierStoreSyncConverter.toD(save);
-      if(EmptyChecker.notEmpty(supplierStoreAddDTO.getAddressList())){
-        supplierStoreAddDTO.getAddressList().forEach(item->item.setRelatedId(save.getId()));
-        merchantAddressService.saveOrUpdateBatch(
-                supplierStoreAddDTO.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
-        syncDTO.setAddressList(supplierStoreAddDTO.getAddressList());
-      }
-      syncList.add(syncDTO);
+    List<SupplierStore> saves=supplierStoreAddConverter.toE((list));
+    if(!supplierStoreDao.saveBatch(saves)){
+      throw new BusiException("导入门店--批量插入失败");
     }
-
+    //存放门店code和地址的对应关系，用于批量新增门店后，存入对应地址
+    Map<String,List<MerchantAddressDTO>> map=list.stream().collect(Collectors.toMap(SupplierStoreAddDTO::getStoreCode,SupplierStoreAddDTO::getAddressList));
+    List<MerchantAddressDTO> addressDTOList=new ArrayList<>();
+    List<SupplierStoreSyncDTO> syncList=new ArrayList<>();
+    for(SupplierStore store:saves){
+      SupplierStoreSyncDTO syncDTO=supplierStoreSyncConverter.toD(store);
+      List<MerchantAddressDTO> addressItemList=map.get(store.getStoreCode());
+      syncDTO.setAddressList(addressItemList);
+      syncList.add(syncDTO);
+      addressItemList.forEach(item->{
+        item.setRelatedType(SupplierStore.class.getSimpleName());
+        item.setRelatedId(store.getId());
+      });
+      addressDTOList.addAll(addressDTOList);
+    }
+    if(!merchantAddressService.batchDeleteAndSave(addressDTOList,SupplierStore.class.getSimpleName())){
+      throw new BusiException("导入门店--批量插入地址失败");
+    }
     //同步商城中台
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList)

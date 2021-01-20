@@ -112,7 +112,7 @@ public class CardController implements IController {
   public R<Page<CardInfoDTO>> queryCardInfo(
       @RequestParam @ApiParam("当前页") Integer current,
       @RequestParam @ApiParam("单页大小") Integer size,
-      @RequestParam(required = false) @ApiParam("卡号") Long cardId,
+      @RequestParam(required = false) @ApiParam("卡号") String cardId,
       @RequestParam(required = false) @ApiParam("申请卡片管理传applyCode") String applyCode,
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,
@@ -139,7 +139,7 @@ public class CardController implements IController {
   @ApiOperation("导出卡片信息")
   @ApiUser
   public R<String> exportCardInfo(
-      @RequestParam(required = false) @ApiParam("卡号") Long cardId,
+      @RequestParam(required = false) @ApiParam("卡号") String cardId,
       @RequestParam(required = false) @ApiParam("卡片名称") String cardName,
       @RequestParam(required = false) @ApiParam("所属商户") String merCode,
       @RequestParam(required = false) @ApiParam("卡片类型") String cardType,

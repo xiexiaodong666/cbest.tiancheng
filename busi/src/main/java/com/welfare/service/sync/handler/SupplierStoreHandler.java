@@ -89,6 +89,7 @@ public class SupplierStoreHandler {
                     addressBean.setAddress(addressDTO.getAddress());
                     addressBean.setAddressType(addressDTO.getAddressType());
                     addressBean.setName(addressDTO.getAddressName());
+                    addressBeans.add(addressBean);
                 }
                 listBean.setAddress(addressBeans);
             }

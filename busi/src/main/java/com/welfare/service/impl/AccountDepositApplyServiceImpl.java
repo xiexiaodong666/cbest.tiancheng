@@ -425,14 +425,12 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         queryWrapper.orderByDesc(AccountDepositApply.APPLY_TIME);
         Page<AccountDepositApply> result = accountDepositApplyDao.page(page, queryWrapper);
         List<AccountDepositApplyInfo> infos = null;
-        if (result != null && CollectionUtils.isNotEmpty(result.getRecords())) {
+        if (CollectionUtils.isNotEmpty(result.getRecords())) {
             List<AccountDepositApply> applys = result.getRecords();
             infos = depositApplyConverter.toInfoList(applys);
             infos.forEach(info -> {
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
-                if (approvalStatus != null) {
-                    info.setApprovalStatus(approvalStatus.getValue());
-                }
+                info.setApprovalStatus(approvalStatus.getValue());
             });
         }
         return PageUtils.toPage(result, infos);

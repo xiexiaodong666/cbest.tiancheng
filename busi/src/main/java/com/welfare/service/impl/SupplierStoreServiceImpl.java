@@ -12,6 +12,7 @@ import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
@@ -199,9 +200,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     merchantAddressReq.setRelatedType(SupplierStore.class.getSimpleName());
     merchantAddressReq.setRelatedId(store.getId());
     List<MerchantAddressDTO> addressDTOLis = merchantAddressService.list(merchantAddressReq);
+    store.setAddressList(addressDTOLis);
     dictService.trans(
-        MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), false,
+        MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), true,
         addressDTOLis.toArray()
+    );
+    dictService.trans(
+            SupplierStoreDetailDTO.class, SupplierStore.class.getSimpleName(), true,
+            store
     );
 
     return store;
@@ -215,19 +221,32 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
+  public SupplierStore getSupplierStoreByCashierNo(String cashierNo) {
+    QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(SupplierStore.CASHIER_NO, cashierNo);
+    return supplierStoreDao.getOne(queryWrapper);
+  }
+
+  @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreAddDTO supplierStore) {
     Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
     if (EmptyChecker.isEmpty(merchant)) {
-      throw new BusiException("商户不存在");
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
     }
     if (!Arrays.asList(merchant.getMerIdentity().split(",")).contains(
         MerIdentityEnum.supplier.getCode())) {
-      throw new BusiException("非供应商门店");
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"非供应商门店",null);
+
     }
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
-      throw new BusiException("门店编码已存在");
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"门店编码已存在",null);
+
     }
+    if (EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(supplierStore.getCashierNo()))) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"虚拟收银机号已存在",null);
+    }
+
     supplierStore.setConsumType(
         JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
     SupplierStore save = supplierStoreAddConverter.toE((supplierStore));
@@ -297,7 +316,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         item.setRelatedType(SupplierStore.class.getSimpleName());
         item.setRelatedId(store.getId());
       });
-      addressDTOList.addAll(addressDTOList);
+      addressDTOList.addAll(addressItemList);
     }
     if(!merchantAddressService.batchSave(addressDTOList,SupplierStore.class.getSimpleName())){
       throw new BusiException("导入门店--批量插入地址失败");

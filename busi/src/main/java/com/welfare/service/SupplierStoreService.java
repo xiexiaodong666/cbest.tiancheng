@@ -48,6 +48,7 @@ public interface SupplierStoreService {
      * @return
      */
     SupplierStore getSupplierStoreByStoreCode(String storeCode);
+    SupplierStore getSupplierStoreByCashierNo(String cashierNo);
 
     /**
      * 新增供应商门店

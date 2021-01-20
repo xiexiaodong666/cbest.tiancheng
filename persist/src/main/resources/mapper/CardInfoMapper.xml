@@ -29,11 +29,13 @@
     ci.create_time as createTime,
     ci.written_time as writtenTime,
     ci.bind_time as bindTime,
-    ci.account_code as accountCode
+    a.phone as accountCode
     FROM
     card_info ci
     LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code
+    left join account  a on a.account_code = ci.account_code
+
     where ci.deleted = 0
     <if test="cardId != null and cardId != '' ">
       and ci.card_id = #{cardId}
@@ -105,11 +107,12 @@ WHERE
     ci.create_time as createTime,
     ci.written_time as writtenTime,
     ci.bind_time as bindTime,
-    ci.account_code as accountCode
+    a.phone as accountCode
     FROM
     card_info ci
     LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code
+    left join account  a on a.account_code = ci.account_code
     where ci.deleted = 0
     <if test="cardId != null and cardId != '' ">
       and ci.card_id = #{cardId}
@@ -122,7 +125,7 @@ WHERE
     </if>
     <if test="cardMedium != null and cardMedium !='' ">and ca.card_medium = #{cardMedium}
     </if>
-    <if test="cardStatus != null  ">and ci.card_statu = #{cardStatus}
+    <if test="cardStatus != null  ">and ci.card_status = #{cardStatus}
     </if>
 
     <if test="writtenStartTime != null ">and ci.written_time &gt;= #{writtenStartTime}</if>

@@ -61,7 +61,7 @@ public class AccountChangeEventRecordServiceImpl implements AccountChangeEventRe
       return;
     }
     accountChangeEventRecordCustomizeMapper.batchInsert(accountChangeEventRecordList);
-    if (accountChangeType.equals(AccountChangeType.ACCOUNT_NEW.getChangeType())) {
+    if (accountChangeType.getChangeType().equals(AccountChangeType.ACCOUNT_NEW.getChangeType())) {
       return;
     } else {
       //新增操作记录之后
@@ -71,6 +71,7 @@ public class AccountChangeEventRecordServiceImpl implements AccountChangeEventRe
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void batchSaveByAccountTypeCode(String accountTypeCode,
       AccountChangeType accountChangeType) {
     List<Account> accounts = accountService.queryByAccountTypeCode(accountTypeCode);
@@ -80,6 +81,7 @@ public class AccountChangeEventRecordServiceImpl implements AccountChangeEventRe
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void batchSaveBySceneStoreRelation(List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList) {
     if (CollectionUtils.isEmpty(accountConsumeSceneStoreRelationList)) {
       return;

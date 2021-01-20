@@ -46,6 +46,7 @@ import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountBindCardDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountDetailParam;
 import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountUploadDTO;
@@ -227,15 +228,16 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public AccountDetailDTO queryDetailByAccountCode(String accountCode) {
-    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(null,Long.parseLong(accountCode),null);
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(null,Long.parseLong(accountCode),null,null);
     AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
     BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
     return accountDetailDTO;
   }
 
   @Override
-  public AccountDetailDTO queryDetailByParam(Long id, Long accountCode, String phone) {
-    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(id,accountCode,phone);
+  public AccountDetailDTO queryDetailByParam(AccountDetailParam accountDetailParam) {
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(accountDetailParam.getId(),accountDetailParam.getAccountCode(),
+        accountDetailParam.getPhone(),accountDetailParam.getMerCode());
     if( null == accountDetailMapperDTO ){
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该员工账号不存在",null);
     }

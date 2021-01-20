@@ -54,7 +54,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public List<Department> list(DepartmentReq req) {
-        if(EmptyChecker.isEmpty(req.getMerCode())){
+        if(EmptyChecker.isEmpty(req.getMerCode())
+                &&EmptyChecker.isEmpty(req.getDepartmentCodeList())){
             req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
         }
         QueryWrapper<Department> q=QueryHelper.getWrapper(req);
@@ -134,7 +135,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean batchAdd(List<Department> list) {
-        return departmentDao.saveBatch(list);
+         departmentDao.saveBatch(list);
+        return true;
     }
 
     @Override

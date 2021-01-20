@@ -60,6 +60,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -288,13 +289,29 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  public boolean batchAdd(List<SupplierStore> list) {
-    boolean flag = supplierStoreDao.saveBatch(list);
+  public boolean batchAdd(List<SupplierStoreAddDTO> list) {
+    List<SupplierStoreSyncDTO> syncList=new ArrayList<>();
+    for(SupplierStoreAddDTO supplierStoreAddDTO: list){
+      SupplierStore save = supplierStoreAddConverter.toE((supplierStoreAddDTO));
+      save.setStatus(0);
+      save.setStorePath(save.getMerCode()+"-"+save.getStoreCode());
+      save.setStoreParent(save.getMerCode());
+      supplierStoreDao.save(save);
+      SupplierStoreSyncDTO syncDTO= supplierStoreSyncConverter.toD(save);
+      if(EmptyChecker.notEmpty(supplierStoreAddDTO.getAddressList())){
+        supplierStoreAddDTO.getAddressList().forEach(item->item.setRelatedId(save.getId()));
+        merchantAddressService.saveOrUpdateBatch(
+                supplierStoreAddDTO.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
+        syncDTO.setAddressList(supplierStoreAddDTO.getAddressList());
+      }
+      syncList.add(syncDTO);
+    }
+
     //同步商城中台
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(supplierStoreSyncConverter.toD(list))
+        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList)
                                         .build());
-    return flag;
+    return Boolean.TRUE;
   }
 
   public List<SupplierStore> list(QueryWrapper<SupplierStore> queryWrapper) {
@@ -312,7 +329,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         Collectors.toMap(DictDTO::getDictCode, item -> false));
     try {
       SupplierStoreListener listener = new SupplierStoreListener(
-          merchantService, this, JSON.toJSONString(map));
+          merchantService, this );
       EasyExcel.read(multipartFile.getInputStream(), SupplierStoreImportDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();
@@ -398,70 +415,94 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       return true;
     }
 
+    Map<String, Boolean> map = null;
     try {
-      Map<String, Boolean> map = mapper.readValue(consumeType, Map.class);
-      boolean isSelectO2O = map.get(ConsumeTypeEnum.O2O.getCode());
-      boolean isSelectOnlineMall =
-          map.get(ConsumeTypeEnum.ONLINE_MALL.getCode());
-      boolean isSelectShopShopping =
-          map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
-
-      for (MerchantStoreRelation storeRelation :
-          storeRelationList) {
-        Map<String, Boolean> consumeTypeMap = mapper.readValue(
-            storeRelation.getConsumType(), Map.class);
-
-        if (!isSelectO2O) {
-          consumeTypeMap.remove(ConsumeTypeEnum.O2O.getCode());
-        } else {
-          if (!consumeTypeMap.containsKey(ConsumeTypeEnum.O2O.getCode())) {
-            consumeTypeMap.put(ConsumeTypeEnum.O2O.getCode(), false);
-          }
-        }
-
-        if (!isSelectOnlineMall) {
-          consumeTypeMap.remove(ConsumeTypeEnum.ONLINE_MALL.getCode());
-        } else {
-          if (!consumeTypeMap.containsKey(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
-            consumeTypeMap.put(ConsumeTypeEnum.ONLINE_MALL.getCode(), false);
-          }
-        }
-
-        if (!isSelectShopShopping) {
-          consumeTypeMap.remove(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
-        } else {
-          if (!consumeTypeMap.containsKey(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
-            consumeTypeMap.put(ConsumeTypeEnum.SHOP_SHOPPING.getCode(), false);
-          }
-        }
-
-        isSelectO2O = true;
-        isSelectOnlineMall = true;
-        isSelectShopShopping = true;
-
-        if (consumeTypeMap.get(ConsumeTypeEnum.O2O.getCode()) == null || !consumeTypeMap.get(
-            ConsumeTypeEnum.O2O.getCode())) {
-          isSelectO2O = false;
-        }
-
-        if (consumeTypeMap.get(ConsumeTypeEnum.ONLINE_MALL.getCode()) == null || !consumeTypeMap
-            .get(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
-          isSelectOnlineMall = false;
-        }
-
-        if (consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode()) == null || !consumeTypeMap
-            .get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
-          isSelectShopShopping = false;
-        }
-
-        Assert.isTrue(
-            isSelectO2O || isSelectOnlineMall || isSelectShopShopping,
-            "消费门店下消费方法不能全被置为空"
-        );
-        storeRelation.setConsumType(mapper.writeValueAsString(consumeTypeMap));
-      }
+      map = mapper.readValue(consumeType, Map.class);
     } catch (JsonProcessingException e) {
       log.error("[syncConsumeType] json convert error", consumeType);
+    }
+
+    if (map == null) {
+      throw new BusiException("消费方法格式错误");
+    }
+
+    boolean isSelectO2O = map.get(ConsumeTypeEnum.O2O.getCode());
+    boolean isSelectOnlineMall =
+        map.get(ConsumeTypeEnum.ONLINE_MALL.getCode());
+    boolean isSelectShopShopping =
+        map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+
+    for (MerchantStoreRelation storeRelation :
+        storeRelationList) {
+      Map<String, Boolean> consumeTypeMap = null;
+      try {
+        consumeTypeMap = mapper.readValue(
+            storeRelation.getConsumType(), Map.class);
+      } catch (JsonProcessingException e) {
+        log.error("[syncConsumeType] json convert error",  storeRelation.getConsumType());
+      }
+
+      if (consumeTypeMap == null) {
+        throw new BusiException("消费方法格式错误");
+      }
+
+      if (!isSelectO2O) {
+        consumeTypeMap.remove(ConsumeTypeEnum.O2O.getCode());
+      } else {
+        if (!consumeTypeMap.containsKey(ConsumeTypeEnum.O2O.getCode())) {
+          consumeTypeMap.put(ConsumeTypeEnum.O2O.getCode(), false);
+        }
+      }
+
+      if (!isSelectOnlineMall) {
+        consumeTypeMap.remove(ConsumeTypeEnum.ONLINE_MALL.getCode());
+      } else {
+        if (!consumeTypeMap.containsKey(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
+          consumeTypeMap.put(ConsumeTypeEnum.ONLINE_MALL.getCode(), false);
+        }
+      }
+
+      if (!isSelectShopShopping) {
+        consumeTypeMap.remove(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+      } else {
+        if (!consumeTypeMap.containsKey(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+          consumeTypeMap.put(ConsumeTypeEnum.SHOP_SHOPPING.getCode(), false);
+        }
+      }
+
+      isSelectO2O = true;
+      isSelectOnlineMall = true;
+      isSelectShopShopping = true;
+
+      if (consumeTypeMap.get(ConsumeTypeEnum.O2O.getCode()) == null || !consumeTypeMap.get(
+          ConsumeTypeEnum.O2O.getCode())) {
+        isSelectO2O = false;
+      }
+
+      if (consumeTypeMap.get(ConsumeTypeEnum.ONLINE_MALL.getCode()) == null || !consumeTypeMap
+          .get(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
+        isSelectOnlineMall = false;
+      }
+
+      if (consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode()) == null || !consumeTypeMap
+          .get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+        isSelectShopShopping = false;
+      }
+
+      Assert.isTrue(
+          isSelectO2O || isSelectOnlineMall || isSelectShopShopping,
+          "消费门店下消费方法不能全被置为空"
+      );
+      try {
+        storeRelation.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+      } catch (JsonProcessingException e) {
+        log.error("[syncConsumeType] writeValueAsString error", consumeTypeMap);
+        throw new BusiException("消费方法格式错误");
+      }
+
+      // 同步员工消费方法
+      accountConsumeSceneStoreRelationService.updateStoreConsumeType(
+          storeRelation.getMerCode(), storeRelation.getStoreCode(), storeRelation.getConsumType());
     }
 
     return merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);

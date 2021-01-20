@@ -14,7 +14,9 @@ import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreImportDTO;
 import jodd.util.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +41,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreImportDTO> {
 
-  private List<SupplierStore> list = new LinkedList();
+  private List<SupplierStoreAddDTO> list = new ArrayList<>();
+
   private List<String> merCodeList = new LinkedList();
   private List<String> storeCodeList = new LinkedList();
   private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getCode(),ConsumeTypeEnum.ONLINE_MALL.getCode(),ConsumeTypeEnum.SHOP_SHOPPING.getCode()});
@@ -47,7 +51,6 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private final MerchantService merchantService;
 
   private final SupplierStoreService storeService;
-  private  final String defaultConsumType;
 
 
   private static StringBuilder uploadInfo = new StringBuilder();
@@ -55,10 +58,9 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
 
   @Override
   public void invoke(SupplierStoreImportDTO storeImportDTO, AnalysisContext analysisContext) {
-    SupplierStore store = new SupplierStore();
+    SupplierStoreAddDTO store = new SupplierStoreAddDTO();
     BeanUtils.copyProperties(storeImportDTO, store);
-    store.setStatus(0);
-    store.setStorePath(store.getMerCode()+"-"+store.getStoreCode());
+
     Integer row=analysisContext.readRowHolder().getRowIndex()+1;
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
       uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空").append(";");
@@ -86,9 +88,24 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
       }
     }
+
+    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType()))){
+      if(EmptyChecker.isEmpty(storeImportDTO.getAddressName())
+              ||EmptyChecker.isEmpty(storeImportDTO.getAddress())){
+        uploadInfo.append("第").append(row.toString()).append("行").append("O2O门店必填自提点").append(";");
+      }else {
+        List<MerchantAddressDTO> addressList = new ArrayList();
+        MerchantAddressDTO merchantAddressDTO=new MerchantAddressDTO();
+        merchantAddressDTO.setRelatedType(SupplierStore.class.getSimpleName());
+        merchantAddressDTO.setAddress(storeImportDTO.getAddress());
+        merchantAddressDTO.setAddressName(storeImportDTO.getAddressName());
+        addressList.add(merchantAddressDTO);
+        store.setAddressList(addressList);
+      }
+
+    }
     store.setCashierNo(store.getCashierNo());
     store.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transferWithExcel(consumTypes)));
-    store.setStoreParent(store.getMerCode());
     list.add(store);
     merCodeList.add(store.getMerCode());
     storeCodeList.add(store.getStoreCode());

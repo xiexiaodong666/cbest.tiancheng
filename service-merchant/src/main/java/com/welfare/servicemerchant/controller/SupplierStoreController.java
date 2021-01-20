@@ -2,6 +2,10 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.MerIdentityEnum;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.SupplierStore;
@@ -79,6 +83,10 @@ public class SupplierStoreController implements IController {
     @PostMapping("/add")
     @ApiOperation("新增供应商门店")
     public R add(@RequestBody@Valid SupplierStoreAddDTO supplierStore){
+        if(supplierStore.getConsumType().contains(ConsumeTypeEnum.O2O.getCode())
+                && EmptyChecker.isEmpty(supplierStore.getAddressList())){
+            throw new BusiException("O2O门店，收货地址必填");
+        }
         return R.status(supplierStoreService.add(supplierStore),"新增失败");
     }
 
@@ -102,6 +110,10 @@ public class SupplierStoreController implements IController {
     @ApiOperation("编辑供应商门店")
     @ApiUser
     public R update(@RequestBody@Valid  SupplierStoreUpdateDTO supplierStore){
+        if(supplierStore.getConsumType().contains(ConsumeTypeEnum.O2O.getCode())
+                && EmptyChecker.isEmpty(supplierStore.getAddressList())){
+            throw new BusiException("O2O门店，收货地址必填");
+        }
         return R.status(supplierStoreService.update(supplierStore),"编辑失败失败");
 
     }

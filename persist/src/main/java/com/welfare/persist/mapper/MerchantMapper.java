@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 商户信息(merchant)数据Mapper
  *
@@ -21,4 +23,5 @@ public interface MerchantMapper extends BaseMapper<Merchant> {
      */
     Integer alwaysUpdateSomeColumnById(@Param(Constants.ENTITY) Merchant merchant);
 
+    //List<Merchant> selectRebateMerList();
 }

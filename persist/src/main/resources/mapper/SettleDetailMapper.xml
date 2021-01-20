@@ -230,7 +230,7 @@
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
         <if test="excludeIdList!=null and excludeIdList.size!=0">
-            and t1.id is not in(
+            and t1.id not in(
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
             )
         </if>
@@ -275,6 +275,22 @@
             else 0 end as settleAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
+        order by t1.id
+        <if test="limit!=null">
+            limit #{limit}
+        </if>
+    </select>
+
+    <select id="getSettleDetailIdList" resultType="Long" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
+        select
+        t1.id as id
+        <include refid="queryListTable"></include>
+        <include refid="queryListCondition"></include>
+        <if test="excludeIdList!=null and excludeIdList.size!=0">
+            and t1.id not in(
+            <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
+            )
+        </if>
         order by t1.id
         <if test="limit!=null">
             limit #{limit}

@@ -200,7 +200,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     merchantAddressReq.setRelatedId(store.getId());
     List<MerchantAddressDTO> addressDTOLis = merchantAddressService.list(merchantAddressReq);
     dictService.trans(
-        MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), true,
+        MerchantAddressDTO.class, MerchantAddress.class.getSimpleName(), false,
         addressDTOLis.toArray()
     );
 

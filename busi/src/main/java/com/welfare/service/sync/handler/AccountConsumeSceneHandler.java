@@ -82,11 +82,10 @@ public class AccountConsumeSceneHandler {
     UserRoleBinding userRoleBinding = new UserRoleBinding();
     List<StoreBinding> bindings = new LinkedList<>();
     HashMap<String,String> employeeRoles = new HashMap<String,String>();
-    AccountConsumeScene accountConsumeScene =null;
+
     for( AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation :  relationList){
       Long sceneId = accountConsumeSceneStoreRelation.getAccountConsumeSceneId();
-      accountConsumeScene = accountConsumeSceneDao.getById(sceneId);
-      Assert.notNull(accountConsumeScene,"根据id:"+sceneId+"未找到消费场景");
+      AccountConsumeScene accountConsumeScene = accountConsumeSceneDao.getById(sceneId);
       employeeRoles.put(accountConsumeScene.getAccountTypeCode(),accountConsumeScene.getAccountTypeCode());
       StoreBinding storeBinding = new StoreBinding();
       String[] array = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
@@ -96,6 +95,7 @@ public class AccountConsumeSceneHandler {
     }
     userRoleBinding.setEmployeeRoles(new ArrayList<>(employeeRoles.keySet()));
     userRoleBinding.setBindings(bindings);
+    AccountConsumeScene accountConsumeScene =accountConsumeSceneDao.getById(relationList.get(0).getAccountConsumeSceneId());
     userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
     userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0);
     return Arrays.asList(userRoleBinding);

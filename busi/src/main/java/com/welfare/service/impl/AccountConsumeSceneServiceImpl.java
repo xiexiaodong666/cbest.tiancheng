@@ -110,7 +110,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景不存在",null);
       }
       AccountConsumeScene sameTypeScene = queryAccountConsumeScene(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
-      if( sameTypeScene.getId() !=  accountConsumeScene.getId()){
+      if( sameTypeScene.getId().compareTo(accountConsumeScene.getId())!= 0){
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同员工类型的消费场景配置",null);
       }
     }else{

@@ -65,16 +65,16 @@
                 AND ap.approval_user LIKE concat(#{query.approvalUser,jdbcType=VARCHAR},'%')
             </if>
             <if test="query.applyTimeStart != null ">
-                AND ap.apply_time ge #{query.applyTimeStart}
+                <![CDATA[  AND ap.apply_time >= #{query.applyTimeStart}  ]]>
             </if>
             <if test="query.applyTimeEnd != null ">
-                AND ap.apply_time le #{query.applyTimeEnd}
+                <![CDATA[  AND ap.apply_time <= #{query.applyTimeEnd}  ]]>
             </if>
             <if test="query.approvalTimeStart != null ">
-                AND ap.approval_time ge #{query.approvalTimeStart}
+                <![CDATA[  AND ap.approval_time >= #{query.approvalTimeStart}  ]]>
             </if>
             <if test="query.approvalTimeEnd != null ">
-                AND ap.approval_time le #{query.approvalTimeEnd}
+                <![CDATA[  AND ap.approval_time <= #{query.approvalTimeEnd}  ]]>
             </if>
         </where>
         ORDER BY ap.apply_time DESC

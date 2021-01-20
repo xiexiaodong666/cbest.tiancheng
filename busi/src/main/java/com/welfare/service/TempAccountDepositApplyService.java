@@ -60,7 +60,7 @@ public interface TempAccountDepositApplyService {
    * @param requestId
    * @return
    */
-  String upload(MultipartFile multipartFile, String requestId, ThreadPoolExecutor executor);
+  String upload(MultipartFile multipartFile, String requestId);
 
   /**
    * 通过requestId获取上传文件的fileId

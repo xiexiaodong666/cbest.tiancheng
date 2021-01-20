@@ -3,7 +3,6 @@ package com.welfare.service.impl;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,49 +17,19 @@ import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
-import com.welfare.persist.dto.AccountBillDetailMapperDTO;
-import com.welfare.persist.dto.AccountBillMapperDTO;
-import com.welfare.persist.dto.AccountDetailMapperDTO;
-import com.welfare.persist.dto.AccountIncrementDTO;
-import com.welfare.persist.dto.AccountPageDTO;
-import com.welfare.persist.dto.AccountSimpleDTO;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountChangeEventRecord;
-import com.welfare.persist.entity.AccountType;
-import com.welfare.persist.entity.CardInfo;
-import com.welfare.persist.entity.Department;
-import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.dto.*;
+import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.persist.mapper.AccountMapper;
-import com.welfare.service.AccountChangeEventRecordService;
-import com.welfare.service.AccountService;
-import com.welfare.service.AccountTypeService;
-import com.welfare.service.CardInfoService;
-import com.welfare.service.DepartmentService;
-import com.welfare.service.MerchantService;
-import com.welfare.service.SequenceService;
+import com.welfare.service.*;
 import com.welfare.service.converter.AccountConverter;
-import com.welfare.service.dto.AccountBillDTO;
-import com.welfare.service.dto.AccountBillDetailDTO;
-import com.welfare.service.dto.AccountBindCardDTO;
-import com.welfare.service.dto.AccountDTO;
-import com.welfare.service.dto.AccountDetailDTO;
-import com.welfare.service.dto.AccountIncrementReq;
-import com.welfare.service.dto.AccountPageReq;
-import com.welfare.service.dto.AccountUploadDTO;
+import com.welfare.service.dto.*;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -69,8 +38,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 账户信息服务接口实现
@@ -227,15 +199,16 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public AccountDetailDTO queryDetailByAccountCode(String accountCode) {
-    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(null,Long.parseLong(accountCode),null);
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(null,Long.parseLong(accountCode),null,null);
     AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
     BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
     return accountDetailDTO;
   }
 
   @Override
-  public AccountDetailDTO queryDetailByParam(Long id, Long accountCode, String phone) {
-    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(id,accountCode,phone);
+  public AccountDetailDTO queryDetailByParam(AccountDetailParam accountDetailParam) {
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(accountDetailParam.getId(),accountDetailParam.getAccountCode(),
+        accountDetailParam.getPhone(),accountDetailParam.getMerCode());
     if( null == accountDetailMapperDTO ){
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该员工账号不存在",null);
     }

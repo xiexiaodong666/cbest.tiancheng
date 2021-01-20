@@ -2,7 +2,6 @@ package com.welfare.service.aspect;
 
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.util.SpringBeanUtils;
-import com.welfare.persist.dao.AccountChangeEventRecordDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;

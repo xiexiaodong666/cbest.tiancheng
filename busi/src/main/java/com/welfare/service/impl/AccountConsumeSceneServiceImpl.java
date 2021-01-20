@@ -1,6 +1,5 @@
 package com.welfare.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,51 +14,30 @@ import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
-import com.welfare.service.AccountChangeEventRecordService;
-import com.welfare.service.AccountConsumeSceneService;
-import com.welfare.service.AccountConsumeSceneStoreRelationService;
-import com.welfare.service.AccountService;
-import com.welfare.service.AccountTypeService;
-import com.welfare.service.MerchantService;
+import com.welfare.service.*;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.service.dto.AccountConsumeSceneReq;
 import com.welfare.service.dto.AccountConsumeSceneStoreRelationReq;
 import com.welfare.service.remote.ShoppingFeignClient;
-import com.welfare.service.remote.entity.RoleConsumptionResp;
-import com.welfare.service.remote.entity.StoreBinding;
-import com.welfare.service.remote.entity.UserRoleBinding;
-import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
-import com.welfare.service.utils.AccountUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 员工消费场景配置服务接口实现
@@ -189,8 +167,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if( updateResult ){
       accountChangeEventRecordService.batchSaveBySceneStoreRelation(accountConsumeSceneStoreRelationList);
       //下发数据
-      Map<Long,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
-      accountConsumeSceneMap.put(accountConsumeScene.getId(),accountConsumeSceneStoreRelationList);
       applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(accountConsumeSceneStoreRelationList).build());
     }
     return true;
@@ -210,8 +186,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     }
     //下发数据
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
-    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
-    accountConsumeSceneMap.put(accountConsumeScene,relationList);
     applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).relationList(relationList).build());
     return deleteResult;
   }
@@ -231,8 +205,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if(updateResult){
       accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.getByAccountConsumeStatus(status));
       List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
-      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
-      accountConsumeSceneMap.put(accountConsumeScene,relationList);
       applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).relationList(relationList).build());
     }
     return updateResult;

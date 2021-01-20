@@ -274,6 +274,9 @@ LIMIT #{size}
     <if test=" phone !='' and phone != null ">
       and a.phone = #{phone}
     </if>
+    <if test=" merCode !='' and merCode != null ">
+      and a.mer_code = #{merCode}
+    </if>
   </select>
 
   <select id="queryDetailPhoneAndMer" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">

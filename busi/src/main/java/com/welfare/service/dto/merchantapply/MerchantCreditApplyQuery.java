@@ -1,8 +1,6 @@
 package com.welfare.service.dto.merchantapply;
 
 import com.welfare.common.annotation.Query;
-import com.welfare.common.constants.WelfareConstant;
-import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

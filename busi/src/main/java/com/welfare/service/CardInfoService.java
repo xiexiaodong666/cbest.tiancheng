@@ -56,12 +56,12 @@ public interface CardInfoService {
    * @param bindEndTime
    * @return
    */
-  Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, Long cardId,String applyCode, String cardName, String merCode,
+  Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardId,String applyCode, String cardName, String merCode,
       String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
       Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
       Date bindEndTime);
 
-  List<CardInfoDTO> exportCardInfo(Long cardId, String cardName, String merCode,
+  List<CardInfoDTO> exportCardInfo(String cardId, String cardName, String merCode,
       String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
       Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
       Date bindEndTime);

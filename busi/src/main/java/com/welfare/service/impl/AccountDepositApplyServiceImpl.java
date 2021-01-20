@@ -11,14 +11,15 @@ import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
-import  com.welfare.persist.dao.AccountDepositApplyDao;
+import com.welfare.persist.dao.AccountDepositApplyDao;
 import com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.converter.AccountDepositApplyConverter;
 import com.welfare.service.converter.DepositApplyDetailConverter;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.AccountDepositRequest;
+import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.accountapply.*;
 import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.enums.ApprovalType;
@@ -36,9 +37,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * 账户充值申请服务接口实现
@@ -444,17 +446,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<AccountDepositApply> applies =  accountDepositApplyDao.getBaseMapper().selectList(queryWrapper);
         List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
-//            List<MerchantAccountType> accountTypes = accountTypeService.list(new MerchantAccountTypeReq());
-//            Map<String, MerchantAccountType> accountTypeMap = new HashMap<>();
-//            if (CollectionUtils.isNotEmpty(accountTypes)) {
-//                accountTypeMap = accountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, MerchantAccountType->MerchantAccountType));
-//            }
-//            Map<String, MerchantAccountType> finalAccountTypeMap = accountTypeMap;
             infos.forEach(info -> {
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
                 if (approvalStatus != null) {
                     info.setApprovalStatus(approvalStatus.getValue());
-                    //info.setMerAccountTypeName(finalAccountTypeMap.get(info.getMerAccountTypeCode()).getMerAccountTypeName());
                 }
             });
         }
@@ -488,51 +483,6 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         }
         return detailInfo;
     }
-
-//    /**
-//     * 给果审批通过，需要给员工增加余额；减少商户充值额度
-//     * @param details
-//     * @param apply
-//     */
-//    private void incrBalanceAndReduceRechargeLimit(List<AccountDepositApplyDetail> details, AccountDepositApply apply) {
-//        if (CollectionUtils.isNotEmpty(details)) {
-//            MerchantCredit merchantCredit = merchantCreditService.getByMerCode(apply.getMerCode());
-//            if (merchantCredit == null) {
-//                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度不存在", null);
-//            }
-//            // 判断充值额度是否超过商户充值额度,减少商户充值额度
-//            double sumAmount = details.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
-//            int success = merchantCreditService.decreaseRechargeLimit(new BigDecimal(sumAmount), merchantCredit.getId());
-//            if (success > 0) {
-//                // 增加员工福利余额及总余额
-//                List<AccountAmountType> list = assemblyAccountAmountTypeList(details, apply);
-//                accountAmountTypeService.batchSaveOrUpdate(list);
-//                list.forEach(accountAmountType -> {
-//                    accountService.increaseAccountBalance(accountAmountType.getAccountBalance(),apply.getApprovalUser(), accountAmountType.getAccountCode());
-//                });
-//            }
-//        }
-//    }
-//
-//    private List<AccountAmountType> assemblyAccountAmountTypeList(List<AccountDepositApplyDetail> details, AccountDepositApply apply){
-//        List<AccountAmountType> list = new ArrayList<>();
-//        AccountAmountType accountAmountType = null;
-//        Date now = new Date();
-//        for (AccountDepositApplyDetail detail: details) {
-//            accountAmountType = new AccountAmountType();
-//            accountAmountType.setAccountCode(detail.getAccountCode());
-//            accountAmountType.setMerAccountTypeCode(apply.getMerAccountTypeCode());
-//            accountAmountType.setAccountBalance(detail.getRechargeAmount());
-//            accountAmountType.setDeleted(Boolean.FALSE);
-//            accountAmountType.setCreateTime(now);
-//            accountAmountType.setCreateUser(apply.getApprovalUser());
-//            accountAmountType.setUpdateTime(now);
-//            accountAmountType.setUpdateUser(apply.getApprovalUser());
-//            accountAmountType.setVersion(0);
-//            list.add(accountAmountType);
-//        }
-//        return list;
-//    }
 
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {
         AccountDepositApplyDetail detail;

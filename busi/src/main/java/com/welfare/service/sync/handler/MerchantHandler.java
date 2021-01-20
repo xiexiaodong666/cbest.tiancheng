@@ -7,7 +7,6 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.service.dto.MerchantAddressDTO;
-import com.welfare.service.dto.MerchantDetailDTO;
 import com.welfare.service.dto.MerchantSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.MerchantShoppingReq;

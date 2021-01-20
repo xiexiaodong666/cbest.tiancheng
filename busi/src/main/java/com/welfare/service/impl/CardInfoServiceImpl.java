@@ -11,11 +11,12 @@ import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.mapper.CardInfoMapper;
 import com.welfare.service.CardInfoService;
-import java.util.Date;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 卡信息服务接口实现
@@ -74,7 +75,7 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, Long cardId, String applyCode, String cardName,
+  public Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardId, String applyCode, String cardName,
       String merCode,
       String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
       Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
@@ -90,7 +91,7 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public List<CardInfoDTO> exportCardInfo(Long cardId, String cardName, String merCode, String cardType,
+  public List<CardInfoDTO> exportCardInfo(String cardId, String cardName, String merCode, String cardType,
       String cardMedium, Integer cardStatus, Date writtenStartTime, Date writtenEndTime,
       Date startTime, Date endTime, Date bindStartTime, Date bindEndTime) {
     return cardInfoMapper.exportCardInfo(cardId,cardName,

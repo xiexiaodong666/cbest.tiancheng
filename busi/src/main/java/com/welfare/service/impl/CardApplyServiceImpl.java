@@ -19,16 +19,17 @@ import com.welfare.persist.mapper.CardApplyMapper;
 import com.welfare.persist.mapper.CardInfoMapper;
 import com.welfare.service.CardApplyService;
 import com.welfare.service.SequenceService;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 制卡信息服务接口实现

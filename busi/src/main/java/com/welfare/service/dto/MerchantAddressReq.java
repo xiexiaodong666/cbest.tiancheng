@@ -4,8 +4,6 @@ import com.welfare.common.annotation.Query;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @author hao.yin
  * @version 1.0.0

@@ -1,12 +1,11 @@
 package com.welfare.service.dto;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.service.dto.AccountBillDetailDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.Data;
 
 /**
  * @author yaoxiao

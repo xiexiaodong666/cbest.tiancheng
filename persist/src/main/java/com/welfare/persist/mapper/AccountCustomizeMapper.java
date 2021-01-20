@@ -36,7 +36,8 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
   AccountDetailMapperDTO queryDetail(@Param("id") Long id);
 
   AccountDetailMapperDTO queryDetailByParam(@Param("id") Long id,@Param("accountCode") Long accountCode,
-      @Param("phone") String phone);
+      @Param("phone") String phone,
+      @Param("merCode") String merCode);
 
 
   IPage<AccountBillDetailMapperDTO> queryAccountBillDetail(Page<AccountBillDetailMapperDTO> page,

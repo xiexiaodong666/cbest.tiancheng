@@ -1,7 +1,8 @@
 package com.welfare.service.dto;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author yaoxiao

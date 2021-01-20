@@ -20,9 +20,25 @@ import java.util.List;
 @Mapper
 public interface AccountDepositApplyDetailMapper extends BaseMapper<AccountDepositApplyDetail> {
 
+  /**
+   * 通过员工额度申请编码查询员工申请明细（只返回未删除的员工)
+   * @param applyCode
+   * @return
+   */
   List<AccountDepositApplyDetail> listByApplyCodeIfAccountExist(@Param("applyCode") String applyCode);
 
+  /**
+   * 通过员工额度申请编码分页查询员工申请明细（只返回未删除的员工)
+   * @param page
+   * @param applyCode
+   * @return
+   */
   Page<TempAccountDepositApplyDTO> listByApplyCodeIfAccountExist2(@Param("page") Page page, @Param("applyCode") String applyCode);
 
+  /**
+   * 通过员工额度申请编码查询申请总人数和总金额
+   * @param applyCode
+   * @return
+   */
   AccountApplyTotalDTO getUserCountAndTotalmount(@Param("applyCode") String applyCode);
 }

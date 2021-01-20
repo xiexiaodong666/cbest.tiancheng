@@ -3,8 +3,6 @@ package com.welfare.service.dto.payment;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.entity.CardInfo;
-import com.welfare.service.BarcodeService;
-import com.welfare.service.CardInfoService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

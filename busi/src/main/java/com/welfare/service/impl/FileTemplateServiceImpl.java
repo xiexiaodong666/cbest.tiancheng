@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文件模板服务接口实现
@@ -24,7 +23,7 @@ public class FileTemplateServiceImpl implements FileTemplateService {
     private final FileTemplateDao fileTemplateDao;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean add(FileTemplate fileTemplate) {
         QueryWrapper<FileTemplate> queryWrapper=new QueryWrapper<>();
         queryWrapper.eq(FileTemplate.FILE_TYPE,fileTemplate.getFileType());

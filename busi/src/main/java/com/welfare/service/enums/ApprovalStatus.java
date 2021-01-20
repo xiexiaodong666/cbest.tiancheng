@@ -1,7 +1,5 @@
 package com.welfare.service.enums;
 
-import com.welfare.common.exception.BusiException;
-
 /**
  *
  * @author duanhy

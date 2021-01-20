@@ -2,10 +2,11 @@ package com.welfare.service.dto;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import lombok.Data;
 
 /**
  * @author yaoxiao

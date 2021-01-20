@@ -21,6 +21,6 @@ public interface MerchantAddressService {
     boolean delete(String relatedType,Long relatedId);
 
 
-    boolean batchDeleteAndSave(List<MerchantAddressDTO> list,String relatedType);
+    boolean batchSave(List<MerchantAddressDTO> list,String relatedType);
     boolean batchDelete(String relatedType,List<Long>relatedIdList);
 }

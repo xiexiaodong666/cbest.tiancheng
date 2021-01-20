@@ -35,7 +35,6 @@ import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 供应商门店服务接口实现
@@ -240,6 +237,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
+    if(!flag){
+      throw new BusiException("新增门店失败");
+    }
     SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(save);
     detailDTO.setId(save.getId());
     detailDTO.setAddressList(supplierStore.getAddressList());
@@ -261,6 +261,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     supplierStore.setStatus(storeActivateReq.getStatus());
     boolean flag = supplierStoreDao.updateById(supplierStore);
     //同步商城中台
+    if(!flag){
+      throw new BusiException("修改门店激活状态失败");
+    }
     //更新需要全量数据传过去，这里需要再查一次门店的 地址数据
     SupplierStoreSyncDTO sync = supplierStoreSyncConverter.toD(supplierStore);
     MerchantAddressReq merchantAddressReq = new MerchantAddressReq();
@@ -296,7 +299,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       });
       addressDTOList.addAll(addressDTOList);
     }
-    if(!merchantAddressService.batchDeleteAndSave(addressDTOList,SupplierStore.class.getSimpleName())){
+    if(!merchantAddressService.batchSave(addressDTOList,SupplierStore.class.getSimpleName())){
       throw new BusiException("导入门店--批量插入地址失败");
     }
     //同步商城中台
@@ -339,15 +342,18 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (EmptyChecker.isEmpty(supplierStore)) {
       throw new BusiException("门店不存在");
     }
-    supplierStoreDao.removeById(id);
+    Boolean flag=supplierStoreDao.removeById(id);
     merchantAddressService.delete(
         SupplierStore.class.getSimpleName(), id);
     //同步商城中台
+    if(!flag){
+      throw new BusiException("删除门店失败");
+    }
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(supplierStoreSyncConverter.toD(supplierStore));
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).build());
-    return Boolean.TRUE;
+    return flag;
   }
 
   @Override
@@ -365,6 +371,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
     //同步商城中台
+    if(!(flag && flag2 && flag3)){
+      throw new BusiException("更新门店失败");
+    }
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(update);
     detailDTO.setAddressList(supplierStore.getAddressList());

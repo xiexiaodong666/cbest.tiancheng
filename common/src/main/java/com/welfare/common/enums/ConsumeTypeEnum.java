@@ -18,20 +18,8 @@ public enum ConsumeTypeEnum {
   SHOP_SHOPPING("SHOP_CONSUMPTION", "到店消费","3");
 
 
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public void setDesc(String desc) {
-    this.desc = desc;
-  }
-
   public String getExcelType() {
     return excelType;
-  }
-
-  public void setExcelType(String excelType) {
-    this.excelType = excelType;
   }
 
   public String getCode() {
@@ -42,12 +30,14 @@ public enum ConsumeTypeEnum {
     return desc;
   }
 
-  private String code;
+  private final String code;
 
-  private String desc;
+  private final String desc;
 
-  //导入excel的时候传的code
-  private String excelType;
+  /**
+   *   导入excel的时候传的code
+   */
+  private final String excelType;
 
   ConsumeTypeEnum(String code, String desc,String excelType) {
     this.code = code;

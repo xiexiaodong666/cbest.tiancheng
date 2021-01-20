@@ -5,6 +5,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum AccountRechargePaymentStatusEnum {
+    /**
+     *
+     */
     PENDING_PAYMENT(100, "待支付"),
     PAYMENT_FAILURE(101, "支付失败"),
     PAYMENT_SUCCESS(102, "支付成功"),
@@ -12,8 +15,8 @@ public enum AccountRechargePaymentStatusEnum {
     REFUND_SUCCESS(104, "退款成功"),
     QUERY_PAY_RESULT_NOT_FOUND(105, "超过一定时间未查询到支付结果");;
 
-    private int code;
-    private String name;
+    private final int code;
+    private final String name;
 
     AccountRechargePaymentStatusEnum(int code, String name) {
         this.code = code;

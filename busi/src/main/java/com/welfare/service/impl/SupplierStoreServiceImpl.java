@@ -385,14 +385,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
-    SupplierStore update = this.buildUpdate(supplierStore);
-    update.setStoreParent(update.getMerCode());
     boolean flag2 = true;
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
       supplierStore.setConsumType(
           JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
       flag2 = this.syncConsumeType(supplierStore.getStoreCode(), supplierStore.getConsumType());
     }
+    SupplierStore update = this.buildUpdate(supplierStore);
+    update.setStoreParent(update.getMerCode());
     boolean flag = 1 == supplierStoreDao.updateAllColumnById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());

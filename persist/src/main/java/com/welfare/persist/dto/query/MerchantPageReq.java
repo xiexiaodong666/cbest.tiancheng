@@ -1,7 +1,6 @@
 package com.welfare.persist.dto.query;
 
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

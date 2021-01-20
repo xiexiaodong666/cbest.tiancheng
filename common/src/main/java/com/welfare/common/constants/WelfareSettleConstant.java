@@ -1,9 +1,5 @@
 package com.welfare.common.constants;
 
-import com.alibaba.fastjson.JSON;
-import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.result.Result;
-
 /**
  * @author qiang.deng
  * @version 1.0.0

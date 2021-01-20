@@ -5,11 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.service.remote.MerchantCreditFeign;
-import com.welfare.service.remote.ShoppingFeignClient;
-import com.welfare.service.remote.entity.*;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.stereotype.Component;
 
 /**

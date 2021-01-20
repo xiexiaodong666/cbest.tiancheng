@@ -1,13 +1,11 @@
 package com.welfare.service.operator.payment.domain;
 
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.Data;
-import org.springframework.core.Ordered;
 
 import java.math.BigDecimal;
 import java.util.List;

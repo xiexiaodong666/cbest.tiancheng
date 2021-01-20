@@ -1,7 +1,8 @@
 package com.welfare.persist.dto;
 
-import java.math.BigDecimal;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * @author yaoxiao

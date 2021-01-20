@@ -1,8 +1,9 @@
 package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author yaoxiao

@@ -2,10 +2,11 @@ package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
 
 @Data
 @ApiModel("员工卡首页账号交易明细")

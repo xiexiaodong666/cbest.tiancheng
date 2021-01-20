@@ -1,7 +1,8 @@
 package com.welfare.persist.dto.query;
 
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * @author yaoxiao

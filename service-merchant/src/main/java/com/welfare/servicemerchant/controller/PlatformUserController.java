@@ -1,7 +1,5 @@
 package com.welfare.servicemerchant.controller;
 
-import static net.dreamlu.mica.core.result.R.success;
-
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.service.remote.PlatformUserFeignClient;
@@ -12,19 +10,17 @@ import com.welfare.service.remote.entity.ShoppingPlatformUser;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.dreamlu.mica.core.result.R.success;
 
 /**
  * @author gaorui

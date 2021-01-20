@@ -1,11 +1,6 @@
 package com.welfare.service.remote.service;
 
-import com.welfare.service.remote.entity.CreateWXH5TradeReq;
-import com.welfare.service.remote.entity.TradeCancelReq;
-import com.welfare.service.remote.entity.TradeQueryReq;
-import com.welfare.service.remote.entity.TradeRefundQueryReq;
-import com.welfare.service.remote.entity.TradeRefundReq;
-import com.welfare.service.remote.entity.CbestPayBaseBizResp;
+import com.welfare.service.remote.entity.*;
 
 public interface CbestPayService {
 

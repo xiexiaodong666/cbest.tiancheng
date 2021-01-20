@@ -1,6 +1,5 @@
 package com.welfare.servicesettlement.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareConstant;
@@ -9,7 +8,10 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.service.SettleDetailService;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.SettleMerInfoResp;
+import com.welfare.service.dto.SettleMerTransDetailPageReq;
+import com.welfare.service.dto.SettleMerTransDetailReq;
+import com.welfare.service.dto.SettleMerTransDetailResp;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,7 +21,6 @@ import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

@@ -3,9 +3,10 @@ package com.welfare.servicemerchant.dto;
 import com.welfare.persist.dto.AdminMerchantStore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
 
 /**
  * @author gaorui

@@ -1,8 +1,9 @@
 package com.welfare.service.remote.entity;
 
+import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
 
 /**
  * @author gaorui

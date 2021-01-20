@@ -2,12 +2,11 @@ package com.welfare.servicemerchant.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiParam;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author yaoxiao

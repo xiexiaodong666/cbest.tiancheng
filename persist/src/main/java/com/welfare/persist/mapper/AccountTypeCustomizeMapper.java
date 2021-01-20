@@ -5,9 +5,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountTypeMapperDTO;
 import com.welfare.persist.entity.Account;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.Date;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
 public interface AccountTypeCustomizeMapper extends BaseMapper<Account> {
 

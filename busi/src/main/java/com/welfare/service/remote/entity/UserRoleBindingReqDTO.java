@@ -1,10 +1,11 @@
 package com.welfare.service.remote.entity;
 
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
 
 /**
  * @author yaoxiao

@@ -1,7 +1,6 @@
 package com.welfare.service;
 
 
-import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 

@@ -282,7 +282,8 @@ public class PaymentServiceImpl implements PaymentService {
         //扣减商户金额
         String storeNo = paymentRequest.getStoreNo();
         SupplierStore store = supplierStoreService.getSupplierStoreByStoreCode(storeNo);
-        if(!store.getStoreCode().equals(account.getMerCode())){
+        Assert.notNull(store,"根据门店号没有找到门店");
+        if(!Objects.equals(store.getMerCode(),account.getMerCode())){
             List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.doOperateAccount(
                     account.getMerCode(),
                     operatedAmount,

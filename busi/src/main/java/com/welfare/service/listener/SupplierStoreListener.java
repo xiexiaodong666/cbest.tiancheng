@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +45,8 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private List<String> storeCodeList = new LinkedList();
   private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getCode(),ConsumeTypeEnum.ONLINE_MALL.getCode(),ConsumeTypeEnum.SHOP_SHOPPING.getCode()});
 
-
+  public static  final String success="导入成功";
+  public static  final String fail="入库失败";
   private final MerchantService merchantService;
 
   private final SupplierStoreService storeService;
@@ -116,10 +118,10 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       if(flag&&EmptyChecker.notEmpty(uploadInfo)){
         Boolean result = storeService.batchAdd(list);
         if (result == false) {
-          uploadInfo.append("入库失败");
+          uploadInfo.append(fail);
         }
         if( StringUtils.isEmpty(uploadInfo.toString())) {
-          uploadInfo.append("导入成功");
+          uploadInfo.append(success);
         }
       }
 
@@ -127,6 +129,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   }
 
   private boolean check() {
+    Map<String,List<String>> groupMap= storeCodeList.stream().collect(Collectors.groupingBy(String::toString));
+    for(Map.Entry<String,List<String>> entry:groupMap.entrySet()){
+      if(entry.getValue().size()>1){
+        uploadInfo.append("excel文件中存在重复的门店代码:").append(entry.getKey()).append(";");
+      }
+    }
     QueryWrapper<SupplierStore> storeQueryWrapper=new QueryWrapper<>();
     storeQueryWrapper.in(SupplierStore.STORE_CODE,storeCodeList);
     List<SupplierStore> stores=storeService.list(storeQueryWrapper);

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.constants.AccountChangeType;
+import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -81,7 +82,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
       BeanUtils.copyProperties(accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeScene.setAccountTypeCode(accountTypeCode);
-      accountConsumeScene.setStatus(1);
+      accountConsumeScene.setStatus(AccountConsumeSceneStatus.ENABLE.getCode());
       validationAccountConsumeScene(accountConsumeScene,true);
       accountConsumeSceneDao.save(accountConsumeScene);
       List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = getAccountConsumeSceneStoreRelations(
@@ -107,6 +108,10 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       AccountConsumeScene queryAccountConsumeScene = accountConsumeSceneDao.getById(accountConsumeScene.getId());
       if( null == queryAccountConsumeScene ){
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景不存在",null);
+      }
+      AccountConsumeScene sameTypeScene = queryAccountConsumeScene(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
+      if( sameTypeScene.getId() !=  accountConsumeScene.getId()){
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同员工类型的消费场景配置",null);
       }
     }else{
       AccountConsumeScene queryAccountConsumeScene = queryAccountConsumeScene(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());

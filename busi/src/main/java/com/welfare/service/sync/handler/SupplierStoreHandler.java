@@ -89,6 +89,7 @@ public class SupplierStoreHandler {
                     addressBean.setAddress(addressDTO.getAddress());
                     addressBean.setAddressType(addressDTO.getAddressType());
                     addressBean.setName(addressDTO.getAddressName());
+                    addressBeans.add(addressBean);
                 }
                 listBean.setAddress(addressBeans);
             }
@@ -96,7 +97,7 @@ public class SupplierStoreHandler {
             storeCodeList.add(supplierStoreDetailDTO.getStoreCode());
         }
         storeShoppingReq.setActionType(typeEnum.getCode());
-        storeShoppingReq.setRequestId(GenerateCodeUtil.UUID());
+        storeShoppingReq.setRequestId(evt.getUserToken().toString());
         storeShoppingReq.setTimestamp(new Date());
         storeShoppingReq.setList(listBeans);
         RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateStore(storeShoppingReq);

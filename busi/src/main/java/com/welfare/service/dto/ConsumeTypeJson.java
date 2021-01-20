@@ -18,11 +18,11 @@ public class ConsumeTypeJson implements Serializable {
   public static final  String F_ONLINE_MALL ="ONLINE_MALL";
   public static final  String F_SHOP_CONSUMPTION ="SHOP_CONSUMPTION";
   public boolean getType(String type){
-    if( type.equals(F_O2O ) ){
+    if( null != O2O && type.equals(F_O2O ) ){
       return O2O.booleanValue();
-    }else if (type.equals(F_ONLINE_MALL )){
+    }else if (null != ONLINE_MALL && type.equals(F_ONLINE_MALL )){
       return ONLINE_MALL.booleanValue();
-    }else if(type.equals(F_SHOP_CONSUMPTION)){
+    }else if(null != SHOP_CONSUMPTION && type.equals(F_SHOP_CONSUMPTION)){
       return SHOP_CONSUMPTION.booleanValue();
     }
     return false;

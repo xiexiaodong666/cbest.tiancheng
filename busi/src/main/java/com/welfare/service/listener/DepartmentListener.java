@@ -45,6 +45,9 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
 
+  public static  final String success="导入成功";
+  public static  final String fail="入库失败";
+
   private static StringBuilder uploadInfo = new StringBuilder();
 
 
@@ -105,10 +108,10 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
       if(flag){
       Boolean result = departmentService.batchAdd(list);
         if (result == false) {
-          uploadInfo.append("入库失败");
+          uploadInfo.append(fail);
         }
         if( StringUtils.isEmpty(uploadInfo.toString())) {
-          uploadInfo.append("导入成功");
+          uploadInfo.append(success);
         }
       }
 

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -115,17 +116,19 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Transactional(rollbackFor = Exception.class)
     public String upload(MultipartFile multipartFile) {
+        DepartmentListener listener = new DepartmentListener(merchantService, this, sequenceService);
         try {
-            DepartmentListener listener = new DepartmentListener(merchantService,this,sequenceService);
             EasyExcel.read(multipartFile.getInputStream(), DepartmentImportDTO.class, listener).sheet()
                     .doRead();
-            String result = listener.getUploadInfo().toString();
-            listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
-            return result;
-        } catch (Exception e) {
-            log.info("批量新增部门解析 Excel exception:{}", e.getMessage());
+        } catch (IOException e) {
+            throw new BusiException("excel解析失败");
         }
-        return "解析失败";
+        String result = listener.getUploadInfo().toString();
+        listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
+        if (!DepartmentListener.success.equals(result)) {
+            throw new BusiException(result);
+        }
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)

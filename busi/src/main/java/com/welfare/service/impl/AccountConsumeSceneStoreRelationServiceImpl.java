@@ -94,7 +94,6 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
 
   /**
    * 获取异常提示信息
-   * @param consumeTypeJson
    * @param selectType
    * @return
    */

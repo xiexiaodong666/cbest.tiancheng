@@ -19,6 +19,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -85,6 +86,7 @@ public class AccountConsumeSceneHandler {
     for( AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation :  relationList){
       Long sceneId = accountConsumeSceneStoreRelation.getAccountConsumeSceneId();
       accountConsumeScene = accountConsumeSceneDao.getById(sceneId);
+      Assert.notNull(accountConsumeScene,"根据id:"+sceneId+"未找到消费场景");
       employeeRoles.put(accountConsumeScene.getAccountTypeCode(),accountConsumeScene.getAccountTypeCode());
       StoreBinding storeBinding = new StoreBinding();
       String[] array = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
@@ -95,7 +97,7 @@ public class AccountConsumeSceneHandler {
     userRoleBinding.setEmployeeRoles(new ArrayList<>(employeeRoles.keySet()));
     userRoleBinding.setBindings(bindings);
     userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
-    userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0 ? true : false);
+    userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0);
     return Arrays.asList(userRoleBinding);
   }
 

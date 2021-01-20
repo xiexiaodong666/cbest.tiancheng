@@ -1,5 +1,7 @@
 package com.welfare.common.util;
 
+import org.springframework.util.Assert;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -440,7 +442,8 @@ public class DateUtil {
  	   date1=str2Date(str1, "yyyy-MM-dd");
  	   String str2=date2Str(date2, "yyyy-MM-dd");
  	   date2=str2Date(str2, "yyyy-MM-dd");
- 	   
+ 	   Assert.notNull(date1,"date1日期为空");
+ 	   Assert.notNull(date2,"date2日期为空");
  	   return (int) (((date2.getTime() - date1.getTime()) /day));
  	   //return (int) Math.ceil((((date2.getTime() - date1.getTime()) / (24 * 60 * 60 * 1000d))));
     }

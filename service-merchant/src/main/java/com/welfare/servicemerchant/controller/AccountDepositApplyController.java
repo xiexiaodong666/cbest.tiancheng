@@ -91,17 +91,13 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/batch-update")
   @ApiOperation("修改账号额度申请(批量)")
   @MerchantUser
-  public R<String> batchUpdate(@RequestParam @ApiParam(name = "申请id）",required = true) String id,
-                             @RequestParam(required = false) @ApiParam(name = "文件id") String fileId,
-                             @RequestParam(required = false) @ApiParam("申请备注") String applyRemark,
-                             @RequestParam(required = false) @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
-                             @RequestParam(required = false) @ApiParam(name = "福利类型名称",required = true) String merAccountTypeName) {
-    DepositApplyUpdateRequest requst = new DepositApplyUpdateRequest();
-    requst.setId(id);
-    requst.setApplyRemark(applyRemark);
-    requst.setMerAccountTypeCode(merAccountTypeCode);
-    requst.setMerAccountTypeName(merAccountTypeName);
-    return success(depositApplyService.updateBatch(requst, fileId, MerchantUserHolder.getMerchantUser())+"");
+  public R<String> batchUpdate(@Validated @RequestBody BatchDepositApplyUpdateRequest request) {
+    DepositApplyUpdateRequest updateRequest = new DepositApplyUpdateRequest();
+    updateRequest.setId(request.getId());
+    updateRequest.setApplyRemark(request.getApplyRemark());
+    updateRequest.setMerAccountTypeCode(request.getMerAccountTypeCode());
+    updateRequest.setMerAccountTypeName(request.getMerAccountTypeName());
+    return success(depositApplyService.updateBatch(updateRequest, request.getFileId(), MerchantUserHolder.getMerchantUser())+"");
   }
 
   @PostMapping("/export")
@@ -130,18 +126,13 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/batch-save")
   @ApiOperation("新增额度申请(批量)")
   @MerchantUser
-  public R<String> batchSave(@RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId,
-                           @RequestParam @ApiParam(name = "文件id",required = true)String fileId,
-                           @RequestParam @ApiParam("申请备注") String applyRemark,
-                           @RequestParam @ApiParam(name = "福利类型",required = true) String merAccountTypeCode,
-                           @RequestParam @ApiParam(name = "福利类型名称",required = true) String merAccountTypeName
-                           ){
-    DepositApplyRequest request = new DepositApplyRequest();
-    request.setRequestId(requestId);
-    request.setApplyRemark(applyRemark);
-    request.setMerAccountTypeCode(merAccountTypeCode);
-    request.setMerAccountTypeName(merAccountTypeName);
-    return success(depositApplyService.saveBatch(request, fileId, MerchantUserHolder.getMerchantUser())+"");
+  public R<String> batchSave(@Validated @RequestBody BatchDepositApplyRequest request){
+    DepositApplyRequest applyRequest = new DepositApplyRequest();
+    request.setRequestId(request.getRequestId());
+    request.setApplyRemark(request.getApplyRemark());
+    request.setMerAccountTypeCode(request.getMerAccountTypeCode());
+    request.setMerAccountTypeName(request.getMerAccountTypeName());
+    return success(depositApplyService.saveBatch(applyRequest, request.getFileId(), MerchantUserHolder.getMerchantUser())+"");
   }
 
   @PostMapping("/upload")

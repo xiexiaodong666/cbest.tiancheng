@@ -36,8 +36,21 @@ public class BatchDepositApplyRequest {
   private String merAccountTypeCode;
 
   /**
+   * 福利类型名称
+   */
+  @ApiModelProperty("福利类型名称")
+  @NotEmpty(message = "福利类型名称为空")
+  private String merAccountTypeName;
+
+  /**
    * 审批类型
    */
   @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")
   private String approvalType;
+
+  /**
+   * 文件id
+   */
+  @ApiModelProperty("文件id")
+  private String fileId;
 }

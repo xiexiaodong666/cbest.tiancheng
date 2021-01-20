@@ -15,6 +15,7 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
+import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
@@ -24,20 +25,41 @@ import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.SupplierStoreExMapper;
-import com.welfare.service.*;
+import com.welfare.service.AccountConsumeSceneStoreRelationService;
+import com.welfare.service.DictService;
+import com.welfare.service.MerchantAddressService;
+import com.welfare.service.MerchantService;
+import com.welfare.service.SupplierStoreService;
 import com.welfare.service.converter.SupplierStoreAddConverter;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
 import com.welfare.service.converter.SupplierStoreSyncConverter;
 import com.welfare.service.converter.SupplierStoreTreeConverter;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.DictDTO;
+import com.welfare.service.dto.DictReq;
+import com.welfare.service.dto.MerchantAddressDTO;
+import com.welfare.service.dto.MerchantAddressReq;
+import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.SupplierStoreActivateReq;
+import com.welfare.service.dto.SupplierStoreAddDTO;
+import com.welfare.service.dto.SupplierStoreDetailDTO;
+import com.welfare.service.dto.SupplierStoreImportDTO;
+import com.welfare.service.dto.SupplierStoreListReq;
+import com.welfare.service.dto.SupplierStoreSyncDTO;
+import com.welfare.service.dto.SupplierStoreTreeDTO;
+import com.welfare.service.dto.SupplierStoreUpdateDTO;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.listener.SupplierStoreListener;
+import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
+import com.welfare.service.remote.entity.RoleConsumptionListReq;
+import com.welfare.service.remote.entity.RoleConsumptionReq;
+import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +74,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -305,23 +324,32 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Transactional(rollbackFor = Exception.class)
   public boolean batchAdd(List<SupplierStoreAddDTO> list) {
     List<SupplierStore> saves=supplierStoreAddConverter.toE((list));
-    if(!supplierStoreDao.saveBatch(saves)){
-      throw new BusiException("导入门店--批量插入失败");
-    }
     //存放门店code和地址的对应关系，用于批量新增门店后，存入对应地址
-    Map<String,List<MerchantAddressDTO>> map=list.stream().collect(Collectors.toMap(SupplierStoreAddDTO::getStoreCode,SupplierStoreAddDTO::getAddressList));
+    Map<String,List<MerchantAddressDTO>> map=new HashMap<>();
+    for(SupplierStoreAddDTO supplierStoreAddDTO: list){
+      map.put(supplierStoreAddDTO.getStoreCode(),supplierStoreAddDTO.getAddressList());
+    }
     List<MerchantAddressDTO> addressDTOList=new ArrayList<>();
     List<SupplierStoreSyncDTO> syncList=new ArrayList<>();
     for(SupplierStore store:saves){
+      store.setStatus(0);
+      store.setStorePath(store.getMerCode() + "-" + store.getStoreCode());
+      store.setStoreParent(store.getMerCode());
       SupplierStoreSyncDTO syncDTO=supplierStoreSyncConverter.toD(store);
       List<MerchantAddressDTO> addressItemList=map.get(store.getStoreCode());
-      syncDTO.setAddressList(addressItemList);
+      if(EmptyChecker.notEmpty(addressItemList)){
+        syncDTO.setAddressList(addressItemList);
+        addressItemList.forEach(item->{
+          item.setRelatedType(SupplierStore.class.getSimpleName());
+          item.setRelatedId(store.getId());
+        });
+        addressDTOList.addAll(addressItemList);
+      }
       syncList.add(syncDTO);
-      addressItemList.forEach(item->{
-        item.setRelatedType(SupplierStore.class.getSimpleName());
-        item.setRelatedId(store.getId());
-      });
-      addressDTOList.addAll(addressItemList);
+
+    }
+    if(!supplierStoreDao.saveBatch(saves)){
+      throw new BusiException("导入门店--批量插入失败");
     }
     if(!merchantAddressService.batchSave(addressDTOList,SupplierStore.class.getSimpleName())){
       throw new BusiException("导入门店--批量插入地址失败");
@@ -342,10 +370,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public String upload(MultipartFile multipartFile) {
     DictReq req = new DictReq();
     req.setDictType(WelfareConstant.DictType.STORE_CONSUM_TYPE.code());
-    //查询所有的消费类型字典，用来初始化
-    List<DictDTO> dictList = dictService.getByType(req);
-    Map<String, Boolean> map = dictList.stream().collect(
-            Collectors.toMap(DictDTO::getDictCode, item -> false));
     SupplierStoreListener listener = new SupplierStoreListener(
             merchantService, this);
     try {
@@ -541,6 +565,52 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       accountConsumeSceneStoreRelationService.updateStoreConsumeType(
           storeRelation.getMerCode(), storeRelation.getStoreCode(), storeRelation.getConsumType());
     }
+
+
+    Map<String, List<MerchantStoreRelation>> mapByMerCode = storeRelationList.stream()
+        .collect(Collectors.groupingBy(t -> t.getMerCode()));
+
+    for (Map.Entry<String, List<MerchantStoreRelation>> m : mapByMerCode.entrySet()) {
+      RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
+      roleConsumptionReq.setActionType(ShoppingActionTypeEnum.UPDATE.getCode());
+      roleConsumptionReq.setTimestamp(new Date());
+      roleConsumptionReq.setRequestId(GenerateCodeUtil.getAccountIdByUUId());
+
+      List<RoleConsumptionListReq> roleConsumptionListReqList = new ArrayList<>();
+      RoleConsumptionListReq roleConsumptionListReq = new RoleConsumptionListReq();
+
+      roleConsumptionReq.setList(roleConsumptionListReqList);
+
+      List<RoleConsumptionBindingsReq> roleConsumptionBindingsReqList = new ArrayList<>();
+      roleConsumptionListReq.setBindings(roleConsumptionBindingsReqList);
+
+      for (MerchantStoreRelation merchantStoreRelation:
+      m.getValue()) {
+
+        RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
+        Map<String, Boolean> consumeTypeMap = null;
+        try {
+          roleConsumptionListReq.setMerchantCode(merchantStoreRelation.getMerCode());
+          roleConsumptionListReq.setEnabled(merchantStoreRelation.getStatus()==1);
+
+          consumeTypeMap = mapper.readValue(
+              merchantStoreRelation.getConsumType(), Map.class);
+        } catch (JsonProcessingException e) {
+          log.error("[syncConsumeType] json convert error",  merchantStoreRelation.getConsumType());
+        }
+        if(consumeTypeMap == null) {
+          throw new BusiException("消费方法格式错误");
+        }
+        roleConsumptionBindingsReq.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
+        roleConsumptionBindingsReq.setStoreCode(merchantStoreRelation.getStoreCode());
+        roleConsumptionBindingsReqList.add(roleConsumptionBindingsReq);
+      }
+
+      MerchantStoreRelationEvt evt = new MerchantStoreRelationEvt();
+      evt.setRoleConsumptionReq(roleConsumptionReq);
+      applicationContext.publishEvent(evt);
+    }
+
 
     return merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);
   }

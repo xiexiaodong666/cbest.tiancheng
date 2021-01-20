@@ -77,7 +77,7 @@ public class AccountDepositApplyController implements IController {
   public R<Page<TempAccountDepositApplyDTO>> batchtem(@RequestParam @ApiParam("当前页（从1开始）") Integer current,
                                                       @RequestParam @ApiParam("单页大小") Integer size,
                                                       @RequestParam @ApiParam(name = "申请id", required = true) Long id){
-    return success(detailService.pageByApplyCode(id, current, size));
+    return success(detailService.pageById(id, current, size));
   }
 
   @GetMapping("/batch-total")

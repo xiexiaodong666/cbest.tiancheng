@@ -55,7 +55,7 @@ public class AccountDepositApplyDetailServiceImpl implements AccountDepositApply
     }
 
     @Override
-    public Page<TempAccountDepositApplyDTO> pageByApplyCode(Long id, int current, int size) {
+    public Page<TempAccountDepositApplyDTO> pageById(Long id, int current, int size) {
         Page<AccountDepositApplyDetail> page = new Page<>();
         page.setCurrent(current);
         page.setSize(size);

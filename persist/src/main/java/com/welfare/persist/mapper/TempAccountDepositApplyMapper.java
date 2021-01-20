@@ -21,9 +21,25 @@ import java.util.List;
 @Mapper
 public interface TempAccountDepositApplyMapper extends BaseMapper<TempAccountDepositApply> {
 
+  /**
+   * 通过fileId分页查询批量员工申请上传文件内容
+   * @param page
+   * @param fileId
+   * @return
+   */
   Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(@Param("page") Page<TempAccountDepositApply> page, @Param("fileId") String fileId);
 
+  /**
+   * 通过fileId查询批量员工申请上传文件内容
+   * @param fileId
+   * @return
+   */
   List<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(@Param("fileId") String fileId);
 
+  /**
+   * 通过fileId分页查询批量员工申请上传文件里的总人数和总金额
+   * @param fileId
+   * @return
+   */
   AccountApplyTotalDTO getUserCountAndTotalAmount(@Param("fileId") String fileId);
 }

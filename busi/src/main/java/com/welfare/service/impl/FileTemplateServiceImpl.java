@@ -24,7 +24,7 @@ public class FileTemplateServiceImpl implements FileTemplateService {
     private final FileTemplateDao fileTemplateDao;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean add(FileTemplate fileTemplate) {
         QueryWrapper<FileTemplate> queryWrapper=new QueryWrapper<>();
         queryWrapper.eq(FileTemplate.FILE_TYPE,fileTemplate.getFileType());

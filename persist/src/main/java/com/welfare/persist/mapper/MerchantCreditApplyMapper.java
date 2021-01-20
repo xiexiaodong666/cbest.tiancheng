@@ -20,9 +20,19 @@ import java.util.List;
 @Mapper
 public interface MerchantCreditApplyMapper extends BaseMapper<MerchantCreditApply> {
 
-
+   /**
+    * 分页查询商户额度申请主数据
+    * @param page
+    * @param req
+    * @return
+    */
    Page<MerchantCreditApplyInfoDTO> queryByPage(Page page, @Param("query") MerchantCreditApplyQueryReq req);
 
+   /**
+    * 查询商户额度申请主数据
+    * @param req
+    * @return
+    */
    List<MerchantCreditApplyInfoDTO> queryByPage(@Param("query") MerchantCreditApplyQueryReq req);
 
 }

@@ -8,9 +8,13 @@ package com.welfare.service.enums;
  * @date 2021/1/8  3:24 PM
  */
 public enum ApprovalType {
-
-
+  /**
+   * 单个员工账号额度申请
+   */
   SINGLE("SINGLE","单个"),
+  /**
+   * 批量的员工账号额度申请
+   */
   BATCH("BATCH","批量");
 
   private String code;

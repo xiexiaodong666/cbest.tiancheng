@@ -12,6 +12,7 @@ import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountDetailParam;
 import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.service.dto.AccountReq;
@@ -79,18 +80,26 @@ public class AccountController implements IController {
   @GetMapping("/{id}")
   @ApiOperation("员工账号详情")
   public R<AccountDetailDTO> detail(@PathVariable String id) {
-    return success(accountService.queryDetailByParam(Long.parseLong(id),null,null));
+    AccountDetailParam accountDetailParam = new AccountDetailParam();
+    accountDetailParam.setId(Long.parseLong(id));
+    return success(accountService.queryDetailByParam(accountDetailParam));
   }
   @GetMapping("/detailByPhone")
-  @ApiOperation("员工账号详情")
+  @ApiOperation("通过手机号获取员工账号详情")
+  @MerchantUser
   public R<AccountDetailDTO> detailByPhone(@RequestParam @ApiParam("员工手机号")  String phone){
-    return success(accountService.queryDetailByParam(null,null,phone));
+    AccountDetailParam accountDetailParam = new AccountDetailParam();
+    accountDetailParam.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    accountDetailParam.setPhone(phone);
+    return success(accountService.queryDetailByParam(accountDetailParam));
   }
 
   @GetMapping("/detailByAccountCode")
   @ApiOperation("通过账号获取员工账号详情")
   public R<AccountDetailDTO> detailByAccountCode(@RequestParam @ApiParam("员工账号")  String accountCode) {
-    return success(accountService.queryDetailByParam(null,Long.parseLong(accountCode),null));
+    AccountDetailParam accountDetailParam = new AccountDetailParam();
+    accountDetailParam.setAccountCode(Long.parseLong(accountCode));
+    return success(accountService.queryDetailByParam(accountDetailParam));
   }
 
   @PostMapping("/save")

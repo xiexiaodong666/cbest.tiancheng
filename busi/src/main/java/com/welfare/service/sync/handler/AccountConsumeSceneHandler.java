@@ -75,8 +75,10 @@ public class AccountConsumeSceneHandler {
   }
 
   private List<UserRoleBinding> assemableUserRoleBindings(List<AccountConsumeSceneStoreRelation> relationList) {
+    if(CollectionUtils.isEmpty(relationList)){
+      return null;
+    }
     UserRoleBinding userRoleBinding = new UserRoleBinding();
-
     List<StoreBinding> bindings = new LinkedList<>();
     HashMap<String,String> employeeRoles = new HashMap<String,String>();
     AccountConsumeScene accountConsumeScene =null;

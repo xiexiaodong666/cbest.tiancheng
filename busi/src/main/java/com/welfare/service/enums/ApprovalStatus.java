@@ -10,13 +10,15 @@ import com.welfare.common.exception.BusiException;
  * @date 2021/1/8  3:21 PM
  */
 public enum  ApprovalStatus {
-
+  /**
+   * 申请状态
+   */
   AUDIT_SUCCESS("AUDIT_SUCCESS","通过"),
   AUDIT_FAILED("AUDIT_FAILED","不通过"),
   AUDITING("AUDITING","待审核");
 
-  private String code;
-  private String value;
+  private final String code;
+  private final String value;
 
   private ApprovalStatus(String code, String value){
     this.code=code;
@@ -38,7 +40,4 @@ public enum  ApprovalStatus {
     return value;
   }
 
-  public void setValue(String value) {
-    this.value = value;
-  }
 }

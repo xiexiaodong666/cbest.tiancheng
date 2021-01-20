@@ -381,7 +381,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 }
                 if (apply.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS.getCode())) {
                     apply.setRechargeStatus(RechargeStatus.SUCCESS.getCode());
-                    details.stream().forEach(detail -> {
+                    details.forEach(detail -> {
                         detail.setRechargeStatus(RechargeStatus.SUCCESS.getCode());
                         detail.setUpdateUser(request.getApprovalUser());
                     });
@@ -392,7 +392,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 }
                 if (apply.getApprovalStatus().equals(ApprovalStatus.AUDIT_FAILED.getCode())) {
                     apply.setRechargeStatus(RechargeStatus.NO.getCode());
-                    details.stream().forEach(detail -> {
+                    details.forEach(detail -> {
                         detail.setRechargeStatus(RechargeStatus.NO.getCode());
                         detail.setUpdateUser(request.getApprovalUser());
                     });

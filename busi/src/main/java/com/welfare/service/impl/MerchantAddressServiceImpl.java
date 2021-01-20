@@ -66,7 +66,7 @@ public class MerchantAddressServiceImpl implements MerchantAddressService {
     }
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean batchDeleteAndSave(List<MerchantAddressDTO> list,String relatedType) {
+    public boolean batchSave(List<MerchantAddressDTO> list,String relatedType) {
         if(EmptyChecker.isEmpty(list)){
             return Boolean.TRUE;
         }

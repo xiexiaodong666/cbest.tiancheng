@@ -161,6 +161,9 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         //同步商城中台
+        if(!(flag&&flag2)){
+            throw new BusiException("新增商户失败");
+        }
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
         detailDTO.setAddressList(merchant.getAddressList());
         detailDTO.setId(save.getId());
@@ -177,6 +180,9 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag= 1==merchantDao.updateAllColumnById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
         //同步商城中台
+        if(!(flag&&flag2)){
+            throw new BusiException("更新商户失败");
+        }
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
         detailDTO.setAddressList(merchant.getAddressList());

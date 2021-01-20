@@ -60,7 +60,19 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
     private final MerchantBillDetailService merchantBillDetailService;
 
-
+    @Override
+    public boolean init(String merCode) {
+        //初始化商户额度信
+        MerchantCredit credit = new MerchantCredit();
+        credit.setMerCode(merCode);
+        credit.setRechargeLimit(BigDecimal.ZERO);
+        credit.setCurrentBalance(BigDecimal.ZERO);
+        credit.setCreditLimit(BigDecimal.ZERO);
+        credit.setRemainingLimit(BigDecimal.ZERO);
+        credit.setRebateLimit(BigDecimal.ZERO);
+        credit.setSelfDepositBalance(BigDecimal.ZERO);
+        return merchantCreditDao.save(credit);
+    }
 
     @Override
     public MerchantCredit getByMerCode(String merCode) {

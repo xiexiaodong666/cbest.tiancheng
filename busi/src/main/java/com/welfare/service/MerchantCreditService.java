@@ -27,6 +27,7 @@ public interface MerchantCreditService {
    */
   MerchantCredit getByMerCode(String merCode);
 
+  boolean init(String merCode);
 
 
   /**

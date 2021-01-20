@@ -205,7 +205,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if(updateResult){
       accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.getByAccountConsumeStatus(status));
       List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
-      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).relationList(relationList).build());
+      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(relationList).build());
     }
     return updateResult;
   }

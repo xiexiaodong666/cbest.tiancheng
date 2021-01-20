@@ -6,6 +6,9 @@ package com.welfare.common.enums;
  * @date 2021/1/10 8:07 PM
  */
 public enum ShoppingActionTypeEnum {
+  /**
+   *
+   */
   ADD("ADD", "添加",1L),
   UPDATE("UPDATE", "修改",2L),
   DELETE("DELETE", "删除",3L),
@@ -14,20 +17,9 @@ public enum ShoppingActionTypeEnum {
 
 
 
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public void setDesc(String desc) {
-    this.desc = desc;
-  }
 
   public Long getEvtType() {
     return evtType;
-  }
-
-  public void setEvtType(Long evtType) {
-    this.evtType = evtType;
   }
 
   public String getCode() {
@@ -38,11 +30,11 @@ public enum ShoppingActionTypeEnum {
     return desc;
   }
 
-  private String code;
+  private final String code;
 
-  private String desc;
+  private final String desc;
 
-  private Long evtType;
+  private final Long evtType;
 
   ShoppingActionTypeEnum(String code, String desc,Long evtType) {
     this.code = code;

@@ -5,11 +5,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum AccountPayTypeEnum {
+    /**
+     *
+     */
     WECHAT("wechat", "微信"),
     ALIPAY("alipay", "支付宝");
 
-    private String type;
-    private String name;
+    private final String type;
+    private final String name;
 
 
     AccountPayTypeEnum(String type, String name) {

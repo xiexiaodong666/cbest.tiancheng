@@ -45,7 +45,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/list", method = RequestMethod.GET)
   @ApiOperation("获取商户用户列表")
   @ApiUser
-  PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
+  public PlatformUserResponse<PlatformUserDataResponse<PlatformUser>> getPlatformUserList(
       @RequestParam int current,
       @RequestParam int size,
       @RequestParam(required = false) String merchant_code,
@@ -81,7 +81,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("新增商户用户")
   @ApiUser
-  PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
+  public PlatformUserResponse<Boolean> addPlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.addPlatformUser(transferShoppingPlatformUser(platformUser, 1));
   }
@@ -92,7 +92,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("修改商户用户")
   @ApiUser
-  PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
+  public PlatformUserResponse<Boolean> updatePlatformUser(@RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUser(transferShoppingPlatformUser(platformUser,2));
   }
@@ -104,7 +104,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/detail", method = RequestMethod.GET)
   @ApiOperation("详情")
   @ApiUser
-  PlatformUserResponse<PlatformUser> getPlatformUserDetail(
+  public PlatformUserResponse<PlatformUser> getPlatformUserDetail(
       @RequestParam("id") Long id) {
     PlatformUserResponse<ShoppingPlatformUser> response = platformUserFeignClient
         .getPlatformUserDetail(id);
@@ -122,7 +122,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/update-status", method = RequestMethod.POST, consumes = "application/json")
   @ApiOperation("锁定/解锁")
   @ApiUser
-  PlatformUserResponse<Boolean> updatePlatformUserStatus(
+  public PlatformUserResponse<Boolean> updatePlatformUserStatus(
       @RequestBody PlatformUser platformUser) {
 
     return platformUserFeignClient.updatePlatformUserStatus(
@@ -136,7 +136,7 @@ public class PlatformUserController {
   @RequestMapping(value = "/export", method = RequestMethod.GET)
   @ApiOperation("导出商户用户列表")
   @ApiUser
-  R<String> export(
+  public R<String> export(
       @RequestParam(required = false) String username,
       @RequestParam(required = false) Integer status,
       @RequestParam(required = false) String merchant_code,

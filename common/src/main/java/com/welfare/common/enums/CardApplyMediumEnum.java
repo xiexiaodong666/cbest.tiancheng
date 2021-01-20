@@ -6,6 +6,9 @@ package com.welfare.common.enums;
  * @date 2021/1/15 4:50 PM
  */
 public enum CardApplyMediumEnum {
+  /**
+   *
+   */
   MAGNETIC_CARD("MAGNETIC_CARD", "磁卡"),
   IC_CARD("IC_CARD", "ic卡"),
   RFID_CARD("RFID_CARD", "rfid卡"),
@@ -14,13 +17,6 @@ public enum CardApplyMediumEnum {
   PAPER_VOUCHER("PAPER_VOUCHER", "纸券");
 
 
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public void setDesc(String desc) {
-    this.desc = desc;
-  }
 
   public String getCode() {
     return code;
@@ -30,9 +26,9 @@ public enum CardApplyMediumEnum {
     return desc;
   }
 
-  private String code;
+  private final String code;
 
-  private String desc;
+  private final String desc;
 
   CardApplyMediumEnum(String code, String desc) {
     this.code = code;

@@ -72,10 +72,8 @@ public class AccountController implements IController {
   }
   @GetMapping("/detailByPhone")
   @ApiOperation("通过手机号获取员工账号详情")
-  @MerchantUser
   public R<AccountDetailDTO> detailByPhone(@RequestParam @ApiParam("员工手机号")  String phone){
     AccountDetailParam accountDetailParam = new AccountDetailParam();
-    accountDetailParam.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     accountDetailParam.setPhone(phone);
     return success(accountService.queryDetailByParam(accountDetailParam));
   }

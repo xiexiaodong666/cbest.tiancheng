@@ -5,14 +5,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum DepartmentTypeEnum {
+    /**
+     *
+     */
     DISTRIBUTION_CENTER("DISTRIBUTION_CENTER", "配送中心","1"),
     DEPARTMENT("DEPARTMENT", "部门","2"),
     GROUP("GROUP","小组","3");
 
-    private String type;
-    private String name;
-    //导入excel的时候传的code
-    private String excelType;
+    private final String type;
+    private final String name;
+    /**
+     *     导入excel的时候传的code
+     */
+    private final String excelType;
 
 
 

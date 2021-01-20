@@ -7,14 +7,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequestMapping("/errortest")
 public class IndexController {
     private static  final  Logger logger = LoggerFactory.getLogger(IndexController.class);
 
-    @RequestMapping("/home")
+    @GetMapping("/home")
     public String home(){
         logger.info("access home");
         logger.error("error test");
@@ -25,7 +27,7 @@ public class IndexController {
     }
 
 
-    @RequestMapping("/errortest")
+    @GetMapping
     @ResponseBody
     @ApiOperation("错误测试")
     public String errtest(PageRequest pageRequest) {
@@ -33,13 +35,11 @@ public class IndexController {
         try {
             logger.info("page:", om.writeValueAsString(pageRequest));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("JsonProcessingException",e);
         }
 
 
-        int i = 1 / 0;
-
-        return "success";
+        throw new RuntimeException("error");
     }
 
 }

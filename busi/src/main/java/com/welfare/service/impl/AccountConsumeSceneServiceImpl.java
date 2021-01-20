@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.constants.AccountChangeType;
+import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -81,7 +82,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       AccountConsumeScene accountConsumeScene = new AccountConsumeScene();
       BeanUtils.copyProperties(accountConsumeSceneAddReq, accountConsumeScene);
       accountConsumeScene.setAccountTypeCode(accountTypeCode);
-      accountConsumeScene.setStatus(1);
+      accountConsumeScene.setStatus(AccountConsumeSceneStatus.ENABLE.getCode());
       validationAccountConsumeScene(accountConsumeScene,true);
       accountConsumeSceneDao.save(accountConsumeScene);
       List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList = getAccountConsumeSceneStoreRelations(

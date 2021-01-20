@@ -3,6 +3,7 @@ package com.welfare.service.sync.handler;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
+import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
@@ -96,7 +97,7 @@ public class AccountConsumeSceneHandler {
     userRoleBinding.setBindings(bindings);
     AccountConsumeScene accountConsumeScene =accountConsumeSceneDao.getById(relationList.get(0).getAccountConsumeSceneId());
     userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
-    userRoleBinding.setEnabled(accountConsumeScene.getStatus() == 0);
+    userRoleBinding.setEnabled(accountConsumeScene.getStatus() == AccountConsumeSceneStatus.ENABLE.getCode());
     return Arrays.asList(userRoleBinding);
   }
 

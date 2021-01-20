@@ -27,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -85,7 +84,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   }
 
   @Override
-  public String upload(MultipartFile multipartFile, String requestId, ThreadPoolExecutor executor) {
+  public String upload(MultipartFile multipartFile, String requestId) {
     String fileId = getFileIdByRequestId(requestId);
     if (StringUtils.isBlank(MerchantUserHolder.getMerchantUser().getMerchantCode())) {
       throw new BusiException("商户编码不能为空");
@@ -104,7 +103,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
         }
         fileId = UUID.randomUUID().toString();
         DepositApplyUploadListener listener = new DepositApplyUploadListener(this, requestId ,
-                fileId, accountService, executor, MerchantUserHolder.getMerchantUser().getMerchantCode());
+                fileId, accountService, MerchantUserHolder.getMerchantUser().getMerchantCode());
         EasyExcel.read(multipartFile.getInputStream(), AccountDepositRequest.class, listener).sheet().doRead();
         log.info("批量导入员工账号存储申请完成. requestId:{} fileId:{}", requestId, fileId);
 //        Page<TempAccountDepositApplyDTO> page = pageByFileIdByExistAccount(1 , 1, fileId);

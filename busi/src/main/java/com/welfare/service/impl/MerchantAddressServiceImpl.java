@@ -56,4 +56,21 @@ public class MerchantAddressServiceImpl implements MerchantAddressService {
         queryWrapper.eq(MerchantAddress.RELATED_ID,relatedId);
         return merchantAddressDao.remove(queryWrapper);
     }
+
+    @Override
+    public boolean batchDelete(String relatedType,List<Long> relatedIdList) {
+        QueryWrapper<MerchantAddress> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq(MerchantAddress.RELATED_TYPE,relatedType);
+        queryWrapper.in(MerchantAddress.RELATED_ID,relatedIdList);
+        return merchantAddressDao.remove(queryWrapper);
+    }
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchDeleteAndSave(List<MerchantAddressDTO> list,String relatedType) {
+        if(EmptyChecker.isEmpty(list)){
+            return Boolean.TRUE;
+        }
+        return merchantAddressDao.saveOrUpdateBatch(merchantAddressConverter.toE(list));
+
+    }
 }

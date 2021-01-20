@@ -1,12 +1,8 @@
 package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.welfare.persist.entity.OrderInfo;
 import com.welfare.persist.entity.ProductInfo;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * (order_info)数据Mapper

@@ -3,16 +3,13 @@ package com.welfare.persist.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.AccountBillDetailMapperDTO;
-import com.welfare.persist.dto.AccountBillMapperDTO;
-import com.welfare.persist.dto.AccountDetailMapperDTO;
-import com.welfare.persist.dto.AccountIncrementDTO;
-import com.welfare.persist.dto.AccountPageDTO;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.entity.Account;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.apache.ibatis.annotations.Param;
 
 public interface AccountCustomizeMapper extends BaseMapper<Account> {
 

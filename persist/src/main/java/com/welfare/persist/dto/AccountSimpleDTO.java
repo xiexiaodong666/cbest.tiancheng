@@ -2,8 +2,9 @@ package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.math.BigDecimal;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 @ApiModel("员工卡首页账号信息")

@@ -2,11 +2,7 @@ package com.welfare.service;
 
 
 import com.welfare.persist.entity.Department;
-import com.welfare.service.dto.DepartmentAddDTO;
-import com.welfare.service.dto.DepartmentDTO;
-import com.welfare.service.dto.DepartmentReq;
-import com.welfare.service.dto.DepartmentTree;
-import com.welfare.service.dto.DepartmentUpdateDTO;
+import com.welfare.service.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

@@ -8,8 +8,9 @@ import com.welfare.persist.entity.Account;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.accountapply.AccountDepositApplyInfo;
-import java.util.List;
 import org.mapstruct.Mapper;
+
+import java.util.List;
 
 /**
  * @author yaoxiao

@@ -2,7 +2,6 @@ package com.welfare.service;
 
 
 import com.welfare.persist.entity.FileTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文件模板服务接口

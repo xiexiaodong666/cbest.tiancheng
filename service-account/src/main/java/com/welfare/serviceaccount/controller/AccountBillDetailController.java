@@ -6,7 +6,6 @@ import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
 import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
 import com.welfare.service.AccountBillDetailService;
 import io.swagger.annotations.ApiOperation;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -14,6 +13,8 @@ import net.dreamlu.mica.core.result.R;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 用户流水明细服务控制器

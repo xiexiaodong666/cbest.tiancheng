@@ -1,10 +1,8 @@
 package com.welfare.service.remote;
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
-import com.welfare.service.remote.entity.*;
+import com.welfare.service.remote.entity.MerchantCreditResp;
 import com.welfare.service.remote.fallback.MerchantCreditFallback;
-import com.welfare.service.remote.fallback.ShoppingFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

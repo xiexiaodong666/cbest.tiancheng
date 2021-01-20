@@ -7,8 +7,7 @@ import com.welfare.persist.dto.CardApplyDTO;
 import com.welfare.persist.dto.query.CardApplyAddReq;
 import com.welfare.persist.dto.query.CardApplyUpdateReq;
 import com.welfare.persist.entity.CardApply;
-import com.welfare.persist.entity.MerchantStoreRelation;
-import io.swagger.models.auth.In;
+
 import java.util.Date;
 import java.util.List;
 

@@ -7,16 +7,12 @@ package com.welfare.common.enums;
  */
 public enum MerchantStoreRelationRebateTypeEnum {
 
+  /**
+   *
+   */
   EMPLOYEE_CARD_NUMBER_PAY("EMPLOYEE_CARD_NUMBER_PAY","员工卡号支付"),
   OTHER_PAY("OTHER_PAY","其他支付方式");
 
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public void setDesc(String desc) {
-    this.desc = desc;
-  }
 
   public String getCode() {
     return code;
@@ -26,9 +22,9 @@ public enum MerchantStoreRelationRebateTypeEnum {
     return desc;
   }
 
-  private String code;
+  private final String code;
 
-  private String desc;
+  private final String desc;
 
   MerchantStoreRelationRebateTypeEnum(String code, String desc){
     this.code = code;

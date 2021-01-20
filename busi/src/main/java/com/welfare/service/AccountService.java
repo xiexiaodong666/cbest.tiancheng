@@ -2,25 +2,18 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
-import com.welfare.persist.dto.AccountSyncDTO;
+import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.CardInfo;
-import com.welfare.service.dto.AccountBillDTO;
-import com.welfare.service.dto.AccountBillDetailDTO;
-import com.welfare.service.dto.AccountDTO;
-import com.welfare.service.dto.AccountDetailDTO;
-import com.welfare.service.dto.AccountDetailParam;
-import com.welfare.service.dto.AccountIncrementReq;
-import com.welfare.service.dto.AccountPageReq;
-import com.welfare.persist.dto.AccountSimpleDTO;
+import com.welfare.service.dto.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 账户信息服务接口

@@ -50,7 +50,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
         try {
             date = DateUtil.str2DateTime(delDate, DateUtil.DEFAULT_DATE_FORMAT);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("date parse error:",e);
         }
 
         Map<String, Object> params = new HashMap<>();

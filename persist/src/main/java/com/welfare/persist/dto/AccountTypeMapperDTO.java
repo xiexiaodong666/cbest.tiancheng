@@ -2,8 +2,9 @@ package com.welfare.persist.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * @author yaoxiao

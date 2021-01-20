@@ -1,12 +1,10 @@
 package com.welfare.service.remote.fallback;
 
 import com.welfare.service.remote.PlatformUserFeignClient;
-import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.remote.entity.PlatformUserDataResponse;
 import com.welfare.service.remote.entity.PlatformUserResponse;
 import com.welfare.service.remote.entity.ShoppingPlatformUser;
 import feign.hystrix.FallbackFactory;
-import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

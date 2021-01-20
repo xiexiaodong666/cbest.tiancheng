@@ -1,7 +1,7 @@
 package com.welfare.persist.mapper;
 
-import com.welfare.persist.entity.MerchantCreditApplyDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.welfare.persist.entity.MerchantCreditApplyDetail;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

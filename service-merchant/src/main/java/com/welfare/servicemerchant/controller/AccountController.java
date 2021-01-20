@@ -8,22 +8,12 @@ import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
-import com.welfare.service.dto.AccountBillDTO;
-import com.welfare.service.dto.AccountBillDetailDTO;
-import com.welfare.service.dto.AccountDTO;
-import com.welfare.service.dto.AccountDetailDTO;
-import com.welfare.service.dto.AccountDetailParam;
-import com.welfare.service.dto.AccountIncrementReq;
-import com.welfare.service.dto.AccountPageReq;
-import com.welfare.service.dto.AccountReq;
+import com.welfare.service.dto.*;
 import com.welfare.servicemerchant.dto.UpdateStatusReq;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -31,16 +21,12 @@ import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author duanhy
@@ -86,10 +72,8 @@ public class AccountController implements IController {
   }
   @GetMapping("/detailByPhone")
   @ApiOperation("通过手机号获取员工账号详情")
-  @MerchantUser
   public R<AccountDetailDTO> detailByPhone(@RequestParam @ApiParam("员工手机号")  String phone){
     AccountDetailParam accountDetailParam = new AccountDetailParam();
-    accountDetailParam.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     accountDetailParam.setPhone(phone);
     return success(accountService.queryDetailByParam(accountDetailParam));
   }

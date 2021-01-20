@@ -14,8 +14,8 @@ public enum IncOrDecType {
     INCREASE("increase","增加"),
     DECREASE("decrease","减少");
 
-    String code;
-    String desc;
+    private final String code;
+    private final String desc;
 
     IncOrDecType(String code, String desc){
         this.code = code;

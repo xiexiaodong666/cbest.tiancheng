@@ -1,12 +1,7 @@
 package com.welfare.service.remote.fallback;
 
 import com.welfare.service.remote.ShoppingFeignClient;
-import com.welfare.service.remote.entity.EmployerReqDTO;
-import com.welfare.service.remote.entity.MerchantShoppingReq;
-import com.welfare.service.remote.entity.RoleConsumptionReq;
-import com.welfare.service.remote.entity.RoleConsumptionResp;
-import com.welfare.service.remote.entity.StoreShoppingReq;
-import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
+import com.welfare.service.remote.entity.*;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

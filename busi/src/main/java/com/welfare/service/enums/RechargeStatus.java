@@ -9,14 +9,17 @@ package com.welfare.service.enums;
  */
 public enum RechargeStatus {
 
+  /**
+   *
+   */
   SUCCESS("SUCCESS","充值成功"),
   NO("NO","审批未通过不充值"),
   INIT("INIT","还未充值");
 
-  private String code;
-  private String value;
+  private final String code;
+  private final String value;
 
-  private RechargeStatus(String code, String value){
+  RechargeStatus(String code, String value){
     this.code=code;
     this.value=value;
   }
@@ -35,9 +38,4 @@ public enum RechargeStatus {
   public String getValue() {
     return value;
   }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
-
 }

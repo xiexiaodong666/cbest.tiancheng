@@ -18,7 +18,7 @@
                 and mat.mer_code=#{req.merCode}
             </if>
             <if test="req!=null and req.merName!=null and req.merName!=''">
-                and m.mer_mame like concat('%',#{req.merName},'%')
+                and m.mer_name like concat('%',#{req.merName},'%')
             </if>
             <if test="req!=null and req.startTime!=null">
                 and mat.create_time &gt;= #{req.startTime}

@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
+@SuppressWarnings("AlibabaCommentsMustBeJavadocFormat")
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,11 +17,11 @@ public class ITEM8 implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // 收款方式项目编号
-    private Number TENDERNUMBER;
+    private Long TENDERNUMBER;
     // 收款方式
     private String TENDERTYPECODE;
     // 收款金额
-    private Number TENDERAMOUNT;
+    private BigDecimal TENDERAMOUNT;
     // 收单行科目
     private String ACCOUNTNUMBER;
     // 手续费

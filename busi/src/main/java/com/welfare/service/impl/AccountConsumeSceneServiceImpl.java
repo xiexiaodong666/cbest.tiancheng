@@ -189,8 +189,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if( updateResult ){
       accountChangeEventRecordService.batchSaveBySceneStoreRelation(accountConsumeSceneStoreRelationList);
       //下发数据
-      Map<Long,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
-      accountConsumeSceneMap.put(accountConsumeScene.getId(),accountConsumeSceneStoreRelationList);
       applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(accountConsumeSceneStoreRelationList).build());
     }
     return true;
@@ -210,8 +208,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     }
     //下发数据
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
-    Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
-    accountConsumeSceneMap.put(accountConsumeScene,relationList);
     applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).relationList(relationList).build());
     return deleteResult;
   }
@@ -231,8 +227,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if(updateResult){
       accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.getByAccountConsumeStatus(status));
       List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
-      Map<AccountConsumeScene,List<AccountConsumeSceneStoreRelation>> accountConsumeSceneMap = new HashMap<>();
-      accountConsumeSceneMap.put(accountConsumeScene,relationList);
       applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.ACTIVATE).relationList(relationList).build());
     }
     return updateResult;

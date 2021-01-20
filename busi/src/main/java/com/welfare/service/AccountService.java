@@ -12,6 +12,7 @@ import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
 import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountDetailParam;
 import com.welfare.service.dto.AccountIncrementReq;
 import com.welfare.service.dto.AccountPageReq;
 import com.welfare.persist.dto.AccountSimpleDTO;
@@ -58,7 +59,7 @@ public interface AccountService {
 
   AccountDetailDTO queryDetailByAccountCode(String accountCode);
 
-  AccountDetailDTO queryDetailByParam(Long id,Long accountCode,String phone);
+  AccountDetailDTO queryDetailByParam(AccountDetailParam accountDetailParam);
 
   Boolean save(Account account);
 

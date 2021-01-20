@@ -74,7 +74,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
             try {
                 UserInfoHolder.setApiUserInfoLocal(JSON.parseObject(new String(apiUserInfo.getBytes("ISO-8859-1"),"utf8"), UserInfo.class));
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                log.error("设置用户信息ApiUser异常",e);
             }
         }
     }
@@ -96,7 +96,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
                 }
                 MerchantUserHolder.setMerchantUser(merchantU);
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                log.error("设置用户信息MerchantUser异常",e);
             }
         }
     }
@@ -111,7 +111,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
             try {
                 AccountUserHolder.setAccountUser(JSON.parseObject(new String(accountUserInfo.getBytes("ISO-8859-1"),"utf8"), AccountUserInfo.class));
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                log.error("设置用户信息AccountUser异常",e);
             }
         }
     }

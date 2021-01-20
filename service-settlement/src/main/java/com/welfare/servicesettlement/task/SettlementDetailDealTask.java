@@ -64,7 +64,7 @@ public class SettlementDetailDealTask extends IJobHandler {
                 String date = jsonObject.getString("date");
                 today = DateUtil.str2Date(date, DateUtil.DEFAULT_DATE_FORMAT);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("exception when parse date:",e);
             }
         }
 
@@ -104,7 +104,7 @@ public class SettlementDetailDealTask extends IJobHandler {
                 try {
                     date = DateUtil.str2DateTime(pullAccountDetailRecord.getDelDate(), DateUtil.DEFAULT_DATE_FORMAT);
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    log.error("exception when parse date:",e);
                 }
                 settleDetailDao.remove(Wrappers.<SettleDetail>lambdaQuery()
                         .eq(SettleDetail::getDataType, WelfareSettleConstant.SettleDetailDataTypeEnum.WELFARE)

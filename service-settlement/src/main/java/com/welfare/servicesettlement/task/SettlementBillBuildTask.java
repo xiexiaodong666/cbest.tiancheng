@@ -56,7 +56,7 @@ public class SettlementBillBuildTask extends IJobHandler {
                 String date = jsonObject.getString("date");
                 today = DateUtil.str2Date(date, DateUtil.DEFAULT_DATE_FORMAT);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Exception detected when parse date:",e);
             }
         }
 

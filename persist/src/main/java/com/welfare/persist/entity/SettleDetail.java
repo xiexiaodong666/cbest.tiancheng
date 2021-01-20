@@ -195,6 +195,9 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
+    @ApiModelProperty("返点金额")
+    private BigDecimal rebateAmount;
+
 //以下为列明常量
 
     /**

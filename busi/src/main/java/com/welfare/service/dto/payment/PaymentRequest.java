@@ -8,6 +8,7 @@ import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.ConsumeTypeJson;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -70,6 +71,7 @@ public abstract class PaymentRequest {
             return null;
         }else{
             String consumType = oneByCashierNo.getConsumType();
+            Assert.notNull(consumType,"门店没有配置消费场景");
             ConsumeTypeJson consumeTypeJson = JSON.parseObject(consumType,ConsumeTypeJson.class);
             return consumeTypeJson.getONLINE_MALL()?ConsumeTypeEnum.ONLINE_MALL.getCode():ConsumeTypeEnum.O2O.getCode();
         }

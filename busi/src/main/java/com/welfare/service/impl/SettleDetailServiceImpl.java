@@ -6,30 +6,34 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareSettleConstant;
+import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
-import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.MerchantCredit;
-import com.welfare.persist.entity.MonthSettle;
-import com.welfare.persist.entity.SettleDetail;
+import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.MerchantBillDetailMapper;
 import com.welfare.persist.mapper.MerchantCreditMapper;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
+import com.welfare.service.operator.merchant.RebateLimitOperator;
+import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -56,10 +60,12 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Autowired
     private MerchantBillDetailMapper merchantBillDetailMapper;
-
+    @Autowired
+    private MerchantStoreRelationDao merchantStoreRelationDao;
     @Value("${pos.onlines:1001}")
     private String posOnlines;
-
+    @Autowired
+    private RebateLimitOperator rebateLimitOperator;
 
     @Override
     public BasePageVo<WelfareSettleResp> queryWelfareSettlePage(WelfareSettlePageReq welfareSettlePageReq) {
@@ -135,9 +141,9 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
-        
+
         List<SettleStatisticsInfoDTO> settleStatisticsInfoDTOList = settleDetailMapper.getSettleStatisticsInfoByCondition(welfareSettleDetailQuery);
-        if(!settleStatisticsInfoDTOList.isEmpty()){
+        if (!settleStatisticsInfoDTOList.isEmpty()) {
             monthSettle.setSettleStatisticsInfo(JSONObject.toJSONString(settleStatisticsInfoDTOList));
         }
 
@@ -148,16 +154,16 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         do {
             idList = settleDetailMapper.getSettleDetailIdList(welfareSettleDetailQuery);
 
-            if(!idList.isEmpty()){
+            if (!idList.isEmpty()) {
                 SettleDetail settleDetail = new SettleDetail();
                 settleDetail.setSettleNo(monthSettle.getSettleNo());
                 settleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
                 settleDetailMapper.update(settleDetail, Wrappers.<SettleDetail>lambdaUpdate()
                         .in(SettleDetail::getId, idList));
-            }else{
+            } else {
                 break;
             }
-        }while(true);
+        } while (true);
     }
 
     @Override
@@ -219,5 +225,45 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         //查询该商户返点信息
 
         //修改数据
+    }
+
+    private SettleDetail calculateAndSetRebate(SettleDetail settleDetail) {
+        String storeCode = settleDetail.getStoreCode();
+        String merCode = settleDetail.getMerCode();
+        MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(storeCode, merCode);
+        String rebateType = relation.getRebateType();
+        if (!Strings.isEmpty(rebateType)) {
+            List<String> payCodes = Arrays.asList(rebateType.split(","));
+            if (payCodes.contains(settleDetail.getPayCode())) {
+                Assert.notNull(relation.getRebateRatio(), "配置了返利类型，没有返利比率,id:" + relation.getId());
+                // transAmount  * (ratio/100) 4位小数，四舍五入
+                BigDecimal rebateAmount = settleDetail.getTransAmount()
+                        .multiply(
+                                relation.getRebateRatio().divide(BigDecimal.valueOf(100),
+                                        4,
+                                        RoundingMode.HALF_UP
+                                ),
+                                new MathContext(4, RoundingMode.HALF_UP)
+                        );
+                settleDetail.setRebateAmount(rebateAmount);
+            }
+        }
+        return settleDetail;
+
+    }
+
+    @Override
+    public List<MerchantBillDetail> calculateAndSetRebate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails) {
+        return settleDetails.stream()
+                .map(detail -> {
+                    calculateAndSetRebate(detail);
+                    if (Objects.isNull(detail.getRebateAmount()) || detail.getRebateAmount().equals(BigDecimal.ZERO)) {
+                        return null;
+                    }
+                    return rebateLimitOperator.increase(merchantCredit, detail.getRebateAmount(), detail.getTransNo());
+                }).filter(operations -> !Objects.isNull(operations))
+                .flatMap(Collection::stream)
+                .map(MerchantAccountOperation::getMerchantBillDetail)
+                .collect(Collectors.toList());
     }
 }

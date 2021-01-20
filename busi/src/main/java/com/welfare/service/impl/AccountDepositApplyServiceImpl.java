@@ -154,7 +154,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
         AccountDepositApply apply = getByRequestId(request.getRequestId());
         if (apply != null) {
-            return Long.valueOf(apply.getId());
+            return apply.getId();
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY_SAVE_REQUEST_ID, request.getRequestId());
         RLock lock = redissonClient.getFairLock(lockKey);
@@ -163,7 +163,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             if (locked) {
                 apply = getByRequestId(request.getRequestId());
                 if (apply != null) {
-                    return Long.valueOf(apply.getId());
+                    return apply.getId();
                 }
                 Merchant merchant = merchantService.detailByMerCode(merchantUser.getMerchantCode());
                 // 初始化主表
@@ -174,7 +174,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工", null);
                 }
                 double sumAmoun = deposits.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
-                BigDecimal sumAmount = new BigDecimal(sumAmoun);
+                BigDecimal sumAmount = BigDecimal.valueOf(sumAmoun);
                 validationParmas(request,merchant,merchantUser,sumAmount);
                 apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
                 // 设置充值总金额
@@ -188,7 +188,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 accountDepositApplyDao.save(apply);
                 //删除临时文件记录表相关数据
                 tempAccountDepositApplyService.delByFileId(fileId);
-                return Long.valueOf(apply.getId());
+                return apply.getId();
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -255,7 +255,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                     detail.setUpdateTime(new Date());
                     accountDepositApplyDetailDao.saveOrUpdate(detail);
                 }
-                return Long.valueOf(apply.getId());
+                return apply.getId();
             } else {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
             }
@@ -305,7 +305,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                     }
                     // 判断金额是否超限
                     double sumAmoun = temps.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
-                    BigDecimal sumAmount = new BigDecimal(sumAmoun);
+                    BigDecimal sumAmount = BigDecimal.valueOf(sumAmoun);
                     MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
                     // 修改充值明细表
                     if (merchantCredit.getRechargeLimit().compareTo(sumAmount) < 0) {

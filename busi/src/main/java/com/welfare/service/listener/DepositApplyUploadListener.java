@@ -3,10 +3,8 @@ package com.welfare.service.listener;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.TempAccountDepositApply;
 import com.welfare.service.AccountService;
@@ -14,16 +12,10 @@ import com.welfare.service.TempAccountDepositApplyService;
 import com.welfare.service.dto.AccountDepositRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * @author duanhy
@@ -41,8 +33,6 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
   private static final int MAX_COUNT = 2000;
 
   private List<TempAccountDepositApply> list = new ArrayList<>();
-
-  private ThreadPoolExecutor executor;
 
   /**
    * 假设这个是一个DAO，当然有业务逻辑这个也可以是一个service。当然如果不用存储这个对象没用。
@@ -63,12 +53,11 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
 
   public DepositApplyUploadListener(TempAccountDepositApplyService depositApplyService,
                                     String requestId, String fileId,AccountService accountService,
-                                    ThreadPoolExecutor executor, String merCode) {
+                                    String merCode) {
     this.depositApplyService = depositApplyService;
     this.requestId = requestId;
     this.fileId = fileId;
     this.accountService = accountService;
-    this.executor = executor;
     this.merCode = merCode;
   }
 

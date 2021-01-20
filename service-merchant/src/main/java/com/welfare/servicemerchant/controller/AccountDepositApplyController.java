@@ -18,14 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 员工账号存款管理
@@ -52,10 +50,6 @@ public class AccountDepositApplyController implements IController {
 
   @Autowired
   private TempAccountDepositApplyService tempAccountDepositApplyService;
-
-  @Autowired
-  @Qualifier("accountApplySaveExecutor")
-  private ThreadPoolExecutor executor;
 
   @PostMapping("/page")
   @ApiOperation("分页账号额度申请列表")
@@ -155,7 +149,7 @@ public class AccountDepositApplyController implements IController {
   @MerchantUser
   public R<String> upload(@RequestPart(name = "file")@ApiParam(name = "file",required = true)MultipartFile multipartFile,
                           @RequestParam @ApiParam(name = "请求id（用于幂等处理，UUID即可）",required = true) String requestId) throws IOException {
-    return success(tempAccountDepositApplyService.upload(multipartFile, requestId, executor));
+    return success(tempAccountDepositApplyService.upload(multipartFile, requestId));
   }
 
   @GetMapping("/upload/page")

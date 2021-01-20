@@ -27,8 +27,8 @@ import java.util.List;
  * 商户信息服务控制器
  *
  * @author hao.yin
- * @since 2021-01-06 13:49:25
  * @description 由 Mybatisplus Code Generator 创建
+ * @since 2021-01-06 13:49:25
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -42,42 +42,46 @@ public class MerchantController implements IController {
 
     @GetMapping("/list")
     @ApiOperation("查询商户列表（不分页）")
-    public R<List<MerchantInfo>> list(@Valid MerchantReq req){
+    public R<List<MerchantInfo>> list(@Valid MerchantReq req) {
         return R.success(merchantConverter.toD(merchantService.list(req)));
     }
+
     @GetMapping("/detail")
     @ApiOperation("查询商户详情）")
-    public R<MerchantDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){
+    public R<MerchantDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id) {
         return R.success(merchantService.detail(id));
     }
 
     @GetMapping("/tree")
     @ApiOperation("查询商户列表树形）")
-    public R<List<MerchantWithCreditAndTreeDTO>> tree( MerchantPageReq merchantPageReq){
+    public R<List<MerchantWithCreditAndTreeDTO>> tree(MerchantPageReq merchantPageReq) {
         return R.success(merchantService.tree(merchantPageReq));
     }
+
     @PostMapping("/add")
     @ApiOperation("新增商户")
-    public R add(@RequestBody @Valid MerchantAddDTO merchant){
-        if(MerIdentityEnum.customer.equals( merchant.getMerType())
-        && EmptyChecker.isEmpty(merchant.getAddressList())){
+    public R add(@RequestBody @Valid MerchantAddDTO merchant) {
+        if (MerIdentityEnum.customer.getCode().equals(merchant.getMerType())
+                && EmptyChecker.isEmpty(merchant.getAddressList())) {
             throw new BusiException("身份属性为客户时，收获地址必填");
         }
-        return R.status(merchantService.add(merchant),"新增失败");
+        return R.status(merchantService.add(merchant), "新增失败");
     }
+
     @PostMapping("/update")
     @ApiOperation("编辑商户")
     @ApiUser
-    public R update(@RequestBody @Valid MerchantUpdateDTO merchant){
-        if(MerIdentityEnum.customer.equals( merchant.getMerType())
-                && EmptyChecker.isEmpty(merchant.getAddressList())){
+    public R update(@RequestBody @Valid MerchantUpdateDTO merchant) {
+        if (MerIdentityEnum.customer.getCode().equals(merchant.getMerType())
+                && EmptyChecker.isEmpty(merchant.getAddressList())) {
             throw new BusiException("身份属性为客户时，收货地址必填");
         }
-        return R.status(merchantService.update(merchant),"更新失败");
+        return R.status(merchantService.update(merchant), "更新失败");
     }
+
     @PostMapping("/export-list")
     @ApiOperation("导出商户列表")
     public R<String> exportList(@RequestBody(required = false) MerchantPageReq merchantPageReq) throws IOException {
-        return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(merchantService.exportList(merchantPageReq), MerchantWithCreditAndTreeDTO.class,"商户导出")));
+        return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(merchantService.exportList(merchantPageReq), MerchantWithCreditAndTreeDTO.class, "商户导出")));
     }
 }

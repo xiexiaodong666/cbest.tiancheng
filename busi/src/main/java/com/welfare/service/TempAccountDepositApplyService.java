@@ -17,14 +17,41 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public interface TempAccountDepositApplyService {
 
+  /**
+   * 批量保存
+   * @param applys
+   * @return
+   */
   Boolean saveAll(List<TempAccountDepositApply> applys);
 
+  /**
+   * 通过fileId删除文件内容
+   * @param fileId
+   * @return
+   */
   Boolean delByFileId(String fileId);
 
+  /**
+   * 通过fileId分页查询批量员工申请上传文件内容
+   * @param current
+   * @param size
+   * @param fileId
+   * @return
+   */
   Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(int current, int size, String fileId);
 
+  /**
+   * 通过fileId查询批量员工申请上传文件内容
+   * @param fileId
+   * @return
+   */
   List<TempAccountDepositApplyDTO> listByFileIdExistAccount(String fileId);
 
+  /**
+   * 通过fileId分页查询批量员工申请上传文件内容
+   * @param fileId
+   * @return
+   */
   List<TempAccountDepositApply> getAllByFileId(String fileId);
 
   /**
@@ -42,7 +69,11 @@ public interface TempAccountDepositApplyService {
    */
   String getFileIdByRequestId(String requestId);
 
-
+  /**
+   * 通过fileId分页查询批量员工申请上传文件里的总人数和总金额
+   * @param fileId
+   * @return
+   */
   AccountApplyTotalDTO getUserCountAndTotalmount(String fileId);
 
 }

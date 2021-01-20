@@ -31,4 +31,6 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
         queryWrapper.eq(SupplierStore.CASHIER_NO,cashierNo);
         return getOne(queryWrapper);
     }
+
+
 }

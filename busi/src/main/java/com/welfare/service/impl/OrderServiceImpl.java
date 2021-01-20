@@ -12,8 +12,10 @@ import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.persist.mapper.OrderInfoMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
+import com.welfare.service.MerchantCreditService;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.OrderService;
+import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.ConsumeTypeJson;
 import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.OrderReqDto;
@@ -39,6 +41,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @ProjectName: e-welfare
@@ -86,7 +89,12 @@ public class OrderServiceImpl implements OrderService {
     private String offsetRest;
     @Value("${spring.kafka.topic:order-info}")
     private String topic;
-
+    @Autowired
+    private SettleDetailService settleDetailService;
+    @Autowired
+    private MerchantBillDetailDao merchantBillDetailDao;
+    @Autowired
+    private MerchantCreditService merchantCreditService;
     private static boolean RUN = false;
 
     @Override
@@ -527,8 +535,17 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //保存结算明细数据
                     if (settleDetailList.size() > 0) {
-                        boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
-                        log.info("kafka明细结算数据保存到数据库{}条{}", settleDetailList.size(), flag == true ? "成功" : "失败");
+                        Map<String, List<SettleDetail>> detailsGroupByMer = settleDetailList.stream()
+                                .collect(Collectors.groupingBy(SettleDetail::getMerCode));
+                        detailsGroupByMer.forEach((merCode, settleDetails) -> {
+                            MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merCode);
+                            List<MerchantBillDetail> merchantBillDetails =
+                                    settleDetailService.calculateAndSetRebate(merchantCredit, settleDetails);
+                            merchantBillDetailDao.saveBatch(merchantBillDetails);
+                            boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
+                            log.info("kafka明细结算数据保存到数据库{}条{}", settleDetailList.size(), flag ? "成功" : "失败");
+                        });
+
                     } else {
                         log.info("kafka明细结算数据中没有满足条件的数据");
                     }

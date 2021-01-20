@@ -221,7 +221,8 @@ public class WelfareConstant {
         /**
          * 账户类型
          */
-        WELFARE_CARD("welfare_card","福利卡消费");
+        WELFARE_CARD("EMPLOYEE_CARD_NUMBER","福利卡消费"),
+        OTHER("OTHER_PAY","其他消费");
         private final String code;
         private final String desc;
 

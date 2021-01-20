@@ -507,27 +507,27 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         }
       }
 
-      isSelectO2O = true;
-      isSelectOnlineMall = true;
-      isSelectShopShopping = true;
+      boolean isSelectO2OSync = true;
+      boolean isSelectOnlineMallSync = true;
+      boolean isSelectShopShoppingSync = true;
 
       if (consumeTypeMap.get(ConsumeTypeEnum.O2O.getCode()) == null || !consumeTypeMap.get(
           ConsumeTypeEnum.O2O.getCode())) {
-        isSelectO2O = false;
+        isSelectO2OSync = false;
       }
 
       if (consumeTypeMap.get(ConsumeTypeEnum.ONLINE_MALL.getCode()) == null || !consumeTypeMap
           .get(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
-        isSelectOnlineMall = false;
+        isSelectOnlineMallSync = false;
       }
 
       if (consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode()) == null || !consumeTypeMap
           .get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
-        isSelectShopShopping = false;
+        isSelectShopShoppingSync = false;
       }
 
       Assert.isTrue(
-          isSelectO2O || isSelectOnlineMall || isSelectShopShopping,
+          isSelectO2OSync || isSelectOnlineMallSync || isSelectShopShoppingSync,
           "消费门店下消费方法不能全被置为空"
       );
       try {

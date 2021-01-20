@@ -2,6 +2,9 @@ package com.welfare.service;
 
 import com.welfare.common.base.BasePageVo;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.entity.MerchantBillDetail;
+import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.persist.entity.SettleDetail;
 import com.welfare.service.dto.*;
 
 import java.util.List;
@@ -52,4 +55,12 @@ public interface SettleDetailService {
     List<SettleMerTransDetailResp> getMerAccountTransDetail(String id, SettleMerTransDetailReq settleMerTransDetailReq);
 
     void merRebate(Merchant merchant);
+
+    /**
+     * 计算并赋值返点金额
+     * @param merchantCredit
+     * @param settleDetails
+     * @return
+     */
+    List<MerchantBillDetail> calculateAndSetRebate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails);
 }

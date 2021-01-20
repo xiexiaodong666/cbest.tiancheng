@@ -299,7 +299,7 @@ public class AccountServiceImpl implements AccountService {
   public Boolean update(Account account) {
     validationAccount(account,false);
     boolean result = accountDao.updateById(account);
-
+    account = accountDao.getById(account.getId());
     applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).accountList(Arrays.asList(account)).build());
     return result;
   }

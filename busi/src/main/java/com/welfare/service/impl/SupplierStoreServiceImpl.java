@@ -309,19 +309,25 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       throw new BusiException("导入门店--批量插入失败");
     }
     //存放门店code和地址的对应关系，用于批量新增门店后，存入对应地址
-    Map<String,List<MerchantAddressDTO>> map=list.stream().collect(Collectors.toMap(SupplierStoreAddDTO::getStoreCode,SupplierStoreAddDTO::getAddressList));
+    Map<String,List<MerchantAddressDTO>> map=new HashMap<>();
+    for(SupplierStoreAddDTO supplierStoreAddDTO: list){
+      map.put(supplierStoreAddDTO.getStoreCode(),supplierStoreAddDTO.getAddressList());
+    }
     List<MerchantAddressDTO> addressDTOList=new ArrayList<>();
     List<SupplierStoreSyncDTO> syncList=new ArrayList<>();
     for(SupplierStore store:saves){
       SupplierStoreSyncDTO syncDTO=supplierStoreSyncConverter.toD(store);
       List<MerchantAddressDTO> addressItemList=map.get(store.getStoreCode());
-      syncDTO.setAddressList(addressItemList);
+      if(EmptyChecker.notEmpty(addressItemList)){
+        syncDTO.setAddressList(addressItemList);
+        addressItemList.forEach(item->{
+          item.setRelatedType(SupplierStore.class.getSimpleName());
+          item.setRelatedId(store.getId());
+        });
+        addressDTOList.addAll(addressItemList);
+      }
       syncList.add(syncDTO);
-      addressItemList.forEach(item->{
-        item.setRelatedType(SupplierStore.class.getSimpleName());
-        item.setRelatedId(store.getId());
-      });
-      addressDTOList.addAll(addressItemList);
+
     }
     if(!merchantAddressService.batchSave(addressDTOList,SupplierStore.class.getSimpleName())){
       throw new BusiException("导入门店--批量插入地址失败");
@@ -342,10 +348,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public String upload(MultipartFile multipartFile) {
     DictReq req = new DictReq();
     req.setDictType(WelfareConstant.DictType.STORE_CONSUM_TYPE.code());
-    //查询所有的消费类型字典，用来初始化
-    List<DictDTO> dictList = dictService.getByType(req);
-    Map<String, Boolean> map = dictList.stream().collect(
-            Collectors.toMap(DictDTO::getDictCode, item -> false));
     SupplierStoreListener listener = new SupplierStoreListener(
             merchantService, this);
     try {

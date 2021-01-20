@@ -105,7 +105,7 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
         department.setDepartmentCode(departmentCode);
       }
 
-      if(flag){
+      if(flag&&EmptyChecker.isEmpty(uploadInfo)){
       Boolean result = departmentService.batchAdd(list);
         if (result == false) {
           uploadInfo.append(fail);

@@ -517,8 +517,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       }
 
       // 同步员工消费方法
-      accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          storeRelation.getMerCode(), storeRelation.getStoreCode(), storeRelation.getConsumType());
+    /*  accountConsumeSceneStoreRelationService.updateStoreConsumeType(
+          storeRelation.getMerCode(), storeRelation.getStoreCode(), storeRelation.getConsumType());*/
     }
 
     return merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);

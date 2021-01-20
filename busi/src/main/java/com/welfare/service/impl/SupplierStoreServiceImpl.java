@@ -357,7 +357,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     String result = listener.getUploadInfo().toString();
     listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
     if (!SupplierStoreListener.success.equals(result)) {
-
+      throw new BusiException(result);
     }
     return result;
   }

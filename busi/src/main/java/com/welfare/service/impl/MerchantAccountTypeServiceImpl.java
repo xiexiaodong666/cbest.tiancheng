@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.MoveDirectionEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
@@ -19,6 +20,7 @@ import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,13 +42,15 @@ import java.util.stream.Collectors;
 public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
     private final MerchantAccountTypeExMapper merchantAccountTypeExMapper;
-    private final MerchantService merchantService;
+    @Autowired
+    private MerchantService merchantService;
     private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
     private final SequenceService sequenceService;
 
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
         QueryWrapper q=QueryHelper.getWrapper(req);
+        q.eq(MerchantAccountType.SHOW_STATUS,MerchantAccountTypeShowStatusEnum.SHOW.getCode());
         q.orderByDesc(MerchantAccountType.CREATE_TIME);
         return merchantAccountTypeDao.list(q);
     }
@@ -94,6 +98,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
             type.setRemark(merchantAccountType.getRemark());
             type.setCreateTime(date);
+            type.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
             accountTypeList.add(type);
         }
         return merchantAccountTypeDao.saveBatch(accountTypeList);
@@ -124,19 +129,16 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
                 type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
                 type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
                 type.setRemark(merchantAccountType.getRemark());
+                type.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
                 type.setCreateTime(date);
                 addList.add(type);
             }else{
-                MerchantAccountType type=new MerchantAccountType();
-                type.setId(typeItem.getId());
+                MerchantAccountType type=merchantAccountTypeDao.getById(typeItem.getId());
                 type.setMerCode(merchantAccountType.getMerCode());
-                type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
-                type.setMerAccountTypeCode(typeItem.getMerAccountTypeCode());
                 type.setDeductionOrder(typeItem.getDeductionOrder());
                 type.setRemark(merchantAccountType.getRemark());
                 type.setCreateTime(date);
                 type.setUpdateTime(date);
-                type.setUpdateUser(merchantAccountType.getUpdateUser());
                 merchantAccountTypeDao.updateAllColumnById(type);
             }
         }
@@ -188,5 +190,26 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
         QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(MerchantAccountType.MER_CODE,merCode);
         return merchantAccountTypeDao.list(queryWrapper);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean init(String merCode) {
+        List<MerchantAccountType> initList=new ArrayList<>();
+        MerchantAccountType merchantAccountType1=new MerchantAccountType();
+        merchantAccountType1.setMerAccountTypeName("员工授信额度");
+        merchantAccountType1.setMerCode(merCode);
+        merchantAccountType1.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+        merchantAccountType1.setDeductionOrder(9999);
+        merchantAccountType1.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+        initList.add(merchantAccountType1);
+        MerchantAccountType merchantAccountType2=new MerchantAccountType();
+        merchantAccountType2.setMerAccountTypeName("自助充值");
+        merchantAccountType2.setMerCode(merCode);
+        merchantAccountType2.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+        merchantAccountType2.setDeductionOrder(0);
+        merchantAccountType2.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+        initList.add(merchantAccountType2);
+        return merchantAccountTypeDao.saveBatch(initList);
     }
 }

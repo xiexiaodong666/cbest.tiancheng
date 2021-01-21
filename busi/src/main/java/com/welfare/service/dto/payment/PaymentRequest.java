@@ -53,6 +53,8 @@ public abstract class PaymentRequest {
     private Date paymentDate;
     @ApiModelProperty("退款交易流水号,返回参数")
     private String refundTransNo;
+    @ApiModelProperty("电话号码")
+    private String phone;
 
     public String calculatePaymentScene(){
         String consumeType = o2oOrOnlineShopping(machineNo);
@@ -71,8 +73,6 @@ public abstract class PaymentRequest {
         if(Objects.isNull(oneByCashierNo)){
             return null;
         }else{
-            Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(oneByCashierNo.getStatus()),
-                    "门店未激活:"+oneByCashierNo.getStoreCode());
             String consumType = oneByCashierNo.getConsumType();
             Assert.notNull(consumType,"门店没有配置消费场景");
             ConsumeTypeJson consumeTypeJson = JSON.parseObject(consumType,ConsumeTypeJson.class);

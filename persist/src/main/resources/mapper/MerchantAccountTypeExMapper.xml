@@ -12,7 +12,7 @@
         mat.create_time createTime
         FROM
         merchant_account_type mat
-        LEFT JOIN merchant m ON mat.mer_code = m.mer_code and mat.deleted=0 and m.deleted=0
+        LEFT JOIN merchant m ON mat.mer_code = m.mer_code and mat.deleted=0 and m.deleted=0 and mat.show_status=1
         <where>
             <if test="req!=null and req.merCode!=null and req.merCode!=''">
                 and mat.mer_code=#{req.merCode}

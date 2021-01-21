@@ -32,5 +32,15 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
         return getOne(queryWrapper);
     }
 
+    @Override
+    public boolean save(SupplierStore entity){
+        return super.save(entity);
+    }
+
+    @Override
+    public boolean updateById(SupplierStore entity){
+        return super.updateById(entity);
+    }
+
 
 }

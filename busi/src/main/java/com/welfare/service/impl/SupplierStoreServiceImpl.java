@@ -68,6 +68,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -336,6 +337,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     for (SupplierStoreAddDTO supplierStoreAddDTO : list) {
       map.put(supplierStoreAddDTO.getStoreCode(), supplierStoreAddDTO.getAddressList());
     }
+    if (!supplierStoreDao.saveBatch(saves)) {
+      throw new BusiException("导入门店--批量插入失败");
+    }
     List<MerchantAddressDTO> addressDTOList = new ArrayList<>();
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     for (SupplierStore store : saves) {
@@ -354,9 +358,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       }
       syncList.add(syncDTO);
 
-    }
-    if (!supplierStoreDao.saveBatch(saves)) {
-      throw new BusiException("导入门店--批量插入失败");
     }
     if (!merchantAddressService.batchSave(addressDTOList, SupplierStore.class.getSimpleName())) {
       throw new BusiException("导入门店--批量插入地址失败");

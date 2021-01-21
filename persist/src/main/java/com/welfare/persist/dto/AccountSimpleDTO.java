@@ -14,7 +14,7 @@ public class AccountSimpleDTO {
     private String merName;
 
     @ApiModelProperty("账号")
-    private Long accountCode;
+    private String phone;
 
     @ApiModelProperty("姓名")
     private String accountName;

@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,8 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
   private final ObjectMapper mapper;
   private final ShoppingFeignClient shoppingFeignClient;
-  private final MerchantService merchantService;
+  @Autowired
+  MerchantService merchantService;
   private final AccountTypeService accountTypeService;
   private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationList;
   private final AccountService accountService;

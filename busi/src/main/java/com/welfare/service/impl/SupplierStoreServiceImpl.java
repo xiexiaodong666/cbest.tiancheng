@@ -336,6 +336,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     for (SupplierStoreAddDTO supplierStoreAddDTO : list) {
       map.put(supplierStoreAddDTO.getStoreCode(), supplierStoreAddDTO.getAddressList());
     }
+    if (!supplierStoreDao.saveBatch(saves)) {
+      throw new BusiException("导入门店--批量插入失败");
+    }
     List<MerchantAddressDTO> addressDTOList = new ArrayList<>();
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     for (SupplierStore store : saves) {
@@ -354,9 +357,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       }
       syncList.add(syncDTO);
 
-    }
-    if (!supplierStoreDao.saveBatch(saves)) {
-      throw new BusiException("导入门店--批量插入失败");
     }
     if (!merchantAddressService.batchSave(addressDTOList, SupplierStore.class.getSimpleName())) {
       throw new BusiException("导入门店--批量插入地址失败");

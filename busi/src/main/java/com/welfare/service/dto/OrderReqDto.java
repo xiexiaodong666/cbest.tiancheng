@@ -36,7 +36,7 @@ public class OrderReqDto implements Serializable {
     @ApiModelProperty(value = "结束时间" , required = false)
     private String endDateTime;
     @ApiModelProperty(value = "门店编码" , required = false)
-    private List<Integer> storeIds;
+    private List<String> storeIds;
     @ApiModelProperty(value = "页面" , required = false)
     private Integer current;
     @ApiModelProperty(value = "页数据" , required = false)

@@ -34,7 +34,7 @@ public class CardPaymentRequest extends PaymentRequest {
             return super.getAccountCode();
         }
         CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
-        CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(magneticStripe);
+        CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(cardInsideInfo);
         Long accountCode = cardInfo.getAccountCode();
         this.setAccountCode(accountCode);
         return accountCode;

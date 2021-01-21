@@ -2,6 +2,7 @@ package com.welfare.service.dto.payment;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.SupplierStore;
@@ -70,6 +71,8 @@ public abstract class PaymentRequest {
         if(Objects.isNull(oneByCashierNo)){
             return null;
         }else{
+            Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(oneByCashierNo.getStatus()),
+                    "门店未激活:"+oneByCashierNo.getStoreCode());
             String consumType = oneByCashierNo.getConsumType();
             Assert.notNull(consumType,"门店没有配置消费场景");
             ConsumeTypeJson consumeTypeJson = JSON.parseObject(consumType,ConsumeTypeJson.class);

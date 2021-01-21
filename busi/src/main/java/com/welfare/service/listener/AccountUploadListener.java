@@ -5,6 +5,7 @@ import com.alibaba.excel.event.AnalysisEventListener;
 import com.welfare.common.constants.AccountStatus;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.AccountUtil;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
@@ -42,8 +43,8 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
 
   private final SequenceService sequenceService;
 
-
   private static StringBuilder uploadInfo = new StringBuilder();
+
 
 
 
@@ -63,6 +64,11 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
   }
 
   private boolean validationAccount(Account account) {
+    String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
+    if( !merCode.equals(account.getMerCode()) ){
+      uploadInfo.append("商户编码不合法:").append(account.getMerCode()).append(";");
+      return false;
+    }
     if(!AccountUtil.validPhone(account.getPhone())){
       uploadInfo.append("手机号码不合法:").append(account.getPhone()).append(";");
       return false;
@@ -83,7 +89,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       uploadInfo.append("不存在的员工类型编码:").append(account.getAccountTypeCode()).append(";");
       return false;
     }
-    Department department = departmentService.getByDepartmentCode(account.getStoreCode());
+    Department department = departmentService.getByDepartmentCodeAndMerCode(account.getStoreCode(),merCode);
     if (null == department) {
       uploadInfo.append("不存在的员工部门:").append(account.getStoreCode()).append(";");
       return false;

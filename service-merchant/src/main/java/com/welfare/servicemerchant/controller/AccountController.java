@@ -149,6 +149,7 @@ public class AccountController implements IController {
 
   @ApiOperation("批量新增员工账号")
   @PostMapping(value = "/uploadAccount")
+  @MerchantUser
   public R<String> uploadAccount(
       @RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile) {
     try {

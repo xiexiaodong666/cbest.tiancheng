@@ -69,4 +69,6 @@ public interface DepartmentService {
      * @return
      */
     Department getByDepartmentCode(String departmentCode);
+
+    public Department getByDepartmentCodeAndMerCode(String departmentCode,String merCode);
 }

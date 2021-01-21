@@ -44,7 +44,7 @@ public class BarcodeServiceImpl implements BarcodeService {
     private static final Long MAX_PERIOD_GENERATE = 30L;
     private static final int MILL_SEC_A_DAY = (86400 * 1000);
     private static final String BARCODE_PREFIX = "e-welfare-barcode";
-    @Value("${e-welfare.barcode.expire:60}")
+    @Value("${e-welfare.barcode.expire:180}")
     private Long barcodeExpireSecs;
 
     private final BarcodeSaltDao barcodeSaltDao;

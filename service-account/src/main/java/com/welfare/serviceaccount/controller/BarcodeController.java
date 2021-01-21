@@ -43,9 +43,8 @@ public class BarcodeController implements IController {
     @GetMapping
     @ApiOperation("用户获取支付条码")
     public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode){
-        BarcodeSalt barcodeSalt =  barcodeService.queryCurrentPeriodSaltValue();
-        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue());
-        return success(paymentBarcode);
+        PaymentBarcode barcode = barcodeService.getBarcode(accountCode);
+        return success(barcode);
     }
 
     @GetMapping("/test-barcode-parse")

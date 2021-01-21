@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 /**
@@ -28,6 +29,8 @@ public class SupplierStoreAddDTO {
      */
     @ApiModelProperty("门店代码")
     @NotBlank
+    @Length(max=4,min = 4)
+    @Pattern(regexp = "^[0-9A-Z]+$")
     private String storeCode;
     /**
      * 门店名称

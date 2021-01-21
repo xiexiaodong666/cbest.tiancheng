@@ -2,6 +2,7 @@ package com.welfare.persist.dto;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.NumberFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -19,6 +20,7 @@ public class MerchantStoreRelationDTO {
    * id
    */
   @ExcelProperty(value ="id")
+  @NumberFormat("###################")
   private Long id;
 
   /**

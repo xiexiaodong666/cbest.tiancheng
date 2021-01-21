@@ -253,6 +253,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreAddDTO supplierStore) {
+    List<String> consumTypes=Arrays.asList(supplierStore.getConsumType().split(","));
+    if(!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"未输入正确的消费类型",null);
+    }
+    if(consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
+            &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"O2O和线上商城不能同时选择",null);
+    }
     Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
     if (EmptyChecker.isEmpty(merchant)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
@@ -408,13 +416,22 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
+    List<String> consumTypes=Arrays.asList(supplierStore.getConsumType().split(","));
+    if(!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"未输入正确的消费类型",null);
+    }
+    SupplierStore entity = supplierStoreDao.getById(supplierStore.getId());
+    if (EmptyChecker.isEmpty(entity)) {
+      throw new BusiException("id不存在");
+    }
     boolean flag2 = true;
+    //同步消费门店消费配置
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
       supplierStore.setConsumType(
           JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
-      flag2 = this.syncConsumeType(supplierStore.getStoreCode(), supplierStore.getConsumType());
+      flag2 = this.syncConsumeType(entity.getStoreCode(), supplierStore.getConsumType());
     }
-    SupplierStore update = this.buildUpdate(supplierStore);
+    SupplierStore update = this.buildUpdate(entity,supplierStore);
     update.setStoreParent(update.getMerCode());
     boolean flag = 1 == supplierStoreDao.updateAllColumnById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
@@ -432,24 +449,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     return flag && flag2 && flag3;
   }
 
-  private SupplierStore buildUpdate(SupplierStoreUpdateDTO update) {
-    SupplierStore entity = supplierStoreDao.getById(update.getId());
-    if (EmptyChecker.isEmpty(entity)) {
-      throw new BusiException("id不存在");
-    }
-    if (!update.getStoreCode().equals(entity.getStoreCode())
-        && EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(update.getStoreCode()))) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店编码已存在", null);
-
-    }
-    if (EmptyChecker.notEmpty(update.getCashierNo())
-        && !update.getCashierNo().equals(entity.getCashierNo())
-        && EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(update.getCashierNo()))) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "虚拟收银机号已存在", null);
-    }
+  private SupplierStore buildUpdate(SupplierStore entity,SupplierStoreUpdateDTO update) {
     entity.setMerCode(update.getMerCode());
-    entity.setCashierNo(update.getCashierNo());
-    entity.setStoreCode(update.getStoreCode());
     entity.setStoreName(update.getStoreName());
     entity.setRemark(update.getRemark());
     entity.setConsumType(update.getConsumType());

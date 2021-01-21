@@ -1,5 +1,7 @@
 package com.welfare.common.enums;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,6 +58,13 @@ public enum ConsumeTypeEnum {
 
   public static ConsumeTypeEnum getByType(String type) {
     return ENUM_MAP.get(type);
+  }
+  public static List<String> getCodeList() {
+    List<String> list = new ArrayList<>();
+    list.add(ConsumeTypeEnum.O2O.getCode());
+    list.add(ConsumeTypeEnum.ONLINE_MALL.getCode());
+    list.add(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+    return list;
   }
 
   public static String getTypeByExcelType(String excelType) {

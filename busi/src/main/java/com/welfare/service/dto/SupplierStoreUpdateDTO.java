@@ -29,12 +29,6 @@ public class SupplierStoreUpdateDTO {
     @NotBlank
     private String merCode;
     /**
-     * 门店代码
-     */
-    @ApiModelProperty("门店代码")
-    @NotBlank
-    private String storeCode;
-    /**
      * 门店名称
      */
     @ApiModelProperty("门店名称")

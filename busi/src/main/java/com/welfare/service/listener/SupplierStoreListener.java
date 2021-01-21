@@ -63,6 +63,14 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     Integer row=analysisContext.readRowHolder().getRowIndex()+1;
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
       uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空").append(";");
+    }else{
+      if(storeImportDTO.getStoreCode().length()!=4){
+        uploadInfo.append("第").append(row.toString()).append("行").append("门店编码只能为4位").append(";");
+      }
+      String regex = "^[0-9A-Z]+$";
+      if(!storeImportDTO.getStoreCode().matches(regex)){
+        uploadInfo.append("第").append(row.toString()).append("行").append("门店编码格式错误").append(";");
+      }
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getMerCode())){
       uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空").append(";");

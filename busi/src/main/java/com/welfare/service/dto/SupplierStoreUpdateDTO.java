@@ -23,12 +23,6 @@ public class SupplierStoreUpdateDTO {
     @ApiModelProperty("id")
 	private Long id;
     /**
-     * 商户代码
-     */
-    @ApiModelProperty("商户代码")
-    @NotBlank
-    private String merCode;
-    /**
      * 门店名称
      */
     @ApiModelProperty("门店名称")

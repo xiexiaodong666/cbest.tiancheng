@@ -450,7 +450,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   private SupplierStore buildUpdate(SupplierStore entity,SupplierStoreUpdateDTO update) {
-    entity.setMerCode(update.getMerCode());
     entity.setStoreName(update.getStoreName());
     entity.setRemark(update.getRemark());
     entity.setConsumType(update.getConsumType());

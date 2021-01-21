@@ -26,6 +26,12 @@ public class MerchantStoreRelationDetailDTO {
   private String merCode;
 
   /**
+   * 是否返利
+   */
+  @ApiModelProperty("是否返利, 1返利, 0不返利")
+  private Integer isRebate;
+
+  /**
    * 门店，消费方式集合
    */
   @ApiModelProperty("门店，消费方式集合")

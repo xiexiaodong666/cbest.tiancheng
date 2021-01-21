@@ -92,7 +92,7 @@ public class SupplierStoreController implements IController {
     }
     @PostMapping("/update")
     @ApiOperation("编辑供应商门店")
-    @ApiUser
+    //@ApiUser
     public R update(@RequestBody@Valid  SupplierStoreUpdateDTO supplierStore){
         if(supplierStore.getConsumType().contains(ConsumeTypeEnum.O2O.getCode())
                 && EmptyChecker.isEmpty(supplierStore.getAddressList())){

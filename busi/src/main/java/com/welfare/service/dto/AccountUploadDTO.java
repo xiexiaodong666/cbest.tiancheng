@@ -21,7 +21,7 @@ public class AccountUploadDTO extends BaseRowModel {
   @ExcelProperty(value = "手机号", index = 2)
   private String phone;
   @ExcelProperty(value = "账号状态", index = 3)
-  private String accountStatus;
+  private Integer accountStatus;
   @ExcelProperty(value = "员工类型编码", index = 4)
   private String accountTypeCode;
   @ExcelProperty(value = "所属部门", index = 5)

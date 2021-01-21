@@ -160,6 +160,7 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant save =merchantAddConverter.toE(merchant);
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
+        merchantCreditService.init(merchant.getMerCode());
         //同步商城中台
         if(!(flag&&flag2)){
             throw new BusiException("新增商户失败");

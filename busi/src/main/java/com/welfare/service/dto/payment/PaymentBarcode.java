@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -17,7 +18,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel("支付条码")
-public class PaymentBarcode {
+public class PaymentBarcode implements Serializable {
     @ApiModelProperty("条码值")
     private String barcode;
     @ApiModelProperty("扫描日期")

@@ -16,8 +16,10 @@
         <result property="transType" column="trans_type"/>
         <result property="transAmount" column="trans_amount"/>
         <result property="transTime" column="trans_time"/>
+        <result property="channel" column="channel"/>
         <collection property="deductionList" ofType="com.welfare.persist.dto.AccountBillDetailSimpleDeductionDTO">
             <id column="adedid"/>
+            <result property="merAccountTypeCode" column="mer_account_type_code"/>
             <result property="merAccountTypeName" column="mer_account_type_name"/>
             <result property="accountDeductionAmount" column="account_deduction_amount"/>
         </collection>
@@ -27,18 +29,22 @@
         SELECT
         abd.id AS adbid,
         abd.store_code,
-        ss.store_name,
+        IF(abd.trans_type='deposit',m.mer_name,ss.store_name) AS store_name,
         abd.trans_type,
         abd.trans_amount,
         abd.trans_time,
+        abd.channel,
         aded.id as adedid,
+        mat.mer_account_type_code,
         mat.mer_account_type_name,
         aded.account_deduction_amount
         FROM
         account_bill_detail abd
-        JOIN account_deduction_detail aded ON abd.trans_no = aded.trans_no
-        JOIN supplier_store ss ON abd.store_code = ss.store_code
-        JOIN merchant_account_type mat ON aded.mer_account_type = mat.mer_account_type_code
+        JOIN account a ON abd.account_code=a.account_code
+        JOIN merchant m ON a.mer_code=m.mer_code
+        LEFT JOIN account_deduction_detail aded ON abd.trans_no = aded.trans_no
+        LEFT JOIN supplier_store ss ON abd.store_code = ss.store_code
+        LEFT JOIN merchant_account_type mat ON aded.mer_account_type = mat.mer_account_type_code
         <where>
             <if test="accountCode != null">
                 AND abd.account_code = #{accountCode}

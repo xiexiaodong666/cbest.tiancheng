@@ -178,7 +178,7 @@ public class PlatformUserController {
   private PlatformUser transferPlatformUser(ShoppingPlatformUser shoppingPlatformUser) {
     PlatformUser platformUser = new PlatformUser();
 
-    platformUser.setId(shoppingPlatformUser.getId());
+    platformUser.setId(Long.valueOf(shoppingPlatformUser.getId()));
     platformUser.setName(shoppingPlatformUser.getName());
     platformUser.setUsername(shoppingPlatformUser.getUsername());
     platformUser.setInitPassword(shoppingPlatformUser.getInit_password());
@@ -202,7 +202,7 @@ public class PlatformUserController {
   private ShoppingPlatformUser transferShoppingPlatformUser(PlatformUser platformUser, Integer action) {
     ShoppingPlatformUser shoppingPlatformUser = new ShoppingPlatformUser();
 
-    shoppingPlatformUser.setId(platformUser.getId());
+    shoppingPlatformUser.setId(String.valueOf(platformUser.getId()));
     shoppingPlatformUser.setName(platformUser.getName());
     shoppingPlatformUser.setUsername(platformUser.getUsername());
     shoppingPlatformUser.setInit_password(platformUser.getInitPassword());

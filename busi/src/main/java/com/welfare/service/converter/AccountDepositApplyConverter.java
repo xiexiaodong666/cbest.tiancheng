@@ -4,8 +4,10 @@ import com.welfare.persist.entity.AccountDepositApply;
 import com.welfare.persist.entity.AccountDepositApplyDetail;
 import com.welfare.service.dto.accountapply.AccountDepositApplyExcelInfo;
 import com.welfare.service.dto.accountapply.AccountDepositApplyInfo;
+import com.welfare.service.dto.accountapply.BatchDepositApplyRequest;
 import com.welfare.service.dto.accountapply.DepositApplyRequest;
 import org.mapstruct.Mapper;
+import org.skife.jdbi.v2.Batch;
 
 import java.util.List;
 

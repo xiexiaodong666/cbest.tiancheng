@@ -43,7 +43,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
 
   private List<String> merCodeList = new LinkedList();
   private List<String> storeCodeList = new LinkedList();
-  private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getCode(),ConsumeTypeEnum.ONLINE_MALL.getCode(),ConsumeTypeEnum.SHOP_SHOPPING.getCode()});
+  private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getExcelType(),ConsumeTypeEnum.ONLINE_MALL.getExcelType(),ConsumeTypeEnum.SHOP_SHOPPING.getExcelType()});
 
   public static  final String success="导入成功";
   public static  final String fail="入库失败";
@@ -63,6 +63,14 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     Integer row=analysisContext.readRowHolder().getRowIndex()+1;
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
       uploadInfo.append("第").append(row.toString()).append("行").append("门店编码不能为空").append(";");
+    }else{
+      if(storeImportDTO.getStoreCode().length()!=4){
+        uploadInfo.append("第").append(row.toString()).append("行").append("门店编码只能为4位").append(";");
+      }
+      String regex = "^[0-9A-Z]+$";
+      if(!storeImportDTO.getStoreCode().matches(regex)){
+        uploadInfo.append("第").append(row.toString()).append("行").append("门店编码格式错误").append(";");
+      }
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getMerCode())){
       uploadInfo.append("第").append(row.toString()).append("行").append("商户编码不能为空").append(";");
@@ -74,8 +82,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       uploadInfo.append("第").append(row.toString()).append("行").append("消费类型不能为空").append(";");
     }
     List<String> consumTypes=Arrays.asList(storeImportDTO.getConsumType().split(","));
-    if(excelAllType.containsAll(consumTypes)){
+    if(!excelAllType.containsAll(consumTypes)){
       uploadInfo.append("第").append(row.toString()).append("行").append("未输入正确的消费类型").append(";");
+    }
+    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
+            &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
+      uploadInfo.append("第").append(row.toString()).append("行").append("线上商城和O2O不能同时选择").append(";");
     }
     if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
             ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
@@ -101,8 +113,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         addressList.add(merchantAddressDTO);
         store.setAddressList(addressList);
       }
-
-    }
+    }else{
+      if(!(EmptyChecker.isEmpty(storeImportDTO.getAddressName())
+              &&EmptyChecker.isEmpty(storeImportDTO.getAddress()))) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("只有O2O门店可以填写自提点").append(";");
+      }
+      }
     store.setCashierNo(store.getCashierNo());
     store.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transferWithExcel(consumTypes)));
     list.add(store);
@@ -115,7 +131,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
     if (!CollectionUtils.isEmpty(list)) {
       boolean flag = check();
-      if(flag&&EmptyChecker.notEmpty(uploadInfo)){
+      if(flag&&EmptyChecker.isEmpty(uploadInfo.toString())){
         Boolean result = storeService.batchAdd(list);
         if (result == false) {
           uploadInfo.append(fail);

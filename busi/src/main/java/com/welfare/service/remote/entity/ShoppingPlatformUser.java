@@ -16,7 +16,7 @@ import java.util.Date;
 public class ShoppingPlatformUser {
 
   @ExcelProperty(value ="id")
-  private Long id;
+  private String id;
   @ExcelProperty(value ="姓名")
   private String name;
   @ExcelProperty(value ="用户名")

@@ -8,11 +8,8 @@ import java.math.BigDecimal;
 @Data
 public class AccountDepositReq {
 
-    @ApiModelProperty(value = "账号")
+    @ApiModelProperty(value = "账号", hidden = true)
     private Long accountCode;
-
-    @ApiModelProperty(value = "商户号")
-    private String merCode;
 
     @ApiModelProperty("充值金额")
     private BigDecimal rechargeAmount;

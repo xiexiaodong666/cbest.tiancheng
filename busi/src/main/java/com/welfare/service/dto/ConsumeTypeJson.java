@@ -27,4 +27,15 @@ public class ConsumeTypeJson implements Serializable {
     }
     return false;
   }
+
+  public String getValue(String type){
+    if( null != O2O && type.equals(F_O2O ) ){
+      return F_O2O;
+    }else if (null != ONLINE_MALL && type.equals(F_ONLINE_MALL )){
+      return F_ONLINE_MALL;
+    }else if(null != SHOP_CONSUMPTION && type.equals(F_SHOP_CONSUMPTION)){
+      return F_SHOP_CONSUMPTION;
+    }
+    return "";
+  }
 }

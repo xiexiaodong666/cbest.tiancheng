@@ -82,8 +82,11 @@
     <if test=" accountName !='' and accountName != null  ">
       and a.account_name like '%${accountName}'
     </if>
-    <if test=" departmentCode !='' and departmentCode != null ">
-      and d.department_code = #{departmentCode}
+    <if test="departmentCodeList != null ">
+      and d.department_code in
+      <foreach collection="departmentCodeList" item="id" index="index" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
     </if>
     <if test="accountStatus != null ">
       and a.account_status = #{accountStatus}

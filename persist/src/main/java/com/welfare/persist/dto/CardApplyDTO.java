@@ -2,6 +2,7 @@ package com.welfare.persist.dto;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.NumberFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -21,6 +22,7 @@ public class CardApplyDTO {
    */
   @ApiModelProperty("id")
   @ExcelProperty(value ="id")
+  @NumberFormat("###################")
   private Long id;
   /**
    * 制卡申请号

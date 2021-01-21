@@ -23,20 +23,6 @@ public class SupplierStoreUpdateDTO {
     @ApiModelProperty("id")
 	private Long id;
     /**
-     * 商户代码
-     */
-    @ApiModelProperty("商户代码")
-    @NotBlank
-    private String merCode;
-    @ApiModelProperty("虚拟收银机号")
-    private String cashierNo;
-    /**
-     * 门店代码
-     */
-    @ApiModelProperty("门店代码")
-    @NotBlank
-    private String storeCode;
-    /**
      * 门店名称
      */
     @ApiModelProperty("门店名称")

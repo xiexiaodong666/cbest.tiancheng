@@ -161,8 +161,8 @@ public class AccountController implements IController {
 
   @ApiOperation("批量绑卡")
   @PostMapping(value = "/batchBindCard")
+  @MerchantUser
   public R<String> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
-
     try {
       return success(accountService.accountBatchBindCard(multipartFile));
     } catch (BusiException be) {

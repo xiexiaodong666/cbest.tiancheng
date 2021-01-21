@@ -224,6 +224,7 @@ public class AccountServiceImpl implements AccountService {
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, accounCode,account.getCreateUser());
     accountChangeEventRecordService.save(accountChangeEventRecord);
 
+    account.setSurplusQuota(account.getMaxQuota());
     account.setAccountCode(accounCode);
     account.setChangeEventId(accountChangeEventRecord.getId());
     boolean result = accountDao.save(account);

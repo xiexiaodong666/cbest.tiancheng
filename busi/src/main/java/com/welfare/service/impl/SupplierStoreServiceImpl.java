@@ -235,6 +235,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreAddDTO supplierStore) {
+    List<String> consumTypes=Arrays.asList(supplierStore.getConsumType().split(","));
+    if(!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"未输入正确的消费类型",null);
+    }
+    if(consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
+            &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"O2O和线上商城不能同时选择",null);
+    }
     Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
     if (EmptyChecker.isEmpty(merchant)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
@@ -390,6 +398,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
+    List<String> consumTypes=Arrays.asList(supplierStore.getConsumType().split(","));
+    if(!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"未输入正确的消费类型",null);
+    }
     boolean flag2 = true;
     if (EmptyChecker.notEmpty(supplierStore.getConsumType())) {
       supplierStore.setConsumType(

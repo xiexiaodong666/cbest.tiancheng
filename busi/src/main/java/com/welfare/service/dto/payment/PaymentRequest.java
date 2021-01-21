@@ -53,6 +53,8 @@ public abstract class PaymentRequest {
     private Date paymentDate;
     @ApiModelProperty("退款交易流水号,返回参数")
     private String refundTransNo;
+    @ApiModelProperty("电话号码")
+    private String phone;
 
     public String calculatePaymentScene(){
         String consumeType = o2oOrOnlineShopping(machineNo);

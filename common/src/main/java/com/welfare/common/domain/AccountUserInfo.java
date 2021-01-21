@@ -9,7 +9,4 @@ public class AccountUserInfo {
 
     private Long accountCode;
 
-    private String phone;
-
-    private String merCode;
 }

@@ -128,10 +128,10 @@ public class AccountDepositApplyController implements IController {
   @MerchantUser
   public R<String> batchSave(@Validated @RequestBody BatchDepositApplyRequest request){
     DepositApplyRequest applyRequest = new DepositApplyRequest();
-    request.setRequestId(request.getRequestId());
-    request.setApplyRemark(request.getApplyRemark());
-    request.setMerAccountTypeCode(request.getMerAccountTypeCode());
-    request.setMerAccountTypeName(request.getMerAccountTypeName());
+    applyRequest.setRequestId(request.getRequestId());
+    applyRequest.setApplyRemark(request.getApplyRemark());
+    applyRequest.setMerAccountTypeCode(request.getMerAccountTypeCode());
+    applyRequest.setMerAccountTypeName(request.getMerAccountTypeName());
     return success(depositApplyService.saveBatch(applyRequest, request.getFileId(), MerchantUserHolder.getMerchantUser())+"");
   }
 

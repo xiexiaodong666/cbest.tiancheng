@@ -37,8 +37,8 @@
     </if>
     <if test="status != null and status !='' ">and ca.status = #{status}
     </if>
-    <if test="startTime != null ">and msr.create_time &gt;= #{startTime}</if>
-    <if test="endTime != null ">and msr.create_time &lt;= #{endTime}</if>
+    <if test="startTime != null ">and ca.create_time &gt;= #{startTime}</if>
+    <if test="endTime != null ">and ca.create_time &lt;= #{endTime}</if>
 
     order by  ca.create_time desc
   </select>
@@ -72,8 +72,8 @@
     </if>
     <if test="status != null and status !='' ">and ca.status = #{status}
     </if>
-    <if test="startTime != null ">and msr.create_time &gt;= #{startTime}</if>
-    <if test="endTime != null ">and msr.create_time &lt;= #{endTime}</if>
+    <if test="startTime != null ">and ca.create_time &gt;= #{startTime}</if>
+    <if test="endTime != null ">and ca.create_time &lt;= #{endTime}</if>
 
   </select>
 </mapper>

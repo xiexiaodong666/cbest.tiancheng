@@ -2,6 +2,7 @@ package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -29,7 +30,7 @@ public class AccountPageReq implements Serializable {
    * 所属部门
    */
   @ApiModelProperty("所属部门")
-  private String departmentCode;
+  private List<String> departmentCodeList;
   /**
    * 账号状态
    */

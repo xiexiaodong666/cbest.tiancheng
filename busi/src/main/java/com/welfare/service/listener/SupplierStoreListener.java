@@ -101,8 +101,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         addressList.add(merchantAddressDTO);
         store.setAddressList(addressList);
       }
-
-    }
+    }else{
+      if(!(EmptyChecker.isEmpty(storeImportDTO.getAddressName())
+              &&EmptyChecker.isEmpty(storeImportDTO.getAddress()))) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("只有O2O门店可以填写自提点").append(";");
+      }
+      }
     store.setCashierNo(store.getCashierNo());
     store.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transferWithExcel(consumTypes)));
     list.add(store);
@@ -115,7 +119,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
     if (!CollectionUtils.isEmpty(list)) {
       boolean flag = check();
-      if(flag&&EmptyChecker.notEmpty(uploadInfo)){
+      if(flag&&EmptyChecker.isEmpty(uploadInfo.toString())){
         Boolean result = storeService.batchAdd(list);
         if (result == false) {
           uploadInfo.append(fail);

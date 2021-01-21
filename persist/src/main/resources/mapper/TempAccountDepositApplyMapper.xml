@@ -40,7 +40,7 @@
         where file_id = #{fileId} and a.deleted = 0
     </select>
 
-    <select id="getUserCountAndTotalmount" resultMap="tempAccountApplyTotalDTO">
+    <select id="getUserCountAndTotalAmount" resultMap="tempAccountApplyTotalDTO">
         SELECT
         count(DISTINCT t.account_code) as userCount,
         SUM(t.recharge_amount) as totalAmount

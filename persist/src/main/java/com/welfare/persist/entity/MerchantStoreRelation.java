@@ -63,12 +63,14 @@ public class MerchantStoreRelation extends Model<MerchantStoreRelation> implemen
     /**
      * 返利类型
      */
-    @ApiModelProperty("返利类型")   
+    @ApiModelProperty("返利类型")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String rebateType;
     /**
      * 返利比率
      */
-    @ApiModelProperty("返利比率")   
+    @ApiModelProperty("返利比率")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private BigDecimal rebateRatio;
     /**
      * 备注

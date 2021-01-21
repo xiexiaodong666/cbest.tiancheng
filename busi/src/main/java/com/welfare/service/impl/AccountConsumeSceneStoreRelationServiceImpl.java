@@ -11,6 +11,8 @@ import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.dto.ConsumeTypeJson;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -70,8 +72,11 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
           }
         }
       }
+      //return consumeTypeJson.getValue(s);
       if(StringUtils.isBlank(sb)){
-        throw  new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景配置了对应得消费方式",null);
+        StringBuilder text = getText(selectType);
+        throw  new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景ID:"+accountConsumeSceneStoreRelation.getAccountConsumeSceneId()+"配置了"+text.toString()+"消费方式",null);
+        //throw  new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型:"++"消费场景配置了对应得消费方式",null);
       }
       if( !sb.toString().equals(accountConsumeSceneStoreRelation.getSceneConsumType())){
         accountConsumeSceneStoreRelation.setSceneConsumType(sb.toString());
@@ -85,6 +90,20 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
       accountChangeEventRecordService.batchSaveBySceneStoreRelation(updateList);
     }
     return;
+  }
+
+  /**
+   * 获取异常提示信息
+   * @param selectType
+   * @return
+   */
+  private StringBuilder getText( String[] selectType) {
+    List<String> typeValue = Arrays.asList(selectType);
+    StringBuilder text = new StringBuilder();
+    typeValue.forEach(t ->{
+      text.append(t );
+    });
+    return text;
   }
 
 

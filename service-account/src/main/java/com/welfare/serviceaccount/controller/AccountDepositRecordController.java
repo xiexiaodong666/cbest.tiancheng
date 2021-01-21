@@ -1,6 +1,7 @@
 package com.welfare.serviceaccount.controller;
 
 import com.welfare.common.annotation.AccountUser;
+import com.welfare.common.util.AccountUserHolder;
 import com.welfare.service.AccountDepositRecordService;
 import com.welfare.service.dto.AccountDepositDTO;
 import com.welfare.service.dto.AccountDepositReq;
@@ -35,6 +36,7 @@ public class AccountDepositRecordController implements IController {
     @PostMapping("/payInfo")
     @AccountUser
     public R<AccountDepositDTO> payInfo(@RequestBody AccountDepositReq req) {
+        req.setAccountCode(AccountUserHolder.getAccountUser().getAccountCode());
         return success(accountDepositRecordService.getPayInfo(req));
     }
 
@@ -42,6 +44,7 @@ public class AccountDepositRecordController implements IController {
     @GetMapping("/payResult")
     @AccountUser
     public R<AccountPayResultQueryDTO> payResult(AccountPayResultQueryReq req) {
+        req.setAccountCode(AccountUserHolder.getAccountUser().getAccountCode());
         return success(accountDepositRecordService.queryPayResult(req));
     }
 

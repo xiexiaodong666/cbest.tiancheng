@@ -23,6 +23,8 @@ public interface MerchantAccountTypeService {
      */
     List<MerchantAccountType>  list(MerchantAccountTypeReq req);
 
+    boolean init(String merCode);
+
     /**
      * 查询商户详情
      * @param id

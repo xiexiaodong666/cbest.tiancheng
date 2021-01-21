@@ -97,12 +97,23 @@ public class MerchantAccountType extends Model<MerchantAccountType> implements S
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
+    /**
+     * 显示状态（默认福利类型（授信额度，自主充值）不需要展示）1展示；0不展示
+     */
+    @ApiModelProperty("显示状态（默认福利类型（授信额度，自主充值）不需要展示）1展示；0不展示")
+    private Integer showStatus;
+
 //以下为列明常量
 
     /**
     * 自增id
     */
     public static final String ID = "id";
+
+    /**
+     * 显示状态
+     */
+    public static final String SHOW_STATUS = "show_status";
     /**
     * 商户代码
     */

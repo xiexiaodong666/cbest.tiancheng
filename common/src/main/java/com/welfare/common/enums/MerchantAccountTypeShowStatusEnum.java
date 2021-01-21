@@ -5,12 +5,12 @@ package com.welfare.common.enums;
  * @version 1.0.0
  * @date 2021/1/12 8:40 PM
  */
-public enum SupplierStoreStatusEnum {
+public enum MerchantAccountTypeShowStatusEnum {
   /**
    *
    */
-  ACTIVATED(1, "激活"),
-  NONACTIVATED(0, "未激活");
+  SHOW(1, "展示"),
+  UNSHOW(0, "不展示");
 
 
   public Integer getCode() {
@@ -25,7 +25,7 @@ public enum SupplierStoreStatusEnum {
 
   private final String desc;
 
-  SupplierStoreStatusEnum(Integer code, String desc) {
+  MerchantAccountTypeShowStatusEnum(Integer code, String desc) {
     this.code = code;
     this.desc = desc;
   }

@@ -29,7 +29,7 @@ public class AccountPageReq implements Serializable {
    * 所属部门
    */
   @ApiModelProperty("所属部门")
-  private String departmentCode;
+  private String[] departmentCodeList;
   /**
    * 账号状态
    */

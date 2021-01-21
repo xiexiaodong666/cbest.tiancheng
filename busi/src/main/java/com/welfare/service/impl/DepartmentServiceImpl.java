@@ -153,6 +153,13 @@ public class DepartmentServiceImpl implements DepartmentService {
         queryWrapper.eq(Department.DEPARTMENT_CODE, departmentCode);
         return departmentDao.getOne(queryWrapper);
     }
+    @Override
+    public Department getByDepartmentCodeAndMerCode(String departmentCode,String merCode){
+        QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Department.DEPARTMENT_CODE, departmentCode);
+        queryWrapper.eq(Department.MER_CODE, merCode);
+        return departmentDao.getOne(queryWrapper);
+    }
 
     @Override
     public List<DepartmentTree> tree(String merCode) {

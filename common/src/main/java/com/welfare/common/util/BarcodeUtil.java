@@ -55,9 +55,9 @@ public class BarcodeUtil {
      */
     public static Long calculateAccount(String barcode,Long secretKey){
         /**
-         * 1. 20位去掉前面固定的69
+         * 1. 21位去掉前面固定的69
          * 2. reverse
-         * 3. code = [Account + secretKey]9位 + [rand1]3位 + [rand2]3位 + [mod]3位
+         * 3. code = [Account + secretKey]10位 + [rand1]3位 + [rand2]3位 + [mod]3位
          * 4. 根据code求出Account
          */
         String barcodeWithoutPrefix = barcode.substring(2, 21);

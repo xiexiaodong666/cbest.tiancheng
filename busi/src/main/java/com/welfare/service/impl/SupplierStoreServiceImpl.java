@@ -68,6 +68,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -237,6 +238,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
+  @Cacheable(value = "supplierStore-by-storeCode",key="#storeCode")
   public SupplierStore getSupplierStoreByStoreCode(String storeCode) {
     QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(SupplierStore.STORE_CODE, storeCode);

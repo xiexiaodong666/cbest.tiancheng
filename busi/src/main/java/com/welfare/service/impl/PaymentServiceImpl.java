@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.*;
@@ -101,6 +102,9 @@ public class PaymentServiceImpl implements PaymentService {
      * @param account
      */
     private void chargePaymentScene(PaymentRequest paymentRequest, Account account) {
+        SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo());
+        Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(supplierStore.getStatus()),
+                "门店未激活:"+supplierStore.getStoreCode());
         String paymentScene = paymentRequest.calculatePaymentScene();
         List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
                 .getAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
@@ -167,9 +171,15 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal usableAmount = account.getAccountBalance().add(account.getSurplusQuota());
             BigDecimal amount = paymentRequest.getAmount();
             boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-            Assert.isTrue(enough, "余额不足");
+            Assert.isTrue(enough, "总账户余额不足");
 
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
+            BigDecimal allTypeBalance = accountAmountDOList.stream()
+                    .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            //判断子账户之和
+            boolean accountTypesEnough = allTypeBalance.subtract(amount).compareTo(BigDecimal.ZERO) < 0;
+            Assert.isTrue(accountTypesEnough, "子账户余额总和不足,请确认员工账户总账和子账是否对应");
             accountAmountDOList.sort(Comparator.comparing(x -> x.getMerchantAccountType().getDeductionOrder()));
             List<PaymentOperation> paymentOperations = new ArrayList<>(4);
             List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)

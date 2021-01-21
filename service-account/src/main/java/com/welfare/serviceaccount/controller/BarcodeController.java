@@ -50,7 +50,7 @@ public class BarcodeController implements IController {
     @GetMapping("/test-barcode-parse")
     public R<String> testBarcodeParse(@RequestParam String barcode){
         Long saltValue = barcodeService.queryCurrentPeriodSaltValue().getSaltValue();
-        return success(BarcodeUtil.calculateAccount("699048259340405130242", saltValue).toString());
+        return success(BarcodeUtil.calculateAccount(barcode, saltValue).toString());
     }
 
     @GetMapping("/salts")

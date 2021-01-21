@@ -178,7 +178,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             //判断子账户之和
-            boolean accountTypesEnough = allTypeBalance.subtract(amount).compareTo(BigDecimal.ZERO) < 0;
+            boolean accountTypesEnough = allTypeBalance.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
             Assert.isTrue(accountTypesEnough, "子账户余额总和不足,请确认员工账户总账和子账是否对应");
             accountAmountDOList.sort(Comparator.comparing(x -> x.getMerchantAccountType().getDeductionOrder()));
             List<PaymentOperation> paymentOperations = new ArrayList<>(4);

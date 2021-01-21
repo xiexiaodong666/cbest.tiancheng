@@ -422,7 +422,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             infos = depositApplyConverter.toInfoList(applys);
             infos.forEach(info -> {
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
-                info.setApprovalStatus(approvalStatus.getValue());
+                info.setApprovalStatusDesc(approvalStatus.getValue());
             });
         }
         return PageUtils.toPage(result, infos);

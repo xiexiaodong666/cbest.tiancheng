@@ -82,6 +82,12 @@ public class AccountDepositApplyInfo {
   private String approvalStatus;
 
   /**
+   * 审批状态描述
+   */
+  @ApiModelProperty("审批状态描述")
+  private String approvalStatusDesc;
+
+  /**
    * 审批人
    */
   @ApiModelProperty("审批人")

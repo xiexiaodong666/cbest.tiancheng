@@ -454,13 +454,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店编码已存在", null);
 
     }
-    if (EmptyChecker.notEmpty(update.getCashierNo())
-        && !update.getCashierNo().equals(entity.getCashierNo())
-        && EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(update.getCashierNo()))) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "虚拟收银机号已存在", null);
-    }
     entity.setMerCode(update.getMerCode());
-    entity.setCashierNo(update.getCashierNo());
     entity.setStoreCode(update.getStoreCode());
     entity.setStoreName(update.getStoreName());
     entity.setRemark(update.getRemark());

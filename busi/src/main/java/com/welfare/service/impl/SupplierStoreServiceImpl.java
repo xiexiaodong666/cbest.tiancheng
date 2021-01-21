@@ -238,7 +238,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
-  @Cacheable(value = "supplierStore-by-storeCode",key="#storeCode")
   public SupplierStore getSupplierStoreByStoreCode(String storeCode) {
     QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(SupplierStore.STORE_CODE, storeCode);

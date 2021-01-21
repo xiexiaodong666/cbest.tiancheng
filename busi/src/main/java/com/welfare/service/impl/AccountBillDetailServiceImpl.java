@@ -17,8 +17,10 @@ import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.dto.Deposit;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.service.AccountBillDetailService;
@@ -47,6 +49,16 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
      */
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
+
+    private final static Map<String, TransType> TRANS_TYPE_MAP = Stream
+        .of(TransType.values()).collect(Collectors
+            .toMap(TransType::code,
+                e -> e));
+
+    private final static Map<String, Channel> CHANNEL_MAP = Stream
+        .of(Channel.values()).collect(Collectors
+            .toMap(Channel::code,
+                e -> e));
 
     @Override
     public void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType,
@@ -84,10 +96,10 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
             .map(accountBillDetailSimpleDTO -> {
                 String channel = accountBillDetailSimpleDTO.getChannel();
                 String transType = accountBillDetailSimpleDTO.getTransType();
-                TransType transTypeEnum = TransType.valueOf(transType.toUpperCase());
+                TransType transTypeEnum = TRANS_TYPE_MAP.get(transType);
 
-                if(transTypeEnum == TransType.DEPOSIT && StrUtil.isNotEmpty(channel)) {
-                    Channel channelEnum = Channel.valueOf(channel.toUpperCase());
+                if (transTypeEnum == TransType.DEPOSIT && StrUtil.isNotEmpty(channel)) {
+                    Channel channelEnum = CHANNEL_MAP.get(channel);
                     if (channelEnum == Channel.WECHAT || channelEnum == Channel.ALIPAY) {
                         accountBillDetailSimpleDTO.setStoreName(StrUtil
                             .format("{}({})", accountBillDetailSimpleDTO.getStoreName(),
@@ -97,7 +109,7 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
 
                 List<AccountBillDetailSimpleDeductionDTO> deductionList = accountBillDetailSimpleDTO
                     .getDeductionList();
-                if(CollectionUtil.isNotEmpty(deductionList)) {
+                if (CollectionUtil.isNotEmpty(deductionList)) {
 
                     Optional<AccountBillDetailSimpleDeductionDTO> optional = deductionList.stream()
                         .filter(
@@ -110,8 +122,7 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
                         accountBillDetailSimpleDTO.setDeductionList(null);
                     }
                 }
-                accountBillDetailSimpleDTO.setTransTypeName(TransType
-                    .valueOf(accountBillDetailSimpleDTO.getTransType().toUpperCase()).desc());
+                accountBillDetailSimpleDTO.setTransTypeName(transTypeEnum.desc());
                 return accountBillDetailSimpleDTO;
             }).collect(Collectors.toList());
         return accountBillDetailSimpleDTOList;

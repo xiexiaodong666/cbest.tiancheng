@@ -17,19 +17,50 @@ import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
-import com.welfare.persist.dto.*;
-import com.welfare.persist.entity.*;
+import com.welfare.persist.dto.AccountBillDetailMapperDTO;
+import com.welfare.persist.dto.AccountBillMapperDTO;
+import com.welfare.persist.dto.AccountDetailMapperDTO;
+import com.welfare.persist.dto.AccountIncrementDTO;
+import com.welfare.persist.dto.AccountPageDTO;
+import com.welfare.persist.dto.AccountSimpleDTO;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountChangeEventRecord;
+import com.welfare.persist.entity.AccountType;
+import com.welfare.persist.entity.CardInfo;
+import com.welfare.persist.entity.Department;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.persist.mapper.AccountMapper;
-import com.welfare.service.*;
+import com.welfare.service.AccountChangeEventRecordService;
+import com.welfare.service.AccountService;
+import com.welfare.service.AccountTypeService;
+import com.welfare.service.CardInfoService;
+import com.welfare.service.DepartmentService;
+import com.welfare.service.MerchantService;
+import com.welfare.service.SequenceService;
 import com.welfare.service.converter.AccountConverter;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.AccountBillDTO;
+import com.welfare.service.dto.AccountBillDetailDTO;
+import com.welfare.service.dto.AccountBindCardDTO;
+import com.welfare.service.dto.AccountDTO;
+import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountDetailParam;
+import com.welfare.service.dto.AccountIncrementReq;
+import com.welfare.service.dto.AccountPageReq;
+import com.welfare.service.dto.AccountUploadDTO;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -39,10 +70,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 账户信息服务接口实现
@@ -71,7 +98,7 @@ public class AccountServiceImpl implements AccountService {
   private final SequenceService sequenceService;
   private final CardInfoService cardInfoService;
   @Autowired
-  private  AccountChangeEventRecordService accountChangeEventRecordService;
+  private AccountChangeEventRecordService accountChangeEventRecordService;
   private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
   private final ApplicationContext applicationContext;
 
@@ -81,19 +108,22 @@ public class AccountServiceImpl implements AccountService {
     IPage<AccountPageDTO> iPage = accountCustomizeMapper
         .queryPageDTO(page, accountPageReq.getMerCode(), accountPageReq.getAccountName(),
             accountPageReq.getDepartmentCodeList(), accountPageReq.getAccountStatus(),
-            accountPageReq.getAccountTypeCode(),accountPageReq.getBinding(),accountPageReq.getCardId());
+            accountPageReq.getAccountTypeCode(), accountPageReq.getBinding(),
+            accountPageReq.getCardId());
     return accountConverter.toPage(iPage);
   }
 
   @Override
   public List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq) {
-    return accountCustomizeMapper.queryIncrementDTO(accountIncrementReq.getStoreCode(),accountIncrementReq.getSize(),accountIncrementReq.getChangeEventId());
+    return accountCustomizeMapper
+        .queryIncrementDTO(accountIncrementReq.getStoreCode(), accountIncrementReq.getSize(),
+            accountIncrementReq.getChangeEventId());
   }
 
   @Override
   public Account findByPhone(String phone) {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
-    accountQueryWrapper.eq(Account.PHONE,phone);
+    accountQueryWrapper.eq(Account.PHONE, phone);
     Account acccount = accountDao.getOne(accountQueryWrapper);
     return acccount;
   }
@@ -103,15 +133,16 @@ public class AccountServiceImpl implements AccountService {
     List<AccountPageDTO> list = accountCustomizeMapper
         .queryPageDTO(accountPageReq.getMerCode(), accountPageReq.getAccountName(),
             accountPageReq.getDepartmentCodeList(), accountPageReq.getAccountStatus(),
-            accountPageReq.getAccountTypeCode(),accountPageReq.getBinding(),accountPageReq.getCardId());
+            accountPageReq.getAccountTypeCode(), accountPageReq.getBinding(),
+            accountPageReq.getCardId());
     return accountConverter.toAccountDTOList(list);
   }
 
   @Override
   public String uploadAccount(MultipartFile multipartFile) {
     try {
-      AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,
-          merchantService,departmentService,sequenceService);
+      AccountUploadListener listener = new AccountUploadListener(accountTypeService, this,
+          merchantService, departmentService, sequenceService);
       EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
           .doRead();
       String result = listener.getUploadInfo().toString();
@@ -127,7 +158,7 @@ public class AccountServiceImpl implements AccountService {
   public String accountBatchBindCard(MultipartFile multipartFile) {
     try {
       AccountBatchBindCardListener accountBatchBindCardListener = new AccountBatchBindCardListener(
-          accountDao,cardInfoService,this);
+          accountDao, cardInfoService, this);
       EasyExcel.read(multipartFile.getInputStream(), AccountBindCardDTO.class,
           accountBatchBindCardListener).sheet().doRead();
       String result = accountBatchBindCardListener.getUploadInfo().toString();
@@ -157,14 +188,17 @@ public class AccountServiceImpl implements AccountService {
   @Transactional(rollbackFor = Exception.class)
   public Boolean delete(Long id) {
     Account syncAccount = accountMapper.selectById(id);
-    if( null ==  syncAccount){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
+    if (null == syncAccount) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
     }
     boolean result = accountDao.removeById(id);
-    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode(),"员工删除");
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils
+        .assemableChangeEvent(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode(),
+            "员工删除");
     accountChangeEventRecordService.save(accountChangeEventRecord);
     syncAccount.setDeleted(true);
-    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).accountList(Arrays.asList(syncAccount)).build());
+    applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE)
+        .accountList(Arrays.asList(syncAccount)).build());
     return result;
   }
 
@@ -172,18 +206,20 @@ public class AccountServiceImpl implements AccountService {
   @Transactional(rollbackFor = Exception.class)
   public Boolean active(Long id, Integer accountStatus) {
     Account syncAccount = accountMapper.selectById(id);
-    if( null ==  syncAccount){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
+    if (null == syncAccount) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
     }
     Account account = new Account();
     account.setId(id);
     account.setAccountStatus(accountStatus);
     boolean result = accountDao.updateById(account);
     AccountChangeType accountChangeType = AccountChangeType.getByAccountStatus(accountStatus);
-    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(),"员工修改状态");
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils
+        .assemableChangeEvent(accountChangeType, syncAccount.getAccountCode(), "员工修改状态");
     accountChangeEventRecordService.save(accountChangeEventRecord);
     syncAccount.setAccountStatus(accountStatus);
-    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).accountList(Arrays.asList(syncAccount)).build());
+    applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE)
+        .accountList(Arrays.asList(syncAccount)).build());
     return result;
   }
 
@@ -197,7 +233,8 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public AccountDetailDTO queryDetailByAccountCode(String accountCode) {
-    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(null,Long.parseLong(accountCode),null,null);
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper
+        .queryDetailByParam(null, Long.parseLong(accountCode), null, null);
     AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
     BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
     return accountDetailDTO;
@@ -205,10 +242,11 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public AccountDetailDTO queryDetailByParam(AccountDetailParam accountDetailParam) {
-    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailByParam(accountDetailParam.getId(),accountDetailParam.getAccountCode(),
-        accountDetailParam.getPhone(),accountDetailParam.getMerCode());
-    if( null == accountDetailMapperDTO ){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该员工账号不存在",null);
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper
+        .queryDetailByParam(accountDetailParam.getId(), accountDetailParam.getAccountCode(),
+            accountDetailParam.getPhone(), accountDetailParam.getMerCode());
+    if (null == accountDetailMapperDTO) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该员工账号不存在", null);
     }
     AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
     BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
@@ -218,10 +256,11 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean save(Account account) {
-    validationAccount(account,true);
+    validationAccount(account, true);
     Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
 
-    AccountChangeEventRecord accountChangeEventRecord = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, accounCode,account.getCreateUser());
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils
+        .assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, accounCode, account.getCreateUser());
     accountChangeEventRecordService.save(accountChangeEventRecord);
 
     account.setSurplusQuota(account.getMaxQuota());
@@ -229,33 +268,34 @@ public class AccountServiceImpl implements AccountService {
     account.setChangeEventId(accountChangeEventRecord.getId());
     boolean result = accountDao.save(account);
 
-    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).accountList(Arrays.asList(account)).build());
+    applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
+        .accountList(Arrays.asList(account)).build());
     return result;
   }
 
-  private void validationAccount(Account account,Boolean isNew){
+  private void validationAccount(Account account, Boolean isNew) {
     Merchant merchant = merchantService.detailByMerCode(account.getMerCode());
-    if( null == merchant ) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
+    if (null == merchant) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
     }
-    AccountType accountType = accountTypeService.queryByTypeCode(account.getMerCode(),account.getAccountTypeCode());
-    if( null == accountType ){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不存在",null);
+    AccountType accountType = accountTypeService
+        .queryByTypeCode(account.getMerCode(), account.getAccountTypeCode());
+    if (null == accountType) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在", null);
     }
     Department department = departmentService.getByDepartmentCode(account.getStoreCode());
-    if( null ==  department){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工部门不存在",null);
+    if (null == department) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
     }
-    if(isNew){
+    if (isNew) {
       Account queryAccount = this.findByPhone(account.getPhone());
-      if( null != queryAccount ){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工手机号已经存在",null);
+      if (null != queryAccount) {
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
       }
-    }
-    else{
+    } else {
       Account syncAccount = accountMapper.selectById(account.getId());
-      if( null ==  syncAccount){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工账户不存在",null);
+      if (null == syncAccount) {
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
       }
     }
   }
@@ -269,10 +309,21 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean update(Account account) {
-    validationAccount(account,false);
+    validationAccount(account, false);
+    Account oldAccount = accountMapper.selectById(account.getId());
+    //判断剩余授信额度  如果是增加,那么额度就是
+    if (oldAccount.getMaxQuota().compareTo(account.getMaxQuota()) != 0) {
+      int incrResult = accountCustomizeMapper
+          .increaseAccountSurplusQuota(account.getMaxQuota().subtract(oldAccount.getMaxQuota()),
+              account.getUpdateUser(), oldAccount.getAccountCode().toString());
+      if (incrResult <= 0) {
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
+      }
+    }
     boolean result = accountDao.updateById(account);
     account = accountDao.getById(account.getId());
-    applicationContext.publishEvent( AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).accountList(Arrays.asList(account)).build());
+    applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE)
+        .accountList(Arrays.asList(account)).build());
     return result;
   }
 
@@ -337,7 +388,7 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public List<Account> queryByAccountTypeCode(String accountTypeCode) {
     QueryWrapper<Account> queryWrapper = new QueryWrapper<Account>();
-    queryWrapper.eq(Account.ACCOUNT_TYPE_CODE,accountTypeCode);
+    queryWrapper.eq(Account.ACCOUNT_TYPE_CODE, accountTypeCode);
     return accountDao.list(queryWrapper);
   }
 
@@ -360,7 +411,7 @@ public class AccountServiceImpl implements AccountService {
     if (cardInfoService.cardIsBind(cardId)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
     }
-    if( cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue() ){
+    if (cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue()) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请确认该卡片状态", null);
     }
     //绑定创建卡号信息
@@ -374,9 +425,10 @@ public class AccountServiceImpl implements AccountService {
     boolean accountUpdate = accountDao.updateById(account);
     return accountUpdate && updateResult;
   }
+
   public Account findByPhoneAndMerCode(String phone, String merCode) {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
-    accountQueryWrapper.eq(Account.PHONE,phone);
+    accountQueryWrapper.eq(Account.PHONE, phone);
     accountQueryWrapper.eq(Account.MER_CODE, merCode);
     return accountDao.getOne(accountQueryWrapper);
   }
@@ -384,8 +436,8 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public void batchBindCard(List<CardInfo> cardInfoList, List<Account> accountList) {
-    if( CollectionUtils.isEmpty(cardInfoList) ||
-        CollectionUtils.isEmpty(accountList)){
+    if (CollectionUtils.isEmpty(cardInfoList) ||
+        CollectionUtils.isEmpty(accountList)) {
       return;
     }
     cardInfoDao.updateBatchById(cardInfoList);
@@ -410,7 +462,8 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public AccountDetailDTO queryDetailPhoneAndMer(String phone) {
-    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper.queryDetailPhoneAndMer(phone,
+    AccountDetailMapperDTO accountDetailMapperDTO = accountCustomizeMapper
+        .queryDetailPhoneAndMer(phone,
             MerchantUserHolder.getMerchantUser().getMerchantCode());
     if (accountDetailMapperDTO == null) {
       return null;

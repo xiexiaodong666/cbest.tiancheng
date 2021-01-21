@@ -108,7 +108,6 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  @Transactional(rollbackFor = Exception.class)
   public String uploadAccount(MultipartFile multipartFile) {
     try {
       AccountUploadListener listener = new AccountUploadListener(accountTypeService,this,

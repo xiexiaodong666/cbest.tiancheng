@@ -6,6 +6,7 @@ import com.welfare.persist.entity.CardInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.util.Assert;
 
 import java.util.Objects;
 
@@ -19,10 +20,8 @@ import java.util.Objects;
 @ApiModel("刷卡支付请求")
 @Data
 public class CardPaymentRequest extends PaymentRequest {
-    @ApiModelProperty(value = "卡内信息")
+    @ApiModelProperty(value = "卡内信息(磁条号)",required = true)
     private String cardInsideInfo;
-    @ApiModelProperty(value = "磁条号",required = true)
-    private String magneticStripe;
     @ApiModelProperty(value = "卡号")
     private String cardNo;
     @ApiModelProperty(value = "卡条码")
@@ -34,7 +33,8 @@ public class CardPaymentRequest extends PaymentRequest {
             return super.getAccountCode();
         }
         CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
-        CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(magneticStripe);
+        CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(cardInsideInfo);
+        Assert.notNull(cardInfo,"根据磁条号未找到卡片:" + cardInsideInfo);
         Long accountCode = cardInfo.getAccountCode();
         this.setAccountCode(accountCode);
         return accountCode;

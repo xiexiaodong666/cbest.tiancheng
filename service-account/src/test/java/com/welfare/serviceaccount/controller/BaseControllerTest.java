@@ -16,8 +16,6 @@ public class BaseControllerTest extends AbstractBaseControllerTest {
         headers.put(Header.SOURCE.code(), HeaderSource.E_WELFARE_API.code());
         AccountUserInfo accountUserInfo = new AccountUserInfo();
         accountUserInfo.setAccountCode(1000000029L);
-        accountUserInfo.setMerCode("A102");
-        accountUserInfo.setPhone("13361612718");
         headers.put(Header.ACCOUNT_USER.code(), JSON.toJSONString(accountUserInfo));
         return headers;
     }

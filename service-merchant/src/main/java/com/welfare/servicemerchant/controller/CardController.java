@@ -8,9 +8,11 @@ import com.welfare.common.enums.CardApplyMediumEnum;
 import com.welfare.common.enums.CardApplyTypeEnum;
 import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.service.AccountService;
 import com.welfare.service.CardApplyService;
 import com.welfare.service.CardInfoService;
 import com.welfare.service.MerchantService;
@@ -42,6 +44,8 @@ import java.util.List;
 @RequestMapping("/card-info")
 @Api(tags = "制卡相关接口")
 public class CardController implements IController {
+
+  private final AccountService accountService;
 
   private final CardInfoService cardInfoService;
 
@@ -187,7 +191,7 @@ public class CardController implements IController {
     queryWrapperM.eq(Merchant.MER_CODE, cardApply.getMerCode());
 
     Merchant merchant = merchantService.getMerchantByMerCode(queryWrapperM);
-
+    Account account = accountService.getByAccountCode(cardInfo.getAccountCode());
     CardInfoDTO cardInfoDTO = new CardInfoDTO();
     cardInfoDTO.setCardId(cardInfo.getCardId());
     cardInfoDTO.setCardName(cardApply.getCardName());
@@ -200,7 +204,9 @@ public class CardController implements IController {
     cardInfoDTO.setCreateTime(cardInfo.getCreateTime());
     cardInfoDTO.setWrittenTime(cardInfo.getWrittenTime());
     cardInfoDTO.setBindTime(cardInfo.getBindTime());
-    cardInfoDTO.setAccountCode(cardInfo.getAccountCode());
+    if(account != null && Strings.isNotEmpty(account.getPhone())) {
+      cardInfoDTO.setAccountCode(Long.valueOf(account.getPhone()));
+    }
 
     return success(cardInfoDTO);
   }

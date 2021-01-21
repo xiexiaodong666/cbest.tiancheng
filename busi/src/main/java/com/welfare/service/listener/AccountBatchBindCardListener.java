@@ -43,10 +43,10 @@ public class AccountBatchBindCardListener extends AnalysisEventListener<AccountB
   @Override
   public void invoke(AccountBindCardDTO accountBindCardDTO, AnalysisContext analysisContext) {
     QueryWrapper<Account> accountQueryWrapper = new  QueryWrapper<Account>();
-    accountQueryWrapper.eq(Account.ACCOUNT_CODE,Long.parseLong(accountBindCardDTO.getAccountCode()));
+    accountQueryWrapper.eq(Account.PHONE,accountBindCardDTO.getPhone());
     Account account = accountDao.getOne(accountQueryWrapper);
     if( null == account ){
-      uploadInfo.append("员工账号:").append(accountBindCardDTO.getAccountCode()).append("不存在;");
+      uploadInfo.append("员工手机号:").append(accountBindCardDTO.getPhone()).append("不存在;");
       return;
     }
     CardInfo cardInfo = cardInfoService.getByCardNo(accountBindCardDTO.getCardId());

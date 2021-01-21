@@ -72,7 +72,7 @@ public class AccountDepositRecordServiceImpl extends
         if (accountPayTypeEnum == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "支付方式有误", null);
         }
-        Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
+        Long accountCode = req.getAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
         if (account == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "获取用户信息失败", null);
@@ -88,7 +88,7 @@ public class AccountDepositRecordServiceImpl extends
         createWXH5TradeReq.setTradeNo(payTradeNo);
         createWXH5TradeReq.setAmount(amountToFen(rechargeAmount));
         createWXH5TradeReq.setNotifyUrl(req.getNotifyUrl());
-        String market = req.getMerCode();
+        String market = account.getMerCode();
 
         CbestPayBaseBizResp resp = cbestPayService.createWXH5Trade(market, createWXH5TradeReq);
         String bizStatus = resp.getBizStatus();
@@ -102,7 +102,7 @@ public class AccountDepositRecordServiceImpl extends
         AccountDepositRecord accountDepositRecord = new AccountDepositRecord();
         accountDepositRecord.setAccountCode(account.getAccountCode());
         accountDepositRecord.setPayType(accountPayTypeEnum.getType());
-        accountDepositRecord.setMerCode(req.getMerCode());
+        accountDepositRecord.setMerCode(account.getMerCode());
         accountDepositRecord
             .setPayStatus(AccountRechargePaymentStatusEnum.PENDING_PAYMENT.getCode());
         accountDepositRecord

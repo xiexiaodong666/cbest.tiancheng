@@ -59,8 +59,8 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantWithCreditConverter merchantWithCreditConverter;
     private final MerchantAccountTypeDao merchantAccountTypeDao;
-
-    private final MerchantAccountTypeService merchantAccountTypeService;
+    @Autowired
+    MerchantAccountTypeService merchantAccountTypeService;
 
 
 

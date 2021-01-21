@@ -35,6 +35,13 @@
     <result property="version" column="version"/>
     <result property="changeEventId" column="change_event_id"/>
   </resultMap>
+
+  <update id="increaseAccountSurplusQuota">
+    UPDATE <include refid="tableName"/> set surplus_quota = surplus_quota + #{surplusQuota}, update_user = #{updateUser},update_time = now(),version = version + 1 where account_code = #{accountCode}
+    and surplus_quota + #{surplusQuota} >= 0
+  </update>
+
+
   <select id="queryByConsumeSceneIdList" resultMap="accountMap">
     select
     <include refid="baseColumn"/>

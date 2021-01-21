@@ -121,6 +121,12 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("手机号")   
     private String phone;
+
+    /**
+     * 是否授信
+     */
+    @ApiModelProperty("是否授信")
+    private Boolean credit;
     /**
      * 最大授权额度
      */

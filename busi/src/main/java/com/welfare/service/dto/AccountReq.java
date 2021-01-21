@@ -60,6 +60,12 @@ public class AccountReq implements Serializable {
   private String accountTypeCode;
 
   /**
+   * 是否授信
+   */
+  @ApiModelProperty("是否授信,1是 0否")
+  private Boolean credit;
+
+  /**
    * 所属部门
    */
   @ApiModelProperty("所属部门Code")

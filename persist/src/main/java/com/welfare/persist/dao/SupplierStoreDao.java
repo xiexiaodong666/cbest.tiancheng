@@ -32,5 +32,11 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
         return getOne(queryWrapper);
     }
 
+    @Override
+    @CacheEvict(value = "supplierStore-by-storeCode",key="#entity.storeCode")
+    public boolean save(SupplierStore entity){
+        return super.save(entity);
+    }
+
 
 }

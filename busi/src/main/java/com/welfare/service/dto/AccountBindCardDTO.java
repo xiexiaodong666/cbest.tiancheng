@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class AccountBindCardDTO extends BaseRowModel {
-  @ExcelProperty(value = "员工账号", index = 0)
-  private String accountCode;
+  @ExcelProperty(value = "手机号", index = 0)
+  private String phone;
   @ExcelProperty(value = "卡号", index = 1)
   private String cardId;
 }

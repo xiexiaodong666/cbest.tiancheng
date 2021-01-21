@@ -372,7 +372,7 @@ public class AccountServiceImpl implements AccountService {
     String merCode = account.getMerCode();
     Merchant merchant = merchantService.getMerchantByMerCode(merCode);
     accountSimpleDTO.setMerName(merchant.getMerName());
-    accountSimpleDTO.setAccountCode(account.getAccountCode());
+    accountSimpleDTO.setPhone(account.getPhone());
     accountSimpleDTO.setAccountName(account.getAccountName());
     accountSimpleDTO.setAccountBalance(account.getAccountBalance());
     accountSimpleDTO.setSurplusQuota(account.getSurplusQuota());

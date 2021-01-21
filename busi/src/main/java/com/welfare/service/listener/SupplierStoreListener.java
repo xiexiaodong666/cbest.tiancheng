@@ -43,7 +43,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
 
   private List<String> merCodeList = new LinkedList();
   private List<String> storeCodeList = new LinkedList();
-  private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getCode(),ConsumeTypeEnum.ONLINE_MALL.getCode(),ConsumeTypeEnum.SHOP_SHOPPING.getCode()});
+  private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getExcelType(),ConsumeTypeEnum.ONLINE_MALL.getExcelType(),ConsumeTypeEnum.SHOP_SHOPPING.getExcelType()});
 
   public static  final String success="导入成功";
   public static  final String fail="入库失败";
@@ -74,8 +74,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       uploadInfo.append("第").append(row.toString()).append("行").append("消费类型不能为空").append(";");
     }
     List<String> consumTypes=Arrays.asList(storeImportDTO.getConsumType().split(","));
-    if(excelAllType.containsAll(consumTypes)){
+    if(!excelAllType.containsAll(consumTypes)){
       uploadInfo.append("第").append(row.toString()).append("行").append("未输入正确的消费类型").append(";");
+    }
+    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
+            &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
+      uploadInfo.append("第").append(row.toString()).append("行").append("线上商城和O2O不能同时选择").append(";");
     }
     if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
             ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){

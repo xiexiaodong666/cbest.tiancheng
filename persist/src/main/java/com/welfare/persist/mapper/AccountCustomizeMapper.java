@@ -16,7 +16,7 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
   IPage<AccountPageDTO> queryPageDTO(Page<AccountPageDTO> page,
       @Param("merCode") String merCode,
       @Param("accountName")String accountName,
-      @Param("departmentCodeList")String[]  departmentCode,
+      @Param("departmentCodeList")List<String>  departmentCodeList,
       @Param("accountStatus")Integer accountStatus,
       @Param("accountTypeCode")String accountTypeCode,
       @Param("binding") Integer binding,
@@ -24,7 +24,7 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
 
   List<AccountPageDTO> queryPageDTO(@Param("merCode") String merCode,
       @Param("accountName")String accountName,
-      @Param("departmentCodeList")String[]  departmentCode,
+      @Param("departmentCodeList")List<String>  departmentCodeList,
       @Param("accountStatus")Integer accountStatus,
       @Param("accountTypeCode")String accountTypeCode,
       @Param("binding") Integer binding,

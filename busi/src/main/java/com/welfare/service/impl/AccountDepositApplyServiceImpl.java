@@ -524,7 +524,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         apply.setApplyUser(merchantUser.getUsername());
         apply.setApplyTime(now);
         apply.setMerCode(merchantUser.getMerchantCode());
-        apply.setApplyCode(sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_DEPOSIT_APPLY.code()) + "");
+        apply.setApplyCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.ACCOUNT_DEPOSIT_APPLY.code()));
         apply.setRechargeStatus(RechargeStatus.INIT.getCode());
         apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
         apply.setCreateUser(merchantUser.getUserCode());

@@ -1,0 +1,78 @@
+package com.welfare.service.sync.handler;
+
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.EmptyChecker;
+import com.welfare.service.dto.SupplierStoreSyncDTO;
+import com.welfare.service.remote.entity.CbestPayBaseBizResp;
+import com.welfare.service.remote.entity.CbestPayCreateMarketReq;
+import com.welfare.service.remote.entity.CbestPayRespRetryConstant;
+import com.welfare.service.remote.entity.CbestPayRespStatusConstant;
+import com.welfare.service.remote.service.CbestPayService;
+import com.welfare.service.sync.event.MarketCreateEvt;
+import lombok.extern.slf4j.Slf4j;
+import org.killbill.bus.api.PersistentBus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.Map;
+
+/**
+ *
+ * @author hao.yin
+ * @version 1.0.0
+ * @date 2020/12/29 10:30
+ */
+@Component
+@Slf4j
+public class MarketCreateHandler {
+
+
+    @Autowired
+    PersistentBus persistentBus;
+    @Autowired
+    CbestPayService cbestPayService;
+    @Autowired
+    ObjectMapper mapper;
+
+    private static final String retryField="retry";
+
+
+    @PostConstruct
+    private void register() {
+        try {
+            persistentBus.register(this);
+        } catch (PersistentBus.EventBusException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onMarketCreateAdd(MarketCreateEvt evt) {
+        SupplierStoreSyncDTO syncDTO=evt.getSupplierStoreSyncDTO();
+        if(EmptyChecker.notEmpty(syncDTO)){
+            CbestPayCreateMarketReq req=new CbestPayCreateMarketReq();
+            req.setName(syncDTO.getStoreName());
+            CbestPayBaseBizResp resp= cbestPayService.marketCreate(syncDTO.getStoreCode(),req);
+            String bizStatus = resp.getBizStatus();
+            switch (bizStatus) {
+                case CbestPayRespStatusConstant
+                        .SUCCESS:
+                     Map<String,String> map= JSON.parseObject(resp.getBizContent(),Map.class);
+                    if (CbestPayRespRetryConstant.Y.equals(map.get(retryField))){
+                        throw new BusiException("重百付创建门店需要重试，" + resp.getBizMsg());
+                    }
+                case CbestPayRespStatusConstant
+                        .FAIL:
+                    throw new BusiException("重百付创建门店失败，" + resp.getBizMsg());
+                default:
+                    throw new BusiException("重百付创建门店失败，未知返回状态" + bizStatus);
+            }
+        }
+    }
+}

@@ -29,12 +29,15 @@ public interface CbestPayService {
      */
     CbestPayBaseBizResp tradeQuery(String market, TradeQueryReq req);
 
-    /**
-     * 聚合交易退款
-     *
-     * @param req
-     * @return
-     */
+    CbestPayBaseBizResp marketCreate(String market, CbestPayCreateMarketReq req);
+
+
+        /**
+         * 聚合交易退款
+         *
+         * @param req
+         * @return
+         */
     CbestPayBaseBizResp tradeRefund(String market, TradeRefundReq req);
 
     /**

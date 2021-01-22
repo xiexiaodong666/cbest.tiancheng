@@ -230,11 +230,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         merchantStoreRelationNew.setRamark(relationUpdateReq.getRamark());
         merchantStoreRelationNew.setDeleted(false);
         merchantStoreRelationNew.setSyncStatus(0);
-        if (UserInfoHolder.getUserInfo() != null) {
+       /* if (UserInfoHolder.getUserInfo() != null) {
           merchantStoreRelationNew.setCreateUser(UserInfoHolder.getUserInfo().getUserName());
-          //merchantStoreRelationNew.setUpdateUser(UserInfoHolder.getUserInfo().getUserName());
+          merchantStoreRelationNew.setUpdateUser(UserInfoHolder.getUserInfo().getUserName());
 
-        }
+        }*/
         merchantStoreRelationNew.setStatus(1);
         merchantStoreRelationNewList.add(merchantStoreRelationNew);
 
@@ -286,11 +286,6 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       m.setRebateType(adminMerchantStore.getRebateType());
       m.setRamark(relationUpdateReq.getRamark());
       m.setSyncStatus(0);
-
-      if (UserInfoHolder.getUserInfo() != null) {
-        // merchantStoreRelationNew.setCreateUser(UserInfoHolder.getUserInfo().getUserName());
-        m.setUpdateUser(UserInfoHolder.getUserInfo().getUserName());
-      }
 
       RoleConsumptionBindingsReq roleConsumptionBindingsReq = new RoleConsumptionBindingsReq();
 

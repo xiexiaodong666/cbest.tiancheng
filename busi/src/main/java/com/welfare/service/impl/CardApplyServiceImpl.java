@@ -96,9 +96,9 @@ public class CardApplyServiceImpl implements CardApplyService {
     cardApply.setIdentificationCode(cardApplyAddReq.getIdentificationCode());
     cardApply.setIdentificationLength(cardApplyAddReq.getIdentificationLength());
     cardApply.setRemark(cardApplyAddReq.getRemark());
-    if (UserInfoHolder.getUserInfo() != null) {
+/*    if (UserInfoHolder.getUserInfo() != null) {
       cardApply.setCreateUser(UserInfoHolder.getUserInfo().getUserName());
-    }
+    }*/
 
     cardApply.setDeleted(false);
     cardApply.setStatus(1);
@@ -119,7 +119,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());
       cardInfo.setCardStatus(WelfareConstant.CardStatus.NEW.code());
       cardInfo.setDeleted(false);
-      cardInfo.setCreateUser(cardApply.getCreateUser());
+      // cardInfo.setCreateUser(cardApply.getCreateUser());
 
       cardInfoList.add(cardInfo);
       writeCardId--;

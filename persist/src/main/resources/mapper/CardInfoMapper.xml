@@ -38,11 +38,11 @@
 
     where ci.deleted = 0
     <if test="cardId != null and cardId != '' ">
-      and ci.card_id = #{cardId}
+      and ci.card_id  like concat('%',#{cardId},'%')
     </if>
     <if test="applyCode != null and applyCode !='' ">and ca.apply_code = #{applyCode}
     </if>
-    <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
+    <if test="cardName != null and cardName !='' ">and ca.card_name  like concat('%',#{cardName},'%')
     </if>
     <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
     </if>
@@ -115,9 +115,9 @@ WHERE
     left join account  a on a.account_code = ci.account_code
     where ci.deleted = 0
     <if test="cardId != null and cardId != '' ">
-      and ci.card_id = #{cardId}
+      and ci.card_id  like concat('%',#{cardId},'%')
     </if>
-    <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
+    <if test="cardName != null and cardName !='' ">and ca.card_name like concat('%',#{cardName},'%')
     </if>
     <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
     </if>

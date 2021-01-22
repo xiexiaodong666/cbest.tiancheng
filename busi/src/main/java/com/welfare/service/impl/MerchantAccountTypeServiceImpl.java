@@ -20,6 +20,7 @@ import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,8 @@ import java.util.stream.Collectors;
 public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
     private final MerchantAccountTypeExMapper merchantAccountTypeExMapper;
-    private final MerchantService merchantService;
+    @Autowired
+    private MerchantService merchantService;
     private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
     private final SequenceService sequenceService;
 

@@ -1,7 +1,6 @@
 git pull
 mvn clean install
-
-scp ./service-merchant/target/e-welfare-merchant.jar root@172.30.37.188:/home/finance/App/e-welfare-merchant.e-cbest.lotest/release/
+scp ./target/e-welfare-merchant.jar root@172.30.37.188:/home/finance/App/e-welfare-merchant.e-cbest.lotest/release/
 echo "sleeping 3 secs"
 sleep 3
   ssh root@172.30.37.188 "

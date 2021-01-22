@@ -88,6 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAccountName(account.getAccountName());
             paymentRequest.setAccountBalance(account.getAccountBalance());
             paymentRequest.setAccountCredit(account.getSurplusQuota());
+            paymentRequest.setPhone(account.getPhone());
             return paymentRequest;
         } finally {
             merAccountLock.unlock();
@@ -158,6 +159,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAccountBalance(account.getAccountBalance());
             paymentRequest.setAccountName(account.getAccountName());
             paymentRequest.setAccountCredit(account.getSurplusQuota());
+            paymentRequest.setPhone(account.getPhone());
         }
 
         return paymentRequest;

@@ -7,6 +7,7 @@ package com.welfare.common.constants;
  */
 public enum  AccountChangeType {
   ACCOUNT_NEW("account_new","新增账户"),
+  ACCOUNT_UPDATE("account_update","修改账户"),
   ACCOUNT_ACTIVE("account_active","账号激活"),
   ACCOUNT_LOCK("account_lock","账号锁定"),
   ACCOUNT_DELETE("account_delete","账号删除"),

@@ -18,6 +18,11 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("updateUser")String updateUser,
       @Param("accountCode")String accountCode);
 
+  int updateMaxAndSurplusQuota(@Param("accountCode")String accountCode,
+      @Param("maxQuota") BigDecimal maxQuota,
+      @Param("surplusQuota") BigDecimal surplusQuota,
+      @Param("updateUser")String updateUser);
+
   IPage<AccountPageDTO> queryPageDTO(Page<AccountPageDTO> page,
       @Param("merCode") String merCode,
       @Param("accountName")String accountName,

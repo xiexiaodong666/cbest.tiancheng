@@ -80,6 +80,8 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      */
     @ApiModelProperty("交易总金额")   
     private BigDecimal transAmount;
+    @ApiModelProperty("此笔交易已逆向金额,用于标记付款流水的已退款金额")
+    private BigDecimal reversedAmount;
     /**
      * 交易时间
      */

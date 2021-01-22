@@ -29,7 +29,7 @@ public interface AccountService {
 
   List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq);
 
-  Account findByPhone(String phone);
+  Account findByPhone(String phone,String merCode);
 
   List<AccountDTO> export(AccountPageReq accountPageReq);
 

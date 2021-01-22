@@ -134,9 +134,10 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public Account findByPhone(String phone) {
+  public Account findByPhone(String phone,String merCode) {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
     accountQueryWrapper.eq(Account.PHONE, phone);
+    accountQueryWrapper.eq(Account.MER_CODE, merCode);
     Account acccount = accountDao.getOne(accountQueryWrapper);
     return acccount;
   }
@@ -326,7 +327,7 @@ public class AccountServiceImpl implements AccountService {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
     }
     if (isNew) {
-      Account queryAccount = this.findByPhone(account.getPhone());
+      Account queryAccount = this.findByPhone(account.getPhone(),account.getMerCode());
       if (null != queryAccount) {
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
       }

@@ -58,7 +58,7 @@ public class MarketCreateHandler {
         SupplierStoreSyncDTO syncDTO=evt.getSupplierStoreSyncDTO();
         if(EmptyChecker.notEmpty(syncDTO)){
             CbestPayCreateMarketReq req=new CbestPayCreateMarketReq();
-            req.setName(syncDTO.getStoreName());
+            req.setMarketName(syncDTO.getStoreName());
             CbestPayBaseBizResp resp= cbestPayService.marketCreate(syncDTO.getStoreCode(),req);
             String bizStatus = resp.getBizStatus();
             switch (bizStatus) {

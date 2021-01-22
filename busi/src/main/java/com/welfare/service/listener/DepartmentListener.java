@@ -64,6 +64,10 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
     }
     if(EmptyChecker.isEmpty(departmentImportDTO.getDepartmentName())){
       uploadInfo.append("第").append(row.toString()).append("行").append("机构名称不能为空").append(";");
+    }else{
+      if(departmentImportDTO.getDepartmentName().length()>50){
+        uploadInfo.append("第").append(row.toString()).append("行").append("机构名称长度不能>50").append(";");
+      }
     }
     if(EmptyChecker.isEmpty(departmentImportDTO.getDepartmentType())){
       uploadInfo.append("第").append(row.toString()).append("行").append("机构类型不能为空").append(";");

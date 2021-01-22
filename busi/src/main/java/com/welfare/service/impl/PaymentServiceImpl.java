@@ -198,14 +198,14 @@ public class PaymentServiceImpl implements PaymentService {
                     break;
                 }
             }
-            saveDetails(paymentOperations, account);
+            saveDetails(paymentOperations, account,accountAmountTypes);
             return paymentOperations;
         } finally {
             accountLock.unlock();
         }
     }
 
-    private void saveDetails(List<PaymentOperation> paymentOperations, Account account) {
+    private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
         List<AccountBillDetail> billDetails = paymentOperations.stream()
                 .map(PaymentOperation::getAccountBillDetail)
                 .collect(Collectors.toList());
@@ -216,8 +216,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(PaymentOperation::getAccountAmountType)
                 .collect(Collectors.toList());
 
-        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountTypes);
-        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountTypes);
+        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
+        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
         account.setAccountBalance(accountBalance);
         account.setSurplusQuota(accountCreditBalance);
         accountDao.updateById(account);

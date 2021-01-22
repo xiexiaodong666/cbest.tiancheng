@@ -13,6 +13,7 @@ import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
+import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -130,7 +131,7 @@ public class AccountServiceImpl implements AccountService {
   public List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq) {
     return accountCustomizeMapper
         .queryIncrementDTO(accountIncrementReq.getStoreCode(), accountIncrementReq.getSize(),
-            accountIncrementReq.getChangeEventId());
+            accountIncrementReq.getChangeEventId(),ConsumeTypeEnum.SHOP_SHOPPING.getCode());
   }
 
   @Override

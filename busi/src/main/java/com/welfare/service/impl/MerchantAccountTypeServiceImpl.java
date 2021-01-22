@@ -199,14 +199,14 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
         MerchantAccountType merchantAccountType1=new MerchantAccountType();
         merchantAccountType1.setMerAccountTypeName("员工授信额度");
         merchantAccountType1.setMerCode(merCode);
-        merchantAccountType1.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+        merchantAccountType1.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code());
         merchantAccountType1.setDeductionOrder(9999);
         merchantAccountType1.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
         initList.add(merchantAccountType1);
         MerchantAccountType merchantAccountType2=new MerchantAccountType();
         merchantAccountType2.setMerAccountTypeName("自助充值");
         merchantAccountType2.setMerCode(merCode);
-        merchantAccountType2.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+        merchantAccountType2.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.SELF.code());
         merchantAccountType2.setDeductionOrder(0);
         merchantAccountType2.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
         initList.add(merchantAccountType2);

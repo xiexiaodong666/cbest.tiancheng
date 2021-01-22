@@ -26,7 +26,7 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
   IPage<AccountPageDTO> queryPageDTO(Page<AccountPageDTO> page,
       @Param("merCode") String merCode,
       @Param("accountName")String accountName,
-      @Param("departmentCodeList")List<String>  departmentCodeList,
+      @Param("departmentPathList")List<String>  departmentPathList,
       @Param("accountStatus")Integer accountStatus,
       @Param("accountTypeCode")String accountTypeCode,
       @Param("binding") Integer binding,
@@ -34,7 +34,7 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
 
   List<AccountPageDTO> queryPageDTO(@Param("merCode") String merCode,
       @Param("accountName")String accountName,
-      @Param("departmentCodeList")List<String>  departmentCodeList,
+      @Param("departmentPathList")List<String>  departmentPathList,
       @Param("accountStatus")Integer accountStatus,
       @Param("accountTypeCode")String accountTypeCode,
       @Param("binding") Integer binding,
@@ -62,7 +62,8 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
 
   List<AccountIncrementDTO> queryIncrementDTO(@Param("storeCode") String storeCode,
       @Param("size")Integer  size,
-      @Param("changeEventId")Long changeEventId);
+      @Param("changeEventId")Long changeEventId,
+      @Param("consumeType")String consumeType);
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
 
   List<Account> queryByConsumeSceneIdList(List<Long> list);

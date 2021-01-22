@@ -13,6 +13,7 @@ import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
+import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -120,7 +121,7 @@ public class AccountServiceImpl implements AccountService {
   public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
     IPage<AccountPageDTO> iPage = accountCustomizeMapper
         .queryPageDTO(page, accountPageReq.getMerCode(), accountPageReq.getAccountName(),
-            accountPageReq.getDepartmentCodeList(), accountPageReq.getAccountStatus(),
+            accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
             accountPageReq.getAccountTypeCode(), accountPageReq.getBinding(),
             accountPageReq.getCardId());
     return accountConverter.toPage(iPage);
@@ -130,11 +131,11 @@ public class AccountServiceImpl implements AccountService {
   public List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq) {
     return accountCustomizeMapper
         .queryIncrementDTO(accountIncrementReq.getStoreCode(), accountIncrementReq.getSize(),
-            accountIncrementReq.getChangeEventId());
+            accountIncrementReq.getChangeEventId(),ConsumeTypeEnum.SHOP_SHOPPING.getCode());
   }
 
   @Override
-  public Account findByPhone(String phone,String merCode) {
+  public Account findByPhone(String phone, String merCode) {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
     accountQueryWrapper.eq(Account.PHONE, phone);
     accountQueryWrapper.eq(Account.MER_CODE, merCode);
@@ -146,7 +147,7 @@ public class AccountServiceImpl implements AccountService {
   public List<AccountDTO> export(AccountPageReq accountPageReq) {
     List<AccountPageDTO> list = accountCustomizeMapper
         .queryPageDTO(accountPageReq.getMerCode(), accountPageReq.getAccountName(),
-            accountPageReq.getDepartmentCodeList(), accountPageReq.getAccountStatus(),
+            accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
             accountPageReq.getAccountTypeCode(), accountPageReq.getBinding(),
             accountPageReq.getCardId());
     return accountConverter.toAccountDTOList(list);
@@ -207,7 +208,7 @@ public class AccountServiceImpl implements AccountService {
     }
     boolean result = accountDao.removeById(id);
 
-    accountChangeEvtRecoed(AccountChangeType.ACCOUNT_DELETE,syncAccount.getAccountCode());
+    accountChangeEvtRecoed(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode());
     syncAccount.setDeleted(true);
     applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE)
         .accountList(Arrays.asList(syncAccount)).build());
@@ -226,7 +227,7 @@ public class AccountServiceImpl implements AccountService {
     account.setAccountStatus(accountStatus);
     boolean result = accountDao.updateById(account);
     AccountChangeType accountChangeType = AccountChangeType.getByAccountStatus(accountStatus);
-    accountChangeEvtRecoed(accountChangeType,syncAccount.getAccountCode());
+    accountChangeEvtRecoed(accountChangeType, syncAccount.getAccountCode());
     syncAccount.setAccountStatus(accountStatus);
     applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE)
         .accountList(Arrays.asList(syncAccount)).build());
@@ -274,7 +275,8 @@ public class AccountServiceImpl implements AccountService {
     accountChangeEventRecordService.save(accountChangeEventRecord);
     if (accountReq.getCredit()) {
       //授信额度
-      AccountAmountType accountAmountType = getAccountAmountType(account.getAccountCode(),account.getMaxQuota(),account.getMerCode());
+      AccountAmountType accountAmountType = getAccountAmountType(account.getAccountCode(),
+          account.getMaxQuota(), account.getMerCode());
       accountAmountTypeMapper.insert(accountAmountType);
       account.setSurplusQuota(account.getMaxQuota());
     }
@@ -296,7 +298,8 @@ public class AccountServiceImpl implements AccountService {
     return account;
   }
 
-  private AccountAmountType getAccountAmountType(Long accountCode,BigDecimal accountBalance,String merCode) {
+  private AccountAmountType getAccountAmountType(Long accountCode, BigDecimal accountBalance,
+      String merCode) {
     MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(
         merCode,
         MerAccountTypeCode.SURPLUS_QUOTA.code());
@@ -327,7 +330,7 @@ public class AccountServiceImpl implements AccountService {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
     }
     if (isNew) {
-      Account queryAccount = this.findByPhone(account.getPhone(),account.getMerCode());
+      Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
       if (null != queryAccount) {
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
       }
@@ -349,7 +352,8 @@ public class AccountServiceImpl implements AccountService {
   @Transactional(rollbackFor = Exception.class)
   public Boolean update(AccountReq accountReq) {
     Account oldAccount = accountMapper.selectById(accountReq.getId());
-    RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + oldAccount.getAccountCode());
+    RLock lock = redissonClient
+        .getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + oldAccount.getAccountCode());
     lock.lock();
     try {
       Account account = assemableAccount4update(accountReq);
@@ -357,9 +361,10 @@ public class AccountServiceImpl implements AccountService {
       //修改授信额度
       updateSurPlusQuota(oldAccount.getAccountCode(), oldAccount.getMaxQuota(),
           oldAccount.getSurplusQuota(),
-          account.getMaxQuota(), account.getUpdateUser(), accountReq.getCredit(),account.getMerCode());
+          account.getMaxQuota(), account.getUpdateUser(), accountReq.getCredit(),
+          account.getMerCode());
       //记录变更时间离线支付用
-      accountChangeEvtRecoed(AccountChangeType.ACCOUNT_UPDATE,oldAccount.getAccountCode());
+      accountChangeEvtRecoed(AccountChangeType.ACCOUNT_UPDATE, oldAccount.getAccountCode());
 
       boolean result = accountDao.updateById(account);
       account = accountDao.getById(account.getId());
@@ -368,11 +373,13 @@ public class AccountServiceImpl implements AccountService {
           .accountList(Arrays.asList(account)).build());
       return result;
     } finally {
-      lock.unlock();
+      if (lock.isHeldByCurrentThread()) {
+        lock.unlock();
+      }
     }
   }
 
-  private void accountChangeEvtRecoed(AccountChangeType accountChangeType,Long accountCode){
+  private void accountChangeEvtRecoed(AccountChangeType accountChangeType, Long accountCode) {
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils
         .assemableChangeEvent(accountChangeType, accountCode,
             MerchantUserHolder.getMerchantUser().getUsername());
@@ -389,23 +396,26 @@ public class AccountServiceImpl implements AccountService {
 
   private void updateSurPlusQuota(Long accountCode, BigDecimal oldMaxQuota, BigDecimal surplusQuota,
       BigDecimal newMaxQuota,
-      String updateUser, Boolean credit,String merCode) {
+      String updateUser, Boolean credit, String merCode) {
     if (credit) {
       QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper();
       queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, accountCode);
-      queryWrapper.eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, MerAccountTypeCode.SURPLUS_QUOTA.code());
+      queryWrapper
+          .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, MerAccountTypeCode.SURPLUS_QUOTA.code());
 
       AccountAmountType accountAmountType = accountAmountTypeMapper.selectOne(queryWrapper);
-      if( null ==  accountAmountType){
+      if (null == accountAmountType) {
         //授信额度被删除新增 修改account额度
-        AccountAmountType  addAccountAmountType =  getAccountAmountType (accountCode,newMaxQuota,merCode);
+        AccountAmountType addAccountAmountType = getAccountAmountType(accountCode, newMaxQuota,
+            merCode);
         accountAmountTypeMapper.insert(addAccountAmountType);
-        accountCustomizeMapper.updateMaxAndSurplusQuota(accountCode.toString(),newMaxQuota,newMaxQuota,updateUser);
+        accountCustomizeMapper
+            .updateMaxAndSurplusQuota(accountCode.toString(), newMaxQuota, newMaxQuota, updateUser);
         return;
       }
-      if( null != accountAmountType ){
+      if (null != accountAmountType) {
         //判断剩余授信额度  如果是增加,那么额度就是
-        if( surplusQuota.compareTo(oldMaxQuota.subtract(newMaxQuota)) < 0  ){
+        if (surplusQuota.compareTo(oldMaxQuota.subtract(newMaxQuota)) < 0) {
           throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
         }
         //修改了额度
@@ -429,7 +439,9 @@ public class AccountServiceImpl implements AccountService {
           MerAccountTypeCode.SURPLUS_QUOTA.code(),
           new BigDecimal(0),
           updateUser);
-      accountCustomizeMapper.updateMaxAndSurplusQuota(accountCode.toString(),new BigDecimal(0),new BigDecimal(0),updateUser);
+      accountCustomizeMapper
+          .updateMaxAndSurplusQuota(accountCode.toString(), new BigDecimal(0), new BigDecimal(0),
+              updateUser);
     }
   }
 

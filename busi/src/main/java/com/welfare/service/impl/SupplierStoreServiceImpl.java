@@ -255,14 +255,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreAddDTO supplierStore) {
-    List<String> consumTypes=Arrays.asList(supplierStore.getConsumType().split(","));
-    if(!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"未输入正确的消费类型",null);
-    }
-    if(consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
-            &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"O2O和线上商城不能同时选择",null);
-    }
+    checkConsumType(supplierStore.getConsumType());
     Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
     if (EmptyChecker.isEmpty(merchant)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
@@ -426,10 +419,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
-    List<String> consumTypes=Arrays.asList(supplierStore.getConsumType().split(","));
-    if(!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"未输入正确的消费类型",null);
-    }
+    checkConsumType(supplierStore.getConsumType());
     SupplierStore entity = supplierStoreDao.getById(supplierStore.getId());
     if (EmptyChecker.isEmpty(entity)) {
       throw new BusiException("id不存在");
@@ -457,6 +447,17 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
     return flag && flag2 && flag3;
+  }
+
+  private void checkConsumType(String consumType) {
+    List<String> consumTypes = Arrays.asList(consumType.split(","));
+    if (!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未输入正确的消费类型", null);
+    }
+    if (consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
+            && consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "O2O和线上商城不能同时选择", null);
+    }
   }
 
   private SupplierStore buildUpdate(SupplierStore entity,SupplierStoreUpdateDTO update) {

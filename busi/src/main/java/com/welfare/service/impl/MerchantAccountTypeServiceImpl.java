@@ -46,7 +46,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     private MerchantService merchantService;
     private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
     private final SequenceService sequenceService;
-
+    private final static Long startId = 10000L;
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
         QueryWrapper q=QueryHelper.getWrapper(req);
@@ -95,7 +95,9 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             type.setDeductionOrder(typeItem.getDeductionOrder());
             type.setMerCode(merchantAccountType.getMerCode());
             type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
-            type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+            type.setMerAccountTypeCode(sequenceService.nextNo(
+                    WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code(), merchantAccountType.getMerCode(), startId,
+                    1).toString());
             type.setRemark(merchantAccountType.getRemark());
             type.setCreateTime(date);
             type.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
@@ -127,7 +129,9 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
                 type.setDeductionOrder(typeItem.getDeductionOrder());
                 type.setMerCode(merchantAccountType.getMerCode());
                 type.setMerAccountTypeName(typeItem.getMerAccountTypeName());
-                type.setMerAccountTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code()).toString());
+                type.setMerAccountTypeCode(sequenceService.nextNo(
+                        WelfareConstant.SequenceType.MER_ACCOUNT_TYPE_CODE.code(), merchantAccountType.getMerCode(), startId,
+                        1).toString());
                 type.setRemark(merchantAccountType.getRemark());
                 type.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
                 type.setCreateTime(date);
@@ -189,6 +193,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     public List<MerchantAccountType> queryByMerCode(String merCode) {
         QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(MerchantAccountType.MER_CODE,merCode);
+        queryWrapper.eq(MerchantAccountType.SHOW_STATUS,MerchantAccountTypeShowStatusEnum.SHOW.getCode());
         return merchantAccountTypeDao.list(queryWrapper);
     }
 

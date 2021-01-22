@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
+import com.welfare.common.constants.AccountStatus;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
@@ -70,6 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Long accountCode = paymentRequest.calculateAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
+        Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()),"账户未启用");
         chargePaymentScene(paymentRequest, account);
 
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
@@ -174,7 +176,6 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal amount = paymentRequest.getAmount();
             boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
             Assert.isTrue(enough, "总账户余额不足");
-
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
             BigDecimal allTypeBalance = accountAmountDOList.stream()
                     .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
@@ -198,14 +199,14 @@ public class PaymentServiceImpl implements PaymentService {
                     break;
                 }
             }
-            saveDetails(paymentOperations, account);
+            saveDetails(paymentOperations, account,accountAmountTypes);
             return paymentOperations;
         } finally {
             accountLock.unlock();
         }
     }
 
-    private void saveDetails(List<PaymentOperation> paymentOperations, Account account) {
+    private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
         List<AccountBillDetail> billDetails = paymentOperations.stream()
                 .map(PaymentOperation::getAccountBillDetail)
                 .collect(Collectors.toList());
@@ -216,8 +217,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(PaymentOperation::getAccountAmountType)
                 .collect(Collectors.toList());
 
-        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountTypes);
-        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountTypes);
+        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
+        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
         account.setAccountBalance(accountBalance);
         account.setSurplusQuota(accountCreditBalance);
         accountDao.updateById(account);
@@ -283,6 +284,7 @@ public class PaymentServiceImpl implements PaymentService {
         accountDeductionDetail.setPayCode(WelfareConstant.PayCode.WELFARE_CARD.code());
         accountDeductionDetail.setTransType(WelfareConstant.TransType.CONSUME.code());
         accountDeductionDetail.setTransAmount(operatedAmount);
+        accountDeductionDetail.setReversedAmount(BigDecimal.ZERO);
         accountDeductionDetail.setTransTime(paymentRequest.getPaymentDate());
         accountDeductionDetail.setStoreCode(paymentRequest.getStoreNo());
         if (paymentRequest instanceof CardPaymentRequest) {

@@ -95,7 +95,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       return false;
     }
 
-    Account queryAccount = accountService.findByPhone(account.getPhone());
+    Account queryAccount = accountService.findByPhone(account.getPhone(),account.getMerCode());
     if (null != queryAccount) {
       uploadInfo.append("员工手机号已经存在:").append(account.getPhone()).append(";");
       return false;

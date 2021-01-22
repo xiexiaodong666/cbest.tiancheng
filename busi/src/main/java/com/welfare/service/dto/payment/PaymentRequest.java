@@ -2,6 +2,7 @@ package com.welfare.service.dto.payment;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.SupplierStore;
@@ -52,6 +53,8 @@ public abstract class PaymentRequest {
     private Date paymentDate;
     @ApiModelProperty("退款交易流水号,返回参数")
     private String refundTransNo;
+    @ApiModelProperty("电话号码")
+    private String phone;
 
     public String calculatePaymentScene(){
         String consumeType = o2oOrOnlineShopping(machineNo);

@@ -5,6 +5,7 @@ import com.alibaba.excel.event.AnalysisEventListener;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.CardInfo;
@@ -43,6 +44,8 @@ public class AccountBatchBindCardListener extends AnalysisEventListener<AccountB
   @Override
   public void invoke(AccountBindCardDTO accountBindCardDTO, AnalysisContext analysisContext) {
     QueryWrapper<Account> accountQueryWrapper = new  QueryWrapper<Account>();
+    String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
+    accountQueryWrapper.eq(Account.MER_CODE,merCode);
     accountQueryWrapper.eq(Account.PHONE,accountBindCardDTO.getPhone());
     Account account = accountDao.getOne(accountQueryWrapper);
     if( null == account ){

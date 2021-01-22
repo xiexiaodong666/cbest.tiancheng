@@ -91,11 +91,8 @@ public class AccountController implements IController {
   @MerchantUser
   public R<Boolean> save(@RequestBody AccountReq accountReq) {
     try {
-      Account account = new Account();
-      BeanUtils.copyProperties(accountReq, account);
-      account.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
-      account.setStoreCode(accountReq.getDepartmentCode());
-      return success(accountService.save(account));
+
+      return success(accountService.save(accountReq));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }
@@ -107,11 +104,8 @@ public class AccountController implements IController {
   @MerchantUser
   public R<Boolean> update(@RequestBody AccountReq accountReq) {
     try {
-      Account account = new Account();
-      BeanUtils.copyProperties(accountReq, account);
-      account.setStoreCode(accountReq.getDepartmentCode());
-      account.setUpdateUser(MerchantUserHolder.getMerchantUser().getUsername());
-      return success(accountService.update(account));
+
+      return success(accountService.update(accountReq));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }
@@ -119,6 +113,7 @@ public class AccountController implements IController {
 
   @PostMapping("/delete")
   @ApiOperation("删除员工账号")
+  @MerchantUser
   public R<Boolean> delete(@RequestBody UpdateStatusReq updateStatusReq) {
     try {
       return success(accountService.delete(Long.parseLong(updateStatusReq.getId())));
@@ -130,6 +125,7 @@ public class AccountController implements IController {
 
   @PostMapping("/updateAccountStatus")
   @ApiOperation("激活或锁定账号")
+  @MerchantUser
   public R<Boolean> updateAccountStatus(@RequestBody UpdateStatusReq updateStatusReq) {
 
     try {
@@ -161,8 +157,8 @@ public class AccountController implements IController {
 
   @ApiOperation("批量绑卡")
   @PostMapping(value = "/batchBindCard")
+  @MerchantUser
   public R<String> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
-
     try {
       return success(accountService.accountBatchBindCard(multipartFile));
     } catch (BusiException be) {

@@ -42,6 +42,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private List<SupplierStoreAddDTO> list = new ArrayList<>();
 
   private List<String> merCodeList = new LinkedList();
+  private List<String> casherNoList = new LinkedList();
   private List<String> storeCodeList = new LinkedList();
   private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getExcelType(),ConsumeTypeEnum.ONLINE_MALL.getExcelType(),ConsumeTypeEnum.SHOP_SHOPPING.getExcelType()});
 
@@ -91,11 +92,13 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     }
     if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
             ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
-      if(EmptyChecker.isEmpty(storeImportDTO.getCasherNo())){
+      if(EmptyChecker.isEmpty(storeImportDTO.getCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("线上商城或者O2O必须输入虚拟收银机号").append(";");
+      }else{
+        casherNoList.add(storeImportDTO.getCashierNo());
       }
     }else{
-      if(EmptyChecker.notEmpty(storeImportDTO.getCasherNo())){
+      if(EmptyChecker.notEmpty(storeImportDTO.getCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
       }
     }
@@ -149,6 +152,14 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     for(Map.Entry<String,List<String>> entry:groupMap.entrySet()){
       if(entry.getValue().size()>1){
         uploadInfo.append("excel文件中存在重复的门店代码:").append(entry.getKey()).append(";");
+      }
+    }
+    if(EmptyChecker.notEmpty(casherNoList)){
+      Map<String,List<String>> casherNoGroupMap= casherNoList.stream().collect(Collectors.groupingBy(String::toString));
+      for(Map.Entry<String,List<String>> entry:casherNoGroupMap.entrySet()){
+        if(entry.getValue().size()>1){
+          uploadInfo.append("excel文件中存在重复的虚拟收银机号:").append(entry.getKey()).append(";");
+        }
       }
     }
     QueryWrapper<SupplierStore> storeQueryWrapper=new QueryWrapper<>();

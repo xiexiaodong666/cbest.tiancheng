@@ -35,6 +35,20 @@
     <result property="version" column="version"/>
     <result property="changeEventId" column="change_event_id"/>
   </resultMap>
+
+  <update id="increaseAccountSurplusQuota">
+    UPDATE <include refid="tableName"/> set surplus_quota = surplus_quota + #{surplusQuota}, update_user = #{updateUser},update_time = now(),version = version + 1 where account_code = #{accountCode}
+    and surplus_quota + #{surplusQuota} >= 0
+  </update>
+
+  <update id="updateMaxAndSurplusQuota">
+    UPDATE <include refid="tableName"/> set surplus_quota = #{surplusQuota}, max_quota =#{maxQuota},update_user = #{updateUser},update_time = now(),version = version + 1
+    where account_code = #{accountCode}
+
+  </update>
+
+
+
   <select id="queryByConsumeSceneIdList" resultMap="accountMap">
     select
     <include refid="baseColumn"/>
@@ -258,7 +272,8 @@ LIMIT #{size}
     a.account_balance AS accountBalance,
     a.remark,
     a.phone,
-    a.binding
+    a.binding,
+    a.credit
     FROM
     account a
     LEFT JOIN department d ON a.store_code = d.department_code

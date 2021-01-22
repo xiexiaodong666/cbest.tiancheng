@@ -83,4 +83,6 @@ public class AccountDetailMapperDTO {
    * 是否激活
    */
   private Integer binding;
+
+  private Integer credit;
 }

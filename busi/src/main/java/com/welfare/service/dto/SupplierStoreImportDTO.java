@@ -48,7 +48,7 @@ public class SupplierStoreImportDTO {
      */
     @ApiModelProperty("虚拟收银机号")
     @ExcelProperty(value = "虚拟收银机号", index = 4)
-    private String casherNo;
+    private String cashierNo;
     /**
      * 自提点名称
      */

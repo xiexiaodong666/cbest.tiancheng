@@ -51,6 +51,7 @@ import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
+import com.welfare.service.sync.event.MarketCreateEvt;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
@@ -68,6 +69,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -297,6 +299,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
+   //同步重百付
+    applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(detailDTO).build());
     return flag;
   }
 
@@ -324,13 +328,21 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(sync);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.ACTIVATE).supplierStoreDetailDTOS(syncList).build());
     return flag;
   }
 
   @Transactional(rollbackFor = Exception.class)
   public boolean batchAdd(List<SupplierStoreAddDTO> list) {
     List<SupplierStore> saves = supplierStoreAddConverter.toE((list));
+    for (SupplierStore store : saves) {
+      store.setStatus(0);
+      store.setStorePath(store.getMerCode() + "-" + store.getStoreCode());
+      store.setStoreParent(store.getMerCode());
+      }
+    if (!supplierStoreDao.saveBatch(saves)) {
+      throw new BusiException("导入门店--批量插入失败");
+    }
     //存放门店code和地址的对应关系，用于批量新增门店后，存入对应地址
     Map<String, List<MerchantAddressDTO>> map = new HashMap<>();
     for (SupplierStoreAddDTO supplierStoreAddDTO : list) {
@@ -339,9 +351,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<MerchantAddressDTO> addressDTOList = new ArrayList<>();
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     for (SupplierStore store : saves) {
-      store.setStatus(0);
-      store.setStorePath(store.getMerCode() + "-" + store.getStoreCode());
-      store.setStoreParent(store.getMerCode());
       SupplierStoreSyncDTO syncDTO = supplierStoreSyncConverter.toD(store);
       List<MerchantAddressDTO> addressItemList = map.get(store.getStoreCode());
       if (EmptyChecker.notEmpty(addressItemList)) {
@@ -355,16 +364,17 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       syncList.add(syncDTO);
 
     }
-    if (!supplierStoreDao.saveBatch(saves)) {
-      throw new BusiException("导入门店--批量插入失败");
-    }
     if (!merchantAddressService.batchSave(addressDTOList, SupplierStore.class.getSimpleName())) {
       throw new BusiException("导入门店--批量插入地址失败");
     }
     //同步商城中台
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList)
+        ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncList)
                                         .build());
+    //同步重百付
+    for(SupplierStoreSyncDTO item: syncList){
+      applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(item).build());
+    }
     return Boolean.TRUE;
   }
 

@@ -13,6 +13,7 @@ import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.entity.AccountDeductionDetail;
+import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.RefundService;
@@ -30,6 +31,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,6 +58,7 @@ public class RefundServiceImpl implements RefundService {
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountDao accountDao;
     private final MerchantCreditService merchantCreditService;
+    private final AccountAmountTypeService accountAmountTypeService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -63,16 +67,16 @@ public class RefundServiceImpl implements RefundService {
         String originalTransNo = refundRequest.getOriginalTransNo();
         List<AccountDeductionDetail> refundDeductionDetailInDb = accountDeductionDetailDao
                 .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
-        if(!CollectionUtils.isEmpty(refundDeductionDetailInDb)){
+        if (!CollectionUtils.isEmpty(refundDeductionDetailInDb)) {
             String transNoInDb = refundDeductionDetailInDb.get(0).getTransNo();
-            if(refundRequest.getTransNo().equals(transNoInDb)){
+            if (refundRequest.getTransNo().equals(transNoInDb)) {
                 RefundRequest refundRequestInDb = queryResult(transNoInDb);
                 log.warn("交易已经处理过，直接返回处理结果:{}", JSON.toJSONString(refundRequestInDb));
-                BeanUtils.copyProperties(refundRequestInDb,refundRequest);
+                BeanUtils.copyProperties(refundRequestInDb, refundRequest);
                 return;
-            }else{
+            } else {
                 throw new BusiException(
-                        ExceptionCode.ILLEGALITY_ARGURMENTS,"交易已经通过transNo:"+ transNoInDb +"退款",null
+                        ExceptionCode.ILLEGALITY_ARGURMENTS, "交易已经通过transNo:" + transNoInDb + "退款", null
                 );
             }
 
@@ -84,7 +88,11 @@ public class RefundServiceImpl implements RefundService {
         Assert.isTrue(!CollectionUtils.isEmpty(accountDeductionDetails), "未找到正向支付流水");
         AccountDeductionDetail first = accountDeductionDetails.get(0);
         Account account = accountService.getByAccountCode(first.getAccountCode());
-        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByAccountCode(account.getAccountCode());
+        List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
+        //按照deductionOrder逆序
+        accountAmountDOList.sort(Comparator.comparing(x -> -1 * x.getMerchantAccountType().getDeductionOrder()));
+        List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
+                .collect(Collectors.toList());
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         merAccountLock.lock();
         try {
@@ -104,16 +112,19 @@ public class RefundServiceImpl implements RefundService {
         try {
             Map<String, AccountAmountType> accountAmountTypeMap = accountAmountTypes.stream()
                     .collect(Collectors.toMap(AccountAmountType::getMerAccountTypeCode, type -> type));
-            List<RefundOperation> refundOperations = accountDeductionDetails.stream()
-                    .map(paymentDeductionDetail -> toRefundDeductionDetail(paymentDeductionDetail, refundRequest))
-                    .map(refundDeductionDetail -> {
-                        AccountAmountType accountAmountType = accountAmountTypeMap.get(refundDeductionDetail.getMerAccountType());
-                        accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(refundDeductionDetail.getTransAmount()));
-                        AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes);
-                        operateMerchantCredit(account, refundDeductionDetail);
-                        return RefundOperation.of(refundBillDetail, refundDeductionDetail);
-                    }).collect(Collectors.toList());
-
+            BigDecimal paidAmount = accountDeductionDetails.stream()
+                    .map(AccountDeductionDetail::getTransAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalToRefundAmount = refundRequest.getAmount();
+            int compareTo = paidAmount.compareTo(totalToRefundAmount);
+            List<RefundOperation> refundOperations = new ArrayList<>();
+            if (compareTo < 0) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"退款金额大于付款金额:" + totalToRefundAmount + ":" + paidAmount, null);
+            } else if (compareTo == 0) {
+                refundOperations = fullyRefund(refundRequest,accountDeductionDetails,account,accountAmountTypes,accountAmountTypeMap);
+            } else {
+                refundOperations = partlyRefund(accountDeductionDetails,accountAmountTypes,refundRequest,account);
+            }
             saveDetails(refundOperations, accountAmountTypes, account);
         } finally {
             accountLock.unlock();
@@ -122,8 +133,66 @@ public class RefundServiceImpl implements RefundService {
         refundRequest.setAccountCredit(account.getSurplusQuota());
         refundRequest.setAccountCode(account.getAccountCode());
         refundRequest.setAccountName(account.getAccountName());
+        refundRequest.setPhone(account.getPhone());
         refundRequest.setMerCode(account.getMerCode());
         refundRequest.setRefundStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+    }
+
+    private List<RefundOperation> partlyRefund(List<AccountDeductionDetail> accountDeductionDetails,List<AccountAmountType> accountAmountTypes,RefundRequest refundRequest,Account account){
+        List<RefundOperation> refundOperations = new ArrayList<>();
+        BigDecimal remainingRefundAmount = refundRequest.getAmount();
+        Map<String, AccountDeductionDetail> groupedDeductionDetail = accountDeductionDetails.stream()
+                .collect(Collectors.toMap(AccountDeductionDetail::getMerAccountType, detail -> detail));
+        BigDecimal refundedAmount = BigDecimal.ZERO;
+        for (AccountAmountType accountAmountType : accountAmountTypes) {
+            AccountDeductionDetail accountDeductionDetail = groupedDeductionDetail.get(accountAmountType.getMerAccountTypeCode());
+            if(accountDeductionDetail == null){
+                //这个子账户在支付的时候没有扣款金额
+                continue;
+            }
+            BigDecimal thisAccountTypeTransAmount = accountDeductionDetail.getTransAmount();
+            BigDecimal subtract = thisAccountTypeTransAmount.subtract(remainingRefundAmount);
+            BigDecimal thisAccountTypeRefundAmount;
+            if (subtract.compareTo(BigDecimal.ZERO) > 0) {
+                thisAccountTypeRefundAmount = remainingRefundAmount;
+                remainingRefundAmount = BigDecimal.ZERO;
+            } else {
+                thisAccountTypeRefundAmount = thisAccountTypeTransAmount;
+                remainingRefundAmount = remainingRefundAmount.subtract(thisAccountTypeRefundAmount);
+            }
+            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(thisAccountTypeRefundAmount));
+            refundedAmount = refundedAmount.add(thisAccountTypeRefundAmount);
+            AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(accountDeductionDetail, refundRequest, thisAccountTypeRefundAmount);
+            AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes);
+            RefundOperation refundOperation = RefundOperation.of(refundBillDetail,refundDeductionDetail);
+            refundOperations.add(refundOperation);
+            operateMerchantCredit(account, refundDeductionDetail);
+            int refundCompare = refundedAmount.compareTo(remainingRefundAmount);
+            if(refundCompare ==0){
+                break;
+            }
+        }
+        if(remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0){
+            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION,"系统异常，退款金额计算错误",null);
+        }
+        return refundOperations;
+    }
+
+    private List<RefundOperation> fullyRefund(RefundRequest refundRequest, List<AccountDeductionDetail> accountDeductionDetails, Account account, List<AccountAmountType> accountAmountTypes, Map<String, AccountAmountType> accountAmountTypeMap) {
+        List<RefundOperation> refundOperations;
+        refundOperations = accountDeductionDetails.stream()
+                .map(paymentDeductionDetail -> toRefundDeductionDetail(
+                        paymentDeductionDetail,
+                        refundRequest,
+                        paymentDeductionDetail.getTransAmount())
+                ).map(refundDeductionDetail -> {
+                    AccountAmountType accountAmountType = accountAmountTypeMap.get(refundDeductionDetail.getMerAccountType());
+                    accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(refundDeductionDetail.getTransAmount()));
+                    AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes);
+                    operateMerchantCredit(account, refundDeductionDetail);
+                    return RefundOperation.of(refundBillDetail, refundDeductionDetail);
+                }).collect(Collectors.toList());
+        return refundOperations;
     }
 
     private void operateMerchantCredit(Account account, AccountDeductionDetail refundDeductionDetail) {
@@ -161,6 +230,7 @@ public class RefundServiceImpl implements RefundService {
             refundRequest.setAccountCredit(account.getSurplusQuota());
             refundRequest.setAccountCode(account.getAccountCode());
             refundRequest.setAccountName(account.getAccountName());
+            refundRequest.setPhone(account.getPhone());
             refundRequest.setMerCode(account.getMerCode());
         }
         return refundRequest;
@@ -209,10 +279,19 @@ public class RefundServiceImpl implements RefundService {
     }
 
 
+    /**
+     * 单条退款
+     *
+     * @param accountDeductionDetail
+     * @param refundRequest
+     * @param refundAmountForThis    这条退款金额多少
+     * @return
+     */
     private AccountDeductionDetail toRefundDeductionDetail(AccountDeductionDetail accountDeductionDetail,
-                                                           RefundRequest refundRequest) {
+                                                           RefundRequest refundRequest, BigDecimal refundAmountForThis) {
         AccountDeductionDetail refundDeductionDetail = new AccountDeductionDetail();
         BeanUtils.copyProperties(accountDeductionDetail, refundDeductionDetail);
+        refundDeductionDetail.setTransAmount(refundAmountForThis);
         refundDeductionDetail.setTransType(WelfareConstant.TransType.REFUND.code());
         refundDeductionDetail.setTransTime(refundRequest.getRefundDate());
         refundDeductionDetail.setTransNo(refundRequest.getTransNo());

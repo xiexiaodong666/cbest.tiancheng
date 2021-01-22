@@ -60,6 +60,12 @@ public class AccountReq implements Serializable {
   private String accountTypeCode;
 
   /**
+   * 是否授信
+   */
+  @ApiModelProperty("是否授信,1是 0否")
+  private Boolean credit;
+
+  /**
    * 所属部门
    */
   @ApiModelProperty("所属部门Code")
@@ -72,11 +78,6 @@ public class AccountReq implements Serializable {
    */
   @ApiModelProperty("最大授权额度")
   private BigDecimal maxQuota;
-  /**
-   * 剩余授权额度
-   */
-  @ApiModelProperty("剩余授权额度")
-  private BigDecimal surplusQuota;
 
   /**
    * 备注

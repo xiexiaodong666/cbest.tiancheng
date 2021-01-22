@@ -33,6 +33,8 @@ public class RefundRequest {
     private Long accountCode;
     @ApiModelProperty("账户姓名(返回参数)")
     private String accountName;
+    @ApiModelProperty("账户电话(返回参数)")
+    private String phone;
     @ApiModelProperty("账户余额(返回参数)")
     private BigDecimal accountBalance;
     @ApiModelProperty("账户信用额度(返回参数)")

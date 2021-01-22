@@ -59,6 +59,8 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantWithCreditConverter merchantWithCreditConverter;
     private final MerchantAccountTypeDao merchantAccountTypeDao;
+    @Autowired
+    MerchantAccountTypeService merchantAccountTypeService;
 
 
 
@@ -156,13 +158,15 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantAddDTO merchant) {
-        merchant.setMerCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code()));
+        String merCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code());
+        merchant.setMerCode(merCode);
         Merchant save =merchantAddConverter.toE(merchant);
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         merchantCreditService.init(merchant.getMerCode());
+        boolean flag3=merchantAccountTypeService.init(merCode);
         //同步商城中台
-        if(!(flag&&flag2)){
+        if(!(flag&&flag2&flag3)){
             throw new BusiException("新增商户失败");
         }
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
@@ -171,7 +175,7 @@ public class MerchantServiceImpl implements MerchantService {
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
-        return flag&&flag2;
+        return flag&&flag2&flag3;
     }
 
     @Override

@@ -193,6 +193,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     public List<MerchantAccountType> queryByMerCode(String merCode) {
         QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(MerchantAccountType.MER_CODE,merCode);
+        queryWrapper.eq(MerchantAccountType.SHOW_STATUS,MerchantAccountTypeShowStatusEnum.SHOW.getCode());
         return merchantAccountTypeDao.list(queryWrapper);
     }
 

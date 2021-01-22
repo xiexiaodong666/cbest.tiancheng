@@ -1,5 +1,6 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.mapper.AccountTypeMapper;
@@ -16,5 +17,9 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class AccountTypeDao extends ServiceImpl<AccountTypeMapper, AccountType> {
-
+    public AccountType getOneByAccountType(String accountType){
+        QueryWrapper<AccountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountType.TYPE_CODE,accountType);
+        return getOne(queryWrapper);
+    }
 }

@@ -2,6 +2,7 @@ package com.welfare.persist.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.mapper.AccountConsumeSceneMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,8 @@ public class AccountConsumeSceneDao extends ServiceImpl<AccountConsumeSceneMappe
     public List<AccountConsumeScene> getAccountTypeAndMerCode(String accountType, String merCode){
         QueryWrapper<AccountConsumeScene> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountConsumeScene.ACCOUNT_TYPE_CODE,accountType)
-                .eq(AccountConsumeScene.MER_CODE,merCode);
+                .eq(AccountConsumeScene.MER_CODE,merCode)
+                .eq(AccountConsumeScene.STATUS, AccountConsumeSceneStatus.ENABLE.getCode());
         return list(queryWrapper);
     }
 }

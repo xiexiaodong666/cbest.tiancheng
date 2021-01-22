@@ -1,6 +1,7 @@
 package com.welfare.service.sync.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -57,21 +58,30 @@ public class MarketCreateHandler {
         SupplierStoreSyncDTO syncDTO=evt.getSupplierStoreSyncDTO();
         if(EmptyChecker.notEmpty(syncDTO)){
             CbestPayCreateMarketReq req=new CbestPayCreateMarketReq();
-            req.setName(syncDTO.getStoreName());
+            req.setMarketName(syncDTO.getStoreName());
             CbestPayBaseBizResp resp= cbestPayService.marketCreate(syncDTO.getStoreCode(),req);
             String bizStatus = resp.getBizStatus();
             switch (bizStatus) {
                 case CbestPayRespStatusConstant
                         .SUCCESS:
-                     Map<String,String> map= JSON.parseObject(resp.getBizContent(),Map.class);
-                    if (CbestPayRespRetryConstant.Y.equals(map.get(retryField))){
-                        throw new BusiException("重百付创建门店需要重试，" + resp.getBizMsg());
-                    }
+                     return;
                 case CbestPayRespStatusConstant
                         .FAIL:
-                    throw new BusiException("重百付创建门店失败，" + resp.getBizMsg());
+                    Map<String,String> map= null;
+                    try {
+                        map = mapper.readValue(resp.getBizContent(), Map.class);
+                    } catch (JsonProcessingException e) {
+                        throw new BusiException("重百付创建门店接口，response转换失败" + resp);
+                    }
+                    if (CbestPayRespRetryConstant.Y.equals(map.get(retryField))){
+                        throw new BusiException("重百付创建门店未成功，需要重试，" + resp.getBizMsg());
+                    }else{
+                        //如果传入的门店编号，重百付已存在，或者为重百门店，或者符合重百编码规则，则重百付不会创建，且不需要重试
+                        log.info("重百付创建门店未成功,不需要重试【{}】",resp.getBizMsg());
+                    }
+                    break;
                 default:
-                    throw new BusiException("重百付创建门店失败，未知返回状态" + bizStatus);
+                    throw new BusiException("重百付创建门店失败【"+resp.getBizMsg()+"】，未知返回状态" + bizStatus);
             }
         }
     }

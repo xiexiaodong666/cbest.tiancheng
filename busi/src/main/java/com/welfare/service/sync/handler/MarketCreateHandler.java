@@ -63,15 +63,18 @@ public class MarketCreateHandler {
             switch (bizStatus) {
                 case CbestPayRespStatusConstant
                         .SUCCESS:
-                     Map<String,String> map= JSON.parseObject(resp.getBizContent(),Map.class);
-                    if (CbestPayRespRetryConstant.Y.equals(map.get(retryField))){
-                        throw new BusiException("重百付创建门店需要重试，" + resp.getBizMsg());
-                    }
+                     return;
                 case CbestPayRespStatusConstant
                         .FAIL:
-                    throw new BusiException("重百付创建门店失败，" + resp.getBizMsg());
+                    Map<String,String> map= JSON.parseObject(resp.getBizContent(),Map.class);
+                    if (CbestPayRespRetryConstant.Y.equals(map.get(retryField))){
+                        throw new BusiException("重百付创建门店未成功，需要重试，" + resp.getBizMsg());
+                    }else{
+                        //如果传入的门店编号，重百付已存在，或者为重百门店，或者符合重百编码规则，则重百付不会创建，且不需要重试
+                        log.info("重百付创建门店未成功,不需要重试【{}】",resp.getBizMsg());
+                    }
                 default:
-                    throw new BusiException("重百付创建门店失败，未知返回状态" + bizStatus);
+                    throw new BusiException("重百付创建门店失败【"+resp.getBizMsg()+"】，未知返回状态" + bizStatus);
             }
         }
     }

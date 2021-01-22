@@ -176,7 +176,6 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal amount = paymentRequest.getAmount();
             boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
             Assert.isTrue(enough, "总账户余额不足");
-
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
             BigDecimal allTypeBalance = accountAmountDOList.stream()
                     .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())

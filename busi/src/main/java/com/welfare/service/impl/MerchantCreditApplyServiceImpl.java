@@ -10,7 +10,6 @@ import com.welfare.common.enums.MerCooperationModeEnum;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.persist.dao.MerDepositApplyFileDao;
 import com.welfare.persist.dao.MerchantCreditApplyDao;
 import com.welfare.persist.dto.MerchantCreditApplyInfoDTO;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
@@ -57,7 +56,6 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     private final RedissonClient redissonClient;
     private final MerchantCreditService merchantCreditService;
     private final MerchantService merchantService;
-    private final MerDepositApplyFileDao depositApplyFileDao;
     private final MerDepositApplyFileService merDepositApplyFileService;
 
     @Override
@@ -79,7 +77,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
                 validationParmas(request.getApplyType(), request.getMerCode());
                 apply = creditApplyConverter.toApply(request);
                 apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
-                apply.setApplyCode(sequenceService.nextNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code()) + "");
+                apply.setApplyCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code()));
                 apply.setApplyUser(user.getUserName());
                 apply.setApplyTime(new Date());
                 merchantCreditApplyDao.save(apply);

@@ -328,7 +328,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(sync);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.ACTIVATE).supplierStoreDetailDTOS(syncList).build());
     return flag;
   }
 
@@ -369,7 +369,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     //同步商城中台
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList)
+        ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncList)
                                         .build());
     //同步重百付
     for(SupplierStoreSyncDTO item: syncList){

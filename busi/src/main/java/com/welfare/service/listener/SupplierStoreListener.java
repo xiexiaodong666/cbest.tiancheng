@@ -78,6 +78,10 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreName())){
       uploadInfo.append("第").append(row.toString()).append("行").append("门店名称不能为空").append(";");
+    }else{
+      if(storeImportDTO.getStoreName().length()>50){
+        uploadInfo.append("第").append(row.toString()).append("行").append("门店名称不能大于50").append(";");
+      }
     }
     if(EmptyChecker.isEmpty(storeImportDTO.getConsumType())){
       uploadInfo.append("第").append(row.toString()).append("行").append("消费类型不能为空").append(";");
@@ -95,7 +99,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       if(EmptyChecker.isEmpty(storeImportDTO.getCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("线上商城或者O2O必须输入虚拟收银机号").append(";");
       }else{
-        casherNoList.add(storeImportDTO.getCashierNo());
+        if(storeImportDTO.getCashierNo().length()>255){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
+        }else{
+          casherNoList.add(storeImportDTO.getCashierNo());
+        }
+
       }
     }else{
       if(EmptyChecker.notEmpty(storeImportDTO.getCashierNo())){
@@ -108,6 +117,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
               ||EmptyChecker.isEmpty(storeImportDTO.getAddress())){
         uploadInfo.append("第").append(row.toString()).append("行").append("O2O门店必填自提点").append(";");
       }else {
+        if(storeImportDTO.getAddressName().length()>100){
+          uploadInfo.append("第").append(row.toString()).append("行").append("自提点名称长度不能大于100").append(";");
+        }
+        if(storeImportDTO.getAddress().length()>255) {
+          uploadInfo.append("第").append(row.toString()).append("行").append("详细地址长度不能大于255").append(";");
+        }
         List<MerchantAddressDTO> addressList = new ArrayList();
         MerchantAddressDTO merchantAddressDTO=new MerchantAddressDTO();
         merchantAddressDTO.setRelatedType(SupplierStore.class.getSimpleName());

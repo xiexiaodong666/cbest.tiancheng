@@ -56,7 +56,7 @@ public class SupplierStoreHandler {
 
     @AllowConcurrentEvents
     @Subscribe
-    public void onMerchantChange(SupplierStoreEvt evt) {
+    public void onSupplierStoreChange(SupplierStoreEvt evt) {
         ShoppingActionTypeEnum typeEnum=evt.getTypeEnum();
         List<SupplierStoreSyncDTO> supplierStoreDetailDTOS=evt.getSupplierStoreDetailDTOS();
         if (EmptyChecker.isEmpty(supplierStoreDetailDTOS)) {

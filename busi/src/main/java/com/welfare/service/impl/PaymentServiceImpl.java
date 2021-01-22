@@ -283,6 +283,7 @@ public class PaymentServiceImpl implements PaymentService {
         accountDeductionDetail.setPayCode(WelfareConstant.PayCode.WELFARE_CARD.code());
         accountDeductionDetail.setTransType(WelfareConstant.TransType.CONSUME.code());
         accountDeductionDetail.setTransAmount(operatedAmount);
+        accountDeductionDetail.setReversedAmount(BigDecimal.ZERO);
         accountDeductionDetail.setTransTime(paymentRequest.getPaymentDate());
         accountDeductionDetail.setStoreCode(paymentRequest.getStoreNo());
         if (paymentRequest instanceof CardPaymentRequest) {

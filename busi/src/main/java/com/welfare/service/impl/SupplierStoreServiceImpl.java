@@ -51,6 +51,7 @@ import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
+import com.welfare.service.sync.event.MarketCreateEvt;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
@@ -298,6 +299,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
+   //同步重百付
+    applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(detailDTO).build());
     return flag;
   }
 
@@ -325,7 +328,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(sync);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.ACTIVATE).supplierStoreDetailDTOS(syncList).build());
     return flag;
   }
 
@@ -366,8 +369,12 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     //同步商城中台
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList)
+        ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncList)
                                         .build());
+    //同步重百付
+    for(SupplierStoreSyncDTO item: syncList){
+      applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(item).build());
+    }
     return Boolean.TRUE;
   }
 

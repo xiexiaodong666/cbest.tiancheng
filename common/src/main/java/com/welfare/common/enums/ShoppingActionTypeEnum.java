@@ -12,8 +12,8 @@ public enum ShoppingActionTypeEnum {
   ADD("ADD", "添加",1L),
   UPDATE("UPDATE", "修改",2L),
   DELETE("DELETE", "删除",3L),
-  BATCH_ADD("BATCH_ADD", "批量添加",4L),
-  ACTIVATE("ACTIVATE", "更改激活状态",5L);
+  BATCH_ADD("ADD", "批量添加",4L),
+  ACTIVATE("UPDATE", "更改激活状态",5L);
 
 
 

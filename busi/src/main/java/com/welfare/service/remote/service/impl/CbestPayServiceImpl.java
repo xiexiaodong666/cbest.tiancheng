@@ -47,6 +47,12 @@ public class CbestPayServiceImpl implements CbestPayService {
     }
 
     @Override
+    public CbestPayBaseBizResp marketCreate(String market, CbestPayCreateMarketReq req) {
+        CbestPayBaseBizResp resp = request("market.create", market, req);
+        return resp;
+    }
+
+    @Override
     public CbestPayBaseBizResp tradeRefund(String market, TradeRefundReq req) {
         CbestPayBaseBizResp resp = request("trade.refund", market, req);
         return resp;

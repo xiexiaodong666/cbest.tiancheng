@@ -105,14 +105,14 @@ public class OrderServiceImpl implements OrderService {
         List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
         // 判断用户传入的门店集合是否在上述商户关联门店中
         List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
-        List<Integer> storeCodeList = orderReqDto.getStoreIds();
+        List<String> storeCodeList = orderReqDto.getStoreIds();
         if (storeCodeList == null) {
             //平台端调用
             merchantStoreRelationList.addAll(merchantStoreRelationList1);
         } else {
             //商户端调用
             merchantStoreRelationList1.forEach(item -> {
-                Integer storeCode = Integer.valueOf(item.getStoreCode());
+                String storeCode = item.getStoreCode();
                 if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)) {
                     merchantStoreRelationList.add(item);
                 }
@@ -193,14 +193,14 @@ public class OrderServiceImpl implements OrderService {
         List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
         // 判断用户传入的门店集合是否在上述商户关联门店中
         List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
-        List<Integer> storeCodeList = orderReqDto.getStoreIds();
+        List<String> storeCodeList = orderReqDto.getStoreIds();
         if (storeCodeList == null) {
             //平台端调用
             merchantStoreRelationList.addAll(merchantStoreRelationList1);
         } else {
             //商户端调用
             merchantStoreRelationList1.forEach(item -> {
-                Integer storeCode = Integer.valueOf(item.getStoreCode());
+                String storeCode = item.getStoreCode();
                 if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)) {
                     merchantStoreRelationList.add(item);
                 }

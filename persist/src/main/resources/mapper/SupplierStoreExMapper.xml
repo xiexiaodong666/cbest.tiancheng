@@ -13,8 +13,9 @@
     ss.create_time as createTime
     FROM
     supplier_store ss
-    LEFT JOIN merchant m ON ss.mer_code = m.mer_code and m.deleted=0 and ss.deleted=0
-    <where>
+    LEFT JOIN merchant m ON ss.mer_code = m.mer_code
+    where
+     m.deleted=0 and ss.deleted=0
       <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and ss.mer_code=#{req.merCode}
       </if>
@@ -39,7 +40,6 @@
           #{item}
         </foreach>
       </if>
-    </where>
     ) temp ORDER BY temp.createTime desc
   </select>
 

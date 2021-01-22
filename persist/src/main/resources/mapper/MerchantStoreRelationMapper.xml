@@ -28,7 +28,7 @@
     msr.deleted != 1
     <if test="status != null and status !='' ">and msr.status = #{status}
     </if>
-    <if test="merName != null and merName !='' ">and m.mer_name = #{merName}
+    <if test="merName != null and merName !='' ">and m.mer_name like concat('%',#{merName},'%')
     </if>
     <if test="startTime != null ">and msr.create_time &gt;= #{startTime}</if>
     <if test="endTime != null ">and msr.create_time &lt;= #{endTime}</if>
@@ -81,7 +81,7 @@
     msr.deleted != 1
     <if test="status != null and status !='' ">and msr.status = #{status}
     </if>
-    <if test="merName != null and merName !='' ">and m.mer_name = #{merName}
+    <if test="merName != null and merName !='' ">and m.mer_name like concat('%',#{merName},'%')
     </if>
     <if test="startTime != null ">and msr.create_time &gt;= #{startTime}</if>
     <if test="endTime != null ">and msr.create_time &lt;= #{endTime}</if>

@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
+import com.welfare.common.constants.AccountStatus;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
@@ -70,6 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Long accountCode = paymentRequest.calculateAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
+        Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()),"账户未启用");
         chargePaymentScene(paymentRequest, account);
 
         RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
@@ -174,7 +176,6 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal amount = paymentRequest.getAmount();
             boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
             Assert.isTrue(enough, "总账户余额不足");
-
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
             BigDecimal allTypeBalance = accountAmountDOList.stream()
                     .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())

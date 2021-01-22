@@ -27,7 +27,7 @@
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code
     where
     ca.deleted != 1
-    <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
+    <if test="cardName != null and cardName !='' ">and ca.card_name like concat('%',#{cardName},'%')
     </if>
     <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
     </if>
@@ -62,7 +62,7 @@
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code
     where
     ca.deleted != 1
-    <if test="cardName != null and cardName !='' ">and ca.card_name = #{cardName}
+    <if test="cardName != null and cardName !='' ">and ca.card_name like concat('%',#{cardName},'%')
     </if>
     <if test="merCode != null and merCode !='' ">and ca.mer_code = #{merCode}
     </if>

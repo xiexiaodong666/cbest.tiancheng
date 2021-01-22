@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class MerchantAccountTypeAddDTO {
     @ApiModelProperty("商户编码")
     @NotBlank
     private String merCode;
+    @Valid
     List<TypeItem> typeList;
     @Data
     @NoArgsConstructor

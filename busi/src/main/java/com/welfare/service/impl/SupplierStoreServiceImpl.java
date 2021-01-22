@@ -333,20 +333,22 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Transactional(rollbackFor = Exception.class)
   public boolean batchAdd(List<SupplierStoreAddDTO> list) {
     List<SupplierStore> saves = supplierStoreAddConverter.toE((list));
+    for (SupplierStore store : saves) {
+      store.setStatus(0);
+      store.setStorePath(store.getMerCode() + "-" + store.getStoreCode());
+      store.setStoreParent(store.getMerCode());
+      }
+    if (!supplierStoreDao.saveBatch(saves)) {
+      throw new BusiException("导入门店--批量插入失败");
+    }
     //存放门店code和地址的对应关系，用于批量新增门店后，存入对应地址
     Map<String, List<MerchantAddressDTO>> map = new HashMap<>();
     for (SupplierStoreAddDTO supplierStoreAddDTO : list) {
       map.put(supplierStoreAddDTO.getStoreCode(), supplierStoreAddDTO.getAddressList());
     }
-    if (!supplierStoreDao.saveBatch(saves)) {
-      throw new BusiException("导入门店--批量插入失败");
-    }
     List<MerchantAddressDTO> addressDTOList = new ArrayList<>();
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     for (SupplierStore store : saves) {
-      store.setStatus(0);
-      store.setStorePath(store.getMerCode() + "-" + store.getStoreCode());
-      store.setStoreParent(store.getMerCode());
       SupplierStoreSyncDTO syncDTO = supplierStoreSyncConverter.toD(store);
       List<MerchantAddressDTO> addressItemList = map.get(store.getStoreCode());
       if (EmptyChecker.notEmpty(addressItemList)) {

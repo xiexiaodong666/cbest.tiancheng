@@ -27,17 +27,17 @@ public abstract class PaymentRequest {
     private static transient final String ONLINE_MACHINE_NO = "9002";
 
 
-    @ApiModelProperty("支付请求id")
+    @ApiModelProperty(value = "支付请求id",required = true)
     private String requestId;
-    @ApiModelProperty("重百付支付流水号")
+    @ApiModelProperty(value = "重百付支付流水号",required = true)
     private String transNo;
-    @ApiModelProperty("门店号")
+    @ApiModelProperty(value = "门店号",required = true)
     private String storeNo;
-    @ApiModelProperty("支付机器号")
+    @ApiModelProperty(value = "支付机器号",required = true)
     private String machineNo;
-    @ApiModelProperty("金额")
+    @ApiModelProperty(value = "金额",required = true)
     private BigDecimal amount = BigDecimal.ZERO;
-    @ApiModelProperty("是否离线，用于区分是离线支付还是在线支付")
+    @ApiModelProperty(value = "是否离线，用于区分是离线支付还是在线支付",required = true)
     private Boolean offline;
     @ApiModelProperty("支付状态，0：新增，1：处理中，2：处理成功，3:已退款，-1：处理失败")
     private Integer paymentStatus;
@@ -49,7 +49,7 @@ public abstract class PaymentRequest {
     private BigDecimal accountBalance;
     @ApiModelProperty("账户信用额度，返回参数")
     private BigDecimal accountCredit;
-    @ApiModelProperty("支付时间")
+    @ApiModelProperty(value = "支付时间",required = true)
     private Date paymentDate;
     @ApiModelProperty("退款交易流水号,返回参数")
     private String refundTransNo;

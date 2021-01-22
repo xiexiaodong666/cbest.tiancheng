@@ -37,6 +37,7 @@ public class MerchantAccountTypeAddDTO {
         @ApiModelProperty("扣款序号")
         private Integer deductionOrder;
         @ApiModelProperty("商户账户类型名称")
+        @Length(max = 20)
         private String merAccountTypeName;
         @ApiModelProperty("商户账户类型编码")
         private String merAccountTypeCode;

@@ -47,8 +47,6 @@ public class OrderController implements IController {
     @Autowired
     private OrderService orderService;
 
-    @ApiUser
-    @MerchantUser
     @ApiOperation("分页查看线下订单")
     @GetMapping("page")
     public R<PageVo<OrderRespDto>> selectByPage(OrderReqDto orderReqDto){
@@ -96,9 +94,6 @@ public class OrderController implements IController {
         return success();
     }
 
-
-    @ApiUser
-    @MerchantUser
     @ApiOperation("查询所有线下订单")
     @GetMapping("select/list")
     public R<List<OrderRespDto>> selectList(OrderReqDto orderReqDto){

@@ -105,4 +105,9 @@ public class AccountDetailDTO {
    */
   @ApiModelProperty("是否绑卡(1绑定0未绑定)")
   private Integer binding;
+  /**
+   * 是否授信
+   */
+  @ApiModelProperty("是否授信")
+  private Integer credit;
 }

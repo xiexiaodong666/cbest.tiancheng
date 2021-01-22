@@ -23,4 +23,19 @@
         update_user =  values(updateUser),
         version = version + values(version)
     </insert>
+
+
+    <update id="incrBalance">
+        UPDATE <include refid="tableName"/> set account_balance = account_balance + #{accountBalance}, update_user = #{updateUser},update_time = now(),version = version + 1
+        where account_code = #{accountCode}
+        and account_balance + #{accountBalance} >= 0
+        and mer_account_type_code = #{merAccountTypeCode}
+    </update>
+
+    <update id="updateBalance">
+        UPDATE <include refid="tableName"/> set account_balance = #{accountBalance}, update_user = #{updateUser},update_time = now(),version = version + 1
+        where account_code = #{accountCode}
+        and mer_account_type_code = #{merAccountTypeCode}
+    </update>
+
 </mapper>

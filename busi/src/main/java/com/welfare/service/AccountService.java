@@ -54,11 +54,11 @@ public interface AccountService {
 
   AccountDetailDTO queryDetailByParam(AccountDetailParam accountDetailParam);
 
-  Boolean save(Account account);
+  Boolean save(AccountReq accountReq);
 
   Boolean batchSave(List<Account> accountList);
 
-  Boolean update(Account account);
+  Boolean update(AccountReq accountReq);
 
   Page<AccountBillDetailDTO> queryAccountBillDetail(Integer currentPage, Integer pageSize,
       String accountCode, Date createTimeStart, Date createTimeEnd);

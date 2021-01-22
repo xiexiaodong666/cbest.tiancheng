@@ -92,13 +92,13 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     }
     if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
             ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
-      if(EmptyChecker.isEmpty(storeImportDTO.getCasherNo())){
+      if(EmptyChecker.isEmpty(storeImportDTO.getCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("线上商城或者O2O必须输入虚拟收银机号").append(";");
       }else{
-        casherNoList.add(storeImportDTO.getCasherNo());
+        casherNoList.add(storeImportDTO.getCashierNo());
       }
     }else{
-      if(EmptyChecker.notEmpty(storeImportDTO.getCasherNo())){
+      if(EmptyChecker.notEmpty(storeImportDTO.getCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
       }
     }

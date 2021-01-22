@@ -54,6 +54,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     @Autowired
     private AccountBillDetailService accountBillDetailService;
 
+
     @Override
     public int batchSaveOrUpdate(List<AccountAmountType> list) {
         return accountAmountTypeMapper.batchSaveOrUpdate(list);

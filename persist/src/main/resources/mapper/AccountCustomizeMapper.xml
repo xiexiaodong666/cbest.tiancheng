@@ -37,16 +37,21 @@
   </resultMap>
 
   <update id="increaseAccountSurplusQuota">
-    UPDATE <include refid="tableName"/> set surplus_quota = surplus_quota + #{surplusQuota}, update_user = #{updateUser},update_time = now(),version = version + 1 where account_code = #{accountCode}
+    UPDATE
+    <include refid="tableName"/>
+    set surplus_quota = surplus_quota + #{surplusQuota}, update_user = #{updateUser},update_time =
+    now(),version = version + 1 where account_code = #{accountCode}
     and surplus_quota + #{surplusQuota} >= 0
   </update>
 
   <update id="updateMaxAndSurplusQuota">
-    UPDATE <include refid="tableName"/> set surplus_quota = #{surplusQuota}, max_quota =#{maxQuota},update_user = #{updateUser},update_time = now(),version = version + 1
+    UPDATE
+    <include refid="tableName"/>
+    set surplus_quota = #{surplusQuota}, max_quota =#{maxQuota},update_user =
+    #{updateUser},update_time = now(),version = version + 1
     where account_code = #{accountCode}
 
   </update>
-
 
 
   <select id="queryByConsumeSceneIdList" resultMap="accountMap">
@@ -96,10 +101,10 @@
     <if test=" accountName !='' and accountName != null  ">
       and a.account_name like '%${accountName}'
     </if>
-    <if test="departmentCodeList != null ">
-      and d.department_code in
-      <foreach collection="departmentCodeList" item="id" index="index" open="(" close=")" separator=",">
-        #{id}
+    <if test="departmentPathList != null ">
+      and
+      <foreach collection="departmentPathList" item="item" index="index" open="(" close=")" separator="or">
+        d.department_path like '${item}%'
       </foreach>
     </if>
     <if test="accountStatus != null ">
@@ -163,7 +168,7 @@ WHERE a.mer_code = at.mer_code
     trans_amount * ( - 1 )
     WHEN abd.trans_type = 'refund' THEN
     trans_amount
-    END  AS transAmount,
+    END AS transAmount,
     abd.create_time AS createTime,
     abd.account_balance AS accountBalance
     FROM

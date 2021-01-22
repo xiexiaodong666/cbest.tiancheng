@@ -27,10 +27,10 @@ public class AccountPageReq implements Serializable {
   @ApiModelProperty("员工姓名")
   private  String accountName;
   /**
-   * 所属部门
+   * 所属部门path集合
    */
-  @ApiModelProperty("所属部门")
-  private List<String> departmentCodeList;
+  @ApiModelProperty("所属部门path集合")
+  private List<String> departmentPathList;
   /**
    * 账号状态
    */

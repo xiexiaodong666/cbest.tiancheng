@@ -1,6 +1,7 @@
 package com.welfare.service.sync.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -66,7 +67,12 @@ public class MarketCreateHandler {
                      return;
                 case CbestPayRespStatusConstant
                         .FAIL:
-                    Map<String,String> map= JSON.parseObject(resp.getBizContent(),Map.class);
+                    Map<String,String> map= null;
+                    try {
+                        map = mapper.readValue(resp.getBizContent(), Map.class);
+                    } catch (JsonProcessingException e) {
+                        throw new BusiException("重百付创建门店接口，response转换失败" + resp);
+                    }
                     if (CbestPayRespRetryConstant.Y.equals(map.get(retryField))){
                         throw new BusiException("重百付创建门店未成功，需要重试，" + resp.getBizMsg());
                     }else{

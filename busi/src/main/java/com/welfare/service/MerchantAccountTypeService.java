@@ -75,5 +75,5 @@ public interface MerchantAccountTypeService {
      * @param merCode
      * @return
      */
-    List<MerchantAccountType> queryByMerCode(String merCode);
+    List<MerchantAccountType> queryShowedByMerCode(String merCode);
 }

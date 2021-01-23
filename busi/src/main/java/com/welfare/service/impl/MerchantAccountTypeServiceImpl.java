@@ -62,7 +62,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             throw new BusiException("福利类型不存在");
         }
         detailDTO.setMerName(merchantService.getMerchantByMerCode(detailDTO.getMerCode()).getMerName());
-        List<MerchantAccountType> list=this.queryByMerCode(detailDTO.getMerCode());
+        List<MerchantAccountType> list=this.queryShowedByMerCode(detailDTO.getMerCode());
         if(EmptyChecker.notEmpty(list)){
             List<MerchantAccountTypeDetailDTO.TypeItem> itemList=list.stream().map(item->{
                 MerchantAccountTypeDetailDTO.TypeItem typeItem=new MerchantAccountTypeDetailDTO.TypeItem();
@@ -190,7 +190,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public List<MerchantAccountType> queryByMerCode(String merCode) {
+    public List<MerchantAccountType> queryShowedByMerCode(String merCode) {
         QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(MerchantAccountType.MER_CODE,merCode);
         queryWrapper.eq(MerchantAccountType.SHOW_STATUS,MerchantAccountTypeShowStatusEnum.SHOW.getCode());

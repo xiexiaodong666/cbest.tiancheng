@@ -188,7 +188,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     boolean flag=true;
     if(EmptyChecker.notEmpty(stores)){
       String storeStr=stores.stream().map(item->item.getStoreCode()).collect(Collectors.joining(","));
-      uploadInfo.append("部门编码重复:").append(storeStr).append(";");
+      uploadInfo.append("门店编码重复:").append(storeStr).append(";");
       flag=false;
     }
     if(EmptyChecker.notEmpty(merCodeList)){

@@ -165,11 +165,11 @@
 
     <insert id="saveOrUpdate" parameterType="list" >
         insert into <!--<include refid="tableName"/>-->
-        order_info(order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,
+        order_info(order_id,trans_no , return_trans_no,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,
         card_id,order_amount,order_time,pay_code,pay_name,trans_type , trans_type_name,create_user,create_time)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.orderId},#{item.goods},#{item.merchantCode},#{item.merchantName},#{item.storeCode},
+            (#{item.orderId},#{item.transNo},#{item.returnTransNo},#{item.goods},#{item.merchantCode},#{item.merchantName},#{item.storeCode},
             #{item.storeName},#{item.accountCode},#{item.accountName},#{item.cardId},
             #{item.orderAmount},#{item.orderTime},#{item.payCode},#{item.payName},
             #{item.transType},#{item.transTypeName},
@@ -177,6 +177,8 @@
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
+        trans_no = values(trans_no),
+        return_trans_no = values(return_trans_no),
         goods = values(goods),
         merchant_code = values(merchant_code),
         merchant_name =  values(merchant_name),

@@ -43,6 +43,18 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
      */
     @ApiModelProperty("订单号")   
     private String orderId;
+
+    /**
+     * 交易流水号
+     */
+    @ApiModelProperty("交易流水号")
+    private String transNo;
+
+    /**
+     * 退款流水号
+     */
+    @ApiModelProperty("退款流水号")
+    private String returnTransNo;
     /**
      * 商品
      */

@@ -180,6 +180,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setCardRebateStoreList(cardRebateStoreList);
         orderPageQuery.setOtherRebateStoreList(otherRebateStoreList);
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
+        orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
 
         Page<OrderInfo> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
         return orderInfoPage;
@@ -266,6 +267,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setCardRebateStoreList(cardRebateStoreList);
         orderPageQuery.setOtherRebateStoreList(otherRebateStoreList);
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
+        orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
         orderPageQuery.setPageNo(orderReqDto.getCurrent());
         orderPageQuery.setPageSize(orderReqDto.getSize());
 
@@ -336,6 +338,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setCardRebateStoreList(cardRebateStoreList);
         orderPageQuery.setOtherRebateStoreList(otherRebateStoreList);
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
+        orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
 
 
         OrderSummary orderInfoList = orderMapper.searchOrderSum(orderPageQuery);

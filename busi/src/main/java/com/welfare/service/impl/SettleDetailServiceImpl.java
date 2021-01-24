@@ -231,6 +231,10 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         String storeCode = settleDetail.getStoreCode();
         String merCode = settleDetail.getMerCode();
         MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(storeCode, merCode);
+        // jian.zhou 2021-01-24
+        // 处理未配置的商户和门店的情况
+        if (relation == null)
+            return settleDetail;
         String rebateType = relation.getRebateType();
         if (!Strings.isEmpty(rebateType)) {
             List<String> payCodes = Arrays.asList(rebateType.split(","));

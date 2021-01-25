@@ -76,8 +76,6 @@ public class PaymentServiceImpl implements PaymentService {
         Long accountCode = paymentRequest.calculateAccountCode();
         String lockKey = "account:" + paymentRequest.calculateAccountCode();
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
-        accountLock.lock();
-        log.error("locked :{}",lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
             log.error("accountInfo:{}",account);
@@ -117,7 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
     private void chargeBeforePay(PaymentRequest paymentRequest, Account account) {
         Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()), "账户未启用");
         MerchantStoreRelation merStoreRelation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(paymentRequest.getStoreNo(), account.getMerCode());
-        Assert.isTrue(EnableEnum.ENABLE.getCode().equals(merStoreRelation.getStatus()), "商户-门店关联未启用");
+        Assert.isTrue(EnableEnum.ENABLE.getCode().equals(merStoreRelation.getStatus()), "用户所在组织（公司）不支持在该门店消费或配置已禁用");
         SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo());
         Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(supplierStore.getStatus()),
                 "门店未激活:" + supplierStore.getStoreCode());
@@ -185,14 +183,14 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal usableAmount = account.getAccountBalance().add(account.getSurplusQuota());
         BigDecimal amount = paymentRequest.getAmount();
         boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-        Assert.isTrue(enough, "总账户余额不足");
+        Assert.isTrue(enough, "用户账户总余额不足");
         List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
         BigDecimal allTypeBalance = accountAmountDOList.stream()
                 .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         //判断子账户之和
         boolean accountTypesEnough = allTypeBalance.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-        Assert.isTrue(accountTypesEnough, "子账户余额总和不足,请确认员工账户总账和子账是否对应");
+        Assert.isTrue(accountTypesEnough, "用户子账户余额总和不足,请确认员工账户总账和子账是否对应");
         accountAmountDOList.sort(Comparator.comparing(x -> x.getMerchantAccountType().getDeductionOrder()));
         List<PaymentOperation> paymentOperations = new ArrayList<>(4);
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)

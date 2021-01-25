@@ -4,6 +4,7 @@ import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantAccountType;
 import lombok.Data;
+import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,6 +26,8 @@ public class AccountAmountDO {
     private String transNo;
     public static AccountAmountDO of(AccountAmountType accountAmountType, MerchantAccountType merchantAccountType, Account account){
         AccountAmountDO accountAmountDO = new AccountAmountDO();
+        Assert.notNull(accountAmountType,"子账户不能为空");
+        Assert.notNull(merchantAccountType,"商户子账户不能为空");
         accountAmountDO.setAccountAmountType(accountAmountType);
         accountAmountDO.setMerchantAccountType(merchantAccountType);
         accountAmountDO.setAccount(account);

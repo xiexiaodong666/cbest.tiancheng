@@ -5,6 +5,7 @@ import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountChangeEventRecord;
@@ -42,7 +43,7 @@ import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_
 public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountAmountTypeMapper accountAmountTypeMapper;
-    private final MerchantAccountTypeService merchantAccountTypeService;
+    private final MerchantAccountTypeDao merchantAccountTypeDao;
     private final RedissonClient redissonClient;
     private final AccountDao accountDao;
     private final AccountService accountService;
@@ -117,7 +118,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, account.getAccountCode());
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(queryWrapper);
         Assert.isTrue(!CollectionUtils.isEmpty(accountAmountTypes), "该用户没有账户余额信息");
-        List<MerchantAccountType> types = merchantAccountTypeService.queryByMerCode(account.getMerCode());
+        List<MerchantAccountType> types = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
         Assert.isTrue(!CollectionUtils.isEmpty(types), "该商户没有配置accountType");
 
         Map<String, MerchantAccountType> map = types.stream()

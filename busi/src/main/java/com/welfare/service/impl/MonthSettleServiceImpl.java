@@ -214,7 +214,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         restoreRemainingLimitReq.setAmount(monthSettleTemp.getSettleAmount().subtract(monthSettleTemp.getSettleSelfAmount()));
         restoreRemainingLimitReq.setTransNo(monthSettleTemp.getSettleNo());
         log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
-        MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq);
+        MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq, "api");
         if(merchantCreditResp.getCode()!=1){
             throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "恢复商户授信额度失败", null);
         }

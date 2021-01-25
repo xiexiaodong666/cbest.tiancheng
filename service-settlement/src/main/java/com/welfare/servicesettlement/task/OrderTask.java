@@ -24,7 +24,7 @@ public class OrderTask {
     @Autowired
     private OrderService orderService;
 
-    @Scheduled(cron = "0 0/10 * * * ? ")
+    @Scheduled(cron = "0 0/12 * * * ? ")
     public void syncOrderData(){
         //查询系统中所有配置门店
         log.info("开始拉取kafka订单数据");

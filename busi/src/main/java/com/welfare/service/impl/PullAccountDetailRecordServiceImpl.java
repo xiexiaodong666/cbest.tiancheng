@@ -103,7 +103,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
                         merchantBillDetailDao.saveBatch(merchantBillDetails);
                     }
                     merchantCreditDao.updateById(merchantCredit);
-                    settleDetailDao.saveOrUpdateBatch(settleDetails);
+                    settleDetailDao.saveBatch(settleDetails);
                 } else {
                     break;
                 }

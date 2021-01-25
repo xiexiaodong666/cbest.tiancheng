@@ -9,6 +9,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
@@ -25,6 +26,7 @@ import com.welfare.service.dto.*;
 import com.welfare.service.operator.merchant.RebateLimitOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,6 +234,12 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         String storeCode = settleDetail.getStoreCode();
         String merCode = settleDetail.getMerCode();
         MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(storeCode, merCode);
+
+        //自营不返利
+        if(StringUtils.isNotBlank(relation.getMerCode()) && relation.getMerCode().equals(settleDetail.getMerCode())){
+            return settleDetail;
+        }
+
         // jian.zhou 2021-01-24
         // 处理未配置的商户和门店的情况
         if (relation == null){

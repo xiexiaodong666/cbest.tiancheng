@@ -389,7 +389,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       throw new BusiException("excel解析失败");
     }
     String result = listener.getUploadInfo().toString();
-    listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
     if (!SupplierStoreListener.success.equals(result)) {
       throw new BusiException(result);
     }

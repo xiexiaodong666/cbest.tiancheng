@@ -20,7 +20,6 @@
     </resultMap>
 
     <resultMap id="tempAccountApplyTotalDTO" type="com.welfare.persist.dto.AccountApplyTotalDTO">
-        <id property="id" column="id" />
         <result property="userCount" column="userCount"/>
         <result property="totalAmount" column="totalAmount"/>
     </resultMap>

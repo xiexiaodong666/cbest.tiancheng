@@ -7,7 +7,6 @@ import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.service.AccountChangeEventRecordService;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -34,8 +33,8 @@ public class AccountDaoAspect {
 
     }
 
-    @After(value = "onUpdateById()")
-    public void after(JoinPoint joinPoint){
+    @Before(value = "onUpdateById()")
+    public void before(JoinPoint joinPoint){
         Object[] args = joinPoint.getArgs();
         Account accountToUpdate = (Account)args[0];
         AccountDao accountDao = SpringBeanUtils.getBean(AccountDao.class);
@@ -50,6 +49,7 @@ public class AccountDaoAspect {
             AccountChangeEventRecordService accountChangeEventRecordService = SpringBeanUtils.getBean(
                 AccountChangeEventRecordService.class);
             accountChangeEventRecordService.save(accountChangeEventRecord);
+            accountToUpdate.setChangeEventId(accountChangeEventRecord.getId());
         }
     }
 }

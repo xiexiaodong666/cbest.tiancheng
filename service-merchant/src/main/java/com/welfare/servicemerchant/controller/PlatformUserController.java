@@ -37,7 +37,7 @@ public class PlatformUserController {
   private final PlatformUserFeignClient platformUserFeignClient;
   private final static Integer size = 1000;
   private final FileUploadService fileUploadService;
-  private final static long sleepTime = 3000;
+  private final static long sleepTime = 300;
 
   /**
    * 获取商户用户列表

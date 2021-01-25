@@ -76,8 +76,6 @@ public class PaymentServiceImpl implements PaymentService {
         Long accountCode = paymentRequest.calculateAccountCode();
         String lockKey = "account:" + paymentRequest.calculateAccountCode();
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
-        accountLock.lock();
-        log.error("locked :{}",lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
             log.error("accountInfo:{}",account);

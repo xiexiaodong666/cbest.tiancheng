@@ -1,6 +1,7 @@
 package com.welfare.common.aspect;
 
 import com.welfare.common.annotation.DistributedLock;
+import com.welfare.common.util.DistributedLockUtil;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -35,19 +36,18 @@ public class DistributedLockAspect {
     public Object before(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) throws Throwable {
         String lockPrefix = distributedLock.lockPrefix();
         String lockKey = getLockKey(joinPoint, distributedLock);
-        RLock lock = redissonClient.getLock(lockPrefix + lockKey);
-        lock.lock();
+        RLock lock = DistributedLockUtil.lockFairly(lockPrefix + lockKey);
         try{
             return joinPoint.proceed();
         } finally {
-            lock.unlock();
+            DistributedLockUtil.unlock(lock);
         }
     }
 
     private String getLockKey(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) {
         String lockKey = distributedLock.lockKey();
         ExpressionParser parser = new SpelExpressionParser();
-        Expression expression = parser.parseExpression(lockKey,new TemplateParserContext());
+        Expression expression = parser.parseExpression("#{"+lockKey+"}",new TemplateParserContext());
         EvaluationContext context = new StandardEvaluationContext();
         Object[] args = joinPoint.getArgs();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();

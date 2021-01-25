@@ -100,9 +100,22 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<OrderInfo> selectPage(Page page, OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
-        QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
-        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
+        //查询供应商下所有门店
+        List<SupplierStore> supplierStoreList = supplierStoreDao.list(queryWrapper);
+        List<String> supplierStoreCodeList = new ArrayList<>();
+        if (supplierStoreList == null || supplierStoreList.size() < 1){
+            return null;
+        }else {
+            supplierStoreCodeList = supplierStoreList.stream().map(item->{
+                return item.getStoreCode();
+            }).collect(Collectors.toList());
+        }
+        QueryWrapper<MerchantStoreRelation> relationQueryWrapper = new QueryWrapper<>();
+        relationQueryWrapper.in( supplierStoreCodeList.size() > 0, MerchantStoreRelation.STORE_CODE , supplierStoreCodeList );
+
+        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(relationQueryWrapper);
         // 判断用户传入的门店集合是否在上述商户关联门店中
         List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
         List<String> storeCodeList = orderReqDto.getStoreIds();
@@ -189,9 +202,23 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderInfo> selectList(OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
-        QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
-        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        //根据当前用户查询所在组织的配置门店情况
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
+        //查询供应商下所有门店
+        List<SupplierStore> supplierStoreList = supplierStoreDao.list(queryWrapper);
+        List<String> supplierStoreCodeList = new ArrayList<>();
+        if (supplierStoreList == null || supplierStoreList.size() < 1){
+            return null;
+        }else {
+            supplierStoreCodeList = supplierStoreList.stream().map(item->{
+                return item.getStoreCode();
+            }).collect(Collectors.toList());
+        }
+        QueryWrapper<MerchantStoreRelation> relationQueryWrapper = new QueryWrapper<>();
+        relationQueryWrapper.in( supplierStoreCodeList.size() > 0, MerchantStoreRelation.STORE_CODE , supplierStoreCodeList );
+
+        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(relationQueryWrapper);
         // 判断用户传入的门店集合是否在上述商户关联门店中
         List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
         List<String> storeCodeList = orderReqDto.getStoreIds();
@@ -278,9 +305,43 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderSummary selectSummary(OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
-        QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
-        List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        //根据当前用户查询所在组织的配置门店情况
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
+        //查询供应商下所有门店
+        List<SupplierStore> supplierStoreList = supplierStoreDao.list(queryWrapper);
+        List<String> supplierStoreCodeList = new ArrayList<>();
+        if (supplierStoreList == null || supplierStoreList.size() < 1){
+            return null;
+        }else {
+            supplierStoreCodeList = supplierStoreList.stream().map(item->{
+                return item.getStoreCode();
+            }).collect(Collectors.toList());
+        }
+        QueryWrapper<MerchantStoreRelation> relationQueryWrapper = new QueryWrapper<>();
+        relationQueryWrapper.in( supplierStoreCodeList.size() > 0, MerchantStoreRelation.STORE_CODE , supplierStoreCodeList );
+
+        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(relationQueryWrapper);
+        //没有配置返利门店
+        // 判断用户传入的门店集合是否在上述商户关联门店中
+        List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
+        List<String> storeCodeList = orderReqDto.getStoreIds();
+        if (storeCodeList == null) {
+            //平台端调用
+            merchantStoreRelationList.addAll(merchantStoreRelationList1);
+        } else {
+            //商户端调用
+            merchantStoreRelationList1.forEach(item -> {
+                String storeCode = item.getStoreCode();
+                if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)) {
+                    merchantStoreRelationList.add(item);
+                }
+            });
+        }
+        //当没有检测到有配置门店，此时不能查询到订单数据
+        if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1) {
+            return null;
+        }
         //没有配置返利门店
         List<String> noRebateStoreList = new ArrayList<>();
         //配置返利门店

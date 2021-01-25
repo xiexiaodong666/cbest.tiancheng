@@ -437,10 +437,10 @@ public class AccountServiceImpl implements AccountService {
       }
       accountAmountTypeMapper.updateBalance(accountCode,
           MerAccountTypeCode.SURPLUS_QUOTA.code(),
-          new BigDecimal(0),
+          BigDecimal.ZERO,
           updateUser);
       accountCustomizeMapper
-          .updateMaxAndSurplusQuota(accountCode.toString(), new BigDecimal(0), new BigDecimal(0),
+          .updateMaxAndSurplusQuota(accountCode.toString(), BigDecimal.ZERO, BigDecimal.ZERO,
               updateUser);
     }
   }

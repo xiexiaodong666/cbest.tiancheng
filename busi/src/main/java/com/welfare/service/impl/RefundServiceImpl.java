@@ -27,6 +27,8 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -79,8 +81,10 @@ public class RefundServiceImpl implements RefundService {
         String lockKey = "account:" + first.getAccountCode();
         RLock accountLock = redissonClient.getFairLock(lockKey);
         accountLock.lock();
+        log.error("locked :{}",lockKey);
         try {
             Account account = accountService.getByAccountCode(first.getAccountCode());
+            log.error("accountInfo:{}",account);
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
             //按照deductionOrder逆序
             accountAmountDOList.sort(Comparator.comparing(x -> -1 * x.getMerchantAccountType().getDeductionOrder()));
@@ -94,7 +98,13 @@ public class RefundServiceImpl implements RefundService {
                 merAccountLock.unlock();
             }
         } finally {
-            accountLock.unlock();
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    accountLock.unlock();
+                    log.error("unlocked :{}",lockKey);
+                }
+            });
         }
 
     }

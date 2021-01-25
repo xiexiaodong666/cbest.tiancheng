@@ -143,8 +143,8 @@ public class OrderServiceImpl implements OrderService {
                 noRebateStoreList.add(item.getStoreCode());
             } else {
                 String rebateType = item.getRebateType();
-                if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
-                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                if ("EMPLOYEE_CARD_NUMBER,OTHER_PAY".equals(rebateType)
+                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER".equals(rebateType)) {
                     //配置了返利，此时检测是否配置类线下门店消费
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
@@ -157,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
                         //配置了线下消费场景
                         otherRebateStoreList.add(item.getStoreCode());
                     }
-                } else if ("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                } else if ("EMPLOYEE_CARD_NUMBER".equals(rebateType)) {
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
@@ -180,6 +180,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setCardRebateStoreList(cardRebateStoreList);
         orderPageQuery.setOtherRebateStoreList(otherRebateStoreList);
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
+        orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
 
         Page<OrderInfo> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
         return orderInfoPage;
@@ -229,8 +230,8 @@ public class OrderServiceImpl implements OrderService {
                 noRebateStoreList.add(item.getStoreCode());
             } else {
                 String rebateType = item.getRebateType();
-                if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
-                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                if ("EMPLOYEE_CARD_NUMBER,OTHER_PAY".equals(rebateType)
+                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER".equals(rebateType)) {
                     //配置了返利，此时检测是否配置类线下门店消费
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
@@ -243,7 +244,7 @@ public class OrderServiceImpl implements OrderService {
                         //配置了线下消费场景
                         otherRebateStoreList.add(item.getStoreCode());
                     }
-                } else if ("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                } else if ("EMPLOYEE_CARD_NUMBER".equals(rebateType)) {
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
@@ -266,6 +267,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setCardRebateStoreList(cardRebateStoreList);
         orderPageQuery.setOtherRebateStoreList(otherRebateStoreList);
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
+        orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
         orderPageQuery.setPageNo(orderReqDto.getCurrent());
         orderPageQuery.setPageSize(orderReqDto.getSize());
 
@@ -299,8 +301,8 @@ public class OrderServiceImpl implements OrderService {
                 noRebateStoreList.add(item.getStoreCode());
             } else {
                 String rebateType = item.getRebateType();
-                if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
-                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                if ("EMPLOYEE_CARD_NUMBER,OTHER_PAY".equals(rebateType)
+                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER".equals(rebateType)) {
                     //配置了返利，此时检测是否配置类线下门店消费
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
@@ -313,7 +315,7 @@ public class OrderServiceImpl implements OrderService {
                         //配置了线下消费场景
                         otherRebateStoreList.add(item.getStoreCode());
                     }
-                } else if ("EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                } else if ("EMPLOYEE_CARD_NUMBER".equals(rebateType)) {
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
                         //配置了线下消费场景
@@ -336,6 +338,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setCardRebateStoreList(cardRebateStoreList);
         orderPageQuery.setOtherRebateStoreList(otherRebateStoreList);
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
+        orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
 
 
         OrderSummary orderInfoList = orderMapper.searchOrderSum(orderPageQuery);
@@ -374,8 +377,8 @@ public class OrderServiceImpl implements OrderService {
                 noRebateStoreList.add(item.getStoreCode());
             } else {
                 String rebateType = item.getRebateType();
-                if ("EMPLOYEE_CARD_NUMBER_PAY,OTHER_PAY".equals(rebateType)
-                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER_PAY".equals(rebateType)) {
+                if ("EMPLOYEE_CARD_NUMBER,OTHER_PAY".equals(rebateType)
+                        || "OTHER_PAY,EMPLOYEE_CARD_NUMBER".equals(rebateType)) {
                     //配置了返利，此时检测是否配置类线下门店消费
                     ConsumeTypeJson consumeTypeJson = JSONObject.parseObject(item.getConsumType(), ConsumeTypeJson.class);
                     if (consumeTypeJson.getSHOP_CONSUMPTION() != null && consumeTypeJson.getSHOP_CONSUMPTION().booleanValue()) {
@@ -428,6 +431,8 @@ public class OrderServiceImpl implements OrderService {
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.setOrderId(item.getOrderId());
             orderInfo.setPayCode(cardPayCode);
+            orderInfo.setTransNo(item.getTransNo());
+            orderInfo.setReturnTransNo(item.getReturnTransNo());
             orderInfo.setGoods(item.getGoods());
             orderInfo.setPayName("员工卡");
             orderInfo.setTransType(item.getTransType());

@@ -121,6 +121,27 @@ WHERE
 	acs.id = #{id} and acstr.deleted = 0
 	</select>
 
+
+  <select id="queryById"
+    resultType="com.welfare.persist.entity.AccountConsumeScene">
+    SELECT
+	acs.id,
+	acs.mer_code AS merCode,
+	acs.account_type_code AS accountTypeCode,
+	acs.remark,
+	acs.STATUS as status,
+	acs.create_time AS createTime,
+	acs.deleted,
+	acs.create_user as createUser,
+	acs.update_user as updateUser,
+	acs.update_time as updateTime,
+	acs.version
+	FROM
+	account_consume_scene acs
+	WHERE
+	acs.id = #{id}
+  </select>
+
   <select id="getCountByMerCodeAndAccountTypeAndStoreCode" resultType="Integer">
     SELECT
 	count( 1 )

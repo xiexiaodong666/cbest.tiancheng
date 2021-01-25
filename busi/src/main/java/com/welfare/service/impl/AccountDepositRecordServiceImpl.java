@@ -303,11 +303,25 @@ public class AccountDepositRecordServiceImpl extends
                         .SUCCESS.equals(tradeCancelBizStatus)) {
                         accountDepositRecord.setPayStatus(
                             AccountRechargePaymentStatusEnum.REFUND_SUCCESS.getCode());
-                        updateById(accountDepositRecord);
+
                         log.info(StrUtil.format("支付交易流水号[{}]调用支付冲正接口成功", payTradeNo));
+                        updateById(accountDepositRecord);
                     } else if (CbestPayRespStatusConstant
                         .FAIL.equals(tradeCancelBizStatus)) {
+                        accountDepositRecord.setPayStatus(
+                            AccountRechargePaymentStatusEnum.REFUND_SUCCESS.getCode());
                         log.error(StrUtil.format("支付交易流水号[{}]调用支付冲正接口失败", payTradeNo));
+                        updateById(accountDepositRecord);
+                    } else {
+                        if (DateUtil
+                            .between(accountDepositRecord.getCreateTime(), new Date(),
+                                DateUnit.MINUTE) > 10) {
+                            accountDepositRecord.setPayStatus(
+                                AccountRechargePaymentStatusEnum.REFUND_TIMEOUT.getCode());
+                            log.error(
+                                StrUtil.format("支付交易流水号[{}]调用支付冲正接口超过5分钟未返回明确成功或失败", payTradeNo));
+                            updateById(accountDepositRecord);
+                        }
                     }
                 }
             } catch (Exception e) {

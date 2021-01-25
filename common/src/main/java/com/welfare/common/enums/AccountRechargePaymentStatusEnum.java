@@ -13,7 +13,8 @@ public enum AccountRechargePaymentStatusEnum {
     PAYMENT_SUCCESS(102, "支付成功"),
     REFUND_FAILURE(103, "退款失败"),
     REFUND_SUCCESS(104, "退款成功"),
-    QUERY_PAY_RESULT_NOT_FOUND(105, "超过一定时间未查询到支付结果");;
+    QUERY_PAY_RESULT_NOT_FOUND(105, "超过一定时间未查询到支付结果"),
+    REFUND_TIMEOUT(106, "退款超时");
 
     private final int code;
     private final String name;

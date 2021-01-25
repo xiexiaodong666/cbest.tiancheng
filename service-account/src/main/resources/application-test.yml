@@ -74,3 +74,14 @@ hystrix:
           strategy: SEMAPHORE
           thread:
             timeoutInMilliseconds: 300000
+xxl:
+  job:
+    admin:
+      addresses: http://172.30.37.35:8180/
+    executor:
+      appname: e-welfare-account
+      ip:
+      port: 9898
+      logpath: /home/finance/Logs/e-welfare-account.e-cbest.lotest/jobhandler/
+      logretentiondays: 30
+    accessToken:

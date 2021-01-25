@@ -7,6 +7,8 @@ import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
@@ -270,16 +272,20 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Override
     public List<MerchantBillDetail> calculateAndSetRebate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails) {
-        return settleDetails.stream()
+        return settleDetails.stream().sorted(Comparator.comparing(SettleDetail::getTransTime))
                 .map(detail -> {
                     SettleDetail settleDetail = calculateAndSetRebate(detail);
                     if (Objects.isNull(detail.getRebateAmount()) || detail.getRebateAmount().equals(BigDecimal.ZERO)) {
+                        //计算返利后，需要返利为0
                         return null;
                     }
-                    if(settleDetail.getTransType().equals(WelfareConstant.TransType.REFUND.code())){
+                    if(WelfareConstant.TransType.CONSUME.code().equals(settleDetail.getTransType())){
+                        return rebateLimitOperator.increase(merchantCredit, settleDetail.getRebateAmount().abs(), settleDetail.getTransNo());
+                    } else if (WelfareConstant.TransType.REFUND.code().equals(settleDetail.getTransType())){
                         return rebateLimitOperator.decrease(merchantCredit,settleDetail.getRebateAmount().abs(),settleDetail.getTransNo());
+                    } else{
+                        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"计算返利时，数据异常",null);
                     }
-                    return rebateLimitOperator.increase(merchantCredit, settleDetail.getRebateAmount(), settleDetail.getTransNo());
                 }).filter(operations -> !Objects.isNull(operations))
                 .flatMap(Collection::stream)
                 .map(MerchantAccountOperation::getMerchantBillDetail)

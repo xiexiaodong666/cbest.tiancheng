@@ -6,6 +6,7 @@ import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.util.DateUtil;
 import com.welfare.persist.dao.MerchantBillDetailDao;
+import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.entity.MerchantBillDetail;
 import com.welfare.persist.entity.MerchantCredit;
@@ -54,13 +55,13 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
     @Autowired
     private SettleDetailService settleDetailService;
     @Autowired
-    private RebateLimitOperator rebateLimitOperator;
-    @Autowired
     private MerchantCreditService merchantCreditService;
     @Autowired
     private MerchantBillDetailDao merchantBillDetailDao;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private MerchantCreditDao merchantCreditDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -96,6 +97,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
                     List<MerchantBillDetail> merchantBillDetails = settleDetailService.calculateAndSetRebate(merchantCredit,settleDetails);
                     merchantBillDetailDao.saveBatch(merchantBillDetails);
                     settleDetailDao.saveOrUpdateBatch(settleDetails);
+                    merchantCreditDao.updateById(merchantCredit);
                 } else {
                     break;
                 }

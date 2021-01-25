@@ -184,7 +184,7 @@ public class MerchantStoreRelationController implements IController {
     }
     List<AdminMerchantStore> adminMerchantStoreList = new ArrayList<>();
     merchantStoreRelationDetailDTO.setAdminMerchantStoreList(adminMerchantStoreList);
-
+    merchantStoreRelationDetailDTO.setIsRebate(0);
     for (MerchantStoreRelation m :
         merchantStoreRelationList) {
       if (m.getIsRebate() != null && m.getIsRebate() == 1) {

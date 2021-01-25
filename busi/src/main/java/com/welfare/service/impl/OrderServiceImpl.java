@@ -477,6 +477,7 @@ public class OrderServiceImpl implements OrderService {
     public int saveOrUpdateBacth(List<SynOrderDto> orderDtoList) {
         List<OrderInfo> orderInfoList = new ArrayList<>();
         orderDtoList.forEach(item -> {
+            log.info("线下订单:{}" , JSONObject.toJSONString(item));
             //根据查询账户详情
             QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq(Account.ACCOUNT_CODE, item.getAccountCode());

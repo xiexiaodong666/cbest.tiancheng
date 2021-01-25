@@ -235,16 +235,17 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         String merCode = settleDetail.getMerCode();
         MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(storeCode, merCode);
 
-        //自营不返利
-        if(StringUtils.isNotBlank(relation.getMerCode()) && relation.getMerCode().equals(settleDetail.getMerCode())){
-            return settleDetail;
-        }
-
         // jian.zhou 2021-01-24
         // 处理未配置的商户和门店的情况
         if (relation == null){
             return settleDetail;
         }
+
+        //自营不返利
+        if(StringUtils.isNotBlank(relation.getMerCode()) && relation.getMerCode().equals(settleDetail.getMerCode())){
+            return settleDetail;
+        }
+
         String rebateType = relation.getRebateType();
         if (Strings.isEmpty(rebateType)) {
             return settleDetail;

@@ -31,8 +31,9 @@ spring:
   kafka:
     servers: 192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667
     topic: test-order_info
-    group-id: test-e-welfare
-    offset: latest
+    group-id: xx-test-e-welfare
+    offset: earliest
+#    latest
 logging:
   file:
     path: D:/home/finance/Logs/e-welfare-settlement.e-cbest.lotest

@@ -129,7 +129,7 @@ public class AccountDepositRecordServiceImpl extends
     }
 
     private int amountToFen(BigDecimal rechargeAmount) {
-        return new BigDecimal("100").multiply(rechargeAmount).intValue();
+        return BigDecimal.valueOf(100).multiply(rechargeAmount).intValue();
     }
 
     @Override

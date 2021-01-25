@@ -88,8 +88,8 @@ public class SettlementBillBuildTask extends IJobHandler {
                         monthSettle.setMerCode(merchant.getMerCode());
                         monthSettle.setSettleNo(merchant.getMerCode()+DateUtil.date2Str(finalToday, DateUtil.PURE_FORMATE_MONTH));
                         monthSettle.setSettleMonth(DateUtil.date2Str(finalToday, DateUtil.FORMAT_YEAR_MONTH));
-                        monthSettle.setRebateAmount(new BigDecimal(0));
-                        monthSettle.setSettleAmount(new BigDecimal(0));
+                        monthSettle.setRebateAmount(BigDecimal.ZERO);
+                        monthSettle.setSettleAmount(BigDecimal.ZERO);
                         monthSettle.setOrderNum(0);
                         monthSettle.setCreateTime(finalToday);
                         monthSettle.setCreateUser("system");

@@ -43,8 +43,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
 
     private String fenToYuan(String amount) {
         try {
-            BigDecimal bigDecimal = new BigDecimal(amount).divide(new BigDecimal("100"))
-                .setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal bigDecimal = new BigDecimal(amount).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP);
             return bigDecimal.toString();
         } catch (Exception e) {
             log.error("金额单位从元转分异常", e);

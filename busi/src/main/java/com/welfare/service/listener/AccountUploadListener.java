@@ -56,9 +56,9 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
     if (validate.booleanValue() == true) {
       Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
       account.setAccountCode(accounCode);
-      account.setSurplusQuota(new BigDecimal(0));
-      account.setAccountBalance(new BigDecimal(0));
-      account.setMaxQuota(new BigDecimal(0));
+      account.setSurplusQuota(BigDecimal.ZERO);
+      account.setAccountBalance(BigDecimal.ZERO);
+      account.setMaxQuota(BigDecimal.ZERO);
       accountUploadList.add(account);
     }
   }

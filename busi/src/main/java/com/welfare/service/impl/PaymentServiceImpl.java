@@ -24,6 +24,8 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -75,8 +77,10 @@ public class PaymentServiceImpl implements PaymentService {
         String lockKey = "account:" + paymentRequest.calculateAccountCode();
         RLock accountLock = redissonClient.getFairLock(lockKey);
         accountLock.lock();
+        log.error("locked :{}",lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
+            log.error("accountInfo:{}",account);
             chargeBeforePay(paymentRequest, account);
             RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             merAccountLock.lock();
@@ -100,7 +104,13 @@ public class PaymentServiceImpl implements PaymentService {
                 merAccountLock.unlock();
             }
         } finally {
-            accountLock.unlock();
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    accountLock.unlock();
+                    log.error("unlocked :{}",lockKey);
+                }
+            });
         }
 
     }
@@ -114,7 +124,7 @@ public class PaymentServiceImpl implements PaymentService {
     private void chargeBeforePay(PaymentRequest paymentRequest, Account account) {
         Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()), "账户未启用");
         MerchantStoreRelation merStoreRelation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(paymentRequest.getStoreNo(), account.getMerCode());
-        Assert.isTrue(merStoreRelation.getStatus().equals(EnableEnum.ENABLE.getCode()), "商户-门店关联未启用");
+        Assert.isTrue(EnableEnum.ENABLE.getCode().equals(merStoreRelation.getStatus()), "商户-门店关联未启用");
         SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo());
         Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(supplierStore.getStatus()),
                 "门店未激活:" + supplierStore.getStoreCode());

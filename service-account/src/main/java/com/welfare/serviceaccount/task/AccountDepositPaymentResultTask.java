@@ -20,6 +20,7 @@ public class AccountDepositPaymentResultTask extends IJobHandler {
         try {
             log.info("============{}查询充值结果任务执行开始===================", this.getClass().getName());
             accountDepositRecordService.execPendingPaymentList();
+            log.info("============{}查询充值结果任务执行结束===================", this.getClass().getName());
         } catch (Exception e) {
             log.info("============{}查询充值结果任务执行【异常】===================", this.getClass().getName());
             log.error("查询充值结果执行异常", e);

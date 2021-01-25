@@ -276,6 +276,7 @@ public class AccountDepositRecordServiceImpl extends
             try {
                 Deposit deposit = buildDeposit(accountDepositRecord);
                 depositService.deposit(deposit);
+                accountDepositRecord.setDepositTradeNo(deposit.getTransNo());
                 accountDepositRecord
                     .setRechargeStatus(
                         AccountRechargeStatusEnum.RECHARGE_SUCCESS.getCode());

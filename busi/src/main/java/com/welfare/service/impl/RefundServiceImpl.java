@@ -5,6 +5,7 @@ import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDao;
@@ -55,7 +56,6 @@ import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SU
 public class RefundServiceImpl implements RefundService {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final AccountBillDetailDao accountBillDetailDao;
-    private final RedissonClient redissonClient;
     private final AccountService accountService;
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountDao accountDao;
@@ -79,9 +79,7 @@ public class RefundServiceImpl implements RefundService {
         Assert.isTrue(!CollectionUtils.isEmpty(accountDeductionDetails), "未找到正向支付流水");
         AccountDeductionDetail first = accountDeductionDetails.get(0);
         String lockKey = "account:" + first.getAccountCode();
-        RLock accountLock = redissonClient.getFairLock(lockKey);
-        accountLock.lock();
-        log.error("locked :{}",lockKey);
+        RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
             Account account = accountService.getByAccountCode(first.getAccountCode());
             log.error("accountInfo:{}",account);
@@ -90,21 +88,14 @@ public class RefundServiceImpl implements RefundService {
             accountAmountDOList.sort(Comparator.comparing(x -> -1 * x.getMerchantAccountType().getDeductionOrder()));
             List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                     .collect(Collectors.toList());
-            RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
-            merAccountLock.lock();
+            RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             try {
                 refund(refundRequest, accountDeductionDetails, refundDeductionDetailInDb, account, accountAmountTypes);
             } finally {
-                merAccountLock.unlock();
+                DistributedLockUtil.unlock(merAccountLock);
             }
         } finally {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCompletion(int status) {
-                    accountLock.unlock();
-                    log.error("unlocked :{}",lockKey);
-                }
-            });
+            DistributedLockUtil.unlock(accountLock);
         }
 
     }

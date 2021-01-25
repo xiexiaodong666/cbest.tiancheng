@@ -74,7 +74,7 @@ public abstract class AbstractMerAccountTypeOperator {
      * @return
      */
     protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo){
-        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
+        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "组织(公司)余额不足", null);
     }
     /**
      * 默认抛出超过余额限度异常,子类可以自定义其他操作

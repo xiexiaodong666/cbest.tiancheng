@@ -17,6 +17,7 @@ import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.CardApplyDao;
@@ -352,9 +353,8 @@ public class AccountServiceImpl implements AccountService {
   @Transactional(rollbackFor = Exception.class)
   public Boolean update(AccountReq accountReq) {
     Account oldAccount = accountMapper.selectById(accountReq.getId());
-    RLock lock = redissonClient
-        .getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + oldAccount.getAccountCode());
-    lock.lock();
+    String lockKey = ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + oldAccount.getAccountCode();
+    RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
     try {
       Account account = assemableAccount4update(accountReq);
       validationAccount(account, false);
@@ -373,8 +373,8 @@ public class AccountServiceImpl implements AccountService {
           .accountList(Arrays.asList(account)).build());
       return result;
     } finally {
-      if (lock.isHeldByCurrentThread()) {
-        lock.unlock();
+      if (accountLock.isHeldByCurrentThread()) {
+        DistributedLockUtil.unlock(accountLock);
       }
     }
   }

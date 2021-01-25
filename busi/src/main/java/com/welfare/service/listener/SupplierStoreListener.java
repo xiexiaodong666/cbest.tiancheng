@@ -163,10 +163,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   }
 
   private boolean check() {
+    boolean flag=true;
     Map<String,List<String>> groupMap= storeCodeList.stream().collect(Collectors.groupingBy(String::toString));
     for(Map.Entry<String,List<String>> entry:groupMap.entrySet()){
       if(entry.getValue().size()>1){
         uploadInfo.append("excel文件中存在重复的门店代码:").append(entry.getKey()).append(";");
+        flag=false;
       }
     }
     if(EmptyChecker.notEmpty(casherNoList)){
@@ -174,23 +176,32 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       for(Map.Entry<String,List<String>> entry:casherNoGroupMap.entrySet()){
         if(entry.getValue().size()>1){
           uploadInfo.append("excel文件中存在重复的虚拟收银机号:").append(entry.getKey()).append(";");
+          flag=false;
         }
       }
     }
     QueryWrapper<SupplierStore> storeQueryWrapper=new QueryWrapper<>();
     storeQueryWrapper.in(SupplierStore.STORE_CODE,storeCodeList);
     List<SupplierStore> stores=storeService.list(storeQueryWrapper);
-    MerchantReq req=new MerchantReq() ;
-    req.setMerCodeList(merCodeList);
-    req.setMerIdentity(MerIdentityEnum.supplier.getCode());
-    List<Merchant> merchants=merchantService.list(req);
-    merCodeList.removeAll(merchants.stream().map(item->item.getMerCode()).collect(Collectors.toList())) ;
-    boolean flag=true;
     if(EmptyChecker.notEmpty(stores)){
       String storeStr=stores.stream().map(item->item.getStoreCode()).collect(Collectors.joining(","));
       uploadInfo.append("门店编码重复:").append(storeStr).append(";");
       flag=false;
     }
+    QueryWrapper<SupplierStore> storeCashQuery=new QueryWrapper<>();
+    storeCashQuery.in(SupplierStore.CASHIER_NO,casherNoList);
+    List<SupplierStore> storesCash=storeService.list(storeCashQuery);
+    if(EmptyChecker.notEmpty(storesCash)){
+      String cashStr=storesCash.stream().map(item->item.getCashierNo()).collect(Collectors.joining(","));
+      uploadInfo.append("虚拟收银机号重复:").append(cashStr).append(";");
+      flag=false;
+    }
+
+    MerchantReq req=new MerchantReq() ;
+    req.setMerCodeList(merCodeList);
+    req.setMerIdentity(MerIdentityEnum.supplier.getCode());
+    List<Merchant> merchants=merchantService.list(req);
+    merCodeList.removeAll(merchants.stream().map(item->item.getMerCode()).collect(Collectors.toList())) ;
     if(EmptyChecker.notEmpty(merCodeList)){
       uploadInfo.append("商户不存在:").append(StringUtil.join(merCodeList,",")).append(";");
       flag=false;

@@ -124,7 +124,6 @@ public class DepartmentServiceImpl implements DepartmentService {
             throw new BusiException("excel解析失败");
         }
         String result = listener.getUploadInfo().toString();
-        listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
         if (!DepartmentListener.success.equals(result)) {
             throw new BusiException(result);
         }

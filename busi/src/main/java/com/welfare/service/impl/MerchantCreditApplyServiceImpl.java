@@ -10,6 +10,7 @@ import com.welfare.common.enums.MerCooperationModeEnum;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.MerchantCreditApplyDao;
 import com.welfare.persist.dto.MerchantCreditApplyInfoDTO;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
@@ -89,7 +90,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         } catch (Exception e) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
-            lock.unlock();
+            DistributedLockUtil.unlock(lock);
         }
     }
 
@@ -136,7 +137,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         } catch (Exception e) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
-            lock.unlock();
+            DistributedLockUtil.unlock(lock);
         }
     }
 
@@ -180,7 +181,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         } catch (Exception e) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
-            lock.unlock();
+            DistributedLockUtil.unlock(lock);
         }
     }
 

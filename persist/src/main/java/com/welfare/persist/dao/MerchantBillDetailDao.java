@@ -1,10 +1,13 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.MerchantBillDetail;
 import com.welfare.persist.mapper.MerchantBillDetailMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * (merchant_bill_detail)数据DAO
@@ -16,5 +19,9 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class MerchantBillDetailDao extends ServiceImpl<MerchantBillDetailMapper, MerchantBillDetail> {
-
+    public boolean deleteByTransNoAndBalanceType(List<String> transNos, String balanceType){
+        QueryWrapper<MerchantBillDetail> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(MerchantBillDetail.TRANS_NO,transNos).eq(MerchantBillDetail.BALANCE_TYPE,balanceType);
+        return remove(queryWrapper);
+    }
 }

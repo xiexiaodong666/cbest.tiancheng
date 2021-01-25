@@ -26,6 +26,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -95,9 +96,14 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
                 if (!settleDetails.isEmpty()) {
                     params.put("minId", settleDetails.get(settleDetails.size() - 1).getId() + 1);
                     List<MerchantBillDetail> merchantBillDetails = settleDetailService.calculateAndSetRebate(merchantCredit,settleDetails);
-                    merchantBillDetailDao.saveBatch(merchantBillDetails);
-                    settleDetailDao.saveOrUpdateBatch(settleDetails);
+                    List<String> rebateTransNos = merchantBillDetails.stream().map(MerchantBillDetail::getTransNo).collect(Collectors.toList());
+                    if(!CollectionUtils.isEmpty(merchantBillDetails)){
+                        //返利需要幂等，先删除相关记录，再重新保存。
+                        merchantBillDetailDao.deleteByTransNoAndBalanceType(rebateTransNos, MerCreditType.REBATE_LIMIT.code());
+                        merchantBillDetailDao.saveBatch(merchantBillDetails);
+                    }
                     merchantCreditDao.updateById(merchantCredit);
+                    settleDetailDao.saveOrUpdateBatch(settleDetails);
                 } else {
                     break;
                 }

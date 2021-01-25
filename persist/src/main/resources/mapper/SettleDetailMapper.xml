@@ -250,6 +250,11 @@
             ) as amount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
+        <if test="excludeIdList!=null and excludeIdList.size!=0">
+            and t1.id not in(
+            <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
+            )
+        </if>
         group by t1.mer_code,t1.mer_account_type,t1.mer_account_type_name
     </select>
 

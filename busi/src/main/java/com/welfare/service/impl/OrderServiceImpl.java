@@ -95,6 +95,8 @@ public class OrderServiceImpl implements OrderService {
     private MerchantBillDetailDao merchantBillDetailDao;
     @Autowired
     private MerchantCreditService merchantCreditService;
+    @Autowired
+    private MerchantCreditDao merchantCreditDao;
     private static boolean RUN = false;
 
     @Override
@@ -607,7 +609,14 @@ public class OrderServiceImpl implements OrderService {
                             MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merCode);
                             List<MerchantBillDetail> merchantBillDetails =
                                     settleDetailService.calculateAndSetRebate(merchantCredit, settleDetails);
-                            merchantBillDetailDao.saveBatch(merchantBillDetails);
+                            List<String> rebateTransNos = merchantBillDetails.stream().map(MerchantBillDetail::getTransNo).collect(Collectors.toList());
+                            if(!CollectionUtils.isEmpty(merchantBillDetails)){
+                                //返利需要幂等，先删除相关记录，再重新保存。
+                                merchantBillDetailDao.deleteByTransNoAndBalanceType(rebateTransNos, WelfareConstant.MerCreditType.REBATE_LIMIT.code());
+                                merchantBillDetailDao.saveBatch(merchantBillDetails);
+                            }
+                            merchantCreditDao.updateById(merchantCredit);
+
                             boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
                             log.info("kafka明细结算数据保存到数据库{}条{}", settleDetailList.size(), flag ? "成功" : "失败");
                         });

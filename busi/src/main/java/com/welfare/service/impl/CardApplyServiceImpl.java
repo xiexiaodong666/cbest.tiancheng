@@ -142,6 +142,9 @@ public class CardApplyServiceImpl implements CardApplyService {
       if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
         cardApply.setCardName(cardApplyUpdateReq.getCardName());
       }
+      if (Strings.isNotEmpty(cardApplyUpdateReq.getRemark())) {
+        cardApply.setRemark(cardApplyUpdateReq.getRemark());
+      }
     } else {
       if (Strings.isNotEmpty(cardApplyUpdateReq.getCardName())) {
         cardApply.setCardName(cardApplyUpdateReq.getCardName());

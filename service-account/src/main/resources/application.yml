@@ -2,6 +2,6 @@ spring:
   profiles:
     active: persist,dev
   application:
-    name: e-welfare
+    name: e-welfare-account
 server:
   port: 10015

@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
@@ -209,14 +212,12 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         merTransDetailQuery.setMerCode(merCode);
 
 
-        List<SettleMerTransDetailResp> settleMerTransDetailRespList = merchantBillDetailMapper.getMerTransDetail(merTransDetailQuery).stream()
+        return merchantBillDetailMapper.getMerTransDetail(merTransDetailQuery).stream()
                 .map(merTransDetailDTO -> {
                     SettleMerTransDetailResp settleMerTransDetailRespTemp = new SettleMerTransDetailResp();
                     BeanUtils.copyProperties(merTransDetailDTO, settleMerTransDetailRespTemp);
                     return settleMerTransDetailRespTemp;
                 }).collect(Collectors.toList());
-
-        return settleMerTransDetailRespList;
     }
 
     @Override
@@ -230,41 +231,59 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     private SettleDetail calculateAndSetRebate(SettleDetail settleDetail) {
         String storeCode = settleDetail.getStoreCode();
         String merCode = settleDetail.getMerCode();
-        MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(storeCode, merCode);
+        MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(storeCode, merCode);
         // jian.zhou 2021-01-24
         // 处理未配置的商户和门店的情况
-        if (relation == null)
+        if (relation == null){
             return settleDetail;
-        String rebateType = relation.getRebateType();
-        if (!Strings.isEmpty(rebateType)) {
-            List<String> payCodes = Arrays.asList(rebateType.split(","));
-            if (payCodes.contains(settleDetail.getPayCode())) {
-                Assert.notNull(relation.getRebateRatio(), "配置了返利类型，没有返利比率,id:" + relation.getId());
-                // transAmount  * (ratio/100) 4位小数，四舍五入
-                BigDecimal rebateAmount = settleDetail.getTransAmount()
-                        .multiply(
-                                relation.getRebateRatio().divide(BigDecimal.valueOf(100),
-                                        4,
-                                        RoundingMode.HALF_UP
-                                ),
-                                new MathContext(4, RoundingMode.HALF_UP)
-                        );
-                settleDetail.setRebateAmount(rebateAmount);
-            }
         }
+        String rebateType = relation.getRebateType();
+        if (Strings.isEmpty(rebateType)) {
+            return settleDetail;
+        }
+        List<String> payCodes = Arrays.asList(rebateType.split(","));
+        if (payCodes.contains(settleDetail.getPayCode())) {
+            Assert.notNull(relation.getRebateRatio(), "配置了返利类型，没有返利比率,id:" + relation.getId());
+            // transAmount  * (ratio/100) 4位小数，四舍五入
+            BigDecimal rebateAmount = settleDetail.getTransAmount()
+                    .multiply(
+                            relation.getRebateRatio().divide(BigDecimal.valueOf(100),
+                                    4,
+                                    RoundingMode.HALF_UP
+                            ),
+                            new MathContext(4, RoundingMode.HALF_UP)
+                    );
+
+            if (WelfareConstant.TransType.CONSUME.code().equals(settleDetail.getTransType())) {
+                //消费，正向返利
+                settleDetail.setRebateAmount(rebateAmount);
+            }else if(WelfareConstant.TransType.REFUND.code().equals(settleDetail.getTransType())){
+                //退款，逆向返利
+                settleDetail.setRebateAmount(rebateAmount.negate());
+            }
+            return settleDetail;
+        }
+
         return settleDetail;
 
     }
 
     @Override
     public List<MerchantBillDetail> calculateAndSetRebate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails) {
-        return settleDetails.stream()
+        return settleDetails.stream().sorted(Comparator.comparing(SettleDetail::getTransTime))
                 .map(detail -> {
-                    calculateAndSetRebate(detail);
+                    SettleDetail settleDetail = calculateAndSetRebate(detail);
                     if (Objects.isNull(detail.getRebateAmount()) || detail.getRebateAmount().equals(BigDecimal.ZERO)) {
+                        //计算返利后，需要返利为0
                         return null;
                     }
-                    return rebateLimitOperator.increase(merchantCredit, detail.getRebateAmount(), detail.getTransNo());
+                    if(WelfareConstant.TransType.CONSUME.code().equals(settleDetail.getTransType())){
+                        return rebateLimitOperator.increase(merchantCredit, settleDetail.getRebateAmount().abs(), settleDetail.getTransNo());
+                    } else if (WelfareConstant.TransType.REFUND.code().equals(settleDetail.getTransType())){
+                        return rebateLimitOperator.decrease(merchantCredit,settleDetail.getRebateAmount().abs(),settleDetail.getTransNo());
+                    } else{
+                        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"计算返利时，数据异常",null);
+                    }
                 }).filter(operations -> !Objects.isNull(operations))
                 .flatMap(Collection::stream)
                 .map(MerchantAccountOperation::getMerchantBillDetail)

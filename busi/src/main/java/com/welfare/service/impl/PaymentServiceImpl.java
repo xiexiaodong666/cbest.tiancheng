@@ -8,6 +8,7 @@ import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
@@ -49,7 +50,6 @@ import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SE
 public class PaymentServiceImpl implements PaymentService {
     private final AccountAmountTypeService accountAmountTypeService;
     private final AccountService accountService;
-    private final RedissonClient redissonClient;
     private final MerchantCreditService merchantCreditService;
     private final AccountBillDetailDao accountBillDetailDao;
     private final AccountDeductionDetailDao accountDeductionDetailDao;
@@ -75,15 +75,14 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Long accountCode = paymentRequest.calculateAccountCode();
         String lockKey = "account:" + paymentRequest.calculateAccountCode();
-        RLock accountLock = redissonClient.getFairLock(lockKey);
+        RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         accountLock.lock();
         log.error("locked :{}",lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
             log.error("accountInfo:{}",account);
             chargeBeforePay(paymentRequest, account);
-            RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
-            merAccountLock.lock();
+            RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             try {
                 List<PaymentOperation> paymentOperations = decreaseAccount(paymentRequest, account);
                 List<MerchantBillDetail> merchantBillDetails = paymentOperations.stream()
@@ -101,16 +100,10 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRequest.setPhone(account.getPhone());
                 return paymentRequest;
             } finally {
-                merAccountLock.unlock();
+                DistributedLockUtil.unlock(merAccountLock);
             }
         } finally {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCompletion(int status) {
-                    accountLock.unlock();
-                    log.error("unlocked :{}",lockKey);
-                }
-            });
+            DistributedLockUtil.unlock(accountLock);
         }
 
     }

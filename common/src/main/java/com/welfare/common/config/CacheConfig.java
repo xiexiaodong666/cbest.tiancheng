@@ -5,11 +5,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.welfare.common.util.DistributedLockUtil;
+import com.welfare.common.util.SpringBeanUtils;
+import org.redisson.api.RedissonClient;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -27,7 +33,7 @@ import java.time.Duration;
  * @date 1/16/2021
  */
 @Configuration
-public class CacheConfig {
+public class CacheConfig implements ApplicationListener<ContextRefreshedEvent> {
 
     @Value("${cache.cache-expire-secs:300}")
     private Long cacheExpireTime;
@@ -47,5 +53,11 @@ public class CacheConfig {
         return RedisCacheManager.builder(redissonConnectionFactory)
                 .cacheDefaults(config)
                 .build();
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        ApplicationContext applicationContext = contextRefreshedEvent.getApplicationContext();
+        DistributedLockUtil.setRedissonClient(applicationContext.getBean(RedissonClient.class));
     }
 }

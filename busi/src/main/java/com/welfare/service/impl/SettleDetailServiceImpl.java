@@ -212,14 +212,12 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         merTransDetailQuery.setMerCode(merCode);
 
 
-        List<SettleMerTransDetailResp> settleMerTransDetailRespList = merchantBillDetailMapper.getMerTransDetail(merTransDetailQuery).stream()
+        return merchantBillDetailMapper.getMerTransDetail(merTransDetailQuery).stream()
                 .map(merTransDetailDTO -> {
                     SettleMerTransDetailResp settleMerTransDetailRespTemp = new SettleMerTransDetailResp();
                     BeanUtils.copyProperties(merTransDetailDTO, settleMerTransDetailRespTemp);
                     return settleMerTransDetailRespTemp;
                 }).collect(Collectors.toList());
-
-        return settleMerTransDetailRespList;
     }
 
     @Override
@@ -233,7 +231,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     private SettleDetail calculateAndSetRebate(SettleDetail settleDetail) {
         String storeCode = settleDetail.getStoreCode();
         String merCode = settleDetail.getMerCode();
-        MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(storeCode, merCode);
+        MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(storeCode, merCode);
         // jian.zhou 2021-01-24
         // 处理未配置的商户和门店的情况
         if (relation == null){

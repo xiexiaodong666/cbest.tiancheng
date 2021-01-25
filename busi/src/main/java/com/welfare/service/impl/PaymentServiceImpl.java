@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.AccountStatus;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -57,6 +58,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final AccountConsumeSceneDao accountConsumeSceneDao;
     private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
     private final SupplierStoreService supplierStoreService;
+    private final MerchantStoreRelationDao merchantStoreRelationDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -70,30 +72,35 @@ public class PaymentServiceImpl implements PaymentService {
             return requestHandled;
         }
         Long accountCode = paymentRequest.calculateAccountCode();
-        Account account = accountService.getByAccountCode(accountCode);
-        Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()),"账户未启用");
-        chargePaymentScene(paymentRequest, account);
-
-        RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
-        merAccountLock.lock();
+        String lockKey = "account:" + paymentRequest.calculateAccountCode();
+        RLock accountLock = redissonClient.getFairLock(lockKey);
+        accountLock.lock();
         try {
-            List<PaymentOperation> paymentOperations = decreaseAccount(paymentRequest, account);
-            List<MerchantBillDetail> merchantBillDetails = paymentOperations.stream()
-                    .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
-                    .map(MerchantAccountOperation::getMerchantBillDetail)
-                    .collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(merchantBillDetails)){
-                merchantBillDetailDao.saveBatch(merchantBillDetails);
-            }
+            Account account = accountService.getByAccountCode(accountCode);
+            chargeBeforePay(paymentRequest, account);
+            RLock merAccountLock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
+            merAccountLock.lock();
+            try {
+                List<PaymentOperation> paymentOperations = decreaseAccount(paymentRequest, account);
+                List<MerchantBillDetail> merchantBillDetails = paymentOperations.stream()
+                        .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
+                        .map(MerchantAccountOperation::getMerchantBillDetail)
+                        .collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(merchantBillDetails)) {
+                    merchantBillDetailDao.saveBatch(merchantBillDetails);
+                }
 
-            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-            paymentRequest.setAccountName(account.getAccountName());
-            paymentRequest.setAccountBalance(account.getAccountBalance());
-            paymentRequest.setAccountCredit(account.getSurplusQuota());
-            paymentRequest.setPhone(account.getPhone());
-            return paymentRequest;
+                paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+                paymentRequest.setAccountName(account.getAccountName());
+                paymentRequest.setAccountBalance(account.getAccountBalance());
+                paymentRequest.setAccountCredit(account.getSurplusQuota());
+                paymentRequest.setPhone(account.getPhone());
+                return paymentRequest;
+            } finally {
+                merAccountLock.unlock();
+            }
         } finally {
-            merAccountLock.unlock();
+            accountLock.unlock();
         }
 
     }
@@ -104,10 +111,13 @@ public class PaymentServiceImpl implements PaymentService {
      * @param paymentRequest
      * @param account
      */
-    private void chargePaymentScene(PaymentRequest paymentRequest, Account account) {
+    private void chargeBeforePay(PaymentRequest paymentRequest, Account account) {
+        Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()), "账户未启用");
+        MerchantStoreRelation merStoreRelation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(paymentRequest.getStoreNo(), account.getMerCode());
+        Assert.isTrue(merStoreRelation.getStatus().equals(EnableEnum.ENABLE.getCode()), "商户-门店关联未启用");
         SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo());
         Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(supplierStore.getStatus()),
-                "门店未激活:"+supplierStore.getStoreCode());
+                "门店未激活:" + supplierStore.getStoreCode());
         String paymentScene = paymentRequest.calculatePaymentScene();
         List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
                 .getAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
@@ -169,41 +179,35 @@ public class PaymentServiceImpl implements PaymentService {
 
     private List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
                                                    Account account) {
-        String lockKey = "account:" + paymentRequest.calculateAccountCode();
-        RLock accountLock = redissonClient.getFairLock(lockKey);
-        try {
-            BigDecimal usableAmount = account.getAccountBalance().add(account.getSurplusQuota());
-            BigDecimal amount = paymentRequest.getAmount();
-            boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-            Assert.isTrue(enough, "总账户余额不足");
-            List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
-            BigDecimal allTypeBalance = accountAmountDOList.stream()
-                    .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            //判断子账户之和
-            boolean accountTypesEnough = allTypeBalance.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-            Assert.isTrue(accountTypesEnough, "子账户余额总和不足,请确认员工账户总账和子账是否对应");
-            accountAmountDOList.sort(Comparator.comparing(x -> x.getMerchantAccountType().getDeductionOrder()));
-            List<PaymentOperation> paymentOperations = new ArrayList<>(4);
-            List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
-                    .collect(Collectors.toList());
-            for (AccountAmountDO accountAmountDO : accountAmountDOList) {
-                if (BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance()) == 0) {
-                    //当前的accountType没钱，则继续下一个账户
-                    continue;
-                }
-                PaymentOperation currentOperation = decrease(accountAmountDO, amount, paymentRequest, accountAmountTypes);
-                amount = amount.subtract(currentOperation.getOperateAmount());
-                paymentOperations.add(currentOperation);
-                if (currentOperation.isEnough()) {
-                    break;
-                }
+        BigDecimal usableAmount = account.getAccountBalance().add(account.getSurplusQuota());
+        BigDecimal amount = paymentRequest.getAmount();
+        boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
+        Assert.isTrue(enough, "总账户余额不足");
+        List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
+        BigDecimal allTypeBalance = accountAmountDOList.stream()
+                .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        //判断子账户之和
+        boolean accountTypesEnough = allTypeBalance.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
+        Assert.isTrue(accountTypesEnough, "子账户余额总和不足,请确认员工账户总账和子账是否对应");
+        accountAmountDOList.sort(Comparator.comparing(x -> x.getMerchantAccountType().getDeductionOrder()));
+        List<PaymentOperation> paymentOperations = new ArrayList<>(4);
+        List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
+                .collect(Collectors.toList());
+        for (AccountAmountDO accountAmountDO : accountAmountDOList) {
+            if (BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance()) == 0) {
+                //当前的accountType没钱，则继续下一个账户
+                continue;
             }
-            saveDetails(paymentOperations, account,accountAmountTypes);
-            return paymentOperations;
-        } finally {
-            accountLock.unlock();
+            PaymentOperation currentOperation = decrease(accountAmountDO, amount, paymentRequest, accountAmountTypes);
+            amount = amount.subtract(currentOperation.getOperateAmount());
+            paymentOperations.add(currentOperation);
+            if (currentOperation.isEnough()) {
+                break;
+            }
         }
+        saveDetails(paymentOperations, account, accountAmountTypes);
+        return paymentOperations;
     }
 
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
@@ -291,13 +295,13 @@ public class PaymentServiceImpl implements PaymentService {
             accountDeductionDetail.setCardId(paymentRequest.getCardNo());
         }
 
-        accountDeductionDetail.setSelfDeductionAmount(SELF.code().equals(accountAmountType.getMerAccountTypeCode())?operatedAmount:BigDecimal.ZERO);
+        accountDeductionDetail.setSelfDeductionAmount(SELF.code().equals(accountAmountType.getMerAccountTypeCode()) ? operatedAmount : BigDecimal.ZERO);
         accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
         //扣减商户金额
         String storeNo = paymentRequest.getStoreNo();
         SupplierStore store = supplierStoreService.getSupplierStoreByStoreCode(storeNo);
-        Assert.notNull(store,"根据门店号没有找到门店");
-        if(!Objects.equals(store.getMerCode(),account.getMerCode())){
+        Assert.notNull(store, "根据门店号没有找到门店");
+        if (!Objects.equals(store.getMerCode(), account.getMerCode())) {
             List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.doOperateAccount(
                     account.getMerCode(),
                     operatedAmount,
@@ -310,12 +314,11 @@ public class PaymentServiceImpl implements PaymentService {
             MerchantBillDetail remainingLimitDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.REMAINING_LIMIT.code());
             accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount().abs());
             accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount().abs());
-        }else{
+        } else {
             paymentOperation.setMerchantAccountOperations(Collections.emptyList());
             accountDeductionDetail.setMerDeductionAmount(BigDecimal.ZERO);
             accountDeductionDetail.setMerDeductionAmount(BigDecimal.ZERO);
         }
-
 
 
         return accountDeductionDetail;

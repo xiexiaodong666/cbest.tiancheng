@@ -76,11 +76,11 @@ public class RefundServiceImpl implements RefundService {
         );
         Assert.isTrue(!CollectionUtils.isEmpty(accountDeductionDetails), "未找到正向支付流水");
         AccountDeductionDetail first = accountDeductionDetails.get(0);
-        Account account = accountService.getByAccountCode(first.getAccountCode());
-        String lockKey = "account:" + account.getAccountCode();
+        String lockKey = "account:" + first.getAccountCode();
         RLock accountLock = redissonClient.getFairLock(lockKey);
         accountLock.lock();
         try {
+            Account account = accountService.getByAccountCode(first.getAccountCode());
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
             //按照deductionOrder逆序
             accountAmountDOList.sort(Comparator.comparing(x -> -1 * x.getMerchantAccountType().getDeductionOrder()));

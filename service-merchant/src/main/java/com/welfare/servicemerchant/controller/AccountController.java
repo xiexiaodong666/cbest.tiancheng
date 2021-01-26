@@ -47,6 +47,14 @@ public class AccountController implements IController {
   private FileUploadService fileUploadService;
 
 
+  @GetMapping("/syncOldData")
+  @ApiOperation("员工账户增量查询")
+  public R<List<AccountIncrementDTO>> incrementAccountList(@RequestParam(value = "accountStatus") Integer accountStatus){
+    accountService.batchSyncData(accountStatus);
+    return success();
+  }
+
+
   @GetMapping("/increment")
   @ApiOperation("员工账户增量查询")
   public R<List<AccountIncrementDTO>> incrementAccountList(AccountIncrementReq accountIncrementReq){

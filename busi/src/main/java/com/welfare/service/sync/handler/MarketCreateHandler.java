@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.SupplierStoreSyncDTO;
@@ -56,6 +57,9 @@ public class MarketCreateHandler {
     @Subscribe
     public void onMarketCreateAdd(SupplierStoreEvt evt) {
         if(EmptyChecker.isEmpty(evt.getSupplierStoreDetailDTOS())){
+            return;
+        }
+        if(!evt.getTypeEnum().getCode().equals(ShoppingActionTypeEnum.ADD.getCode())){
             return;
         }
         SupplierStoreSyncDTO syncDTO=evt.getSupplierStoreDetailDTOS().get(0);

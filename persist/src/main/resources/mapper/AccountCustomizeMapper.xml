@@ -87,6 +87,10 @@
     GROUP_CONCAT(ci.card_id) AS cardId,
     a.account_balance AS accountBalance,
     a.binding,
+    case a.binding
+    when 0 then '未绑定'
+    when 1 then '绑定'
+    end as   bindingString,
     a.phone
     FROM
     account a
@@ -117,7 +121,7 @@
       and at.type_code = #{accountTypeCode}
     </if>
     <if test=" cardId !='' and cardId != null ">
-      and ci.card_id = #{cardId}
+      and a. account_code in( select a1.account_code from account a1 left join card_info ci1 on ci1.account_code = a1.account_code where ci1.card_id = #{cardId})
     </if>
     GROUP BY a.account_code
     order by a.create_time desc

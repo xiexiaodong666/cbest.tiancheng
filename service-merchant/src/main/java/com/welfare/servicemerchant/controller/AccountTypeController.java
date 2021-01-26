@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.annotation.RepeatRequestVerification;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountTypeMapperDTO;
@@ -89,6 +90,7 @@ public class AccountTypeController implements IController {
   @PostMapping("/save")
   @ApiOperation("新增员工类型")
   @MerchantUser
+  @RepeatRequestVerification(prefixKey= "e-welfare-repeat-request:account_type_save")
   public R<Boolean> save(@RequestBody AccountTypeReq accountTypeReq){
     try{
       AccountType accountType = accountTypeConverter.toEntity(accountTypeReq);

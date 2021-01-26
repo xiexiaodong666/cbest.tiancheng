@@ -162,11 +162,7 @@
                      when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
                      else 0 end
             ) as rebateAmount,
-            sum(
-                case when t1.trans_type='consume' then 1
-                     when t1.trans_type='refund' then -1
-                     else 0 end
-            ) as orderNum,
+            count(DISTINCT t1.trans_no) as orderNum,
             'unconfirmed' as  rec_status,
             'unsettled' as settle_status,
             'unsended' as send_status,

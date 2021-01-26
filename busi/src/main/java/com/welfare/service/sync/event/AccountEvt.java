@@ -12,6 +12,7 @@ import org.killbill.bus.api.BusEvent;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author yaoxiao
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class AccountEvt implements BusEvent {
   private ShoppingActionTypeEnum typeEnum;
   private List<Account> accountList;
+  private List<Long> codeList;
 
   @Override
   public Long getSearchKey1() {
@@ -34,10 +36,13 @@ public class AccountEvt implements BusEvent {
 
   @Override
   public Long getSearchKey2() {
-    if(accountList.size()==1){
+    if(!CollectionUtils.isEmpty(accountList)){
       return accountList.get(0).getId();
     }
-    return null;
+    if(!CollectionUtils.isEmpty(codeList)){
+      return Long.parseLong(String.valueOf(codeList.size()));
+    }
+    return 0L;
   }
 
   @Override

@@ -49,6 +49,7 @@ public class AccountDaoAspect {
             AccountChangeEventRecordService accountChangeEventRecordService = SpringBeanUtils.getBean(
                 AccountChangeEventRecordService.class);
             accountChangeEventRecordService.save(accountChangeEventRecord);
+            accountToUpdate.setChangeEventId(accountChangeEventRecord.getId());
         }
     }
 }

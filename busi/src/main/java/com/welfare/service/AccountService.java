@@ -56,6 +56,8 @@ public interface AccountService {
 
   Boolean save(AccountReq accountReq);
 
+  void batchSyncData(Integer accountStatus);
+
   Boolean batchSave(List<Account> accountList);
 
   Boolean update(AccountReq accountReq);

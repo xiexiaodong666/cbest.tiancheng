@@ -12,6 +12,8 @@ import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.AccountService;
 import com.welfare.service.CardInfoService;
 import com.welfare.service.dto.AccountBindCardDTO;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -27,41 +29,56 @@ import java.util.List;
  */
 @Slf4j
 public class AccountBatchBindCardListener extends AnalysisEventListener<AccountBindCardDTO> {
+
   List<CardInfo> cardInfoList = new LinkedList<CardInfo>();
   List<Account> accountList = new LinkedList<Account>();
 
   private AccountDao accountDao;
   private CardInfoService cardInfoService;
   private AccountService accountService;
-  private static StringBuilder  uploadInfo = new StringBuilder();
+  private static StringBuilder uploadInfo = new StringBuilder();
+  private boolean rowHeadIsOK = true;
 
-  public AccountBatchBindCardListener(AccountDao accountDao,CardInfoService cardInfoService,AccountService accountService) {
+  public AccountBatchBindCardListener(AccountDao accountDao, CardInfoService cardInfoService,
+      AccountService accountService) {
     this.accountDao = accountDao;
     this.cardInfoService = cardInfoService;
     this.accountService = accountService;
   }
 
   @Override
+  public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+    if (!headMap.get(0).equals("手机号") ||
+        !headMap.get(1).equals("卡号")) {
+      rowHeadIsOK = false;
+      return;
+    }
+  }
+
+  @Override
   public void invoke(AccountBindCardDTO accountBindCardDTO, AnalysisContext analysisContext) {
-    QueryWrapper<Account> accountQueryWrapper = new  QueryWrapper<Account>();
+    if( !rowHeadIsOK ){
+      return;
+    }
+    QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<Account>();
     String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
-    accountQueryWrapper.eq(Account.MER_CODE,merCode);
-    accountQueryWrapper.eq(Account.PHONE,accountBindCardDTO.getPhone());
+    accountQueryWrapper.eq(Account.MER_CODE, merCode);
+    accountQueryWrapper.eq(Account.PHONE, accountBindCardDTO.getPhone());
     Account account = accountDao.getOne(accountQueryWrapper);
-    if( null == account ){
+    if (null == account) {
       uploadInfo.append("员工手机号:").append(accountBindCardDTO.getPhone()).append("不存在;");
       return;
     }
     CardInfo cardInfo = cardInfoService.getByCardNo(accountBindCardDTO.getCardId());
-    if( null ==  cardInfo){
+    if (null == cardInfo) {
       uploadInfo.append("卡号:").append(accountBindCardDTO.getCardId()).append("不存在;");
       return;
     }
-    if( cardInfoService.cardIsBind(accountBindCardDTO.getCardId()) ){
+    if (cardInfoService.cardIsBind(accountBindCardDTO.getCardId())) {
       uploadInfo.append("卡号:").append(accountBindCardDTO.getCardId()).append("已经绑定其他账号;");
       return;
     }
-    if( cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue() ){
+    if (cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue()) {
       uploadInfo.append("卡号:").append(accountBindCardDTO.getCardId()).append("请确认该卡片状态;");
       return;
     }
@@ -75,9 +92,12 @@ public class AccountBatchBindCardListener extends AnalysisEventListener<AccountB
 
   @Override
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
-    if(!CollectionUtils.isEmpty(cardInfoList)){
-      accountService.batchBindCard(cardInfoList,accountList);
-      if(StringUtils.isEmpty(uploadInfo.toString()) ){
+    if( !rowHeadIsOK ){
+      uploadInfo.append("模板格式(表头)有误");
+    }
+    if (!CollectionUtils.isEmpty(cardInfoList)) {
+      accountService.batchBindCard(cardInfoList, accountList);
+      if (StringUtils.isEmpty(uploadInfo.toString())) {
         uploadInfo.append("导入成功");
       }
     }

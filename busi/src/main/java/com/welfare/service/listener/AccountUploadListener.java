@@ -13,6 +13,8 @@ import com.welfare.persist.entity.Merchant;
 import com.welfare.service.*;
 import com.welfare.service.dto.AccountUploadDTO;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -45,11 +47,28 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
 
   private static StringBuilder uploadInfo = new StringBuilder();
 
-
+  private boolean rowHeadIsOK = true;
 
 
   @Override
+  public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+    if (!headMap.get(0).equals("商户编码") ||
+        !headMap.get(1).equals("员工名称") ||
+        !headMap.get(2).equals("手机号") ||
+        !headMap.get(3).equals("账号状态(1正常2锁定)") ||
+        !headMap.get(4).equals("员工类型编码") ||
+        !headMap.get(5).equals("所属部门(代码)") ||
+        !headMap.get(6).equals("创建人姓名")) {
+      rowHeadIsOK = false;
+      return;
+    }
+  }
+
+  @Override
   public void invoke(AccountUploadDTO accountUploadDTO, AnalysisContext analysisContext) {
+    if (!rowHeadIsOK) {
+      return;
+    }
     Account account = new Account();
     BeanUtils.copyProperties(accountUploadDTO, account);
     Boolean validate = validationAccount(account);
@@ -65,15 +84,15 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
 
   private boolean validationAccount(Account account) {
     String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
-    if( !merCode.equals(account.getMerCode()) ){
+    if (!merCode.equals(account.getMerCode())) {
       uploadInfo.append("商户编码不合法:").append(account.getMerCode()).append(";");
       return false;
     }
-    if(!AccountUtil.validPhone(account.getPhone())){
+    if (!AccountUtil.validPhone(account.getPhone())) {
       uploadInfo.append("手机号码不合法:").append(account.getPhone()).append(";");
       return false;
     }
-    if( !AccountStatus.validStatus(account.getAccountStatus()) ){
+    if (!AccountStatus.validStatus(account.getAccountStatus())) {
       uploadInfo.append("员工状态不合法:").append(account.getAccountStatus()).append(";");
       return false;
     }
@@ -89,13 +108,14 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       uploadInfo.append("不存在的员工类型编码:").append(account.getAccountTypeCode()).append(";");
       return false;
     }
-    Department department = departmentService.getByDepartmentCodeAndMerCode(account.getStoreCode(),merCode);
+    Department department = departmentService
+        .getByDepartmentCodeAndMerCode(account.getStoreCode(), merCode);
     if (null == department) {
       uploadInfo.append("不存在的员工部门:").append(account.getStoreCode()).append(";");
       return false;
     }
 
-    Account queryAccount = accountService.findByPhone(account.getPhone(),account.getMerCode());
+    Account queryAccount = accountService.findByPhone(account.getPhone(), account.getMerCode());
     if (null != queryAccount) {
       uploadInfo.append("员工手机号已经存在:").append(account.getPhone()).append(";");
       return false;
@@ -105,12 +125,42 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
 
   @Override
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
+    if (!rowHeadIsOK) {
+      uploadInfo.append("模板格式(表头)有误");
+    }
     if (!CollectionUtils.isEmpty(accountUploadList)) {
-      accountService.batchUpload(accountUploadList);
+      //数据以500等分分批同步
+      List<List<Account>> averageAccountList = averageAssign(accountUploadList);
+      for (List<Account> accountList : averageAccountList) {
+        accountService.batchUpload(accountList);
+      }
       if (StringUtils.isEmpty(uploadInfo.toString())) {
         uploadInfo.append("导入成功");
       }
     }
+  }
+
+  public static <T> List<List<T>> averageAssign(List<T> source) {
+    int n = source.size() % 500 == 0 ? source.size() / 500 : source.size() / 500 + 1;
+    List<List<T>> result = new ArrayList<List<T>>();
+    //(先计算出余数)
+    int remainder = source.size() % n;
+    //然后是商
+    int number = source.size() / n;
+    //偏移量
+    int offset = 0;
+    for (int i = 0; i < n; i++) {
+      List<T> value = null;
+      if (remainder > 0) {
+        value = source.subList(i * number + offset, (i + 1) * number + offset + 1);
+        remainder--;
+        offset++;
+      } else {
+        value = source.subList(i * number + offset, (i + 1) * number + offset);
+      }
+      result.add(value);
+    }
+    return result;
   }
 
   public StringBuilder getUploadInfo() {

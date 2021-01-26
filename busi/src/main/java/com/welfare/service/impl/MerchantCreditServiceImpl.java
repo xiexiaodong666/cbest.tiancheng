@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.MerchantBillDetailDao;
 import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.entity.MerchantBillDetail;
@@ -180,7 +181,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             }
             increaseAccountType(req.getMerCode(),MerCreditType.REMAINING_LIMIT,req.getAmount(),req.getTransNo());
         } finally {
-            lock.unlock();
+            DistributedLockUtil.unlock(lock);
         }
     }
 

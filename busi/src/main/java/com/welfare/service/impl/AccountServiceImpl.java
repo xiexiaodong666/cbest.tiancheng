@@ -68,6 +68,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -263,6 +264,28 @@ public class AccountServiceImpl implements AccountService {
     AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
     BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
     return accountDetailDTO;
+  }
+
+  @Override
+  public void batchSyncData(Integer accountStatus) {
+    QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<Account>();
+    accountQueryWrapper.eq(Account.ACCOUNT_STATUS,accountStatus);
+    List<Account> accountList = accountDao.list(accountQueryWrapper);
+    for( Account account : accountList ){
+      assemablChangeEventIdAccount(account);
+    }
+    batchSave(accountList);
+    applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
+        .accountList(accountList).build());
+  }
+
+  private void assemablChangeEventIdAccount(Account account) {
+    //修改account 成正常的状态
+    AccountChangeEventRecord accountChangeEventRecord = AccountUtils
+        .assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, account.getAccountCode(),
+            account.getCreateUser());
+    accountChangeEventRecordService.save(accountChangeEventRecord);
+    account.setChangeEventId(accountChangeEventRecord.getId());
   }
 
   @Override
@@ -544,6 +567,7 @@ public class AccountServiceImpl implements AccountService {
     return accountUpdate && updateResult;
   }
 
+  @Override
   public Account findByPhoneAndMerCode(String phone, String merCode) {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
     accountQueryWrapper.eq(Account.PHONE, phone);
@@ -573,8 +597,12 @@ public class AccountServiceImpl implements AccountService {
       //批量回写
       List<Map<String, Object>> mapList = AccountUtils.getMaps(recordList);
       this.batchUpdateChangeEventId(mapList);
+      List<Long> codeList = accountList.stream().map(account -> {
+        return account.getAccountCode();
+      }).collect(Collectors.toList());
+      //批量下发员工账号数据
       applicationContext.publishEvent(AccountEvt
-          .builder().typeEnum(ShoppingActionTypeEnum.BATCH_ADD).accountList(accountList).build());
+          .builder().typeEnum(ShoppingActionTypeEnum.ACCOUNT_BATCH_ADD).codeList(codeList).build());
     }
   }
 

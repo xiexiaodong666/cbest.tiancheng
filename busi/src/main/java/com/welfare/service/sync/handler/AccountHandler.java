@@ -1,11 +1,13 @@
 package com.welfare.service.sync.handler;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
+import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.Merchant;
@@ -41,6 +43,8 @@ public class AccountHandler {
   ShoppingFeignClient shoppingFeignClient;
   @Autowired
   private MerchantService merchantService;
+  @Autowired
+  private AccountDao accountDao;
 
   private Gson gson= new Gson();
 
@@ -57,8 +61,17 @@ public class AccountHandler {
   @AllowConcurrentEvents
   @Subscribe
   public void accountEvt(AccountEvt accountEvt) {
+    log.info("下发数据 accountEvt:{}",accountEvt);
     ShoppingActionTypeEnum actionTypeEnum = accountEvt.getTypeEnum();
-    List<Account> accountList = accountEvt.getAccountList();
+    List<Account> accountList = null;
+    if( actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ADD.getCode()) ){
+      accountList = accountEvt.getAccountList();
+    }else if ( actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ACCOUNT_BATCH_ADD.getCode()) ){
+      List<Long> codeList = accountEvt.getCodeList();
+      QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<Account> ();
+      accountQueryWrapper.in(Account.ACCOUNT_CODE,codeList);
+      accountList = accountDao.list(accountQueryWrapper);
+    }
     List<String> merchantCodeList = accountList.stream().map(account -> {
       return account.getMerCode();
     }).collect(Collectors.toList());
@@ -72,7 +85,7 @@ public class AccountHandler {
     // 员工账号数据同步
     List<EmployerDTO> employerDTOList = AccountUtils.assemableEmployerDTOList(accountSyncDTOList);
     EmployerReqDTO employerReqDTO = new EmployerReqDTO();
-    employerReqDTO.setActionType(actionTypeEnum);
+    employerReqDTO.setActionType(actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ACCOUNT_BATCH_ADD.getCode()) ? ShoppingActionTypeEnum.ADD : actionTypeEnum);
     employerReqDTO.setRequestId(UUID.randomUUID().toString());
     employerReqDTO.setTimestamp(new Date());
     employerReqDTO.setList(employerDTOList);

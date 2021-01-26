@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
  * @Author: qiang.deng01
  * @Date: 2020/6/17 11:35
  */
-/*@Configuration
-@ComponentScan(basePackages = "com.welfare.serviceaccount.task")*/
+@Configuration
+@ComponentScan(basePackages = "com.welfare.serviceaccount.task")
 @Slf4j
 public class XxlJobConfig {
     @Value("${xxl.job.admin.addresses}")

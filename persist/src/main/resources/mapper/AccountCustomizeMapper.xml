@@ -87,6 +87,10 @@
     GROUP_CONCAT(ci.card_id) AS cardId,
     a.account_balance AS accountBalance,
     a.binding,
+    case a.binding
+    when 0 then '未绑定'
+    when 1 then '绑定'
+    end as   bindingString,
     a.phone
     FROM
     account a

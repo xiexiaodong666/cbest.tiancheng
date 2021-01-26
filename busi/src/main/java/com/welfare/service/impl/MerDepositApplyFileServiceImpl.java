@@ -41,7 +41,7 @@ public class MerDepositApplyFileServiceImpl implements MerDepositApplyFileServic
   }
 
   @Override
-  @Transactional
+  @Transactional(rollbackFor = Exception.class)
   public void save(String merDepositApplyCode, List<String> fileUrls) {
     delByMerDepositApplyCode(merDepositApplyCode);
     if (CollectionUtils.isNotEmpty(fileUrls)) {

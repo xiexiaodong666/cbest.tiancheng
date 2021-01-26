@@ -133,6 +133,9 @@ public class AccountDTO implements Serializable {
   @ApiModelProperty("是否绑卡(1绑定0未绑定)")
   private Integer binding;
 
+  @ExcelProperty(value = "是否绑卡")
+  private String bindingString;
+
   public BigDecimal getUsedQuota() {
     if(  null != maxQuota && null != surplusQuota){
       return maxQuota.subtract(surplusQuota);

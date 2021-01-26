@@ -544,6 +544,7 @@ public class AccountServiceImpl implements AccountService {
     return accountUpdate && updateResult;
   }
 
+  @Override
   public Account findByPhoneAndMerCode(String phone, String merCode) {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
     accountQueryWrapper.eq(Account.PHONE, phone);

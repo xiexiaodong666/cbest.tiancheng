@@ -51,7 +51,6 @@ import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
-import com.welfare.service.sync.event.MarketCreateEvt;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
@@ -286,6 +285,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
+    //同步重百付
     if (!flag) {
       throw new BusiException("新增门店失败");
     }
@@ -296,8 +296,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
-   //同步重百付
-    applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(detailDTO).build());
     return flag;
   }
 
@@ -394,6 +392,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       throw new BusiException("excel解析失败");
     }
     String result = listener.getUploadInfo().toString();
+    listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
     if (!SupplierStoreListener.success.equals(result)) {
       throw new BusiException(result);
     }

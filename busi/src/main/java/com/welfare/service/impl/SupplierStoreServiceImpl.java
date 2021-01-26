@@ -256,6 +256,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreAddDTO supplierStore) {
     checkConsumType(supplierStore.getConsumType());
+    if(EmptyChecker.notEmpty(supplierStore.getAddressList())
+            &&supplierStore.getAddressList().size()>10){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
+    }
     Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
     if (EmptyChecker.isEmpty(merchant)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
@@ -419,6 +423,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
     checkConsumType(supplierStore.getConsumType());
+    if(EmptyChecker.notEmpty(supplierStore.getAddressList())
+            &&supplierStore.getAddressList().size()>10){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
+    }
     SupplierStore entity = supplierStoreDao.getById(supplierStore.getId());
     if (EmptyChecker.isEmpty(entity)) {
       throw new BusiException("id不存在");

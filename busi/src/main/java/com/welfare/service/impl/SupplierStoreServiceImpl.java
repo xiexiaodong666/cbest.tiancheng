@@ -286,6 +286,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
+    //同步重百付
     if (!flag) {
       throw new BusiException("新增门店失败");
     }
@@ -296,8 +297,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
-   //同步重百付
-    applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(detailDTO).build());
     return flag;
   }
 

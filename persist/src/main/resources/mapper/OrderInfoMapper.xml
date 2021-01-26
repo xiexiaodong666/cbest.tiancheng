@@ -18,16 +18,12 @@
         ab.trans_amount as orderAmount,
         ab.create_time as orderTime
         FROM
-        account_bill_detail ab,
-        account t,
-        supplier_store s,
-        merchant m,
-        order_info oi
+        account_bill_detail ab
+        LEFT JOIN account t on ab.account_code = t.account_code
+        LEFT JOIN supplier_store s on ab.store_code = s.store_code
+        LEFT JOIN merchant m on s.mer_code = m.mer_code
+        LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
         <where>
-            ab.account_code = t.account_code
-            AND s.store_code = ab.store_code
-            AND m.mer_code = s.mer_code
-            AND oi.trans_no = ab.trans_no
             <if test="orderPageQuery.accountName != null">
                 and t.account_name = #{orderPageQuery.accountName}
             </if>
@@ -74,7 +70,7 @@
             else (-1) * sum(trans_amount)
             end
             as orderAmount,
-            count(order_id) AS orderNum
+            count(*) AS orderNum
             from (
             SELECT
                 oi.order_id ,
@@ -88,16 +84,12 @@
                 ab.trans_amount,
                 ab.trans_type
             FROM
-            account_bill_detail ab,
-            account t,
-            supplier_store s,
-            merchant m,
-            order_info oi
+            account_bill_detail ab
+            LEFT JOIN account t on ab.account_code = t.account_code
+            LEFT JOIN supplier_store s on ab.store_code = s.store_code
+            LEFT JOIN merchant m on s.mer_code = m.mer_code
+            LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
             <where>
-                ab.account_code = t.account_code
-                AND s.store_code = ab.store_code
-                AND m.mer_code = s.mer_code
-                AND oi.trans_no = ab.trans_no
                 <if test="orderPageQuery.accountName != null">
                     and t.account_name = #{orderPageQuery.accountName}
                 </if>

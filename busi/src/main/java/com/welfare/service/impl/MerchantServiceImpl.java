@@ -5,6 +5,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dao.MerchantDao;
@@ -158,6 +159,10 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantAddDTO merchant) {
+        if(EmptyChecker.notEmpty(merchant.getAddressList())
+                &&merchant.getAddressList().size()>10){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+        }
         String merCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code());
         merchant.setMerCode(merCode);
         Merchant save =merchantAddConverter.toE(merchant);
@@ -181,6 +186,10 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantUpdateDTO merchant) {
+        if(EmptyChecker.notEmpty(merchant.getAddressList())
+                &&merchant.getAddressList().size()>10){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+        }
         Merchant update=buildEntity(merchant);
         boolean flag= 1==merchantDao.updateAllColumnById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());

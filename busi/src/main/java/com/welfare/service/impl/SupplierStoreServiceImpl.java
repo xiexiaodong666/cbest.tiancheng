@@ -365,13 +365,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       throw new BusiException("导入门店--批量插入地址失败");
     }
     //同步商城中台
-    applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncList)
-                                        .build());
     //同步重百付
     for(SupplierStoreSyncDTO item: syncList){
-      applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(item).build());
-    }
+      //为了保证事件可以支持批量推送，所以只有重新创建一个，只有一个元素的集合
+      List<SupplierStoreSyncDTO> syncItemList=new ArrayList<>();
+      syncItemList.add(item);
+      applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
+              ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncItemList)
+              .build());    }
     return Boolean.TRUE;
   }
 

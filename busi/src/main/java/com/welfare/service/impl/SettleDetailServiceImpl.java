@@ -12,6 +12,7 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
+import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
@@ -71,6 +72,8 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     private String posOnlines;
     @Autowired
     private RebateLimitOperator rebateLimitOperator;
+    @Autowired
+    private SupplierStoreDao supplierStoreDao;
 
     @Override
     public BasePageVo<WelfareSettleResp> queryWelfareSettlePage(WelfareSettlePageReq welfareSettlePageReq) {
@@ -242,7 +245,8 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         }
 
         //自营不返利
-        if(StringUtils.isNotBlank(relation.getMerCode()) && relation.getMerCode().equals(settleDetail.getMerCode())){
+        SupplierStore supplierStore = supplierStoreDao.getOne(Wrappers.<SupplierStore>lambdaQuery().eq(SupplierStore::getStoreCode, settleDetail.getStoreCode()));
+        if(StringUtils.isNotBlank(relation.getMerCode()) && supplierStore.getMerCode().equals(settleDetail.getMerCode())){
             return settleDetail;
         }
 

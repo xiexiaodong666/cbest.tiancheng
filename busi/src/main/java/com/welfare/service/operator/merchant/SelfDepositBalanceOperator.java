@@ -57,7 +57,7 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
     protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo) {
         AbstractMerAccountTypeOperator nextOperator = getNext();
         if (Objects.isNull(nextOperator)) {
-            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
+            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "组织(公司)余额不足", null);
         }
         merchantCredit.setSelfDepositBalance(BigDecimal.ZERO);
         MerchantAccountOperation operation = MerchantAccountOperation.of(

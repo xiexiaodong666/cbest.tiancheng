@@ -35,7 +35,7 @@ public class RepeatRequestVerificationAspect {
   public Object before(ProceedingJoinPoint joinPoint, RepeatRequestVerification repeatRequestVerification) throws Throwable {
     String lockPrefix = repeatRequestVerification.prefixKey();
     String key = JsonUtil.toJson(joinPoint.getArgs());
-    if(stringRedisTemplate.opsForValue().setIfAbsent(lockPrefix +key ,"true",100, TimeUnit.SECONDS)){
+    if(stringRedisTemplate.opsForValue().setIfAbsent(lockPrefix +key ,"true",1, TimeUnit.SECONDS)){
       return joinPoint.proceed();
     }else{
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"请勿重复提交",null);

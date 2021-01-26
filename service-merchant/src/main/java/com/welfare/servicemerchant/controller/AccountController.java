@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.annotation.RepeatRequestVerification;
 import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
@@ -103,6 +104,7 @@ public class AccountController implements IController {
   @PostMapping("/save")
   @ApiOperation("新增员工账号")
   @MerchantUser
+  @RepeatRequestVerification(prefixKey= "e-welfare-repeat-request:account_save")
   public R<Boolean> save(@RequestBody AccountReq accountReq) {
     try {
 

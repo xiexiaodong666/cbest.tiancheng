@@ -90,7 +90,7 @@ public class AccountTypeController implements IController {
   @PostMapping("/save")
   @ApiOperation("新增员工类型")
   @MerchantUser
-  @RepeatRequestVerification(prefixKey= "e-welfare-repeat-request:")
+  @RepeatRequestVerification(prefixKey= "e-welfare-repeat-request:account_type_save")
   public R<Boolean> save(@RequestBody AccountTypeReq accountTypeReq){
     try{
       AccountType accountType = accountTypeConverter.toEntity(accountTypeReq);

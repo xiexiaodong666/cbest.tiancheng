@@ -3,6 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.annotation.RepeatRequestVerification;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountChangeEventRecordDao;
@@ -100,6 +101,7 @@ public class AccountConsumeSceneController implements IController {
   @PostMapping("/save")
   @ApiOperation("新增员工消费配置")
   @MerchantUser
+  @RepeatRequestVerification(prefixKey= "e-welfare-repeat-request:account_consume_scene_save")
   public R<Boolean> save(@RequestBody AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
     try {
       accountConsumeSceneAddReq.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());

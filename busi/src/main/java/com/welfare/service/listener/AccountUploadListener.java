@@ -13,6 +13,7 @@ import com.welfare.persist.entity.Merchant;
 import com.welfare.service.*;
 import com.welfare.service.dto.AccountUploadDTO;
 import java.math.BigDecimal;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -45,11 +46,29 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
 
   private static StringBuilder uploadInfo = new StringBuilder();
 
+  private boolean rowHeadIsOK = true;
 
 
 
   @Override
+  public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+    if (!headMap.get(0).equals("商户编码") ||
+        !headMap.get(1).equals("员工名称") ||
+        !headMap.get(1).equals("手机号")||
+        !headMap.get(1).equals("账号状态(1正常2锁定)")||
+        !headMap.get(1).equals("员工类型编码")||
+        !headMap.get(1).equals("所属部门(代码)")||
+        !headMap.get(1).equals("创建人姓名")) {
+      rowHeadIsOK = false;
+      return;
+    }
+  }
+
+  @Override
   public void invoke(AccountUploadDTO accountUploadDTO, AnalysisContext analysisContext) {
+    if( !rowHeadIsOK ){
+      return;
+    }
     Account account = new Account();
     BeanUtils.copyProperties(accountUploadDTO, account);
     Boolean validate = validationAccount(account);
@@ -105,6 +124,9 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
 
   @Override
   public void doAfterAllAnalysed(AnalysisContext analysisContext) {
+    if( !rowHeadIsOK ){
+      uploadInfo.append("模板格式(表头)有误");
+    }
     if (!CollectionUtils.isEmpty(accountUploadList)) {
       accountService.batchUpload(accountUploadList);
       if (StringUtils.isEmpty(uploadInfo.toString())) {

@@ -134,13 +134,15 @@ public class DepartmentListener extends AnalysisEventListener<DepartmentImportDT
         flag=false;
       }
     }
-    MerchantReq req=new MerchantReq() ;
-    req.setMerCodeList(merCodeList);
-    List<Merchant> merchants=merchantService.list(req);
-    merCodeList.removeAll(merchants.stream().map(item->item.getMerCode()).collect(Collectors.toList())) ;
     if(EmptyChecker.notEmpty(merCodeList)){
-      uploadInfo.append("商户不存在:").append(StringUtil.join(merCodeList,",")).append(";");
-      flag=false;
+      MerchantReq req=new MerchantReq() ;
+      req.setMerCodeList(merCodeList);
+      List<Merchant> merchants=merchantService.list(req);
+      merCodeList.removeAll(merchants.stream().map(item->item.getMerCode()).collect(Collectors.toList())) ;
+      if(EmptyChecker.notEmpty(merCodeList)){
+        uploadInfo.append("商户不存在:").append(StringUtil.join(merCodeList,",")).append(";");
+        flag=false;
+      }
     }
     return flag;
   }

@@ -70,6 +70,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       return;
     }
     Account account = new Account();
+    account.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
     BeanUtils.copyProperties(accountUploadDTO, account);
     Boolean validate = validationAccount(account);
     if (validate.booleanValue() == true) {

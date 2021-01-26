@@ -214,10 +214,6 @@ public class RefundServiceImpl implements RefundService {
     }
 
     private void operateMerchantCredit(Account account, AccountDeductionDetail refundDeductionDetail) {
-        if (refundDeductionDetail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SELF.code())) {
-            //自主充值余额不需要操作商户账户
-            return;
-        }
         merchantCreditService.increaseAccountType(
                 account.getMerCode(),
                 WelfareConstant.MerCreditType.REMAINING_LIMIT,

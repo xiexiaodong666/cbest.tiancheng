@@ -295,7 +295,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag;
   }
 
@@ -323,7 +323,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(sync);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ACTIVATE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.ACTIVATE).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag;
   }
 
@@ -369,7 +369,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       List<SupplierStoreSyncDTO> syncItemList=new ArrayList<>();
       syncItemList.add(item);
       applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-              ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncItemList)
+              ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncItemList).timestamp(new Date())
               .build());    }
     return Boolean.TRUE;
   }
@@ -415,7 +415,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(supplierStoreSyncConverter.toD(supplierStore));
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag;
   }
 
@@ -452,7 +452,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     detailDTO.setAddressList(supplierStore.getAddressList());
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag && flag2 && flag3;
   }
 

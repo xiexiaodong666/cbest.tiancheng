@@ -64,13 +64,13 @@ public class AccountHandler {
     log.info("下发数据 accountEvt:{}",accountEvt);
     ShoppingActionTypeEnum actionTypeEnum = accountEvt.getTypeEnum();
     List<Account> accountList = null;
-    if( actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ADD.getCode()) ){
-      accountList = accountEvt.getAccountList();
-    }else if ( actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ACCOUNT_BATCH_ADD.getCode()) ){
+   if ( actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ACCOUNT_BATCH_ADD.getCode()) ){
       List<Long> codeList = accountEvt.getCodeList();
       QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<Account> ();
       accountQueryWrapper.in(Account.ACCOUNT_CODE,codeList);
       accountList = accountDao.list(accountQueryWrapper);
+    }else{
+      accountList = accountEvt.getAccountList();
     }
     List<String> merchantCodeList = accountList.stream().map(account -> {
       return account.getMerCode();

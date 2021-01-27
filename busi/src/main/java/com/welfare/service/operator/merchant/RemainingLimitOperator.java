@@ -68,31 +68,36 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
     }
 
     @Override
-    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo) {
-        AbstractMerAccountTypeOperator nextOperator = getNext();
-        if (Objects.isNull(nextOperator)) {
-            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
-        }
-        List<MerchantAccountOperation> operations = new ArrayList<>();
-        BigDecimal creditLimit = merchantCredit.getCreditLimit();
-        BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
-        // 加剩余信用额度
-        merchantCredit.setRemainingLimit(creditLimit);
-        MerchantAccountOperation remainingLimitOperation = MerchantAccountOperation.of(
-                merCreditType,
-                creditLimit.subtract(remainingLimit),
-                IncOrDecType.INCREASE,
-                merchantCredit,
-                transNo
-        );
-        if(remainingLimitOperation.getAmount().compareTo(BigDecimal.ZERO) != 0){
-            operations.add(remainingLimitOperation);
-        }
-        // 加余额
-        List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo);
-        operations.addAll(moreOperations);
-        return operations;
+    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo){
+        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "结算金额超过信用额度", null);
     }
+
+//    @Override
+//    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo) {
+//        AbstractMerAccountTypeOperator nextOperator = getNext();
+//        if (Objects.isNull(nextOperator)) {
+//            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
+//        }
+//        List<MerchantAccountOperation> operations = new ArrayList<>();
+//        BigDecimal creditLimit = merchantCredit.getCreditLimit();
+//        BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
+//        // 加剩余信用额度
+//        merchantCredit.setRemainingLimit(creditLimit);
+//        MerchantAccountOperation remainingLimitOperation = MerchantAccountOperation.of(
+//                merCreditType,
+//                creditLimit.subtract(remainingLimit),
+//                IncOrDecType.INCREASE,
+//                merchantCredit,
+//                transNo
+//        );
+//        if(remainingLimitOperation.getAmount().compareTo(BigDecimal.ZERO) != 0){
+//            operations.add(remainingLimitOperation);
+//        }
+//        // 加余额
+//        List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo);
+//        operations.addAll(moreOperations);
+//        return operations;
+//    }
 
     @Override
     public void afterPropertiesSet() throws Exception {

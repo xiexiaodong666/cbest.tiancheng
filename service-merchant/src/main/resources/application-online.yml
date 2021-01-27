@@ -2,7 +2,7 @@ spring:
   cache:
     type: redis
   datasource:
-    url: jdbc:mysql://db.haproxy.cbest.gam:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://db.haproxy.cbest.gam:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true
     username: jav_tclife_rw
     password: 3uUacFIf3PDoBy
   redis:

@@ -105,9 +105,9 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
   public List<MerchantAccountOperation> set(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
     BigDecimal creditLimit = merchantCredit.getCreditLimit();
     if (amount.compareTo(creditLimit) >= 0 ) {
-      return increase(merchantCredit,amount.subtract(creditLimit),transNo, WelfareConstant.TransType.RESET_INCR.code());
+      return increase(merchantCredit,amount.subtract(creditLimit),transNo, WelfareConstant.TransType.DEPOSIT_INCR.code());
     } else {
-      return decrease(merchantCredit,creditLimit.subtract(amount),transNo, WelfareConstant.TransType.RESET_DECR.code());
+      return decrease(merchantCredit,creditLimit.subtract(amount),transNo, WelfareConstant.TransType.DEPOSIT_DECR.code());
     }
   }
 }

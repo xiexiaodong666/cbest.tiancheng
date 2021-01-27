@@ -97,7 +97,7 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
                     Channel channelEnum = CHANNEL_MAP.get(channel);
                     if (channelEnum == Channel.WECHAT || channelEnum == Channel.ALIPAY) {
                         accountBillDetailSimpleDTO.setStoreName("员工自主充值");
-                        accountBillDetailSimpleDTO.setTransTypeName(channelEnum.name());
+                        accountBillDetailSimpleDTO.setTransTypeName(channelEnum.desc());
                     }
                 }
                 return accountBillDetailSimpleDTO;

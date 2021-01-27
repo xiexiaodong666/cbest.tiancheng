@@ -196,10 +196,13 @@ public class WelfareConstant {
          * 账户类型
          */
         CONSUME("consume","消费"),
-        DEPOSIT("deposit","充值"),
+        DEPOSIT_INCR("deposit_incr","充值(增加)"),
+        DEPOSIT_DECR("deposit_decr","充值(减少)"),
         REFUND("refund","退款"),
-        REBATE("rebate","返利"),
-        RESET("reset","设置");
+        RESET_INCR("reset_incr","设置（增加)"),
+        RESET_DECR("reset_decr","设置（减少)"),
+        REBATE_DECR("rebate_decr","返点（减少)"),
+        REBATE_INCR("rebate_incr","返点（新增)");
         private final String code;
         private final String desc;
 

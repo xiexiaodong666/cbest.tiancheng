@@ -41,7 +41,8 @@ import java.util.List;
 @Service
 public class AccountTypeServiceImpl implements AccountTypeService {
     private final AccountTypeDao accountTypeDao;
-    private final MerchantService merchantService;
+    @Autowired
+    private MerchantService merchantService;
     private final AccountTypeCustomizeMapper accountTypeCustomizeMapper;
     private final AccountTypeConverter accountTypeConverter;
     private final SequenceService sequenceService;

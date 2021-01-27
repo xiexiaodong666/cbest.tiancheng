@@ -97,7 +97,7 @@ public class SupplierStoreHandler {
         }
         storeShoppingReq.setActionType(typeEnum.getCode());
         storeShoppingReq.setRequestId(evt.getUserToken().toString());
-        storeShoppingReq.setTimestamp(new Date());
+        storeShoppingReq.setTimestamp(evt.getTimestamp());
         storeShoppingReq.setList(listBeans);
         RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateStore(storeShoppingReq);
         if (!("0000").equals(resp.getCode())) {

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://db.haproxy.cbest.gam:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true
+    url: jdbc:mysql://192.1.30.205:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true
     username: jav_tclife_rw
     password: 3uUacFIf3PDoBy
     driverClassName: com.mysql.jdbc.Driver
@@ -32,7 +32,7 @@ logging:
 cbest:
   oss:
     config:
-      bucket: sjgo-img-test
+      bucket: sjgo-img
   pay:
     url: http://192.1.30.160:8000/gateway
     appId: yufu
@@ -40,7 +40,7 @@ cbest:
     notifyUrl: http://xxx/accountDepositRecord/payNotify
 
 cdn:
-  server: http://img-test.sjgo365.com
+  server: http://img.sjgo365.com
 
 e-welfare:
   distributed-lock:

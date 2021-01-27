@@ -5,6 +5,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.DistributedLockUtil;
+import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.MerchantBillDetailDao;
 import com.welfare.persist.dao.MerchantCreditDao;
 import com.welfare.persist.entity.Merchant;
@@ -64,8 +65,6 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private  MerchantService merchantService;
     private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
     private final MerchantBillDetailService merchantBillDetailService;
-    @Autowired
-    private AccountService accountService;
     @Autowired
     private MerchantCreditService creditService;
     @Override
@@ -194,17 +193,19 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                 return;
             }
             MerchantCredit merchantCredit = creditService.getByMerCode(req.getMerCode());
-            if (merchantCredit.getRemainingLimit().add(req.getAmount()).compareTo(merchantCredit.getCreditLimit()) >0) {
-                throw new BusiException("结算金额超过商户最大信用额度！");
+            if (merchantCredit.getRemainingLimit().add(req.getAmount()).compareTo(merchantCredit.getCreditLimit()) > 0) {
+                throw new BusiException(String.format("结算金额[%s]超过商户最大信用额度[%s],剩余额度[%s]",
+                        req.getAmount(), merchantCredit.getCreditLimit(), merchantCredit.getRemainingLimit()));
             }
-                // 恢复商户的信用额度
+            // 恢复商户的信用额度
             increaseAccountType(req.getMerCode(),
                     MerCreditType.REMAINING_LIMIT,
                     req.getAmount(),
                     req.getTransNo(),
                     WelfareConstant.TransType.RESET_INCR.code());
             // 恢复员工的信用额度
-            accountService.restoreSurplusQuotaByMerCode(req.getMerCode());
+            AccountService accountService = SpringBeanUtils.getBean(AccountService.class);
+            accountService.restoreSurplusQuotaByMerCode(req.getMerCode(), req.getAmount(), req.getTransNo());
         } finally {
             DistributedLockUtil.unlock(lock);
         }

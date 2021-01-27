@@ -33,7 +33,7 @@ logging:
     path: /home/finance/Logs/e-welfare-account.e-cbest.lotest
   level:
     root: info
-    com.welfare.persist.mapper: debug
+    #com.welfare.persist.mapper: debug
 encrypt:
   file: ${config.file:classpath:config/config.properties}
 e-welfare:
@@ -91,3 +91,7 @@ xxl:
       logpath: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest/jobhandler/
       logretentiondays: 30
     accessToken:
+
+notification:
+  url: http://test-welfare-internal.kube.cbestcd.com
+  targetPath: https://test-welfare-app.sjgo365.com/tc/redirect?target=center

@@ -146,7 +146,8 @@ public class WelfareConstant {
         ACCOUNT_CODE("account_code","员工账号"),
         DEPARTMENT_CODE("department_code","部门编号"),
         MER_CODE("mer_code","商户编号"),
-        ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请");
+        ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请"),
+        RESET_ACCOUNT_SURPLUS_QUOTA("reset_account_surplus_quota","员工账号授信额度变更");
         private final String code;
         private final String desc;
 

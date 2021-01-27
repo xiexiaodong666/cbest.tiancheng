@@ -69,7 +69,7 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         accountBillDetail.setTransTime(Calendar.getInstance().getTime());
         //AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(accountCode);
         accountBillDetail.setSurplusQuota(account.getSurplusQuota());
-        accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT.code());
+        accountBillDetail.setTransType(TransType.DEPOSIT_INCR.code());
         accountBillDetailDao.save(accountBillDetail);
     }
 
@@ -93,11 +93,11 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
                 String transType = accountBillDetailSimpleDTO.getTransType();
                 TransType transTypeEnum = TRANS_TYPE_MAP.get(transType);
                 accountBillDetailSimpleDTO.setTransTypeName(transTypeEnum.desc());
-                if (transTypeEnum == TransType.DEPOSIT && StrUtil.isNotEmpty(channel)) {
+                if (transTypeEnum == TransType.DEPOSIT_INCR && StrUtil.isNotEmpty(channel)) {
                     Channel channelEnum = CHANNEL_MAP.get(channel);
                     if (channelEnum == Channel.WECHAT || channelEnum == Channel.ALIPAY) {
                         accountBillDetailSimpleDTO.setStoreName("员工自主充值");
-                        accountBillDetailSimpleDTO.setTransTypeName(channelEnum.name());
+                        accountBillDetailSimpleDTO.setTransTypeName(channelEnum.desc());
                     }
                 }
                 return accountBillDetailSimpleDTO;

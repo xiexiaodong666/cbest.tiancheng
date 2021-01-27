@@ -1,3 +1,6 @@
+server:
+  port: ${tomcat.port:8080}
+
 spring:
   profiles:
     active: persist,dev
@@ -8,8 +11,6 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-server:
-  port: 10017
 
 mybatis-plus:
   configuration:
@@ -25,3 +26,15 @@ cbest:
       accessKey: lF3iXaqMbr9f3GEdPJeN
       secretKey: KqMaYYENOqD8JBZUhqgBhOddVYc5Y1Pd1pAJRoA2
       keyPrefix: e-welfare/
+
+exclude-header-interceptor:
+  - /swagger*/**
+  - /doc.html*
+  - /error*
+  - /index
+  - /**/*.css
+  - /**/*.js
+  - /**/*.png
+  - /**/*.jpg
+  - /**/*.jpeg
+  - /**/*.ico

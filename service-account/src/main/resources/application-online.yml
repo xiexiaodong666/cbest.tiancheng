@@ -1,9 +1,75 @@
 spring:
-  profiles: online
+  cache:
+    type: redis
+  datasource:
+    url: jdbc:mysql://192.1.30.205:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: jav_tclife_rw
+    password: 3uUacFIf3PDoBy
+  redis:
+    lettuce:
+      pool:
+        max-idle: 30
+        max-active: 500
+        min-idle: 2
+        max-wait: 1000
+    timeout: 5000
+    database: 0
+    password: v6z82Ebfc7I1
+    host: 192.1.30.205
+    port: 6399
+
 logging:
+  file:
+    path: /data/Logs/e-welfare-account
   level:
     root: info
-  file:
-    path: /home/honour/Logs/e-welfare-account.e-cbest.lo
+    com.welfare.persist.mapper: info
 encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare-account.e-cbest.lo/config.properties}
+  file: ${config.file:classpath:config/config.properties}
+e-welfare:
+  distributed-lock:
+    enabled: true
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+platformUser:
+  url:
+shopping:
+  url:
+
+cbest:
+  pay:
+    url: http://192.1.30.160:8000/gateway
+    appId: yufu
+    appKey: e4716980da4382e1f4cc6ee4bb640277
+
+feign:
+  hystrix:
+    enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 300000
+xxl:
+  job:
+    admin:
+      addresses: http://172.30.37.35:8180/
+    executor:
+      appname: e-welfare-account
+      ip:
+      port: 9898
+      logpath: /data/Logs/e-welfare-account/jobhandler/
+      logretentiondays: 30
+    accessToken:
+
+notification:
+  url: http://welfare-internal.kube.cbestcd.com
+  targetPath: https://welfare-app.sjgo365.com/tc/redirect?target=center

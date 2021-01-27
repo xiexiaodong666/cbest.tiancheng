@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.DistributedLockUtil;
@@ -98,12 +99,12 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType) {
         AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
-            List<MerchantAccountOperation> operations = doOperateAccount(merCode, amount, transNo, merAccountTypeOperator);
+            List<MerchantAccountOperation> operations = doOperateAccount(merCode, amount, transNo, merAccountTypeOperator, transType);
             List<MerchantBillDetail> merchantBillDetails = operations.stream()
                     .map(MerchantAccountOperation::getMerchantBillDetail)
                     .collect(Collectors.toList());
@@ -115,22 +116,22 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     }
 
     @Override
-    public List<MerchantAccountOperation> doOperateAccount(String merCode, BigDecimal amount, String transNo, AbstractMerAccountTypeOperator merAccountTypeOperator) {
+    public List<MerchantAccountOperation> doOperateAccount(String merCode, BigDecimal amount, String transNo, AbstractMerAccountTypeOperator merAccountTypeOperator, String transType) {
         MerchantCredit merchantCredit = this.getByMerCode(merCode);
-        List<MerchantAccountOperation> operations = merAccountTypeOperator.decrease(merchantCredit, amount, transNo);
+        List<MerchantAccountOperation> operations = merAccountTypeOperator.decrease(merchantCredit, amount, transNo, transType);
         merchantCreditDao.updateById(merchantCredit);
         return operations;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
+    public void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            List<MerchantAccountOperation> increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo );
+            List<MerchantAccountOperation> increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo, transType);
             merchantCreditDao.updateById(merchantCredit);
             List<MerchantBillDetail> merchantBillDetails = increase.stream()
                     .map(MerchantAccountOperation::getMerchantBillDetail)
@@ -179,7 +180,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             if (CollectionUtils.isNotEmpty(details)) {
                 return;
             }
-            increaseAccountType(req.getMerCode(),MerCreditType.REMAINING_LIMIT,req.getAmount(),req.getTransNo());
+            increaseAccountType(req.getMerCode(),MerCreditType.REMAINING_LIMIT,req.getAmount(),req.getTransNo(), WelfareConstant.TransType.RESET.code());
         } finally {
             DistributedLockUtil.unlock(lock);
         }

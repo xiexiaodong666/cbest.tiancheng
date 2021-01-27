@@ -249,24 +249,12 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         if (merchant == null) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
         }
-        WelfareConstant.MerCreditType type = WelfareConstant.MerCreditType.findByCode(typeStr);
         if (StringUtils.isBlank(merchant.getMerIdentity())) {
             throw new BusiException("商户没有设置属性！");
         }
         List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持[客户]充值", null);
-        }
-        if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payFirt.getCode())) {
-            if (WelfareConstant.MerCreditType.CREDIT_LIMIT == type
-                    || WelfareConstant.MerCreditType.REMAINING_LIMIT == type) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("当前合作方式[%s]不能充值[%s]类型",MerCooperationModeEnum.payFirt.getDesc(),type.desc()), null);
-            }
-        }
-        if (merchant.getMerCooperationMode().equals(MerCooperationModeEnum.payed.getCode())) {
-            if (WelfareConstant.MerCreditType.CURRENT_BALANCE == type) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("当前合作方式[%s]不能充值[%s]类型",MerCooperationModeEnum.payed.getDesc(),type.desc()), null);
-            }
         }
     }
 
@@ -275,11 +263,11 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
      */
     private void operatorMerAccountByType(String merCode, WelfareConstant.MerCreditType merCreditType, BigDecimal amount, String transNo){
         if (merCreditType == WelfareConstant.MerCreditType.REBATE_LIMIT) {
-            merchantCreditService.decreaseAccountType(merCode,merCreditType,amount,transNo);
+            merchantCreditService.decreaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.RESET.code());
         } else if (merCreditType == WelfareConstant.MerCreditType.CREDIT_LIMIT) {
             merchantCreditService.setAccountType(merCode,merCreditType,amount,transNo);
         } else {
-            merchantCreditService.increaseAccountType(merCode,merCreditType,amount,transNo);
+            merchantCreditService.increaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.RESET.code());
         }
     }
 }

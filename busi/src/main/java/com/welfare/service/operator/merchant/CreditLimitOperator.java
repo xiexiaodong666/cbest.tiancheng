@@ -30,20 +30,20 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
   private RemainingLimitOperator remainingLimitOperator;
 
   @Override
-  public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+  public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType) {
     log.info("ready to decrease merchantCredit.creditLimit for {}", amount.toString());
 
-    return doWhenNotEnough(merchantCredit, amount, merchantCredit.getCreditLimit(), transNo);
+    return doWhenNotEnough(merchantCredit, amount, merchantCredit.getCreditLimit(), transNo,transType );
   }
 
   @Override
-  public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+  public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType) {
     log.info("ready to increase merchantCredit.creditLimit for {}", amount.toString());
-    return doWhenMoreThan(merchantCredit, amount, transNo);
+    return doWhenMoreThan(merchantCredit, amount, transNo, transType);
   }
 
   @Override
-  protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo) {
+  protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo, String transType) {
     List<MerchantAccountOperation> operations = new ArrayList<>();
     BigDecimal oldCreditLimit = merchantCredit.getCreditLimit();
     BigDecimal oldRemainingLimit = merchantCredit.getRemainingLimit();
@@ -54,7 +54,8 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
             amountLeftToBeDecrease,
             IncOrDecType.DECREASE,
             merchantCredit,
-            transNo
+            transNo,
+            transType
     );
     operations.add(creditLimitLimitOperator);
     AbstractMerAccountTypeOperator nextOperator = getNext();
@@ -65,14 +66,15 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
             amountLeftToBeDecrease,
             IncOrDecType.DECREASE,
             merchantCredit,
-            transNo
+            transNo,
+            transType
     );
     operations.add(remainingLimitLimitOperator);
     return operations;
   }
 
   @Override
-  protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo) {
+  protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo, String transType) {
     AbstractMerAccountTypeOperator nextOperator = getNext();
     List<MerchantAccountOperation> operations = new ArrayList<>();
     BigDecimal creditLimit = merchantCredit.getCreditLimit();
@@ -84,11 +86,12 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
             amountLeftToBeIncrease,
             IncOrDecType.INCREASE,
             merchantCredit,
-            transNo
+            transNo,
+            transType
     );
     operations.add(remainingLimitOperator);
     // 加剩余信用额度
-    List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo);
+    List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo,transType );
     operations.addAll(moreOperations);
     return operations;
   }
@@ -102,9 +105,9 @@ public class CreditLimitOperator extends AbstractMerAccountTypeOperator implemen
   public List<MerchantAccountOperation> set(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
     BigDecimal creditLimit = merchantCredit.getCreditLimit();
     if (amount.compareTo(creditLimit) >= 0 ) {
-      return increase(merchantCredit,amount.subtract(creditLimit),transNo);
+      return increase(merchantCredit,amount.subtract(creditLimit),transNo, WelfareConstant.TransType.RESET.code());
     } else {
-      return decrease(merchantCredit,creditLimit.subtract(amount),transNo);
+      return decrease(merchantCredit,creditLimit.subtract(amount),transNo, WelfareConstant.TransType.RESET.code());
     }
   }
 }

@@ -48,7 +48,7 @@ public class RedisKeyConstant {
   /**
    * 操作AccountAmountType表的更新需要的锁key前缀
    */
-  public static final String ACCOUNT_AMOUNT_TYPE_OPERATE = "e-welfare_account_amount_type_operate";
+  public static final String ACCOUNT_AMOUNT_TYPE_OPERATE = "e-welfare_account_amount_type_operate:";
 
   /**
    * 调用恢复剩余剩余信用额度接口 请求id的key前缀

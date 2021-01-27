@@ -104,10 +104,13 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
-            List<MerchantAccountOperation> operations = doOperateAccount(merCode, amount, transNo, merAccountTypeOperator, transType);
+            MerchantCredit merchantCredit = this.getByMerCode(merCode);
+            List<MerchantAccountOperation> operations = doOperateAccount(merchantCredit, amount, transNo, merAccountTypeOperator, transType);
             List<MerchantBillDetail> merchantBillDetails = operations.stream()
                     .map(MerchantAccountOperation::getMerchantBillDetail)
                     .collect(Collectors.toList());
+            //上一句里面已经对merchantCredit进行了操作
+            merchantCreditDao.updateById(merchantCredit);
             merchantBillDetailDao.saveBatch(merchantBillDetails);
             return operations;
         } finally {
@@ -116,11 +119,8 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     }
 
     @Override
-    public List<MerchantAccountOperation> doOperateAccount(String merCode, BigDecimal amount, String transNo, AbstractMerAccountTypeOperator merAccountTypeOperator, String transType) {
-        MerchantCredit merchantCredit = this.getByMerCode(merCode);
-        List<MerchantAccountOperation> operations = merAccountTypeOperator.decrease(merchantCredit, amount, transNo, transType);
-        merchantCreditDao.updateById(merchantCredit);
-        return operations;
+    public List<MerchantAccountOperation> doOperateAccount(MerchantCredit merchantCredit, BigDecimal amount, String transNo, AbstractMerAccountTypeOperator merAccountTypeOperator, String transType) {
+        return merAccountTypeOperator.decrease(merchantCredit, amount, transNo, transType);
     }
 
     @Override

@@ -374,6 +374,10 @@ public class AccountServiceImpl implements AccountService {
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
       }
     } else {
+      Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
+      if( queryAccount != null && queryAccount.getId().longValue() != account.getId().longValue() ){
+        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经有其他员工绑定了该手机", null);
+      }
       Account syncAccount = accountMapper.selectById(account.getId());
       if (null == syncAccount) {
         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
@@ -396,15 +400,16 @@ public class AccountServiceImpl implements AccountService {
     try {
       Account account = assemableAccount4update(accountReq);
       validationAccount(account, false);
+
+      //记录变更时间离线支付用
+      accountChangeEvtRecoed(AccountChangeType.ACCOUNT_UPDATE, oldAccount.getAccountCode());
+
+      boolean result = accountDao.updateById(account);
       //修改授信额度
       updateSurPlusQuota(oldAccount.getAccountCode(), oldAccount.getMaxQuota(),
           oldAccount.getSurplusQuota(),
           account.getMaxQuota(), account.getUpdateUser(), accountReq.getCredit(),
           account.getMerCode());
-      //记录变更时间离线支付用
-      accountChangeEvtRecoed(AccountChangeType.ACCOUNT_UPDATE, oldAccount.getAccountCode());
-
-      boolean result = accountDao.updateById(account);
       account = accountDao.getById(account.getId());
 
       applicationContext
@@ -435,6 +440,7 @@ public class AccountServiceImpl implements AccountService {
 
   private void updateSurPlusQuota(Long accountCode, BigDecimal oldMaxQuota, BigDecimal surplusQuota,
       BigDecimal newMaxQuota, String updateUser, Boolean credit, String merCode) {
+
     if (credit) {
       AccountAmountTypeService accountAmountTypeService = SpringBeanUtils.getBean(AccountAmountTypeService.class);
       AccountAmountType accountAmountType = accountAmountTypeService
@@ -446,9 +452,7 @@ public class AccountServiceImpl implements AccountService {
         accountAmountTypeMapper.insert(addAccountAmountType);
         accountCustomizeMapper
             .updateMaxAndSurplusQuota(accountCode.toString(), newMaxQuota, newMaxQuota, updateUser);
-        return;
-      }
-      if (null != accountAmountType) {
+      }else{
         //判断剩余授信额度  如果是增加,那么额度就是
         if (surplusQuota.compareTo(oldMaxQuota.subtract(newMaxQuota)) < 0) {
           throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);

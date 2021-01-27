@@ -168,12 +168,12 @@ WHERE a.mer_code = at.mer_code
     ss.store_name AS storeName,
     abd.trans_type AS transType,
     CASE
-    when abd.trans_type = 'deposit' then "充值"
+    when abd.trans_type = 'deposit_incr' then "充值"
     when abd.trans_type = 'consume' then "消费"
     when abd.trans_type = 'refund' then "退款"
     END as transTypeString,
     CASE
-    WHEN abd.trans_type = 'deposit' THEN
+    WHEN abd.trans_type = 'deposit_incr' THEN
     trans_amount
     WHEN abd.trans_type = 'consume' THEN
     trans_amount * ( - 1 )
@@ -201,7 +201,7 @@ WHERE a.mer_code = at.mer_code
     SUM(
     CASE
 
-    WHEN abd.trans_type = 'deposit' THEN
+    WHEN abd.trans_type = 'deposit_incr' THEN
     trans_amount
     WHEN abd.trans_type = 'consume' THEN
     trans_amount * ( - 1 )

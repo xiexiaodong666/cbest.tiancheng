@@ -263,11 +263,11 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
      */
     private void operatorMerAccountByType(String merCode, WelfareConstant.MerCreditType merCreditType, BigDecimal amount, String transNo){
         if (merCreditType == WelfareConstant.MerCreditType.REBATE_LIMIT) {
-            merchantCreditService.decreaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.RESET_DECR.code());
+            merchantCreditService.decreaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.DEPOSIT_DECR.code());
         } else if (merCreditType == WelfareConstant.MerCreditType.CREDIT_LIMIT) {
             merchantCreditService.setAccountType(merCode,merCreditType,amount,transNo);
         } else {
-            merchantCreditService.increaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.RESET_INCR.code());
+            merchantCreditService.increaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.DEPOSIT_INCR.code());
         }
     }
 }

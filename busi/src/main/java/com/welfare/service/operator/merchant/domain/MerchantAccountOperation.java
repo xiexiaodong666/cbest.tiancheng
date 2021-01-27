@@ -21,6 +21,7 @@ public class MerchantAccountOperation {
     private BigDecimal amount;
     private IncOrDecType incOrDecType;
     private MerchantBillDetail merchantBillDetail;
+    private MerchantCredit merchantCredit;
     /**
      * 返回一个MerchantAccountOperation
      * @param operateType

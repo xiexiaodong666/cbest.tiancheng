@@ -50,7 +50,7 @@ public interface MerchantCreditService {
    * @param transType
    * @return
    */
-  List<MerchantAccountOperation> doOperateAccount(String merCode,
+  List<MerchantAccountOperation> doOperateAccount(MerchantCredit merCode,
                                                   BigDecimal amount,
                                                   String transNo,
                                                   AbstractMerAccountTypeOperator merAccountTypeOperator, String transType);

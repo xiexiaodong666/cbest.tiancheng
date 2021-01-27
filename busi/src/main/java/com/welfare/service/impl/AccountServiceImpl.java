@@ -21,6 +21,7 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
@@ -73,11 +74,7 @@ import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -124,7 +121,8 @@ public class AccountServiceImpl implements AccountService {
   private final MerchantAccountTypeService merchantAccountTypeService;
   private final AccountAmountTypeMapper accountAmountTypeMapper;
   private final RedissonClient redissonClient;
-  private final AccountAmountTypeService accountAmountTypeService;
+  @Autowired
+  private AccountAmountTypeService accountAmountTypeService;
   private final AccountBillDetailMapper accountBillDetailMapper;
   private final AccountDeductionDetailMapper accountDeductionDetailMapper;
 
@@ -485,19 +483,18 @@ public class AccountServiceImpl implements AccountService {
     BigDecimal transAmout =null;
     if (oldMaxQuota.compareTo(newMaxQuota) < 0) {
       //变大
-      transType = TransType.RESET;
+      transType = TransType.RESET_INCR;
       transAmout = newMaxQuota.subtract(oldMaxQuota);
     } else if (oldMaxQuota.compareTo(newMaxQuota) > 0) {
       //变小
-      transType = TransType.RESET;
+      transType = TransType.RESET_DECR;
       transAmout = oldMaxQuota.subtract(newMaxQuota);
     } else {
       //不变
       return;
     }
-    Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
     Account account = this.getByAccountCode(accountCode);
-    String transNo = null;
+    String transNo = String.valueOf(sequenceService.nextNo(WelfareConstant.SequenceType.RESET_ACCOUNT_SURPLUS_QUOTA.code()));;
     AccountBillDetail accountBillDetail = getAccountBillDetail(accountCode,
         transType, transAmout, account,transNo);
     accountBillDetailMapper.insert(accountBillDetail);
@@ -702,4 +699,45 @@ public class AccountServiceImpl implements AccountService {
     BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
     return accountDetailDTO;
   }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void restoreSurplusQuotaByMerCode(String merCode) {
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Account.MER_CODE, merCode);
+        queryWrapper.eq(Account.CREDIT, Boolean.TRUE);
+        List<Account> accounts = accountDao.list(queryWrapper);
+        String updateUser = UserInfoHolder.getUserInfo().getUserId();
+        if (CollectionUtils.isNotEmpty(accounts)) {
+            accounts.forEach(account -> {
+                restoreSurplusQuotaByAccountCode(account.getAccountCode(), updateUser);
+            });
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser) {
+        String lockKey = ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + accountCode;
+        RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
+        try {
+            QueryWrapper<Account> queryCredit = new QueryWrapper<>();
+            queryCredit.eq(Account.ACCOUNT_CODE, accountCode);
+            queryCredit.eq(Account.CREDIT, Boolean.TRUE);
+            Account account = accountDao.getOne(queryCredit);
+            if (Objects.nonNull(account)) {
+                int isSuccess = accountCustomizeMapper.restoreAccountSurplusQuota(account.getAccountCode(),updateUser);
+                if (isSuccess > 0) {
+                    accountAmountTypeMapper.updateBalance(
+                            account.getAccountCode(),
+                            MerAccountTypeCode.SURPLUS_QUOTA.code(),
+                            account.getMaxQuota(),
+                            updateUser
+                    );
+                }
+            }
+        } finally {
+            DistributedLockUtil.unlock(accountLock);
+        }
+    }
 }

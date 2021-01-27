@@ -53,6 +53,13 @@
 
   </update>
 
+  <update id="restoreAccountSurplusQuota">
+    UPDATE
+    <include refid="tableName"/>
+    set surplus_quota = max_quota, update_user = #{updateUser},update_time =
+    now(),version = version + 1 where account_code = #{accountCode}
+    and credit = 1 and deleted = 0
+  </update>
 
   <select id="queryByConsumeSceneIdList" resultMap="accountMap">
     select

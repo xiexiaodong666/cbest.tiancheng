@@ -32,7 +32,7 @@ logging:
   file:
     path: /home/finance/Logs/e-welfare-account.e-cbest.lotest
   level:
-    root: warn
+    root: info
     #com.welfare.persist.mapper: debug
 encrypt:
   file: ${config.file:classpath:config/config.properties}

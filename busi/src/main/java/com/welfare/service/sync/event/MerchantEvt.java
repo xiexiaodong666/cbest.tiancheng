@@ -30,7 +30,7 @@ public class MerchantEvt implements BusEvent {
   private ShoppingActionTypeEnum typeEnum;
   private List<MerchantSyncDTO> merchantDetailDTOList;
   //业务发生时间
-  private Date timestamp=new Date();
+  protected Date timestamp;
   @Override
   public Long getSearchKey1() {
     return typeEnum.getEvtType();

@@ -272,10 +272,16 @@ public class AccountServiceImpl implements AccountService {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<Account>();
     accountQueryWrapper.eq(Account.ACCOUNT_STATUS,accountStatus);
     List<Account> accountList = accountDao.list(accountQueryWrapper);
-    for( Account account : accountList ){
-      assemableAccount(account);
+
+    List<AccountChangeEventRecord> recordList = AccountUtils
+        .getEventList(accountList, AccountChangeType.ACCOUNT_NEW);
+    accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
+
+    for( Account account :  accountList){
+      account.setAccountStatus(AccountStatus.ENABLE.getCode());
     }
     accountDao.updateBatchById(accountList);
+
     applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
         .accountList(accountList).build());
   }
@@ -596,9 +602,7 @@ public class AccountServiceImpl implements AccountService {
       List<AccountChangeEventRecord> recordList = AccountUtils
           .getEventList(accountList, AccountChangeType.ACCOUNT_NEW);
       accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
-      //批量回写
-      List<Map<String, Object>> mapList = AccountUtils.getMaps(recordList);
-      this.batchUpdateChangeEventId(mapList);
+
       List<Long> codeList = accountList.stream().map(account -> {
         return account.getAccountCode();
       }).collect(Collectors.toList());

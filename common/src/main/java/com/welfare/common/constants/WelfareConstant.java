@@ -197,7 +197,9 @@ public class WelfareConstant {
          */
         CONSUME("consume","消费"),
         DEPOSIT("deposit","充值"),
-        REFUND("refund","退款");
+        REFUND("refund","退款"),
+        REBATE("rebate","返利"),
+        RESET("reset","设置");
         private final String code;
         private final String desc;
 

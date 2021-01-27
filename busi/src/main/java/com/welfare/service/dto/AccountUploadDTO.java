@@ -26,6 +26,4 @@ public class AccountUploadDTO extends BaseRowModel {
   private String accountTypeCode;
   @ExcelProperty(value = "所属部门", index = 5)
   private String storeCode;
-  @ExcelProperty(value = "创建人姓名", index = 6)
-  private String createUser;
 }

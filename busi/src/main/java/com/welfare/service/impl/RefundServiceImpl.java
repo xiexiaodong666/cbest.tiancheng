@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
+import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -15,12 +16,9 @@ import com.welfare.service.operator.payment.domain.RefundOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -66,7 +64,7 @@ public class RefundServiceImpl implements RefundService {
         );
         Assert.isTrue(!CollectionUtils.isEmpty(accountDeductionDetails), "未找到正向支付流水");
         AccountDeductionDetail first = accountDeductionDetails.get(0);
-        String lockKey = "account:" + first.getAccountCode();
+        String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + first.getAccountCode();
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
             Account account = accountService.getByAccountCode(first.getAccountCode());
@@ -212,7 +210,8 @@ public class RefundServiceImpl implements RefundService {
                 account.getMerCode(),
                 WelfareConstant.MerCreditType.REMAINING_LIMIT,
                 refundDeductionDetail.getTransAmount(),
-                refundDeductionDetail.getTransNo()
+                refundDeductionDetail.getTransNo(),
+                WelfareConstant.TransType.REFUND.code()
         );
     }
 

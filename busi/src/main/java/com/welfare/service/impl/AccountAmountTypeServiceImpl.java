@@ -72,7 +72,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
 
     @Override
     public void updateAccountAmountType(Deposit deposit) {
-        RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + deposit.getAccountCode());
+        RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
         lock.lock();
         try{
             AccountAmountType accountAmountType = this.queryOne(deposit.getAccountCode(),

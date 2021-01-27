@@ -36,9 +36,10 @@ public interface MerchantCreditService {
    * @param merCreditType
    * @param amount
    * @param transNo
+   * @param transType
    * @return
    */
-  List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
+  List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType);
 
   /**
    * 操作商户金额
@@ -46,12 +47,13 @@ public interface MerchantCreditService {
    * @param amount
    * @param transNo
    * @param merAccountTypeOperator
+   * @param transType
    * @return
    */
   List<MerchantAccountOperation> doOperateAccount(String merCode,
                                                   BigDecimal amount,
                                                   String transNo,
-                                                  AbstractMerAccountTypeOperator merAccountTypeOperator);
+                                                  AbstractMerAccountTypeOperator merAccountTypeOperator, String transType);
 
   /**
    * 增加额度
@@ -59,8 +61,9 @@ public interface MerchantCreditService {
    * @param merCreditType
    * @param amount
    * @param transNo
+   * @param transType
    */
-  void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
+  void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType);
 
   /**
    * 设置额度

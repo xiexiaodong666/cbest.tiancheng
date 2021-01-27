@@ -31,6 +31,8 @@ public class OrderReqDto implements Serializable {
     private BigDecimal hightPrice;
     @ApiModelProperty(value = "商户编码" , required = false)
     private String merchantCode;
+    @ApiModelProperty(value = "供应商编码" , required = false)
+    private String supplierMerchantCode;
     @ApiModelProperty(value = "开始时间" , required = false)
     private String startDateTime;
     @ApiModelProperty(value = "结束时间" , required = false)
@@ -41,4 +43,6 @@ public class OrderReqDto implements Serializable {
     private Integer current;
     @ApiModelProperty(value = "页数据" , required = false)
     private Integer size;
+    @ApiModelProperty(value = "调用方[商户端:MERCHANT , 供应商：SUPPLIER , 平台端: PLATFORM]" , required = false)
+    private String type;
 }

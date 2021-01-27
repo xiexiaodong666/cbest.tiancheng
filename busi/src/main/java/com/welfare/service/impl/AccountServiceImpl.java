@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.AccountChangeType;
+import com.welfare.common.constants.AccountStatus;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
@@ -271,21 +272,28 @@ public class AccountServiceImpl implements AccountService {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<Account>();
     accountQueryWrapper.eq(Account.ACCOUNT_STATUS,accountStatus);
     List<Account> accountList = accountDao.list(accountQueryWrapper);
-    for( Account account : accountList ){
-      assemablChangeEventIdAccount(account);
+
+    List<AccountChangeEventRecord> recordList = AccountUtils
+        .getEventList(accountList, AccountChangeType.ACCOUNT_NEW);
+    accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
+
+    for( Account account :  accountList){
+      account.setAccountStatus(AccountStatus.ENABLE.getCode());
     }
-    batchSave(accountList);
+    accountDao.updateBatchById(accountList);
+
     applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
         .accountList(accountList).build());
   }
 
-  private void assemablChangeEventIdAccount(Account account) {
+  private void assemableAccount(Account account) {
     //修改account 成正常的状态
     AccountChangeEventRecord accountChangeEventRecord = AccountUtils
         .assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, account.getAccountCode(),
             account.getCreateUser());
     accountChangeEventRecordService.save(accountChangeEventRecord);
     account.setChangeEventId(accountChangeEventRecord.getId());
+    account.setAccountStatus(AccountStatus.ENABLE.getCode());
   }
 
   @Override
@@ -594,9 +602,7 @@ public class AccountServiceImpl implements AccountService {
       List<AccountChangeEventRecord> recordList = AccountUtils
           .getEventList(accountList, AccountChangeType.ACCOUNT_NEW);
       accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
-      //批量回写
-      List<Map<String, Object>> mapList = AccountUtils.getMaps(recordList);
-      this.batchUpdateChangeEventId(mapList);
+
       List<Long> codeList = accountList.stream().map(account -> {
         return account.getAccountCode();
       }).collect(Collectors.toList());

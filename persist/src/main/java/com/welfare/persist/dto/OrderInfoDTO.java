@@ -1,4 +1,4 @@
-package com.welfare.persist.entity;
+package com.welfare.persist.dto;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -26,133 +26,104 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-@Accessors(chain = true)
-@TableName("order_info")
 @ApiModel("")
-public class OrderInfo extends Model<OrderInfo> implements Serializable {
+public class OrderInfoDTO extends Model<OrderInfoDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId
 	private Integer id;
     /**
      * 订单号
      */
-    @ApiModelProperty("订单号")   
     private String orderId;
 
     /**
      * 交易流水号
      */
-    @ApiModelProperty("交易流水号")
     private String transNo;
 
     /**
      * 退款流水号
      */
-    @ApiModelProperty("退款流水号")
     private String returnTransNo;
     /**
      * 商品
      */
-    @ApiModelProperty("商品")   
     private String goods;
     /**
      * 商户代码
      */
-    @ApiModelProperty("商户代码")   
     private String merchantCode;
     /**
      * 商户名称
      */
-    @ApiModelProperty("商户名称")   
     private String merchantName;
+
+    private String accountMerCode;
+
+    private String accountMerName;
     /**
      * 门店编码
      */
-    @ApiModelProperty("门店编码")   
     private String storeCode;
     /**
      * 门店名称
      */
-    @ApiModelProperty("门店名称")   
     private String storeName;
     /**
      * 账户
      */
-    @ApiModelProperty("账户")
     private Long accountCode;
     /**
-     * 账户所属商户编码
-     */
-    @ApiModelProperty("账户所属商户编码")
-    private String accountMerCode;
     /**
      * 账户名称
      */
-    @ApiModelProperty("账户名称")   
     private String accountName;
     /**
      * 交易类型
      */
-    @ApiModelProperty("交易类型")   
     private String transType;
     /**
      * 交易类型名称
      */
-    @ApiModelProperty("交易类型名称")   
     private String transTypeName;
     /**
      * 卡号
      */
-    @ApiModelProperty("卡号")   
     private Integer cardId;
     /**
      * 订单金额
      */
-    @ApiModelProperty("订单金额")   
     private BigDecimal orderAmount;
     /**
      * 订单时间
      */
-    @ApiModelProperty("订单时间")   
     private Date orderTime;
     /**
      * 支付编码
      */
-    @ApiModelProperty("支付编码")   
     private String payCode;
     /**
      * 支付名称
      */
-    @ApiModelProperty("支付名称")   
     private String payName;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")   
-    @TableField(fill = FieldFill.INSERT)
 	private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")   
-    @TableField(fill = FieldFill.INSERT)
 	private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")   
-    @TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")   
-    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
 
 //以下为列明常量

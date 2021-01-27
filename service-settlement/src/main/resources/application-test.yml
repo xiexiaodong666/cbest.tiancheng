@@ -30,8 +30,8 @@ spring:
     database: 0
   kafka:
     servers: 192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667
-    topic: order_info
-    group-id: e-welfare
+    topic: test-order_info
+    group-id: xx-e-welfare
     offset: latest
 logging:
   file:

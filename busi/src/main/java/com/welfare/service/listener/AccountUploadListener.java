@@ -57,8 +57,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
         !headMap.get(2).equals("手机号") ||
         !headMap.get(3).equals("账号状态(1正常2锁定)") ||
         !headMap.get(4).equals("员工类型编码") ||
-        !headMap.get(5).equals("所属部门(代码)") ||
-        !headMap.get(6).equals("创建人姓名")) {
+        !headMap.get(5).equals("所属部门(代码)")) {
       rowHeadIsOK = false;
       return;
     }
@@ -70,6 +69,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       return;
     }
     Account account = new Account();
+    account.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
     BeanUtils.copyProperties(accountUploadDTO, account);
     Boolean validate = validationAccount(account);
     if (validate.booleanValue() == true) {

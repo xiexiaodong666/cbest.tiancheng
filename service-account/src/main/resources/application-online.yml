@@ -69,3 +69,7 @@ xxl:
       logpath: /data/Logs/e-welfare-account/jobhandler/
       logretentiondays: 30
     accessToken:
+
+notification:
+  url: http://welfare-internal.kube.cbestcd.com
+  targetPath: https://welfare-app.sjgo365.com/tc/redirect?target=center

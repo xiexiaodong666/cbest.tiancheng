@@ -21,6 +21,7 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.CardApplyDao;
@@ -110,6 +111,7 @@ public class AccountServiceImpl implements AccountService {
   private final CardApplyDao cardApplyDao;
   private final ShoppingFeignClient shoppingFeignClient;
   private final ObjectMapper mapper;
+  @Autowired
   private final MerchantService merchantService;
   private final DepartmentService departmentService;
   private final SequenceService sequenceService;
@@ -121,8 +123,6 @@ public class AccountServiceImpl implements AccountService {
   private final MerchantAccountTypeService merchantAccountTypeService;
   private final AccountAmountTypeMapper accountAmountTypeMapper;
   private final RedissonClient redissonClient;
-  @Autowired
-  private AccountAmountTypeService accountAmountTypeService;
   private final AccountBillDetailMapper accountBillDetailMapper;
   private final AccountDeductionDetailMapper accountDeductionDetailMapper;
 
@@ -442,6 +442,7 @@ public class AccountServiceImpl implements AccountService {
       BigDecimal newMaxQuota, String updateUser, Boolean credit, String merCode) {
 
     if (credit) {
+      AccountAmountTypeService accountAmountTypeService = SpringBeanUtils.getBean(AccountAmountTypeService.class);
       AccountAmountType accountAmountType = accountAmountTypeService
           .queryOne(accountCode, MerAccountTypeCode.SURPLUS_QUOTA.code());
       if (null == accountAmountType) {

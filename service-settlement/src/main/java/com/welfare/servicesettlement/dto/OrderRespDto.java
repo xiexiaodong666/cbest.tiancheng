@@ -25,14 +25,18 @@ public class OrderRespDto implements Serializable {
     private String orderId;
     @ApiModelProperty("商品")
     private String goods;
-    @ApiModelProperty("所属商户")
+    @ApiModelProperty("供应商名称")
     private String merchantName;
-    @ApiModelProperty("商户代码")
+    @ApiModelProperty("供应商编码")
     private String merchantCode;
     @ApiModelProperty("买家名称")
     private String accountName;
     @ApiModelProperty("买家账号")
     private Long accountCode;
+    @ApiModelProperty("买家所属客户编码")
+    private String accountMerCode;
+    @ApiModelProperty("买家所属客户名称")
+    private String accountMerName;
     @ApiModelProperty("买家卡号")
     private String accountCardId;
     @ApiModelProperty("门店编码")

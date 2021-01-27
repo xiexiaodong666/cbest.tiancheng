@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.*;
+import com.welfare.persist.dto.OrderInfoDTO;
 import com.welfare.persist.dto.query.OrderPageQuery;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountMapper;
@@ -97,13 +98,12 @@ public class OrderServiceImpl implements OrderService {
     private MerchantCreditService merchantCreditService;
     @Autowired
     private MerchantCreditDao merchantCreditDao;
-    private static boolean RUN = false;
 
     @Override
-    public Page<OrderInfo> selectPage(Page page, OrderReqDto orderReqDto) {
+    public Page<OrderInfoDTO> selectPage(Page page, OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
         QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(SupplierStore.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
+        queryWrapper.eq(SupplierStore.MER_CODE, orderReqDto.getMerchantCode());
         //查询供应商下所有门店
         List<SupplierStore> supplierStoreList = supplierStoreDao.list(queryWrapper);
         List<String> supplierStoreCodeList = new ArrayList<>();
@@ -135,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
         }
         //当没有检测到有配置门店，此时不能查询到订单数据
         if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1) {
-            Page<OrderInfo> orderInfoPage = new Page<>();
+            Page<OrderInfoDTO> orderInfoPage = new Page<>();
             return orderInfoPage;
         }
         //没有配置返利门店
@@ -197,12 +197,76 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
         orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
 
-        Page<OrderInfo> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
-        return orderInfoPage;
+//        Page<OrderInfoDTO> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
+//        return orderInfoPage;
+        return null;
     }
 
+
+    public Page<OrderInfoDTO> selectPage1(Page page, OrderReqDto orderReqDto){
+        //判断是哪一端查询
+        OrderPageQuery orderPageQuery = new OrderPageQuery();
+        if ("SUPPLIER".equals(orderReqDto.getType())){
+            orderPageQuery.setSupplierMerCode(orderReqDto.getSupplierMerchantCode());
+        }else if ("MERCHANT".equals(orderReqDto.getType())){
+            //客户-判断该客户下配置的消费门店以及返利配置
+            orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
+        }else{
+            //平台端
+            // 传入了 客户编码  供应商门店编码， 客户编码查询配置的消费门店何返利配置
+            orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
+            orderPageQuery.setSupplierMerCode(orderReqDto.getSupplierMerchantCode());
+        }
+        // 判断用户传入的门店集合是否在上述商户关联门店中
+        //构建查询条件
+
+        orderPageQuery.setOrderId((orderReqDto.getOrderId()));
+        orderPageQuery.setStoreList(orderReqDto.getStoreIds());
+        orderPageQuery.setAccountName((orderReqDto.getConsumerName()));
+        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null : orderReqDto.getLowPrice().toPlainString());
+        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
+        orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
+        orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
+
+        Page<OrderInfoDTO> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
+        return orderInfoPage;
+
+    }
+
+    public OrderSummary selectSummary1(OrderReqDto orderReqDto){
+        //判断是哪一端查询
+        OrderPageQuery orderPageQuery = new OrderPageQuery();
+        if ("SUPPLIER".equals(orderReqDto.getType())){
+            orderPageQuery.setSupplierMerCode(orderReqDto.getSupplierMerchantCode());
+        }else if ("MERCHANT".equals(orderReqDto.getType())){
+            //客户-判断该客户下配置的消费门店以及返利配置
+            orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
+        }else{
+            //平台端
+            // 传入了 客户编码  供应商门店编码， 客户编码查询配置的消费门店何返利配置
+            orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
+            orderPageQuery.setSupplierMerCode(orderReqDto.getSupplierMerchantCode());
+        }
+        // 判断用户传入的门店集合是否在上述商户关联门店中
+        //构建查询条件
+
+        orderPageQuery.setOrderId((orderReqDto.getOrderId()));
+        orderPageQuery.setStoreList(orderReqDto.getStoreIds());
+        orderPageQuery.setAccountName((orderReqDto.getConsumerName()));
+        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null : orderReqDto.getLowPrice().toPlainString());
+        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
+        orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
+        orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
+
+        OrderSummary orderSummary = orderMapper.searchOrderSum( orderPageQuery);
+        return orderSummary;
+
+    }
+
+
+
     @Override
-    public List<OrderInfo> selectList(OrderReqDto orderReqDto) {
+    public List<OrderInfoDTO> selectList(OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
         //根据当前用户查询所在组织的配置门店情况
         QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
@@ -300,7 +364,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setPageNo(orderReqDto.getCurrent());
         orderPageQuery.setPageSize(orderReqDto.getSize());
 
-        List<OrderInfo> orderInfoList = orderMapper.searchOrder(orderPageQuery);
+        List<OrderInfoDTO> orderInfoList = orderMapper.searchOrder(orderPageQuery);
         return orderInfoList;
     }
 

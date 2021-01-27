@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.controller;
 
+import com.welfare.service.AccountService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
 import io.swagger.annotations.Api;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class MerchantCreditController implements IController {
 
     private final MerchantCreditService merchantCreditService;
+
+    private final AccountService accountService;
 
     @PostMapping("/restore/remainingLimit")
     @ApiOperation("恢复商户剩余信用额度")

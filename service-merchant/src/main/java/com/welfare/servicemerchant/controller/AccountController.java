@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -236,4 +237,15 @@ public class AccountController implements IController {
   public R<AccountDetailDTO> detailByPhoneAndMer(@RequestParam(required = false) @ApiParam(value = "员工手机号")  String phone){
     return success(accountService.queryDetailPhoneAndMer(phone));
   }
+
+//  @ApiOperation("测试")
+//  @PostMapping(value = "/test/{merCode}")
+//  public R<String> merCode(@PathVariable String merCode) {
+//    try {
+//      accountService.asyncRestoreSurplusQuotaByMerCode(merCode);
+//    } catch (BusiException be) {
+//      return R.fail(be.getMessage());
+//    }
+//    return R.success();
+//  }
 }

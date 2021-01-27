@@ -82,4 +82,17 @@ public interface AccountService {
   void batchBindCard(List<CardInfo> cardInfoList,List<Account> accountList);
   void batchUpload(List<Account> accountList);
   AccountDetailDTO queryDetailPhoneAndMer(String phone);
+
+  /**
+   * 恢复商户下所有已开通信用额度的账户的额度
+   * @param merCode
+   */
+  void restoreSurplusQuotaByMerCode(String merCode);
+
+  /**
+   * 恢复的账户的额度
+   * @param accountCode
+   * @param updateUser
+   */
+  void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser);
 }

@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Description:
@@ -57,7 +59,7 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
         BigDecimal add = amount.add(remainingLimit).subtract(creditLimit);
         if (add.compareTo(BigDecimal.ZERO) > 0) {
             // 超过信用额度
-            return doWhenMoreThan(merchantCredit,add,transNo, transType);
+            return doWhenMoreThan(merchantCredit,add,transNo,transType);
         } else {
             merchantCredit.setRemainingLimit(remainingLimit.add(amount));
             MerchantAccountOperation remainingLimitOperator = MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo, transType);
@@ -66,36 +68,32 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
     }
 
     @Override
-    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo, String transType){
-        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "结算金额超过信用额度", null);
+    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo, String transType) {
+        AbstractMerAccountTypeOperator nextOperator = getNext();
+        if (Objects.isNull(nextOperator)) {
+            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
+        }
+        List<MerchantAccountOperation> operations = new ArrayList<>();
+        BigDecimal creditLimit = merchantCredit.getCreditLimit();
+        BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
+        // 加剩余信用额度
+        merchantCredit.setRemainingLimit(creditLimit);
+        MerchantAccountOperation remainingLimitOperation = MerchantAccountOperation.of(
+                merCreditType,
+                creditLimit.subtract(remainingLimit),
+                IncOrDecType.INCREASE,
+                merchantCredit,
+                transNo,
+                transType
+        );
+        if(remainingLimitOperation.getAmount().compareTo(BigDecimal.ZERO) != 0){
+            operations.add(remainingLimitOperation);
+        }
+        // 加余额
+        List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo, transType);
+        operations.addAll(moreOperations);
+        return operations;
     }
-
-//    @Override
-//    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo) {
-//        AbstractMerAccountTypeOperator nextOperator = getNext();
-//        if (Objects.isNull(nextOperator)) {
-//            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
-//        }
-//        List<MerchantAccountOperation> operations = new ArrayList<>();
-//        BigDecimal creditLimit = merchantCredit.getCreditLimit();
-//        BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
-//        // 加剩余信用额度
-//        merchantCredit.setRemainingLimit(creditLimit);
-//        MerchantAccountOperation remainingLimitOperation = MerchantAccountOperation.of(
-//                merCreditType,
-//                creditLimit.subtract(remainingLimit),
-//                IncOrDecType.INCREASE,
-//                merchantCredit,
-//                transNo
-//        );
-//        if(remainingLimitOperation.getAmount().compareTo(BigDecimal.ZERO) != 0){
-//            operations.add(remainingLimitOperation);
-//        }
-//        // 加余额
-//        List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo);
-//        operations.addAll(moreOperations);
-//        return operations;
-//    }
 
     @Override
     public void afterPropertiesSet() throws Exception {

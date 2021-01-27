@@ -9,54 +9,39 @@
         id,account_code,card_id,bill_no,order_time,bill_type,store_code,real_amount,account_balance,pos,create_user,create_time,payment_type,update_user,update_time,flag,version
     </sql>
 
-    <resultMap id="accountBillDetailSimpleDTO" type="com.welfare.persist.dto.AccountBillDetailSimpleDTO" >
-        <id column="adbid"/>
-        <result property="storeCode" column="store_code"/>
-        <result property="storeName" column="store_name"/>
-        <result property="transType" column="trans_type"/>
-        <result property="transAmount" column="trans_amount"/>
-        <result property="transTime" column="trans_time"/>
-        <result property="channel" column="channel"/>
-        <collection property="deductionList" ofType="com.welfare.persist.dto.AccountBillDetailSimpleDeductionDTO">
-            <id column="adedid"/>
-            <result property="merAccountTypeCode" column="mer_account_type_code"/>
-            <result property="merAccountTypeName" column="mer_account_type_name"/>
-            <result property="accountDeductionAmount" column="account_deduction_amount"/>
-        </collection>
-    </resultMap>
-
-    <select id="selectAccountBillDetailSimpleList" resultMap="accountBillDetailSimpleDTO" parameterType="com.welfare.persist.dto.query.AccountBillDetailSimpleReq">
+    <select id="selectAccountBillDetailSimpleList" resultType="com.welfare.persist.dto.AccountBillDetailSimpleDTO" parameterType="com.welfare.persist.dto.query.AccountBillDetailSimpleReq">
         SELECT
         abd.id AS adbid,
-        abd.store_code,
-        IF(abd.trans_type='deposit',m.mer_name,ss.store_name) AS store_name,
-        abd.trans_type,
-        abd.trans_amount,
-        abd.trans_time,
+        IFNULL(aded.store_code,abd.store_code) AS storeCode,
+        IFNULL(ss.store_name,m.mer_name) AS storeName,
+        IFNULL(aded.trans_type,abd.trans_type) AS transType,
+        IFNULL(aded.trans_amount,abd.trans_amount) AS transAmount,
+        IFNULL(aded.trans_time,abd.trans_time) AS transTime,
         abd.channel,
         aded.id as adedid,
-        mat.mer_account_type_code,
-        mat.mer_account_type_name,
-        aded.account_deduction_amount
+        mat.mer_account_type_code AS merAccountTypeCode,
+        mat.mer_account_type_name AS merAccountTypeName
         FROM
-        account_bill_detail abd
+        (SELECT id,account_code,trans_no,store_code,trans_type,sum(trans_amount) AS trans_amount,trans_time,channel FROM account_bill_detail
+        <where>
+            <if test="accountCode != null">
+                AND account_code = #{accountCode}
+            </if>
+            <if test="startTransTime != null ">
+                <![CDATA[AND trans_time >= #{startTransTime}]]>
+            </if>
+            <if test="endTransTime != null ">
+                <![CDATA[AND trans_time <= #{endTransTime}]]>
+            </if>
+        </where>
+        GROUP BY trans_no
+        ORDER BY trans_time DESC
+        ) abd
         JOIN account a ON abd.account_code=a.account_code
         JOIN merchant m ON a.mer_code=m.mer_code
         LEFT JOIN account_deduction_detail aded ON abd.trans_no = aded.trans_no
         LEFT JOIN supplier_store ss ON abd.store_code = ss.store_code
-        LEFT JOIN merchant_account_type mat ON aded.mer_account_type = mat.mer_account_type_code
-        <where>
-            <if test="accountCode != null">
-                AND abd.account_code = #{accountCode}
-            </if>
-            <if test="startTransTime != null ">
-                <![CDATA[AND abd.trans_time >= #{startTransTime}]]>
-            </if>
-            <if test="endTransTime != null ">
-                <![CDATA[AND abd.trans_time <= #{endTransTime}]]>
-            </if>
-        </where>
-        ORDER BY abd.trans_time DESC
+        LEFT JOIN merchant_account_type mat ON aded.mer_account_type = mat.mer_account_type_code AND a.mer_code=mat.mer_code
     </select>
 
 </mapper>

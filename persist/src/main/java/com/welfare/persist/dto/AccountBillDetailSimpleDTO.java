@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 import lombok.Data;
 
 @Data
@@ -34,6 +33,12 @@ public class AccountBillDetailSimpleDTO {
     @ApiModelProperty("渠道")
     private String channel;
 
-    @ApiModelProperty("扣款详情")
-    private List<AccountBillDetailSimpleDeductionDTO> deductionList;
+    @ApiModelProperty("账户类型名称")
+    private String merAccountTypeCode;
+
+    @ApiModelProperty("账户类型名称")
+    private String merAccountTypeName;
+
+//    @ApiModelProperty("子账户扣款金额")
+//    private BigDecimal accountDeductionAmount;
 }

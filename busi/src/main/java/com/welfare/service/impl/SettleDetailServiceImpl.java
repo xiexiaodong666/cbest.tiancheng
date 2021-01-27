@@ -149,6 +149,10 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
 
+        if(monthSettle.getSettleAmount().compareTo(new BigDecimal(0)) == -1){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "结算金额为负，无法生成结算单", null);
+        }
+
         List<SettleStatisticsInfoDTO> settleStatisticsInfoDTOList = settleDetailMapper.getSettleStatisticsInfoByCondition(welfareSettleDetailQuery);
         if (!settleStatisticsInfoDTOList.isEmpty()) {
             monthSettle.setSettleStatisticsInfo(JSONObject.toJSONString(settleStatisticsInfoDTOList));

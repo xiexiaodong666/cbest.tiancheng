@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @email yuxiang.li@sjgo365.com
  * @date 1/27/2021
  */
-@FeignClient(value = "notificationFeign", url = "${notification.url:http://172.30.37.188:10016}", fallbackFactory = NotificationFallback.class)
+@FeignClient(value = "notificationFeign", url = "${notification.url:http://test-welfare-internal.kube.cbestcd.com}", fallbackFactory = NotificationFallback.class)
 public interface NotificationFeign {
 
     /**

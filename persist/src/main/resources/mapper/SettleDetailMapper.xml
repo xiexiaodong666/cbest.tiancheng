@@ -145,8 +145,11 @@
                 <when test="storeType=='self'">
                     and t3.mer_code = t1.mer_code
                 </when>
-                <when test="storeType=='third'">
-                    and t3.mer_code != t1.mer_code
+                <when test="storeType=='third_online'">
+                    and t3.mer_code != t1.mer_code and t1.pos = t3.cashier_no
+                </when>
+                <when test="storeType=='third_offline'">
+                    and t3.mer_code != t1.mer_code and t1.pos != t3.cashier_no
                 </when>
             </choose>
         </where>
@@ -355,8 +358,11 @@
                 <when test="storeType=='self'">
                     and t3.mer_code = t1.mer_code
                 </when>
-                <when test="storeType=='third'">
-                    and t3.mer_code != t1.mer_code
+                <when test="storeType=='third_online'">
+                    and t3.mer_code != t1.mer_code and t1.pos = t3.cashier_no
+                </when>
+                <when test="storeType=='third_offline'">
+                    and t3.mer_code != t1.mer_code and t1.pos != t3.cashier_no
                 </when>
             </choose>
             and t1.settle_flag='unsettled'

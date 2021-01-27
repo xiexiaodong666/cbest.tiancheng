@@ -86,11 +86,6 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
     @ApiModelProperty("账户")
     private Long accountCode;
     /**
-     * 账户所属商户编码
-     */
-    @ApiModelProperty("账户所属商户编码")
-    private String accountMerCode;
-    /**
      * 账户名称
      */
     @ApiModelProperty("账户名称")   

@@ -66,6 +66,7 @@ public class SupplierStoreController implements IController {
 
     @PostMapping("/add")
     @ApiOperation("新增供应商门店")
+    @ApiUser
     public R add(@RequestBody@Valid SupplierStoreAddDTO supplierStore){
         if(supplierStore.getConsumType().contains(ConsumeTypeEnum.O2O.getCode())
                 && EmptyChecker.isEmpty(supplierStore.getAddressList())){
@@ -76,23 +77,26 @@ public class SupplierStoreController implements IController {
 
     @PostMapping("/activate")
     @ApiOperation("更改供应商门店激活状态")
+    @ApiUser
     public R activate(@RequestBody@Valid  SupplierStoreActivateReq storeActivateReq){
         return R.status(supplierStoreService.activate(storeActivateReq),"更改激活状态失败");
     }
     @PostMapping("/batch-add")
     @ApiOperation("批量新增供应商门店")
+    @ApiUser
     public R batchAdd(@RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile){
         return R.success(supplierStoreService.upload(multipartFile));
     }
 
     @PostMapping("/delete/{id}")
     @ApiOperation("删除供应商门店")
+    @ApiUser
     public R delete(@PathVariable @NotBlank Long id){
         return R.status(supplierStoreService.delete(id),"删除失败");
     }
     @PostMapping("/update")
     @ApiOperation("编辑供应商门店")
-    //@ApiUser
+    @ApiUser
     public R update(@RequestBody@Valid  SupplierStoreUpdateDTO supplierStore){
         if(supplierStore.getConsumType().contains(ConsumeTypeEnum.O2O.getCode())
                 && EmptyChecker.isEmpty(supplierStore.getAddressList())){

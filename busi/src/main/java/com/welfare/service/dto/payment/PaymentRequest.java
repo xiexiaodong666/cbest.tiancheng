@@ -55,11 +55,13 @@ public abstract class PaymentRequest {
     private String refundTransNo;
     @ApiModelProperty("电话号码")
     private String phone;
+    private String paymentScene;
 
     public String calculatePaymentScene(){
         String consumeType = o2oOrOnlineShopping(machineNo);
         //不是O2O或者ONLINE_SHOPPING,则为到店消费
-        return consumeType == null ? ConsumeTypeEnum.SHOP_SHOPPING.getCode() :consumeType;
+        this.paymentScene =  consumeType == null ? ConsumeTypeEnum.SHOP_SHOPPING.getCode() :consumeType;
+        return paymentScene;
     }
 
     /**

@@ -14,6 +14,7 @@ import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
+import com.welfare.service.async.AsyncNotificationService;
 import com.welfare.service.dto.payment.CardPaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
@@ -61,7 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final SupplierStoreService supplierStoreService;
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantCreditDao merchantCreditDao;
-
+    private final AsyncNotificationService asyncNotificationService;
     PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
 
     @Override
@@ -82,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
-            chargeBeforePay(paymentRequest, account,supplierStore);
+            chargeBeforePay(paymentRequest, account, supplierStore);
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
             log.error("accountInfo:{}", account);
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
@@ -106,10 +107,12 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAccountCredit(account.getSurplusQuota());
             paymentRequest.setPhone(account.getPhone());
             return paymentRequest;
-
         } finally {
             DistributedLockUtil.unlock(accountLock);
             paymentRequestPerfMonitor.stop();
+            if(WelfareConstant.PaymentScene.OFFLINE_CBEST.code().equals(paymentRequest.getPaymentScene())){
+                asyncNotificationService.paymentNotify(paymentRequest.getPhone(),paymentRequest.getAmount());
+            }
         }
 
     }
@@ -120,7 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
      * @param account
      * @param supplierStore
      */
-    private void chargeBeforePay(PaymentRequest paymentRequest, Account account, SupplierStore supplierStore) {
+    private String chargeBeforePay(PaymentRequest paymentRequest, Account account, SupplierStore supplierStore) {
         Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()), "账户未启用");
         MerchantStoreRelation merStoreRelation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(paymentRequest.getStoreNo(), account.getMerCode());
         Assert.isTrue(EnableEnum.ENABLE.getCode().equals(merStoreRelation.getStatus()), "用户所在组织（公司）不支持在该门店消费或配置已禁用");
@@ -141,6 +144,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (!sceneConsumeTypes.contains(paymentScene)) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + paymentScene, null);
         }
+        return paymentScene;
     }
 
     @Override

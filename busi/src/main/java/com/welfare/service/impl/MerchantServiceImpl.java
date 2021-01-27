@@ -179,7 +179,7 @@ public class MerchantServiceImpl implements MerchantService {
         detailDTO.setId(save.getId());
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         syncList.add(detailDTO);
-        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
+        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).timestamp(new Date()).build());
         return flag&&flag2&flag3;
     }
 
@@ -201,7 +201,7 @@ public class MerchantServiceImpl implements MerchantService {
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
-        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).build());
+        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).timestamp(new Date()).build());
         return flag&&flag2;
     }
     private Merchant buildEntity(MerchantUpdateDTO merchant){

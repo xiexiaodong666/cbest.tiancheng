@@ -26,7 +26,7 @@ public class SupplierStoreEvt implements BusEvent {
     protected ShoppingActionTypeEnum typeEnum;
     protected List<SupplierStoreSyncDTO> supplierStoreDetailDTOS;
     //业务发生时间
-    private Date timestamp=new Date();
+    protected Date timestamp;
     @Override
     public Long getSearchKey1() {
         return typeEnum.getEvtType();

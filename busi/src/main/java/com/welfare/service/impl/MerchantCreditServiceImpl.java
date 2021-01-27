@@ -193,10 +193,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                 return;
             }
             MerchantCredit merchantCredit = creditService.getByMerCode(req.getMerCode());
-            if (merchantCredit.getRemainingLimit().add(req.getAmount()).compareTo(merchantCredit.getCreditLimit()) >0) {
+            if (merchantCredit.getRemainingLimit().add(req.getAmount()).compareTo(merchantCredit.getCreditLimit()) > 0) {
                 throw new BusiException("结算金额超过商户最大信用额度！");
             }
-                // 恢复商户的信用额度
+            // 恢复商户的信用额度
             increaseAccountType(req.getMerCode(),
                     MerCreditType.REMAINING_LIMIT,
                     req.getAmount(),
@@ -204,7 +204,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                     WelfareConstant.TransType.RESET_INCR.code());
             // 恢复员工的信用额度
             AccountService accountService = SpringBeanUtils.getBean(AccountService.class);
-            accountService.restoreSurplusQuotaByMerCode(req.getMerCode());
+            accountService.restoreSurplusQuotaByMerCode(req.getMerCode(), req.getAmount());
         } finally {
             DistributedLockUtil.unlock(lock);
         }

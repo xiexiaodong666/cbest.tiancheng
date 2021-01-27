@@ -110,7 +110,6 @@
         from settle_detail t1
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code and t4.deleted=0
-        left join
         <where>
             <if test="settleNo!=null and settleNo!=''">
                 and t1.settle_no = #{settleNo}

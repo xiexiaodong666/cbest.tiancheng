@@ -194,7 +194,8 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             }
             MerchantCredit merchantCredit = creditService.getByMerCode(req.getMerCode());
             if (merchantCredit.getRemainingLimit().add(req.getAmount()).compareTo(merchantCredit.getCreditLimit()) > 0) {
-                throw new BusiException(String.format("结算金额[]%s超过商户最大信用额度[%s]", req.getAmount(), merchantCredit.getCreditLimit()));
+                throw new BusiException(String.format("结算金额[%s]超过商户最大信用额度[%s],剩余额度[%s]",
+                        req.getAmount(), merchantCredit.getCreditLimit(), merchantCredit.getRemainingLimit()));
             }
             // 恢复商户的信用额度
             increaseAccountType(req.getMerCode(),

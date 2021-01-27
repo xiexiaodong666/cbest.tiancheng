@@ -1,6 +1,7 @@
 package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.OrderInfoDTO;
 import com.welfare.persist.entity.OrderInfo;
 import com.welfare.persist.entity.OrderSummary;
 import com.welfare.service.dto.OrderReqDto;
@@ -19,9 +20,9 @@ import java.util.List;
  */
 public interface OrderService {
 
-    Page<OrderInfo> selectPage(Page page,OrderReqDto orderReqDto);
+    Page<OrderInfoDTO> selectPage(Page page,OrderReqDto orderReqDto);
 
-    List<OrderInfo> selectList(OrderReqDto orderReqDto);
+    List<OrderInfoDTO> selectList(OrderReqDto orderReqDto);
 
     OrderSummary selectSummary(OrderReqDto orderReqDto);
 

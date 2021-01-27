@@ -6,18 +6,9 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
-import com.welfare.persist.dao.AccountAmountTypeDao;
-import com.welfare.persist.dao.AccountBillDetailDao;
-import com.welfare.persist.dao.AccountDao;
-import com.welfare.persist.dao.AccountDeductionDetailDao;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.AccountBillDetail;
-import com.welfare.persist.entity.AccountDeductionDetail;
-import com.welfare.service.AccountAmountTypeService;
-import com.welfare.service.AccountService;
-import com.welfare.service.MerchantCreditService;
-import com.welfare.service.RefundService;
+import com.welfare.persist.dao.*;
+import com.welfare.persist.entity.*;
+import com.welfare.service.*;
 import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.RefundOperation;
@@ -34,10 +25,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
@@ -61,7 +49,7 @@ public class RefundServiceImpl implements RefundService {
     private final AccountDao accountDao;
     private final MerchantCreditService merchantCreditService;
     private final AccountAmountTypeService accountAmountTypeService;
-
+    private final SupplierStoreService supplierStoreService;
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DistributedLock(lockPrefix = "e-welfare-refund::", lockKey = "#refundRequest.originalTransNo")
@@ -214,6 +202,12 @@ public class RefundServiceImpl implements RefundService {
     }
 
     private void operateMerchantCredit(Account account, AccountDeductionDetail refundDeductionDetail) {
+        String storeCode = refundDeductionDetail.getStoreCode();
+        SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(storeCode);
+        if(Objects.equals(account.getMerCode(),supplierStore.getMerCode())){
+            //用户所属商户和门店的商户是同一个，表示是在自营消费的退款，不操作商家
+            return;
+        }
         merchantCreditService.increaseAccountType(
                 account.getMerCode(),
                 WelfareConstant.MerCreditType.REMAINING_LIMIT,

@@ -4,7 +4,7 @@ spring:
   application:
     name: e-welfare-account
 server:
-  port: ${tomcat.port:8080}
+  port: ${tomcat.port:10015}
 
 exclude-header-interceptor:
   - /swagger*/**

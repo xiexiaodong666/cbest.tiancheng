@@ -93,5 +93,5 @@ xxl:
     accessToken:
 
 notification:
-  url: http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base/inward/tc/push/message
+  url: http://test-welfare-internal.kube.cbestcd.com
   targetPath: https://test-welfare-app.sjgo365.com/tc/redirect?target=center

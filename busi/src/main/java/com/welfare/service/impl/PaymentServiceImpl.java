@@ -3,11 +3,13 @@ package com.welfare.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.AccountStatus;
+import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.perf.PerfMonitor;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
@@ -62,10 +64,12 @@ public class PaymentServiceImpl implements PaymentService {
     private final SupplierStoreService supplierStoreService;
     private final MerchantStoreRelationDao merchantStoreRelationDao;
 
+    PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
     public PaymentRequest paymentRequest(PaymentRequest paymentRequest) {
+        paymentRequestPerfMonitor.start();
         PaymentRequest requestHandled = queryResult(paymentRequest.getTransNo());
         if (WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
                 || WelfareConstant.AsyncStatus.REVERSED.code().equals(requestHandled.getPaymentStatus())) {
@@ -74,7 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
             return requestHandled;
         }
         Long accountCode = paymentRequest.calculateAccountCode();
-        String lockKey = "account:" + paymentRequest.calculateAccountCode();
+        String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + paymentRequest.calculateAccountCode();
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
@@ -102,6 +106,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
         } finally {
             DistributedLockUtil.unlock(accountLock);
+            paymentRequestPerfMonitor.stop();
         }
 
     }

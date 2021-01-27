@@ -5,6 +5,7 @@ import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.AccountStatus;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
@@ -85,7 +86,6 @@ public class PaymentServiceImpl implements PaymentService {
             Account account = accountService.getByAccountCode(accountCode);
             chargeBeforePay(paymentRequest, account, supplierStore);
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
-            log.error("accountInfo:{}", account);
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             List<MerchantBillDetail> merchantBillDetails;
             try {
@@ -110,7 +110,7 @@ public class PaymentServiceImpl implements PaymentService {
         } finally {
             DistributedLockUtil.unlock(accountLock);
             paymentRequestPerfMonitor.stop();
-            if(WelfareConstant.PaymentScene.OFFLINE_CBEST.code().equals(paymentRequest.getPaymentScene())){
+            if(ConsumeTypeEnum.SHOP_SHOPPING.getCode().equals(paymentRequest.getPaymentScene())){
                 asyncNotificationService.paymentNotify(paymentRequest.getPhone(),paymentRequest.getAmount());
             }
         }
@@ -126,6 +126,7 @@ public class PaymentServiceImpl implements PaymentService {
     private String chargeBeforePay(PaymentRequest paymentRequest, Account account, SupplierStore supplierStore) {
         Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()), "账户未启用");
         MerchantStoreRelation merStoreRelation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(paymentRequest.getStoreNo(), account.getMerCode());
+        Assert.notNull(merStoreRelation,"用户所在组织（公司）不支持在该门店消费或配置已禁用");
         Assert.isTrue(EnableEnum.ENABLE.getCode().equals(merStoreRelation.getStatus()), "用户所在组织（公司）不支持在该门店消费或配置已禁用");
         Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(supplierStore.getStatus()),
                 "门店未激活:" + supplierStore.getStoreCode());

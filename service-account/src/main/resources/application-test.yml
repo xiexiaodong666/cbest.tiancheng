@@ -85,3 +85,7 @@ xxl:
       logpath: /home/finance/Logs/e-welfare-account.e-cbest.lotest/jobhandler/
       logretentiondays: 30
     accessToken:
+
+notification:
+  url: http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base/inward/tc/push/message
+  targetPath: https://test-welfare-app.sjgo365.com/tc/redirect?target=center

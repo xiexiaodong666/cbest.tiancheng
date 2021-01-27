@@ -46,6 +46,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
     private final RedissonClient redissonClient;
     private final AccountDao accountDao;
+    @Autowired
     private final AccountService accountService;
     private final OrderTransRelationService orderTransRelationService;
     private final AccountChangeEventRecordService accountChangeEventRecordService;
@@ -96,7 +97,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             accountChangeEventRecordService.save(accountChangeEventRecord);
             accountDao.saveOrUpdate(account);
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType, account);
-            orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT);
+            orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT_INCR);
         } finally {
             lock.unlock();
         }

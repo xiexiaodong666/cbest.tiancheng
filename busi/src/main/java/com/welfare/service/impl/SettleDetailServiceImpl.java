@@ -294,14 +294,14 @@ public class SettleDetailServiceImpl implements SettleDetailService {
                                 merchantCredit,
                                 settleDetail.getRebateAmount().abs(),
                                 settleDetail.getTransNo(),
-                                WelfareConstant.TransType.REBATE.code()
+                                WelfareConstant.TransType.REBATE_INCR.code()
                         );
                     } else if (WelfareConstant.TransType.REFUND.code().equals(settleDetail.getTransType())){
                         return rebateLimitOperator.decrease(
                                 merchantCredit,
                                 settleDetail.getRebateAmount().abs(),
                                 settleDetail.getTransNo(),
-                                WelfareConstant.TransType.REBATE.code()
+                                WelfareConstant.TransType.REBATE_DECR.code()
                         );
                     } else{
                         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"计算返利时，数据异常",null);

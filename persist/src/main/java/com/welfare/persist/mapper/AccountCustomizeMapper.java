@@ -23,6 +23,9 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("surplusQuota") BigDecimal surplusQuota,
       @Param("updateUser")String updateUser);
 
+  int restoreAccountSurplusQuota(@Param("accountCode")Long accountCode,
+                               @Param("updateUser")String updateUser);
+
   IPage<AccountPageDTO> queryPageDTO(Page<AccountPageDTO> page,
       @Param("merCode") String merCode,
       @Param("accountName")String accountName,

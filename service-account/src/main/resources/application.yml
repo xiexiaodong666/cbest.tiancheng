@@ -4,4 +4,16 @@ spring:
   application:
     name: e-welfare-account
 server:
-  port: 10015
+  port: ${tomcat.port:8080}
+
+exclude-header-interceptor:
+  - /swagger*/**
+  - /doc.html*
+  - /error*
+  - /index
+  - /**/*.css
+  - /**/*.js
+  - /**/*.png
+  - /**/*.jpg
+  - /**/*.jpeg
+  - /**/*.ico

@@ -1,15 +1,16 @@
+server:
+  port: ${tomcat.port:8080}
 spring:
   profiles:
     active: persist,dev
   application:
     name: e-welfare-merchant
   mvc:
-      date-format: yyyy-MM-dd HH:mm:ss
+    date-format: yyyy-MM-dd HH:mm:ss
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-server:
-  port: 10016
+
 cbest:
   oss:
     config:
@@ -17,5 +18,14 @@ cbest:
       secretKey: KqMaYYENOqD8JBZUhqgBhOddVYc5Y1Pd1pAJRoA2
       keyPrefix: e-welfare/
 
-
-
+exclude-header-interceptor:
+  - /swagger*/**
+  - /doc.html*
+  - /error*
+  - /index
+  - /**/*.css
+  - /**/*.js
+  - /**/*.png
+  - /**/*.jpg
+  - /**/*.jpeg
+  - /**/*.ico

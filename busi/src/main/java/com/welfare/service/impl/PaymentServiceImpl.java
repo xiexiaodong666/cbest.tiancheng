@@ -23,12 +23,9 @@ import com.welfare.service.operator.payment.domain.PaymentOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -312,7 +309,7 @@ public class PaymentServiceImpl implements PaymentService {
                     account.getMerCode(),
                     operatedAmount,
                     paymentRequest.getTransNo(),
-                    currentBalanceOperator);
+                    currentBalanceOperator, WelfareConstant.TransType.CONSUME.code());
             paymentOperation.setMerchantAccountOperations(merchantAccountOperations);
             Map<String, MerchantBillDetail> merBillDetailMap = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
                     .collect(Collectors.toMap(MerchantBillDetail::getBalanceType, merchantBillDetail -> merchantBillDetail));

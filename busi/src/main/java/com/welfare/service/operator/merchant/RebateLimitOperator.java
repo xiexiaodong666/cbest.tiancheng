@@ -27,12 +27,12 @@ public class RebateLimitOperator extends AbstractMerAccountTypeOperator {
     private MerCreditType merCreditType = MerCreditType.REBATE_LIMIT;
 
     @Override
-    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType){
         log.info("ready to decrease merchantCredit.rebateLimit for {}",amount.toString());
         BigDecimal currentBalance = merchantCredit.getRebateLimit();
         BigDecimal subtract = currentBalance.subtract(amount);
         if(subtract.compareTo(BigDecimal.ZERO) < 0){
-            return doWhenNotEnough(merchantCredit,subtract.negate(),currentBalance , transNo);
+            return doWhenNotEnough(merchantCredit,subtract.negate(),currentBalance , transNo,transType );
         }else{
             merchantCredit.setRebateLimit(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
@@ -40,16 +40,16 @@ public class RebateLimitOperator extends AbstractMerAccountTypeOperator {
                     amount,
                     IncOrDecType.DECREASE,
                     merchantCredit,
-                    transNo);
+                    transNo, transType);
             return Collections.singletonList(operation);
         }
 
     }
     @Override
-    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType){
         log.info("ready to increase merchantCredit.rebateLimit for {}",amount.toString());
         merchantCredit.setRebateLimit(merchantCredit.getRebateLimit().add(amount));
-        MerchantAccountOperation operation = MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE,merchantCredit,transNo );
+        MerchantAccountOperation operation = MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE,merchantCredit,transNo, transType);
         return Lists.newArrayList(operation);
     }
 }

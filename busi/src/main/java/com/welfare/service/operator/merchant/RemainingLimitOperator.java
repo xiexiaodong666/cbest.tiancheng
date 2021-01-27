@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Description:
@@ -34,41 +32,41 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
     @Autowired
     private CurrentBalanceOperator currentBalanceOperator;
     @Override
-    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType) {
         log.info("ready to decrease merchantCredit.currentRemainingLimit for {}", amount.toString());
         BigDecimal currentRemainingLimit = merchantCredit.getRemainingLimit();
         BigDecimal subtract = currentRemainingLimit.subtract(amount);
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
-            return doWhenNotEnough(merchantCredit,subtract.negate(),currentRemainingLimit , transNo);
+            return doWhenNotEnough(merchantCredit,subtract.negate(),currentRemainingLimit , transNo, transType);
         } else {
             merchantCredit.setRemainingLimit(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     merCreditType,
                     amount,
-                    IncOrDecType.DECREASE, merchantCredit,transNo );
+                    IncOrDecType.DECREASE, merchantCredit,transNo, transType);
             return Collections.singletonList(operation);
         }
 
     }
 
     @Override
-    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType) {
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         BigDecimal creditLimit = merchantCredit.getCreditLimit();
         BigDecimal remainingLimit = merchantCredit.getRemainingLimit();
         BigDecimal add = amount.add(remainingLimit).subtract(creditLimit);
         if (add.compareTo(BigDecimal.ZERO) > 0) {
             // 超过信用额度
-            return doWhenMoreThan(merchantCredit,add,transNo);
+            return doWhenMoreThan(merchantCredit,add,transNo, transType);
         } else {
             merchantCredit.setRemainingLimit(remainingLimit.add(amount));
-            MerchantAccountOperation remainingLimitOperator = MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo);
+            MerchantAccountOperation remainingLimitOperator = MerchantAccountOperation.of(merCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo, transType);
             return Lists.newArrayList(remainingLimitOperator);
         }
     }
 
     @Override
-    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo){
+    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo, String transType){
         throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "结算金额超过信用额度", null);
     }
 

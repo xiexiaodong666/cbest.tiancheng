@@ -16,12 +16,9 @@ import com.welfare.service.operator.payment.domain.RefundOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -213,7 +210,8 @@ public class RefundServiceImpl implements RefundService {
                 account.getMerCode(),
                 WelfareConstant.MerCreditType.REMAINING_LIMIT,
                 refundDeductionDetail.getTransAmount(),
-                refundDeductionDetail.getTransNo()
+                refundDeductionDetail.getTransNo(),
+                WelfareConstant.TransType.REFUND.code()
         );
     }
 

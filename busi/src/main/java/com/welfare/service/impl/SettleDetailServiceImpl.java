@@ -9,7 +9,6 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.StringUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
@@ -291,9 +290,19 @@ public class SettleDetailServiceImpl implements SettleDetailService {
                         return null;
                     }
                     if(WelfareConstant.TransType.CONSUME.code().equals(settleDetail.getTransType())){
-                        return rebateLimitOperator.increase(merchantCredit, settleDetail.getRebateAmount().abs(), settleDetail.getTransNo());
+                        return rebateLimitOperator.increase(
+                                merchantCredit,
+                                settleDetail.getRebateAmount().abs(),
+                                settleDetail.getTransNo(),
+                                WelfareConstant.TransType.REBATE.code()
+                        );
                     } else if (WelfareConstant.TransType.REFUND.code().equals(settleDetail.getTransType())){
-                        return rebateLimitOperator.decrease(merchantCredit,settleDetail.getRebateAmount().abs(),settleDetail.getTransNo());
+                        return rebateLimitOperator.decrease(
+                                merchantCredit,
+                                settleDetail.getRebateAmount().abs(),
+                                settleDetail.getTransNo(),
+                                WelfareConstant.TransType.REBATE.code()
+                        );
                     } else{
                         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"计算返利时，数据异常",null);
                     }

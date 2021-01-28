@@ -171,6 +171,7 @@ WHERE a.mer_code = at.mer_code
     when abd.trans_type = 'deposit_incr' then "充值"
     when abd.trans_type = 'consume' then "消费"
     when abd.trans_type = 'refund' then "退款"
+    when abd.trans_type = 'deposit_back' then "回冲"
     END as transTypeString,
     CASE
     WHEN abd.trans_type = 'deposit_incr' THEN
@@ -179,6 +180,8 @@ WHERE a.mer_code = at.mer_code
     trans_amount * ( - 1 )
     WHEN abd.trans_type = 'refund' THEN
     trans_amount
+    WHEN abd.trans_type = 'deposit_back' THEN
+    trans_amount * ( - 1 )
     END AS transAmount,
     abd.create_time AS createTime,
     abd.account_balance AS accountBalance
@@ -193,6 +196,7 @@ WHERE a.mer_code = at.mer_code
     <if test="createTimeEnd != null ">
       and abd.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
+    order by create_time desc
   </select>
 
   <select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">
@@ -207,6 +211,8 @@ WHERE a.mer_code = at.mer_code
     trans_amount * ( - 1 )
     WHEN abd.trans_type = 'refund' THEN
     trans_amount
+    WHEN abd.trans_type = 'deposit_back' THEN
+    trans_amount * ( - 1 )
     END
     ) AS accountTotalAmount,
     COUNT( abd.id ) AS tradeNum,

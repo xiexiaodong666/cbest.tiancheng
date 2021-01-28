@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
@@ -72,6 +73,7 @@ public class MerchantServiceImpl implements MerchantService {
         List<Merchant> list = merchantDao.list(q);
         if(req.isMerAccountTypeFlag()){
             QueryWrapper<MerchantAccountType> groupWapper=new QueryWrapper<>();
+            groupWapper.eq(MerchantAccountType.SHOW_STATUS, MerchantAccountTypeShowStatusEnum.SHOW.getCode());
             List<MerchantAccountType> types=merchantAccountTypeDao.list(groupWapper.groupBy(MerchantAccountType.MER_CODE));
             if(EmptyChecker.notEmpty(types)){
                 List<String> merCodes=types.stream().map(item->item.getMerCode()).collect(Collectors.toList());

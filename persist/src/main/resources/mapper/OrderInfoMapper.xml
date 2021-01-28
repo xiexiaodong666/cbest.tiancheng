@@ -33,14 +33,7 @@
         max(trans_time) as trans_time ,store_code,trans_type,max(card_id) as card_id
         from account_bill_detail
         where trans_type in ('consume','refund')
-        and pos not in (
-            SELECT
-            cashier_no
-            FROM
-            supplier_store t
-            WHERE
-            t.cashier_no IS NOT NULL
-        )
+        and order_channel = "SHOP_CONSUMPTION"
         group by trans_no , store_code , trans_type,account_code) ab
         LEFT JOIN account t on ab.account_code = t.account_code
         LEFT JOIN supplier_store s on ab.store_code = s.store_code
@@ -111,14 +104,7 @@
         trans_no , max(trans_time) as trans_time ,store_code,trans_type
         from account_bill_detail
         where trans_type in ('consume','refund')
-        and pos not in (
-            SELECT
-            cashier_no
-            FROM
-            supplier_store t
-            WHERE
-            t.cashier_no IS NOT NULL
-        )
+        and order_channel = "SHOP_CONSUMPTION"
         group by trans_no , store_code , trans_type,account_code) ab
             LEFT JOIN account t on ab.account_code = t.account_code
             LEFT JOIN supplier_store s on ab.store_code = s.store_code

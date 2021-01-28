@@ -69,7 +69,7 @@
     consum_type consumType,
     status ,
     create_time createTime,
-    0 as disabled
+    0 as isMerchant
     from supplier_store ss where ss.deleted=0
     ) temp0
     <where>
@@ -94,7 +94,7 @@
     null consumType,
     status ,
     create_time createTime,
-    true as disabled
+    true as isMerchant
 
     from merchant m where m.deleted=0
 

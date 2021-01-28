@@ -11,6 +11,7 @@ import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
+import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ConsumeTypesUtils;
@@ -111,7 +112,28 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public List<SupplierStore> list(SupplierStoreListReq req) {
     QueryWrapper<SupplierStore> q = QueryHelper.getWrapper(req);
     q.orderByDesc(SupplierStore.CREATE_TIME);
-    return supplierStoreDao.list(q);
+    List<SupplierStore> supplierStores = supplierStoreDao.list(q);
+    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
+      for (SupplierStore s:
+          supplierStores) {
+      try {
+
+          if (Strings.isNotEmpty(s.getConsumType())) {
+            Map<String, Boolean> consumeTypeMap = mapper.readValue(
+                s.getConsumType(), Map.class);
+            ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
+            s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+          } else {
+            log.error(s.getConsumType() + "########");
+          }
+
+
+      } catch (JsonProcessingException e) {
+        log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
+      }
+    }
+    }
+      return supplierStores;
   }
 
   @Override
@@ -298,7 +320,27 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag;
   }
-
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void batchActivate(List<SupplierStoreActivateReq> reqList) {
+    if(EmptyChecker.notEmpty(reqList)){
+      for(SupplierStoreActivateReq req:reqList){
+        if(!activate(req)){
+          throw new BusiException("更新激活状态失败【"+req.getId()+"】,【"+req.getStatus()+"】");
+        }
+      }
+    }else{
+      List<SupplierStore> list=supplierStoreDao.list();
+      for(SupplierStore ss:list){
+        SupplierStoreActivateReq req=new SupplierStoreActivateReq();
+        req.setId(ss.getId());
+        req.setStatus(SupplierStoreStatusEnum.ACTIVATED.getCode());
+        if(!activate(req)){
+          throw new BusiException("更新激活状态失败【"+req.getId()+"】,【"+req.getStatus()+"】");
+        }
+      }
+    }
+  }
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean activate(SupplierStoreActivateReq storeActivateReq) {

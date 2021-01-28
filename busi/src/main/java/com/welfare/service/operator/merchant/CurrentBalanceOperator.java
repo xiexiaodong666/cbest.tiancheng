@@ -67,7 +67,7 @@ public class CurrentBalanceOperator extends AbstractMerAccountTypeOperator imple
         merchantCredit.setCurrentBalance(BigDecimal.ZERO);
         MerchantAccountOperation operation = MerchantAccountOperation.of(
                 merCreditType,
-                merchantCredit.getCurrentBalance(),
+                operatedAmount,
                 IncOrDecType.DECREASE,
                 merchantCredit,
                 transNo,transType

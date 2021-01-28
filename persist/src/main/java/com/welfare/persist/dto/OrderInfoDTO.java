@@ -94,6 +94,10 @@ public class OrderInfoDTO extends Model<OrderInfoDTO> implements Serializable {
      */
     private Integer cardId;
     /**
+     * 电话号码
+     */
+    private String phone;
+    /**
      * 订单金额
      */
     private BigDecimal orderAmount;

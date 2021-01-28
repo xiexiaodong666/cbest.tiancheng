@@ -130,7 +130,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
     }
     if (!CollectionUtils.isEmpty(accountUploadList)) {
       //数据以500等分分批同步
-      List<List<Account>> averageAccountList = averageAssign(accountUploadList);
+      List<List<Account>> averageAccountList = AccountUtil.averageAssign(accountUploadList);
       for (List<Account> accountList : averageAccountList) {
         accountService.batchUpload(accountList);
       }
@@ -140,28 +140,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
     }
   }
 
-  public static <T> List<List<T>> averageAssign(List<T> source) {
-    int n = source.size() % 500 == 0 ? source.size() / 500 : source.size() / 500 + 1;
-    List<List<T>> result = new ArrayList<List<T>>();
-    //(先计算出余数)
-    int remainder = source.size() % n;
-    //然后是商
-    int number = source.size() / n;
-    //偏移量
-    int offset = 0;
-    for (int i = 0; i < n; i++) {
-      List<T> value = null;
-      if (remainder > 0) {
-        value = source.subList(i * number + offset, (i + 1) * number + offset + 1);
-        remainder--;
-        offset++;
-      } else {
-        value = source.subList(i * number + offset, (i + 1) * number + offset);
-      }
-      result.add(value);
-    }
-    return result;
-  }
+
 
   public StringBuilder getUploadInfo() {
     return uploadInfo;

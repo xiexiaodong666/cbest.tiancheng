@@ -5,7 +5,15 @@
 
 
     <select id="searchOrder" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.dto.OrderInfoDTO">
-        select  mm.mer_name as accountMerName, tt.* , phone from (
+        select  mm.mer_name as accountMerName, tt.orderId ,
+        tt.accountMerCode,tt.merchantName,tt.accountCode,
+        tt.accountName,tt.merchantCode,tt.storeCode,tt.storeName,
+        tt.orderTime,tt.cardId,trans_type,
+        case trans_type
+        when "consume" then orderAmount
+        else  (-1) * orderAmount
+        end
+        as orderAmount, phone from (
         SELECT
         oi.order_id as orderId,
         t.phone as phone,
@@ -18,7 +26,8 @@
         s.store_name as storeName,
         ab.trans_amount as orderAmount,
         ab.trans_time as orderTime,
-        ab.card_id as cardId
+        ab.card_id as cardId,
+        ab.trans_type
         FROM
         (select account_code,sum(trans_amount) as trans_amount , trans_no ,
         max(trans_time) as trans_time ,store_code,trans_type,max(card_id) as card_id

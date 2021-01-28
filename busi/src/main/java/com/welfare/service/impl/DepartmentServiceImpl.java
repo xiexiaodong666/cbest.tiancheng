@@ -16,6 +16,7 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.converter.DepartmentConverter;
 import com.welfare.service.converter.DepartmentTreeConverter;
+import com.welfare.service.converter.DepartmentTreeWithoutMerchantConverter;
 import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import com.welfare.service.listener.DepartmentListener;
@@ -42,6 +43,7 @@ import java.util.List;
 public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentDao departmentDao;
     private final DepartmentTreeConverter departmentTreeConverter;
+    private final DepartmentTreeWithoutMerchantConverter departmentTreeWithoutMerchantConverter;
     private final MerchantService merchantService;
     private final DepartmentConverter departmentConverter;
     private final SequenceService sequenceService;
@@ -168,6 +170,25 @@ public class DepartmentServiceImpl implements DepartmentService {
             item.setCode(item.getDepartmentCode());
             item.setParentCode(item.getDepartmentParent());
 
+        });
+        TreeUtil treeUtil=new TreeUtil(treeDTOList,"0");
+        return treeUtil.getTree();
+    }
+
+    @Override
+    public List<DepartmentTree> treeWithoutMerchant(String merCode) {
+        QueryWrapper<Department> queryWrapper=new QueryWrapper<>();
+        if(EmptyChecker.notEmpty(merCode)){
+            queryWrapper.eq(Department.MER_CODE,merCode);
+        }
+        List<DepartmentTree> treeDTOList=departmentTreeWithoutMerchantConverter.toD(departmentDao.list(queryWrapper));
+        treeDTOList.forEach(item-> {
+            item.setCode(item.getDepartmentCode());
+            if(item.getMerCode().equals(item.getDepartmentParent())){
+                item.setParentCode("0");
+            }else{
+                item.setParentCode(item.getDepartmentParent());
+            }
         });
         TreeUtil treeUtil=new TreeUtil(treeDTOList,"0");
         return treeUtil.getTree();

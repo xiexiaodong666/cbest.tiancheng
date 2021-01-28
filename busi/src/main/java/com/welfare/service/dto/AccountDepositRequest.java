@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -33,5 +34,6 @@ public class AccountDepositRequest {
   @ApiModelProperty(value = "申请充值金额", required = true)
   @DecimalMin(value = "0", message = "金额不能小于0")
   @NotNull(message = "申请充值金额不能为空")
+  @DecimalMax(message = "金额超过限制[99999999.99]", value = "99999999.99")
   private BigDecimal rechargeAmount;
 }

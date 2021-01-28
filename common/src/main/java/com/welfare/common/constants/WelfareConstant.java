@@ -312,7 +312,8 @@ public class WelfareConstant {
          */
         NEW(0,"新增"),
         WRITTEN(1,"已写入"),
-        BIND(2,"已绑定");
+        BIND(2,"已绑定"),
+        DISABLE(-1,"已禁用");
         private final Integer code;
         private final String desc;
 

@@ -40,7 +40,6 @@ public class MerchantCreditApplyUpdateReq {
    * 金额
    */
   @ApiModelProperty("金额")
-  @DecimalMin(value = "0", message = "金额不能小于0")
   private BigDecimal balance;
 
   /**

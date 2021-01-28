@@ -43,7 +43,6 @@ public class MerchantCreditApplyRequest {
    * 金额
    */
   @ApiModelProperty("金额")
-  @DecimalMin(message = "金额不能小于0", value = "0")
   private BigDecimal balance;
 
   /**

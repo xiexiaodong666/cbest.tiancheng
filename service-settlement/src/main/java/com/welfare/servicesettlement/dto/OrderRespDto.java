@@ -48,4 +48,6 @@ public class OrderRespDto implements Serializable {
     @ApiModelProperty("订单创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private Date orderTime;
+    @ApiModelProperty("电话号码")
+    private String phone;
 }

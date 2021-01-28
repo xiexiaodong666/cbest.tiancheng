@@ -196,7 +196,7 @@ WHERE a.mer_code = at.mer_code
     <if test="createTimeEnd != null ">
       and abd.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
-    order by create_time desc
+    order by abd.create_time desc
   </select>
 
   <select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">

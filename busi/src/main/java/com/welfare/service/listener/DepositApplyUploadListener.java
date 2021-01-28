@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.DecimalMax;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -31,6 +32,8 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
   private static final int BATCH_COUNT = 100;
 
   private static final int MAX_COUNT = 2000;
+
+  private static final BigDecimal MAX_AMOUNT = BigDecimal.valueOf(99999999.99);
 
   private List<TempAccountDepositApply> list = new ArrayList<>();
 
@@ -69,6 +72,9 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
     }
     if (request.getRechargeAmount() == null || request.getRechargeAmount().compareTo(BigDecimal.ZERO) < 0) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]金额不能小于0！", request.getPhone()), null);
+    }
+    if (request.getRechargeAmount().compareTo(MAX_AMOUNT) > 0) {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]金额超过限制[%s]！", request.getPhone(), MAX_AMOUNT), null);
     }
     if (accountCodeSet.contains(request.getPhone())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("[%s]账号(手机号)不能重复！", request.getPhone()), null);

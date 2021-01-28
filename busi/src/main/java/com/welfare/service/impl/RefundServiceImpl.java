@@ -149,6 +149,8 @@ public class RefundServiceImpl implements RefundService {
                 .filter(paidDetail -> paidDetail.getTransAmount().compareTo(paidDetail.getReversedAmount()) > 0)
                 .collect(Collectors.toMap(AccountDeductionDetail::getMerAccountType, detail -> detail));
         BigDecimal refundedAmount = BigDecimal.ZERO;
+        AccountBillDetail tmpAccountBillDetail = accountBillDetailDao.getOneByTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
+        Assert.notNull(tmpAccountBillDetail,"未找到正向支付明细");
         for (AccountAmountType accountAmountType : accountAmountTypes) {
             AccountDeductionDetail accountDeductionDetail = groupedPaidDetail.get(accountAmountType.getMerAccountTypeCode());
             if (accountDeductionDetail == null || remainingRefundAmount.compareTo(BigDecimal.ZERO) == 0) {
@@ -168,7 +170,7 @@ public class RefundServiceImpl implements RefundService {
             accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(thisAccountTypeRefundAmount));
             refundedAmount = refundedAmount.add(thisAccountTypeRefundAmount);
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(accountDeductionDetail, refundRequest, thisAccountTypeRefundAmount);
-            AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes);
+            AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes,tmpAccountBillDetail.getOrderChannel());
 
             operateMerchantCredit(account, refundDeductionDetail);
             RefundOperation refundOperation = RefundOperation.of(refundBillDetail, refundDeductionDetail);
@@ -186,6 +188,8 @@ public class RefundServiceImpl implements RefundService {
 
     private List<RefundOperation> fullyRefund(RefundRequest refundRequest, List<AccountDeductionDetail> accountDeductionDetails, Account account, List<AccountAmountType> accountAmountTypes, Map<String, AccountAmountType> accountAmountTypeMap) {
         List<RefundOperation> refundOperations;
+        AccountBillDetail tmpAccountBillDetail = accountBillDetailDao.getOneByTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
+        Assert.notNull(tmpAccountBillDetail,"未找到正向支付明细");
         refundOperations = accountDeductionDetails.stream()
                 .map(paymentDeductionDetail -> toRefundDeductionDetail(
                         paymentDeductionDetail,
@@ -194,7 +198,7 @@ public class RefundServiceImpl implements RefundService {
                 ).map(refundDeductionDetail -> {
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(refundDeductionDetail.getMerAccountType());
                     accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(refundDeductionDetail.getTransAmount()));
-                    AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes);
+                    AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
                     operateMerchantCredit(account, refundDeductionDetail);
                     return RefundOperation.of(refundBillDetail, refundDeductionDetail);
                 }).collect(Collectors.toList());
@@ -275,7 +279,7 @@ public class RefundServiceImpl implements RefundService {
 
 
     private AccountBillDetail toRefundBillDetail(AccountDeductionDetail refundDeductionDetail,
-                                                 List<AccountAmountType> accountAmountTypes) {
+                                                 List<AccountAmountType> accountAmountTypes, String orderChannel) {
         AccountBillDetail refundDetail = new AccountBillDetail();
         refundDetail.setTransType(WelfareConstant.TransType.REFUND.code());
         refundDetail.setTransTime(refundDeductionDetail.getTransTime());
@@ -283,6 +287,7 @@ public class RefundServiceImpl implements RefundService {
         refundDetail.setChannel(refundDeductionDetail.getChanel());
         refundDetail.setStoreCode(refundDeductionDetail.getStoreCode());
         refundDetail.setPos(refundDeductionDetail.getPos());
+        refundDetail.setOrderChannel(orderChannel);
         refundDetail.setTransAmount(refundDeductionDetail.getTransAmount());
         refundDetail.setAccountCode(refundDeductionDetail.getAccountCode());
         BigDecimal accountBalance = accountAmountTypes.stream()

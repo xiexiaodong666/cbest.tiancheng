@@ -332,6 +332,33 @@ public class WelfareConstant {
     }
 
     /**
+     * 卡状态
+     */
+    public enum CardEnable{
+
+        /**
+         * 卡状态
+         */
+        ENABLE(1,"启用"),
+        DISABLE(0,"禁用");
+        private final Integer code;
+        private final String desc;
+
+        CardEnable(Integer code, String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public Integer code(){
+            return this.code;
+        }
+
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+    /**
      * 渠道
      */
     public enum Channel {

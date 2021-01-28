@@ -23,25 +23,14 @@ import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.common.util.UserInfoHolder;
-import com.welfare.persist.dao.AccountDao;
-import com.welfare.persist.dao.CardApplyDao;
-import com.welfare.persist.dao.CardInfoDao;
+import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.dto.AccountBillMapperDTO;
 import com.welfare.persist.dto.AccountDetailMapperDTO;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.AccountBillDetail;
-import com.welfare.persist.entity.AccountChangeEventRecord;
-import com.welfare.persist.entity.AccountDeductionDetail;
-import com.welfare.persist.entity.AccountType;
-import com.welfare.persist.entity.CardInfo;
-import com.welfare.persist.entity.Department;
-import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.persist.mapper.AccountBillDetailMapper;
 import com.welfare.persist.mapper.AccountChangeEventRecordCustomizeMapper;
@@ -125,6 +114,9 @@ public class AccountServiceImpl implements AccountService {
   private final RedissonClient redissonClient;
   private final AccountBillDetailMapper accountBillDetailMapper;
   private final AccountDeductionDetailMapper accountDeductionDetailMapper;
+  private final AccountDeductionDetailDao accountDeductionDetailDao;
+  private final AccountBillDetailDao accountBillDetailDao;
+  private final OrderTransRelationDao orderTransRelationDao;
 
 
   @Override
@@ -705,44 +697,101 @@ public class AccountServiceImpl implements AccountService {
     return accountDetailDTO;
   }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void restoreSurplusQuotaByMerCode(String merCode) {
-        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(Account.MER_CODE, merCode);
-        queryWrapper.eq(Account.CREDIT, Boolean.TRUE);
-        List<Account> accounts = accountDao.list(queryWrapper);
-        String updateUser = UserInfoHolder.getUserInfo().getUserId();
-        if (CollectionUtils.isNotEmpty(accounts)) {
-            accounts.forEach(account -> {
-                restoreSurplusQuotaByAccountCode(account.getAccountCode(), updateUser);
-            });
-        }
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void restoreSurplusQuotaByMerCode(String merCode, BigDecimal merUpdateCreditAmount, String settlementTransNo) {
+    QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(Account.MER_CODE, merCode);
+    queryWrapper.eq(Account.CREDIT, Boolean.TRUE);
+    List<Account> accounts = accountDao.list(queryWrapper);
+    String updateUser = UserInfoHolder.getUserInfo().getUserId();
+    if (CollectionUtils.isNotEmpty(accounts)) {
+      accounts.forEach(account -> {
+        restoreSurplusQuotaByAccountCode(account.getAccountCode(),updateUser, settlementTransNo);
+      });
     }
+  }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser) {
-        String lockKey = ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + accountCode;
-        RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
-        try {
-            QueryWrapper<Account> queryCredit = new QueryWrapper<>();
-            queryCredit.eq(Account.ACCOUNT_CODE, accountCode);
-            queryCredit.eq(Account.CREDIT, Boolean.TRUE);
-            Account account = accountDao.getOne(queryCredit);
-            if (Objects.nonNull(account)) {
-                int isSuccess = accountCustomizeMapper.restoreAccountSurplusQuota(account.getAccountCode(),updateUser);
-                if (isSuccess > 0) {
-                    accountAmountTypeMapper.updateBalance(
-                            account.getAccountCode(),
-                            MerAccountTypeCode.SURPLUS_QUOTA.code(),
-                            account.getMaxQuota(),
-                            updateUser
-                    );
-                }
-            }
-        } finally {
-            DistributedLockUtil.unlock(accountLock);
-        }
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser, String settlementTransNo) {
+    String lockKey = ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + accountCode;
+    RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
+    try {
+      QueryWrapper<Account> queryCredit = new QueryWrapper<>();
+      queryCredit.eq(Account.ACCOUNT_CODE, accountCode);
+      queryCredit.eq(Account.CREDIT, Boolean.TRUE);
+      Account account = accountDao.getOne(queryCredit);
+      if (Objects.nonNull(account)) {
+        BigDecimal updateQuota = account.getMaxQuota().subtract(account.getSurplusQuota());
+        int isSuccess = accountCustomizeMapper.restoreAccountSurplusQuota(account.getAccountCode(),updateUser);
+        accountAmountTypeMapper.updateBalance(
+                account.getAccountCode(),
+                MerAccountTypeCode.SURPLUS_QUOTA.code(),
+                account.getMaxQuota(),
+                updateUser
+        );
+        String transNo = sequenceService.nextNo(WelfareConstant.SequenceType.DEPOSIT.code()) + "";
+        AccountBillDetail accountBillDetail = assemblyAccountBillDetail(account, updateQuota, transNo);
+        accountBillDetailDao.save(accountBillDetail);
+        AccountDeductionDetail accountDeductionDetail = assemblyAccountDeductionDetail(account, updateQuota, transNo);
+        accountDeductionDetailDao.save(accountDeductionDetail);
+        OrderTransRelation transRelation = assemblyOrderTransRelation(updateQuota, transNo, settlementTransNo);
+        orderTransRelationDao.save(transRelation);
+      }
+    } finally {
+      DistributedLockUtil.unlock(accountLock);
     }
+  }
+
+  private OrderTransRelation assemblyOrderTransRelation(BigDecimal updateQuota,
+                                                        String transNo, String settlementTransNo){
+    OrderTransRelation transRelation = new OrderTransRelation();
+    transRelation.setTransNo(transNo);
+    transRelation.setOrderId(settlementTransNo);
+    if (updateQuota.compareTo(BigDecimal.ZERO) < 0) {
+      transRelation.setType(TransType.RESET_DECR.code());
+    } else {
+      transRelation.setType(TransType.RESET_INCR.code());
+    }
+    return transRelation;
+  }
+
+  private AccountBillDetail assemblyAccountBillDetail(Account account, BigDecimal updateQuota, String transNo){
+    AccountBillDetail accountBillDetail = new AccountBillDetail();
+    accountBillDetail.setAccountCode(account.getAccountCode());
+    accountBillDetail.setAccountBalance(account.getAccountBalance());
+    accountBillDetail.setChannel(WelfareConstant.Channel.PLATFORM.code());
+    accountBillDetail.setTransNo(transNo);
+    accountBillDetail.setTransAmount(updateQuota);
+    accountBillDetail.setTransTime(Calendar.getInstance().getTime());
+    accountBillDetail.setSurplusQuota(account.getMaxQuota());
+    if (updateQuota.compareTo(BigDecimal.ZERO) < 0) {
+      accountBillDetail.setTransType(TransType.RESET_DECR.code());
+    } else {
+      accountBillDetail.setTransType(TransType.RESET_INCR.code());
+    }
+    return accountBillDetail;
+  }
+
+  private AccountDeductionDetail assemblyAccountDeductionDetail(Account account, BigDecimal updateQuota, String transNo){
+    AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
+    accountDeductionDetail.setAccountCode(account.getAccountCode());
+    accountDeductionDetail.setAccountDeductionAmount(updateQuota.abs());
+    accountDeductionDetail.setAccountAmountTypeBalance(account.getMaxQuota());
+    accountDeductionDetail.setMerAccountType(MerAccountTypeCode.SURPLUS_QUOTA.code());
+    accountDeductionDetail.setTransNo(transNo);
+    if (updateQuota.compareTo(BigDecimal.ZERO) < 0) {
+      accountDeductionDetail.setTransType(TransType.RESET_DECR.code());
+    } else {
+      accountDeductionDetail.setTransType(TransType.RESET_INCR.code());
+    }
+    accountDeductionDetail.setTransAmount(updateQuota.abs());
+    accountDeductionDetail.setReversedAmount(BigDecimal.ZERO);
+    accountDeductionDetail.setTransTime(Calendar.getInstance().getTime());
+    accountDeductionDetail.setAccountDeductionAmount(updateQuota.abs());
+    accountDeductionDetail.setMerDeductionCreditAmount(BigDecimal.ZERO);
+    accountDeductionDetail.setMerDeductionAmount(BigDecimal.ZERO);
+    return accountDeductionDetail;
+  }
 }

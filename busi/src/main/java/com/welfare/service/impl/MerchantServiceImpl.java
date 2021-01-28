@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
 import com.welfare.common.exception.BusiException;
@@ -72,6 +73,7 @@ public class MerchantServiceImpl implements MerchantService {
         List<Merchant> list = merchantDao.list(q);
         if(req.isMerAccountTypeFlag()){
             QueryWrapper<MerchantAccountType> groupWapper=new QueryWrapper<>();
+            groupWapper.eq(MerchantAccountType.SHOW_STATUS, MerchantAccountTypeShowStatusEnum.SHOW.getCode());
             List<MerchantAccountType> types=merchantAccountTypeDao.list(groupWapper.groupBy(MerchantAccountType.MER_CODE));
             if(EmptyChecker.notEmpty(types)){
                 List<String> merCodes=types.stream().map(item->item.getMerCode()).collect(Collectors.toList());
@@ -179,7 +181,7 @@ public class MerchantServiceImpl implements MerchantService {
         detailDTO.setId(save.getId());
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         syncList.add(detailDTO);
-        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).build());
+        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).timestamp(new Date()).build());
         return flag&&flag2&flag3;
     }
 
@@ -201,7 +203,7 @@ public class MerchantServiceImpl implements MerchantService {
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
-        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).build());
+        applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).timestamp(new Date()).build());
         return flag&&flag2;
     }
     private Merchant buildEntity(MerchantUpdateDTO merchant){

@@ -59,7 +59,7 @@ public class MerchantHandler  {
         }
         MerchantShoppingReq req = new MerchantShoppingReq();
         req.setActionType(typeEnum.getCode());
-        req.setTimestamp(new Date());
+        req.setTimestamp(evt.getTimestamp());
         req.setRequestId(evt.getUserToken().toString());
         List<MerchantShoppingReq.ListBean> list = new ArrayList<>();
         List<String> merCodeList = new ArrayList<>();

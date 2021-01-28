@@ -84,15 +84,18 @@ public interface AccountService {
   AccountDetailDTO queryDetailPhoneAndMer(String phone);
 
   /**
-   * 恢复商户下所有已开通信用额度的账户的额度
+   * 恢复商户下所有的账户的额度
    * @param merCode
+   * @param merUpdateCreditAmount
+   * @param settlementTransNo
    */
-  void restoreSurplusQuotaByMerCode(String merCode);
+  void restoreSurplusQuotaByMerCode(String merCode, BigDecimal merUpdateCreditAmount, String settlementTransNo);
 
   /**
    * 恢复的账户的额度
    * @param accountCode
    * @param updateUser
+   * @param settlementTransNo
    */
-  void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser);
+  void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser, String settlementTransNo);
 }

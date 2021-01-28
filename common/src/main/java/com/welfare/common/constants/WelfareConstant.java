@@ -203,7 +203,8 @@ public class WelfareConstant {
         RESET_INCR("reset_incr","设置（增加)"),
         RESET_DECR("reset_decr","设置（减少)"),
         REBATE_DECR("rebate_decr","返点（减少)"),
-        REBATE_INCR("rebate_incr","返点（新增)");
+        REBATE_INCR("rebate_incr","返点（新增)"),
+        DEPOSIT_BACK("deposit_back","回冲");
         private final String code;
         private final String desc;
 

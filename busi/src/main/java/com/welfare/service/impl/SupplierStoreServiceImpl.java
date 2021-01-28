@@ -112,7 +112,28 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public List<SupplierStore> list(SupplierStoreListReq req) {
     QueryWrapper<SupplierStore> q = QueryHelper.getWrapper(req);
     q.orderByDesc(SupplierStore.CREATE_TIME);
-    return supplierStoreDao.list(q);
+    List<SupplierStore> supplierStores = supplierStoreDao.list(q);
+    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
+      for (SupplierStore s:
+          supplierStores) {
+      try {
+
+          if (Strings.isNotEmpty(s.getConsumType())) {
+            Map<String, Boolean> consumeTypeMap = mapper.readValue(
+                s.getConsumType(), Map.class);
+            ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
+            s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+          } else {
+            log.error(s.getConsumType() + "########");
+          }
+
+
+      } catch (JsonProcessingException e) {
+        log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
+      }
+    }
+    }
+      return supplierStores;
   }
 
   @Override

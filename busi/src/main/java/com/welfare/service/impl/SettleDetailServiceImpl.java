@@ -111,6 +111,12 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Override
     public BasePageVo<WelfareSettleDetailResp> queryWelfareSettleDetailPage(WelfareSettleDetailPageReq welfareSettleDetailPageReq) {
+        String merCode = welfareSettleDetailPageReq.getMerCode();
+
+        if(StringUtils.isBlank(merCode)){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+        }
+
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailPageReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
@@ -148,6 +154,10 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
+
+        if(monthSettle.getSettleAmount().compareTo(new BigDecimal(0)) == -1){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "结算金额为负，无法生成结算单", null);
+        }
 
         List<SettleStatisticsInfoDTO> settleStatisticsInfoDTOList = settleDetailMapper.getSettleStatisticsInfoByCondition(welfareSettleDetailQuery);
         if (!settleStatisticsInfoDTOList.isEmpty()) {

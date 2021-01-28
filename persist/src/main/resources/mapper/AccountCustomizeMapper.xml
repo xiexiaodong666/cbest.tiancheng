@@ -225,13 +225,13 @@
     CASE
 
     WHEN abd.trans_type = 'deposit_incr' THEN
-    trans_amount
+    trans_amount * ( - 1 )
     WHEN abd.trans_type = 'consume' THEN
-    trans_amount * ( - 1 )
-    WHEN abd.trans_type = 'refund' THEN
     trans_amount
-    WHEN abd.trans_type = 'deposit_back' THEN
+    WHEN abd.trans_type = 'refund' THEN
     trans_amount * ( - 1 )
+    WHEN abd.trans_type = 'deposit_back' THEN
+    trans_amount
     END
     ) AS accountTotalAmount,
     COUNT( abd.id ) AS tradeNum,

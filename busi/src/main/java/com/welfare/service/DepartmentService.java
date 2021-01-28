@@ -23,11 +23,17 @@ public interface DepartmentService {
     List<Department> list(DepartmentReq req);
 
     /**
-     * 转换树形结构
+     * 树形结构
      * @param merCode
      * @return
      */
     List<DepartmentTree> tree(String merCode);
+    /**
+     * 树形结构(不含商户)
+     * @param merCode
+     * @return
+     */
+    List<DepartmentTree> treeWithoutMerchant(String merCode);
 
     /**
      * 查询商户详情

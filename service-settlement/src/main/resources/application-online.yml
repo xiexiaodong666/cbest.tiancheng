@@ -56,12 +56,12 @@ cbest:
     notifyUrl: http://xxx/accountDepositRecord/payNotify
   oss:
     config:
-      bucket: sjgo-img-test
+      bucket: sjgo-img
 
 xxl:
   job:
     admin:
-      addresses: http://172.30.37.35:8180/
+      addresses: http://172.30.37.47:8334/
     executor:
       appname: e-welfare-settlement
       ip:
@@ -72,4 +72,4 @@ xxl:
 pos:
   onlines: 1001
 cdn:
-  server: http://img-test.sjgo365.com
+  server: http://img.sjgo365.com

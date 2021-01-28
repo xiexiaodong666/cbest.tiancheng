@@ -58,7 +58,7 @@ public abstract class PaymentRequest {
     private String paymentScene;
 
     public String calculatePaymentScene(){
-        String consumeType = o2oOrOnlineShopping(machineNo);
+        String consumeType = o2oOrOnlineShopping(machineNo,storeNo);
         //不是O2O或者ONLINE_SHOPPING,则为到店消费
         this.paymentScene =  consumeType == null ? ConsumeTypeEnum.SHOP_SHOPPING.getCode() :consumeType;
         return paymentScene;
@@ -69,9 +69,9 @@ public abstract class PaymentRequest {
      * @param machineNo
      * @return
      */
-    private String o2oOrOnlineShopping(String machineNo) {
+    private String o2oOrOnlineShopping(String machineNo,String storeCode) {
         SupplierStoreDao supplierStoreDao = SpringBeanUtils.getBean(SupplierStoreDao.class);
-        SupplierStore oneByCashierNo = supplierStoreDao.getOneByCashierNo(machineNo);
+        SupplierStore oneByCashierNo = supplierStoreDao.getOneByCashierNoAndStoreCode(machineNo,storeCode);
         if(Objects.isNull(oneByCashierNo)){
             return null;
         }else{

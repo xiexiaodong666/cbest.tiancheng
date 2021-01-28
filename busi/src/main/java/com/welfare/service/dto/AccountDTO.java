@@ -117,8 +117,11 @@ public class AccountDTO implements Serializable {
    * 员工卡号
    */
   @ApiModelProperty("员工卡号(如果存在多个逗号分隔)")
-  @ExcelProperty(value = "员工卡号(如果存在多个逗号分隔)")
   private String cardId;
+
+  @ApiModelProperty("员工卡号+状态")
+  @ExcelProperty(value = "员工卡号+状态(如果存在多个逗号分隔)")
+  private String cardIdString;
 
   /**
    * 账户余额

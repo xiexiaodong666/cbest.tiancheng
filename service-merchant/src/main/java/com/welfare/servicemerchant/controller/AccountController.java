@@ -57,8 +57,8 @@ public class AccountController implements IController {
 
   @GetMapping("/syncOldData")
   @ApiOperation("员工账户增量查询")
-  public R<List<AccountIncrementDTO>> incrementAccountList(@RequestParam(value = "accountStatus") Integer accountStatus){
-    accountService.batchSyncData(accountStatus);
+  public R<List<AccountIncrementDTO>> incrementAccountList(@RequestParam(value = "staffStatus") Integer staffStatus){
+    accountService.batchSyncData(staffStatus);
     return success();
   }
 

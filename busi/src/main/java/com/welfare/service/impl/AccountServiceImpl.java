@@ -270,18 +270,14 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public void batchSyncData(Integer accountStatus) {
+  public void batchSyncData(Integer staffStatus) {
     QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<Account>();
-    accountQueryWrapper.eq(Account.ACCOUNT_STATUS, accountStatus);
+    accountQueryWrapper.eq(Account.STAFF_STATUS, staffStatus);
     List<Account> accountList = accountDao.list(accountQueryWrapper);
 
     List<AccountChangeEventRecord> recordList = AccountUtils
         .getEventList(accountList, AccountChangeType.ACCOUNT_NEW);
     accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
-
-    for (Account account : accountList) {
-      account.setAccountStatus(AccountStatus.ENABLE.getCode());
-    }
     accountDao.updateBatchById(accountList);
 
     applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)

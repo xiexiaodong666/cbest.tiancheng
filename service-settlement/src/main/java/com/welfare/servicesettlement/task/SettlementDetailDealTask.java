@@ -100,7 +100,7 @@ public class SettlementDetailDealTask extends IJobHandler {
                 pullAccountDetailRecordMapper.updateById(pullAccountDetailRecord);
 
                 //执行前，环境清理，保证任务可重复执行
-                Date date = null;
+                /*Date date = null;
                 try {
                     date = DateUtil.str2DateTime(pullAccountDetailRecord.getDelDate(), DateUtil.DEFAULT_DATE_FORMAT);
                 } catch (ParseException e) {
@@ -110,7 +110,7 @@ public class SettlementDetailDealTask extends IJobHandler {
                         .eq(SettleDetail::getDataType, WelfareSettleConstant.SettleDetailDataTypeEnum.WELFARE)
                         .eq(SettleDetail::getMerCode, pullAccountDetailRecord.getMerCode())
                         .between(SettleDetail::getTransTime, DateUtil.getDayMin(date, -1), DateUtil.getDayMax(date, -1))
-                );
+                );*/
 
                 //执行数据拉取
                 pullAccountDetailRecordService.pullAccountDetailToSettleDetail(pullAccountDetailRecord);

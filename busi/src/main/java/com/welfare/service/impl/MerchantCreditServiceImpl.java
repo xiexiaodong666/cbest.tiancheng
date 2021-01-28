@@ -130,7 +130,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType) {
+    public List<MerchantAccountOperation> increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
         try{
@@ -142,6 +142,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                     .map(MerchantAccountOperation::getMerchantBillDetail)
                     .collect(Collectors.toList());
             merchantBillDetailDao.saveBatch(merchantBillDetails);
+            return increase;
         } finally {
             lock.unlock();
         }

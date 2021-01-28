@@ -62,8 +62,9 @@ public interface MerchantCreditService {
    * @param amount
    * @param transNo
    * @param transType
+   * @return
    */
-  void increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType);
+  List<MerchantAccountOperation> increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType);
 
   /**
    * 设置额度

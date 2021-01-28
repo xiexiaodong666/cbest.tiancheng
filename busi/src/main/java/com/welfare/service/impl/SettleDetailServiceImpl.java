@@ -111,6 +111,12 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Override
     public BasePageVo<WelfareSettleDetailResp> queryWelfareSettleDetailPage(WelfareSettleDetailPageReq welfareSettleDetailPageReq) {
+        String merCode = welfareSettleDetailPageReq.getMerCode();
+
+        if(StringUtils.isBlank(merCode)){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+        }
+
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailPageReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);

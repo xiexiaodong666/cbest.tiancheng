@@ -77,7 +77,7 @@ public class CardInfoServiceImpl implements CardInfoService {
   }
 
   @Override
-  public boolean disableCard(Set<String> cardIdSet) {
+  public boolean disableCard(Set<String> cardIdSet, Integer enabled) {
 
     QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
     queryWrapper.in(CardInfo.CARD_ID, cardIdSet);
@@ -88,7 +88,7 @@ public class CardInfoServiceImpl implements CardInfoService {
 
     for (CardInfo cardInfo :
         cardInfoList) {
-      cardInfo.setEnabled(CardEnable.DISABLE.code());
+      cardInfo.setEnabled(enabled);
     }
 
     return cardInfoDao.saveOrUpdateBatch(cardInfoList);

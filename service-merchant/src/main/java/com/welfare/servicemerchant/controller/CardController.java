@@ -103,9 +103,10 @@ public class CardController implements IController {
   @PostMapping("/disable")
   @ApiOperation("禁用卡片")
   public R<Boolean> disableCard(
-      @ApiParam("卡号") @RequestParam("cardIdSet") Set<String> cardIdSet) {
+      @ApiParam("卡号") @RequestParam("cardIdSet") Set<String> cardIdSet,
+      @ApiParam("1启动, 0 禁用") @RequestParam("enabled") Integer enabled) {
 
-    return success(cardInfoService.disableCard(cardIdSet));
+    return success(cardInfoService.disableCard(cardIdSet, enabled));
   }
 
   @PutMapping("/written")

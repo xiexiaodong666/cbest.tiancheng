@@ -194,20 +194,20 @@
     END as transTypeString,
     CASE
     WHEN abd.trans_type = 'deposit_incr' THEN
-    trans_amount
+    trans_amount * ( - 1 )
     WHEN abd.trans_type = 'consume' THEN
-    trans_amount * ( - 1 )
-    WHEN abd.trans_type = 'refund' THEN
     trans_amount
-    WHEN abd.trans_type = 'deposit_back' THEN
+    WHEN abd.trans_type = 'refund' THEN
     trans_amount * ( - 1 )
+    WHEN abd.trans_type = 'deposit_back' THEN
+    trans_amount
     END AS transAmount,
     abd.create_time AS createTime,
     abd.account_balance AS accountBalance
     FROM
     account_bill_detail abd
     LEFT JOIN supplier_store ss ON ss.store_code = abd.store_code
-    WHERE
+    WHERE abd.trans_type in('deposit_incr','consume','refund','deposit_back') and
     abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
       and abd.create_time <![CDATA[>=]]> #{createTimeStart}
@@ -239,7 +239,7 @@
     FROM
     account_bill_detail abd
     LEFT JOIN account a ON a.account_code = abd.account_code
-    WHERE
+    WHERE abd.trans_type in('deposit_incr','consume','refund','deposit_back') and
     abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
       and abd.create_time <![CDATA[>=]]> #{createTimeStart}

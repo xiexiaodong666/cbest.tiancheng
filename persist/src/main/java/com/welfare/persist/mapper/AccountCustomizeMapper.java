@@ -33,7 +33,8 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("accountStatus")Integer accountStatus,
       @Param("accountTypeCode")String accountTypeCode,
       @Param("binding") Integer binding,
-      @Param("cardId")String cardId);
+      @Param("cardId")String cardId,
+      @Param("phone")String phone);
 
   List<AccountPageDTO> queryPageDTO(@Param("merCode") String merCode,
       @Param("accountName")String accountName,
@@ -41,7 +42,8 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("accountStatus")Integer accountStatus,
       @Param("accountTypeCode")String accountTypeCode,
       @Param("binding") Integer binding,
-      @Param("cardId")String cardId);
+      @Param("cardId")String cardId,
+      @Param("phone")String phone);
 
   AccountDetailMapperDTO queryDetail(@Param("id") Long id);
 

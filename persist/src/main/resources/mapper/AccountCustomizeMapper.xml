@@ -130,6 +130,9 @@
     <if test=" cardId !='' and cardId != null ">
       and a. account_code in( select a1.account_code from account a1 left join card_info ci1 on ci1.account_code = a1.account_code where ci1.card_id = #{cardId})
     </if>
+    <if test=" phone !='' and phone != null ">
+      and a.phone = #{phone}
+    </if>
     GROUP BY a.account_code
     order by a.create_time desc
   </select>

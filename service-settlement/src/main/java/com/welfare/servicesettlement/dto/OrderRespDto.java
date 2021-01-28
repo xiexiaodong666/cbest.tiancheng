@@ -38,7 +38,7 @@ public class OrderRespDto implements Serializable {
     @ApiModelProperty("买家所属客户名称")
     private String accountMerName;
     @ApiModelProperty("买家卡号")
-    private String accountCardId;
+    private Integer accountCardId;
     @ApiModelProperty("门店编码")
     private String storeCode;
     @ApiModelProperty("门店名称")

@@ -45,7 +45,7 @@ public interface CardInfoService {
    * @param cardIdSet
    * @return
    */
-  boolean disableCard(Set<String> cardIdSet);
+  boolean disableCard(Set<String> cardIdSet, Integer enabled);
 
 
   /**

@@ -313,12 +313,38 @@ public class WelfareConstant {
          */
         NEW(0,"新增"),
         WRITTEN(1,"已写入"),
-        BIND(2,"已绑定"),
-        DISABLE(-1,"已禁用");
+        BIND(2,"已绑定");
         private final Integer code;
         private final String desc;
 
         CardStatus(Integer code, String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public Integer code(){
+            return this.code;
+        }
+
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+    /**
+     * 卡状态
+     */
+    public enum CardEnable{
+
+        /**
+         * 卡状态
+         */
+        ENABLE(1,"启用"),
+        DISABLE(0,"禁用");
+        private final Integer code;
+        private final String desc;
+
+        CardEnable(Integer code, String desc){
             this.code = code;
             this.desc = desc;
         }

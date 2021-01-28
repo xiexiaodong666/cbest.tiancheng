@@ -36,7 +36,7 @@ public class CardPaymentRequest extends PaymentRequest {
         CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
         CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(cardInsideInfo);
         Assert.notNull(cardInfo,"根据磁条号未找到卡片:" + cardInsideInfo);
-        Assert.isTrue(!WelfareConstant.CardStatus.DISABLE.code().equals(cardInfo.getCardStatus()),"卡片已禁用");
+        Assert.isTrue(WelfareConstant.CardEnable.ENABLE.code().equals(cardInfo.getEnabled()),"卡片已禁用");
         Long accountCode = cardInfo.getAccountCode();
         this.setAccountCode(accountCode);
         return accountCode;

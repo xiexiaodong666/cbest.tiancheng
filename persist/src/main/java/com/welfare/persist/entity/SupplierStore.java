@@ -136,7 +136,7 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
      */
     @ApiModelProperty("type 1商户，2门店")
     @TableField(exist = false)
-    private Boolean disabled;
+    private Boolean isMerchant;
 
 //以下为列明常量
 

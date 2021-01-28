@@ -111,4 +111,13 @@ public class SupplierStoreController implements IController {
         return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(supplierStoreService.exportList(req), SupplierStoreWithMerchantDTO.class,"门店导出")));
 
     }
+
+
+    @PostMapping("/batch-activate")
+    @ApiOperation("更改供应商门店激活状态")
+    @ApiUser
+    public R batchActivate(@RequestBody  List<SupplierStoreActivateReq> storeActivateReqs){
+        supplierStoreService.batchActivate(storeActivateReqs);
+        return R.success();
+    }
 }

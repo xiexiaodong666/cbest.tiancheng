@@ -51,6 +51,13 @@ public interface SupplierStoreService {
     boolean add(SupplierStoreAddDTO supplierStore);
 
     /**
+     * 数据迁移后将所有门店置为激活状态（慎用！）
+     * @param reqList
+     */
+    void batchActivate(List<SupplierStoreActivateReq> reqList);
+
+
+    /**
      * 更改供应商门店激活状态
      * @return
      */

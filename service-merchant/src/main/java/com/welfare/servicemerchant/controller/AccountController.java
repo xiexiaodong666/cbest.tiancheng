@@ -237,15 +237,4 @@ public class AccountController implements IController {
   public R<AccountDetailDTO> detailByPhoneAndMer(@RequestParam(required = false) @ApiParam(value = "员工手机号")  String phone){
     return success(accountService.queryDetailPhoneAndMer(phone));
   }
-
-//  @ApiOperation("测试")
-//  @PostMapping(value = "/test/{merCode}")
-//  public R<String> merCode(@PathVariable String merCode) {
-//    try {
-//      accountService.asyncRestoreSurplusQuotaByMerCode(merCode);
-//    } catch (BusiException be) {
-//      return R.fail(be.getMessage());
-//    }
-//    return R.success();
-//  }
 }

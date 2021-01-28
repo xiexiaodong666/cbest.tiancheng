@@ -11,6 +11,7 @@ import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.dto.RefundRequest;
+import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.RefundOperation;
 import lombok.RequiredArgsConstructor;
@@ -168,9 +169,10 @@ public class RefundServiceImpl implements RefundService {
             refundedAmount = refundedAmount.add(thisAccountTypeRefundAmount);
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(accountDeductionDetail, refundRequest, thisAccountTypeRefundAmount);
             AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes);
+
+            operateMerchantCredit(account, refundDeductionDetail);
             RefundOperation refundOperation = RefundOperation.of(refundBillDetail, refundDeductionDetail);
             refundOperations.add(refundOperation);
-            operateMerchantCredit(account, refundDeductionDetail);
             int refundCompare = refundedAmount.compareTo(remainingRefundAmount);
             if (refundCompare == 0) {
                 break;
@@ -206,13 +208,22 @@ public class RefundServiceImpl implements RefundService {
             //用户所属商户和门店的商户是同一个，表示是在自营消费的退款，不操作商家
             return;
         }
-        merchantCreditService.increaseAccountType(
+        List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.increaseAccountType(
                 account.getMerCode(),
                 WelfareConstant.MerCreditType.REMAINING_LIMIT,
                 refundDeductionDetail.getTransAmount(),
                 refundDeductionDetail.getTransNo(),
                 WelfareConstant.TransType.REFUND.code()
         );
+        BigDecimal currentBalanceOperated = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
+                .filter(detail -> WelfareConstant.MerCreditType.CURRENT_BALANCE.code().equals(detail.getBalanceType()))
+                .map(MerchantBillDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal remainingLimitOperated = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
+                .filter(detail -> WelfareConstant.MerCreditType.REMAINING_LIMIT.code().equals(detail.getBalanceType()))
+                .map(MerchantBillDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        refundDeductionDetail.setMerDeductionAmount(currentBalanceOperated);
+        refundDeductionDetail.setMerDeductionCreditAmount(remainingLimitOperated);
     }
 
     @Override

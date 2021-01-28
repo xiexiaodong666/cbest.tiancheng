@@ -130,6 +130,9 @@
     <if test=" cardId !='' and cardId != null ">
       and a. account_code in( select a1.account_code from account a1 left join card_info ci1 on ci1.account_code = a1.account_code where ci1.card_id = #{cardId})
     </if>
+    <if test=" phone !='' and phone != null ">
+      and a.phone = #{phone}
+    </if>
     GROUP BY a.account_code
     order by a.create_time desc
   </select>
@@ -168,17 +171,20 @@ WHERE a.mer_code = at.mer_code
     ss.store_name AS storeName,
     abd.trans_type AS transType,
     CASE
-    when abd.trans_type = 'deposit' then "充值"
+    when abd.trans_type = 'deposit_incr' then "充值"
     when abd.trans_type = 'consume' then "消费"
     when abd.trans_type = 'refund' then "退款"
+    when abd.trans_type = 'deposit_back' then "回冲"
     END as transTypeString,
     CASE
-    WHEN abd.trans_type = 'deposit' THEN
+    WHEN abd.trans_type = 'deposit_incr' THEN
     trans_amount
     WHEN abd.trans_type = 'consume' THEN
     trans_amount * ( - 1 )
     WHEN abd.trans_type = 'refund' THEN
     trans_amount
+    WHEN abd.trans_type = 'deposit_back' THEN
+    trans_amount * ( - 1 )
     END AS transAmount,
     abd.create_time AS createTime,
     abd.account_balance AS accountBalance
@@ -193,6 +199,7 @@ WHERE a.mer_code = at.mer_code
     <if test="createTimeEnd != null ">
       and abd.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
+    order by abd.create_time desc
   </select>
 
   <select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">
@@ -201,12 +208,14 @@ WHERE a.mer_code = at.mer_code
     SUM(
     CASE
 
-    WHEN abd.trans_type = 'deposit' THEN
+    WHEN abd.trans_type = 'deposit_incr' THEN
     trans_amount
     WHEN abd.trans_type = 'consume' THEN
     trans_amount * ( - 1 )
     WHEN abd.trans_type = 'refund' THEN
     trans_amount
+    WHEN abd.trans_type = 'deposit_back' THEN
+    trans_amount * ( - 1 )
     END
     ) AS accountTotalAmount,
     COUNT( abd.id ) AS tradeNum,

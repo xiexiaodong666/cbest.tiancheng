@@ -353,6 +353,7 @@ public class PaymentServiceImpl implements PaymentService {
         accountBillDetail.setTransAmount(operatedAmount);
         accountBillDetail.setStoreCode(paymentRequest.getStoreNo());
         accountBillDetail.setCardId(paymentRequest.getCardNo());
+        accountBillDetail.setOrderChannel(paymentRequest.getPaymentScene());
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
         BigDecimal accountSurplusQuota = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
         accountBillDetail.setAccountBalance(accountBalance);

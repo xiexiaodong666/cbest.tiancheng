@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.CardEnable;
 import com.welfare.common.enums.SequenceTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -119,6 +120,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       cardInfo.setMagneticStripe(prefix + GenerateCodeUtil.UUID());
       cardInfo.setCardStatus(WelfareConstant.CardStatus.NEW.code());
       cardInfo.setDeleted(false);
+      cardInfo.setEnabled(CardEnable.ENABLE.code());
       // cardInfo.setCreateUser(cardApply.getCreateUser());
 
       cardInfoList.add(cardInfo);

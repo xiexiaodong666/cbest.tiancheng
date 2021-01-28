@@ -134,6 +134,7 @@ public class OrderController implements IController {
 
     private void beanCopy(OrderInfoDTO orderInfo , OrderRespDto orderRespDto){
         BeanUtils.copyProperties(orderInfo , orderRespDto);
+        orderRespDto.setAccountCardId(orderInfo.getCardId());
         orderRespDto.setOrderAmount(orderInfo.getOrderAmount() != null ? orderInfo.getOrderAmount().toPlainString() : "0");
     }
 

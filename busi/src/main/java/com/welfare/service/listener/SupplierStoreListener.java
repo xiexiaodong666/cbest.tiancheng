@@ -42,7 +42,6 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private List<SupplierStoreAddDTO> list = new ArrayList<>();
 
   private List<String> merCodeList = new LinkedList();
-  private List<String> casherNoList = new LinkedList();
   private List<String> storeCodeList = new LinkedList();
   private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getExcelType(),ConsumeTypeEnum.ONLINE_MALL.getExcelType(),ConsumeTypeEnum.SHOP_SHOPPING.getExcelType()});
 
@@ -101,8 +100,10 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       }else{
         if(storeImportDTO.getCashierNo().length()>255){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
-        }else{
-          casherNoList.add(storeImportDTO.getCashierNo());
+        }
+        String regex = "^[V][0-9]{3}+$";
+        if(!storeImportDTO.getCashierNo().matches(regex)){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
         }
 
       }
@@ -164,23 +165,6 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
 
   private boolean check() {
     boolean flag=true;
-    if(EmptyChecker.notEmpty(casherNoList)){
-      Map<String,List<String>> casherNoGroupMap= casherNoList.stream().collect(Collectors.groupingBy(String::toString));
-      for(Map.Entry<String,List<String>> entry:casherNoGroupMap.entrySet()){
-        if(entry.getValue().size()>1){
-          uploadInfo.append("excel文件中存在重复的虚拟收银机号:").append(entry.getKey()).append(";");
-          flag=false;
-        }
-      }
-      QueryWrapper<SupplierStore> storeCashQuery=new QueryWrapper<>();
-      storeCashQuery.in(SupplierStore.CASHIER_NO,casherNoList);
-      List<SupplierStore> storesCash=storeService.list(storeCashQuery);
-      if(EmptyChecker.notEmpty(storesCash)){
-        String cashStr=storesCash.stream().map(item->item.getCashierNo()).collect(Collectors.joining(","));
-        uploadInfo.append("虚拟收银机号重复:").append(cashStr).append(";");
-        flag=false;
-      }
-    }
     if(EmptyChecker.notEmpty(storeCodeList)){
       Map<String,List<String>> groupMap= storeCodeList.stream().collect(Collectors.groupingBy(String::toString));
       for(Map.Entry<String,List<String>> entry:groupMap.entrySet()){

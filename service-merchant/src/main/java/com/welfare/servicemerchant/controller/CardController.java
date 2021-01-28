@@ -16,6 +16,7 @@ import com.welfare.service.AccountService;
 import com.welfare.service.CardApplyService;
 import com.welfare.service.CardInfoService;
 import com.welfare.service.MerchantService;
+import com.welfare.servicemerchant.dto.DisableCardDTO;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -102,12 +103,10 @@ public class CardController implements IController {
 
   @PostMapping("/disable")
   @ApiOperation("禁用卡片")
-  @ApiUser
   public R<Boolean> disableCard(
-      @ApiParam("卡号") @RequestParam("cardIdSet") Set<String> cardIdSet,
-      @ApiParam("1启动, 0 禁用") @RequestParam("enabled") Integer enabled) {
+      @RequestBody DisableCardDTO disableCardDTO) {
 
-    return success(cardInfoService.disableCard(cardIdSet, enabled));
+    return success(cardInfoService.disableCard(disableCardDTO.getCardIdSet(), disableCardDTO.getEnabled()));
   }
 
   @PutMapping("/written")

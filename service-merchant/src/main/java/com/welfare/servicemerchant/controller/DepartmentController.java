@@ -73,4 +73,10 @@ public class DepartmentController implements IController {
     public R delete(@PathVariable @NotBlank String  departmentCode){
         return R.status(departmentService.delete(departmentCode),"删除失败");
     }
+
+    @GetMapping("/tree-without-merchant")
+    @ApiOperation("根据商户代码查询商户部门列表（树形）")
+    public R<List<DepartmentTree>> treeWithoutMerchant(String merCode){
+        return R.success(departmentService.treeWithoutMerchant(merCode));
+    }
 }

@@ -278,6 +278,10 @@ public class AccountServiceImpl implements AccountService {
     List<AccountChangeEventRecord> recordList = AccountUtils
         .getEventList(accountList, AccountChangeType.ACCOUNT_NEW);
     accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_NEW);
+
+    for (Account account : accountList) {
+      account.setStaffStatus("0");
+    }
     accountDao.updateBatchById(accountList);
 
     applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)

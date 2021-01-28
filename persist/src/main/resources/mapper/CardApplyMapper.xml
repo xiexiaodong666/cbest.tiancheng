@@ -21,7 +21,8 @@
     ca.STATUS as status,
     ca.create_time as createTime,
     m.mer_name as merName,
-    ca.apply_code as applyCode
+    ca.apply_code as applyCode,
+    enabled as enabled
     FROM
     card_apply ca
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code
@@ -55,8 +56,8 @@
     ca.STATUS as status,
     ca.create_time as createTime,
     m.mer_name as merName,
-    ca.apply_code as applyCode
-
+    ca.apply_code as applyCode,
+    enabled as enabled
     FROM
     card_apply ca
     LEFT JOIN merchant m ON m.mer_code = ca.mer_code

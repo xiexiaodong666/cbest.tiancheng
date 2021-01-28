@@ -87,6 +87,12 @@ public class CardController implements IController {
     Merchant merchant = merchantService.queryByCode(cardApply.getMerCode());
     CardInfoApiDTO cardInfoApiDTO = tranferToCardInfoApiDTO(cardInfo, cardApply);
 
+    Account account = accountService.getByAccountCode(cardInfo.getAccountCode());
+    if(account != null) {
+      cardInfoApiDTO.setAccountName(account.getAccountName());
+      cardInfoApiDTO.setPhone(account.getPhone());
+    }
+
     cardInfoApiDTO.setMerName(merchant.getMerName());
     return success(cardInfoApiDTO);
   }

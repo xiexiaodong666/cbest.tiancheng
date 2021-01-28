@@ -131,4 +131,11 @@ public class CardInfoApiDTO {
 
   @ApiModelProperty("启用状态")
   private Integer enabled;
+
+
+  @ApiModelProperty("启用状态")
+  private String accountName;
+
+  @ApiModelProperty("启用状态")
+  private String phone;
 }

@@ -128,4 +128,7 @@ public class CardInfoApiDTO {
    */
   @ApiModelProperty("商户名称")
   private String merName;
+
+  @ApiModelProperty("启用状态")
+  private Integer enabled;
 }

@@ -29,7 +29,9 @@
     ci.create_time as createTime,
     ci.written_time as writtenTime,
     ci.bind_time as bindTime,
-    a.phone as accountCode
+    a.phone as accountCode,
+    ci.enabled as enabled
+
     FROM
     card_info ci
     LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
@@ -84,7 +86,9 @@
 	ci.create_time AS createTime,
 	ci.written_time AS writtenTime,
 	ci.bind_time AS bindTime,
-	ci.account_code AS accountCode
+	ci.account_code AS accountCode,
+	ci.enabled as enabled
+
 FROM
 	card_info ci
 	LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
@@ -107,7 +111,9 @@ WHERE
     ci.create_time as createTime,
     ci.written_time as writtenTime,
     ci.bind_time as bindTime,
-    a.phone as accountCode
+    a.phone as accountCode,
+    ci.enabled as enabled
+
     FROM
     card_info ci
     LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code

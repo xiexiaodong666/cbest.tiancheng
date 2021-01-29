@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://192.1.30.205:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://db.haproxy.cbest.gam:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: jav_tclife_rw
     password: 3uUacFIf3PDoBy
     type: com.alibaba.druid.pool.DruidDataSource
@@ -19,7 +19,7 @@ spring:
     timeout: 5000
     database: 0
     password: v6z82Ebfc7I1
-    host: 192.1.30.205
+    host: redis.cbest.gam
     port: 6399
   kafka:
     servers: 192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667

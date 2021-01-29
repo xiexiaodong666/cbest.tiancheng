@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://192.1.30.205:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true
+    url: jdbc:mysql://db.haproxy.cbest.gam:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true
     username: jav_tclife_rw
     password: 3uUacFIf3PDoBy
     driverClassName: com.mysql.jdbc.Driver
@@ -9,13 +9,13 @@ spring:
     lettuce:
       pool:
         max-idle: 30
-        max-active: 500
+        max-active: 200
         min-idle: 2
         max-wait: 1000
     timeout: 5000
     database: 0
     password: v6z82Ebfc7I1
-    host: 192.1.30.205
+    host: redis.cbest.gam
     port: 6399
   servlet:
     multipart:

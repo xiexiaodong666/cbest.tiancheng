@@ -30,7 +30,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
             return super.getAccountCode();
         }
         BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
-        Long accountCode = barcodeService.parseAccountFromBarcode(barcode, getOffline());
+        Long accountCode = barcodeService.parseAccountFromBarcode(barcode, scanDate,getOffline());
         this.setAccountCode(accountCode);
         return accountCode;
     }

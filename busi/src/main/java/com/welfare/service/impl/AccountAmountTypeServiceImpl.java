@@ -54,7 +54,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
      */
     @Autowired
     private AccountBillDetailService accountBillDetailService;
-    private AccountDeductionDetailDao accountDeductionDetailDao;
+    private final AccountDeductionDetailDao accountDeductionDetailDao;
 
     @Override
     public int batchSaveOrUpdate(List<AccountAmountType> list) {

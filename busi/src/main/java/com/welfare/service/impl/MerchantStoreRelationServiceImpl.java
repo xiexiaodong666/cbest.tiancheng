@@ -22,6 +22,7 @@ import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
@@ -262,7 +263,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
   List<MerchantStoreRelation> removeMerchantStoreRelationList = new ArrayList<>();
 
-    Map<String, String> storeCodeConsumeTypeMap = new HashMap<>();
+    List<StoreConsumeRelationDTO> storeConsumeRelationDTOS = new ArrayList<>();
     for(
   MerchantStoreRelation m :
   merchantStoreRelations)
@@ -275,7 +276,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if (adminMerchantStoreOptional.isPresent()) {
       AdminMerchantStore adminMerchantStore = adminMerchantStoreOptional.get();
 
-      storeCodeConsumeTypeMap.put(adminMerchantStore.getStoreCode(), adminMerchantStore.getConsumType());
+      StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
+      storeConsumeRelationDTO.setStoreCode(adminMerchantStore.getStoreCode());
+      storeConsumeRelationDTO.setConsumeType(adminMerchantStore.getConsumType());
+
+      storeConsumeRelationDTOS.add(storeConsumeRelationDTO);
 
       m.setConsumType(adminMerchantStore.getConsumType());
       m.setStoreCode(adminMerchantStore.getStoreCode());
@@ -313,8 +318,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   }
 
     // 同步员工消费方法
-    accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-        merchantStoreRelation.getMerCode(), storeCodeConsumeTypeMap);
+    accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(
+        merchantStoreRelation.getMerCode(), storeConsumeRelationDTOS);
 
 
     if(CollectionUtils.isNotEmpty(removeMerchantStoreRelationList))

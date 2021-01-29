@@ -39,6 +39,7 @@ import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
@@ -625,14 +626,20 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
     boolean isSaveOrUpdateBatch = merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);
 
+    List<StoreConsumeRelationDTO> relationDTOList = new ArrayList<>();
+
     Map<String, List<MerchantStoreRelation>> mapByMerCode = storeRelationList.stream()
         .collect(Collectors.groupingBy(t -> t.getMerCode()));
     for (Map.Entry<String, List<MerchantStoreRelation>> m : mapByMerCode.entrySet()) {
 
-      Map<String, String> maps = m.getValue().stream().collect(Collectors.toMap(MerchantStoreRelation::getStoreCode, MerchantStoreRelation::getConsumType, (key1, key2) -> key2));
-
-
-      accountConsumeSceneStoreRelationService.updateStoreConsumeType(m.getKey(), maps);
+      for (MerchantStoreRelation merchantStoreRelation : m.getValue()) {
+        StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
+        storeConsumeRelationDTO.setStoreCode(merchantStoreRelation.getStoreCode());
+        storeConsumeRelationDTO.setConsumeType(merchantStoreRelation.getConsumType());
+        relationDTOList.add(storeConsumeRelationDTO);
+      }
+      
+      accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(m.getKey(), relationDTOList);
     }
       queryWrapper = new QueryWrapper<>();
     queryWrapper.in(MerchantStoreRelation.MER_CODE, mapByMerCode.keySet());

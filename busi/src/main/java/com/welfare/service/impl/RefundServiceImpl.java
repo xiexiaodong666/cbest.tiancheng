@@ -170,9 +170,8 @@ public class RefundServiceImpl implements RefundService {
             }
             accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(thisAccountTypeRefundAmount));
             refundedAmount = refundedAmount.add(thisAccountTypeRefundAmount);
-            AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(accountDeductionDetail, refundRequest, thisAccountTypeRefundAmount);
+            AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(accountDeductionDetail, refundRequest, thisAccountTypeRefundAmount,accountAmountType);
             AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes,tmpAccountBillDetail.getOrderChannel());
-
             operateMerchantCredit(account, refundDeductionDetail);
             RefundOperation refundOperation = RefundOperation.of(refundBillDetail, refundDeductionDetail);
             refundOperations.add(refundOperation);
@@ -195,7 +194,7 @@ public class RefundServiceImpl implements RefundService {
                 .map(paymentDeductionDetail -> toRefundDeductionDetail(
                         paymentDeductionDetail,
                         refundRequest,
-                        paymentDeductionDetail.getTransAmount())
+                        paymentDeductionDetail.getTransAmount(), accountAmountTypeMap.get(paymentDeductionDetail.getMerAccountType()))
                 ).map(refundDeductionDetail -> {
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(refundDeductionDetail.getMerAccountType());
                     accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(refundDeductionDetail.getTransAmount()));
@@ -310,10 +309,11 @@ public class RefundServiceImpl implements RefundService {
      * @param accountDeductionDetail
      * @param refundRequest
      * @param refundAmountForThis    这条退款金额多少
+     * @param accountAmountType
      * @return
      */
     private AccountDeductionDetail toRefundDeductionDetail(AccountDeductionDetail accountDeductionDetail,
-                                                           RefundRequest refundRequest, BigDecimal refundAmountForThis) {
+                                                           RefundRequest refundRequest, BigDecimal refundAmountForThis, AccountAmountType accountAmountType) {
         AccountDeductionDetail refundDeductionDetail = new AccountDeductionDetail();
         BeanUtils.copyProperties(accountDeductionDetail, refundDeductionDetail);
         refundDeductionDetail.setTransAmount(refundAmountForThis);
@@ -324,6 +324,7 @@ public class RefundServiceImpl implements RefundService {
         refundDeductionDetail.setTransTime(refundRequest.getRefundDate());
         refundDeductionDetail.setTransNo(refundRequest.getTransNo());
         refundDeductionDetail.setRelatedTransNo(accountDeductionDetail.getTransNo());
+        refundDeductionDetail.setAccountAmountTypeBalance(accountAmountType.getAccountBalance());
         //保存时自动赋值
         refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);

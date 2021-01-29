@@ -29,7 +29,6 @@
 
     <select id="getSettleDetailFromAccountDetail" parameterType="Map" resultType="com.welfare.persist.entity.SettleDetail">
         select
-        t1.id as id,
         null as orderId,
         t1.trans_no as transNo,
         t1.account_code as accountCode,
@@ -100,11 +99,11 @@
             t1.mer_account_type_name as welfare_type_name,
             case when t1.trans_type='consume' then t1.trans_amount
                  when t1.trans_type='refund' then t1.trans_amount*-1 end as pay_amount,
-            case when t1.trans_type='consume' then 0
+            case when t1.trans_type='consume' then 0.00
                  when t1.trans_type='refund' then t1.trans_amount end as refund_amount,
             case when t1.trans_type='consume' then t1.trans_amount
                  when t1.trans_type='refund' then t1.trans_amount*-1 end as real_amount,
-            case when t3.mer_code = t1.mer_code then 0
+            case when t3.mer_code = t1.mer_code then 0.00
                  when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.mer_credit_deduction_amount
                  when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
                  else 0 end as settle_amount
@@ -172,7 +171,7 @@
         t1.mer_name as mer_name,
         sum(
         case
-            when t3.mer_code = t1.mer_code  then 0
+            when t3.mer_code = t1.mer_code  then 0.00
             when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.mer_credit_deduction_amount
             when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
             else 0 end
@@ -216,7 +215,7 @@
         ) as transAmount,
         sum(
         case
-             when t3.mer_code = t1.mer_code then 0
+             when t3.mer_code = t1.mer_code then 0.00
              when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.mer_credit_deduction_amount
              when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
              else 0 end
@@ -249,7 +248,7 @@
             t1.mer_account_type_name as settleAccountTypeName,
             sum(
                 case
-                when t3.mer_code = t1.mer_code  then 0
+                when t3.mer_code = t1.mer_code  then 0.00
                 when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.mer_credit_deduction_amount
                 when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
                 else 0 end
@@ -282,7 +281,7 @@
         case when t1.trans_type='consume' then t1.trans_amount
              when t1.trans_type='refund' then t1.trans_amount*-1 end as payAmount,
         case
-            when t3.mer_code = t1.mer_code then 0
+            when t3.mer_code = t1.mer_code then 0.00
             when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.mer_credit_deduction_amount
             when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
             else 0 end as settleAmount
@@ -320,7 +319,7 @@
         select
         sum(
         case
-            when t3.mer_code = t1.mer_code then 0
+            when t3.mer_code = t1.mer_code then 0.00
             when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.mer_credit_deduction_amount
             when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
         else 0 end

@@ -53,7 +53,7 @@ mybatis-plus:
 
 
 platformUser:
-  url: http://test-welfare-app.sjgo365.com/shop-api/tc/store
+  url: http://welfare-internal.kube.cbestcd.com/backend-api/tc/store
 
 shopping:
   url: http://welfare-internal.kube.cbestcd.com/backend-api/rpc-base

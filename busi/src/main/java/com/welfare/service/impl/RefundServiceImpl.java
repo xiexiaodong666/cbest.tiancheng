@@ -249,6 +249,7 @@ public class RefundServiceImpl implements RefundService {
                     .map(AccountDeductionDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             refundRequest.setAmount(amount);
             Account account = accountService.getByAccountCode(detail.getAccountCode());
+            refundRequest.setAccountMerCode(account.getMerCode());
             refundRequest.setAccountBalance(account.getAccountBalance());
             refundRequest.setAccountCredit(account.getSurplusQuota());
             refundRequest.setAccountCode(account.getAccountCode());

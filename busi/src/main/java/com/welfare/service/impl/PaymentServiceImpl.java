@@ -184,6 +184,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAmount(amount);
 
             Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
+            paymentRequest.setAccountMerCode(account.getMerCode());
             paymentRequest.setAccountBalance(account.getAccountBalance());
             paymentRequest.setAccountName(account.getAccountName());
             paymentRequest.setAccountCredit(account.getSurplusQuota());

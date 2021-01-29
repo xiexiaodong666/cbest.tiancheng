@@ -91,7 +91,7 @@ public class OrderController implements IController {
             PageVo.Ext ext1 = new PageVo.Ext();
             if (orderSummary != null){
                 ext1.setAmount(orderSummary.getOrderAmount() == null ? "0": orderSummary.getOrderAmount());
-                ext1.setOrderNum(orderSummary.getOrderNum()== null ? 0 : orderSummary.getOrderNum());
+                ext1.setOrderNum(orderSummary.getOrderNum() == null? 0 :orderSummary.getOrderNum() );
                 resultPage.setExt(ext1);
             }
         }else{

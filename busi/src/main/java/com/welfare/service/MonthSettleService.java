@@ -8,6 +8,7 @@ import com.welfare.persist.entity.MonthSettle;
 import com.welfare.service.dto.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 月度结算账单服务接口
@@ -68,4 +69,6 @@ public interface MonthSettleService {
     Boolean addMonthSettleList(List<MonthSettle> monthSettleList);
 
     MonthSettle getMonthSettleById(Long id);
+
+    Map<String, Object> getAccoutType(String merCode);
 }

@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -235,6 +236,11 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     @Override
     public MonthSettle getMonthSettleById(Long id) {
         return monthSettleMapper.selectById(id);
+    }
+
+    @Override
+    public Map<String, Object> getAccoutType(String merCode) {
+        return monthSettleMapper.getAccoutType(merCode);
     }
 
     /**

@@ -25,4 +25,6 @@ public interface MonthSettleMapper extends BaseMapper<MonthSettle> {
     MonthSettle sumSettleDetailToMonthSettle(MonthSettleDetailQuery monthSettleDetailQuery);
 
     Map<String, Object> selectMonthSettleSummaryInfo(MonthSettleQuery monthSettleQuery);
+
+    Map<String, Object> getAccoutType(String merCode);
 }

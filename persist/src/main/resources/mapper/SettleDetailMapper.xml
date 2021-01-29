@@ -29,7 +29,6 @@
 
     <select id="getSettleDetailFromAccountDetail" parameterType="Map" resultType="com.welfare.persist.entity.SettleDetail">
         select
-        t1.id as id,
         null as orderId,
         t1.trans_no as transNo,
         t1.account_code as accountCode,

@@ -196,7 +196,8 @@
         merchant_account_type t1
         left join merchant t2
         on t1.mer_code=t2.mer_code
-        where t.mer_code = #{merCode}
+        where t1.mer_code = #{merCode}
+        and t1.deleted=0 and t2.deleted=0
         and (CASE WHEN t2.self_recharge !=1 THEN t1.mer_account_type_code!='self'
 			else 1=1 END)
     </select>

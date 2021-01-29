@@ -17,7 +17,12 @@
         WHEN 'deposit_incr' THEN
         m.mer_name
         WHEN 'deposit_decr' THEN
-        m.mer_name ELSE ss.store_name
+        m.mer_name
+        WHEN 'reset_incr' THEN
+        m.mer_name
+        WHEN 'reset_decr' THEN
+        m.mer_name
+        ELSE ss.store_name
         END AS storeName,
         aded.trans_type AS transType,
         aded.trans_amount AS transAmount,
@@ -43,6 +48,7 @@
                 <![CDATA[AND aded.trans_time <= #{endTransTime}]]>
             </if>
         </where>
+        ORDER BY aded.trans_time DESC
     </select>
 
 </mapper>

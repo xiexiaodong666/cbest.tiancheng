@@ -2,36 +2,46 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.annotation.RepeatRequestVerification;
 import com.welfare.common.exception.BusiException;
-import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
-import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.AccountBillDTO;
+import com.welfare.service.dto.AccountBillDetailDTO;
+import com.welfare.service.dto.AccountDTO;
+import com.welfare.service.dto.AccountDetailDTO;
+import com.welfare.service.dto.AccountDetailParam;
+import com.welfare.service.dto.AccountIncrementReq;
+import com.welfare.service.dto.AccountPageReq;
+import com.welfare.service.dto.AccountReq;
 import com.welfare.servicemerchant.dto.UpdateStatusReq;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author duanhy
  * @version 1.0.0
- * @description
  * @date 2021/1/6  5:16 PM
  */
 @Slf4j
@@ -41,10 +51,16 @@ import java.util.List;
 @Api(tags = "员工账号管理")
 public class AccountController implements IController {
 
-  @Autowired
-  private AccountService accountService;
-  @Autowired
-  private FileUploadService fileUploadService;
+  private final AccountService accountService;
+  private final FileUploadService fileUploadService;
+
+
+  @GetMapping("/syncOldData")
+  @ApiOperation("员工账户增量查询")
+  public R<List<AccountIncrementDTO>> incrementAccountList(@RequestParam(value = "staffStatus") Integer staffStatus){
+    accountService.batchSyncData(staffStatus);
+    return success();
+  }
 
 
   @GetMapping("/increment")
@@ -89,6 +105,7 @@ public class AccountController implements IController {
   @PostMapping("/save")
   @ApiOperation("新增员工账号")
   @MerchantUser
+  @RepeatRequestVerification(prefixKey= "e-welfare-repeat-request:account_save")
   public R<Boolean> save(@RequestBody AccountReq accountReq) {
     try {
 
@@ -168,7 +185,7 @@ public class AccountController implements IController {
 
   @GetMapping("/bill")
   @ApiOperation("员工账号消费汇总")
-  public R<AccountBillDTO> quertBill(
+  public R<AccountBillDTO> queryBill(
       @RequestParam(required = false) @ApiParam("accountCode") String accountCode,
       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
       @RequestParam(required = false) @ApiParam("创建时间_start") Date createTimeStart,
@@ -217,7 +234,7 @@ public class AccountController implements IController {
   @GetMapping("/detailByPhoneAndMerCode")
   @ApiOperation("通过手机号查询当前商户下的员工账号详情")
   @MerchantUser
-  public R<AccountDetailDTO> detailByPhoneAndMer(@RequestParam(required = false) @ApiParam(value = "员工手机号" ,required = false)  String phone){
+  public R<AccountDetailDTO> detailByPhoneAndMer(@RequestParam(required = false) @ApiParam(value = "员工手机号")  String phone){
     return success(accountService.queryDetailPhoneAndMer(phone));
   }
 }

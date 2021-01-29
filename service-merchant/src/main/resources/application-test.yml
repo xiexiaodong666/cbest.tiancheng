@@ -3,6 +3,10 @@ spring:
     url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true
     username: root
     password: mysql@123
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 logging:
   file:
     path: /home/finance/Logs/e-welfare-merchant.e-cbest.lotest

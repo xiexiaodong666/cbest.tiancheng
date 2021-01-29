@@ -11,6 +11,7 @@ import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
+import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ConsumeTypesUtils;
@@ -51,7 +52,6 @@ import com.welfare.service.listener.SupplierStoreListener;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
-import com.welfare.service.sync.event.MarketCreateEvt;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
@@ -112,7 +112,28 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public List<SupplierStore> list(SupplierStoreListReq req) {
     QueryWrapper<SupplierStore> q = QueryHelper.getWrapper(req);
     q.orderByDesc(SupplierStore.CREATE_TIME);
-    return supplierStoreDao.list(q);
+    List<SupplierStore> supplierStores = supplierStoreDao.list(q);
+    if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
+      for (SupplierStore s:
+          supplierStores) {
+      try {
+
+          if (Strings.isNotEmpty(s.getConsumType())) {
+            Map<String, Boolean> consumeTypeMap = mapper.readValue(
+                s.getConsumType(), Map.class);
+            ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
+            s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
+          } else {
+            log.error(s.getConsumType() + "########");
+          }
+
+
+      } catch (JsonProcessingException e) {
+        log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
+      }
+    }
+    }
+      return supplierStores;
   }
 
   @Override
@@ -256,6 +277,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Transactional(rollbackFor = Exception.class)
   public boolean add(SupplierStoreAddDTO supplierStore) {
     checkConsumType(supplierStore.getConsumType());
+    if(EmptyChecker.notEmpty(supplierStore.getAddressList())
+            &&supplierStore.getAddressList().size()>10){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
+    }
     Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
     if (EmptyChecker.isEmpty(merchant)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
@@ -282,6 +307,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
     //同步商城中台
+    //同步重百付
     if (!flag) {
       throw new BusiException("新增门店失败");
     }
@@ -291,12 +317,30 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).build());
-   //同步重百付
-    applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(detailDTO).build());
+        ShoppingActionTypeEnum.ADD).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag;
   }
-
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void batchActivate(List<SupplierStoreActivateReq> reqList) {
+    if(EmptyChecker.notEmpty(reqList)){
+      for(SupplierStoreActivateReq req:reqList){
+        if(!activate(req)){
+          throw new BusiException("更新激活状态失败【"+req.getId()+"】,【"+req.getStatus()+"】");
+        }
+      }
+    }else{
+      List<SupplierStore> list=supplierStoreDao.list();
+      for(SupplierStore ss:list){
+        SupplierStoreActivateReq req=new SupplierStoreActivateReq();
+        req.setId(ss.getId());
+        req.setStatus(SupplierStoreStatusEnum.ACTIVATED.getCode());
+        if(!activate(req)){
+          throw new BusiException("更新激活状态失败【"+req.getId()+"】,【"+req.getStatus()+"】");
+        }
+      }
+    }
+  }
   @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean activate(SupplierStoreActivateReq storeActivateReq) {
@@ -321,7 +365,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(sync);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.ACTIVATE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.ACTIVATE).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag;
   }
 
@@ -361,13 +405,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       throw new BusiException("导入门店--批量插入地址失败");
     }
     //同步商城中台
-    applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncList)
-                                        .build());
     //同步重百付
     for(SupplierStoreSyncDTO item: syncList){
-      applicationContext.publishEvent(MarketCreateEvt.builder().supplierStoreSyncDTO(item).build());
-    }
+      //为了保证事件可以支持批量推送，所以只有重新创建一个，只有一个元素的集合
+      List<SupplierStoreSyncDTO> syncItemList=new ArrayList<>();
+      syncItemList.add(item);
+      applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
+              ShoppingActionTypeEnum.BATCH_ADD).supplierStoreDetailDTOS(syncItemList).timestamp(new Date())
+              .build());    }
     return Boolean.TRUE;
   }
 
@@ -412,7 +457,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(supplierStoreSyncConverter.toD(supplierStore));
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.DELETE).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag;
   }
 
@@ -420,6 +465,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Transactional(rollbackFor = Exception.class)
   public boolean update(SupplierStoreUpdateDTO supplierStore) {
     checkConsumType(supplierStore.getConsumType());
+    if(EmptyChecker.notEmpty(supplierStore.getAddressList())
+            &&supplierStore.getAddressList().size()>10){
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
+    }
     SupplierStore entity = supplierStoreDao.getById(supplierStore.getId());
     if (EmptyChecker.isEmpty(entity)) {
       throw new BusiException("id不存在");
@@ -445,7 +494,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     detailDTO.setAddressList(supplierStore.getAddressList());
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
-        ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).build());
+        ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
     return flag && flag2 && flag3;
   }
 

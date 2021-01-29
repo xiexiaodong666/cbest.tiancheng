@@ -5,6 +5,7 @@ spring:
     url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: mysql@123
+
   redis:
     lettuce:
       pool:
@@ -23,12 +24,16 @@ spring:
         - 192.1.30.186:7005
     database: 0
     #password: msxfMarketing
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 logging:
   file:
     path: /home/finance/Logs/e-welfare-account.e-cbest.lotest
   level:
     root: info
-    com.welfare.persist.mapper: debug
+    #com.welfare.persist.mapper: debug
 encrypt:
   file: ${config.file:classpath:config/config.properties}
 e-welfare:
@@ -75,3 +80,18 @@ hystrix:
           strategy: SEMAPHORE
           thread:
             timeoutInMilliseconds: 300000
+xxl:
+  job:
+    admin:
+      addresses: http://172.30.37.36:8180/
+    executor:
+      appname: e-welfare-settlement
+      ip:
+      port: 9888
+      logpath: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest/jobhandler/
+      logretentiondays: 30
+    accessToken:
+
+notification:
+  url: http://test-welfare-internal.kube.cbestcd.com
+  targetPath: https://test-welfare-app.sjgo365.com/tc/redirect?target=center

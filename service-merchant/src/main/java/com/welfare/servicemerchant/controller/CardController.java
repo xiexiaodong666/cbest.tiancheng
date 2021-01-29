@@ -16,20 +16,28 @@ import com.welfare.service.AccountService;
 import com.welfare.service.CardApplyService;
 import com.welfare.service.CardInfoService;
 import com.welfare.service.MerchantService;
+import com.welfare.servicemerchant.dto.DisableCardDTO;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Description:
@@ -79,6 +87,12 @@ public class CardController implements IController {
     Merchant merchant = merchantService.queryByCode(cardApply.getMerCode());
     CardInfoApiDTO cardInfoApiDTO = tranferToCardInfoApiDTO(cardInfo, cardApply);
 
+    Account account = accountService.getByAccountCode(cardInfo.getAccountCode());
+    if(account != null) {
+      cardInfoApiDTO.setAccountName(account.getAccountName());
+      cardInfoApiDTO.setPhone(account.getPhone());
+    }
+
     cardInfoApiDTO.setMerName(merchant.getMerName());
     return success(cardInfoApiDTO);
   }
@@ -91,6 +105,14 @@ public class CardController implements IController {
     List<CardInfoApiDTO> cardInfos = cardInfoService.listByApplyCode(
         applyCode, WelfareConstant.CardStatus.NEW.code());
     return success(cardInfos);
+  }
+
+  @PostMapping("/disable")
+  @ApiOperation("禁用卡片")
+  public R<Boolean> disableCard(
+      @RequestBody DisableCardDTO disableCardDTO) {
+
+    return success(cardInfoService.disableCard(disableCardDTO.getCardIdSet(), disableCardDTO.getEnabled()));
   }
 
   @PutMapping("/written")
@@ -158,17 +180,17 @@ public class CardController implements IController {
                                                                   endTime, bindStartTime,
                                                                   bindEndTime
     );
-    for (CardInfoDTO cardInfoDTO:
-    exportList) {
-      if(Strings.isNotEmpty(cardInfoDTO.getCardMedium())) {
-        cardInfoDTO.setCardMedium(CardApplyMediumEnum.valueOf(cardInfoDTO.getCardMedium()).getDesc());
+    for (CardInfoDTO cardInfoDTO :
+        exportList) {
+      if (Strings.isNotEmpty(cardInfoDTO.getCardMedium())) {
+        cardInfoDTO.setCardMedium(
+            CardApplyMediumEnum.valueOf(cardInfoDTO.getCardMedium()).getDesc());
       }
 
-      if(Strings.isNotEmpty(cardInfoDTO.getCardType())) {
+      if (Strings.isNotEmpty(cardInfoDTO.getCardType())) {
         cardInfoDTO.setCardType(CardApplyTypeEnum.valueOf(cardInfoDTO.getCardType()).getDesc());
       }
     }
-
 
     String path = fileUploadService.uploadExcelFile(exportList, CardInfoDTO.class, "卡片信息");
     // wait gc
@@ -204,7 +226,7 @@ public class CardController implements IController {
     cardInfoDTO.setCreateTime(cardInfo.getCreateTime());
     cardInfoDTO.setWrittenTime(cardInfo.getWrittenTime());
     cardInfoDTO.setBindTime(cardInfo.getBindTime());
-    if(account != null && Strings.isNotEmpty(account.getPhone())) {
+    if (account != null && Strings.isNotEmpty(account.getPhone())) {
       cardInfoDTO.setAccountCode(Long.valueOf(account.getPhone()));
     }
 

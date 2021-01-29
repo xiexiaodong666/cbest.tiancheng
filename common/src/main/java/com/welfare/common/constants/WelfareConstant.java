@@ -146,7 +146,8 @@ public class WelfareConstant {
         ACCOUNT_CODE("account_code","员工账号"),
         DEPARTMENT_CODE("department_code","部门编号"),
         MER_CODE("mer_code","商户编号"),
-        ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请");
+        ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请"),
+        RESET_ACCOUNT_SURPLUS_QUOTA("reset_account_surplus_quota","员工账号授信额度变更");
         private final String code;
         private final String desc;
 
@@ -196,8 +197,14 @@ public class WelfareConstant {
          * 账户类型
          */
         CONSUME("consume","消费"),
-        DEPOSIT("deposit","充值"),
-        REFUND("refund","退款");
+        DEPOSIT_INCR("deposit_incr","充值(增加)"),
+        DEPOSIT_DECR("deposit_decr","充值(减少)"),
+        REFUND("refund","退款"),
+        RESET_INCR("reset_incr","设置（增加)"),
+        RESET_DECR("reset_decr","设置（减少)"),
+        REBATE_DECR("rebate_decr","返点（减少)"),
+        REBATE_INCR("rebate_incr","返点（新增)"),
+        DEPOSIT_BACK("deposit_back","回冲");
         private final String code;
         private final String desc;
 
@@ -311,6 +318,33 @@ public class WelfareConstant {
         private final String desc;
 
         CardStatus(Integer code, String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public Integer code(){
+            return this.code;
+        }
+
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+    /**
+     * 卡状态
+     */
+    public enum CardEnable{
+
+        /**
+         * 卡状态
+         */
+        ENABLE(1,"启用"),
+        DISABLE(0,"禁用");
+        private final Integer code;
+        private final String desc;
+
+        CardEnable(Integer code, String desc){
             this.code = code;
             this.desc = desc;
         }

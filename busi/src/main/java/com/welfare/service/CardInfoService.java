@@ -8,6 +8,7 @@ import com.welfare.persist.entity.CardInfo;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 卡信息服务接口
@@ -38,6 +39,13 @@ public interface CardInfoService {
    * 更新卡信息为已写入
    */
   CardInfo updateWritten(CardInfo cardInfo);
+
+  /**
+   * 禁用卡片信息
+   * @param cardIdSet
+   * @return
+   */
+  boolean disableCard(Set<String> cardIdSet, Integer enabled);
 
 
   /**

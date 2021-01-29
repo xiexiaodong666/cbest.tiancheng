@@ -56,6 +56,8 @@ public interface AccountService {
 
   Boolean save(AccountReq accountReq);
 
+  void batchSyncData(Integer staffStatus);
+
   Boolean batchSave(List<Account> accountList);
 
   Boolean update(AccountReq accountReq);
@@ -80,4 +82,20 @@ public interface AccountService {
   void batchBindCard(List<CardInfo> cardInfoList,List<Account> accountList);
   void batchUpload(List<Account> accountList);
   AccountDetailDTO queryDetailPhoneAndMer(String phone);
+
+  /**
+   * 恢复商户下所有的账户的额度
+   * @param merCode
+   * @param merUpdateCreditAmount
+   * @param settlementTransNo
+   */
+  void restoreSurplusQuotaByMerCode(String merCode, BigDecimal merUpdateCreditAmount, String settlementTransNo);
+
+  /**
+   * 恢复的账户的额度
+   * @param accountCode
+   * @param updateUser
+   * @param settlementTransNo
+   */
+  void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser, String settlementTransNo);
 }

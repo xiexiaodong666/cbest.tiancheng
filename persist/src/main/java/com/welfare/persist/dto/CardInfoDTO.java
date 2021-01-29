@@ -2,6 +2,7 @@ package com.welfare.persist.dto;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -65,4 +66,7 @@ public class CardInfoDTO {
    */
   @ExcelProperty(value ="绑定账号")
   private Long accountCode;
+
+  @ExcelProperty(value ="启用或禁用 1 启用 0禁用")
+  private Integer enabled;
 }

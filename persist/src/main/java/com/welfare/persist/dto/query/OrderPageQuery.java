@@ -36,6 +36,10 @@ public class OrderPageQuery {
      */
     private String merchantCode;
     /**
+     * 
+     */
+    private String supplierMerCode;
+    /**
      * 订单开始时间
      */
     private String startDateTime;
@@ -59,6 +63,8 @@ public class OrderPageQuery {
      * 员工卡支付和其他支付方式返利门店列表
      */
     private List<String> allRebateStoreList;
+
+    private List<String> storeList;
     /**
      * 页码
      */

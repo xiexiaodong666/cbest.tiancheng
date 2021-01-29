@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.*;
+import com.welfare.persist.dto.OrderInfoDTO;
 import com.welfare.persist.dto.query.OrderPageQuery;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountMapper;
@@ -95,14 +96,28 @@ public class OrderServiceImpl implements OrderService {
     private MerchantBillDetailDao merchantBillDetailDao;
     @Autowired
     private MerchantCreditService merchantCreditService;
-    private static boolean RUN = false;
+    @Autowired
+    private MerchantCreditDao merchantCreditDao;
 
     @Override
-    public Page<OrderInfo> selectPage(Page page, OrderReqDto orderReqDto) {
+    public Page<OrderInfoDTO> selectPage(Page page, OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
-        QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
-        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.MER_CODE, orderReqDto.getMerchantCode());
+        //查询供应商下所有门店
+        List<SupplierStore> supplierStoreList = supplierStoreDao.list(queryWrapper);
+        List<String> supplierStoreCodeList = new ArrayList<>();
+        if (supplierStoreList == null || supplierStoreList.size() < 1){
+            return null;
+        }else {
+            supplierStoreCodeList = supplierStoreList.stream().map(item->{
+                return item.getStoreCode();
+            }).collect(Collectors.toList());
+        }
+        QueryWrapper<MerchantStoreRelation> relationQueryWrapper = new QueryWrapper<>();
+        relationQueryWrapper.in( supplierStoreCodeList.size() > 0, MerchantStoreRelation.STORE_CODE , supplierStoreCodeList );
+
+        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(relationQueryWrapper);
         // 判断用户传入的门店集合是否在上述商户关联门店中
         List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
         List<String> storeCodeList = orderReqDto.getStoreIds();
@@ -120,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
         }
         //当没有检测到有配置门店，此时不能查询到订单数据
         if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1) {
-            Page<OrderInfo> orderInfoPage = new Page<>();
+            Page<OrderInfoDTO> orderInfoPage = new Page<>();
             return orderInfoPage;
         }
         //没有配置返利门店
@@ -182,16 +197,94 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setNoRebateStoreList(noRebateStoreList);
         orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
 
-        Page<OrderInfo> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
-        return orderInfoPage;
+//        Page<OrderInfoDTO> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
+//        return orderInfoPage;
+        return null;
     }
 
+
+    public Page<OrderInfoDTO> selectPage1(Page page, OrderReqDto orderReqDto){
+        //判断是哪一端查询
+        OrderPageQuery orderPageQuery = new OrderPageQuery();
+        if ("SUPPLIER".equals(orderReqDto.getType())){
+            orderPageQuery.setSupplierMerCode(orderReqDto.getSupplierMerchantCode());
+        }else if ("MERCHANT".equals(orderReqDto.getType())){
+            //客户-判断该客户下配置的消费门店以及返利配置
+            orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
+        }else{
+            //平台端
+            // 传入了 客户编码  供应商门店编码， 客户编码查询配置的消费门店何返利配置
+            orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
+            orderPageQuery.setSupplierMerCode(orderReqDto.getSupplierMerchantCode());
+        }
+        // 判断用户传入的门店集合是否在上述商户关联门店中
+        //构建查询条件
+
+        orderPageQuery.setOrderId((orderReqDto.getOrderId()));
+        orderPageQuery.setStoreList(orderReqDto.getStoreIds());
+        orderPageQuery.setAccountName((orderReqDto.getConsumerName()));
+        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null : orderReqDto.getLowPrice().toPlainString());
+        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
+        orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
+        orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
+
+        Page<OrderInfoDTO> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
+        return orderInfoPage;
+
+    }
+
+    public OrderSummary selectSummary1(OrderReqDto orderReqDto){
+        //判断是哪一端查询
+        OrderPageQuery orderPageQuery = new OrderPageQuery();
+        if ("SUPPLIER".equals(orderReqDto.getType())){
+            orderPageQuery.setSupplierMerCode(orderReqDto.getSupplierMerchantCode());
+        }else if ("MERCHANT".equals(orderReqDto.getType())){
+            //客户-判断该客户下配置的消费门店以及返利配置
+            orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
+        }else{
+            //平台端
+            // 传入了 客户编码  供应商门店编码， 客户编码查询配置的消费门店何返利配置
+            orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
+            orderPageQuery.setSupplierMerCode(orderReqDto.getSupplierMerchantCode());
+        }
+        // 判断用户传入的门店集合是否在上述商户关联门店中
+        //构建查询条件
+
+        orderPageQuery.setOrderId((orderReqDto.getOrderId()));
+        orderPageQuery.setStoreList(orderReqDto.getStoreIds());
+        orderPageQuery.setAccountName((orderReqDto.getConsumerName()));
+        orderPageQuery.setLowPrice(orderReqDto.getLowPrice() == null ? null : orderReqDto.getLowPrice().toPlainString());
+        orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
+        orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
+        orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
+
+        OrderSummary orderSummary = orderMapper.searchOrderSum( orderPageQuery);
+        return orderSummary;
+
+    }
+
+
+
     @Override
-    public List<OrderInfo> selectList(OrderReqDto orderReqDto) {
+    public List<OrderInfoDTO> selectList(OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
-        QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
-        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        //根据当前用户查询所在组织的配置门店情况
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
+        //查询供应商下所有门店
+        List<SupplierStore> supplierStoreList = supplierStoreDao.list(queryWrapper);
+        List<String> supplierStoreCodeList = new ArrayList<>();
+        if (supplierStoreList == null || supplierStoreList.size() < 1){
+            return null;
+        }else {
+            supplierStoreCodeList = supplierStoreList.stream().map(item->{
+                return item.getStoreCode();
+            }).collect(Collectors.toList());
+        }
+        QueryWrapper<MerchantStoreRelation> relationQueryWrapper = new QueryWrapper<>();
+        relationQueryWrapper.in( supplierStoreCodeList.size() > 0, MerchantStoreRelation.STORE_CODE , supplierStoreCodeList );
+
+        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(relationQueryWrapper);
         // 判断用户传入的门店集合是否在上述商户关联门店中
         List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
         List<String> storeCodeList = orderReqDto.getStoreIds();
@@ -271,16 +364,50 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setPageNo(orderReqDto.getCurrent());
         orderPageQuery.setPageSize(orderReqDto.getSize());
 
-        List<OrderInfo> orderInfoList = orderMapper.searchOrder(orderPageQuery);
+        List<OrderInfoDTO> orderInfoList = orderMapper.searchOrder(orderPageQuery);
         return orderInfoList;
     }
 
     @Override
     public OrderSummary selectSummary(OrderReqDto orderReqDto) {
         //根据当前用户查询所在组织的配置门店情况
-        QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
-        List<MerchantStoreRelation> merchantStoreRelationList = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        //根据当前用户查询所在组织的配置门店情况
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.MER_CODE, orderReqDto.getMerchantCode()).eq(MerchantStoreRelation.DELETED, 0);
+        //查询供应商下所有门店
+        List<SupplierStore> supplierStoreList = supplierStoreDao.list(queryWrapper);
+        List<String> supplierStoreCodeList = new ArrayList<>();
+        if (supplierStoreList == null || supplierStoreList.size() < 1){
+            return null;
+        }else {
+            supplierStoreCodeList = supplierStoreList.stream().map(item->{
+                return item.getStoreCode();
+            }).collect(Collectors.toList());
+        }
+        QueryWrapper<MerchantStoreRelation> relationQueryWrapper = new QueryWrapper<>();
+        relationQueryWrapper.in( supplierStoreCodeList.size() > 0, MerchantStoreRelation.STORE_CODE , supplierStoreCodeList );
+
+        List<MerchantStoreRelation> merchantStoreRelationList1 = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(relationQueryWrapper);
+        //没有配置返利门店
+        // 判断用户传入的门店集合是否在上述商户关联门店中
+        List<MerchantStoreRelation> merchantStoreRelationList = new ArrayList<>();
+        List<String> storeCodeList = orderReqDto.getStoreIds();
+        if (storeCodeList == null) {
+            //平台端调用
+            merchantStoreRelationList.addAll(merchantStoreRelationList1);
+        } else {
+            //商户端调用
+            merchantStoreRelationList1.forEach(item -> {
+                String storeCode = item.getStoreCode();
+                if (orderReqDto.getStoreIds() != null && orderReqDto.getStoreIds().contains(storeCode)) {
+                    merchantStoreRelationList.add(item);
+                }
+            });
+        }
+        //当没有检测到有配置门店，此时不能查询到订单数据
+        if (merchantStoreRelationList == null || merchantStoreRelationList.size() < 1) {
+            return null;
+        }
         //没有配置返利门店
         List<String> noRebateStoreList = new ArrayList<>();
         //配置返利门店
@@ -414,6 +541,7 @@ public class OrderServiceImpl implements OrderService {
     public int saveOrUpdateBacth(List<SynOrderDto> orderDtoList) {
         List<OrderInfo> orderInfoList = new ArrayList<>();
         orderDtoList.forEach(item -> {
+            log.info("线下订单:{}" , JSONObject.toJSONString(item));
             //根据查询账户详情
             QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq(Account.ACCOUNT_CODE, item.getAccountCode());
@@ -546,7 +674,14 @@ public class OrderServiceImpl implements OrderService {
                             MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merCode);
                             List<MerchantBillDetail> merchantBillDetails =
                                     settleDetailService.calculateAndSetRebate(merchantCredit, settleDetails);
-                            merchantBillDetailDao.saveBatch(merchantBillDetails);
+                            List<String> rebateTransNos = merchantBillDetails.stream().map(MerchantBillDetail::getTransNo).collect(Collectors.toList());
+                            if(!CollectionUtils.isEmpty(merchantBillDetails)){
+                                //返利需要幂等，先删除相关记录，再重新保存。
+                                merchantBillDetailDao.deleteByTransNoAndBalanceType(rebateTransNos, WelfareConstant.MerCreditType.REBATE_LIMIT.code());
+                                merchantBillDetailDao.saveBatch(merchantBillDetails);
+                            }
+                            merchantCreditDao.updateById(merchantCredit);
+
                             boolean flag = settleDetailDao.saveOrUpdateBatch(settleDetailList);
                             log.info("kafka明细结算数据保存到数据库{}条{}", settleDetailList.size(), flag ? "成功" : "失败");
                         });

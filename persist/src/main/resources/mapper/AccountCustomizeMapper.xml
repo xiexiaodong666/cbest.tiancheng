@@ -3,14 +3,17 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.AccountCustomizeMapper">
   <sql id="tableName">
-        account
-    </sql>
+    account
+  </sql>
 
   <sql id="baseColumn">
-        a.id,a.account_name,a.account_code,a.account_type_code,a.mer_code,a.store_code,a.account_status,a.staff_status,
+    a
+    .
+    id
+    ,a.account_name,a.account_code,a.account_type_code,a.mer_code,a.store_code,a.account_status,a.staff_status,
         a.binding,a.create_user,a.create_time,a.update_user,a.update_time,a.account_balance,a.version,a.phone,a.max_quota,
         a.surplus_quota,a.change_event_id,a.remark,a.deleted
-    </sql>
+  </sql>
 
   <resultMap type="com.welfare.persist.entity.Account" id="accountMap">
     <id property="id" column="id"/>
@@ -53,6 +56,13 @@
 
   </update>
 
+  <update id="restoreAccountSurplusQuota">
+    UPDATE
+    <include refid="tableName"/>
+    set surplus_quota = max_quota, update_user = #{updateUser},update_time =
+    now(),version = version + 1 where account_code = #{accountCode}
+    and credit = 1 and deleted = 0
+  </update>
 
   <select id="queryByConsumeSceneIdList" resultMap="accountMap">
     select
@@ -85,8 +95,24 @@
     a.max_quota AS maxQuota,
     a.surplus_quota AS surplusQuota,
     GROUP_CONCAT(ci.card_id) AS cardId,
+    GROUP_CONCAT(
+    CONCAT(
+    ci.card_id,
+    "(",
+    CASE ci.enabled
+    WHEN 0 THEN
+    '禁用)'
+    ELSE
+    "正常)"
+    END
+    )
+    ) AS cardIdString,
     a.account_balance AS accountBalance,
     a.binding,
+    case a.binding
+    when 0 then '未绑定'
+    when 1 then '绑定'
+    end as bindingString,
     a.phone
     FROM
     account a
@@ -103,7 +129,8 @@
     </if>
     <if test="departmentPathList != null ">
       and
-      <foreach collection="departmentPathList" item="item" index="index" open="(" close=")" separator="or">
+      <foreach collection="departmentPathList" item="item" index="index" open="(" close=")"
+        separator="or">
         d.department_path like '${item}%'
       </foreach>
     </if>
@@ -117,7 +144,11 @@
       and at.type_code = #{accountTypeCode}
     </if>
     <if test=" cardId !='' and cardId != null ">
-      and ci.card_id = #{cardId}
+      and a. account_code in( select a1.account_code from account a1 left join card_info ci1 on
+      ci1.account_code = a1.account_code where ci1.card_id = #{cardId})
+    </if>
+    <if test=" phone !='' and phone != null ">
+      and a.phone = #{phone}
     </if>
     GROUP BY a.account_code
     order by a.create_time desc
@@ -125,29 +156,28 @@
 
 
   <select id="queryDetail" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
-    SELECT
-	a.id,
-	a.account_name AS accountName,
-	a.account_code AS accountCode,
-	a.account_status AS accountStatus,
-	AT.type_code AS accountTypeCode,
-	AT.type_name AS accountTypeName,
-	d.department_code AS departmentCode,
-	d.department_name AS departmentName,
-	m.mer_code AS merCode,
-	m.mer_name AS merName,
-	a.max_quota AS maxQuota,
-	a.surplus_quota AS surplusQuota,
-	a.account_balance AS accountBalance,
-	a.remark
-FROM
-	account a
-	LEFT JOIN department d ON a.store_code = d.department_code
-	LEFT JOIN merchant m ON a.mer_code = m.mer_code
-	LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
-WHERE a.mer_code = at.mer_code
-	and a.deleted = 0
-	AND a.id = #{id}
+    SELECT a.id,
+           a.account_name    AS accountName,
+           a.account_code    AS accountCode,
+           a.account_status  AS accountStatus,
+           AT.type_code      AS accountTypeCode,
+           AT.type_name      AS accountTypeName,
+           d.department_code AS departmentCode,
+           d.department_name AS departmentName,
+           m.mer_code        AS merCode,
+           m.mer_name        AS merName,
+           a.max_quota       AS maxQuota,
+           a.surplus_quota   AS surplusQuota,
+           a.account_balance AS accountBalance,
+           a.remark
+    FROM account a
+           LEFT JOIN department d ON a.store_code = d.department_code
+           LEFT JOIN merchant m ON a.mer_code = m.mer_code
+           LEFT JOIN account_type AT
+    ON AT.type_code = a.account_type_code
+    WHERE a.mer_code = at.mer_code
+      and a.deleted = 0
+      AND a.id = #{id}
   </select>
 
 
@@ -157,16 +187,19 @@ WHERE a.mer_code = at.mer_code
     ss.store_name AS storeName,
     abd.trans_type AS transType,
     CASE
-    when abd.trans_type = 'deposit' then "充值"
+    when abd.trans_type = 'deposit_incr' then "充值"
     when abd.trans_type = 'consume' then "消费"
     when abd.trans_type = 'refund' then "退款"
+    when abd.trans_type = 'deposit_back' then "回冲"
     END as transTypeString,
     CASE
-    WHEN abd.trans_type = 'deposit' THEN
-    trans_amount
-    WHEN abd.trans_type = 'consume' THEN
+    WHEN abd.trans_type = 'deposit_incr' THEN
     trans_amount * ( - 1 )
+    WHEN abd.trans_type = 'consume' THEN
+    trans_amount
     WHEN abd.trans_type = 'refund' THEN
+    trans_amount * ( - 1 )
+    WHEN abd.trans_type = 'deposit_back' THEN
     trans_amount
     END AS transAmount,
     abd.create_time AS createTime,
@@ -174,7 +207,7 @@ WHERE a.mer_code = at.mer_code
     FROM
     account_bill_detail abd
     LEFT JOIN supplier_store ss ON ss.store_code = abd.store_code
-    WHERE
+    WHERE abd.trans_type in('deposit_incr','consume','refund','deposit_back') and
     abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
       and abd.create_time <![CDATA[>=]]> #{createTimeStart}
@@ -182,6 +215,7 @@ WHERE a.mer_code = at.mer_code
     <if test="createTimeEnd != null ">
       and abd.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
+    order by abd.create_time desc
   </select>
 
   <select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">
@@ -190,11 +224,13 @@ WHERE a.mer_code = at.mer_code
     SUM(
     CASE
 
-    WHEN abd.trans_type = 'deposit' THEN
-    trans_amount
-    WHEN abd.trans_type = 'consume' THEN
+    WHEN abd.trans_type = 'deposit_incr' THEN
     trans_amount * ( - 1 )
+    WHEN abd.trans_type = 'consume' THEN
+    trans_amount
     WHEN abd.trans_type = 'refund' THEN
+    trans_amount * ( - 1 )
+    WHEN abd.trans_type = 'deposit_back' THEN
     trans_amount
     END
     ) AS accountTotalAmount,
@@ -203,7 +239,7 @@ WHERE a.mer_code = at.mer_code
     FROM
     account_bill_detail abd
     LEFT JOIN account a ON a.account_code = abd.account_code
-    WHERE
+    WHERE abd.trans_type in('deposit_incr','consume','refund','deposit_back') and
     abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
       and abd.create_time <![CDATA[>=]]> #{createTimeStart}
@@ -214,39 +250,41 @@ WHERE a.mer_code = at.mer_code
   </select>
 
   <select id="queryIncrementDTO" resultType="com.welfare.persist.dto.AccountIncrementDTO">
-		SELECT
-	a.account_code AS accountCode,
-	a.change_event_id AS changeEventId,
-	a.account_balance AS accountBalance,
-	GROUP_CONCAT( ci.magnetic_stripe ) AS magneticStripe,
-CASE
+    SELECT a.account_code                   AS accountCode,
+           a.change_event_id                AS changeEventId,
+           a.account_balance                AS accountBalance,
+           GROUP_CONCAT(ci.magnetic_stripe) AS magneticStripe,
+           CASE
 
-	WHEN (
-	a.deleted = 0
-AND AT.deleted = 0
-AND acs.deleted = 0
-AND a.account_status = 1
-AND acs.`status` = 1
-AND locate( relation.scene_consum_type, #{consumeType} ) > 0
-	) THEN
-	TRUE ELSE FALSE
-	END AS canUse
-FROM
-	account a
-	LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
-	LEFT JOIN account_consume_scene acs ON acs.account_type_code = AT.type_code
-	LEFT JOIN account_consume_scene_store_relation relation ON relation.account_consume_scene_id = acs.id
-	LEFT JOIN card_info ci ON a.account_code = ci.account_code
-WHERE
-a.mer_code = at.mer_code and
-	relation.store_code = #{storeCode}
-	AND a.change_event_id > #{changeEventId}
-GROUP BY
-	a.account_code
-ORDER BY
-	a.change_event_id ASC
-LIMIT #{size}
-	</select>
+             WHEN (
+                 a.deleted = 0
+                 AND AT.deleted = 0
+                 AND acs.deleted = 0
+                 AND a.account_status = 1
+                 AND acs.`status` = 1
+                 AND locate(relation.scene_consum_type, #{consumeType}) > 0
+               ) THEN
+               TRUE
+             ELSE FALSE
+             END                            AS canUse
+    FROM account a
+           LEFT JOIN account_type AT
+    ON AT.type_code = a.account_type_code
+      LEFT JOIN account_consume_scene acs ON acs.account_type_code = AT.type_code
+      LEFT JOIN account_consume_scene_store_relation relation ON relation.account_consume_scene_id = acs.id
+      LEFT JOIN card_info ci ON a.account_code = ci.account_code
+    WHERE
+      a.mer_code = at.mer_code
+      and
+      relation.store_code = #{storeCode}
+      AND a.change_event_id
+        > #{changeEventId}
+    GROUP BY
+      a.account_code
+    ORDER BY
+      a.change_event_id ASC
+      LIMIT #{size}
+  </select>
 
   <update id="batchUpdateChangeEventId" parameterType="java.util.Map">
     <foreach collection="list" item="item" index="index" open="" close="" separator=";">
@@ -303,31 +341,31 @@ LIMIT #{size}
   </select>
 
   <select id="queryDetailPhoneAndMer" resultType="com.welfare.persist.dto.AccountDetailMapperDTO">
-    SELECT
-    a.id,
-    a.account_name AS accountName,
-    a.account_code AS accountCode,
-    a.account_status AS accountStatus,
-    AT.type_code AS accountTypeCode,
-    AT.type_name AS accountTypeName,
-    d.department_code AS departmentCode,
-    d.department_name AS departmentName,
-    m.mer_code AS merCode,
-    m.mer_name AS merName,
-    a.max_quota AS maxQuota,
-    a.surplus_quota AS surplusQuota,
-    a.account_balance AS accountBalance,
-    a.remark,
-    a.phone
-    FROM
-    account a
-    LEFT JOIN department d ON a.store_code = d.department_code
-    LEFT JOIN merchant m ON a.mer_code = m.mer_code
-    LEFT JOIN account_type AT ON AT.type_code = a.account_type_code
+    SELECT a.id,
+           a.account_name    AS accountName,
+           a.account_code    AS accountCode,
+           a.account_status  AS accountStatus,
+           AT.type_code      AS accountTypeCode,
+           AT.type_name      AS accountTypeName,
+           d.department_code AS departmentCode,
+           d.department_name AS departmentName,
+           m.mer_code        AS merCode,
+           m.mer_name        AS merName,
+           a.max_quota       AS maxQuota,
+           a.surplus_quota   AS surplusQuota,
+           a.account_balance AS accountBalance,
+           a.remark,
+           a.phone
+    FROM account a
+           LEFT JOIN department d ON a.store_code = d.department_code
+           LEFT JOIN merchant m ON a.mer_code = m.mer_code
+           LEFT JOIN account_type AT
+    ON AT.type_code = a.account_type_code
     WHERE
-    a.mer_code = at.mer_code and
-    a.deleted = 0
-    AND a.phone = #{phone}
-    AND a.mer_code = #{merCode}
+      a.mer_code = at.mer_code
+      and
+      a.deleted = 0
+      AND a.phone = #{phone}
+      AND a.mer_code = #{merCode}
   </select>
 </mapper>

@@ -1,19 +1,75 @@
 spring:
-  profiles: online
+  datasource:
+    url: jdbc:mysql://192.1.30.205:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true
+    username: jav_tclife_rw
+    password: 3uUacFIf3PDoBy
+    driverClassName: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    lettuce:
+      pool:
+        max-idle: 30
+        max-active: 500
+        min-idle: 2
+        max-wait: 1000
+    timeout: 5000
+    database: 0
+    password: v6z82Ebfc7I1
+    host: 192.1.30.205
+    port: 6399
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 logging:
+  file:
+    path: /data/Logs/e-welfare-merchant
   level:
     root: info
-  file:
-    path: /home/honour/Logs/e-welfare-merchant.e-cbest.lo
-encrypt:
-  file: ${config.file:file:/home/finance/Config/e-welfare-merchant.e-cbest.lo/config.properties}
+#encrypt:
+  #file: ${config.file:classpath:config/config.properties}
 
 cbest:
   oss:
     config:
       bucket: sjgo-img
+  pay:
+    url: http://192.1.30.160:8000/gateway
+    appId: yufu
+    appKey: e4716980da4382e1f4cc6ee4bb640277
+    notifyUrl: http://xxx/accountDepositRecord/payNotify
 
 cdn:
   server: http://img.sjgo365.com
 
+e-welfare:
+  distributed-lock:
+    enabled: true
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
+
+platformUser:
+  url: http://test-welfare-app.sjgo365.com/shop-api/tc/store
+
+shopping:
+  url: http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base
+
+
+
+feign:
+  client:
+    config:
+      #default代表所有服务
+      default:
+        #feign客户端建立连接超时时间
+        connect-timeout: 10000
+        #feign客户端建立连接后读取资源超时时间
+        read-timeout: 30000
+      #而service-test表示当调用service-test这个服务时，用下面的配置
+      #service-test:
+       # connect-timeout: 10000
+        #read-timeout: 20000

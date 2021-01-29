@@ -29,7 +29,9 @@
     ci.create_time as createTime,
     ci.written_time as writtenTime,
     ci.bind_time as bindTime,
-    a.phone as accountCode
+    a.phone as accountCode,
+    ci.enabled as enabled
+
     FROM
     card_info ci
     LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
@@ -84,7 +86,9 @@
 	ci.create_time AS createTime,
 	ci.written_time AS writtenTime,
 	ci.bind_time AS bindTime,
-	ci.account_code AS accountCode
+	ci.account_code AS accountCode,
+	ci.enabled as enabled
+
 FROM
 	card_info ci
 	LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
@@ -107,7 +111,9 @@ WHERE
     ci.create_time as createTime,
     ci.written_time as writtenTime,
     ci.bind_time as bindTime,
-    a.phone as accountCode
+    a.phone as accountCode,
+    ci.enabled as enabled
+
     FROM
     card_info ci
     LEFT JOIN card_apply ca ON ca.apply_code = ci.apply_code
@@ -131,8 +137,8 @@ WHERE
     <if test="writtenStartTime != null ">and ci.written_time &gt;= #{writtenStartTime}</if>
     <if test="writtenEndTime != null ">and ci.written_time &lt;= #{writtenEndTime}</if>
 
-    <if test="startTime != null ">and ci.create_time &gt;= #{createTime}</if>
-    <if test="endTime != null ">and ci.create_time &lt;= #{createTime}</if>
+    <if test="startTime != null ">and ci.create_time &gt;= #{startTime}</if>
+    <if test="endTime != null ">and ci.create_time &lt;= #{endTime}</if>
 
     <if test="bindStartTime != null ">and ci.bind_time &gt;= #{bindStartTime}</if>
     <if test="bindEndTime != null ">and ci.bind_time &lt;= #{bindEndTime}</if>

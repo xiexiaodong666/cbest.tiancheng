@@ -150,7 +150,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     public List<MonthSettleDetailResp> queryMonthSettleDetailLimit(Long id, MonthSettleDetailReq monthSettleDetailReq) {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
-        PageHelper.startPage(1, WelfareSettleConstant.LIMIT);
+
+        monthSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
 
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleDetailDTOS.stream().map(monthSettleDetailDTO -> {
@@ -211,7 +212,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         RestoreRemainingLimitReq restoreRemainingLimitReq = new RestoreRemainingLimitReq();
         restoreRemainingLimitReq.setMerCode(monthSettleTemp.getMerCode());
-        restoreRemainingLimitReq.setAmount(monthSettleTemp.getSettleAmount().subtract(monthSettleTemp.getSettleSelfAmount()));
+        restoreRemainingLimitReq.setAmount(monthSettleTemp.getSettleAmount());
         restoreRemainingLimitReq.setTransNo(monthSettleTemp.getSettleNo());
         log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
         MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq, "api");

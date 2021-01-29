@@ -32,13 +32,13 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
     private final WelfareConstant.MerCreditType merCreditType = WelfareConstant.MerCreditType.SELF_DEPOSIT;
 
     @Override
-    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType) {
         log.info("ready to decrease merchantCredit.selfDepositBalance for {}", amount.toString());
         BigDecimal selfDepositBalance = merchantCredit.getSelfDepositBalance();
         BigDecimal subtract = selfDepositBalance.subtract(amount);
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
             BigDecimal amountLeftToBeDecrease = subtract.negate();
-            return doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, selfDepositBalance , transNo);
+            return doWhenNotEnough(merchantCredit, amountLeftToBeDecrease, selfDepositBalance , transNo, transType);
         } else {
             merchantCredit.setSelfDepositBalance(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
@@ -46,18 +46,18 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
                     amount,
                     IncOrDecType.DECREASE,
                     merchantCredit,
-                    transNo
-            );
+                    transNo,
+                    transType);
             return Collections.singletonList(operation);
         }
 
     }
 
     @Override
-    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo) {
+    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo, String transType) {
         AbstractMerAccountTypeOperator nextOperator = getNext();
         if (Objects.isNull(nextOperator)) {
-            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
+            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "组织(公司)余额不足", null);
         }
         merchantCredit.setSelfDepositBalance(BigDecimal.ZERO);
         MerchantAccountOperation operation = MerchantAccountOperation.of(
@@ -65,20 +65,20 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
                 operatedAmount,
                 IncOrDecType.DECREASE,
                 merchantCredit,
-                transNo
-        );
+                transNo,
+                transType);
         List<MerchantAccountOperation> operations = new ArrayList<>();
         operations.add(operation);
-        List<MerchantAccountOperation> moreOperations = nextOperator.decrease(merchantCredit, amountLeftToBeDecrease,transNo);
+        List<MerchantAccountOperation> moreOperations = nextOperator.decrease(merchantCredit, amountLeftToBeDecrease,transNo, transType);
         operations.addAll(moreOperations);
         return operations;
     }
 
     @Override
-    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo) {
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType) {
         log.info("ready to increase merchantCredit.currentBalance for {}", amount.toString());
         merchantCredit.setCurrentBalance(merchantCredit.getCurrentBalance().add(amount));
-        MerchantAccountOperation operation = MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit, transNo);
+        MerchantAccountOperation operation = MerchantAccountOperation.of(merCreditType, amount, IncOrDecType.INCREASE, merchantCredit, transNo, transType);
         return Collections.singletonList(operation);
     }
 

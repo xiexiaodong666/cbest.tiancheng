@@ -20,9 +20,15 @@ import org.springframework.stereotype.Repository;
 public class MerchantStoreRelationDao extends ServiceImpl<MerchantStoreRelationMapper, MerchantStoreRelation> {
 
     @Cacheable(value = "merchantStoreRelation-by-storeCode-merCode",key="#storeCode+#merCode")
-    public MerchantStoreRelation getOneByStoreCodeAndMerCode(String storeCode, String merCode){
+    public MerchantStoreRelation getOneByStoreCodeAndMerCodeCacheable(String storeCode, String merCode){
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(MerchantStoreRelation.STORE_CODE,storeCode).eq(MerchantStoreRelation.MER_CODE,merCode);
         return getOne(queryWrapper);
     }
+
+    public MerchantStoreRelation getOneByStoreCodeAndMerCode(String storeCode,String merCode){
+        return this.getOneByStoreCodeAndMerCodeCacheable(storeCode, merCode);
+    }
+
+
 }

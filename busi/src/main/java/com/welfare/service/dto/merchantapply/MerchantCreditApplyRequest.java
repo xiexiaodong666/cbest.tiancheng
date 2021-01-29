@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
@@ -42,7 +43,6 @@ public class MerchantCreditApplyRequest {
    * 金额
    */
   @ApiModelProperty("金额")
-  @DecimalMin(message = "金额不能小于0", value = "0")
   private BigDecimal balance;
 
   /**

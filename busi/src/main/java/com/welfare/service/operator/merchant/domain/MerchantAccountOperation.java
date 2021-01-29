@@ -21,6 +21,7 @@ public class MerchantAccountOperation {
     private BigDecimal amount;
     private IncOrDecType incOrDecType;
     private MerchantBillDetail merchantBillDetail;
+    private MerchantCredit merchantCredit;
     /**
      * 返回一个MerchantAccountOperation
      * @param operateType
@@ -28,12 +29,13 @@ public class MerchantAccountOperation {
      * @param incOrDecType
      * @param merchantCredit
      * @param transNo
+     * @param transType
      * @return
      */
     public static MerchantAccountOperation of(MerCreditType operateType,
                                               BigDecimal operatedAmount,
                                               IncOrDecType incOrDecType,
-                                              MerchantCredit merchantCredit, String transNo){
+                                              MerchantCredit merchantCredit, String transNo, String transType){
         MerchantAccountOperation merchantAccountOperation = new MerchantAccountOperation();
         merchantAccountOperation.setType(operateType);
         merchantAccountOperation.setAmount(operatedAmount);
@@ -42,7 +44,7 @@ public class MerchantAccountOperation {
         MerchantBillDetail merchantBillDetail = new MerchantBillDetail();
         merchantBillDetail.setBalanceType(operateType.code());
         merchantBillDetail.setTransAmount(incOrDecType.equals(IncOrDecType.INCREASE) ? operatedAmount : operatedAmount.negate());
-        merchantBillDetail.setTransType(operateType.code());
+        merchantBillDetail.setTransType(transType);
         merchantBillDetail.setTransNo(transNo);
         merchantBillDetail.setMerCode(merchantCredit.getMerCode());
         merchantBillDetail.setCurrentBalance(merchantCredit.getCurrentBalance());

@@ -18,6 +18,8 @@ import java.util.Map;
 @FeignClient(value = "CbestDmall-Interface", url = "${cbest.dmall.url:http://dmall.e-cbest.com}", fallbackFactory = CbestDmallFeignFallback.class)
 public interface CbestDmallFeign {
 
+  String SUCCESS_CODE = "0000";
+
   /**
    * 分页查询价格模板
    * @param req

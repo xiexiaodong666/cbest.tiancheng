@@ -1,5 +1,6 @@
 package com.welfare.service.remote.entity.pos;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Data;
  * @Date: 2021/1/29 10:38 上午
  */
 @Data
+@Builder
 public class DmallResponse <T> {
 
   /**

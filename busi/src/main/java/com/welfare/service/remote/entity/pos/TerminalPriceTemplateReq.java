@@ -1,9 +1,11 @@
 package com.welfare.service.remote.entity.pos;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @Author: duanhy
@@ -11,6 +13,7 @@ import javax.validation.constraints.NotNull;
  * @Date: 2021/1/29 11:51 上午
  */
 @Data
+@Builder
 public class TerminalPriceTemplateReq {
 
   @ApiModelProperty(value = "查询条件", required = true)
@@ -18,5 +21,5 @@ public class TerminalPriceTemplateReq {
   private PagingCondition paging;
 
   @ApiModelProperty("门店号")
-  private String storeCode;
+  private List<String> storeCodes;
 }

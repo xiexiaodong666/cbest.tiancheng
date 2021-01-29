@@ -54,7 +54,8 @@ cbest:
     url: http://192.1.30.71:9999/gateway
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
-
+  dmall:
+    url: http://172.30.37.22:4000
 exclude-header-interceptor:
   - /swagger*/**
   - /doc.html*

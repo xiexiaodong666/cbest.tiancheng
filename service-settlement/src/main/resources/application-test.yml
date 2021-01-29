@@ -75,7 +75,8 @@ cbest:
   oss:
     config:
       bucket: sjgo-img-test
-
+  dmall:
+    url: http://192.1.34.24
 pos:
   onlines: 1001
 

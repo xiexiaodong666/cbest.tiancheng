@@ -44,7 +44,8 @@ cbest:
     url: http://192.1.30.160:8000/gateway
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
-
+  dmall:
+    url: http://dmall.e-cbest.com
 feign:
   hystrix:
     enabled: true

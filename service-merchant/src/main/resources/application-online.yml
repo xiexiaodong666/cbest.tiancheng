@@ -38,7 +38,8 @@ cbest:
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
     notifyUrl: http://xxx/accountDepositRecord/payNotify
-
+  dmall:
+    url: http://dmall.e-cbest.com
 cdn:
   server: http://img.sjgo365.com
 

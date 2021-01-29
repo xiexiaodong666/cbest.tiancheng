@@ -109,6 +109,7 @@ public class CardController implements IController {
 
   @PostMapping("/disable")
   @ApiOperation("禁用卡片")
+  @ApiUser
   public R<Boolean> disableCard(
       @RequestBody DisableCardDTO disableCardDTO) {
 

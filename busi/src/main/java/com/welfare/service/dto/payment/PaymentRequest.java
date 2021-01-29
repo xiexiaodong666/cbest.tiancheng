@@ -55,6 +55,8 @@ public abstract class PaymentRequest {
     private String refundTransNo;
     @ApiModelProperty("电话号码")
     private String phone;
+    @ApiModelProperty("账户所在商家，返回参数")
+    private String accountMerCode;
     private String paymentScene;
 
     public String calculatePaymentScene(){

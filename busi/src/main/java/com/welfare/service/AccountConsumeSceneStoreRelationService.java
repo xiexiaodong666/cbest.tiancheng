@@ -3,6 +3,7 @@ package com.welfare.service;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yaoxiao
@@ -14,8 +15,7 @@ public interface AccountConsumeSceneStoreRelationService {
 
   /**
    * 门店修改了消费方式,员工类型同步修改消费方式
-   * @param storeCode
-   * @param consumeType
+   *
    */
-  public void updateStoreConsumeType(String merCode,String storeCode,String consumeType);
+  public void updateStoreConsumeType(String merCode, Map<String, String> storeCodeConsumeTypeMap);
 }

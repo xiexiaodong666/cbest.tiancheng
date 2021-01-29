@@ -621,16 +621,20 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         throw new BusiException("消费方法格式错误");
       }
 
-      // 同步员工消费方法
-      accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          storeRelation.getMerCode(), storeRelation.getStoreCode(), storeRelation.getConsumType());
     }
 
     boolean isSaveOrUpdateBatch = merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);
 
     Map<String, List<MerchantStoreRelation>> mapByMerCode = storeRelationList.stream()
         .collect(Collectors.groupingBy(t -> t.getMerCode()));
-    queryWrapper = new QueryWrapper<>();
+    for (Map.Entry<String, List<MerchantStoreRelation>> m : mapByMerCode.entrySet()) {
+
+      Map<String, String> maps = m.getValue().stream().collect(Collectors.toMap(MerchantStoreRelation::getStoreCode, MerchantStoreRelation::getConsumType, (key1, key2) -> key2));
+
+
+      accountConsumeSceneStoreRelationService.updateStoreConsumeType(m.getKey(), maps);
+    }
+      queryWrapper = new QueryWrapper<>();
     queryWrapper.in(MerchantStoreRelation.MER_CODE, mapByMerCode.keySet());
     List<MerchantStoreRelation> storeRelationListByMerCode = merchantStoreRelationDao.list(
         queryWrapper);

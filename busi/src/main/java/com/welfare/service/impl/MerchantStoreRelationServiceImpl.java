@@ -262,6 +262,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
   List<MerchantStoreRelation> removeMerchantStoreRelationList = new ArrayList<>();
 
+    Map<String, String> storeCodeConsumeTypeMap = new HashMap<>();
     for(
   MerchantStoreRelation m :
   merchantStoreRelations)
@@ -274,9 +275,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if (adminMerchantStoreOptional.isPresent()) {
       AdminMerchantStore adminMerchantStore = adminMerchantStoreOptional.get();
 
-      // 同步员工消费方法
-     accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          m.getMerCode(), adminMerchantStore.getStoreCode(), adminMerchantStore.getConsumType());
+      storeCodeConsumeTypeMap.put(adminMerchantStore.getStoreCode(), adminMerchantStore.getConsumType());
 
       m.setConsumType(adminMerchantStore.getConsumType());
       m.setStoreCode(adminMerchantStore.getStoreCode());
@@ -312,6 +311,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       removeMerchantStoreRelationList.add(m);
     }
   }
+
+    // 同步员工消费方法
+    accountConsumeSceneStoreRelationService.updateStoreConsumeType(
+        merchantStoreRelation.getMerCode(), storeCodeConsumeTypeMap);
+
 
     if(CollectionUtils.isNotEmpty(removeMerchantStoreRelationList))
 

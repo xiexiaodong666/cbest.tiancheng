@@ -184,12 +184,15 @@
   <select id="queryAccountBillDetail"
     resultType="com.welfare.persist.dto.AccountBillDetailMapperDTO">
     SELECT
+    abd.trans_no,
     CASE abd.trans_type
-    WHEN 'deposit_incr' THEN m.mer_name
-    WHEN 'refund' THEN m.mer_name
-    WHEN 'deposit_back' THEN m.mer_name
-    else  ss.store_name
-    END	 AS storeName,
+    WHEN 'deposit_incr' THEN
+    m.mer_name
+    WHEN 'refund' THEN
+    m.mer_name
+    ELSE
+    ss.store_name
+    END AS storeName,
     abd.trans_type AS transType,
     CASE
     WHEN abd.trans_type = 'deposit_incr' THEN
@@ -201,6 +204,8 @@
     WHEN abd.trans_type = 'deposit_back' THEN
     "出账"
     END AS transTypeString,
+    sum(
+    DISTINCT (
     CASE
     WHEN abd.trans_type = 'deposit_incr' THEN
     abd.trans_amount
@@ -210,25 +215,42 @@
     abd.trans_amount
     WHEN abd.trans_type = 'deposit_back' THEN
     abd.trans_amount * (- 1)
-    END AS transAmount,
+    END
+    )
+    ) AS transAmount,
     abd.create_time AS createTime,
-    abd.account_balance AS accountBalance
-    ,GROUP_CONCAT(DISTINCT(mat.mer_account_type_name)) AS accountTypeName
+    (
+    SELECT
+    abdTemp.account_balance
+    FROM
+    account_bill_detail abdTemp
+    WHERE
+    id = (
+    SELECT
+    max(id)
+    FROM
+    account_bill_detail abd2
+    WHERE
+    abd2.trans_no = abd.trans_no
+    )) AS accountBalance,
+    GROUP_CONCAT(
+    DISTINCT (mat.mer_account_type_name)
+    ) AS accountTypeName
     FROM
     account_bill_detail abd
-    left join account a on a.account_code = abd.account_code
-    left join merchant m on m.mer_code = a.mer_code
-    LEFT JOIN merchant_account_type mat ON m.mer_code  = mat.mer_code
+    LEFT JOIN account a ON a.account_code = abd.account_code
+    LEFT JOIN merchant m ON m.mer_code = a.mer_code
+    LEFT JOIN merchant_account_type mat ON m.mer_code = mat.mer_code
     LEFT JOIN account_deduction_detail addetail ON abd.trans_no = addetail.trans_no
     LEFT JOIN supplier_store ss ON addetail.store_code = ss.store_code
-
     WHERE
     abd.trans_type IN (
     'deposit_incr',
     'consume',
     'refund',
     'deposit_back'
-    ) and addetail.mer_account_type = mat.mer_account_type_code  and abd.account_code = #{accountCode}
+    )
+    AND addetail.mer_account_type = mat.mer_account_type_code  and abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
       and abd.create_time <![CDATA[>=]]> #{createTimeStart}
     </if>

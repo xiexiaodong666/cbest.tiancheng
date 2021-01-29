@@ -85,6 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
+            paymentRequest.setAccountMerCode(account.getMerCode());
             Assert.notNull(account,"未找到账号：" + accountCode);
             chargeBeforePay(paymentRequest, account, supplierStore);
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);

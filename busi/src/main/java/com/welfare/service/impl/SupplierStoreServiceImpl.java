@@ -626,11 +626,11 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
     boolean isSaveOrUpdateBatch = merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);
 
-    List<StoreConsumeRelationDTO> relationDTOList = new ArrayList<>();
 
     Map<String, List<MerchantStoreRelation>> mapByMerCode = storeRelationList.stream()
         .collect(Collectors.groupingBy(t -> t.getMerCode()));
     for (Map.Entry<String, List<MerchantStoreRelation>> m : mapByMerCode.entrySet()) {
+      List<StoreConsumeRelationDTO> relationDTOList = new ArrayList<>();
 
       for (MerchantStoreRelation merchantStoreRelation : m.getValue()) {
         StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();

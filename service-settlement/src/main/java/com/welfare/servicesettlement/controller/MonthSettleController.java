@@ -180,7 +180,7 @@ public class MonthSettleController implements IController {
 
     @GetMapping("/accountType/list")
     @ApiOperation("结算账户列表查询")
-    public R<Map<String, Object>> getAccoutType(String merCode){
+    public R<List<Map<String, Object>>> getAccoutType(String merCode){
         return R.success(monthSettleService.getAccoutType(merCode));
     }
 

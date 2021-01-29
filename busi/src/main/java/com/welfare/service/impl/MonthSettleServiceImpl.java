@@ -239,7 +239,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
-    public Map<String, Object> getAccoutType(String merCode) {
+    public List<Map<String, Object>> getAccoutType(String merCode) {
         return monthSettleMapper.getAccoutType(merCode);
     }
 

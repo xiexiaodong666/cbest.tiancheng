@@ -70,5 +70,5 @@ public interface MonthSettleService {
 
     MonthSettle getMonthSettleById(Long id);
 
-    Map<String, Object> getAccoutType(String merCode);
+    List<Map<String, Object>> getAccoutType(String merCode);
 }

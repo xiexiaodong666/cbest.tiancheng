@@ -60,10 +60,10 @@
                 and ab.trans_amount &lt;= #{orderPageQuery.highPrice}
             </if>
             <if test="orderPageQuery.startDateTime != null">
-                and order_time &gt;= #{orderPageQuery.startDateTime}
+                and trans_time &gt;= #{orderPageQuery.startDateTime}
             </if>
             <if test="orderPageQuery.endDateTime != null">
-                and order_time &lt;= #{orderPageQuery.endDateTime}
+                and trans_time &lt;= #{orderPageQuery.endDateTime}
             </if>
             <if test="orderPageQuery.supplierMerCode != null">
                 and m.mer_code = #{orderPageQuery.supplierMerCode}
@@ -131,10 +131,10 @@
                     and ab.trans_amount &lt;= #{orderPageQuery.highPrice}
                 </if>
                 <if test="orderPageQuery.startDateTime != null">
-                    and order_time &gt;= #{orderPageQuery.startDateTime}
+                    and trans_time &gt;= #{orderPageQuery.startDateTime}
                 </if>
                 <if test="orderPageQuery.endDateTime != null">
-                    and order_time &lt;= #{orderPageQuery.endDateTime}
+                    and trans_time &lt;= #{orderPageQuery.endDateTime}
                 </if>
                 <if test="orderPageQuery.supplierMerCode != null">
                     and m.mer_code = #{orderPageQuery.supplierMerCode}

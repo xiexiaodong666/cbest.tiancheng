@@ -118,9 +118,9 @@
     account a
     left JOIN merchant m on a.mer_code = m.mer_code
     LEFT JOIN department d ON a.store_code = d.department_code
-    LEFT JOIN account_type at ON at.type_code = a.account_type_code
+    LEFT JOIN account_type at ON at.type_code = a.account_type_code and a.mer_code = at.mer_code
     LEFT JOIN card_info ci ON ci.account_code = a.account_code
-    where a.deleted = 0 and a.mer_code = at.mer_code
+    where a.deleted = 0
     <if test=" merCode !='' and merCode != null ">
       and a.mer_code = #{merCode} and at.mer_code = #{merCode}
     </if>
@@ -172,7 +172,7 @@
            a.remark
     FROM account a
            LEFT JOIN department d ON a.store_code = d.department_code
-           LEFT JOIN merchant m ON a.mer_code = m.mer_code
+           LEFT JOIN merchant m ON a.mer_code = m.mer_code 
            LEFT JOIN account_type AT
     ON AT.type_code = a.account_type_code
     WHERE a.mer_code = at.mer_code

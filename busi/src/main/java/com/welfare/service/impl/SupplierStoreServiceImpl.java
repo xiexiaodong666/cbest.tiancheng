@@ -515,6 +515,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     entity.setConsumType(update.getConsumType());
     entity.setUpdateUser(update.getUpdateUser());
     entity.setExternalCode(update.getExternalCode());
+    entity.setCashierNo(update.getCashierNo());
     return entity;
   }
 

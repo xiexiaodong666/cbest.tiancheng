@@ -90,10 +90,15 @@ public class OrderController implements IController {
             OrderSummary orderSummary = orderService.selectSummary1(orderReqDto);
             PageVo.Ext ext1 = new PageVo.Ext();
             if (orderSummary != null){
-                ext1.setAmount(orderSummary.getOrderAmount());
-                ext1.setOrderNum(orderSummary.getOrderNum());
+                ext1.setAmount(orderSummary.getOrderAmount() == null ? "0": orderSummary.getOrderAmount());
+                ext1.setOrderNum(orderSummary.getOrderNum()== null ? 0 : orderSummary.getOrderNum());
                 resultPage.setExt(ext1);
             }
+        }else{
+            PageVo.Ext ext1 = new PageVo.Ext();
+            ext1.setAmount("0");
+            ext1.setOrderNum(0);
+            resultPage.setExt(ext1);
         }
         return success(resultPage);
     }

@@ -187,6 +187,7 @@
     CASE abd.trans_type
     WHEN 'deposit_incr' THEN m.mer_name
     WHEN 'refund' THEN m.mer_name
+    WHEN 'deposit_back' THEN m.mer_name
     else  ss.store_name
     END	 AS storeName,
     abd.trans_type AS transType,
@@ -247,13 +248,13 @@
     CASE
 
     WHEN abd.trans_type = 'deposit_incr' THEN
-    trans_amount * ( - 1 )
+    trans_amount
     WHEN abd.trans_type = 'consume' THEN
-    trans_amount
+    trans_amount  * ( - 1 )
     WHEN abd.trans_type = 'refund' THEN
-    trans_amount * ( - 1 )
-    WHEN abd.trans_type = 'deposit_back' THEN
     trans_amount
+    WHEN abd.trans_type = 'deposit_back' THEN
+    trans_amount * ( - 1 )
     END
     ) AS accountTotalAmount,
     COUNT( abd.id ) AS tradeNum,

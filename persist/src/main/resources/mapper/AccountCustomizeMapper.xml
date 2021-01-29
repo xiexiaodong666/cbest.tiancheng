@@ -184,38 +184,61 @@
   <select id="queryAccountBillDetail"
     resultType="com.welfare.persist.dto.AccountBillDetailMapperDTO">
     SELECT
-    ss.store_name AS storeName,
+    CASE abd.trans_type
+    WHEN 'deposit_incr' THEN m.mer_name
+    WHEN 'refund' THEN m.mer_name
+    WHEN 'deposit_back' THEN m.mer_name
+    else  ss.store_name
+    END	 AS storeName,
     abd.trans_type AS transType,
     CASE
-    when abd.trans_type = 'deposit_incr' then "充值"
-    when abd.trans_type = 'consume' then "消费"
-    when abd.trans_type = 'refund' then "退款"
-    when abd.trans_type = 'deposit_back' then "回冲"
-    END as transTypeString,
+    WHEN abd.trans_type = 'deposit_incr' THEN
+    "入账"
+    WHEN abd.trans_type = 'consume' THEN
+    "出账"
+    WHEN abd.trans_type = 'refund' THEN
+    "入账"
+    WHEN abd.trans_type = 'deposit_back' THEN
+    "出账"
+    END AS transTypeString,
     CASE
     WHEN abd.trans_type = 'deposit_incr' THEN
-    trans_amount * ( - 1 )
+    abd.trans_amount
     WHEN abd.trans_type = 'consume' THEN
-    trans_amount
+    abd.trans_amount * (- 1)
     WHEN abd.trans_type = 'refund' THEN
-    trans_amount * ( - 1 )
+    abd.trans_amount
     WHEN abd.trans_type = 'deposit_back' THEN
-    trans_amount
+    abd.trans_amount * (- 1)
     END AS transAmount,
     abd.create_time AS createTime,
     abd.account_balance AS accountBalance
+    ,GROUP_CONCAT(DISTINCT(mat.mer_account_type_name)) AS accountTypeName
     FROM
     account_bill_detail abd
-    LEFT JOIN supplier_store ss ON ss.store_code = abd.store_code
-    WHERE abd.trans_type in('deposit_incr','consume','refund','deposit_back') and
-    abd.account_code = #{accountCode}
+    left join account a on a.account_code = abd.account_code
+    left join merchant m on m.mer_code = a.mer_code
+    LEFT JOIN merchant_account_type mat ON m.mer_code  = mat.mer_code
+    LEFT JOIN account_deduction_detail addetail ON abd.trans_no = addetail.trans_no
+    LEFT JOIN supplier_store ss ON addetail.store_code = ss.store_code
+
+    WHERE
+    abd.trans_type IN (
+    'deposit_incr',
+    'consume',
+    'refund',
+    'deposit_back'
+    ) and addetail.mer_account_type = mat.mer_account_type_code  and abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
       and abd.create_time <![CDATA[>=]]> #{createTimeStart}
     </if>
     <if test="createTimeEnd != null ">
       and abd.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
-    order by abd.create_time desc
+    GROUP BY
+    abd.trans_no
+    ORDER BY
+    abd.create_time DESC
   </select>
 
   <select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">
@@ -225,13 +248,13 @@
     CASE
 
     WHEN abd.trans_type = 'deposit_incr' THEN
-    trans_amount * ( - 1 )
+    trans_amount
     WHEN abd.trans_type = 'consume' THEN
-    trans_amount
+    trans_amount  * ( - 1 )
     WHEN abd.trans_type = 'refund' THEN
-    trans_amount * ( - 1 )
-    WHEN abd.trans_type = 'deposit_back' THEN
     trans_amount
+    WHEN abd.trans_type = 'deposit_back' THEN
+    trans_amount * ( - 1 )
     END
     ) AS accountTotalAmount,
     COUNT( abd.id ) AS tradeNum,

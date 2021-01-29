@@ -18,4 +18,5 @@ public class AccountBillDetailMapperDTO {
   private BigDecimal transAmount;
   private Date createTime;
   private BigDecimal  accountBalance;
+  private String accountTypeName;
 }

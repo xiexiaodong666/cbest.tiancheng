@@ -6,9 +6,13 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareSettleConstant;
+import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.domain.UserInfo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DateUtil;
+import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MonthSettleDao;
 import com.welfare.persist.dto.MonthSettleDTO;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
@@ -33,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -171,6 +176,9 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         monthSettle.setSendTime(new Date());
 
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        monthSettle.setCreateUser(userInfo.getUserId());
+
         return monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()
                         .eq(MonthSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code())
@@ -185,7 +193,10 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         //修改账单确认状态为已确认
         monthSettle.setRecStatus(WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code());
+
+        MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         monthSettle.setConfirmTime(new Date());
+        monthSettle.setUppdateUser(merchantUser.getUserCode());
 
         return monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()
@@ -202,6 +213,9 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         //修改账单结算状态为已结算
         MonthSettle monthSettle = new MonthSettle();
         monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
+
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        monthSettle.setUppdateUser(userInfo.getUserId());
 
         int i = monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()
@@ -235,6 +249,11 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     @Override
     public MonthSettle getMonthSettleById(Long id) {
         return monthSettleMapper.selectById(id);
+    }
+
+    @Override
+    public List<Map<String, Object>> getAccoutType(String merCode) {
+        return monthSettleMapper.getAccountType(merCode);
     }
 
     /**

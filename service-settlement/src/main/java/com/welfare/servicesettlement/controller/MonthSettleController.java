@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -102,6 +103,7 @@ public class MonthSettleController implements IController {
 
         List<MonthSettleDetailResp> monthSettleDetailResps = new ArrayList<>();
         List<MonthSettleDetailResp> monthSettleDetailRespsTemp;
+        monthSettleDetailReq.setMinId(0l);
         do {
             monthSettleDetailRespsTemp = monthSettleService.queryMonthSettleDetailLimit(id, monthSettleDetailReq);
             if(!monthSettleDetailRespsTemp.isEmpty()){
@@ -175,6 +177,12 @@ public class MonthSettleController implements IController {
         params.put("date", date);
         settlementBillBuildTask.execute(JSON.toJSONString(params));
         return R.success();
+    }
+
+    @GetMapping("/accountType/list")
+    @ApiOperation("结算账户列表查询")
+    public R<List<Map<String, Object>>> getAccoutType(String merCode){
+        return R.success(monthSettleService.getAccoutType(merCode));
     }
 
     /**

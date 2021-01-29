@@ -2,7 +2,7 @@ spring:
   cache:
     type: redis
   datasource:
-    url: jdbc:mysql://192.1.30.205:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://db.haproxy.cbest.gam:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: jav_tclife_rw
     password: 3uUacFIf3PDoBy
   redis:
@@ -15,7 +15,7 @@ spring:
     timeout: 5000
     database: 0
     password: v6z82Ebfc7I1
-    host: 192.1.30.205
+    host: redis.cbest.gam
     port: 6399
 
 logging:
@@ -24,6 +24,7 @@ logging:
   level:
     root: info
     com.welfare.persist.mapper: info
+
 encrypt:
   file: ${config.file:classpath:config/config.properties}
 e-welfare:
@@ -34,6 +35,7 @@ mybatis-plus:
     db-config:
       logic-delete-value: 1
       logic-not-delete-value: 0
+
 platformUser:
   url:
 shopping:
@@ -42,8 +44,8 @@ shopping:
 cbest:
   pay:
     url: http://192.1.30.160:8000/gateway
-    appId: yufu
-    appKey: e4716980da4382e1f4cc6ee4bb640277
+    appId: olife
+    appKey: e400233f4a719304ce189cde2aeaae98
   dmall:
     url: http://dmall.e-cbest.com
 feign:

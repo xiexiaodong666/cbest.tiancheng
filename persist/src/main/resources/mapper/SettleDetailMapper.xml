@@ -75,6 +75,7 @@
             <if test="merCode!=null and merCode!=''">
                 and t2.mer_code=#{merCode}
             </if>
+            and t1.trans_type in('consume','refund')
         </where>
         order by t1.id
         <if test="limit!=null">

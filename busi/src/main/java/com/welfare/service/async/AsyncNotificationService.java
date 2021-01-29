@@ -32,7 +32,7 @@ public class AsyncNotificationService {
     @Async("e-welfare-taskExecutor")
     public void paymentNotify(String phone, BigDecimal amount){
         String msg = "交易提醒:您在甜橙生活有一笔" + amount.toString() + "元的消费已成功";
-        NotificationReq notificationReq = NotificationReq.of(phone, msg, targetPath, "消费账单通知");
+        NotificationReq notificationReq = NotificationReq.of(phone, msg, "", "消费账单通知");
         NotificationResp notificationResp = notificationFeign.doNotify(notificationReq);
         if(!SUCCEED.equals(notificationResp.getCode())){
             log.error("调用通知系统出错,msg:{},failureData:{}",notificationResp.getMsg(),JSON.toJSONString(notificationResp.getFailureData()));

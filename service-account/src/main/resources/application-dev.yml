@@ -94,4 +94,4 @@ xxl:
 
 notification:
   url: http://test-welfare-internal.kube.cbestcd.com
-  targetPath: https://test-welfare-app.sjgo365.com/tc/redirect?target=center
+  #targetPath: https://test-welfare-app.sjgo365.com/tc/redirect?target=center

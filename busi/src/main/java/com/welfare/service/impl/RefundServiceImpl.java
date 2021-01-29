@@ -69,6 +69,7 @@ public class RefundServiceImpl implements RefundService {
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
             Account account = accountService.getByAccountCode(first.getAccountCode());
+            refundRequest.setAccountMerCode(account.getMerCode());
             log.error("accountInfo:{}",account);
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
             //按照deductionOrder逆序

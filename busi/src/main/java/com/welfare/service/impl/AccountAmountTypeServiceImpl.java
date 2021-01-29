@@ -5,11 +5,9 @@ import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.AccountChangeEventRecord;
-import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.*;
 import com.welfare.service.dto.Deposit;
@@ -24,6 +22,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +54,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
      */
     @Autowired
     private AccountBillDetailService accountBillDetailService;
-
+    private final AccountDeductionDetailDao accountDeductionDetailDao;
 
     @Override
     public int batchSaveOrUpdate(List<AccountAmountType> list) {
@@ -97,7 +96,11 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             accountChangeEventRecordService.save(accountChangeEventRecord);
             accountDao.saveOrUpdate(account);
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType, account);
-            orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT_INCR);
+            orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),
+                    deposit.getTransNo(),
+                    WelfareConstant.TransType.DEPOSIT_INCR);
+            AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(deposit, account, accountAmountType);
+            accountDeductionDetailDao.save(deductionDetail);
         } finally {
             lock.unlock();
         }
@@ -143,5 +146,23 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         return balanceSum;
     }
 
-
+    private AccountDeductionDetail assemblyAccountDeductionDetail(Deposit deposit, Account account,
+                                                                  AccountAmountType accountAmountType) {
+        AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
+        accountDeductionDetail.setAccountCode(account.getAccountCode());
+        accountDeductionDetail.setAccountDeductionAmount(deposit.getAmount());
+        accountDeductionDetail.setAccountAmountTypeBalance(accountAmountType.getAccountBalance());
+        accountDeductionDetail.setMerAccountType(accountAmountType.getMerAccountTypeCode());
+        accountDeductionDetail.setTransNo(deposit.getTransNo());
+        accountDeductionDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
+        accountDeductionDetail.setTransAmount(deposit.getAmount());
+        accountDeductionDetail.setReversedAmount(BigDecimal.ZERO);
+        accountDeductionDetail.setTransTime(Calendar.getInstance().getTime());
+        accountDeductionDetail.setMerDeductionCreditAmount(BigDecimal.ZERO);
+        accountDeductionDetail.setMerDeductionAmount(BigDecimal.ZERO);
+        accountDeductionDetail.setSelfDeductionAmount(BigDecimal.ZERO);
+        accountDeductionDetail.setCardId(deposit.getCardNo());
+        accountDeductionDetail.setChanel(deposit.getChannel());
+        return accountDeductionDetail;
+    }
 }

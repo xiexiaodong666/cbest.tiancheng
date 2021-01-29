@@ -153,7 +153,15 @@
                 </when>
             </choose>
         </where>
-        order by t1.id
+
+        <if test="limit!=null and minId!=null">
+            order by t1.id
+            limit #{limit}
+        </if>
+
+        <if test="minId==null and minId==null">
+            order by t1.trans_time desc
+        </if>
     </select>
 
 
@@ -279,9 +287,14 @@
             else 0 end as settleAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
-        order by t1.id
-        <if test="limit!=null">
+
+        <if test="limit!=null and minId!=null">
+            order by t1.id
             limit #{limit}
+        </if>
+
+        <if test="limit==null and minId==null">
+            order by t1.trans_time desc
         </if>
     </select>
 

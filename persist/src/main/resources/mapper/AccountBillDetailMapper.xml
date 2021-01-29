@@ -11,37 +11,38 @@
 
     <select id="selectAccountBillDetailSimpleList" resultType="com.welfare.persist.dto.AccountBillDetailSimpleDTO" parameterType="com.welfare.persist.dto.query.AccountBillDetailSimpleReq">
         SELECT
-        abd.id AS adbid,
-        IFNULL(aded.store_code,abd.store_code) AS storeCode,
-        IFNULL(ss.store_name,m.mer_name) AS storeName,
-        IFNULL(aded.trans_type,abd.trans_type) AS transType,
-        IFNULL(aded.trans_amount,abd.trans_amount) AS transAmount,
-        IFNULL(aded.trans_time,abd.trans_time) AS transTime,
-        abd.channel,
-        aded.id as adedid,
+        aded.store_code AS storeCode,
+        CASE
+        aded.trans_type
+        WHEN 'deposit_incr' THEN
+        m.mer_name
+        WHEN 'deposit_decr' THEN
+        m.mer_name ELSE ss.store_name
+        END AS storeName,
+        aded.trans_type AS transType,
+        aded.trans_amount AS transAmount,
+        aded.trans_time AS transTime,
+        aded.chanel AS channel,
         mat.mer_account_type_code AS merAccountTypeCode,
         mat.mer_account_type_name AS merAccountTypeName
         FROM
-        (SELECT id,account_code,trans_no,store_code,trans_type,sum(trans_amount) AS trans_amount,trans_time,channel FROM account_bill_detail
+        account_deduction_detail aded
+        JOIN account a ON aded.account_code = a.account_code
+        JOIN merchant m ON a.mer_code = m.mer_code
+        LEFT JOIN supplier_store ss ON aded.store_code = ss.store_code
+        LEFT JOIN merchant_account_type mat ON aded.mer_account_type = mat.mer_account_type_code
+        AND a.mer_code = mat.mer_code
         <where>
             <if test="accountCode != null">
-                AND account_code = #{accountCode}
+                AND aded.account_code = #{accountCode}
             </if>
             <if test="startTransTime != null ">
-                <![CDATA[AND trans_time >= #{startTransTime}]]>
+                <![CDATA[AND aded.trans_time >= #{startTransTime}]]>
             </if>
             <if test="endTransTime != null ">
-                <![CDATA[AND trans_time <= #{endTransTime}]]>
+                <![CDATA[AND aded.trans_time <= #{endTransTime}]]>
             </if>
         </where>
-        GROUP BY trans_no
-        ORDER BY trans_time DESC
-        ) abd
-        JOIN account a ON abd.account_code=a.account_code
-        JOIN merchant m ON a.mer_code=m.mer_code
-        LEFT JOIN account_deduction_detail aded ON abd.trans_no = aded.trans_no
-        LEFT JOIN supplier_store ss ON abd.store_code = ss.store_code
-        LEFT JOIN merchant_account_type mat ON aded.mer_account_type = mat.mer_account_type_code AND a.mer_code=mat.mer_code
     </select>
 
 </mapper>

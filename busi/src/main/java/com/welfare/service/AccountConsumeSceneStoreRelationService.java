@@ -2,6 +2,7 @@ package com.welfare.service;
 
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 
+import com.welfare.service.dto.StoreConsumeRelationDTO;
 import java.util.List;
 import java.util.Map;
 
@@ -17,5 +18,7 @@ public interface AccountConsumeSceneStoreRelationService {
    * 门店修改了消费方式,员工类型同步修改消费方式
    *
    */
-  public void updateStoreConsumeType(String merCode, Map<String, String> storeCodeConsumeTypeMap);
+  public void updateStoreConsumeType(String merCode,String storeCode, String consumeType);
+
+  public void updateStoreConsumeTypeByDTOList(String merCode,List<StoreConsumeRelationDTO> relationDTOList);
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @Author: duanhy
@@ -38,7 +39,6 @@ public class PriceTemplateMeal {
   @Min(message = "价格不能小于0", value = 0)
   private Integer price;
 
-  @ApiModelProperty(value = "帐户扣费规则", required = true)
-  @NotNull(message = "帐户扣费规则不能为空")
-  private PriceTemplateAccountRule accountRules;
+  @ApiModelProperty(value = "帐户扣费规则")
+  private List<PriceTemplateAccountRule> accountRules;
 }

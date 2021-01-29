@@ -20,27 +20,22 @@ public class CbestDmallFeignFallback implements FallbackFactory<CbestDmallFeign>
       public DmallResponse<PagingResult<PriceTemplateBrief>> listPriceTemplate(PosPriceTemplateReq req) {
         return null;
       }
-
       @Override
       public DmallResponse<PosPriceTemplate> queryPriceTemplate(@NotNull(message = "id不能为空") Map<String, Long> id) {
         return null;
       }
-
       @Override
       public DmallResponse<PosPriceTemplate> createPriceTemplate(PosPriceTemplateSaveReq req) {
         return null;
       }
-
       @Override
       public DmallResponse<PosPriceTemplate> modifyPriceTemplate(PosPriceTemplate req) {
         return null;
       }
-
       @Override
       public DmallResponse<PagingResult<PosTerminalPriceTemplateResp>> listTerminalPriceTemplate(TerminalPriceTemplateReq req) {
         return null;
       }
-
       @Override
       public DmallResponse<PosTerminalPriceTemplateResp> modifyTerminalPriceTemplate(TerminalPriceTemplateUpdateReq req) {
         return null;

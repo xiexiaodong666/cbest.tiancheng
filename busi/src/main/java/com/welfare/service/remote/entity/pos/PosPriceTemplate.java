@@ -17,11 +17,11 @@ import java.util.List;
 @ApiModel("价格模板")
 public class PosPriceTemplate {
 
-  @ApiModelProperty("价格模板简要信息")
+  @ApiModelProperty(value = "价格模板简要信息", required = true)
   @NotNull(message = "价格模板简要信息不能为空")
   private PriceTemplateBrief brief;
 
-  @ApiModelProperty("价格模板进餐配置")
+  @ApiModelProperty(value = "价格模板进餐配置", required = true)
   @NotNull(message = "价格模板进餐配置不能为空")
   private List<PriceTemplateMeal> meals;
 

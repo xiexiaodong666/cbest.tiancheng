@@ -42,6 +42,11 @@ public class DepositServiceImpl implements DepositService {
         deposit.setDepositStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
     }
 
+    @Override
+    public void personalDeposit(Deposit deposit) {
+        accountAmountTypeService.updateAccountAmountType(deposit);
+        deposit.setDepositStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+    }
 
 
     @Override

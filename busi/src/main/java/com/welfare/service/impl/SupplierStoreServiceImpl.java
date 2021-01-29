@@ -294,9 +294,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店编码已存在", null);
 
     }
-    if (EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(supplierStore.getCashierNo()))) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "虚拟收银机号已存在", null);
-    }
+//    if (EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(supplierStore.getCashierNo()))) {
+//      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "虚拟收银机号已存在", null);
+//    }
 
     supplierStore.setConsumType(
         JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
@@ -515,6 +515,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     entity.setConsumType(update.getConsumType());
     entity.setUpdateUser(update.getUpdateUser());
     entity.setExternalCode(update.getExternalCode());
+    entity.setCashierNo(update.getCashierNo());
     return entity;
   }
 

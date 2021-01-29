@@ -103,6 +103,7 @@ public class MonthSettleController implements IController {
 
         List<MonthSettleDetailResp> monthSettleDetailResps = new ArrayList<>();
         List<MonthSettleDetailResp> monthSettleDetailRespsTemp;
+        monthSettleDetailReq.setMinId(0l);
         do {
             monthSettleDetailRespsTemp = monthSettleService.queryMonthSettleDetailLimit(id, monthSettleDetailReq);
             if(!monthSettleDetailRespsTemp.isEmpty()){

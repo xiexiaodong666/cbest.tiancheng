@@ -43,6 +43,7 @@
                 <![CDATA[AND aded.trans_time <= #{endTransTime}]]>
             </if>
         </where>
+        ORDER BY aded.trans_time DESC
     </select>
 
 </mapper>

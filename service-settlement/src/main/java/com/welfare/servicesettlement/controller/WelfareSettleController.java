@@ -66,6 +66,7 @@ public class WelfareSettleController implements IController {
 
         List<WelfareSettleDetailResp> welfareSettleDetailRespList = new ArrayList<>();
         List<WelfareSettleDetailResp> welfareSettleDetailRespListTemp;
+        welfareSettleDetailReq.setMinId(0l);
         do {
             welfareSettleDetailRespListTemp = settleDetailService.queryWelfareSettleDetail(welfareSettleDetailReq);
             if(!welfareSettleDetailRespListTemp.isEmpty()){

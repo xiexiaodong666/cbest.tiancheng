@@ -216,10 +216,10 @@
     FROM
     account_bill_detail abd
     left join account a on a.account_code = abd.account_code
+    left join merchant m on m.mer_code = a.mer_code
+    LEFT JOIN merchant_account_type mat ON m.mer_code  = mat.mer_code
     LEFT JOIN account_deduction_detail addetail ON abd.trans_no = addetail.trans_no
     LEFT JOIN supplier_store ss ON addetail.store_code = ss.store_code
-    left join merchant m on m.mer_code = ss.mer_code
-    LEFT JOIN merchant_account_type mat ON m.mer_code  = mat.mer_code
 
     WHERE
     abd.trans_type IN (

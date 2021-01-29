@@ -74,9 +74,12 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     });
     List<AccountConsumeSceneStoreRelation> updateList = new LinkedList<AccountConsumeSceneStoreRelation>();
     accountConsumeSceneStoreRelations.forEach(accountConsumeSceneStoreRelation -> {
+      //原员工类型配置消费方式
       String[] selectType = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
-      StringBuilder sb = getRelationUpdateResult(selectType,accountConsumeSceneStoreRelation,
-          updateRelationMap.get(accountConsumeSceneStoreRelation.getStoreCode()));
+      //要修改的消费配置方式
+      String consumeType = updateRelationMap.get(accountConsumeSceneStoreRelation.getStoreCode());
+      //修改结果
+      StringBuilder sb = getRelationUpdateResult(selectType,accountConsumeSceneStoreRelation,consumeType);
       //return consumeTypeJson.getValue(s);
       if(StringUtils.isBlank(sb)){
         StringBuilder text = getText(selectType);

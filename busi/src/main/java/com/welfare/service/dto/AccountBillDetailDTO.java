@@ -61,8 +61,8 @@ public class AccountBillDetailDTO implements Serializable {
   /**
    * 交易账户
    */
-  @ExcelProperty(value = "枚举值")
-  @ApiModelProperty("枚举值")
+  @ExcelProperty(value = "名目")
+  @ApiModelProperty("名目\"")
   private String accountTypeName;
 
 

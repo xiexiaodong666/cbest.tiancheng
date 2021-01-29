@@ -79,11 +79,14 @@ public class PaymentServiceImpl implements PaymentService {
             return requestHandled;
         }
         Long accountCode = paymentRequest.calculateAccountCode();
+        Assert.notNull(accountCode,"账号不能为空。");
         SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo());
         String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + paymentRequest.calculateAccountCode();
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
+            Assert.notNull(account,"未找到账号：" + accountCode);
+            paymentRequest.setAccountMerCode(account.getMerCode());
             chargeBeforePay(paymentRequest, account, supplierStore);
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
@@ -181,6 +184,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAmount(amount);
 
             Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
+            paymentRequest.setAccountMerCode(account.getMerCode());
             paymentRequest.setAccountBalance(account.getAccountBalance());
             paymentRequest.setAccountName(account.getAccountName());
             paymentRequest.setAccountCredit(account.getSurplusQuota());

@@ -99,7 +99,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
-
+        welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         List<WelfareSettleDetailResp> welfareSettleDetailRespList = settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
             WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
             BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);

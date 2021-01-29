@@ -116,8 +116,8 @@ public class BarcodeServiceImpl implements BarcodeService {
     }
 
     @Override
-    public BarcodeSalt queryCurrentPeriodSaltValue() {
-        Long period = BarcodeUtil.currentAsPeriod();
+    public BarcodeSalt queryPeriodSaltValue(Date scanDate) {
+        Long period = BarcodeUtil.dateAsPeriod(scanDate);
         return querySaltByPeriodNumeric(period);
     }
 
@@ -130,7 +130,7 @@ public class BarcodeServiceImpl implements BarcodeService {
 
     @Override
     public PaymentBarcode getBarcode(Long accountCode) {
-        BarcodeSalt barcodeSalt =  queryCurrentPeriodSaltValue();
+        BarcodeSalt barcodeSalt =  queryPeriodSaltValue(Calendar.getInstance().getTime());
         PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue());
         redisTemplate.opsForValue().set(
                 BARCODE_PREFIX + paymentBarcode.getBarcode(),
@@ -141,18 +141,18 @@ public class BarcodeServiceImpl implements BarcodeService {
     }
 
     @Override
-    public Long parseAccountFromBarcode(String barcode, boolean isOffline) {
+    public Long parseAccountFromBarcode(String barcode, Date scanDate, boolean isOffline) {
         if(!isOffline){
             PaymentBarcode paymentBarcode = redisTemplate.opsForValue().get(BARCODE_PREFIX + barcode);
             Assert.notNull(paymentBarcode,"条码过期或不存在");
         }
-        BarcodeSalt barcodeSalt = queryCurrentPeriodSaltValue();
+        BarcodeSalt barcodeSalt = queryPeriodSaltValue(scanDate);
         Long accountCode = BarcodeUtil.calculateAccount(barcode, barcodeSalt.getSaltValue());
         return accountCode;
     }
 
     private BarcodeSalt getTheLatestSaltInDb() {
-        Long currentPeriod = BarcodeUtil.currentAsPeriod();
+        Long currentPeriod = BarcodeUtil.dateAsPeriod(Calendar.getInstance().getTime());
         QueryWrapper<BarcodeSalt> queryWrapper = new QueryWrapper<>();
         queryWrapper.ge(BarcodeSalt.VALID_PERIOD_NUMERIC,currentPeriod)
                 .orderByDesc(BarcodeSalt.VALID_PERIOD_NUMERIC)

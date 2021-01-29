@@ -3,6 +3,7 @@ package com.welfare.common.util;
 import jodd.util.MathUtil;
 import jodd.util.StringUtil;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,6 +17,7 @@ import java.util.Date;
  * @email yuxiang.li@sjgo365.com
  * @date 1/9/2021
  */
+@Slf4j
 public class BarcodeUtil {
     private BarcodeUtil(){
 
@@ -81,11 +83,15 @@ public class BarcodeUtil {
     /**
      * 将当前时间转为Period返回
      * @return
+     * @param date
      */
-    public static Long currentAsPeriod(){
-        Date currentDate = Calendar.getInstance().getTime();
+    public static Long dateAsPeriod(Date date){
+        if(date == null){
+            log.warn("no date, use current.");
+            date = Calendar.getInstance().getTime();
+        }
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        String dayStr = dateFormat.format(currentDate);
+        String dayStr = dateFormat.format(date);
         return Long.parseLong(dayStr);
     }
 

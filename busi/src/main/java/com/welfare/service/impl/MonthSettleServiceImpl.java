@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -150,7 +151,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     public List<MonthSettleDetailResp> queryMonthSettleDetailLimit(Long id, MonthSettleDetailReq monthSettleDetailReq) {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
-        PageHelper.startPage(1, WelfareSettleConstant.LIMIT);
+
+        monthSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
 
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleDetailDTOS.stream().map(monthSettleDetailDTO -> {
@@ -234,6 +236,11 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     @Override
     public MonthSettle getMonthSettleById(Long id) {
         return monthSettleMapper.selectById(id);
+    }
+
+    @Override
+    public List<Map<String, Object>> getAccoutType(String merCode) {
+        return monthSettleMapper.getAccountType(merCode);
     }
 
     /**

@@ -87,6 +87,12 @@ public class CardController implements IController {
     Merchant merchant = merchantService.queryByCode(cardApply.getMerCode());
     CardInfoApiDTO cardInfoApiDTO = tranferToCardInfoApiDTO(cardInfo, cardApply);
 
+    Account account = accountService.getByAccountCode(cardInfo.getAccountCode());
+    if(account != null) {
+      cardInfoApiDTO.setAccountName(account.getAccountName());
+      cardInfoApiDTO.setPhone(account.getPhone());
+    }
+
     cardInfoApiDTO.setMerName(merchant.getMerName());
     return success(cardInfoApiDTO);
   }
@@ -103,6 +109,7 @@ public class CardController implements IController {
 
   @PostMapping("/disable")
   @ApiOperation("禁用卡片")
+  @ApiUser
   public R<Boolean> disableCard(
       @RequestBody DisableCardDTO disableCardDTO) {
 

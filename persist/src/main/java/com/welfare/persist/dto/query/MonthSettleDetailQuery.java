@@ -28,11 +28,16 @@ public class MonthSettleDetailQuery{
 
     private String storeType;
 
-    private Long minId;
 
     private String posOnlines;
 
     private String settleNo;
 
     private String transNo;
+
+    private Long minId;
+    /**
+     * 查询数据量限制
+     */
+    private Integer limit;
 }

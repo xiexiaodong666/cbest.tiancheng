@@ -813,9 +813,10 @@ public class AccountServiceImpl implements AccountService {
     accountDeductionDetail.setTransAmount(updateQuota.abs());
     accountDeductionDetail.setReversedAmount(BigDecimal.ZERO);
     accountDeductionDetail.setTransTime(Calendar.getInstance().getTime());
-    accountDeductionDetail.setAccountDeductionAmount(updateQuota.abs());
     accountDeductionDetail.setMerDeductionCreditAmount(BigDecimal.ZERO);
     accountDeductionDetail.setMerDeductionAmount(BigDecimal.ZERO);
+    accountDeductionDetail.setChanel(WelfareConstant.Channel.PLATFORM.code());
+    accountDeductionDetail.setSelfDeductionAmount(BigDecimal.ZERO);
     return accountDeductionDetail;
   }
 }

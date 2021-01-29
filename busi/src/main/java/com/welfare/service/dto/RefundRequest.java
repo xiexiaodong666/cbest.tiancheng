@@ -41,4 +41,6 @@ public class RefundRequest {
     private BigDecimal accountCredit;
     @ApiModelProperty("商户编码")
     private String merCode;
+    @ApiModelProperty("账户所在商家，返回参数")
+    private String accountMerCode;
 }

@@ -10,13 +10,12 @@
     m.mer_name as merName,
     ss.mer_code as merCode,
     ss.STATUS as status,
-    m.mer_identity,
     ss.create_time as createTime
     FROM
     supplier_store ss
     LEFT JOIN merchant m ON ss.mer_code = m.mer_code
     where
-     m.deleted=0 and ss.deleted=0 and m.mer_identity like "%SUPPLIER%"
+     m.deleted=0 and ss.deleted=0
       <if test="req!=null and req.merCode!=null and req.merCode!=''">
         and ss.mer_code=#{req.merCode}
       </if>

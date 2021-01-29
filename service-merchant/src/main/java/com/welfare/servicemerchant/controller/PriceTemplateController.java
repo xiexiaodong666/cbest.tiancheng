@@ -8,6 +8,7 @@ import com.welfare.service.dto.pos.TerminalPriceTemplateQueryReq;
 import com.welfare.service.remote.entity.pos.*;
 import com.welfare.service.remote.service.CbestDmallService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ public class PriceTemplateController implements IController {
    */
   @PostMapping("/list")
   @MerchantUser
+  @ApiOperation("分页查询价格模板")
   R<Page<PriceTemplateBrief>> listPriceTemplate(@RequestBody PriceTemplateQueryReq req){
     PagingCondition pagingCondition = new PagingCondition();
     pagingCondition.setPageNo(req.getCurrent());
@@ -54,13 +56,12 @@ public class PriceTemplateController implements IController {
 
   /**
    * 查询价格模板
-   * @param id
    * @return
    */
-  @GetMapping("/query")
+  @GetMapping("/query/{id}")
   @MerchantUser
-  R<PosPriceTemplate> queryPriceTemplate(@ApiParam(name = "id", required = true)
-                                         @NotNull(message = "id不能为空") Long id){
+  @ApiOperation("查询价格模板")
+  R<PosPriceTemplate> queryPriceTemplate(@PathVariable("id") Long id){
     return success(cbestDmallService.queryPriceTemplate(id));
   }
 
@@ -71,6 +72,7 @@ public class PriceTemplateController implements IController {
    */
   @PostMapping("/create")
   @MerchantUser
+  @ApiOperation("创建价格模板")
   R<PosPriceTemplate> createPriceTemplate(@RequestBody PosPriceTemplateSaveReq req){
     return success(cbestDmallService.createPriceTemplate(req));
   }
@@ -82,6 +84,7 @@ public class PriceTemplateController implements IController {
    */
   @PostMapping("/modify")
   @MerchantUser
+  @ApiOperation("修改价格模板")
   R<PosPriceTemplate> modifyPriceTemplate(@RequestBody PosPriceTemplate req){
     return success(cbestDmallService.modifyPriceTemplate(req));
   }
@@ -93,6 +96,7 @@ public class PriceTemplateController implements IController {
    */
   @PostMapping("terminal/list")
   @MerchantUser
+  @ApiOperation("分页查询收银机价格模板")
   R<Page<PosTerminalPriceTemplateResp>> listTerminalPriceTemplate(@RequestBody TerminalPriceTemplateQueryReq req){
     PagingCondition pagingCondition = new PagingCondition();
     pagingCondition.setPageNo(req.getCurrent());
@@ -111,6 +115,7 @@ public class PriceTemplateController implements IController {
    */
   @PostMapping("/terminal/modify")
   @MerchantUser
+  @ApiOperation("修改收银机价格模板")
   R<PosTerminalPriceTemplateResp> modifyTerminalPriceTemplate(@RequestBody TerminalPriceTemplateUpdateReq req) {
     return success(cbestDmallService.modifyTerminalPriceTemplate(req));
   }

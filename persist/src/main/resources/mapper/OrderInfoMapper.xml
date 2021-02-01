@@ -8,12 +8,19 @@
         select  mm.mer_name as accountMerName, tt.orderId ,
         tt.accountMerCode,tt.merchantName,tt.accountCode,
         tt.accountName,tt.merchantCode,tt.storeCode,tt.storeName,
-        tt.orderTime,tt.cardId,trans_type,
+        tt.orderTime,tt.cardId,trans_type, phone,
+        case time_interval
+        when 1 then "早餐"
+        when 2 then "午餐"
+        when 3 then "晚餐"
+        when 4 then "宵夜"
+        else time_interval end as time_interval,
+        tt.type_code , tt.type_name as accountType, tt.department_code , tt.department_name as departmentName,
         case trans_type
         when "consume" then orderAmount
         else  (-1) * orderAmount
         end
-        as orderAmount, phone, time_interval from (
+        as orderAmount from (
         SELECT
         oi.order_id as orderId,
         t.phone as phone,
@@ -28,7 +35,12 @@
         ab.trans_time as orderTime,
         ab.card_id as cardId,
         ab.trans_type,
-        oi.time_interval
+        oi.time_interval,
+        t.account_type_code,
+        d.department_code,
+        d.department_name ,
+        aty.type_code,
+        aty.type_name
         FROM
         (select account_code,sum(trans_amount) as trans_amount , trans_no ,
         max(trans_time) as trans_time ,store_code,trans_type,max(card_id) as card_id
@@ -40,6 +52,8 @@
         LEFT JOIN supplier_store s on ab.store_code = s.store_code
         LEFT JOIN merchant m on s.mer_code = m.mer_code
         LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
+        LEFT JOIN department d on d.department_code = t.store_code
+        LEFT JOIN account_type aty on aty.type_code = t.account_type_code
         <where>
             <if test="orderPageQuery.accountName != null">
                 and t.account_name = #{orderPageQuery.accountName}
@@ -74,7 +88,20 @@
         on tt.accountMerCode = mm.mer_code
         <where>
             <if test="orderPageQuery.merchantCode != null">
-                tt.accountMerCode = #{orderPageQuery.merchantCode}
+                and tt.accountMerCode = #{orderPageQuery.merchantCode}
+            </if>
+            <if test="orderPageQuery.timeInterval != null">
+                and tt.time_interval = #{orderPageQuery.timeInterval}
+            </if>
+            <if test="orderPageQuery.accountType != null">
+                and tt.type_code = #{orderPageQuery.accountType}
+            </if>
+            <if test="orderPageQuery.organizationCode != null">
+                and tt.department_code in (
+                    select department_code from department
+                    where department_code = #{orderPageQuery.organizationCode}
+                    or department_path = #{orderPageQuery.organizationCode}
+                )
             </if>
         </where>
         order by tt.orderTime desc
@@ -99,7 +126,13 @@
                 s.store_code AS storeCode,
                 s.store_name AS sotreName,
                 ab.trans_amount,
-                ab.trans_type
+                ab.trans_type,
+                oi.time_interval,
+                t.account_type_code,
+                d.department_code,
+                d.department_name ,
+                aty.type_code,
+                aty.type_name
             FROM
             (select account_code,sum(trans_amount) as trans_amount ,
         trans_no , max(trans_time) as trans_time ,store_code,trans_type
@@ -111,6 +144,8 @@
             LEFT JOIN supplier_store s on ab.store_code = s.store_code
             LEFT JOIN merchant m on s.mer_code = m.mer_code
             LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
+            LEFT JOIN department d on d.department_code = t.store_code
+            LEFT JOIN account_type aty on aty.type_code = t.account_type_code
             <where>
                 <if test="orderPageQuery.accountName != null">
                     and t.account_name = #{orderPageQuery.accountName}
@@ -146,6 +181,19 @@
             <where>
                 <if test="orderPageQuery.merchantCode != null">
                     tt.accountMerCode = #{orderPageQuery.merchantCode}
+                </if>
+                <if test="orderPageQuery.timeInterval != null">
+                    and tt.time_interval = #{orderPageQuery.timeInterval}
+                </if>
+                <if test="orderPageQuery.accountType != null">
+                    and tt.type_code = #{orderPageQuery.accountType}
+                </if>
+                <if test="orderPageQuery.organizationCode != null">
+                    and tt.department_code in (
+                    select department_code from department
+                    where department_code = #{orderPageQuery.organizationCode}
+                    or department_path = #{orderPageQuery.organizationCode}
+                    )
                 </if>
             </where>
             group by trans_type

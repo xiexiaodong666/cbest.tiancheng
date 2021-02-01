@@ -154,7 +154,7 @@ public class Account extends Model<Account> implements Serializable {
      * 文件存储关联id
      */
     @ApiModelProperty("文件存储关联id")   
-    private String fileUniversalStorageId;
+    private Long fileUniversalStorageId;
 
 //以下为列明常量
 

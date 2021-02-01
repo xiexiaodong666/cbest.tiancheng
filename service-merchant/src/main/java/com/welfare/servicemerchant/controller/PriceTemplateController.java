@@ -9,15 +9,13 @@ import com.welfare.service.remote.entity.pos.*;
 import com.welfare.service.remote.service.CbestDmallService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * 终端相关接口
@@ -48,9 +46,11 @@ public class PriceTemplateController implements IController {
     pagingCondition.setPageSize(req.getSize());
     PosPriceTemplateReq templateReq = PosPriceTemplateReq.builder()
             .name(req.getName())
-            .storeCodes(Lists.newArrayList(req.getStoreCode()))
             .paging(pagingCondition)
             .build();
+    if (StringUtils.isNoneBlank(req.getStoreCode())) {
+      templateReq.setStoreCodes(Lists.newArrayList(req.getStoreCode()));
+    }
     return success(cbestDmallService.listPriceTemplate(templateReq));
   }
 
@@ -102,9 +102,11 @@ public class PriceTemplateController implements IController {
     pagingCondition.setPageNo(req.getCurrent());
     pagingCondition.setPageSize(req.getSize());
     TerminalPriceTemplateReq posPriceTemplateReq = TerminalPriceTemplateReq.builder()
-            .storeCodes(Lists.newArrayList(req.getStoreCode()))
             .paging(pagingCondition)
             .build();
+    if (StringUtils.isNoneBlank(req.getStoreCode())) {
+      posPriceTemplateReq.setStoreCodes(Lists.newArrayList(req.getStoreCode()));
+    }
     return success(cbestDmallService.listTerminalPriceTemplate(posPriceTemplateReq));
   }
 

@@ -1,4 +1,6 @@
 package com.welfare.service.impl;
+import com.welfare.common.enums.FileUniversalStorageEnum;
+import java.util.Date;
 
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
@@ -35,6 +37,9 @@ import com.welfare.persist.mapper.AccountDeductionDetailMapper;
 import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.service.*;
 import com.welfare.service.converter.AccountConverter;
+import com.welfare.service.dto.AccountBatchImgDTO;
+import com.welfare.service.dto.AccountBatchImgInfoReq;
+import com.welfare.service.dto.AccountBatchImgReq;
 import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountBindCardDTO;
@@ -81,7 +86,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountDao accountDao;
-    private final AccountMapper accountMapper;
+    private final FileUniversalStorageDao fileUniversalStorageDao;
+
+  private final AccountMapper accountMapper;
     private final AccountCustomizeMapper accountCustomizeMapper;
     private final AccountConverter accountConverter;
     @Autowired
@@ -287,6 +294,54 @@ public class AccountServiceImpl implements AccountService {
                     .builder().typeEnum(ShoppingActionTypeEnum.ACCOUNT_BATCH_ADD).codeList(codeList)
                     .build());
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AccountBatchImgDTO uploadBatchImg(AccountBatchImgReq accountBatchImgReq) {
+      AccountBatchImgDTO accountBatchImgDTO = new AccountBatchImgDTO();
+
+      List<String> successList = new ArrayList<>();
+      List<String> failList;
+
+      String merCode = accountBatchImgReq.getMerCode();
+      List<AccountBatchImgInfoReq> batchImgInfoListReq = accountBatchImgReq.getAccountBatchImgInfoReqList();
+
+      List<String> phones = batchImgInfoListReq.stream().map(b->b.getPhone()).collect(Collectors.toList());
+
+      QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
+      accountQueryWrapper.in(Account.PHONE, phones);
+      accountQueryWrapper.eq(Account.MER_CODE, merCode);
+      List<Account> accountList = accountDao.list(accountQueryWrapper);
+
+      List<FileUniversalStorage> fileUniversalStorageList = new ArrayList<>();
+
+      for(Account account : accountList) {
+        Optional<AccountBatchImgInfoReq> accountOptional = batchImgInfoListReq.stream().filter(i->i.getPhone().equals(account.getPhone())).findFirst();
+        if(accountOptional.isPresent()) {
+          successList.add(accountOptional.get().getPhone());
+          FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
+          fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
+          fileUniversalStorage.setImgKey(accountOptional.get().getImgKey());
+          fileUniversalStorage.setDeleted(false);
+          fileUniversalStorageList.add(fileUniversalStorage);
+        }
+
+      }
+
+      phones.removeAll(successList);
+      failList = phones;
+
+      fileUniversalStorageDao.saveBatch(fileUniversalStorageList);
+      for (int i =0; i< accountList.size(); i++) {
+        accountList.get(i).setFileUniversalStorageId(fileUniversalStorageList.get(i).getId());
+      }
+      accountDao.saveOrUpdateBatch(accountList);
+
+      accountBatchImgDTO.setSuccessList(successList);
+      accountBatchImgDTO.setFailList(failList);
+
+      return accountBatchImgDTO;
     }
 
     private void assemableAccount(Account account) {

@@ -778,14 +778,30 @@ public class AccountServiceImpl implements AccountService {
             default:
                 break;
         }
-        Assert.notNull(accountCode,"根据条件没有解析出账号");
-      Account account = this.getByAccountCode(accountCode);
-      List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao.getAccountTypeAndMerCode(account.getAccountTypeCode(), merCode);
-      List<Long> sceneIds = accountConsumeScenes.stream().map(AccountConsumeScene::getId).collect(Collectors.toList());
-      List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelations = accountConsumeSceneStoreRelationDao.queryBySceneIdsAndStoreNo(sceneIds, storeCode);
-      accountConsumeSceneDO.setAccount(account);
-      accountConsumeSceneDO.setAccountConsumeSceneStoreRelations(accountConsumeSceneStoreRelations);
-      return accountConsumeSceneDO;
+        Assert.notNull(accountCode, "根据条件没有解析出账号");
+        Account account = this.getByAccountCode(accountCode);
+        accountConsumeSceneDO.setAccount(account);
+        List<AccountConsumeScene> accountConsumeScenes
+                = accountConsumeSceneDao.getAccountTypeAndMerCode(account.getAccountTypeCode(), merCode);
+        if(CollectionUtils.isEmpty(accountConsumeScenes)){
+            log.warn("没有找到消费场景");
+            accountConsumeSceneDO.setAccountConsumeTypes(Collections.emptyList());
+            return accountConsumeSceneDO;
+        }
+        List<Long> sceneIds = accountConsumeScenes.stream()
+                .map(AccountConsumeScene::getId).collect(Collectors.toList());
+        List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelations
+                = accountConsumeSceneStoreRelationDao.queryBySceneIdsAndStoreNo(sceneIds, storeCode);
+        if(CollectionUtils.isEmpty(accountConsumeSceneStoreRelations)){
+            log.warn("没有找到消费场景和门店关联");
+            accountConsumeSceneDO.setAccountConsumeTypes(Collections.emptyList());
+            return accountConsumeSceneDO;
+        }
+        List<String> consumeTypes = accountConsumeSceneStoreRelations.stream()
+                .map(AccountConsumeSceneStoreRelation::getSceneConsumType)
+                .collect(Collectors.toList());
+        accountConsumeSceneDO.setAccountConsumeTypes(consumeTypes);
+        return accountConsumeSceneDO;
     }
 
     private OrderTransRelation assemblyOrderTransRelation(BigDecimal updateQuota,

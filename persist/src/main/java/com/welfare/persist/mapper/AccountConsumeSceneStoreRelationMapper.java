@@ -18,4 +18,8 @@ import java.util.List;
 public interface AccountConsumeSceneStoreRelationMapper extends BaseMapper<AccountConsumeSceneStoreRelation> {
   public List<AccountConsumeSceneStoreRelation> queryRelationDetail(
       @Param("merCode")String merCode,@Param("storeCode")String storeCode);
+
+
+  public List<AccountConsumeSceneStoreRelation> queryRelationList(
+      @Param("merCode")String merCode,@Param("storeCodeList")List<String> storeCodeList);
 }

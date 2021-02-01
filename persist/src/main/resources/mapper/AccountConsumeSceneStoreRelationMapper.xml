@@ -3,30 +3,56 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper">
   <sql id="tableName">
-        account_consume_scene_store_relation
-    </sql>
+    account_consume_scene_store_relation
+  </sql>
 
   <sql id="baseColumn">
-        id,account_consume_scene_id,store_code,scene_consum_type,create_user,create_time,update_user,update_time,deleted,version
-    </sql>
+    id
+    ,account_consume_scene_id,store_code,scene_consum_type,create_user,create_time,update_user,update_time,deleted,version
+  </sql>
 
-  <select id="queryRelationDetail" resultType="com.welfare.persist.entity.AccountConsumeSceneStoreRelation">
-        SELECT
-	acssr.id,
-	acssr.account_consume_scene_id as accountConsumeSceneId,
-	acssr.store_code as storeCode,
-	acssr.scene_consum_type as sceneConsumType,
-	acssr.create_user as createUser,
-	acssr.create_time as createTime,
-	acssr.update_user as updateUser,
-	acssr.update_time as updateTime,
-	acssr.deleted,
-	acssr.version
-	from
-	account_consume_scene_store_relation acssr
-	INNER JOIN account_consume_scene acs on acs.id = acssr.account_consume_scene_id
-	where acs.mer_code = #{merCode} and acssr.store_code = #{storeCode}
-	and acs.deleted = 0 and acssr.deleted = 0
-    </select>
+  <select id="queryRelationDetail"
+    resultType="com.welfare.persist.entity.AccountConsumeSceneStoreRelation">
+    SELECT acssr.id,
+           acssr.account_consume_scene_id as accountConsumeSceneId,
+           acssr.store_code               as storeCode,
+           acssr.scene_consum_type        as sceneConsumType,
+           acssr.create_user              as createUser,
+           acssr.create_time              as createTime,
+           acssr.update_user              as updateUser,
+           acssr.update_time              as updateTime,
+           acssr.deleted,
+           acssr.version
+    from account_consume_scene_store_relation acssr
+           INNER JOIN account_consume_scene acs on acs.id = acssr.account_consume_scene_id
+    where acs.mer_code = #{merCode}
+      and acssr.store_code = #{storeCode}
+      and acs.deleted = 0
+      and acssr.deleted = 0
+  </select>
+
+
+  <select id="queryRelationList"
+    resultType="com.welfare.persist.entity.AccountConsumeSceneStoreRelation">
+    SELECT
+    acssr.id,
+    acssr.account_consume_scene_id as accountConsumeSceneId,
+    acssr.store_code as storeCode,
+    acssr.scene_consum_type as sceneConsumType,
+    acssr.create_user as createUser,
+    acssr.create_time as createTime,
+    acssr.update_user as updateUser,
+    acssr.update_time as updateTime,
+    acssr.deleted,
+    acssr.version
+    from
+    account_consume_scene_store_relation acssr
+    INNER JOIN account_consume_scene acs on acs.id = acssr.account_consume_scene_id
+    where acs.mer_code = #{merCode} and acssr.store_code in
+    <foreach collection="storeCodeList" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    and acs.deleted = 0 and acssr.deleted = 0
+  </select>
 
 </mapper>

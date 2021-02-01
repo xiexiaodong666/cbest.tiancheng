@@ -43,6 +43,7 @@ import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantReq;
 import com.welfare.service.dto.StoreConsumeTypeDTO;
+import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
@@ -682,16 +683,26 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         throw new BusiException("消费方法格式错误");
       }
 
-      // 同步员工消费方法
-      accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          storeRelation.getMerCode(), storeRelation.getStoreCode(), storeRelation.getConsumType());
     }
 
     boolean isSaveOrUpdateBatch = merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);
 
+
     Map<String, List<MerchantStoreRelation>> mapByMerCode = storeRelationList.stream()
         .collect(Collectors.groupingBy(t -> t.getMerCode()));
-    queryWrapper = new QueryWrapper<>();
+    for (Map.Entry<String, List<MerchantStoreRelation>> m : mapByMerCode.entrySet()) {
+      List<StoreConsumeRelationDTO> relationDTOList = new ArrayList<>();
+
+      for (MerchantStoreRelation merchantStoreRelation : m.getValue()) {
+        StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
+        storeConsumeRelationDTO.setStoreCode(merchantStoreRelation.getStoreCode());
+        storeConsumeRelationDTO.setConsumeType(merchantStoreRelation.getConsumType());
+        relationDTOList.add(storeConsumeRelationDTO);
+      }
+      
+      accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(m.getKey(), relationDTOList);
+    }
+      queryWrapper = new QueryWrapper<>();
     queryWrapper.in(MerchantStoreRelation.MER_CODE, mapByMerCode.keySet());
     List<MerchantStoreRelation> storeRelationListByMerCode = merchantStoreRelationDao.list(
         queryWrapper);

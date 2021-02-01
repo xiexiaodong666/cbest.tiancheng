@@ -758,7 +758,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode, String merCode, WelfareConstant.ConsumeQueryType queryType, String queryInfo) {
+    public AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode, WelfareConstant.ConsumeQueryType queryType, String queryInfo) {
         Long accountCode = null;
         AccountConsumeSceneDO accountConsumeSceneDO = new AccountConsumeSceneDO();
         accountConsumeSceneDO.setQueryInfo(queryInfo);
@@ -781,8 +781,9 @@ public class AccountServiceImpl implements AccountService {
         Assert.notNull(accountCode, "根据条件没有解析出账号");
         Account account = this.getByAccountCode(accountCode);
         accountConsumeSceneDO.setAccount(account);
+        SupplierStore supplierStore = supplierStoreDao.getOneByCode(storeCode);
         List<AccountConsumeScene> accountConsumeScenes
-                = accountConsumeSceneDao.getAccountTypeAndMerCode(account.getAccountTypeCode(), merCode);
+                = accountConsumeSceneDao.getAccountTypeAndMerCode(account.getAccountTypeCode(), supplierStore.getMerCode());
         if(CollectionUtils.isEmpty(accountConsumeScenes)){
             log.warn("没有找到消费场景");
             accountConsumeSceneDO.setAccountConsumeTypes(Collections.emptyList());

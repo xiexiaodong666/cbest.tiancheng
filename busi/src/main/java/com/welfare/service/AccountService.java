@@ -104,10 +104,9 @@ public interface AccountService {
   /**
    * 查询消费场景DO
    * @param storeCode
-   * @param merCode
    * @param queryType
    * @param queryInfo
    * @return
    */
-  AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode, String merCode, WelfareConstant.ConsumeQueryType queryType, String queryInfo);
+  AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode, WelfareConstant.ConsumeQueryType queryType, String queryInfo);
 }

@@ -47,6 +47,13 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
         return list(queryWrapper);
     }
 
+    @Cacheable(value = "supplierStore-by-code",key = "#storeCode")
+    public SupplierStore getOneByCode(String storeCode){
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.STORE_CODE, storeCode);
+        return getOne(queryWrapper);
+    }
+
     @Override
     public boolean save(SupplierStore entity){
         return super.save(entity);

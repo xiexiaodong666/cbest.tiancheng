@@ -44,21 +44,19 @@ public class AccountController implements IController {
 
     @ApiOperation("查询账户消费场景-卡内信息")
     @GetMapping("/consume-scene/card")
-    public R<AccountConsumeSceneDO> queryAccountConsumeSceneDOByCardInfo(@RequestParam @ApiParam("门店号") String storeCode,
-                                                               @RequestParam @ApiParam("商家编码") String merCode,
-                                                               @RequestParam @ApiParam("卡内信息") String cardInsideInfo){
+    public R<AccountConsumeSceneDO> queryAccountConsumeSceneDOByCardInfo(@RequestParam @ApiParam(value = "门店号",required = true) String storeCode,
+                                                               @RequestParam @ApiParam(value = "卡内信息",required = true) String cardInsideInfo){
         AccountConsumeSceneDO accountConsumeSceneDO =
-                accountService.queryAccountConsumeSceneDO(storeCode,merCode, WelfareConstant.ConsumeQueryType.CARD, cardInsideInfo);
+                accountService.queryAccountConsumeSceneDO(storeCode, WelfareConstant.ConsumeQueryType.CARD, cardInsideInfo);
         return success(accountConsumeSceneDO);
     }
 
     @ApiOperation("查询账户消费场景-条码")
     @GetMapping("/consume-scene/barcode")
-    public R<AccountConsumeSceneDO> queryAccountConsumeSceneDOByBarcode(@RequestParam @ApiParam("门店号") String storeCode,
-                                                               @RequestParam @ApiParam("商家编码") String merCode,
-                                                               @RequestParam @ApiParam("条码") String barcode){
+    public R<AccountConsumeSceneDO> queryAccountConsumeSceneDOByBarcode(@RequestParam @ApiParam(value = "门店号",required = true) String storeCode,
+                                                               @RequestParam @ApiParam(value = "条码",required = true) String barcode){
         AccountConsumeSceneDO accountConsumeSceneDO =
-                accountService.queryAccountConsumeSceneDO(storeCode,merCode, WelfareConstant.ConsumeQueryType.BARCODE, barcode);
+                accountService.queryAccountConsumeSceneDO(storeCode, WelfareConstant.ConsumeQueryType.BARCODE, barcode);
         return success(accountConsumeSceneDO);
     }
 }

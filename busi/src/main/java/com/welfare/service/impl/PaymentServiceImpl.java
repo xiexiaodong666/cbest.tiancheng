@@ -98,6 +98,12 @@ public class PaymentServiceImpl implements PaymentService {
                         .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
                         .map(MerchantAccountOperation::getMerchantBillDetail)
                         .collect(Collectors.toList());
+
+                List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
+                        .collect(Collectors.toList());
+                //在循环里面已经对merchantCredit进行了更新
+                merchantCreditDao.updateById(merchantCredit);
+                saveDetails(paymentOperations, account, accountAmountTypes);
             } finally {
                 DistributedLockUtil.unlock(merAccountLock);
             }
@@ -195,7 +201,7 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRequest;
     }
 
-    private List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
+    public List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
                                                    Account account, List<AccountAmountDO> accountAmountDOList,
                                                    SupplierStore supplierStore, MerchantCredit merchantCredit) {
         BigDecimal usableAmount = account.getAccountBalance().add(account.getSurplusQuota());
@@ -224,9 +230,6 @@ public class PaymentServiceImpl implements PaymentService {
                 break;
             }
         }
-        //在循环里面已经对merchantCredit进行了更新
-        merchantCreditDao.updateById(merchantCredit);
-        saveDetails(paymentOperations, account, accountAmountTypes);
         return paymentOperations;
     }
 

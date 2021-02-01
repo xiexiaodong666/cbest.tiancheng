@@ -1,5 +1,6 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.persist.entity.StoreConsumeType;
 import com.welfare.persist.mapper.StoreConsumeTypeMapper;
@@ -16,5 +17,16 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class StoreConsumeTypeDao extends ServiceImpl<StoreConsumeTypeMapper, StoreConsumeType> {
-
+    /**
+     * 根据收银机号获取
+     *
+     * @param cashierNo
+     * @param storeCode
+     * @return
+     */
+    public StoreConsumeType getOneByCashierNoAndStoreNo( String cashierNo,String storeCode){
+        QueryWrapper<StoreConsumeType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(StoreConsumeType.CASHIER_NO,cashierNo).eq(StoreConsumeType.STORE_CODE,storeCode);
+        return getOne(queryWrapper);
+    }
 }

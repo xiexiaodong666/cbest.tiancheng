@@ -1,12 +1,10 @@
 package com.welfare.service.dto.payment;
 
-import com.alibaba.fastjson.JSON;
 import com.welfare.common.enums.ConsumeTypeEnum;
-import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.util.SpringBeanUtils;
+import com.welfare.persist.dao.StoreConsumeTypeDao;
 import com.welfare.persist.dao.SupplierStoreDao;
-import com.welfare.persist.entity.SupplierStore;
-import com.welfare.service.dto.ConsumeTypeJson;
+import com.welfare.persist.entity.StoreConsumeType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -72,15 +70,14 @@ public abstract class PaymentRequest {
      * @return
      */
     private String o2oOrOnlineShopping(String machineNo,String storeCode) {
-        SupplierStoreDao supplierStoreDao = SpringBeanUtils.getBean(SupplierStoreDao.class);
-        SupplierStore oneByCashierNo = supplierStoreDao.getOneByCashierNoAndStoreCode(machineNo,storeCode);
-        if(Objects.isNull(oneByCashierNo)){
+        StoreConsumeTypeDao storeConsumeTypeDao = SpringBeanUtils.getBean(StoreConsumeTypeDao.class);
+        StoreConsumeType storeConsumeType = storeConsumeTypeDao.getOneByCashierNoAndStoreNo(machineNo,storeCode);
+        if(Objects.isNull(storeConsumeType)){
             return null;
         }else{
-            String consumType = oneByCashierNo.getConsumType();
-            Assert.notNull(consumType,"门店没有配置消费场景");
-            ConsumeTypeJson consumeTypeJson = JSON.parseObject(consumType,ConsumeTypeJson.class);
-            return consumeTypeJson.getONLINE_MALL()?ConsumeTypeEnum.ONLINE_MALL.getCode():ConsumeTypeEnum.O2O.getCode();
+            String consumeType = storeConsumeType.getConsumType();
+            Assert.notNull(consumeType,"门店没有配置消费场景");
+            return consumeType;
         }
     }
 

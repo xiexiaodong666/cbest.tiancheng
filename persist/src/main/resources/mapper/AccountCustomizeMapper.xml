@@ -187,8 +187,6 @@
     CASE abd.trans_type
     WHEN 'deposit_incr' THEN
     m.mer_name
-    WHEN 'refund' THEN
-    m.mer_name
     ELSE
     ss.store_name
     END AS storeName,

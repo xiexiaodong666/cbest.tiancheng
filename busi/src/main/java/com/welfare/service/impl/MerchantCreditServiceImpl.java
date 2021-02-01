@@ -119,7 +119,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             merchantBillDetailDao.saveBatch(merchantBillDetails);
             return operations;
         } finally {
-            lock.unlock();
+            DistributedLockUtil.unlock(lock);
         }
     }
 

@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
 import com.welfare.service.MerchantCreditApplyService;
@@ -20,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -42,6 +44,8 @@ public class MerchantCreditApplyController implements IController {
     @Autowired
     private FileUploadService fileUploadService;
 
+    private static final BigDecimal MAX_AMOUNT = BigDecimal.valueOf(99999999.99);
+
     @PostMapping("/page")
     @ApiOperation("分页商户额度申请列表")
     @ApiUser
@@ -63,6 +67,12 @@ public class MerchantCreditApplyController implements IController {
     @ApiOperation("修改商户额度申请")
     @ApiUser
     public R<String> update(@Validated @RequestBody MerchantCreditApplyUpdateReq request){
+        if (request.getBalance() == null || request.getBalance().compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusiException("金额不能小于0");
+        }
+        if (request.getBalance() != null && request.getBalance().compareTo(MAX_AMOUNT) > 0) {
+            throw new BusiException(String.format("金额超过限制[%s]", MAX_AMOUNT));
+        }
         return success(applyService.update(request, UserInfoHolder.getUserInfo()));
     }
 
@@ -89,6 +99,12 @@ public class MerchantCreditApplyController implements IController {
     @ApiOperation("新增商户额度申请")
     @ApiUser
     public R<String> save(@Validated @RequestBody MerchantCreditApplyRequest request){
+        if (request.getBalance() == null || request.getBalance().compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusiException("金额不能小于0");
+        }
+        if (request.getBalance() != null && request.getBalance().compareTo(MAX_AMOUNT) > 0) {
+            throw new BusiException(String.format("金额超过限制[%s]", MAX_AMOUNT));
+        }
         return success(applyService.save(request, UserInfoHolder.getUserInfo()));
     }
 }

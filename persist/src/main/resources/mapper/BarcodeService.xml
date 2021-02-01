@@ -16,13 +16,13 @@
             create_time as transTime,
             case when trans_amount&gt;0 then 'in'
                  when trans_amount&lt;0 then 'out' end as inOrOutType,
-            trans_type as  transType,
+            balance_type as  transType,
             trans_amount as inOrOutAmount,
-            case when trans_type='rechargeLimit' then recharge_limit
-                 when trans_type='currentBalance' then current_balance
-                 when trans_type='creditLimit' then credit_limit
-                 when trans_type='remainingLimit' then remaining_limit
-                 when trans_type='rebateLimit' then rebate_limit end as allAmount
+            case when balance_type='rechargeLimit' then recharge_limit
+                 when balance_type='currentBalance' then current_balance
+                 when balance_type='creditLimit' then credit_limit
+                 when balance_type='remainingLimit' then remaining_limit
+                 when balance_type='rebateLimit' then rebate_limit end as allAmount
         from merchant_bill_detail
         <where>
             <if test="merCode!=null and merCode!=''">
@@ -39,7 +39,7 @@
                  </choose>
             </if>
             <if test="transType!=null and transType!=''">
-                and trans_type=#{transType}
+                and balance_type=#{transType}
             </if>
             <if test="startTime!=null">
                 and create_time &gt;=#{startTime,jdbcType=TIMESTAMP}

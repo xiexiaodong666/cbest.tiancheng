@@ -11,7 +11,7 @@
         0 departmentParent,
         m.create_time createTime
         FROM
-        merchant m) temp0
+        merchant m where m.deleted=0) temp0
         <where>
             <if test="merCode!=null and merCode!=''">
                 and temp0.merCode=#{merCode}
@@ -27,7 +27,7 @@
         d.department_parent departmentParent,
         d.create_time createTime
         FROM
-        department d) temp
+        department d where d.deleted=0) temp
 
         <where>
             <if test="merCode!=null and merCode!=''">

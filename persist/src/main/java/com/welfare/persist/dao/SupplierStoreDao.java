@@ -20,15 +20,22 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierStore> {
 
-    @CacheEvict(value = "supplierStore-by-cashierNo",key="#entity.cashierNo")
+    //@CacheEvict(value = "supplierStore-by-cashierNo",key="#entity.cashierNo")
     public Integer updateAllColumnById(SupplierStore entity){
         return getBaseMapper().alwaysUpdateSomeColumnById(entity);
     }
 
-    @Cacheable(value = "supplierStore-by-cashierNo",key="#cashierNo")
+    //@Cacheable(value = "supplierStore-by-cashierNo",key="#cashierNo")
     public SupplierStore getOneByCashierNo(String cashierNo){
         QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(SupplierStore.CASHIER_NO,cashierNo);
+        return getOne(queryWrapper);
+    }
+
+    public SupplierStore getOneByCashierNoAndStoreCode(String cashierNo,String storeCode){
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.CASHIER_NO,cashierNo)
+                .eq(SupplierStore.STORE_CODE,storeCode);
         return getOne(queryWrapper);
     }
 

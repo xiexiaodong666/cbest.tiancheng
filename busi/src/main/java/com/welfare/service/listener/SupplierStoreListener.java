@@ -42,7 +42,6 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   private List<SupplierStoreAddDTO> list = new ArrayList<>();
 
   private List<String> merCodeList = new LinkedList();
-  private List<String> casherNoList = new LinkedList();
   private List<String> storeCodeList = new LinkedList();
   private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getExcelType(),ConsumeTypeEnum.ONLINE_MALL.getExcelType(),ConsumeTypeEnum.SHOP_SHOPPING.getExcelType()});
 
@@ -101,8 +100,10 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       }else{
         if(storeImportDTO.getCashierNo().length()>255){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
-        }else{
-          casherNoList.add(storeImportDTO.getCashierNo());
+        }
+        String regex = "^[V][0-9]{3}+$";
+        if(!storeImportDTO.getCashierNo().matches(regex)){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
         }
 
       }
@@ -163,38 +164,36 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   }
 
   private boolean check() {
-    Map<String,List<String>> groupMap= storeCodeList.stream().collect(Collectors.groupingBy(String::toString));
-    for(Map.Entry<String,List<String>> entry:groupMap.entrySet()){
-      if(entry.getValue().size()>1){
-        uploadInfo.append("excel文件中存在重复的门店代码:").append(entry.getKey()).append(";");
-      }
-    }
-    if(EmptyChecker.notEmpty(casherNoList)){
-      Map<String,List<String>> casherNoGroupMap= casherNoList.stream().collect(Collectors.groupingBy(String::toString));
-      for(Map.Entry<String,List<String>> entry:casherNoGroupMap.entrySet()){
+    boolean flag=true;
+    if(EmptyChecker.notEmpty(storeCodeList)){
+      Map<String,List<String>> groupMap= storeCodeList.stream().collect(Collectors.groupingBy(String::toString));
+      for(Map.Entry<String,List<String>> entry:groupMap.entrySet()){
         if(entry.getValue().size()>1){
-          uploadInfo.append("excel文件中存在重复的虚拟收银机号:").append(entry.getKey()).append(";");
+          uploadInfo.append("excel文件中存在重复的门店代码:").append(entry.getKey()).append(";");
+          flag=false;
         }
       }
-    }
-    QueryWrapper<SupplierStore> storeQueryWrapper=new QueryWrapper<>();
-    storeQueryWrapper.in(SupplierStore.STORE_CODE,storeCodeList);
-    List<SupplierStore> stores=storeService.list(storeQueryWrapper);
-    MerchantReq req=new MerchantReq() ;
-    req.setMerCodeList(merCodeList);
-    req.setMerIdentity(MerIdentityEnum.supplier.getCode());
-    List<Merchant> merchants=merchantService.list(req);
-    merCodeList.removeAll(merchants.stream().map(item->item.getMerCode()).collect(Collectors.toList())) ;
-    boolean flag=true;
-    if(EmptyChecker.notEmpty(stores)){
-      String storeStr=stores.stream().map(item->item.getStoreCode()).collect(Collectors.joining(","));
-      uploadInfo.append("门店编码重复:").append(storeStr).append(";");
-      flag=false;
+      QueryWrapper<SupplierStore> storeQueryWrapper=new QueryWrapper<>();
+      storeQueryWrapper.in(SupplierStore.STORE_CODE,storeCodeList);
+      List<SupplierStore> stores=storeService.list(storeQueryWrapper);
+      if(EmptyChecker.notEmpty(stores)){
+        String storeStr=stores.stream().map(item->item.getStoreCode()).collect(Collectors.joining(","));
+        uploadInfo.append("门店编码重复:").append(storeStr).append(";");
+        flag=false;
+      }
     }
     if(EmptyChecker.notEmpty(merCodeList)){
-      uploadInfo.append("商户不存在:").append(StringUtil.join(merCodeList,",")).append(";");
-      flag=false;
+      MerchantReq req=new MerchantReq() ;
+      req.setMerCodeList(merCodeList);
+      req.setMerIdentity(MerIdentityEnum.supplier.getCode());
+      List<Merchant> merchants=merchantService.list(req);
+      merCodeList.removeAll(merchants.stream().map(item->item.getMerCode()).collect(Collectors.toList())) ;
+      if(EmptyChecker.notEmpty(merCodeList)){
+        uploadInfo.append("商户不存在:").append(StringUtil.join(merCodeList,",")).append(";");
+        flag=false;
+      }
     }
+
     return flag;
   }
 

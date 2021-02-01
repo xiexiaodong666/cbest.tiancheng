@@ -1,5 +1,6 @@
 package com.welfare.service.sync.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -56,6 +57,7 @@ public class SupplierStoreHandler {
     @AllowConcurrentEvents
     @Subscribe
     public void onSupplierStoreChange(SupplierStoreEvt evt) {
+        log.info("同步门店到商城中台，event【{}】", JSON.toJSONString(evt));
         ShoppingActionTypeEnum typeEnum=evt.getTypeEnum();
         List<SupplierStoreSyncDTO> supplierStoreDetailDTOS=evt.getSupplierStoreDetailDTOS();
         if (EmptyChecker.isEmpty(supplierStoreDetailDTOS)) {
@@ -97,9 +99,11 @@ public class SupplierStoreHandler {
         }
         storeShoppingReq.setActionType(typeEnum.getCode());
         storeShoppingReq.setRequestId(evt.getUserToken().toString());
-        storeShoppingReq.setTimestamp(new Date());
+        storeShoppingReq.setTimestamp(evt.getTimestamp());
         storeShoppingReq.setList(listBeans);
+        log.info("同步门店到商城中台，req【{}】", JSON.toJSONString(storeShoppingReq));
         RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateStore(storeShoppingReq);
+        log.info("同步门店到商城中台，res【{}】", JSON.toJSONString(resp));
         if (!("0000").equals(resp.getCode())) {
             throw new BusiException("同步门店数据到商城中心失败msg【"+resp.getMsg()+"】");
         }

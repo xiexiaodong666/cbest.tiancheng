@@ -21,6 +21,7 @@ public class AccountDepositTask extends IJobHandler {
         try {
             log.info("============{}执行支付成功后充值任务执行开始===================", this.getClass().getName());
             accountDepositRecordService.execPendingAndFailureRechargeList();
+            log.info("============{}执行支付成功后充值任务执行结束===================", this.getClass().getName());
         } catch (Exception e) {
             log.info("============{}执行支付成功后充值任务执行【异常】===================",
                 this.getClass().getName());

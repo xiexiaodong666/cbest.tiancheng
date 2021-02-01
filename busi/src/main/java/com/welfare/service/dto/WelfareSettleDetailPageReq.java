@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Data
 public class WelfareSettleDetailPageReq  extends PageReq {
-    @ApiModelProperty(value = "商户编号")
+    @ApiModelProperty(value = "商户编号", required = true)
     private String merCode;
 
     @ApiModelProperty(value = "订单编号")

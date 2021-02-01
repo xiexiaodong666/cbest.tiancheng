@@ -28,11 +28,11 @@ spring:
         - 192.1.30.186:7004
         - 192.1.30.186:7005
     database: 0
-  kafka:
-    servers: 192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667
-    topic: order_info
-    group-id: e-welfare
-    offset: latest
+#  kafka:
+#    servers: 192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667
+#    topic: test-order_info
+#    group-id: xx-e-welfare
+#    offset: latest
 logging:
   file:
     path: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest
@@ -52,7 +52,7 @@ mybatis-plus:
 xxl:
   job:
     admin:
-      addresses: http://172.30.37.35:8180/
+      addresses: http://172.30.37.36:8180/
     executor:
       appname: e-welfare-settlement
       ip:

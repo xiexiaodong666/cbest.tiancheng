@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 /**
@@ -50,6 +51,9 @@ public class SupplierStoreUpdateDTO {
      */
     @ApiModelProperty("外部编码")  
     private String externalCode;
+    @ApiModelProperty("虚拟收银机号")
+    @Pattern(regexp = "^[V][0-9]{3}+$")
+    private String cashierNo;
 
     List<MerchantAddressDTO> addressList;
 

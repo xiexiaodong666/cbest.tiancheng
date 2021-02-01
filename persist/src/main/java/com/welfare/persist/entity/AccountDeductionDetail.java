@@ -114,7 +114,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     private BigDecimal merDeductionAmount;
     /**
      * 商户额度扣款金额
-     */
+     */ 
     @ApiModelProperty("商户额度扣款金额")   
     private BigDecimal merDeductionCreditAmount;
     /**

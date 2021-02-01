@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.killbill.bus.api.BusEvent;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +25,8 @@ import java.util.UUID;
 public class SupplierStoreEvt implements BusEvent {
     protected ShoppingActionTypeEnum typeEnum;
     protected List<SupplierStoreSyncDTO> supplierStoreDetailDTOS;
+    //业务发生时间
+    protected Date timestamp;
     @Override
     public Long getSearchKey1() {
         return typeEnum.getEvtType();

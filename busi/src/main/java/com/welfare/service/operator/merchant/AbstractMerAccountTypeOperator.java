@@ -25,9 +25,10 @@ public abstract class AbstractMerAccountTypeOperator {
      * @param merchantCredit
      * @param amount
      * @param transNo
+     * @param transType
      * @return 实际操作金额
      */
-    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
+    public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType){
         throw new RuntimeException("not supported method");
     }
 
@@ -36,9 +37,10 @@ public abstract class AbstractMerAccountTypeOperator {
      * @param merchantCredit
      * @param amount
      * @param transNo
+     * @param transType
      * @return 实际操作金额
      */
-    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo){
+    public List<MerchantAccountOperation> increase(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType){
         throw new RuntimeException("not supported method");
     }
 
@@ -71,19 +73,24 @@ public abstract class AbstractMerAccountTypeOperator {
      * @param amountLeftToBeDecrease
      * @param operatedAmount
      * @param transNo
+     * @param transType
      * @return
      */
-    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo){
-        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "余额不足", null);
+    protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit,
+                                                             BigDecimal amountLeftToBeDecrease,
+                                                             BigDecimal operatedAmount,
+                                                             String transNo, String transType){
+        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "组织(公司)余额不足", null);
     }
     /**
      * 默认抛出超过余额限度异常,子类可以自定义其他操作
      * @param merchantCredit
      * @param amountLeftToBeIncrease
      * @param transNo
+     * @param transType
      * @return
      */
-    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo){
+    protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo, String transType){
         throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
     }
 }

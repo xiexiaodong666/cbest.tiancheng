@@ -90,6 +90,8 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
      */
     @ApiModelProperty("授信余额")   
     private BigDecimal surplusQuota;
+    @ApiModelProperty("订单渠道（o2o,online,shop_shopping）")
+    private String orderChannel;
     /**
      * 创建人
      */
@@ -201,5 +203,6 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     * 版本
     */
     public static final String VERSION = "version";
+    public static final String ORDER_CHANNEL = "order_channel";
 
 }

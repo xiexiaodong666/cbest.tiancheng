@@ -129,7 +129,7 @@ public class AccountDepositRecordServiceImpl extends
     }
 
     private int amountToFen(BigDecimal rechargeAmount) {
-        return new BigDecimal("100").multiply(rechargeAmount).intValue();
+        return BigDecimal.valueOf(100).multiply(rechargeAmount).intValue();
     }
 
     @Override
@@ -275,7 +275,8 @@ public class AccountDepositRecordServiceImpl extends
         for (AccountDepositRecord accountDepositRecord : pendingAndFailureRechargeList) {
             try {
                 Deposit deposit = buildDeposit(accountDepositRecord);
-                depositService.deposit(deposit);
+                depositService.personalDeposit(deposit);
+                accountDepositRecord.setDepositTradeNo(deposit.getTransNo());
                 accountDepositRecord
                     .setRechargeStatus(
                         AccountRechargeStatusEnum.RECHARGE_SUCCESS.getCode());

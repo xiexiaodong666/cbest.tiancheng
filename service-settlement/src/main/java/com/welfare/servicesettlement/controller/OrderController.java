@@ -5,11 +5,13 @@ import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.dto.OrderInfoDTO;
 import com.welfare.persist.entity.OrderInfo;
 import com.welfare.persist.entity.OrderSummary;
 import com.welfare.service.OrderService;
 import com.welfare.service.dto.OrderReqDto;
 import com.welfare.service.dto.SynOrderDto;
+import com.welfare.service.impl.OrderServiceImpl;
 import com.welfare.servicesettlement.dto.OrderRespDto;
 import com.welfare.servicesettlement.dto.PageVo;
 import io.swagger.annotations.Api;
@@ -23,6 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,20 +48,33 @@ import java.util.Objects;
 public class OrderController implements IController {
 
     @Autowired
-    private OrderService orderService;
+    private OrderServiceImpl orderService;
 
     @ApiOperation("分页查看线下订单")
     @GetMapping("page")
     public R<PageVo<OrderRespDto>> selectByPage(OrderReqDto orderReqDto){
         PageVo<OrderRespDto> resultPage = new PageVo<>();
-        MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
-        if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){
-            orderReqDto.setMerchantCode(merchantUserInfo.getMerchantCode());
+        if (StringUtils.isNotBlank(orderReqDto.getType())){
+            if ("SUPPLIER".equals(orderReqDto.getType())){
+                //供应商编码
+                MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
+                if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){
+                    orderReqDto.setSupplierMerchantCode(merchantUserInfo.getMerchantCode());
+                }
+            } else if("MERCHANT".equals(orderReqDto.getType())){
+                //商户编码
+                MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
+                if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){
+                    orderReqDto.setMerchantCode(merchantUserInfo.getMerchantCode());
+                }
+            }
+            //其他是平台端调用
         }
+
         Page page = new Page();
         page.setCurrent(orderReqDto.getCurrent());
         page.setSize(orderReqDto.getSize());
-        Page<OrderInfo> orderPage = orderService.selectPage(page , orderReqDto);
+        Page<OrderInfoDTO> orderPage = orderService.selectPage1(page , orderReqDto);
         if (Objects.nonNull(orderPage) && orderPage.getRecords().size() > 0){
             List<OrderRespDto> respDtoList = new ArrayList<>();
             orderPage.getRecords().forEach(item->{
@@ -71,13 +87,18 @@ public class OrderController implements IController {
             resultPage.setSize(orderPage.getSize());
             resultPage.setTotal(orderPage.getTotal());
             //订单汇总数据
-            OrderSummary orderSummary = orderService.selectSummary(orderReqDto);
+            OrderSummary orderSummary = orderService.selectSummary1(orderReqDto);
             PageVo.Ext ext1 = new PageVo.Ext();
             if (orderSummary != null){
-                ext1.setAmount(orderSummary.getOrderAmount());
-                ext1.setOrderNum(orderSummary.getOrderNum());
+                ext1.setAmount(orderSummary.getOrderAmount() == null ? "0": orderSummary.getOrderAmount());
+                ext1.setOrderNum(orderSummary.getOrderNum()== null ? 0 : orderSummary.getOrderNum());
                 resultPage.setExt(ext1);
             }
+        }else{
+            PageVo.Ext ext1 = new PageVo.Ext();
+            ext1.setAmount("0");
+            ext1.setOrderNum(0);
+            resultPage.setExt(ext1);
         }
         return success(resultPage);
     }
@@ -101,7 +122,7 @@ public class OrderController implements IController {
         if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){
             orderReqDto.setMerchantCode(merchantUserInfo.getMerchantCode());
         }
-        List<OrderInfo> orderInfoPage = orderService.selectList(orderReqDto);
+        List<OrderInfoDTO> orderInfoPage = orderService.selectList(orderReqDto);
         List<OrderRespDto> respDtoList = new ArrayList<>();
 
         if (Objects.nonNull(orderInfoPage)){
@@ -116,9 +137,10 @@ public class OrderController implements IController {
         return success(respDtoList);
     }
 
-    private void beanCopy(OrderInfo orderInfo , OrderRespDto orderRespDto){
+    private void beanCopy(OrderInfoDTO orderInfo , OrderRespDto orderRespDto){
         BeanUtils.copyProperties(orderInfo , orderRespDto);
-        orderRespDto.setOrderAmount(orderInfo.getOrderAmount().toPlainString());
+        orderRespDto.setAccountCardId(orderInfo.getCardId());
+        orderRespDto.setOrderAmount(orderInfo.getOrderAmount() != null ? orderInfo.getOrderAmount().toPlainString() : "0");
     }
 
 }

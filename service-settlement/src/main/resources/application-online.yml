@@ -1,12 +1,10 @@
 spring:
-  profiles: online
   datasource:
-    driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
-    username: root
-    password: mysql@123
+    url: jdbc:mysql://db.haproxy.cbest.gam:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: jav_tclife_rw
+    password: 3uUacFIf3PDoBy
     type: com.alibaba.druid.pool.DruidDataSource
-    maxActive: 20
+    maxActive: 200
     minIdle: 1
     testOnBorrow: true
     testOnReturn: false
@@ -15,24 +13,27 @@ spring:
     lettuce:
       pool:
         max-idle: 30
-        max-active: 8
+        max-active: 500
         min-idle: 2
         max-wait: 1000
     timeout: 5000
-    cluster:
-      nodes:
-        - 192.1.30.186:7000
-        - 192.1.30.186:7001
-        - 192.1.30.186:7002
-        - 192.1.30.186:7003
-        - 192.1.30.186:7004
-        - 192.1.30.186:7005
     database: 0
+    password: v6z82Ebfc7I1
+    host: redis.cbest.gam
+    port: 6399
+  kafka:
+    servers: 192.1.30.236:6667,192.1.30.237:6667,192.1.30.238:6667
+    topic: order-info
+    group-id: welfare
+    offset: earliest
+
 logging:
   file:
-    path: D:/home/finance/Logs/e-welfare-account.e-cbest.lotest
+    path: /data/Logs/e-welfare-settlement
   level:
     root: info
+    com.welfare.persist.mapper: info
+
 encrypt:
   file: ${config.file:classpath:config/config.properties}
 e-welfare:
@@ -44,6 +45,19 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+platformUser:
+  url:
+
+cbest:
+  pay:
+    url: http://192.1.30.160:8000/gateway
+    appId: olife
+    appKey: e400233f4a719304ce189cde2aeaae98
+    notifyUrl: http://xxx/accountDepositRecord/payNotify
+  oss:
+    config:
+      bucket: sjgo-img
+
 xxl:
   job:
     admin:
@@ -52,6 +66,10 @@ xxl:
       appname: e-welfare-settlement
       ip:
       port: 9888
-      logpath: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest/jobhandler/
+      logpath: /data/Logs/e-welfare-settlement/jobhandler/
       logretentiondays: 30
     accessToken:
+pos:
+  onlines: 1001
+cdn:
+  server: http://img.sjgo365.com

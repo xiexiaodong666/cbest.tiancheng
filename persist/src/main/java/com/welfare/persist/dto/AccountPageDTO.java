@@ -27,7 +27,9 @@ public class AccountPageDTO {
   private BigDecimal maxQuota;
   private BigDecimal surplusQuota;
   private String cardId;
+  private String cardIdString;
   private BigDecimal accountBalance;
   private Integer binding;
+  private String bindingString;
   private String phone;
 }

@@ -2,6 +2,18 @@ spring:
   profiles:
     active: persist,dev
   application:
-    name: e-welfare
+    name: e-welfare-account
 server:
-  port: 10015
+  port: ${tomcat.port:10015}
+
+exclude-header-interceptor:
+  - /swagger*/**
+  - /doc.html*
+  - /error*
+  - /index
+  - /**/*.css
+  - /**/*.js
+  - /**/*.png
+  - /**/*.jpg
+  - /**/*.jpeg
+  - /**/*.ico

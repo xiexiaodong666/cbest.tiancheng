@@ -52,4 +52,9 @@ public class AccountPageReq implements Serializable {
    */
   @ApiModelProperty("卡片号码")
   private String cardId;
+  /**
+   * 手机号码
+   */
+  @ApiModelProperty("手机号码")
+  private String phone;
 }

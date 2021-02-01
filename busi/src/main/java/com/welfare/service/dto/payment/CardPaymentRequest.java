@@ -1,5 +1,6 @@
 package com.welfare.service.dto.payment;
 
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.entity.CardInfo;
@@ -35,6 +36,7 @@ public class CardPaymentRequest extends PaymentRequest {
         CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
         CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(cardInsideInfo);
         Assert.notNull(cardInfo,"根据磁条号未找到卡片:" + cardInsideInfo);
+        Assert.isTrue(WelfareConstant.CardEnable.ENABLE.code().equals(cardInfo.getEnabled()),"卡片已禁用");
         Long accountCode = cardInfo.getAccountCode();
         this.setAccountCode(accountCode);
         return accountCode;

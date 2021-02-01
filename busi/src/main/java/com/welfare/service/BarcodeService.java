@@ -3,6 +3,7 @@ package com.welfare.service;
 import com.welfare.persist.entity.BarcodeSalt;
 import com.welfare.service.dto.payment.PaymentBarcode;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,8 +36,9 @@ public interface BarcodeService {
     /**
      * 获取当前周期的saltValue
      * @return
+     * @param scanDate
      */
-    BarcodeSalt queryCurrentPeriodSaltValue();
+    BarcodeSalt queryPeriodSaltValue(Date scanDate);
 
     /**
      * 根据period查询单条barcodeSalt
@@ -55,8 +57,9 @@ public interface BarcodeService {
     /**
      * 从barcode解析账户号
      * @param barcode
+     * @param scanDate
      * @param isOffline
      * @return
      */
-    Long parseAccountFromBarcode(String barcode, boolean isOffline);
+    Long parseAccountFromBarcode(String barcode, Date scanDate, boolean isOffline);
 }

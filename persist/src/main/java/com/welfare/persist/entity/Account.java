@@ -234,5 +234,8 @@ public class Account extends Model<Account> implements Serializable {
     * 员工账号变更记录ID
     */
     public static final String CHANGE_EVENT_ID = "change_event_id";
-
+    /**
+     * 是否授信
+     */
+    public static final String CREDIT = "credit";
 }

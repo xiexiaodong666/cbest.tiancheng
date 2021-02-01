@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.SupplierStoreSyncDTO;
@@ -13,7 +14,7 @@ import com.welfare.service.remote.entity.CbestPayCreateMarketReq;
 import com.welfare.service.remote.entity.CbestPayRespRetryConstant;
 import com.welfare.service.remote.entity.CbestPayRespStatusConstant;
 import com.welfare.service.remote.service.CbestPayService;
-import com.welfare.service.sync.event.MarketCreateEvt;
+import com.welfare.service.sync.event.SupplierStoreEvt;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +55,21 @@ public class MarketCreateHandler {
 
     @AllowConcurrentEvents
     @Subscribe
-    public void onMarketCreateAdd(MarketCreateEvt evt) {
-        SupplierStoreSyncDTO syncDTO=evt.getSupplierStoreSyncDTO();
+    public void onMarketCreateAdd(SupplierStoreEvt evt) {
+        if(EmptyChecker.isEmpty(evt.getSupplierStoreDetailDTOS())){
+            return;
+        }
+        if(!evt.getTypeEnum().getCode().equals(ShoppingActionTypeEnum.ADD.getCode())){
+            return;
+        }
+        log.info("同步门店到重百付，event【{}】", JSON.toJSONString(evt));
+        SupplierStoreSyncDTO syncDTO=evt.getSupplierStoreDetailDTOS().get(0);
         if(EmptyChecker.notEmpty(syncDTO)){
             CbestPayCreateMarketReq req=new CbestPayCreateMarketReq();
             req.setMarketName(syncDTO.getStoreName());
+            log.info("同步门店到重百付，req【{}】，storeCode【{}】", JSON.toJSONString(req),syncDTO.getStoreCode());
             CbestPayBaseBizResp resp= cbestPayService.marketCreate(syncDTO.getStoreCode(),req);
+            log.info("同步门店到重百付，resp【{}】", JSON.toJSONString(resp));
             String bizStatus = resp.getBizStatus();
             switch (bizStatus) {
                 case CbestPayRespStatusConstant

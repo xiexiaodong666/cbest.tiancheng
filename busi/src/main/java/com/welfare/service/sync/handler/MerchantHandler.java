@@ -1,5 +1,6 @@
 package com.welfare.service.sync.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
@@ -52,6 +53,7 @@ public class MerchantHandler  {
     @AllowConcurrentEvents
     @Subscribe
     public void onMerchantChange(MerchantEvt evt) {
+        log.info("同步商户到商城中台，event【{}】", JSON.toJSONString(evt));
         ShoppingActionTypeEnum typeEnum=evt.getTypeEnum();
         List<MerchantSyncDTO> merchantDetailDTOList=evt.getMerchantDetailDTOList();
         if (EmptyChecker.isEmpty(merchantDetailDTOList)) {
@@ -59,7 +61,7 @@ public class MerchantHandler  {
         }
         MerchantShoppingReq req = new MerchantShoppingReq();
         req.setActionType(typeEnum.getCode());
-        req.setTimestamp(new Date());
+        req.setTimestamp(evt.getTimestamp());
         req.setRequestId(evt.getUserToken().toString());
         List<MerchantShoppingReq.ListBean> list = new ArrayList<>();
         List<String> merCodeList = new ArrayList<>();
@@ -88,7 +90,9 @@ public class MerchantHandler  {
             merCodeList.add(merchant.getMerCode());
         }
         req.setList(list);
+        log.info("同步商户到商城中台，req【{}】", JSON.toJSONString(req));
         RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateMerchant(req);
+        log.info("同步商户到商城中台，resp【{}】", JSON.toJSONString(resp));
         if (!("0000").equals(resp.getCode())) {
             throw new BusiException("同步商户数据到商城中心失败msg【"+resp.getMsg()+"】");
         }

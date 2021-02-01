@@ -22,15 +22,14 @@ public class AccountBillDetailDTO implements Serializable {
   /**
    * 消费门店名称
    */
-  @ApiModelProperty("消费门店名称(交易方)")
-  @ExcelProperty(value = "消费门店名称")
+  @ApiModelProperty("交易方")
+  @ExcelProperty(value = "交易方")
   private String storeName;
 
   /**
    * 交易类型
    */
   @ApiModelProperty("交易类型(消费、退款、充值等)")
-  @ExcelProperty(value = "交易类型(出入账)code")
   private String transType;
 
   /**
@@ -38,7 +37,6 @@ public class AccountBillDetailDTO implements Serializable {
    */
   @ExcelProperty(value = "交易类型value")
   private String transTypeString;
-
   /**
    * 交易总金额
    */
@@ -59,5 +57,13 @@ public class AccountBillDetailDTO implements Serializable {
   @ApiModelProperty("创建时间(日期)")
   @ExcelProperty(value = "创建时间")
   private Date createTime;
+
+  /**
+   * 交易账户
+   */
+  @ExcelProperty(value = "名目")
+  @ApiModelProperty("名目")
+  private String accountTypeName;
+
 
 }

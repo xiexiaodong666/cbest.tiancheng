@@ -30,4 +30,6 @@ public class SupplierStoreListReq {
     @ApiModelProperty("门店code集合")
     private List<String> storeCodeList;
 
+    @ApiModelProperty("来源")
+    private String source;
 }

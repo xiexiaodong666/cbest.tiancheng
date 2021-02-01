@@ -76,6 +76,6 @@ public class SupplierStoreTreeDTO extends Tree{
      * disabled false 门店 true 商户
      */
     @ApiModelProperty("type 1商户，2门店")
-    private Boolean disabled;
+    private Boolean isMerchant;
 
 }

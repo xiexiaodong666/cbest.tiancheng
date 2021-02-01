@@ -95,6 +95,7 @@
                 and t1.send_status = #{sendStatus}
             </if>
         </where>
+        order by t1.create_time desc
     </select>
 
 
@@ -162,11 +163,7 @@
                      when t2.rebate_type='other_pay' and t1.trans_type_name!='员工卡支付' and t1.trans_type='refund' then  rebate_ratio/100*trans_amount*-1
                      else 0 end
             ) as rebateAmount,
-            sum(
-                case when t1.trans_type='consume' then 1
-                     when t1.trans_type='refund' then -1
-                     else 0 end
-            ) as orderNum,
+            count(DISTINCT t1.trans_no) as orderNum,
             'unconfirmed' as  rec_status,
             'unsettled' as settle_status,
             'unsended' as send_status,
@@ -188,5 +185,20 @@
             </if>
         </where>
         group by t1.mer_code
+    </select>
+
+
+    <select id="getAccountType" resultType="map" parameterType="String">
+        select
+            t1.mer_account_type_code as merAccountTypeCode,
+            t1.mer_account_type_name as merAccountTypeName
+        from
+        merchant_account_type t1
+        left join merchant t2
+        on t1.mer_code=t2.mer_code
+        where t1.mer_code = #{merCode}
+        and t1.deleted=0 and t2.deleted=0
+        and (CASE WHEN t2.self_recharge !=1 THEN t1.mer_account_type_code!='self'
+			else 1=1 END)
     </select>
 </mapper>

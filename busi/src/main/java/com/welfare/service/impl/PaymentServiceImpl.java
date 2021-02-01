@@ -92,6 +92,7 @@ public class PaymentServiceImpl implements PaymentService {
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             List<MerchantBillDetail> merchantBillDetails;
             try {
+                MerchantCredit merchantCredit = merchantCreditService.getByMerCode(account.getMerCode());
                 List<PaymentOperation> paymentOperations = decreaseAccount(paymentRequest, account,accountAmountDOList,supplierStore);
                 merchantBillDetails = paymentOperations.stream()
                         .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
@@ -128,7 +129,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
     private String chargeBeforePay(PaymentRequest paymentRequest, Account account, SupplierStore supplierStore) {
         Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()), "账户未启用");
-        MerchantStoreRelation merStoreRelation = merchantStoreRelationDao.getOneByStoreCodeAndMerCode(paymentRequest.getStoreNo(), account.getMerCode());
+        MerchantStoreRelation merStoreRelation = merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(), account.getMerCode());
         Assert.notNull(merStoreRelation,"用户所在组织（公司）不支持在该门店消费或配置已禁用");
         Assert.isTrue(EnableEnum.ENABLE.getCode().equals(merStoreRelation.getStatus()), "用户所在组织（公司）不支持在该门店消费或配置已禁用");
         Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(supplierStore.getStatus()),

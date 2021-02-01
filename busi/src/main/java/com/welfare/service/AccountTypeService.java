@@ -10,6 +10,8 @@ import com.welfare.service.dto.AccountTypeDTO;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 员工类型服务接口
@@ -31,4 +33,5 @@ public interface AccountTypeService {
   public Boolean update(AccountType accountType);
   public Boolean delete(Long id);
   AccountType queryByTypeCode(String merCode,String typeCode);
+  Map<String, List<AccountType>> mapByTypeCode(Set<String> typeCodes);
 }

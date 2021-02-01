@@ -574,6 +574,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setMerchantCode(merchant != null ? merchant.getMerCode() : null);
             orderInfo.setMerchantName(merchant != null ? merchant.getMerName() : null);
             orderInfo.setOrderAmount(item.getTransAmount());
+            orderInfo.setTimeInterval(item.getTimeInterval());
             orderInfoList.add(orderInfo);
         });
         int count = orderMapper.saveOrUpdate(orderInfoList);

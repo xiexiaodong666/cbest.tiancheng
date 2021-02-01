@@ -129,6 +129,10 @@ public class OrderInfoDTO extends Model<OrderInfoDTO> implements Serializable {
      * 更新时间
      */
 	private Date updateTime;
+	/**
+	 * 时段
+	 */
+	private Integer timeInterval;
 
 //以下为列明常量
 

@@ -149,6 +149,11 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
     @ApiModelProperty("更新时间")   
     @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
+    /**
+     * 时段
+     */
+    @ApiModelProperty("时段")
+    private Integer timeInterval;
 
 //以下为列明常量
 

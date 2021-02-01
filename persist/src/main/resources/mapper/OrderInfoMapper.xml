@@ -13,7 +13,7 @@
         when "consume" then orderAmount
         else  (-1) * orderAmount
         end
-        as orderAmount, phone from (
+        as orderAmount, phone, time_interval from (
         SELECT
         oi.order_id as orderId,
         t.phone as phone,
@@ -27,7 +27,8 @@
         ab.trans_amount as orderAmount,
         ab.trans_time as orderTime,
         ab.card_id as cardId,
-        ab.trans_type
+        ab.trans_type,
+        oi.time_interval
         FROM
         (select account_code,sum(trans_amount) as trans_amount , trans_no ,
         max(trans_time) as trans_time ,store_code,trans_type,max(card_id) as card_id
@@ -322,14 +323,14 @@
     <insert id="saveOrUpdate" parameterType="list" >
         insert into <!--<include refid="tableName"/>-->
         order_info(order_id,trans_no , return_trans_no,goods,merchant_code,merchant_name,store_code,store_name,account_code,account_name,
-        card_id,order_amount,order_time,pay_code,pay_name,trans_type , trans_type_name,create_user,create_time)
+        card_id,order_amount,order_time,pay_code,pay_name,trans_type , trans_type_name,create_user,create_time , time_interval)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.orderId},#{item.transNo},#{item.returnTransNo},#{item.goods},#{item.merchantCode},#{item.merchantName},#{item.storeCode},
             #{item.storeName},#{item.accountCode},#{item.accountName},#{item.cardId},
             #{item.orderAmount},#{item.orderTime},#{item.payCode},#{item.payName},
             #{item.transType},#{item.transTypeName},
-            "system",now()
+            "system",now(),#{item.timeInterval}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -350,7 +351,8 @@
         trans_type = values(trans_type),
         trans_type_name = values(trans_type_name),
         update_user = values(update_user),
-        update_time = values(update_time)
+        update_time = values(update_time),
+        time_interval = values(time_interval)
     </insert>
 
 </mapper>

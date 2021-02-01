@@ -60,6 +60,8 @@ public interface AccountService {
 
   void batchSyncData(Integer staffStatus);
 
+  AccountBatchImgDTO uploadBatchImg(AccountBatchImgReq accountBatchImgReq);
+
   Boolean batchSave(List<Account> accountList);
 
   Boolean update(AccountReq accountReq);

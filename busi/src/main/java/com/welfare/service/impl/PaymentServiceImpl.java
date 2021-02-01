@@ -153,7 +153,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .distinct()
                 .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + paymentScene, null);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
         }
         return paymentScene;
     }

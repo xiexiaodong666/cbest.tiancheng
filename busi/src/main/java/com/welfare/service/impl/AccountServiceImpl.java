@@ -370,6 +370,15 @@ public class AccountServiceImpl implements AccountService {
             accountAmountTypeMapper.insert(accountAmountType);
             account.setSurplusQuota(account.getMaxQuota());
         }
+        FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
+        fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
+        fileUniversalStorage.setUrl(accountReq.getImgUrl());
+        fileUniversalStorage.setDeleted(false);
+
+        fileUniversalStorageDao.save(fileUniversalStorage);
+        account.setFileUniversalStorageId(fileUniversalStorage.getId());
+
+        // 添加
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
 
@@ -449,7 +458,15 @@ public class AccountServiceImpl implements AccountService {
         String lockKey = ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + oldAccount.getAccountCode();
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
+
             Account account = assemableAccount4update(accountReq);
+
+          FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
+          fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
+          fileUniversalStorage.setUrl(accountReq.getImgUrl());
+          fileUniversalStorage.setDeleted(false);
+          fileUniversalStorageDao.save(fileUniversalStorage);
+          account.setFileUniversalStorageId(fileUniversalStorage.getId());
             validationAccount(account, false);
 
             //记录变更时间离线支付用

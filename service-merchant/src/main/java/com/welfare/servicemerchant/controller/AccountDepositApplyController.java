@@ -148,12 +148,14 @@ public class AccountDepositApplyController implements IController {
   public R<Page<TempAccountDepositApplyDTO>> uploadData(@RequestParam @ApiParam("当前页(从1开始)") Integer current,
                                                         @RequestParam @ApiParam("单页大小") Integer size,
                                                         @RequestParam @ApiParam("文件id")String fileId) {
-    return success(tempAccountDepositApplyService.pageByFileIdByExistAccount(current, size, fileId));
+    return success(tempAccountDepositApplyService.pageByFileIdByExistAccount(current, size, fileId,
+            MerchantUserHolder.getMerchantUser().getMerchantCode()));
   }
 
   @GetMapping("/upload/total")
   @ApiOperation("查询上传excel的总人数和总金额")
   public R<AccountApplyTotalDTO> uploadTotalData(@RequestParam @ApiParam("文件id")String fileId) {
-    return success(tempAccountDepositApplyService.getUserCountAndTotalmount(fileId));
+    return success(tempAccountDepositApplyService.getUserCountAndTotalmount(fileId,
+            MerchantUserHolder.getMerchantUser().getMerchantCode()));
   }
 }

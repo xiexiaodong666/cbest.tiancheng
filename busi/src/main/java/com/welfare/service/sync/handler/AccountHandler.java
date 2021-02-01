@@ -8,9 +8,13 @@ import com.google.gson.Gson;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountType;
+import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.service.AccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.EmployerDTO;
@@ -45,6 +49,10 @@ public class AccountHandler {
   private MerchantService merchantService;
   @Autowired
   private AccountDao accountDao;
+  @Autowired
+  private DepartmentDao departmentDao;
+  @Autowired
+  private AccountTypeService accountTypeService;
 
   private Gson gson= new Gson();
 
@@ -80,8 +88,13 @@ public class AccountHandler {
     merchantList.forEach(merchant -> {
       merchantMap.put(merchant.getMerCode(), merchant);
     });
-
-    List<AccountSyncDTO> accountSyncDTOList = AccountUtils.getSyncDTO(accountList, merchantMap);
+    // 查询员工机构名称
+    Set<String> departmentCodeSet = accountList.stream().map(Account::getStoreCode).collect(Collectors.toSet());
+    Map<String, Department> departmentMap = departmentDao.mapByDepartmentCodes(departmentCodeSet);
+    // 查询员工类型名称
+    Set<String> accountTypeCodeSet = accountList.stream().map(Account::getAccountTypeCode).collect(Collectors.toSet());
+    Map<String, List<AccountType>> accountTypeMap = accountTypeService.mapByTypeCode(accountTypeCodeSet);
+    List<AccountSyncDTO> accountSyncDTOList = AccountUtils.getSyncDTO(accountList, merchantMap, departmentMap, accountTypeMap);
     // 员工账号数据同步
     List<EmployerDTO> employerDTOList = AccountUtils.assemableEmployerDTOList(accountSyncDTOList);
     EmployerReqDTO employerReqDTO = new EmployerReqDTO();

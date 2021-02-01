@@ -22,12 +22,13 @@ import com.welfare.service.converter.AccountTypeConverter;
 import com.welfare.service.dto.AccountTypeDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 员工类型服务接口实现
@@ -82,6 +83,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public Boolean save(AccountType accountType){
         accountType.setTypeCode(sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_TYPE_CODE.code()).toString());
         validationAccountType(accountType,true);
@@ -129,5 +131,19 @@ public class AccountTypeServiceImpl implements AccountTypeService {
         wrapper.eq(AccountType.TYPE_CODE,typeCode);
         AccountType accountType = accountTypeDao.getOne(wrapper);
         return accountType;
+    }
+
+    @Override
+    public Map<String, List<AccountType>> mapByTypeCode(Set<String> typeCodes) {
+        Map<String, List<AccountType>> map = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(typeCodes)) {
+            QueryWrapper<AccountType> queryWrapper = new QueryWrapper<>();
+            queryWrapper.in(AccountType.TYPE_CODE, typeCodes);
+            List<AccountType> list = accountTypeDao.list(queryWrapper);
+            if (CollectionUtils.isNotEmpty(list)) {
+                map = list.stream().collect(Collectors.groupingBy(AccountType::getTypeCode));
+            }
+        }
+        return map;
     }
 }

@@ -1,5 +1,6 @@
 package com.welfare.service.remote.entity.pos;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class PagingResult<T> {
   private Integer pageNo;
   private Integer pageSize;

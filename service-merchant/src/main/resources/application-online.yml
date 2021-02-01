@@ -38,7 +38,8 @@ cbest:
     appId: olife
     appKey: e400233f4a719304ce189cde2aeaae98
     notifyUrl: http://xxx/accountDepositRecord/payNotify
-
+  dmall:
+    url: http://dmall.e-cbest.com
 cdn:
   server: http://img.sjgo365.com
 

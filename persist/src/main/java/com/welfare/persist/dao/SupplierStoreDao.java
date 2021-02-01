@@ -9,6 +9,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 供应商门店(supplier_store)数据DAO
  *
@@ -37,6 +39,12 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
         queryWrapper.eq(SupplierStore.CASHIER_NO,cashierNo)
                 .eq(SupplierStore.STORE_CODE,storeCode);
         return getOne(queryWrapper);
+    }
+
+    public List<SupplierStore> listByMerCode(String merCode){
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.MER_CODE, merCode);
+        return list(queryWrapper);
     }
 
     @Override

@@ -46,7 +46,8 @@ cbest:
     url: http://192.1.30.160:8000/gateway
     appId: olife
     appKey: e400233f4a719304ce189cde2aeaae98
-
+  dmall:
+    url: http://dmall.e-cbest.com
 feign:
   hystrix:
     enabled: true

@@ -93,22 +93,41 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
             &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
       uploadInfo.append("第").append(row.toString()).append("行").append("线上商城和O2O不能同时选择").append(";");
     }
-    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
-            ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
-      if(EmptyChecker.isEmpty(storeImportDTO.getCashierNo())){
-        uploadInfo.append("第").append(row.toString()).append("行").append("线上商城或者O2O必须输入虚拟收银机号").append(";");
-      }else{
-        if(storeImportDTO.getCashierNo().length()>255){
+
+    if(consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())) {
+      if (EmptyChecker.isEmpty(storeImportDTO.getO2oCashierNo())) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("O2O必须输入虚拟收银机号")
+            .append(";");
+      } else {
+        if(storeImportDTO.getO2oCashierNo().length()>255){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
         }
         String regex = "^[V][0-9]{3}+$";
-        if(!storeImportDTO.getCashierNo().matches(regex)){
+        if(!storeImportDTO.getO2oCashierNo().matches(regex)){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
         }
-
       }
-    }else{
-      if(EmptyChecker.notEmpty(storeImportDTO.getCashierNo())){
+    } else {
+      if(EmptyChecker.notEmpty(storeImportDTO.getO2oCashierNo())){
+        uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
+      }
+    }
+
+    if(consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType())) {
+      if (EmptyChecker.isEmpty(storeImportDTO.getO2oCashierNo())) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("线上商城必须输入虚拟收银机号")
+            .append(";");
+      } else {
+        if(storeImportDTO.getO2oCashierNo().length()>255){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
+        }
+        String regex = "^[V][0-9]{3}+$";
+        if(!storeImportDTO.getO2oCashierNo().matches(regex)){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
+        }
+      }
+    } else {
+      if(EmptyChecker.notEmpty(storeImportDTO.getO2oCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
       }
     }

@@ -60,4 +60,9 @@ public class SupplierStoreAddDTO {
 
     List<MerchantAddressDTO> addressList;
 
+    /**
+     * 门店关联消费方法虚拟收银号
+     */
+    @ApiModelProperty("门店关联消费方法虚拟收银号")
+    List<StoreConsumeTypeDTO> storeConsumeTypeList;
 }

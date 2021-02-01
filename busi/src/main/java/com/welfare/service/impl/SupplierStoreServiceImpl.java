@@ -18,18 +18,21 @@ import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
+import com.welfare.persist.dao.StoreConsumeTypeDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import com.welfare.persist.entity.StoreConsumeType;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.SupplierStoreExMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantService;
+import com.welfare.service.StoreConsumeTypeService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.converter.SupplierStoreAddConverter;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
@@ -39,6 +42,7 @@ import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.StoreConsumeTypeDTO;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
@@ -67,6 +71,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.cache.annotation.Cacheable;
@@ -89,6 +94,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class SupplierStoreServiceImpl implements SupplierStoreService {
 
+  private final StoreConsumeTypeDao storeConsumeTypeDao;
+  private final StoreConsumeTypeService storeConsumeTypeService;
   private final SupplierStoreDao supplierStoreDao;
   private final SupplierStoreAddConverter supplierStoreAddConverter;
 
@@ -241,6 +248,22 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     //商户名称
     store.setMerName(merchantService.getMerchantByMerCode(store.getMerCode()).getMerName());
+
+    List<StoreConsumeTypeDTO> storeConsumeTypeDTOList = new ArrayList<>();
+    List<StoreConsumeType> storeConsumeTypeList = storeConsumeTypeService.getStoreConsumeTypeList(store.getStoreCode());
+    store.setStoreConsumeTypeList(storeConsumeTypeDTOList);
+
+    if(CollectionUtils.isNotEmpty(storeConsumeTypeList)) {
+      for (StoreConsumeType storeConsumeType:
+      storeConsumeTypeList) {
+        StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
+        storeConsumeTypeDTO.setCashierNo(storeConsumeType.getCashierNo());
+        storeConsumeTypeDTO.setConsumeType(storeConsumeType.getConsumType());
+
+        storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
+      }
+    }
+
     //自提点地址
     MerchantAddressReq merchantAddressReq = new MerchantAddressReq();
     merchantAddressReq.setRelatedType(SupplierStore.class.getSimpleName());
@@ -267,12 +290,6 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     return supplierStoreDao.getOne(queryWrapper);
   }
 
-  @Override
-  public SupplierStore getSupplierStoreByCashierNo(String cashierNo) {
-    QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
-    queryWrapper.eq(SupplierStore.CASHIER_NO, cashierNo);
-    return supplierStoreDao.getOne(queryWrapper);
-  }
 
   @Override
   @Transactional(rollbackFor = Exception.class)
@@ -307,9 +324,28 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     save.setStoreParent(save.getMerCode());
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
+
+    //
+    boolean saveStoreConsumeType = true;
+    List<StoreConsumeType> storeConsumeTypeList = new ArrayList<>();
+    List<StoreConsumeTypeDTO> consumeTypeDTOList = supplierStore.getStoreConsumeTypeList();
+    if(CollectionUtils.isNotEmpty(consumeTypeDTOList)) {
+      for (StoreConsumeTypeDTO storeConsumeTypeDTO:
+      consumeTypeDTOList) {
+        StoreConsumeType storeConsumeType = new StoreConsumeType();
+        storeConsumeType.setStoreCode(save.getStoreCode());
+        storeConsumeType.setCashierNo(storeConsumeTypeDTO.getCashierNo());
+        storeConsumeType.setConsumType(storeConsumeTypeDTO.getConsumeType());
+        storeConsumeType.setDeleted(false);
+        storeConsumeTypeList.add(storeConsumeType);
+      }
+      saveStoreConsumeType = storeConsumeTypeDao.saveBatch(storeConsumeTypeList);
+    }
+
+
     //同步商城中台
     //同步重百付
-    if (!flag) {
+    if (!flag || !saveStoreConsumeType) {
       throw new BusiException("新增门店失败");
     }
     SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(save);
@@ -443,6 +479,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public boolean delete(Long id) {
     SupplierStore supplierStore = supplierStoreDao.getById(id);
     if (EmptyChecker.isEmpty(supplierStore)) {
@@ -451,6 +488,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     Boolean flag = supplierStoreDao.removeById(id);
     merchantAddressService.delete(
         SupplierStore.class.getSimpleName(), id);
+    storeConsumeTypeService.removeByStore(supplierStore.getStoreCode());
+
     //同步商城中台
     if (!flag) {
       throw new BusiException("删除门店失败");
@@ -486,8 +525,29 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = 1 == supplierStoreDao.updateAllColumnById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
+
+    //
+    boolean saveStoreConsumeType = true;
+    List<StoreConsumeType> storeConsumeTypeList = new ArrayList<>();
+    List<StoreConsumeTypeDTO> consumeTypeDTOList = supplierStore.getStoreConsumeTypeList();
+    if(CollectionUtils.isNotEmpty(consumeTypeDTOList)) {
+
+      storeConsumeTypeService.removeByStore(entity.getStoreCode());
+
+      for (StoreConsumeTypeDTO storeConsumeTypeDTO:
+          consumeTypeDTOList) {
+        StoreConsumeType storeConsumeType = new StoreConsumeType();
+        storeConsumeType.setStoreCode(entity.getStoreCode());
+        storeConsumeType.setCashierNo(storeConsumeTypeDTO.getCashierNo());
+        storeConsumeType.setConsumType(storeConsumeTypeDTO.getConsumeType());
+        storeConsumeType.setDeleted(false);
+        storeConsumeTypeList.add(storeConsumeType);
+      }
+      saveStoreConsumeType = storeConsumeTypeDao.saveBatch(storeConsumeTypeList);
+    }
+
     //同步商城中台
-    if (!(flag && flag2 && flag3)) {
+    if (!(flag && flag2 && flag3 && saveStoreConsumeType)) {
       throw new BusiException("更新门店失败");
     }
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
@@ -504,10 +564,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未输入正确的消费类型", null);
     }
-    if (consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
+    /*if (consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
             && consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "O2O和线上商城不能同时选择", null);
-    }
+    }*/
   }
 
   private SupplierStore buildUpdate(SupplierStore entity,SupplierStoreUpdateDTO update) {
@@ -516,7 +576,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     entity.setConsumType(update.getConsumType());
     entity.setUpdateUser(update.getUpdateUser());
     entity.setExternalCode(update.getExternalCode());
-    entity.setCashierNo(update.getCashierNo());
+
     return entity;
   }
 

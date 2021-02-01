@@ -322,7 +322,7 @@ public class AccountServiceImpl implements AccountService {
           successList.add(accountOptional.get().getPhone());
           FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
           fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
-          fileUniversalStorage.setImgKey(accountOptional.get().getImgKey());
+          fileUniversalStorage.setUrl(accountOptional.get().getUrl());
           fileUniversalStorage.setDeleted(false);
           fileUniversalStorageList.add(fileUniversalStorage);
         }

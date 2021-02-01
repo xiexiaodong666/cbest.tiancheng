@@ -19,9 +19,9 @@ public class AccountBatchImgInfoReq {
   @ApiModelProperty("手机号码")
   private String phone;
   /**
-   * s3存储key
+   * 文件url
    */
-  @ApiModelProperty("s3存储key")
-  private String imgKey;
+  @ApiModelProperty("url")
+  private String url;
 
 }

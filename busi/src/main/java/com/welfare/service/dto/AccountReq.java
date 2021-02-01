@@ -84,4 +84,10 @@ public class AccountReq implements Serializable {
    */
   @ApiModelProperty("备注")
   private String remark;
+
+  /**
+   * 照片url
+   */
+  @ApiModelProperty("照片url")
+  private String imgUrl;
 }

@@ -110,4 +110,10 @@ public class AccountDetailDTO {
    */
   @ApiModelProperty("是否授信")
   private Integer credit;
+
+  /**
+   * 照片url
+   */
+  @ApiModelProperty("照片url")
+  private String imgUrl;
 }

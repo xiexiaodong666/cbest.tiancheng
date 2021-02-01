@@ -19,6 +19,12 @@ public interface DepositService {
     void deposit(Deposit deposit);
 
     /**
+     * 个人第三方充值
+     * @param deposit
+     */
+    void personalDeposit(Deposit deposit);
+
+    /**
      * 充值 批量
      * @param deposits
      */

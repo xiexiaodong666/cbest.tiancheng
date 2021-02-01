@@ -275,7 +275,7 @@ public class AccountDepositRecordServiceImpl extends
         for (AccountDepositRecord accountDepositRecord : pendingAndFailureRechargeList) {
             try {
                 Deposit deposit = buildDeposit(accountDepositRecord);
-                depositService.deposit(deposit);
+                depositService.personalDeposit(deposit);
                 accountDepositRecord.setDepositTradeNo(deposit.getTransNo());
                 accountDepositRecord
                     .setRechargeStatus(

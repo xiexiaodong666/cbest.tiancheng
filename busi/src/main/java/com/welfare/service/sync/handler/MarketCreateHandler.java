@@ -62,11 +62,14 @@ public class MarketCreateHandler {
         if(!evt.getTypeEnum().getCode().equals(ShoppingActionTypeEnum.ADD.getCode())){
             return;
         }
+        log.info("同步门店到重百付，event【{}】", JSON.toJSONString(evt));
         SupplierStoreSyncDTO syncDTO=evt.getSupplierStoreDetailDTOS().get(0);
         if(EmptyChecker.notEmpty(syncDTO)){
             CbestPayCreateMarketReq req=new CbestPayCreateMarketReq();
             req.setMarketName(syncDTO.getStoreName());
+            log.info("同步门店到重百付，req【{}】，storeCode【{}】", JSON.toJSONString(req),syncDTO.getStoreCode());
             CbestPayBaseBizResp resp= cbestPayService.marketCreate(syncDTO.getStoreCode(),req);
+            log.info("同步门店到重百付，resp【{}】", JSON.toJSONString(resp));
             String bizStatus = resp.getBizStatus();
             switch (bizStatus) {
                 case CbestPayRespStatusConstant

@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  * 账户信息(account)数据Mapper
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
+ * @since 2021-02-01 11:20:41
  * @description 由 Mybatisplus Code Generator 创建
 */
 @Mapper

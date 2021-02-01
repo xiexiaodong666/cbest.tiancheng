@@ -81,7 +81,7 @@ public class PaymentServiceImpl implements PaymentService {
         Long accountCode = paymentRequest.calculateAccountCode();
         Assert.notNull(accountCode,"账号不能为空。");
         SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo());
-        String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + paymentRequest.calculateAccountCode();
+        String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + accountCode;
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
             Account account = accountService.getByAccountCode(accountCode);
@@ -93,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
             List<MerchantBillDetail> merchantBillDetails;
             try {
                 MerchantCredit merchantCredit = merchantCreditService.getByMerCode(account.getMerCode());
-                List<PaymentOperation> paymentOperations = decreaseAccount(paymentRequest, account,accountAmountDOList,supplierStore);
+                List<PaymentOperation> paymentOperations = decreaseAccount(paymentRequest, account,accountAmountDOList,supplierStore,merchantCredit);
                 merchantBillDetails = paymentOperations.stream()
                         .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
                         .map(MerchantAccountOperation::getMerchantBillDetail)
@@ -196,7 +196,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
-                                                   Account account, List<AccountAmountDO> accountAmountDOList, SupplierStore supplierStore) {
+                                                   Account account, List<AccountAmountDO> accountAmountDOList,
+                                                   SupplierStore supplierStore, MerchantCredit merchantCredit) {
         BigDecimal usableAmount = account.getAccountBalance().add(account.getSurplusQuota());
         BigDecimal amount = paymentRequest.getAmount();
         boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
@@ -211,7 +212,6 @@ public class PaymentServiceImpl implements PaymentService {
         List<PaymentOperation> paymentOperations = new ArrayList<>(4);
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
-        MerchantCredit merchantCredit = merchantCreditService.getByMerCode(account.getMerCode());
         for (AccountAmountDO accountAmountDO : accountAmountDOList) {
             if (BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance()) == 0) {
                 //当前的accountType没钱，则继续下一个账户

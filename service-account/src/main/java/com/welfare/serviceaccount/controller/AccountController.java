@@ -1,17 +1,21 @@
 package com.welfare.serviceaccount.controller;
 
 import com.welfare.common.annotation.AccountUser;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.AccountUserHolder;
+import com.welfare.persist.dto.AccountConsumeSceneDO;
 import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.AccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -36,5 +40,25 @@ public class AccountController implements IController {
     public R<AccountSimpleDTO> info() {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.queryAccountInfo(accountCode));
+    }
+
+    @ApiOperation("查询账户消费场景-卡内信息")
+    @GetMapping("/consume-scene/card")
+    public R<AccountConsumeSceneDO> queryAccountConsumeSceneDOByCardInfo(@RequestParam @ApiParam("门店号") String storeCode,
+                                                               @RequestParam @ApiParam("商家编码") String merCode,
+                                                               @RequestParam @ApiParam("卡内信息") String cardInsideInfo){
+        AccountConsumeSceneDO accountConsumeSceneDO =
+                accountService.queryAccountConsumeSceneDO(storeCode,merCode, WelfareConstant.ConsumeQueryType.CARD, cardInsideInfo);
+        return success(accountConsumeSceneDO);
+    }
+
+    @ApiOperation("查询账户消费场景-条码")
+    @GetMapping("/consume-scene/barcode")
+    public R<AccountConsumeSceneDO> queryAccountConsumeSceneDOByBarcode(@RequestParam @ApiParam("门店号") String storeCode,
+                                                               @RequestParam @ApiParam("商家编码") String merCode,
+                                                               @RequestParam @ApiParam("条码") String barcode){
+        AccountConsumeSceneDO accountConsumeSceneDO =
+                accountService.queryAccountConsumeSceneDO(storeCode,merCode, WelfareConstant.ConsumeQueryType.BARCODE, barcode);
+        return success(accountConsumeSceneDO);
     }
 }

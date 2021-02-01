@@ -2,6 +2,8 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.persist.dto.AccountConsumeSceneDO;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
@@ -98,4 +100,14 @@ public interface AccountService {
    * @param settlementTransNo
    */
   void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser, String settlementTransNo);
+
+  /**
+   * 查询消费场景DO
+   * @param storeCode
+   * @param merCode
+   * @param queryType
+   * @param queryInfo
+   * @return
+   */
+  AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode, String merCode, WelfareConstant.ConsumeQueryType queryType, String queryInfo);
 }

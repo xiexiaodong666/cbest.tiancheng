@@ -8,6 +8,7 @@ import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
+import com.welfare.serviceaccount.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,9 +29,7 @@ import java.util.stream.Collectors;
  * @email yuxiang.li@sjgo365.com
  * @date 2/1/2021
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ServiceAccountApplication.class)
-public class PaymentServiceImplTest {
+public class PaymentServiceImplTest extends BaseTest {
     PaymentRequest paymentRequest;
     Account account;
     List<AccountAmountDO> accountAmountDOs;

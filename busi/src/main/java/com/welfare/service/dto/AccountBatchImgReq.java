@@ -26,7 +26,7 @@ public class AccountBatchImgReq {
   /**
    * 手机号和s3存储key集合对象
    */
-  @ApiModelProperty("手机号和s3存储key集合对象")
-  @NotNull(message = "手机号和s3存储key集合不能唯恐")
+  @ApiModelProperty("手机号和url集合对象")
+  @NotNull(message = "手机号和url集合不能为空")
   private List<AccountBatchImgInfoReq> accountBatchImgInfoReqList;
 }

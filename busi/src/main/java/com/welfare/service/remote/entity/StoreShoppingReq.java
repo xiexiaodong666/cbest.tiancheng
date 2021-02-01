@@ -23,15 +23,23 @@ public class StoreShoppingReq implements Serializable {
     private String merchantCode;
     private String storeName;
     private int status;
-    private String cashierNo;
     private String storeCode;
     private List<AddressBean> address;
+    private List<ConsumeSettingsBean> consumeSettings;
+
     private List<String> consumeTypes;
     @Data
     public static class AddressBean  {
       private String address;
       private String addressType;
       private String name;
+    }
+
+    @Data
+    public static class ConsumeSettingsBean{
+      private String cashierNo;
+      private String consumeType;
+
     }
   }
 }

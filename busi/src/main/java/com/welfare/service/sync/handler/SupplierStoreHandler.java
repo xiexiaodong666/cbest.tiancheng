@@ -10,10 +10,12 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.MerchantAddressDTO;
+import com.welfare.service.dto.StoreConsumeTypeDTO;
 import com.welfare.service.dto.SupplierStoreSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
+import com.welfare.service.remote.entity.StoreShoppingReq.ListBean.ConsumeSettingsBean;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
@@ -80,7 +82,19 @@ public class SupplierStoreHandler {
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
             listBean.setStoreName(supplierStoreDetailDTO.getStoreName());
             listBean.setStoreCode(supplierStoreDetailDTO.getStoreCode());
-            listBean.setCashierNo(supplierStoreDetailDTO.getCashierNo());
+            List<ConsumeSettingsBean> consumeSettings = new ArrayList<>();
+            if(EmptyChecker.notEmpty(supplierStoreDetailDTO.getStoreConsumeTypeList())) {
+
+                for (StoreConsumeTypeDTO storeConsumeTypeDTO:
+                supplierStoreDetailDTO.getStoreConsumeTypeList()) {
+                    ConsumeSettingsBean consumeSettingsBean = new ConsumeSettingsBean();
+                    consumeSettingsBean.setCashierNo(storeConsumeTypeDTO.getCashierNo());
+                    consumeSettingsBean.setConsumeType(storeConsumeTypeDTO.getConsumeType());
+                    consumeSettings.add(consumeSettingsBean);
+                }
+                listBean.setConsumeSettings(consumeSettings);
+            }
+            // listBean.setCashierNo(supplierStoreDetailDTO.getCashierNo());
             listBean.setEnabled(supplierStoreDetailDTO.getStatus().equals(1));
             //门店相关地址
             List<StoreShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();

@@ -318,15 +318,12 @@ public class AccountServiceImpl implements AccountService {
 
       for(Account account : accountList) {
         Optional<AccountBatchImgInfoReq> accountOptional = batchImgInfoListReq.stream().filter(i->i.getPhone().equals(account.getPhone())).findFirst();
-        if(accountOptional.isPresent()) {
-          successList.add(accountOptional.get().getPhone());
-          FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
-          fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
-          fileUniversalStorage.setUrl(accountOptional.get().getUrl());
-          fileUniversalStorage.setDeleted(false);
-          fileUniversalStorageList.add(fileUniversalStorage);
-        }
-
+        successList.add(accountOptional.get().getPhone());
+        FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
+        fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
+        fileUniversalStorage.setUrl(accountOptional.get().getUrl());
+        fileUniversalStorage.setDeleted(false);
+        fileUniversalStorageList.add(fileUniversalStorage);
       }
 
       phones.removeAll(successList);

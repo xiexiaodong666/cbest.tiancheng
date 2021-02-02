@@ -2,7 +2,7 @@ spring:
   cache:
     type: redis
   datasource:
-    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.1.30.186:3306/e-welfare-0208?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: mysql@123
   redis:

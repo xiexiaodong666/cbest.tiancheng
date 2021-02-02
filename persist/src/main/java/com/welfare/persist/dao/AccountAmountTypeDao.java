@@ -5,9 +5,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * (account_amount_type)数据DAO
@@ -29,5 +33,20 @@ public class AccountAmountTypeDao extends ServiceImpl<AccountAmountTypeMapper, A
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE,accountCode);
         return list(queryWrapper);
+    }
+    /**
+     * 根据账户号查询AccountAmountType map
+     * @param accountCodes
+     * @return
+     */
+    public Map<Long, AccountAmountType> mapByAccountCodes(List<Long> accountCodes){
+        Map<Long, AccountAmountType> map = new HashMap<>();
+        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(AccountAmountType.ACCOUNT_CODE, accountCodes);
+        List<AccountAmountType> list = list(queryWrapper);
+        if (CollectionUtils.isNotEmpty(list)) {
+            map = list.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, a -> a,(k1, k2)->k1));
+        }
+        return map;
     }
 }

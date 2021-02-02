@@ -4,6 +4,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.service.*;
+import com.welfare.service.dto.DecreaseMerchantCredit;
 import com.welfare.service.dto.Deposit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,6 @@ public class DepositServiceImpl implements DepositService {
         deposit.setDepositStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
     }
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deposit(List<Deposit> deposits) {
@@ -65,5 +65,10 @@ public class DepositServiceImpl implements DepositService {
         return Deposit.of(accountBillDetail, account);
     }
 
-
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDeposit(List<Deposit> deposits) {
+        merchantCreditService.batchDecreaseLimit(DecreaseMerchantCredit.of(deposits));
+        accountAmountTypeService.batchUpdateAccountAmountType(deposits);
+    }
 }

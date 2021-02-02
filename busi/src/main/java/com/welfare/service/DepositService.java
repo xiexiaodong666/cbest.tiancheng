@@ -36,4 +36,10 @@ public interface DepositService {
      * @return
      */
     Deposit getByTransNo(String transNo);
+
+    /**
+     * 充值 批量
+     * @param deposits
+     */
+    void batchDeposit(List<Deposit> deposits);
 }

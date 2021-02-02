@@ -43,6 +43,13 @@ public interface AccountAmountTypeService {
     void updateAccountAmountType(Deposit deposit);
 
     /**
+     * 批量更新账户accountAmountType
+     *
+     * @param deposits
+     */
+    void batchUpdateAccountAmountType(List<Deposit> deposits);
+
+    /**
      * 查询指定account的授信额度
      *
      * @param accountCode

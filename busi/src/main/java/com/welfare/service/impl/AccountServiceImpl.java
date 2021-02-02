@@ -63,6 +63,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -318,15 +319,12 @@ public class AccountServiceImpl implements AccountService {
 
       for(Account account : accountList) {
         Optional<AccountBatchImgInfoReq> accountOptional = batchImgInfoListReq.stream().filter(i->i.getPhone().equals(account.getPhone())).findFirst();
-        if(accountOptional.isPresent()) {
-          successList.add(accountOptional.get().getPhone());
-          FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
-          fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
-          fileUniversalStorage.setUrl(accountOptional.get().getUrl());
-          fileUniversalStorage.setDeleted(false);
-          fileUniversalStorageList.add(fileUniversalStorage);
-        }
-
+        successList.add(accountOptional.get().getPhone());
+        FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
+        fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
+        fileUniversalStorage.setUrl(accountOptional.get().getUrl());
+        fileUniversalStorage.setDeleted(false);
+        fileUniversalStorageList.add(fileUniversalStorage);
       }
 
       phones.removeAll(successList);
@@ -370,13 +368,14 @@ public class AccountServiceImpl implements AccountService {
             accountAmountTypeMapper.insert(accountAmountType);
             account.setSurplusQuota(account.getMaxQuota());
         }
+
         FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
         fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
         fileUniversalStorage.setUrl(accountReq.getImgUrl());
         fileUniversalStorage.setDeleted(false);
-
         fileUniversalStorageDao.save(fileUniversalStorage);
         account.setFileUniversalStorageId(fileUniversalStorage.getId());
+
 
         // 添加
         account.setChangeEventId(accountChangeEventRecord.getId());
@@ -459,14 +458,22 @@ public class AccountServiceImpl implements AccountService {
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
 
-            Account account = assemableAccount4update(accountReq);
+          Account account = assemableAccount4update(accountReq);
 
-          FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
-          fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
-          fileUniversalStorage.setUrl(accountReq.getImgUrl());
-          fileUniversalStorage.setDeleted(false);
-          fileUniversalStorageDao.save(fileUniversalStorage);
-          account.setFileUniversalStorageId(fileUniversalStorage.getId());
+          // 上传照片
+          if(oldAccount.getFileUniversalStorageId() != null) {
+            FileUniversalStorage fileUniversalStorage = fileUniversalStorageDao.getById(oldAccount.getFileUniversalStorageId());
+            fileUniversalStorage.setUrl(accountReq.getImgUrl());
+            fileUniversalStorageDao.updateById(fileUniversalStorage);
+          } else {
+            FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
+            fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
+            fileUniversalStorage.setUrl(accountReq.getImgUrl());
+            fileUniversalStorage.setDeleted(false);
+            fileUniversalStorageDao.save(fileUniversalStorage);
+            account.setFileUniversalStorageId(fileUniversalStorage.getId());
+          }
+
             validationAccount(account, false);
 
             //记录变更时间离线支付用

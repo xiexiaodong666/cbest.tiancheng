@@ -14,6 +14,7 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.StoreConsumeTypeDTO;
 import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreImportDTO;
 import jodd.util.StringUtil;
@@ -59,6 +60,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   public void invoke(SupplierStoreImportDTO storeImportDTO, AnalysisContext analysisContext) {
     SupplierStoreAddDTO store = new SupplierStoreAddDTO();
     BeanUtils.copyProperties(storeImportDTO, store);
+    List<StoreConsumeTypeDTO> storeConsumeTypeDTOList = new ArrayList<>();
 
     Integer row=analysisContext.readRowHolder().getRowIndex()+1;
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
@@ -89,10 +91,10 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     if(!excelAllType.containsAll(consumTypes)){
       uploadInfo.append("第").append(row.toString()).append("行").append("未输入正确的消费类型").append(";");
     }
-    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
+/*    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
             &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
       uploadInfo.append("第").append(row.toString()).append("行").append("线上商城和O2O不能同时选择").append(";");
-    }
+    }*/
 
     if(consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())) {
       if (EmptyChecker.isEmpty(storeImportDTO.getO2oCashierNo())) {
@@ -106,6 +108,10 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         if(!storeImportDTO.getO2oCashierNo().matches(regex)){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
         }
+        StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
+        storeConsumeTypeDTO.setConsumeType(ConsumeTypeEnum.O2O.getCode());
+        storeConsumeTypeDTO.setCashierNo(storeImportDTO.getO2oCashierNo());
+        storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
       }
     } else {
       if(EmptyChecker.notEmpty(storeImportDTO.getO2oCashierNo())){
@@ -114,17 +120,22 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     }
 
     if(consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType())) {
-      if (EmptyChecker.isEmpty(storeImportDTO.getO2oCashierNo())) {
+      if (EmptyChecker.isEmpty(storeImportDTO.getOnlineCashierNo())) {
         uploadInfo.append("第").append(row.toString()).append("行").append("线上商城必须输入虚拟收银机号")
             .append(";");
       } else {
-        if(storeImportDTO.getO2oCashierNo().length()>255){
+        if(storeImportDTO.getOnlineCashierNo().length()>255){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
         }
         String regex = "^[V][0-9]{3}+$";
-        if(!storeImportDTO.getO2oCashierNo().matches(regex)){
+        if(!storeImportDTO.getOnlineCashierNo().matches(regex)){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
         }
+
+        StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
+        storeConsumeTypeDTO.setConsumeType(ConsumeTypeEnum.ONLINE_MALL.getCode());
+        storeConsumeTypeDTO.setCashierNo(storeImportDTO.getOnlineCashierNo());
+        storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
       }
     } else {
       if(EmptyChecker.notEmpty(storeImportDTO.getO2oCashierNo())){
@@ -157,7 +168,9 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         uploadInfo.append("第").append(row.toString()).append("行").append("只有O2O门店可以填写自提点").append(";");
       }
       }
-    store.setCashierNo(store.getCashierNo());
+    // store.setCashierNo(store.getCashierNo());
+
+    store.setStoreConsumeTypeList(storeConsumeTypeDTOList);
     store.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transferWithExcel(consumTypes)));
     list.add(store);
     merCodeList.add(store.getMerCode());

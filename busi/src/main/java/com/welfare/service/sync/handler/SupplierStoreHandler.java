@@ -5,15 +5,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.MerchantAddressDTO;
+import com.welfare.service.dto.StoreConsumeTypeDTO;
 import com.welfare.service.dto.SupplierStoreSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
+import com.welfare.service.remote.entity.StoreShoppingReq.ListBean.ConsumeSettingsBean;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
@@ -68,6 +71,8 @@ public class SupplierStoreHandler {
         List<StoreShoppingReq.ListBean> listBeans = new ArrayList<>();
         List<String> storeCodeList = new ArrayList<>();
         for (SupplierStoreSyncDTO supplierStoreDetailDTO : supplierStoreDetailDTOS) {
+            List<ConsumeSettingsBean> consumeSettings = new ArrayList<>();
+
             StoreShoppingReq.ListBean listBean = new StoreShoppingReq.ListBean();
             Map<String, Boolean> consumeTypeMap = null;
             try {
@@ -76,11 +81,26 @@ public class SupplierStoreHandler {
             } catch (JsonProcessingException e) {
                 throw new BusiException("同步门店信息到商城中心，消费类型转换失败【"+supplierStoreDetailDTO.getConsumType()+"】");
             }
-            listBean.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
+            if(consumeTypeMap!= null && consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+                ConsumeSettingsBean consumeSettingsBean = new ConsumeSettingsBean();
+                consumeSettingsBean.setConsumeType(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+                consumeSettings.add(consumeSettingsBean);
+            }
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
             listBean.setStoreName(supplierStoreDetailDTO.getStoreName());
             listBean.setStoreCode(supplierStoreDetailDTO.getStoreCode());
-            listBean.setCashierNo(supplierStoreDetailDTO.getCashierNo());
+            if(EmptyChecker.notEmpty(supplierStoreDetailDTO.getStoreConsumeTypeList())) {
+
+                for (StoreConsumeTypeDTO storeConsumeTypeDTO:
+                supplierStoreDetailDTO.getStoreConsumeTypeList()) {
+                    ConsumeSettingsBean consumeSettingsBean = new ConsumeSettingsBean();
+                    consumeSettingsBean.setCashierNo(storeConsumeTypeDTO.getCashierNo());
+                    consumeSettingsBean.setConsumeType(storeConsumeTypeDTO.getConsumeType());
+                    consumeSettings.add(consumeSettingsBean);
+                }
+                listBean.setConsumeSettings(consumeSettings);
+            }
+            // listBean.setCashierNo(supplierStoreDetailDTO.getCashierNo());
             listBean.setEnabled(supplierStoreDetailDTO.getStatus().equals(1));
             //门店相关地址
             List<StoreShoppingReq.ListBean.AddressBean> addressBeans = new ArrayList<>();
@@ -88,7 +108,7 @@ public class SupplierStoreHandler {
                 for (MerchantAddressDTO addressDTO : supplierStoreDetailDTO.getAddressList()) {
                     StoreShoppingReq.ListBean.AddressBean addressBean = new StoreShoppingReq.ListBean.AddressBean();
                     addressBean.setAddress(addressDTO.getAddress());
-                    addressBean.setAddressType(addressDTO.getAddressType());
+                    // addressBean.setAddressType(addressDTO.getAddressType());
                     addressBean.setName(addressDTO.getAddressName());
                     addressBeans.add(addressBean);
                 }

@@ -85,4 +85,6 @@ public class AccountDetailMapperDTO {
   private Integer binding;
 
   private Integer credit;
+
+  private String imgUrl;
 }

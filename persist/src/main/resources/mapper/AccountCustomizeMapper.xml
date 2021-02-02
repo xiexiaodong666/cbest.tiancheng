@@ -356,12 +356,15 @@
     a.remark,
     a.phone,
     a.binding,
-    a.credit
+    a.credit,
+    f.url as imgUrl
     FROM
     account a
     LEFT JOIN department d ON a.store_code = d.department_code
     LEFT JOIN merchant m ON a.mer_code = m.mer_code
     LEFT JOIN account_type AT ON AT.type_code = a.account_type_code and a.mer_code = at.mer_code
+    LEFT JOIN file_universal_storage f  ON f.id =  a.file_universal_storage_id
+
     WHERE
     a.deleted = 0
 
@@ -394,12 +397,15 @@
            a.surplus_quota   AS surplusQuota,
            a.account_balance AS accountBalance,
            a.remark,
-           a.phone
+           a.phone,
+           f.url as imgUrl
+
     FROM account a
            LEFT JOIN department d ON a.store_code = d.department_code
            LEFT JOIN merchant m ON a.mer_code = m.mer_code
            LEFT JOIN account_type AT
     ON AT.type_code = a.account_type_code and a.mer_code = at.mer_code
+    			 LEFT JOIN file_universal_storage f  ON f.id =  a.file_universal_storage_id
     WHERE
       a.deleted = 0
       AND a.phone = #{phone}

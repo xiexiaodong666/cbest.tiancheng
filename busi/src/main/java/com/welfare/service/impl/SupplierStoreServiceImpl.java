@@ -571,10 +571,9 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean saveStoreConsumeType = true;
     List<StoreConsumeType> storeConsumeTypeList = new ArrayList<>();
     List<StoreConsumeTypeDTO> consumeTypeDTOList = supplierStore.getStoreConsumeTypeList();
+
+    storeConsumeTypeService.removeByStore(entity.getStoreCode());
     if(CollectionUtils.isNotEmpty(consumeTypeDTOList)) {
-
-      storeConsumeTypeService.removeByStore(entity.getStoreCode());
-
       for (StoreConsumeTypeDTO storeConsumeTypeDTO:
           consumeTypeDTOList) {
         StoreConsumeType storeConsumeType = new StoreConsumeType();

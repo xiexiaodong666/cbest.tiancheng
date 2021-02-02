@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.ConsumeTypesUtils;
@@ -70,19 +71,24 @@ public class SupplierStoreHandler {
         List<StoreShoppingReq.ListBean> listBeans = new ArrayList<>();
         List<String> storeCodeList = new ArrayList<>();
         for (SupplierStoreSyncDTO supplierStoreDetailDTO : supplierStoreDetailDTOS) {
+            List<ConsumeSettingsBean> consumeSettings = new ArrayList<>();
+
             StoreShoppingReq.ListBean listBean = new StoreShoppingReq.ListBean();
-          /*  Map<String, Boolean> consumeTypeMap = null;
+            Map<String, Boolean> consumeTypeMap = null;
             try {
                 consumeTypeMap = mapper.readValue(
                         supplierStoreDetailDTO.getConsumType(), Map.class);
             } catch (JsonProcessingException e) {
                 throw new BusiException("同步门店信息到商城中心，消费类型转换失败【"+supplierStoreDetailDTO.getConsumType()+"】");
-            }*/
-            // listBean.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
+            }
+            if(consumeTypeMap!= null && consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+                ConsumeSettingsBean consumeSettingsBean = new ConsumeSettingsBean();
+                consumeSettingsBean.setConsumeType(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+                consumeSettings.add(consumeSettingsBean);
+            }
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
             listBean.setStoreName(supplierStoreDetailDTO.getStoreName());
             listBean.setStoreCode(supplierStoreDetailDTO.getStoreCode());
-            List<ConsumeSettingsBean> consumeSettings = new ArrayList<>();
             if(EmptyChecker.notEmpty(supplierStoreDetailDTO.getStoreConsumeTypeList())) {
 
                 for (StoreConsumeTypeDTO storeConsumeTypeDTO:

@@ -51,8 +51,8 @@ public class OrderController implements IController {
     private OrderServiceImpl orderService;
 
     @ApiOperation("分页查看线下订单")
-    @GetMapping("page")
-    public R<PageVo<OrderRespDto>> selectByPage(OrderReqDto orderReqDto){
+    @RequestMapping(value = "page" , method = RequestMethod.POST)
+    public R<PageVo<OrderRespDto>> selectByPage(@RequestBody OrderReqDto orderReqDto){
         PageVo<OrderRespDto> resultPage = new PageVo<>();
         if (StringUtils.isNotBlank(orderReqDto.getType())){
             if ("SUPPLIER".equals(orderReqDto.getType())){
@@ -91,7 +91,7 @@ public class OrderController implements IController {
             PageVo.Ext ext1 = new PageVo.Ext();
             if (orderSummary != null){
                 ext1.setAmount(orderSummary.getOrderAmount() == null ? "0": orderSummary.getOrderAmount());
-                ext1.setOrderNum(orderSummary.getOrderNum()== null ? 0 : orderSummary.getOrderNum());
+                ext1.setOrderNum(orderSummary.getOrderNum() == null? 0 :orderSummary.getOrderNum() );
                 resultPage.setExt(ext1);
             }
         }else{
@@ -116,7 +116,7 @@ public class OrderController implements IController {
     }
 
     @ApiOperation("查询所有线下订单")
-    @GetMapping("select/list")
+    @RequestMapping(value = "select/list" , method = RequestMethod.POST)
     public R<List<OrderRespDto>> selectList(OrderReqDto orderReqDto){
         MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
         if (merchantUserInfo != null && StringUtils.isNotBlank(merchantUserInfo.getMerchantCode())){

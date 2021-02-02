@@ -81,73 +81,73 @@
 
     <select id="searchOrderSum" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.entity.OrderSummary">
         select sum(orderAmount) as orderAmount , sum(orderNum) as orderNum from (
-            select case trans_type
-            when "consume" then sum(trans_amount)
-            else (-1) * sum(trans_amount)
-            end
-            as orderAmount,
-            count(*) AS orderNum
-            from (
-            SELECT
-                oi.order_id ,
-                t.mer_code AS accountMerCode,
-                t.account_code AS accountCode,
-                t.account_name AS accountName,
-                s.mer_code AS supplierMerCode,
-                m.mer_name AS supplierMername,
-                s.store_code AS storeCode,
-                s.store_name AS sotreName,
-                ab.trans_amount,
-                ab.trans_type
-            FROM
-            (select account_code,sum(trans_amount) as trans_amount ,
+        select case trans_type
+        when "consume" then sum(trans_amount)
+        else (-1) * sum(trans_amount)
+        end
+        as orderAmount,
+        count(*) AS orderNum
+        from (
+        SELECT
+        oi.order_id ,
+        t.mer_code AS accountMerCode,
+        t.account_code AS accountCode,
+        t.account_name AS accountName,
+        s.mer_code AS supplierMerCode,
+        m.mer_name AS supplierMername,
+        s.store_code AS storeCode,
+        s.store_name AS sotreName,
+        ab.trans_amount,
+        ab.trans_type
+        FROM
+        (select account_code,sum(trans_amount) as trans_amount ,
         trans_no , max(trans_time) as trans_time ,store_code,trans_type
         from account_bill_detail
         where trans_type in ('consume','refund')
         and order_channel = "SHOP_CONSUMPTION"
         group by trans_no , store_code , trans_type,account_code) ab
-            LEFT JOIN account t on ab.account_code = t.account_code
-            LEFT JOIN supplier_store s on ab.store_code = s.store_code
-            LEFT JOIN merchant m on s.mer_code = m.mer_code
-            LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
-            <where>
-                <if test="orderPageQuery.accountName != null">
-                    and t.account_name = #{orderPageQuery.accountName}
-                </if>
-                <if test="orderPageQuery.storeList != null and orderPageQuery.storeList.size >0">
-                    <!--只有员工卡支付方式返利-->
-                    AND ab.store_code in
-                    <foreach collection="orderPageQuery.storeList" item="item" index="index" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-                <if test="orderPageQuery.orderId != null">
-                    and oi.order_id = #{orderPageQuery.orderId}
-                </if>
-                <if test="orderPageQuery.lowPrice != null">
-                    and ab.trans_amount &gt;= #{orderPageQuery.lowPrice}
-                </if>
-                <if test="orderPageQuery.highPrice != null">
-                    and ab.trans_amount &lt;= #{orderPageQuery.highPrice}
-                </if>
-                <if test="orderPageQuery.startDateTime != null">
-                    and trans_time &gt;= #{orderPageQuery.startDateTime}
-                </if>
-                <if test="orderPageQuery.endDateTime != null">
-                    and trans_time &lt;= #{orderPageQuery.endDateTime}
-                </if>
-                <if test="orderPageQuery.supplierMerCode != null">
-                    and m.mer_code = #{orderPageQuery.supplierMerCode}
-                </if>
-            </where>
-            ) tt LEFT JOIN merchant mm
-            on tt.accountMerCode = mm.mer_code
-            <where>
-                <if test="orderPageQuery.merchantCode != null">
-                    tt.accountMerCode = #{orderPageQuery.merchantCode}
-                </if>
-            </where>
-            group by trans_type
+        LEFT JOIN account t on ab.account_code = t.account_code
+        LEFT JOIN supplier_store s on ab.store_code = s.store_code
+        LEFT JOIN merchant m on s.mer_code = m.mer_code
+        LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
+        <where>
+            <if test="orderPageQuery.accountName != null">
+                and t.account_name = #{orderPageQuery.accountName}
+            </if>
+            <if test="orderPageQuery.storeList != null and orderPageQuery.storeList.size >0">
+                <!--只有员工卡支付方式返利-->
+                AND ab.store_code in
+                <foreach collection="orderPageQuery.storeList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="orderPageQuery.orderId != null">
+                and oi.order_id = #{orderPageQuery.orderId}
+            </if>
+            <if test="orderPageQuery.lowPrice != null">
+                and ab.trans_amount &gt;= #{orderPageQuery.lowPrice}
+            </if>
+            <if test="orderPageQuery.highPrice != null">
+                and ab.trans_amount &lt;= #{orderPageQuery.highPrice}
+            </if>
+            <if test="orderPageQuery.startDateTime != null">
+                and trans_time &gt;= #{orderPageQuery.startDateTime}
+            </if>
+            <if test="orderPageQuery.endDateTime != null">
+                and trans_time &lt;= #{orderPageQuery.endDateTime}
+            </if>
+            <if test="orderPageQuery.supplierMerCode != null">
+                and m.mer_code = #{orderPageQuery.supplierMerCode}
+            </if>
+        </where>
+        ) tt LEFT JOIN merchant mm
+        on tt.accountMerCode = mm.mer_code
+        <where>
+            <if test="orderPageQuery.merchantCode != null">
+                tt.accountMerCode = #{orderPageQuery.merchantCode}
+            </if>
+        </where>
+        group by trans_type
         )t
     </select>
 
@@ -155,7 +155,7 @@
         order_info
     </sql>
 
-	<!--查询订单-->
+    <!--查询订单-->
     <sql id="baseColumn">
         id,order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,
         account_name,card_id,order_amount,order_time,pay_code,pay_name,trans_type,trans_type_name,
@@ -163,82 +163,82 @@
     </sql>
 
     <!--&lt;!&ndash;查询订单&ndash;&gt;
-    <select id="searchOrder" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.entity.OrderInfo">
-        select
-        id,order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,
-        account_name,card_id,
-        case trans_type
-        when "refund" then (-1) * order_amount
-        else order_amount
-        end
-        as order_amount,order_time,pay_code,pay_name,trans_type,trans_type_name,
-        create_user,create_time
-        from order_info
-        <where>
-            <if test="orderPageQuery.orderId != null">
-                and order_id = #{orderPageQuery.orderId}
-            </if>
-            <if test="orderPageQuery.accountName != null">
-                and account_name = #{orderPageQuery.accountName}
-            </if>
-            <if test="orderPageQuery.lowPrice != null">
-                and order_amount &gt;= #{orderPageQuery.lowPrice}
-            </if>
-            <if test="orderPageQuery.highPrice != null">
-                and order_amount &lt;= #{orderPageQuery.highPrice}
-            </if>
-            <if test="orderPageQuery.merchantCode != null">
-                and merchant_code = #{orderPageQuery.merchantCode}
-            </if>
-            <if test="orderPageQuery.accountMerCode != null">
-                and account_mer_code = #{orderPageQuery.accountMerCode}
-            </if>
-            <if test="orderPageQuery.startDateTime != null">
-                and order_time &gt;= #{orderPageQuery.startDateTime}
-            </if>
-            <if test="orderPageQuery.endDateTime != null">
-                and order_time &lt;= #{orderPageQuery.endDateTime}
-            </if>
-            <if test="(orderPageQuery.noRebateStoreList != null and orderPageQuery.noRebateStoreList.size > 0)
-                or  (orderPageQuery.cardRebateStoreList != null and orderPageQuery.cardRebateStoreList.size >0)
-                or (orderPageQuery.otherRebateStoreList != null and orderPageQuery.otherRebateStoreList.size >0 )
-                or (orderPageQuery.allRebateStoreList != null and orderPageQuery.allRebateStoreList.size > 0)">
-                and ( 1 = 1
-                <if test="orderPageQuery.noRebateStoreList != null and orderPageQuery.noRebateStoreList.size > 0">
-                    &lt;!&ndash;没有返利&ndash;&gt;
-                    or (store_code in
-                    <foreach collection="orderPageQuery.noRebateStoreList" item="item" index="index" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                    and pay_code = "5065")
-                </if>
-                <if test="orderPageQuery.cardRebateStoreList != null and orderPageQuery.cardRebateStoreList.size >0">
-                    &lt;!&ndash;只有员工卡支付方式返利&ndash;&gt;
-                    or (1 = 1 and store_code in
-                    <foreach collection="orderPageQuery.cardRebateStoreList" item="item" index="index" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                    and pay_code = "5065")
-                </if>
-                <if test="orderPageQuery.otherRebateStoreList != null and orderPageQuery.otherRebateStoreList.size >0">
-                    &lt;!&ndash;只有员工卡支付方式返利&ndash;&gt;
-                    or (1 = 1 and store_code in
-                    <foreach collection="orderPageQuery.otherRebateStoreList" item="item" index="index" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                    and pay_code != "5065")
-                </if>
-                <if test="orderPageQuery.allRebateStoreList != null and orderPageQuery.allRebateStoreList.size > 0">
-                    &lt;!&ndash;员工卡支付和其他支付方式返利&ndash;&gt;
-                    or store_code in
-                    <foreach collection="orderPageQuery.allRebateStoreList" item="item" index="index" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-                )
-            </if>
-        </where>
-    </select>
+   <select id="searchOrder" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.entity.OrderInfo">
+       select
+       id,order_id,goods,merchant_code,merchant_name,store_code,store_name,account_code,
+       account_name,card_id,
+       case trans_type
+       when "refund" then (-1) * order_amount
+       else order_amount
+       end
+       as order_amount,order_time,pay_code,pay_name,trans_type,trans_type_name,
+       create_user,create_time
+       from order_info
+       <where>
+           <if test="orderPageQuery.orderId != null">
+               and order_id = #{orderPageQuery.orderId}
+           </if>
+           <if test="orderPageQuery.accountName != null">
+               and account_name = #{orderPageQuery.accountName}
+           </if>
+           <if test="orderPageQuery.lowPrice != null">
+               and order_amount &gt;= #{orderPageQuery.lowPrice}
+           </if>
+           <if test="orderPageQuery.highPrice != null">
+               and order_amount &lt;= #{orderPageQuery.highPrice}
+           </if>
+           <if test="orderPageQuery.merchantCode != null">
+               and merchant_code = #{orderPageQuery.merchantCode}
+           </if>
+           <if test="orderPageQuery.accountMerCode != null">
+               and account_mer_code = #{orderPageQuery.accountMerCode}
+           </if>
+           <if test="orderPageQuery.startDateTime != null">
+               and order_time &gt;= #{orderPageQuery.startDateTime}
+           </if>
+           <if test="orderPageQuery.endDateTime != null">
+               and order_time &lt;= #{orderPageQuery.endDateTime}
+           </if>
+           <if test="(orderPageQuery.noRebateStoreList != null and orderPageQuery.noRebateStoreList.size > 0)
+               or  (orderPageQuery.cardRebateStoreList != null and orderPageQuery.cardRebateStoreList.size >0)
+               or (orderPageQuery.otherRebateStoreList != null and orderPageQuery.otherRebateStoreList.size >0 )
+               or (orderPageQuery.allRebateStoreList != null and orderPageQuery.allRebateStoreList.size > 0)">
+               and ( 1 = 1
+               <if test="orderPageQuery.noRebateStoreList != null and orderPageQuery.noRebateStoreList.size > 0">
+                   &lt;!&ndash;没有返利&ndash;&gt;
+                   or (store_code in
+                   <foreach collection="orderPageQuery.noRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                       #{item}
+                   </foreach>
+                   and pay_code = "5065")
+               </if>
+               <if test="orderPageQuery.cardRebateStoreList != null and orderPageQuery.cardRebateStoreList.size >0">
+                   &lt;!&ndash;只有员工卡支付方式返利&ndash;&gt;
+                   or (1 = 1 and store_code in
+                   <foreach collection="orderPageQuery.cardRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                       #{item}
+                   </foreach>
+                   and pay_code = "5065")
+               </if>
+               <if test="orderPageQuery.otherRebateStoreList != null and orderPageQuery.otherRebateStoreList.size >0">
+                   &lt;!&ndash;只有员工卡支付方式返利&ndash;&gt;
+                   or (1 = 1 and store_code in
+                   <foreach collection="orderPageQuery.otherRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                       #{item}
+                   </foreach>
+                   and pay_code != "5065")
+               </if>
+               <if test="orderPageQuery.allRebateStoreList != null and orderPageQuery.allRebateStoreList.size > 0">
+                   &lt;!&ndash;员工卡支付和其他支付方式返利&ndash;&gt;
+                   or store_code in
+                   <foreach collection="orderPageQuery.allRebateStoreList" item="item" index="index" open="(" separator="," close=")">
+                       #{item}
+                   </foreach>
+               </if>
+               )
+           </if>
+       </where>
+   </select>
 -->
     <!--订单分页查询，从支付流水作为源-->
     <!--<select id="searchOrderSum" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.entity.OrderSummary">
@@ -315,8 +315,7 @@
                 </if>
             </where>
             group by trans_type
-
-        )t
+         )t
     </select>-->
 
     <insert id="saveOrUpdate" parameterType="list" >

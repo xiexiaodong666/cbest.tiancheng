@@ -464,6 +464,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
           StoreConsumeType storeConsumeType = new StoreConsumeType();
           storeConsumeType.setCashierNo(storeConsumeTypeDTO.getCashierNo());
           storeConsumeType.setConsumType(storeConsumeTypeDTO.getConsumeType());
+          storeConsumeType.setStoreCode(store.getStoreCode());
           storeConsumeType.setDeleted(false);
           storeConsumeTypeList.add(storeConsumeType);
         }

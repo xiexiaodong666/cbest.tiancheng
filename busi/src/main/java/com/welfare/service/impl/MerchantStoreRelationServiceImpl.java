@@ -344,7 +344,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if(CollectionUtils.isNotEmpty(merchantStoreRelations))
 
   {
-    updateBatch = merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelations);
+    updateBatch = merchantStoreRelationDao.updateBatchById(merchantStoreRelations);
   }
     if(CollectionUtils.isNotEmpty(merchantStoreRelationNewList))
 

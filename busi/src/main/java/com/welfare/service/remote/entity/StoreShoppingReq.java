@@ -26,12 +26,9 @@ public class StoreShoppingReq implements Serializable {
     private String storeCode;
     private List<AddressBean> address;
     private List<ConsumeSettingsBean> consumeSettings;
-
-    private List<String> consumeTypes;
     @Data
     public static class AddressBean  {
       private String address;
-      private String addressType;
       private String name;
     }
 

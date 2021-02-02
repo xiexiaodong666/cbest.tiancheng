@@ -71,14 +71,14 @@ public class SupplierStoreHandler {
         List<String> storeCodeList = new ArrayList<>();
         for (SupplierStoreSyncDTO supplierStoreDetailDTO : supplierStoreDetailDTOS) {
             StoreShoppingReq.ListBean listBean = new StoreShoppingReq.ListBean();
-            Map<String, Boolean> consumeTypeMap = null;
+          /*  Map<String, Boolean> consumeTypeMap = null;
             try {
                 consumeTypeMap = mapper.readValue(
                         supplierStoreDetailDTO.getConsumType(), Map.class);
             } catch (JsonProcessingException e) {
                 throw new BusiException("同步门店信息到商城中心，消费类型转换失败【"+supplierStoreDetailDTO.getConsumType()+"】");
-            }
-            listBean.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
+            }*/
+            // listBean.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
             listBean.setStoreName(supplierStoreDetailDTO.getStoreName());
             listBean.setStoreCode(supplierStoreDetailDTO.getStoreCode());
@@ -102,7 +102,7 @@ public class SupplierStoreHandler {
                 for (MerchantAddressDTO addressDTO : supplierStoreDetailDTO.getAddressList()) {
                     StoreShoppingReq.ListBean.AddressBean addressBean = new StoreShoppingReq.ListBean.AddressBean();
                     addressBean.setAddress(addressDTO.getAddress());
-                    addressBean.setAddressType(addressDTO.getAddressType());
+                    // addressBean.setAddressType(addressDTO.getAddressType());
                     addressBean.setName(addressDTO.getAddressName());
                     addressBeans.add(addressBean);
                 }

@@ -114,9 +114,10 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     RLock lock = DistributedLockUtil.lockFairly(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
                     locks.add(lock);
                 });
+                String merAccountTypeCode = deposits.get(0).getMerAccountTypeCode();
                 List<Long> accountCodes = deposits.stream().map(Deposit::getAccountCode).collect(Collectors.toList());
                 Map<Long, Account> accountMap = accountDao.mapByAccountCodes(accountCodes);
-                Map<Long, AccountAmountType> accountAmountTypeMap = accountAmountTypeDao.mapByAccountCodes(accountCodes);
+                Map<Long, AccountAmountType> accountAmountTypeMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, merAccountTypeCode);
                 List<AccountDeductionDetail> deductionDetails = new ArrayList<>();
                 List<AccountChangeEventRecord> records = new ArrayList<>();
                 List<AccountBillDetail> details = new ArrayList<>();
@@ -149,8 +150,8 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 }
                 accountAmountTypeDao.updateBatchById(accountAmountTypeMap.values(), accountAmountTypeMap.size());
                 accountDao.updateBatchById(accountMap.values(), accountMap.size());
-                accountDeductionDetailDao.updateBatchById(deductionDetails, deductionDetails.size());
-                accountChangeEventRecordDao.updateBatchById(records, records.size());
+                accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());
+                accountChangeEventRecordDao.saveBatch(records, records.size());
                 accountBillDetailDao.saveBatch(details, details.size());
                 orderTransRelationDao.saveBatch(relations, relations.size());
             } finally {

@@ -43,7 +43,7 @@ public interface AccountAmountTypeService {
     void updateAccountAmountType(Deposit deposit);
 
     /**
-     * 批量更新账户accountAmountType
+     * 批量更新账户accountAmountType(目前只支持对同一个余额类型操作)
      *
      * @param deposits
      */

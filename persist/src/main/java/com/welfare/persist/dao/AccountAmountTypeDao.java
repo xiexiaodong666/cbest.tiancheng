@@ -37,12 +37,14 @@ public class AccountAmountTypeDao extends ServiceImpl<AccountAmountTypeMapper, A
     /**
      * 根据账户号查询AccountAmountType map
      * @param accountCodes
+     * @param merAccountTypeCode
      * @return
      */
-    public Map<Long, AccountAmountType> mapByAccountCodes(List<Long> accountCodes){
+    public Map<Long, AccountAmountType> mapByAccountCodes(List<Long> accountCodes, String merAccountTypeCode){
         Map<Long, AccountAmountType> map = new HashMap<>();
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.in(AccountAmountType.ACCOUNT_CODE, accountCodes);
+        queryWrapper.eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, merAccountTypeCode);
         List<AccountAmountType> list = list(queryWrapper);
         if (CollectionUtils.isNotEmpty(list)) {
             map = list.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, a -> a,(k1, k2)->k1));

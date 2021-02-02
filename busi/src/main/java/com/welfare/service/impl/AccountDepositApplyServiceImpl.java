@@ -372,9 +372,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 });
             }
             // 修改申请主表
-            accountDepositApplyDao.saveOrUpdate(apply);
+            accountDepositApplyDao.updateById(apply);
             // 更新申请明细充值状态
-            accountDepositApplyDetailDao.saveOrUpdateBatch(details);
+            accountDepositApplyDetailDao.updateBatchById(details);
             return apply.getId();
         } catch (Exception e) {
             log.error("审批员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);

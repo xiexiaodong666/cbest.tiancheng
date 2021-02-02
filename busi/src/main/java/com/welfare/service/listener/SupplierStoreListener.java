@@ -120,21 +120,21 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     }
 
     if(consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType())) {
-      if (EmptyChecker.isEmpty(storeImportDTO.getO2oCashierNo())) {
+      if (EmptyChecker.isEmpty(storeImportDTO.getOnlineCashierNo())) {
         uploadInfo.append("第").append(row.toString()).append("行").append("线上商城必须输入虚拟收银机号")
             .append(";");
       } else {
-        if(storeImportDTO.getO2oCashierNo().length()>255){
+        if(storeImportDTO.getOnlineCashierNo().length()>255){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
         }
         String regex = "^[V][0-9]{3}+$";
-        if(!storeImportDTO.getO2oCashierNo().matches(regex)){
+        if(!storeImportDTO.getOnlineCashierNo().matches(regex)){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
         }
 
         StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
         storeConsumeTypeDTO.setConsumeType(ConsumeTypeEnum.ONLINE_MALL.getCode());
-        storeConsumeTypeDTO.setCashierNo(storeImportDTO.getO2oCashierNo());
+        storeConsumeTypeDTO.setCashierNo(storeImportDTO.getOnlineCashierNo());
         storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
       }
     } else {

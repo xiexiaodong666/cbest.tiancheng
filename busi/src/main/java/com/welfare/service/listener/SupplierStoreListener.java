@@ -91,10 +91,10 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     if(!excelAllType.containsAll(consumTypes)){
       uploadInfo.append("第").append(row.toString()).append("行").append("未输入正确的消费类型").append(";");
     }
-    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
+/*    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
             &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
       uploadInfo.append("第").append(row.toString()).append("行").append("线上商城和O2O不能同时选择").append(";");
-    }
+    }*/
 
     if(consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())) {
       if (EmptyChecker.isEmpty(storeImportDTO.getO2oCashierNo())) {

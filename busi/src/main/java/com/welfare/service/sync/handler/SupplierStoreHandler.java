@@ -85,6 +85,7 @@ public class SupplierStoreHandler {
                 ConsumeSettingsBean consumeSettingsBean = new ConsumeSettingsBean();
                 consumeSettingsBean.setConsumeType(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
                 consumeSettings.add(consumeSettingsBean);
+                listBean.setConsumeSettings(consumeSettings);
             }
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
             listBean.setStoreName(supplierStoreDetailDTO.getStoreName());

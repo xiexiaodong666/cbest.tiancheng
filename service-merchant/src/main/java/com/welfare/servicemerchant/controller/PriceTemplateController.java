@@ -129,15 +129,15 @@ public class PriceTemplateController implements IController {
    * @param storeCode
    * @return
    */
-  @PostMapping("terminal/all/{storeCode}")
+  @PostMapping("/all/{storeCode}")
   @MerchantUser
-  @ApiOperation("查询收银机价格模板")
-  R<List<PosTerminalPriceTemplateResp>> allTerminalPriceTemplate(@PathVariable("storeCode") String storeCode){
-    TerminalPriceTemplateQueryReq req = new TerminalPriceTemplateQueryReq();
+  @ApiOperation("查询价格模板")
+  R<List<PriceTemplateBrief>> allTerminalPriceTemplate(@PathVariable("storeCode") String storeCode){
+    PriceTemplateQueryReq req = new PriceTemplateQueryReq();
     req.setStoreCode(storeCode);
     req.setCurrent(1);
     req.setSize(999);
-    R<Page<PosTerminalPriceTemplateResp>> r = listTerminalPriceTemplate(req);
+    R<Page<PriceTemplateBrief>> r = listPriceTemplate(req);
     if (r.isSuccess()) {
       return success(r.getData() != null ? r.getData().getRecords() : null);
     } else {

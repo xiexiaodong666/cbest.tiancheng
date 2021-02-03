@@ -1,6 +1,7 @@
 package com.welfare.common.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.RedissonLock;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -52,15 +53,25 @@ public class DistributedLockUtil {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCompletion(int status) {
-                    log.info("ready to unlock:{}",lock.getName());
-                    lock.unlock();
-                    log.info("unlocked:{}",lock.getName());
+                    doUnlock(lock);
                 }
             });
         }else{
-            log.info("ready to unlock:{}",lock.getName());
-            lock.unlock();
-            log.info("unlocked:{}",lock.getName());
+            doUnlock(lock);
+        }
+    }
+
+    private static void doUnlock(RLock lock) {
+        if(lock instanceof RedissonLock){
+            log.info("ready to unlock:{}", lock.getName());
+        }else{
+            log.info("ready to unlock multi");
+        }
+        lock.unlock();
+        if(lock instanceof RedissonLock){
+            log.info("unlocked:{}", lock.getName());
+        }else{
+            log.info("unlocked multi");
         }
     }
 }

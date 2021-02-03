@@ -106,18 +106,19 @@ public class AccountConsumeSceneHandler {
 
     //封装map key accountConsumeSceneId value List<AccountConsumeSceneStoreRelation>
     Map<Long,List<AccountConsumeSceneStoreRelation>> sceneRelationMap = new HashMap<Long,List<AccountConsumeSceneStoreRelation>>();
-    accountConsumeSceneEvt.getRelationList().forEach(accountConsumeSceneStoreRelation -> {
-      List<AccountConsumeSceneStoreRelation> relations = sceneRelationMap.get(accountConsumeSceneStoreRelation.getAccountConsumeSceneId());
-      if(CollectionUtils.isEmpty(relations)){
-        relations = new LinkedList<AccountConsumeSceneStoreRelation>();
-        relations.add(accountConsumeSceneStoreRelation);
-        sceneRelationMap.put(accountConsumeSceneStoreRelation.getAccountConsumeSceneId(),relations);
-      }else{
-        relations.add(accountConsumeSceneStoreRelation);
-        sceneRelationMap.put(accountConsumeSceneStoreRelation.getAccountConsumeSceneId(),relations);
-      }
-    });
-
+    if( !shoppingActionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ACCOUNT_CONSUME_SCENE_BATCH_DELETE.getCode()) ){
+      accountConsumeSceneEvt.getRelationList().forEach(accountConsumeSceneStoreRelation -> {
+        List<AccountConsumeSceneStoreRelation> relations = sceneRelationMap.get(accountConsumeSceneStoreRelation.getAccountConsumeSceneId());
+        if(CollectionUtils.isEmpty(relations)){
+          relations = new LinkedList<AccountConsumeSceneStoreRelation>();
+          relations.add(accountConsumeSceneStoreRelation);
+          sceneRelationMap.put(accountConsumeSceneStoreRelation.getAccountConsumeSceneId(),relations);
+        }else{
+          relations.add(accountConsumeSceneStoreRelation);
+          sceneRelationMap.put(accountConsumeSceneStoreRelation.getAccountConsumeSceneId(),relations);
+        }
+      });
+    }
     //封装userRoleBindingList
     accountConsumeSceneList.forEach( accountConsumeScene -> {
       UserRoleBinding userRoleBinding = new UserRoleBinding();

@@ -138,6 +138,14 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     if( updateResult){
       //数据变更
       accountChangeEventRecordService.batchSaveBySceneStoreRelation(updateList);
+      List<Long> deleteIdList = updateList.stream().map(accountConsumeSceneStoreRelation -> {
+        if( StringUtils.isBlank(accountConsumeSceneStoreRelation.getSceneConsumType()) ){
+          return accountConsumeSceneStoreRelation.getId();
+        }else{
+          return null;
+        }
+      }).collect(Collectors.toList());
+      accountConsumeSceneStoreRelationDao.removeByIds(deleteIdList);
       //批量下发数据传的是全量 不支持增量
       List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(merCode);
       applicationContext.publishEvent( AccountConsumeSceneEvt
@@ -151,10 +159,11 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     StringBuilder sb = new StringBuilder();
     Gson gson = new Gson();
     ConsumeTypeJson consumeTypeJson = gson.fromJson(consumeType,ConsumeTypeJson.class);
-    for( int i =0 ; i <selectType.length; i ++  ){
+    for( int i =0 ,t = 0; i <selectType.length; i ++  ){
       String type = selectType[i];
       if( consumeTypeJson.getType(type) ){
-        if( i == 0  ){
+        if( t == 0  ){
+          t++;
           sb.append(type);
         }else{
           sb.append(",").append(type);

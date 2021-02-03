@@ -40,7 +40,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
         RedisTemplate<String,String> redisTemplate = SpringBeanUtils.getBean(StringRedisTemplate.class);
         String expireSecs = SpringBeanUtils.getApplicationContext()
                 .getEnvironment()
-                .getProperty("e-welfare.barcode.expire", "180");
+                .getProperty("e-welfare.barcode.expire", "210");
         String barcodeInRedis = redisTemplate.opsForValue().get("BARCODE:" + barcode);
         if(!StringUtils.isEmpty(barcodeInRedis)){
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"重复的支付条码",null);

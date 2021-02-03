@@ -92,6 +92,10 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     private BigDecimal surplusQuota;
     @ApiModelProperty("订单渠道（o2o,online,shop_shopping）")
     private String orderChannel;
+    @ApiModelProperty("支付方式,二维码、卡、线上")
+    private String paymentType;
+    @ApiModelProperty("支付方式信息，二维码条码或者卡磁条号")
+    private String paymentTypeInfo;
     /**
      * 创建人
      */
@@ -204,5 +208,7 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     */
     public static final String VERSION = "version";
     public static final String ORDER_CHANNEL = "order_channel";
+    public static final String PAYMENT_TYPE = "支付识别信息，二维码或者卡内磁条号";
+    public static final String PAYMENT_TYPE_INFO = "支付识别信息，二维码或者卡内磁条号";
 
 }

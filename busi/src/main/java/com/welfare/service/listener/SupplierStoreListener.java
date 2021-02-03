@@ -20,6 +20,7 @@ import com.welfare.service.dto.SupplierStoreImportDTO;
 import jodd.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -140,6 +141,12 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     } else {
       if(EmptyChecker.notEmpty(storeImportDTO.getOnlineCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
+      }
+    }
+
+    if(Strings.isNotEmpty(storeImportDTO.getOnlineCashierNo()) && Strings.isNotEmpty(storeImportDTO.getO2oCashierNo())) {
+      if(storeImportDTO.getO2oCashierNo().equals(storeImportDTO.getOnlineCashierNo())) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("同一门店下虚拟收银机号不能相同").append(";");
       }
     }
 

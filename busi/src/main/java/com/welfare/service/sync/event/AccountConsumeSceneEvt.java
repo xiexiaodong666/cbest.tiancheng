@@ -26,6 +26,8 @@ import java.util.UUID;
 public class AccountConsumeSceneEvt implements BusEvent {
   private ShoppingActionTypeEnum typeEnum;
   private List<AccountConsumeSceneStoreRelation> relationList;
+  //merCode,accountTypeCodeList 只有在商户消费门店被批量删除时才会使用
+  private String merCode;
 
   @Override
   public Long getSearchKey1() {

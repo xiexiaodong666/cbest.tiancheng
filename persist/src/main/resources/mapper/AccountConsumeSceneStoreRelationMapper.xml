@@ -10,6 +10,18 @@
     id
     ,account_consume_scene_id,store_code,scene_consum_type,create_user,create_time,update_user,update_time,deleted,version
   </sql>
+  <sql id ="baseMapColumn">
+    relation.id,
+           relation.account_consume_scene_id as accountConsumeSceneId,
+           relation.store_code               as storeCode,
+           relation.scene_consum_type        as sceneConsumType,
+           relation.create_user              as createUser,
+           relation.create_time              as createTime,
+           relation.update_user              as updateUser,
+           relation.update_time              as updateTime,
+           relation.deleted,
+           relation.version
+  </sql>
 
   <select id="queryRelationDetail"
     resultType="com.welfare.persist.entity.AccountConsumeSceneStoreRelation">
@@ -53,6 +65,35 @@
       #{item}
     </foreach>
     and acs.deleted = 0 and acssr.deleted = 0
+  </select>
+
+
+  <select id="queryAllRelationList"
+    resultType="com.welfare.persist.entity.AccountConsumeSceneStoreRelation">
+    SELECT
+    acssr.id,
+    acssr.account_consume_scene_id as accountConsumeSceneId,
+    acssr.store_code as storeCode,
+    acssr.scene_consum_type as sceneConsumType,
+    acssr.create_user as createUser,
+    acssr.create_time as createTime,
+    acssr.update_user as updateUser,
+    acssr.update_time as updateTime,
+    acssr.deleted,
+    acssr.version
+    from
+    account_consume_scene_store_relation acssr
+    INNER JOIN account_consume_scene acs on acs.id = acssr.account_consume_scene_id
+    where acs.mer_code = #{merCode} and acs.deleted = 0 and acssr.deleted = 0
+  </select>
+
+
+  <select id="queryDeleteRelationScene" resultType="com.welfare.persist.entity.AccountConsumeSceneStoreRelation">
+    select
+    <include refid="baseMapColumn"/>
+    from  account_consume_scene acs
+    left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
+    where acs.mer_code= #{merCode} and relation.deleted=0
   </select>
 
 </mapper>

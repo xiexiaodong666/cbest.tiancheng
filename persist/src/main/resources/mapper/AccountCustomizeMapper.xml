@@ -7,10 +7,7 @@
   </sql>
 
   <sql id="baseColumn">
-    a
-    .
-    id
-    ,a.account_name,a.account_code,a.account_type_code,a.mer_code,a.store_code,a.account_status,a.staff_status,
+    a.id,a.account_name,a.account_code,a.account_type_code,a.mer_code,a.store_code,a.account_status,a.staff_status,
         a.binding,a.create_user,a.create_time,a.update_user,a.update_time,a.account_balance,a.version,a.phone,a.max_quota,
         a.surplus_quota,a.change_event_id,a.remark,a.deleted
   </sql>
@@ -38,6 +35,17 @@
     <result property="version" column="version"/>
     <result property="changeEventId" column="change_event_id"/>
   </resultMap>
+
+  <select id ="getUpdateAccountByMerCode" resultMap="accountMap">
+    select
+    DISTINCT(a.id) as bsId,
+    <include refid="baseColumn"/>
+    from account a
+    left join account_type at on at.mer_code = a.mer_code and at.type_code = a.account_type_code
+    left join account_consume_scene acs on acs.account_type_code = at.type_code and acs.mer_code = AT.mer_code
+    left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
+    where a.mer_code= #{merCode}
+  </select>
 
   <update id="increaseAccountSurplusQuota">
     UPDATE
@@ -172,7 +180,7 @@
            a.remark
     FROM account a
            LEFT JOIN department d ON a.store_code = d.department_code
-           LEFT JOIN merchant m ON a.mer_code = m.mer_code 
+           LEFT JOIN merchant m ON a.mer_code = m.mer_code
            LEFT JOIN account_type AT
     ON AT.type_code = a.account_type_code and a.mer_code = at.mer_code
     WHERE  a.deleted = 0

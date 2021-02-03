@@ -22,4 +22,7 @@ public interface AccountConsumeSceneStoreRelationMapper extends BaseMapper<Accou
 
   public List<AccountConsumeSceneStoreRelation> queryRelationList(
       @Param("merCode")String merCode,@Param("storeCodeList")List<String> storeCodeList);
+  public List<AccountConsumeSceneStoreRelation> queryAllRelationList(@Param("merCode")String merCode);
+
+  List<AccountConsumeSceneStoreRelation> queryDeleteRelationScene(@Param("merCode")String merCode);
 }

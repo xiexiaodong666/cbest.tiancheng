@@ -14,11 +14,17 @@ import java.util.Map;
 public interface AccountConsumeSceneStoreRelationService {
   public List<AccountConsumeSceneStoreRelation> getListByConsumeSceneId(Long accountConsumeSceneId);
 
-  /**
-   * 门店修改了消费方式,员工类型同步修改消费方式
-   *
-   */
-  public void updateStoreConsumeType(String merCode,String storeCode, String consumeType);
 
+  /**
+   * 批量修改商户关联门店消费场景
+   * @param merCode
+   * @param relationDTOList
+   */
   public void updateStoreConsumeTypeByDTOList(String merCode,List<StoreConsumeRelationDTO> relationDTOList);
+
+  /**
+   * 在商户门店配置列表删除所有的配置消费场景门店
+   * @param merCode
+   */
+  public void deleteConsumeScene(String merCode);
 }

@@ -142,9 +142,9 @@ public class MerchantStoreRelationController implements IController {
   @ApiOperation("修改消费门店配置")
   @ApiUser
   public R<Boolean> updateMerchantStore(
-      @RequestBody MerchantStoreRelationUpdateReq relationUpadateReq) {
+      @RequestBody MerchantStoreRelationUpdateReq relationUpdateReq) {
 
-    return success(merchantStoreRelationService.update(relationUpadateReq));
+    return success(merchantStoreRelationService.update(relationUpdateReq));
   }
 
   @PutMapping("/status")

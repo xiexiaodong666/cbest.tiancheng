@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +40,18 @@ public class AccountDao extends ServiceImpl<AccountMapper, Account> {
         List<Account> list = list(queryWrapper);
         if (CollectionUtils.isNotEmpty(list)) {
             map = list.stream().collect(Collectors.toMap(Account::getAccountCode, a -> a,(k1, k2)->k1));
+        }
+        return map;
+    }
+
+    public Map<String, Account> mapByMerCodeAndPhones(String merCode, Set<String> phones) {
+        Map<String, Account> map = new HashMap<>();
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(Account.PHONE, phones);
+        queryWrapper.eq(Account.MER_CODE, merCode);
+        List<Account> list = list(queryWrapper);
+        if (CollectionUtils.isNotEmpty(list)) {
+            map = list.stream().collect(Collectors.toMap(Account::getPhone, a -> a,(k1, k2)->k1));
         }
         return map;
     }

@@ -7,6 +7,7 @@ import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
+import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -17,8 +18,7 @@ import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.async.AsyncNotificationService;
-import com.welfare.service.dto.payment.CardPaymentRequest;
-import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.dto.payment.*;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
@@ -395,6 +395,18 @@ public class PaymentServiceImpl implements PaymentService {
         accountBillDetail.setStoreCode(paymentRequest.getStoreNo());
         accountBillDetail.setCardId(paymentRequest.getCardNo());
         accountBillDetail.setOrderChannel(paymentRequest.getPaymentScene());
+        if(paymentRequest instanceof CardPaymentRequest){
+            accountBillDetail.setPaymentType(PaymentTypeEnum.CARD.getCode());
+            accountBillDetail.setPaymentTypeInfo(((CardPaymentRequest) paymentRequest).getCardInsideInfo());
+        }else if(paymentRequest instanceof BarcodePaymentRequest){
+            accountBillDetail.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
+            accountBillDetail.setPaymentTypeInfo(((BarcodePaymentRequest) paymentRequest).getBarcode());
+        }else if(paymentRequest instanceof OnlinePaymentRequest){
+            accountBillDetail.setPaymentType(PaymentTypeEnum.ONLINE.getCode());
+        }else if(paymentRequest instanceof DoorAccessPaymentRequest){
+            accountBillDetail.setPaymentType(PaymentTypeEnum.DOOR_ACCESS.getCode());
+        }
+
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
         BigDecimal accountSurplusQuota = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
         accountBillDetail.setAccountBalance(accountBalance);

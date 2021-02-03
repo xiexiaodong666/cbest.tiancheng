@@ -16,6 +16,8 @@ import net.dreamlu.mica.core.result.R;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * 终端相关接口
@@ -120,5 +122,26 @@ public class PriceTemplateController implements IController {
   @ApiOperation("修改收银机价格模板")
   R<PosTerminalPriceTemplateResp> modifyTerminalPriceTemplate(@RequestBody TerminalPriceTemplateUpdateReq req) {
     return success(cbestDmallService.modifyTerminalPriceTemplate(req));
+  }
+
+  /**
+   * 查询收银机价格模板
+   * @param storeCode
+   * @return
+   */
+  @PostMapping("/all/{storeCode}")
+  @MerchantUser
+  @ApiOperation("查询价格模板")
+  R<List<PriceTemplateBrief>> allTerminalPriceTemplate(@PathVariable("storeCode") String storeCode){
+    PriceTemplateQueryReq req = new PriceTemplateQueryReq();
+    req.setStoreCode(storeCode);
+    req.setCurrent(1);
+    req.setSize(999);
+    R<Page<PriceTemplateBrief>> r = listPriceTemplate(req);
+    if (r.isSuccess()) {
+      return success(r.getData() != null ? r.getData().getRecords() : null);
+    } else {
+      return fail(r.getMsg());
+    }
   }
 }

@@ -12,6 +12,8 @@ import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.RedissonLock;
+import org.redisson.RedissonMultiLock;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import sun.swing.BakedArrayList;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
@@ -109,11 +112,14 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     public void batchUpdateAccountAmountType(List<Deposit> deposits) {
         if (!CollectionUtils.isEmpty(deposits)) {
             List<RLock> locks = new ArrayList<>();
+            RLock multiLock = null;
             try {
                 deposits.forEach(deposit -> {
-                    RLock lock = DistributedLockUtil.lockFairly(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
+                    RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
                     locks.add(lock);
                 });
+                multiLock = redissonClient.getMultiLock(locks.toArray(new RLock[]{}));
+                multiLock.lock(-1, TimeUnit.SECONDS);
                 String merAccountTypeCode = deposits.get(0).getMerAccountTypeCode();
                 List<Long> accountCodes = deposits.stream().map(Deposit::getAccountCode).collect(Collectors.toList());
                 Map<Long, Account> accountMap = accountDao.mapByAccountCodes(accountCodes);
@@ -155,7 +161,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 accountBillDetailDao.saveBatch(details, details.size());
                 orderTransRelationDao.saveBatch(relations, relations.size());
             } finally {
-                locks.forEach(DistributedLockUtil::unlock);
+                DistributedLockUtil.unlock(multiLock);
             }
         }
     }

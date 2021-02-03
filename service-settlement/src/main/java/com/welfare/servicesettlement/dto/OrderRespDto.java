@@ -50,4 +50,12 @@ public class OrderRespDto implements Serializable {
     private Date orderTime;
     @ApiModelProperty("电话号码")
     private String phone;
+    @ApiModelProperty("就餐时段")
+    private String timeInterval;
+    @ApiModelProperty("所属组织")
+    private String departmentName;
+    @ApiModelProperty("账户类别")
+    private String accountType;
+    @ApiModelProperty("账号类别名称")
+    private String accountTypeName;
 }

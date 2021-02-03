@@ -45,4 +45,10 @@ public class OrderReqDto implements Serializable {
     private Integer size;
     @ApiModelProperty(value = "调用方[商户端:MERCHANT , 供应商：SUPPLIER , 平台端: PLATFORM]" , required = false)
     private String type;
+    @ApiModelProperty(value = "组织编码" , required = false)
+    private String organizationCode;
+    @ApiModelProperty(value = "用餐时段" , required = false)
+    private Integer timeInterval;
+    @ApiModelProperty(value = "账户类别" , required = false)
+    private String accountType;
 }

@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +13,7 @@ import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
+import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.AdminMerchantStore;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
@@ -28,6 +30,7 @@ import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -53,6 +56,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private final MerchantStoreRelationDao merchantStoreRelationDao;
   private final MerchantStoreRelationMapper merchantStoreRelationMapper;
   private final SupplierStoreService supplierStoreService;
+  private final SupplierStoreDao supplierStoreDao;
+
   private final ObjectMapper mapper;
   private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final ApplicationContext applicationContext;
@@ -339,7 +344,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if(CollectionUtils.isNotEmpty(merchantStoreRelations))
 
   {
-    updateBatch = merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelations);
+    updateBatch = merchantStoreRelationDao.updateBatchById(merchantStoreRelations);
   }
     if(CollectionUtils.isNotEmpty(merchantStoreRelationNewList))
 
@@ -439,10 +444,19 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private boolean validateConsumeType(List<AdminMerchantStore> merchantStoreList) {
 
     boolean validate = true;
+    List<String> storeCodes =  merchantStoreList.stream().map(m->m.getStoreCode()).collect(Collectors.toList());
+    QueryWrapper<SupplierStore> wrapper = new QueryWrapper<>();
+    wrapper.in(SupplierStore.STORE_CODE, storeCodes);
+    List<SupplierStore> supplierStoreList = supplierStoreDao.list(wrapper);
     for (AdminMerchantStore merchantStore :
         merchantStoreList) {
-      SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(
-          merchantStore.getStoreCode());
+      SupplierStore supplierStore;
+      Optional<SupplierStore> supplierStoreOptional = supplierStoreList.stream().filter(s->s.getStoreCode().equals(merchantStore.getStoreCode())).findFirst();
+      if(supplierStoreOptional.isPresent()) {
+        supplierStore = supplierStoreOptional.get();
+      } else {
+        continue;
+      }
       try {
         Map<String, Boolean> consumeTypeMap = mapper.readValue(
             supplierStore.getConsumType(), Map.class);

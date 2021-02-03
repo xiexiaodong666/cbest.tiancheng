@@ -15,6 +15,7 @@ import com.welfare.service.AccountService;
 import com.welfare.service.MerchantBillDetailService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.MerchantService;
+import com.welfare.service.dto.DecreaseMerchantCredit;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
 import com.welfare.service.operator.merchant.*;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -25,15 +26,11 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
@@ -107,8 +104,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     @Transactional(rollbackFor = Exception.class)
     public List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType) {
         AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-        RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
-        lock.lock();
+        RLock lock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         try{
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             List<MerchantAccountOperation> operations = doOperateAccount(merchantCredit, amount, transNo, merAccountTypeOperator, transType);
@@ -120,7 +116,49 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             merchantBillDetailDao.saveBatch(merchantBillDetails);
             return operations;
         } finally {
-            lock.unlock();
+            DistributedLockUtil.unlock(lock);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDecreaseLimit(List<DecreaseMerchantCredit> decreaseMerchantCredits) {
+        if (CollectionUtils.isNotEmpty(decreaseMerchantCredits)) {
+            List<RLock> locks = new ArrayList<>();
+            try {
+                List<MerchantAccountOperation> operations = new ArrayList<>();
+                // 给所有商户加锁
+                for (DecreaseMerchantCredit decrease : decreaseMerchantCredits) {
+                    RLock lock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + decrease.getMerCode());
+                    locks.add(lock);
+                }
+                List<String> merCodeList = decreaseMerchantCredits.stream().map(DecreaseMerchantCredit::getMerCode).collect(Collectors.toList());
+                Map<String, MerchantCredit> merchantCreditMap = merchantCreditDao.mapByMerCodes(merCodeList);
+                for (DecreaseMerchantCredit decreaseMerCredit : decreaseMerchantCredits) {
+                    AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(decreaseMerCredit.getMerCreditType());
+                    MerchantCredit merchantCredit = merchantCreditMap.get(decreaseMerCredit.getMerCode());
+                    if (Objects.isNull(merchantCredit)) {
+                        merchantCredit = this.getByMerCode(decreaseMerCredit.getMerCode());
+                        merchantCreditMap.put(decreaseMerCredit.getMerCode(), merchantCredit);
+                    }
+                    List<MerchantAccountOperation> accountOperations = doOperateAccount(
+                            merchantCredit,
+                            decreaseMerCredit.getAmount(),
+                            decreaseMerCredit.getTransNo(),
+                            merAccountTypeOperator,
+                            decreaseMerCredit.getTransType());
+                    operations.addAll(accountOperations);
+                }
+                // 批量更新金额
+                merchantCreditDao.updateBatchById(merchantCreditMap.values(), merchantCreditMap.size());
+                // 保存流水
+                List<MerchantBillDetail> merchantBillDetails = operations.stream()
+                        .map(MerchantAccountOperation::getMerchantBillDetail)
+                        .collect(Collectors.toList());
+                merchantBillDetailDao.saveBatch(merchantBillDetails);
+            } finally {
+                locks.forEach(DistributedLockUtil::unlock);
+            }
         }
     }
 
@@ -183,8 +221,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             log.warn("该笔结算单已经确认过了,transNo:{}", req.getTransNo());
             return;
         }
-        RLock lock = redissonClient.getFairLock(RESTORE_REMAINING_LIMIT_REQUEST_ID + ":" + req.getTransNo());
-        lock.lock();
+        RLock lock = DistributedLockUtil.lockFairly(RESTORE_REMAINING_LIMIT_REQUEST_ID + ":" + req.getTransNo());
         try{
             details = merchantBillDetailService.findByTransNoAndTransType(
                     req.getTransNo(),

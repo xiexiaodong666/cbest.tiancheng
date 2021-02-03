@@ -43,7 +43,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
                 .getProperty("e-welfare.barcode.expire", "210");
         String barcodeInRedis = redisTemplate.opsForValue().get("BARCODE:" + barcode);
         if(!StringUtils.isEmpty(barcodeInRedis)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"重复的支付条码",null);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该支付码已被使用",null);
         }else{
             redisTemplate.opsForValue().set("BARCODE:"+barcode,barcode,Long.parseLong(expireSecs), TimeUnit.SECONDS);
         }

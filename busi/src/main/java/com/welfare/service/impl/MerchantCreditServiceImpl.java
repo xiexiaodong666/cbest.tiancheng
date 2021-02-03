@@ -128,8 +128,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             try {
                 List<MerchantAccountOperation> operations = new ArrayList<>();
                 // 给所有商户加锁
-                for (DecreaseMerchantCredit decrease : decreaseMerchantCredits) {
-                    RLock lock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + decrease.getMerCode());
+                Set<String> merCodeSet = decreaseMerchantCredits.stream().map(DecreaseMerchantCredit::getMerCode)
+                        .collect(Collectors.toSet());;
+                for (String merCode : merCodeSet) {
+                    RLock lock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
                     locks.add(lock);
                 }
                 List<String> merCodeList = decreaseMerchantCredits.stream().map(DecreaseMerchantCredit::getMerCode).collect(Collectors.toList());

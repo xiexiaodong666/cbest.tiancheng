@@ -20,6 +20,7 @@ import com.welfare.service.*;
 import com.welfare.service.converter.AccountDepositApplyConverter;
 import com.welfare.service.converter.DepositApplyDetailConverter;
 import com.welfare.service.dto.AccountDepositRequest;
+import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.accountapply.*;
 import com.welfare.service.enums.ApprovalStatus;
@@ -476,11 +477,14 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     private List<AccountDepositApplyDetail> assemblyAccountDepositApplyDetailList(AccountDepositApply apply,List<TempAccountDepositApplyDTO> temp) {
         List<AccountDepositApplyDetail> details = new ArrayList<>();
         AccountDepositApplyDetail detail = null;
-        for (TempAccountDepositApplyDTO depositRequest : temp) {
+        // 获取一段序列号
+        BatchSequence batchSequence = sequenceService.batchGenerate(WelfareConstant.SequenceType.DEPOSIT.code(), temp.size());
+        List<Sequence> sequences = batchSequence.getSequences();
+        for (int i = 0; i < temp.size(); i++) {
             detail = new AccountDepositApplyDetail();
-            detail.setAccountCode(depositRequest.getAccountCode());
+            detail.setAccountCode(temp.get(i).getAccountCode());
             detail.setApplyCode(apply.getApplyCode());
-            detail.setRechargeAmount(depositRequest.getRechargeAmount());
+            detail.setRechargeAmount(temp.get(i).getRechargeAmount());
             detail.setRechargeStatus(RechargeStatus.INIT.getCode());
             detail.setDeleted(Boolean.FALSE);
             Date now = new Date();
@@ -489,7 +493,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             detail.setUpdateTime(now);
             detail.setUpdateUser(apply.getApprovalUser());
             detail.setVersion(0);
-            detail.setTransNo(sequenceService.nextNo(WelfareConstant.SequenceType.DEPOSIT.code()) + "");
+            detail.setTransNo(sequences.get(i).getSequenceNo() + "");
             details.add(detail);
         }
         return details;

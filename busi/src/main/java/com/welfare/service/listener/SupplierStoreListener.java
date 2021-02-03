@@ -138,7 +138,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
       }
     } else {
-      if(EmptyChecker.notEmpty(storeImportDTO.getO2oCashierNo())){
+      if(EmptyChecker.notEmpty(storeImportDTO.getOnlineCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
       }
     }

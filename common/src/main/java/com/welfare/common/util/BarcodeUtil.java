@@ -40,13 +40,11 @@ public class BarcodeUtil {
         long rand2 = MathUtil.randomLong(500, 999);
         long mod = secretAccount % rand1;
         long secretResult = secretAccount / rand1 * rand2;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(String.format("%010d",secretResult))
-                .append(rand1)
-                .append(rand2)
-                .append(String.format("%03d",mod));
-        String barcode = "69" + jodd.util.StringUtil.reverse(stringBuilder.toString());
-        return barcode;
+        String stringBuilder = String.format("%010d", secretResult) +
+                rand1 +
+                rand2 +
+                String.format("%03d", mod);
+        return "69" + StringUtil.reverse(stringBuilder);
     }
 
     /**

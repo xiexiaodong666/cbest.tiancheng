@@ -107,12 +107,8 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
 
     @Override
     public void batchUpdateAccountAmountType(List<Deposit> deposits) {
-        RedissonClient redissonClient   = null;
         if (!CollectionUtils.isEmpty(deposits)) {
             List<RLock> locks = new ArrayList<>();
-            RLock multiLock = redissonClient.getMultiLock(locks.toArray(new RLock[]{}));
-            multiLock.lock();
-
             try {
                 deposits.forEach(deposit -> {
                     RLock lock = DistributedLockUtil.lockFairly(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());

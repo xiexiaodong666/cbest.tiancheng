@@ -363,7 +363,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 // 如果审批通过，需要给员工增加余额；减少商户充值额度；保存商户充值额度变动明细
                 List<AccountDepositApplyDetail> existDetails = depositApplyDetailService
                         .listByApplyCodeIfAccountExist(apply.getApplyCode());
-                depositService.batchDeposit(Deposit.of(apply, existDetails));
+                if (CollectionUtils.isNotEmpty(existDetails)) {
+                    depositService.batchDeposit(Deposit.of(apply, existDetails));
+                }
             }
             if (apply.getApprovalStatus().equals(ApprovalStatus.AUDIT_FAILED.getCode())) {
                 apply.setRechargeStatus(RechargeStatus.NO.getCode());

@@ -227,6 +227,9 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
         orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
         orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
+        orderPageQuery.setOrganizationCode(orderReqDto.getOrganizationCode());
+        orderPageQuery.setAccountType(orderReqDto.getAccountType());
+        orderPageQuery.setTimeInterval(orderReqDto.getTimeInterval());
 
         Page<OrderInfoDTO> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
         return orderInfoPage;
@@ -257,6 +260,9 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setHighPrice(orderReqDto.getHightPrice() == null ? null : orderReqDto.getHightPrice().toPlainString());
         orderPageQuery.setStartDateTime((orderReqDto.getStartDateTime()));
         orderPageQuery.setEndDateTime((orderReqDto.getEndDateTime()));
+        orderPageQuery.setOrganizationCode(orderReqDto.getOrganizationCode());
+        orderPageQuery.setAccountType(orderReqDto.getAccountType());
+        orderPageQuery.setTimeInterval(orderReqDto.getTimeInterval());
 
         OrderSummary orderSummary = orderMapper.searchOrderSum( orderPageQuery);
         return orderSummary;
@@ -574,6 +580,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setMerchantCode(merchant != null ? merchant.getMerCode() : null);
             orderInfo.setMerchantName(merchant != null ? merchant.getMerName() : null);
             orderInfo.setOrderAmount(item.getTransAmount());
+            orderInfo.setTimeInterval(item.getTimeInterval());
             orderInfoList.add(orderInfo);
         });
         int count = orderMapper.saveOrUpdate(orderInfoList);

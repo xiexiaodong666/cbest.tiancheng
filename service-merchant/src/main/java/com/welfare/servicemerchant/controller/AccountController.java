@@ -8,6 +8,7 @@ import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.service.AccountService;
 import com.welfare.service.dto.AccountBatchImgDTO;
+import com.welfare.service.dto.AccountBatchImgInfoReq;
 import com.welfare.service.dto.AccountBatchImgReq;
 import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
@@ -23,12 +24,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -61,9 +64,17 @@ public class AccountController implements IController {
 
   @PostMapping("/upload/batch/img")
   @ApiOperation("批量上传员工照片")
-  public R<AccountBatchImgDTO> uploadBatchImg(@RequestBody @Validated AccountBatchImgReq accountBatchImgReq){
+  public R<AccountBatchImgDTO> uploadBatchImg(@RequestBody @Validated AccountBatchImgReq accountBatchImgReq) {
+    accountBatchImgReq.getAccountBatchImgInfoReqList().forEach(c-> {
+      if(c.getPhone().contains(".")) {
+        c.setPhone(c.getPhone().substring(0, c.getPhone().indexOf(".")));
+      }
+    });
 
-    return success(accountService.uploadBatchImg(accountBatchImgReq));
+    AccountBatchImgDTO accountBatchImgDTO = accountService.uploadBatchImg(accountBatchImgReq);
+
+
+    return success(accountBatchImgDTO);
   }
 
   @GetMapping("/syncOldData")

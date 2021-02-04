@@ -318,19 +318,25 @@ public class AccountServiceImpl implements AccountService {
       List<FileUniversalStorage> fileUniversalStorageList = new ArrayList<>();
 
       for(Account account : accountList) {
-        Optional<AccountBatchImgInfoReq> accountOptional = batchImgInfoListReq.stream().filter(i->i.getPhone().equals(account.getPhone())).findFirst();
-        successList.add(accountOptional.get().getPhone());
-        FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
-        fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
-        fileUniversalStorage.setUrl(accountOptional.get().getUrl());
-        fileUniversalStorage.setDeleted(false);
+        AccountBatchImgInfoReq accountOptional = batchImgInfoListReq.stream().filter(i->i.getPhone().equals(account.getPhone())).findFirst().get();
+        successList.add(accountOptional.getPhone());
+        FileUniversalStorage fileUniversalStorage;
+        if(account.getFileUniversalStorageId() != null && account.getFileUniversalStorageId() != 0) {
+          fileUniversalStorage = fileUniversalStorageDao.getById(account.getFileUniversalStorageId());
+          fileUniversalStorage.setUrl(accountOptional.getUrl());
+        } else {
+          fileUniversalStorage = new FileUniversalStorage();
+          fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
+          fileUniversalStorage.setUrl(accountOptional.getUrl());
+          fileUniversalStorage.setDeleted(false);
+        }
         fileUniversalStorageList.add(fileUniversalStorage);
       }
 
       phones.removeAll(successList);
       failList = phones;
 
-      fileUniversalStorageDao.saveBatch(fileUniversalStorageList);
+      fileUniversalStorageDao.saveOrUpdateBatch(fileUniversalStorageList);
       for (int i =0; i< accountList.size(); i++) {
         accountList.get(i).setFileUniversalStorageId(fileUniversalStorageList.get(i).getId());
       }

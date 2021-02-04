@@ -156,7 +156,7 @@ public class PaymentServiceImpl implements PaymentService {
             return paymentRequest;
         } catch (InterruptedException | ExecutionException e) {
             log.error("异步执行查询异常", e);
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, e.getMessage(), e);
+            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(accountLock);
             paymentRequestPerfMonitor.stop();

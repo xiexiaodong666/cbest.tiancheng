@@ -32,4 +32,7 @@ public class SupplierStoreListReq {
 
     @ApiModelProperty("来源")
     private String source;
+
+    @ApiModelProperty("消费方式(SHOP_CONSUMPTION:到店消费, 线上商城:ONLINE_MALL, O2O:线上下单，到店提货)")
+    private String consumType;
 }

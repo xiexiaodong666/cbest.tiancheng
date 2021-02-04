@@ -40,7 +40,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
       List<SupplierStore> supplierStores =  supplierStoreDao
               .listByMerCode(merCode);
       if (CollectionUtils.isEmpty(supplierStores)) {
-        log.warn("商户下没有门店直接返回 请求:{} 商户:{}", JSON.toJSONString(req), merCode);
+        log.warn("商户下没有线下门店直接返回 请求:{} 商户:{}", JSON.toJSONString(req), merCode);
         return toPage(null, req.getPaging());
       }
       req.setStoreCodes(supplierStores.stream().map(SupplierStore::getStoreCode).collect(Collectors.toList()));
@@ -92,7 +92,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
       List<SupplierStore> supplierStores = supplierStoreDao
               .listByMerCode(merCode);
       if (CollectionUtils.isEmpty(supplierStores)) {
-        log.warn("商户下没有门店直接返回 请求:{} 商户:{}", JSON.toJSONString(req), merCode);
+        log.warn("商户下没有线下门店直接返回 请求:{} 商户:{}", JSON.toJSONString(req), merCode);
         return toPage(null, req.getPaging());
       }
       req.setStoreCodes(supplierStores.stream().map(SupplierStore::getStoreCode).collect(Collectors.toList()));

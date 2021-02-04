@@ -196,6 +196,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     List<MerchantStoreRelation> merchantStoreRelationNewList = new ArrayList<>();
     List<Long> deleteIds = new ArrayList<>();
+    List<String> storeCodeList = new ArrayList<>();
+
     List<AdminMerchantStore> adminMerchantStoreList = relationUpdateReq.getAdminMerchantStoreList();
 
     List<AdminMerchantStore> adminMerchantStoreUpdateList = new ArrayList<>();
@@ -317,6 +319,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     } // delete
     else {
+      storeCodeList.add(m.getStoreCode());
       deleteIds.add(m.getId());
       removeMerchantStoreRelationList.add(m);
     }
@@ -339,6 +342,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if(CollectionUtils.isNotEmpty(deleteIds))
 
   {
+    accountConsumeSceneStoreRelationService.deleteConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
     remove = merchantStoreRelationDao.removeByIds(deleteIds);
   }
     if(CollectionUtils.isNotEmpty(merchantStoreRelations))
@@ -390,6 +394,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     }
 
     List<Long> removeIds = new ArrayList<>();
+    List<String> storeCodeList = new ArrayList<>();
 
     if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
       for (MerchantStoreRelation storeRelation :
@@ -397,6 +402,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         if (delete != null) {
           roleConsumptionReq.setActionType(ShoppingActionTypeEnum.DELETE.getCode());
 
+          storeCodeList.add(storeRelation.getStoreCode());
           removeIds.add(storeRelation.getId());
           storeRelation.setSyncStatus(0);
         }
@@ -431,6 +437,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     boolean remove = true;
     if (CollectionUtils.isNotEmpty(removeIds)) {
+      accountConsumeSceneStoreRelationService.deleteConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
       remove = merchantStoreRelationDao.removeByIds(removeIds);
     }
 

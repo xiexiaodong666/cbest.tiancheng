@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SupplierListener {
 
-  @Autowired
+  @Autowired(required = false)
   PersistentBus persistentBus;
 
   @Autowired

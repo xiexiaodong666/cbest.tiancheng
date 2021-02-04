@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AccountConsumeSceneListener {
 
-  @Autowired
+  @Autowired(required = false)
   PersistentBus persistentBus;
 
   @Autowired

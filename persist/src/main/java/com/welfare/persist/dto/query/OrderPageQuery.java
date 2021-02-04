@@ -74,4 +74,10 @@ public class OrderPageQuery {
      */
     private Integer pageSize;
 
+    private Integer timeInterval;
+
+    private String accountType;
+
+    private String organizationCode;
+
 }

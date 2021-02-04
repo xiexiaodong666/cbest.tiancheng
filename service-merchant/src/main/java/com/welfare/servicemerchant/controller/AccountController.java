@@ -62,7 +62,9 @@ public class AccountController implements IController {
   @PostMapping("/upload/batch/img")
   @ApiOperation("批量上传员工照片")
   public R<AccountBatchImgDTO> uploadBatchImg(@RequestBody @Validated AccountBatchImgReq accountBatchImgReq){
-
+    accountBatchImgReq.getAccountBatchImgInfoReqList().forEach(c->{
+      c.setUrl(c.getUrl().substring(0, c.getUrl().indexOf("?")));
+    });
     return success(accountService.uploadBatchImg(accountBatchImgReq));
   }
 

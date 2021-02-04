@@ -1,5 +1,6 @@
 package com.welfare.service.remote;
 
+import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.PlatformUserDataResponse;
 import com.welfare.service.remote.entity.PlatformUserResponse;
 import com.welfare.service.remote.entity.ShoppingPlatformUser;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "platformUser", url = "${platformUser.url}", fallbackFactory = PlatformUserFallback.class)
+@FeignClient(value = "platformUser", url = "${platformUser.url}", fallbackFactory = PlatformUserFallback.class, configuration = {FeignConfiguration.class})
 public interface PlatformUserFeignClient {
 
   /**

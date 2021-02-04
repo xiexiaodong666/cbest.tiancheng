@@ -1,5 +1,6 @@
 package com.welfare.service.remote;
 
+import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.*;
 import com.welfare.service.remote.fallback.ShoppingFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "shopping", url = "${shopping.url:http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base}", fallbackFactory = ShoppingFeignClientFallback.class)
+@FeignClient(value = "shopping", url = "${shopping.url:http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base}", fallbackFactory = ShoppingFeignClientFallback.class, configuration = FeignConfiguration.class)
 public interface ShoppingFeignClient {
 
 

@@ -6,7 +6,7 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
-import com.welfare.servicemerchant.service.sync.event.MerchantStoreRelationEvt;
+import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;

@@ -1,6 +1,7 @@
-package com.welfare.servicemerchant.service.sync.listener;
+package com.welfare.service.sync.listener;
 
-import com.welfare.servicemerchant.service.sync.event.AccountConsumeSceneEvt;
+
+import com.welfare.service.sync.event.MerchantEvt;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
@@ -11,22 +12,26 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+
 /**
- * @author yaoxiao
- * @version 0.0.1
- * @date 2021/1/15 15:25
+ * @author hao.yin
+ * @version 1.0.0
+ * @date 2020/8/5 13:16
  */
 @Component
 @Slf4j
-public class AccountConsumeSceneListener {
+public class MerchantListener {
+
   @Autowired
   PersistentBus persistentBus;
 
   @Autowired
   DataSource dataSource;
+
+
   @EventListener
   @Transactional(rollbackFor = Exception.class)
-  public void onAdd(AccountConsumeSceneEvt evt) throws EventBusException {
+  public void onAdd(MerchantEvt evt) throws EventBusException {
     persistentBus.postFromTransaction(evt, DataSourceUtils.getConnection(dataSource));
   }
 }

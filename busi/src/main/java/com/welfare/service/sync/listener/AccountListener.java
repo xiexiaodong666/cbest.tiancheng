@@ -1,6 +1,6 @@
-package com.welfare.servicemerchant.service.sync.listener;
+package com.welfare.service.sync.listener;
 
-import com.welfare.servicemerchant.service.sync.event.AccountEvt;
+import com.welfare.service.sync.event.AccountEvt;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;

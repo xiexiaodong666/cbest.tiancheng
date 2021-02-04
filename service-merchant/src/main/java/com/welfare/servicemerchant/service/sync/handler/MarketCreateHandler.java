@@ -14,7 +14,7 @@ import com.welfare.service.remote.entity.CbestPayCreateMarketReq;
 import com.welfare.service.remote.entity.CbestPayRespRetryConstant;
 import com.welfare.service.remote.entity.CbestPayRespStatusConstant;
 import com.welfare.service.remote.service.CbestPayService;
-import com.welfare.servicemerchant.service.sync.event.SupplierStoreEvt;
+import com.welfare.service.sync.event.SupplierStoreEvt;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

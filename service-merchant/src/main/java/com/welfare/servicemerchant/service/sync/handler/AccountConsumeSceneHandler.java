@@ -15,7 +15,7 @@ import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreBinding;
 import com.welfare.service.remote.entity.UserRoleBinding;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
-import com.welfare.servicemerchant.service.sync.event.AccountConsumeSceneEvt;
+import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;

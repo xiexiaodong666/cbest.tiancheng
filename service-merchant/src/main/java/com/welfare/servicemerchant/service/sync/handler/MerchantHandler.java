@@ -11,7 +11,7 @@ import com.welfare.service.dto.MerchantSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
-import com.welfare.servicemerchant.service.sync.event.MerchantEvt;
+import com.welfare.service.sync.event.MerchantEvt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

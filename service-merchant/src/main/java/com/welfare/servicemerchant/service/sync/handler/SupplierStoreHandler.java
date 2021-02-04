@@ -14,7 +14,7 @@ import com.welfare.service.dto.SupplierStoreSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
-import com.welfare.servicemerchant.service.sync.event.SupplierStoreEvt;
+import com.welfare.service.sync.event.SupplierStoreEvt;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

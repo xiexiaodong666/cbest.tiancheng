@@ -1,7 +1,7 @@
-package com.welfare.servicemerchant.service.sync.listener;
+package com.welfare.service.sync.listener;
 
 
-import com.welfare.servicemerchant.service.sync.event.SupplierStoreEvt;
+import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @Slf4j
-public class SupplierListener {
+public class MerchantStoreRelationListener {
 
   @Autowired
   PersistentBus persistentBus;
@@ -31,7 +31,9 @@ public class SupplierListener {
 
   @EventListener
   @Transactional(rollbackFor = Exception.class)
-  public void onAdd(SupplierStoreEvt evt) throws EventBusException {
-      persistentBus.postFromTransaction(evt, DataSourceUtils.getConnection(dataSource));
-    }
+  public void onMerchantStoreRelationChange(MerchantStoreRelationEvt evt) throws EventBusException {
+    log.info("监听器。。。。{}", "");
+
+    persistentBus.postFromTransaction(evt, DataSourceUtils.getConnection(dataSource));
+  }
 }

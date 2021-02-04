@@ -304,9 +304,13 @@ public class AccountServiceImpl implements AccountService {
 
       List<String> successList = new ArrayList<>();
       List<String> failList;
+      Map<String, FileUniversalStorage> map = new HashMap<>();
 
       String merCode = accountBatchImgReq.getMerCode();
       List<AccountBatchImgInfoReq> batchImgInfoListReq = accountBatchImgReq.getAccountBatchImgInfoReqList();
+
+      batchImgInfoListReq = batchImgInfoListReq.stream().collect(
+          Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getPhone()))), ArrayList::new));
 
       List<String> phones = batchImgInfoListReq.stream().map(b->b.getPhone()).collect(Collectors.toList());
 
@@ -330,6 +334,7 @@ public class AccountServiceImpl implements AccountService {
           fileUniversalStorage.setUrl(accountOptional.getUrl());
           fileUniversalStorage.setDeleted(false);
         }
+        map.put(account.getPhone(), fileUniversalStorage);
         fileUniversalStorageList.add(fileUniversalStorage);
       }
 
@@ -338,7 +343,7 @@ public class AccountServiceImpl implements AccountService {
 
       fileUniversalStorageDao.saveOrUpdateBatch(fileUniversalStorageList);
       for (int i =0; i< accountList.size(); i++) {
-        accountList.get(i).setFileUniversalStorageId(fileUniversalStorageList.get(i).getId());
+        accountList.get(i).setFileUniversalStorageId(map.get(accountList.get(i).getPhone()).getId());
       }
       accountDao.updateBatchById(accountList);
 

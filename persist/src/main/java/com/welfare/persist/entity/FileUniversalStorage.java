@@ -1,5 +1,6 @@
 package com.welfare.persist.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -46,12 +47,14 @@ public class FileUniversalStorage extends Model<FileUniversalStorage> implements
     /**
      * s3存储key
      */
-    @ApiModelProperty("s3存储key")   
+    @ApiModelProperty("s3存储key")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String imgKey;
     /**
      * 文件路径
      */
-    @ApiModelProperty("文件路径")   
+    @ApiModelProperty("文件路径")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String url;
     /**
      * 创建人

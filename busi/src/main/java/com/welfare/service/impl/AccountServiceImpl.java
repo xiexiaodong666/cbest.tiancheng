@@ -336,7 +336,7 @@ public class AccountServiceImpl implements AccountService {
       phones.removeAll(successList);
       failList = phones;
 
-      fileUniversalStorageDao.saveBatch(fileUniversalStorageList);
+      fileUniversalStorageDao.saveOrUpdateBatch(fileUniversalStorageList);
       for (int i =0; i< accountList.size(); i++) {
         accountList.get(i).setFileUniversalStorageId(fileUniversalStorageList.get(i).getId());
       }

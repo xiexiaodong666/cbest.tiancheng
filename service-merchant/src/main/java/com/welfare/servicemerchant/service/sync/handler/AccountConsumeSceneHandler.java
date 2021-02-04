@@ -1,4 +1,4 @@
-package com.welfare.service.sync.handler;
+package com.welfare.servicemerchant.service.sync.handler;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -15,7 +15,7 @@ import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreBinding;
 import com.welfare.service.remote.entity.UserRoleBinding;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
-import com.welfare.service.sync.event.AccountConsumeSceneEvt;
+import com.welfare.servicemerchant.service.sync.event.AccountConsumeSceneEvt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;

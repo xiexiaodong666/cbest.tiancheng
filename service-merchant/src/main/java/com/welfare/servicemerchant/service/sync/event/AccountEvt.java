@@ -1,4 +1,4 @@
-package com.welfare.service.sync.event;
+package com.welfare.servicemerchant.service.sync.event;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

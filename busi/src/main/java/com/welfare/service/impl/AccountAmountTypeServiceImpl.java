@@ -114,12 +114,14 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             List<RLock> locks = new ArrayList<>();
             RLock multiLock = null;
             try {
+                long start = System.currentTimeMillis();
                 deposits.forEach(deposit -> {
                     RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
                     locks.add(lock);
                 });
                 multiLock = redissonClient.getMultiLock(locks.toArray(new RLock[]{}));
                 multiLock.lock(-1, TimeUnit.SECONDS);
+                log.info("批量充值账号加锁 耗时:{}", (System.currentTimeMillis() - start));
                 String merAccountTypeCode = deposits.get(0).getMerAccountTypeCode();
                 List<Long> accountCodes = deposits.stream().map(Deposit::getAccountCode).collect(Collectors.toList());
                 Map<Long, Account> accountMap = accountDao.mapByAccountCodes(accountCodes);
@@ -150,8 +152,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(deposit, account, accountAmountType);
                     deductionDetails.add(deductionDetail);
                     details.add(assemblyAccountBillDetail(deposit, accountAmountType, account));
-                    relations.add(assemblyNewTransRelation(
-                            deposit.getApplyCode(),
+                    relations.add(assemblyNewTransRelation(deposit.getApplyCode(),
                             deposit.getTransNo(),
                             WelfareConstant.TransType.DEPOSIT_INCR));
                 }

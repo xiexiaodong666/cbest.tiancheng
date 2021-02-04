@@ -152,7 +152,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                     operations.addAll(accountOperations);
                 }
                 // 批量更新金额
-                merchantCreditDao.updateBatchById(merchantCreditMap.values(), merchantCreditMap.size());
+                boolean isSuccess = merchantCreditDao.updateBatchById(merchantCreditMap.values(), merchantCreditMap.size());
+                if (!isSuccess) {
+                    throw new RuntimeException("充值失败，重试");
+                }
                 // 保存流水
                 List<MerchantBillDetail> merchantBillDetails = operations.stream()
                         .map(MerchantAccountOperation::getMerchantBillDetail)

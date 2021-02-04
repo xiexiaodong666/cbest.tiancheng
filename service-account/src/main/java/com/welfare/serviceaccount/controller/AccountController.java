@@ -5,7 +5,9 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.AccountUserHolder;
 import com.welfare.persist.dto.AccountConsumeSceneDO;
 import com.welfare.persist.dto.AccountSimpleDTO;
+import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountService;
+import com.welfare.service.dto.AccountDO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -58,5 +60,13 @@ public class AccountController implements IController {
         AccountConsumeSceneDO accountConsumeSceneDO =
                 accountService.queryAccountConsumeSceneDO(storeCode, WelfareConstant.ConsumeQueryType.BARCODE, barcode);
         return success(accountConsumeSceneDO);
+    }
+
+    @ApiOperation("查询账户信息")
+    @GetMapping("/simple")
+    public R<AccountDO> queryAccountInfo(@RequestParam @ApiParam(value = "查询条件",required = true) String queryInfo,
+                                         @RequestParam @ApiParam("条件类型（barcode:条码,card:磁条信息）") String queryInfoType){
+        AccountDO accountDO = accountService.queryByQueryInfo(queryInfo,queryInfoType);
+        return success(accountDO);
     }
 }

@@ -78,6 +78,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       account.setSurplusQuota(BigDecimal.ZERO);
       account.setAccountBalance(BigDecimal.ZERO);
       account.setMaxQuota(BigDecimal.ZERO);
+      account.setCredit(false);
       accountUploadList.add(account);
     }
   }

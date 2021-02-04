@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 import com.welfare.common.enums.FileUniversalStorageEnum;
+import com.welfare.service.dto.UploadImgErrorMsgDTO;
 import java.util.Date;
 
 
@@ -37,19 +38,7 @@ import com.welfare.persist.mapper.AccountDeductionDetailMapper;
 import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.service.*;
 import com.welfare.service.converter.AccountConverter;
-import com.welfare.service.dto.AccountBatchImgDTO;
-import com.welfare.service.dto.AccountBatchImgInfoReq;
-import com.welfare.service.dto.AccountBatchImgReq;
-import com.welfare.service.dto.AccountBillDTO;
-import com.welfare.service.dto.AccountBillDetailDTO;
-import com.welfare.service.dto.AccountBindCardDTO;
-import com.welfare.service.dto.AccountDTO;
-import com.welfare.service.dto.AccountDetailDTO;
-import com.welfare.service.dto.AccountDetailParam;
-import com.welfare.service.dto.AccountIncrementReq;
-import com.welfare.service.dto.AccountPageReq;
-import com.welfare.service.dto.AccountReq;
-import com.welfare.service.dto.AccountUploadDTO;
+import com.welfare.service.dto.*;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.remote.ShoppingFeignClient;
@@ -347,8 +336,20 @@ public class AccountServiceImpl implements AccountService {
       }
       accountDao.updateBatchById(accountList);
 
+      List<UploadImgErrorMsgDTO> uploadImgErrorMsgDTOList = new ArrayList<>();
       accountBatchImgDTO.setSuccessList(successList);
-      accountBatchImgDTO.setFailList(failList);
+
+      if(CollectionUtils.isNotEmpty(failList)) {
+        for (String phone:
+        failList) {
+          UploadImgErrorMsgDTO uploadImgErrorMsgDTO = new UploadImgErrorMsgDTO();
+          uploadImgErrorMsgDTO.setError("该商户下没有此用户");
+          uploadImgErrorMsgDTO.setPhone(phone);
+
+          uploadImgErrorMsgDTOList.add(uploadImgErrorMsgDTO);
+        }
+        accountBatchImgDTO.setFailList(uploadImgErrorMsgDTOList);
+      }
 
       return accountBatchImgDTO;
     }
@@ -893,6 +894,23 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
         accountConsumeSceneDO.setAccountConsumeTypes(consumeTypes);
         return accountConsumeSceneDO;
+    }
+
+    @Override
+    public AccountDO queryByQueryInfo(String queryInfo, String queryType) {
+        Long accountCode = null;
+        if (WelfareConstant.ConsumeQueryType.CARD.code().equals(queryType)) {
+            CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
+            CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(queryInfo);
+            Assert.notNull(cardInfo, "根据磁条号未找到卡片:" + queryInfo);
+            Assert.isTrue(WelfareConstant.CardEnable.ENABLE.code().equals(cardInfo.getEnabled()), "卡片已禁用");
+            accountCode = cardInfo.getAccountCode();
+        }else if(WelfareConstant.ConsumeQueryType.BARCODE.code().equals(queryType)){
+            BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
+            accountCode = barcodeService.parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
+        }
+        Assert.notNull(accountCode, "根据条件没有解析出账号");
+        return AccountDO.of(this.getByAccountCode(accountCode));
     }
 
     private OrderTransRelation assemblyOrderTransRelation(BigDecimal updateQuota,

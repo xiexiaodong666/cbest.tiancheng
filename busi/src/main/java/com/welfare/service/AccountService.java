@@ -111,4 +111,12 @@ public interface AccountService {
    * @return
    */
   AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode, WelfareConstant.ConsumeQueryType queryType, String queryInfo);
+
+  /**
+   * 根据queryInfo和queryType查询账户
+   * @param queryInfo
+   * @param queryType
+   * @return
+   */
+  AccountDO queryByQueryInfo(String queryInfo,String queryType);
 }

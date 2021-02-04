@@ -133,6 +133,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(deposit.getAccountCode());
                     if (Objects.isNull(accountAmountType)) {
                         accountAmountType = deposit.toNewAccountAmountType();
+                        accountAmountTypeDao.save(accountAmountType);
                         BigDecimal afterAddAmount = accountAmountType.getAccountBalance().add(deposit.getAmount());
                         accountAmountType.setAccountBalance(afterAddAmount);
                         accountAmountTypeMap.put(deposit.getAccountCode(), accountAmountType);

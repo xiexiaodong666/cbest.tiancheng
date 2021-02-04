@@ -7,6 +7,22 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  redis:
+    lettuce:
+      pool:
+        max-idle: 30
+        max-active: 8
+        min-idle: 2
+        max-wait: 1000
+    timeout: 5000
+    cluster:
+      nodes:
+        - 192.1.30.186:7000
+        - 192.1.30.186:7001
+        - 192.1.30.186:7002
+        - 192.1.30.186:7003
+        - 192.1.30.186:7004
+        - 192.1.30.186:7005
 logging:
   file:
     path: /home/finance/Logs/e-welfare-merchant.e-cbest.lotest

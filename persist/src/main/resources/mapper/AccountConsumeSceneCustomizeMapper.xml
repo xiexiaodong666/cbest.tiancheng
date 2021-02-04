@@ -52,7 +52,13 @@
 
   <select id="getPageDTO" resultType="com.welfare.persist.dto.AccountConsumeScenePageDTO">
     SELECT
-    GROUP_CONCAT( CONCAT( msr.store_alias, "-", msr.store_code ) ) AS storeInfo,
+    GROUP_CONCAT(
+    DISTINCT(CONCAT(
+    msr.store_alias,
+    "-",
+    msr.store_code
+    ))
+    ) AS storeInfo,
     act.type_name AS accountTypeName,
     acs.id,
     acs.STATUS,
@@ -65,12 +71,12 @@
     acs.mer_code as merCode
     FROM
     account_consume_scene acs
-    inner join account_consume_scene_store_relation acstr on acs.id = acstr.account_consume_scene_id
-    inner JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code
-    AND acs.mer_code = msr.mer_code
-    inner JOIN account_type act ON act.type_code = acs.account_type_code
-    where acs.deleted =0 and acstr.deleted= 0
-    and acs.mer_code = act.mer_code and acs.mer_code = msr.mer_code
+    INNER JOIN account_type act ON act.type_code = acs.account_type_code and  acs.mer_code = act.mer_code
+    INNER JOIN account_consume_scene_store_relation acstr ON acs.id = acstr.account_consume_scene_id
+    INNER JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code AND acs.mer_code = msr.mer_code
+    WHERE
+    acs.deleted = 0
+    AND acstr.deleted = 0
     <if test=" merCode !='' and merCode != null ">
       and acs.mer_code = #{merCode}
     </if>
@@ -86,7 +92,7 @@
     <if test="createTimeEnd != null ">
       and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
-    GROUP BY acs.account_type_code,acs.mer_code
+    GROUP BY acs.id
     order by acs.create_time desc
   </select>
 

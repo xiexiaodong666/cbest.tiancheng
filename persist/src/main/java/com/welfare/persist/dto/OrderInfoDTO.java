@@ -129,6 +129,18 @@ public class OrderInfoDTO extends Model<OrderInfoDTO> implements Serializable {
      * 更新时间
      */
 	private Date updateTime;
+	/**
+	 * 时段
+	 */
+	private String timeInterval;
+	//部门编码
+	private String departmentCode;
+	//部门名称
+	private String departmentName;
+	//账户类型
+	private String accountType;
+
+    private String accountTypeName;
 
 //以下为列明常量
 

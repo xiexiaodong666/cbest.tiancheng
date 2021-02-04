@@ -41,4 +41,6 @@ public class SynOrderDto {
     @ApiModelProperty(value = "交易时间[yyyy-MM-dd HH:mm:ss]" , required = true)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private Date transTime;
+    @ApiModelProperty(value = "消费时段" , required = false)
+    private Integer timeInterval;
 }

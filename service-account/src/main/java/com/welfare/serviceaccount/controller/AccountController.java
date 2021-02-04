@@ -63,7 +63,7 @@ public class AccountController implements IController {
     }
 
     @ApiOperation("查询账户信息")
-    @GetMapping("/info")
+    @GetMapping("/simple")
     public R<AccountDO> queryAccountInfo(@RequestParam @ApiParam(value = "查询条件",required = true) String queryInfo,
                                          @RequestParam @ApiParam("条件类型（barcode:条码,card:磁条信息）") String queryInfoType){
         AccountDO accountDO = accountService.queryByQueryInfo(queryInfo,queryInfoType);

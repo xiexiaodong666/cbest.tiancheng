@@ -4,6 +4,7 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.AccountUtil;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.TempAccountDepositApply;
@@ -11,6 +12,7 @@ import com.welfare.service.TempAccountDepositApplyService;
 import com.welfare.service.dto.AccountDepositRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -56,19 +58,23 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
   @Override
   public void invoke(AccountDepositRequest request, AnalysisContext context) {
     log.info("员工账号存储申请：解析到一条数据:{}, requestId:{}, fileId;{}", JSON.toJSONString(request), requestId, fileId);
-    if (Objects.isNull(request.getPhone())) {
+    if (StringUtils.isBlank(request.getPhone())) {
       throw new BusiException("账号不能为空");
     }
+//    if (!AccountUtil.validPhone(request.getPhone())) {
+//      throw new BusiException(String.format("[%s]手机号不合法！", request.getPhone()));
+//    }
     if (request.getRechargeAmount() == null || request.getRechargeAmount().compareTo(BigDecimal.ZERO) < 0) {
       throw new BusiException(String.format("[%s]金额不能小于0！", request.getPhone()));
     }
     if (request.getRechargeAmount().compareTo(MAX_AMOUNT) > 0) {
       throw new BusiException(String.format("[%s]金额超过限制[%s]！", request.getPhone(), MAX_AMOUNT));
     }
-    if (phoneSet.contains(request.getPhone())) {
+    if (phoneSet.contains(request.getPhone().trim())) {
       throw new BusiException(String.format("[%s]账号(手机号)不能重复！", request.getPhone()));
     }
-    phoneSet.add(request.getPhone());
+    request.setPhone(request.getPhone().trim());
+    phoneSet.add(request.getPhone().trim());
     requestList.add(request);
   }
 

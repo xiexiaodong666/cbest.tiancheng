@@ -128,15 +128,15 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 List<AccountChangeEventRecord> records = new ArrayList<>();
                 List<AccountBillDetail> details = new ArrayList<>();
                 List<OrderTransRelation> relations = new ArrayList<>();
+                List<AccountAmountType> newAccountAmountTypes = new ArrayList<>();
 
                 for (Deposit deposit : deposits) {
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(deposit.getAccountCode());
                     if (Objects.isNull(accountAmountType)) {
                         accountAmountType = deposit.toNewAccountAmountType();
-                        accountAmountTypeDao.save(accountAmountType);
                         BigDecimal afterAddAmount = accountAmountType.getAccountBalance().add(deposit.getAmount());
                         accountAmountType.setAccountBalance(afterAddAmount);
-                        accountAmountTypeMap.put(deposit.getAccountCode(), accountAmountType);
+                        newAccountAmountTypes.add(accountAmountType);
                     } else {
                         accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
                     }
@@ -155,7 +155,12 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                             deposit.getTransNo(),
                             WelfareConstant.TransType.DEPOSIT_INCR));
                 }
-                accountAmountTypeDao.updateBatchById(accountAmountTypeMap.values(), accountAmountTypeMap.size());
+                if (!CollectionUtils.isEmpty(newAccountAmountTypes)) {
+                    accountAmountTypeDao.saveBatch(newAccountAmountTypes, newAccountAmountTypes.size());
+                }
+                if (!CollectionUtils.isEmpty(accountAmountTypeMap)) {
+                    accountAmountTypeDao.updateBatchById(accountAmountTypeMap.values(), accountAmountTypeMap.size());
+                }
                 accountDao.updateBatchById(accountMap.values(), accountMap.size());
                 accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());
                 accountChangeEventRecordDao.saveBatch(records, records.size());

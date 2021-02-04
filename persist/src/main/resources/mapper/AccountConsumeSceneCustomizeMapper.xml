@@ -204,4 +204,17 @@ WHERE
     where acs.mer_code= #{merCode}
   </select>
 
+
+  <select id="queryDeleteSceneByMerCodeAndStoreCodeList" resultType="com.welfare.persist.entity.AccountConsumeScene">
+    select
+    DISTINCT(acs.id) as bsId,
+    <include refid="baseMapColumn"/>
+    from  account_consume_scene acs
+    left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
+    where acs.mer_code= #{merCode}
+    and relation.store_code in
+    <foreach collection="storeCodeList" item="id" index="index" open="(" close=")" separator=",">
+    #{id}
+    </foreach>
+  </select>
 </mapper>

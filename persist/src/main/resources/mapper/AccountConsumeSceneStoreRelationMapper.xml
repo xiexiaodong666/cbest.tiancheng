@@ -94,6 +94,10 @@
     from  account_consume_scene acs
     left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
     where acs.mer_code= #{merCode} and relation.deleted=0
+    and relation.store_code in
+    <foreach collection="storeCodeList" item="id" index="index" open="(" close=")" separator=",">
+    #{id}
+    </foreach>
   </select>
 
 </mapper>

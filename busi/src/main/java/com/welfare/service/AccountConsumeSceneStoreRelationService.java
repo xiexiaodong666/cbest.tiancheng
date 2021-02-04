@@ -26,5 +26,5 @@ public interface AccountConsumeSceneStoreRelationService {
    * 在商户门店配置列表删除所有的配置消费场景门店
    * @param merCode
    */
-  public void deleteConsumeScene(String merCode);
+  public void deleteConsumeScene(String merCode,List<String> storeCodeList);
 }

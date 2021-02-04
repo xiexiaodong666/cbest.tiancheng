@@ -68,29 +68,31 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
   }
 
   @Transactional(rollbackFor = Exception.class)
-  public void deleteConsumeScene(String merCode){
+  public void deleteConsumeScene(String merCode,List<String> storeCodeList){
+    log.info("商户门店删除,变更员工类型消费场景 merCode:{},storeCodeList:{}",merCode,storeCodeList);
     //要变更的账号信息
-    List<Account> accounts = accountCustomizeMapper.getUpdateAccountByMerCode(merCode);
+    List<Account> accounts = accountCustomizeMapper.getUpdateAccountByMerCode(merCode,storeCodeList);
     List<AccountChangeEventRecord> recordList = AccountUtils
         .getEventList(accounts, AccountChangeType.ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE);
     accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE);
 
     //删除 AccountConsumeScene
-    List<AccountConsumeScene> updateAccountConsumerScene = accountConsumeSceneCustomizeMapper.queryDeleteScene(merCode);
+    List<AccountConsumeScene> updateAccountConsumerScene = accountConsumeSceneCustomizeMapper.queryDeleteSceneByMerCodeAndStoreCodeList(merCode,storeCodeList);
     accountConsumeSceneDao.removeByIds(updateAccountConsumerScene.stream().map(accountConsumeScene -> {
       return accountConsumeScene.getId();
     }).collect(Collectors.toList()));
 
     //删除 AccountConsumeStoreRelation
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationMapper
-        .queryDeleteRelationScene(merCode);
+        .queryDeleteRelationScene(merCode,storeCodeList);
     accountConsumeSceneStoreRelationDao.removeByIds(relationList.stream().map(accountConsumeSceneStoreRelation -> {
       return accountConsumeSceneStoreRelation.getId();
     }).collect(Collectors.toList()));
 
+    List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(merCode);
     //下发数据
     applicationContext.publishEvent( AccountConsumeSceneEvt
-        .builder().typeEnum(ShoppingActionTypeEnum.ACCOUNT_CONSUME_SCENE_BATCH_DELETE).merCode(merCode).build());
+        .builder().typeEnum(ShoppingActionTypeEnum.ACCOUNT_CONSUME_SCENE_BATCH_DELETE).relationList(allRelations).merCode(merCode).build());
   }
 
   @Override

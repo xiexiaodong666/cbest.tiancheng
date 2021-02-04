@@ -36,4 +36,6 @@ public interface AccountConsumeSceneCustomizeMapper extends BaseMapper<AccountCo
       @Param("storeCode")String storeCode
   );
   List<AccountConsumeScene> queryDeleteScene(@Param("merCode") String merCode);
+  List<AccountConsumeScene> queryDeleteSceneByMerCodeAndStoreCodeList(@Param("merCode") String merCode,
+      @Param("storeCodeList")List<String> storeCodeList);
 }

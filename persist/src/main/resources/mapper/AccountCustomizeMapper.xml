@@ -45,6 +45,10 @@
     left join account_consume_scene acs on acs.account_type_code = at.type_code and acs.mer_code = AT.mer_code
     left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
     where a.mer_code= #{merCode}
+    and relation.store_code in
+    <foreach collection="storeCodeList" item="id" index="index" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
   </select>
 
   <update id="increaseAccountSurplusQuota">

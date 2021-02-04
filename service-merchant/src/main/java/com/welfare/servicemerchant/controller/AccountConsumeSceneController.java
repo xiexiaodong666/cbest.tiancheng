@@ -73,11 +73,11 @@ public class AccountConsumeSceneController implements IController {
   public void test( @RequestParam(value = "merCode")  String merCode,
       @RequestParam(value = "storeCode")  String storeCode,
       @RequestParam(value = "consumeType")  String consumeType){
-    //accountConsumeSceneStoreRelationService.deleteConsumeScene(merCode);
-    StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
+    accountConsumeSceneStoreRelationService.deleteConsumeScene(merCode,Arrays.asList(storeCode));
+   /* StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
     storeConsumeRelationDTO.setStoreCode(storeCode);
     storeConsumeRelationDTO.setConsumeType(consumeType);
-    accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(merCode, Arrays.asList(storeConsumeRelationDTO));
+    accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(merCode, Arrays.asList(storeConsumeRelationDTO));*/
   }
 
   @GetMapping("/page")

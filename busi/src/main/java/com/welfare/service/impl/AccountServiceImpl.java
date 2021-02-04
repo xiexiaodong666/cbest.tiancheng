@@ -318,16 +318,16 @@ public class AccountServiceImpl implements AccountService {
       List<FileUniversalStorage> fileUniversalStorageList = new ArrayList<>();
 
       for(Account account : accountList) {
-        Optional<AccountBatchImgInfoReq> accountOptional = batchImgInfoListReq.stream().filter(i->i.getPhone().equals(account.getPhone())).findFirst();
-        successList.add(accountOptional.get().getPhone());
+        AccountBatchImgInfoReq accountOptional = batchImgInfoListReq.stream().filter(i->i.getPhone().equals(account.getPhone())).findFirst().get();
+        successList.add(accountOptional.getPhone());
         FileUniversalStorage fileUniversalStorage;
         if(account.getFileUniversalStorageId() != null && account.getFileUniversalStorageId() != 0) {
           fileUniversalStorage = fileUniversalStorageDao.getById(account.getFileUniversalStorageId());
-          fileUniversalStorage.setUrl(accountOptional.get().getUrl());
+          fileUniversalStorage.setUrl(accountOptional.getUrl());
         } else {
           fileUniversalStorage = new FileUniversalStorage();
           fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
-          fileUniversalStorage.setUrl(accountOptional.get().getUrl());
+          fileUniversalStorage.setUrl(accountOptional.getUrl());
           fileUniversalStorage.setDeleted(false);
         }
         fileUniversalStorageList.add(fileUniversalStorage);

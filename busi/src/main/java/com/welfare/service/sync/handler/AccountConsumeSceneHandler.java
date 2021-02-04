@@ -22,10 +22,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -65,19 +68,14 @@ public class AccountConsumeSceneHandler {
   public void accountConsumeSceneEvt(AccountConsumeSceneEvt accountConsumeSceneEvt) {
 
     ShoppingActionTypeEnum actionTypeEnum = accountConsumeSceneEvt.getTypeEnum();
-    List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneEvt.getRelationList();
-    if (CollectionUtils.isEmpty(relationList)) {
-      return;
-    }
     UserRoleBindingReqDTO userRoleBindingReqDTO = new UserRoleBindingReqDTO();
-    //这边没有删除 删除和修改传同样的type bindings 为空
-    userRoleBindingReqDTO.setActionType(
-        actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.DELETE.getCode())
-            ? ShoppingActionTypeEnum.UPDATE : actionTypeEnum);
     userRoleBindingReqDTO.setRequestId(UUID.randomUUID().toString());
     userRoleBindingReqDTO.setTimestamp(new Date());
-    List<UserRoleBinding> userRoleBindingList = assemableUserRoleBindings(relationList,
-        actionTypeEnum);
+    List<UserRoleBinding> userRoleBindingList = assemableUserRoleBindings(actionTypeEnum,accountConsumeSceneEvt);
+    //这边没有删除 删除和修改传同样的type bindings 为空
+    userRoleBindingReqDTO.setActionType(
+        actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.DELETE.getCode()) || actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ACCOUNT_CONSUME_SCENE_BATCH_DELETE.getCode())
+            ? ShoppingActionTypeEnum.UPDATE : actionTypeEnum);
     userRoleBindingReqDTO.setList(userRoleBindingList);
 
     log.info("同步员工类型数据 userRoleBindingReqDTO:{}",
@@ -89,65 +87,69 @@ public class AccountConsumeSceneHandler {
     }
   }
 
-  private List<UserRoleBinding> assemableUserRoleBindings(
-      List<AccountConsumeSceneStoreRelation> relationList,
-      ShoppingActionTypeEnum shoppingActionTypeEnum) {
-    if (CollectionUtils.isEmpty(relationList)) {
+  private List<UserRoleBinding> assemableUserRoleBindings(ShoppingActionTypeEnum shoppingActionTypeEnum,AccountConsumeSceneEvt accountConsumeSceneEvt) {
+    List<UserRoleBinding> userRoleBindingList = new LinkedList<UserRoleBinding>();
+
+    List<AccountConsumeScene> accountConsumeSceneList = null;
+
+    //获取对应的的accountConsumeSceneList
+    if (shoppingActionTypeEnum.getCode()
+        .equals(ShoppingActionTypeEnum.ACCOUNT_CONSUME_SCENE_BATCH_DELETE.getCode())){
+      accountConsumeSceneList = accountConsumeSceneCustomizeMapper
+          .queryDeleteScene(accountConsumeSceneEvt.getMerCode());
+    }else{
+      List<Long> sceneIdList = accountConsumeSceneEvt.getRelationList().stream().map(accountConsumeSceneStoreRelation -> {
+        return accountConsumeSceneStoreRelation.getAccountConsumeSceneId();
+      }).collect(Collectors.toList());
+      accountConsumeSceneList = accountConsumeSceneCustomizeMapper.queryByIdList(sceneIdList);
+    }
+
+    //封装map key accountConsumeSceneId value List<AccountConsumeSceneStoreRelation>
+    Map<Long,List<AccountConsumeSceneStoreRelation>> sceneRelationMap = new HashMap<Long,List<AccountConsumeSceneStoreRelation>>();
+    accountConsumeSceneEvt.getRelationList().forEach(accountConsumeSceneStoreRelation -> {
+      List<AccountConsumeSceneStoreRelation> relations = sceneRelationMap.get(accountConsumeSceneStoreRelation.getAccountConsumeSceneId());
+      if(CollectionUtils.isEmpty(relations)){
+        relations = new LinkedList<AccountConsumeSceneStoreRelation>();
+        relations.add(accountConsumeSceneStoreRelation);
+        sceneRelationMap.put(accountConsumeSceneStoreRelation.getAccountConsumeSceneId(),relations);
+      }else{
+        relations.add(accountConsumeSceneStoreRelation);
+        sceneRelationMap.put(accountConsumeSceneStoreRelation.getAccountConsumeSceneId(),relations);
+      }
+    });
+    //封装userRoleBindingList
+    accountConsumeSceneList.forEach( accountConsumeScene -> {
+      UserRoleBinding userRoleBinding = new UserRoleBinding();
+      userRoleBinding.setEmployeeRole(accountConsumeScene.getAccountTypeCode());
+      userRoleBinding.setEnabled(accountConsumeScene.getStatus() == AccountConsumeSceneStatus.ENABLE.getCode());
+      userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
+      if(!sceneRelationMap.isEmpty()){
+        List<StoreBinding> bindings = assemableBindings(sceneRelationMap.get(accountConsumeScene.getId()));
+        userRoleBinding.setBindings(bindings);
+      }
+      userRoleBindingList.add(userRoleBinding);
+    });
+
+    return userRoleBindingList;
+  }
+
+
+  private List<StoreBinding> assemableBindings(List<AccountConsumeSceneStoreRelation> relationList) {
+    if( relationList == null ){
       return null;
     }
-    UserRoleBinding userRoleBinding = new UserRoleBinding();
-    List<String> employeeRoles = assemableEmployeeRoles(relationList);
-    userRoleBinding.setEmployeeRoles(employeeRoles);
-    List<StoreBinding> bindings = assemableBindings(relationList, shoppingActionTypeEnum);
-    userRoleBinding.setBindings(bindings);
-    AccountConsumeScene accountConsumeScene = accountConsumeSceneCustomizeMapper
-        .queryById(relationList.get(0).getAccountConsumeSceneId());
-    userRoleBinding.setMerchantCode(accountConsumeScene.getMerCode());
-    userRoleBinding
-        .setEnabled(accountConsumeScene.getStatus() == AccountConsumeSceneStatus.ENABLE.getCode());
-    return Arrays.asList(userRoleBinding);
-  }
-
-  private List<String> assemableEmployeeRoles(List<AccountConsumeSceneStoreRelation> relationList){
-    HashMap<String, String> employeeRoles = new HashMap<String, String>();
-    for (AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation : relationList) {
-      Long sceneId = accountConsumeSceneStoreRelation.getAccountConsumeSceneId();
-      AccountConsumeScene accountConsumeScene = accountConsumeSceneCustomizeMapper
-          .queryById(sceneId);
-      employeeRoles.put(accountConsumeScene.getAccountTypeCode(),
-          accountConsumeScene.getAccountTypeCode());
-    }
-    return new ArrayList<>(employeeRoles.keySet());
-  }
-
-  private List<StoreBinding> assemableBindings(List<AccountConsumeSceneStoreRelation> relationList,
-      ShoppingActionTypeEnum shoppingActionTypeEnum) {
     List<StoreBinding> bindings = new LinkedList<>();
-    if (!shoppingActionTypeEnum.getCode().equals(ShoppingActionTypeEnum.DELETE.getCode())) {
-      for (AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation : relationList) {
-        StoreBinding storeBinding = new StoreBinding();
-        String[] array = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
-        storeBinding.setConsumeTypes(Arrays.asList(array));
-        storeBinding.setStoreCode(accountConsumeSceneStoreRelation.getStoreCode());
-        bindings.add(storeBinding);
+    for (AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation : relationList) {
+      if(StringUtils.isBlank(accountConsumeSceneStoreRelation.getSceneConsumType())){
+        //员工类型在该门店的唯一消费方式被删除(商户门店修改了该门店的消费类型)
+        continue;
       }
+      StoreBinding storeBinding = new StoreBinding();
+      String[] array = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
+      storeBinding.setConsumeTypes(Arrays.asList(array));
+      storeBinding.setStoreCode(accountConsumeSceneStoreRelation.getStoreCode());
+      bindings.add(storeBinding);
     }
     return bindings;
-  }
-
-  private List<StoreBinding> assemableStoreBindings(
-      List<AccountConsumeSceneStoreRelation> relationList) {
-    if (CollectionUtils.isEmpty(relationList)) {
-      return null;
-    }
-    List<StoreBinding> storeBindingList = new LinkedList<StoreBinding>();
-    relationList.forEach(accountConsumeSceneStoreRelation -> {
-      StoreBinding storeBinding = new StoreBinding();
-      storeBinding.setStoreCode(accountConsumeSceneStoreRelation.getStoreCode());
-      String[] types = accountConsumeSceneStoreRelation.getSceneConsumType().split(",");
-      storeBinding.setConsumeTypes(Arrays.asList(types));
-      storeBindingList.add(storeBinding);
-    });
-    return storeBindingList;
   }
 }

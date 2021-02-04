@@ -11,6 +11,19 @@
   <sql id="baseColumn">
         id,mer_code,account_type_code,remark,create_user,create_time,update_user,update_time,flag,version
     </sql>
+  <sql id="baseMapColumn">
+    acs.id,
+	acs.mer_code AS merCode,
+	acs.account_type_code AS accountTypeCode,
+	acs.remark,
+	acs.STATUS as status,
+	acs.create_time AS createTime,
+	acs.deleted,
+	acs.create_user as createUser,
+	acs.update_user as updateUser,
+	acs.update_time as updateTime,
+	acs.version
+  </sql>
   <sql id="pageAndExport">
      SELECT
     GROUP_CONCAT( CONCAT( msr.store_alias, "-", msr.store_code ) ) AS storeInfo,
@@ -33,6 +46,8 @@
     where acs.deleted =0 and acstr.deleted= 0 and msr.deleted = 0
     and acs.mer_code = act.mer_code and acs.mer_code = msr.mer_code
   </sql>
+
+
 
 
   <select id="getPageDTO" resultType="com.welfare.persist.dto.AccountConsumeScenePageDTO">
@@ -95,6 +110,7 @@
     </collection>
   </resultMap>
 
+
   <select id="queryAccountConsumerScene4Detail"
     resultMap="detailMap">
 		SELECT
@@ -142,6 +158,31 @@ WHERE
 	acs.id = #{id}
   </select>
 
+  <select id="queryByIdList"
+    resultType="com.welfare.persist.entity.AccountConsumeScene">
+    SELECT
+      acs.id,
+      acs.mer_code AS merCode,
+      acs.account_type_code AS accountTypeCode,
+      acs.remark,
+      acs.STATUS as status,
+      acs.create_time AS createTime,
+      acs.deleted,
+      acs.create_user as createUser,
+      acs.update_user as updateUser,
+      acs.update_time as updateTime,
+      acs.version
+    FROM
+      account_consume_scene acs
+    WHERE
+      acs.id in
+    <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+
+
   <select id="getCountByMerCodeAndAccountTypeAndStoreCode" resultType="Integer">
     SELECT
 	count( 1 )
@@ -154,4 +195,26 @@ WHERE
 	AND acs.account_type_code = #{storeCode}
   </select>
 
+  <select id="queryDeleteScene" resultType="com.welfare.persist.entity.AccountConsumeScene">
+    select
+    DISTINCT(acs.id) as bsId,
+    <include refid="baseMapColumn"/>
+    from  account_consume_scene acs
+    left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
+    where acs.mer_code= #{merCode}
+  </select>
+
+
+  <select id="queryDeleteSceneByMerCodeAndStoreCodeList" resultType="com.welfare.persist.entity.AccountConsumeScene">
+    select
+    DISTINCT(acs.id) as bsId,
+    <include refid="baseMapColumn"/>
+    from  account_consume_scene acs
+    left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
+    where acs.mer_code= #{merCode}
+    and relation.store_code in
+    <foreach collection="storeCodeList" item="id" index="index" open="(" close=")" separator=",">
+    #{id}
+    </foreach>
+  </select>
 </mapper>

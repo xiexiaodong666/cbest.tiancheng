@@ -74,6 +74,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
@@ -123,26 +124,43 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStore> supplierStores = supplierStoreDao.list(q);
     if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
       for (SupplierStore s:
-          supplierStores) {
-      try {
-
+              supplierStores) {
+        try {
           if (Strings.isNotEmpty(s.getConsumType())) {
             Map<String, Boolean> consumeTypeMap = mapper.readValue(
-                s.getConsumType(), Map.class);
+                    s.getConsumType(), Map.class);
             ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
             s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
           } else {
             log.error(s.getConsumType() + "########");
           }
-
-
-      } catch (JsonProcessingException e) {
-        log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
+        } catch (JsonProcessingException e) {
+          log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
+        }
       }
     }
+
+    if (CollectionUtils.isNotEmpty(supplierStores) && StringUtils.isNoneBlank(req.getConsumType())) {
+      supplierStores = supplierStores.stream().filter(s -> {
+        if (Strings.isNotEmpty(s.getConsumType())) {
+          Map<String, Boolean> consumeTypeMap;
+          try {
+            consumeTypeMap = mapper.readValue(s.getConsumType(), Map.class);
+            return consumeTypeMap.get(req.getConsumType()) != null
+                    && consumeTypeMap.get(req.getConsumType());
+          } catch (JsonProcessingException e) {
+            e.printStackTrace();
+          }
+          return false;
+        } else {
+          return false;
+        }
+      }).collect(Collectors.toList());
     }
-      return supplierStores;
+
+    return supplierStores;
   }
+
 
   @Override
   public List<SupplierStoreTreeDTO> tree(String merCode, String source) {

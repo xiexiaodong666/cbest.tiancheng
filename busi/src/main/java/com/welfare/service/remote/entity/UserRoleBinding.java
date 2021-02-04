@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class UserRoleBinding implements Serializable {
   private List<StoreBinding> bindings;
-  private List<String> employeeRoles;
+  private String employeeRole;
   private Boolean enabled;
   private String merchantCode;
 }

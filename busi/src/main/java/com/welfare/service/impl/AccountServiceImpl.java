@@ -340,7 +340,7 @@ public class AccountServiceImpl implements AccountService {
       for (int i =0; i< accountList.size(); i++) {
         accountList.get(i).setFileUniversalStorageId(fileUniversalStorageList.get(i).getId());
       }
-      accountDao.saveOrUpdateBatch(accountList);
+      accountDao.updateBatchById(accountList);
 
       accountBatchImgDTO.setSuccessList(successList);
       accountBatchImgDTO.setFailList(failList);

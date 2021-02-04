@@ -73,6 +73,7 @@ public class AccountController implements IController {
 
     AccountBatchImgDTO accountBatchImgDTO = accountService.uploadBatchImg(accountBatchImgReq);
 
+
     return success(accountBatchImgDTO);
   }
 

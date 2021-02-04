@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 import com.welfare.common.enums.FileUniversalStorageEnum;
+import com.welfare.service.dto.UploadImgErrorMsgDTO;
 import java.util.Date;
 
 
@@ -347,8 +348,20 @@ public class AccountServiceImpl implements AccountService {
       }
       accountDao.updateBatchById(accountList);
 
+      List<UploadImgErrorMsgDTO> uploadImgErrorMsgDTOList = new ArrayList<>();
       accountBatchImgDTO.setSuccessList(successList);
-      accountBatchImgDTO.setFailList(failList);
+
+      if(CollectionUtils.isNotEmpty(failList)) {
+        for (String phone:
+        failList) {
+          UploadImgErrorMsgDTO uploadImgErrorMsgDTO = new UploadImgErrorMsgDTO();
+          uploadImgErrorMsgDTO.setError("该商户下没有此用户");
+          uploadImgErrorMsgDTO.setPhone(phone);
+
+          uploadImgErrorMsgDTOList.add(uploadImgErrorMsgDTO);
+        }
+        accountBatchImgDTO.setFailList(uploadImgErrorMsgDTOList);
+      }
 
       return accountBatchImgDTO;
     }

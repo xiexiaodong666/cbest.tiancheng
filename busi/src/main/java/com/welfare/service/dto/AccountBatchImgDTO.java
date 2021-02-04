@@ -24,5 +24,5 @@ public class AccountBatchImgDTO {
    * 失败的集合
    */
   @ApiModelProperty("失败的集合")
-  private List<String> failList;
+  private List<UploadImgErrorMsgDTO> failList;
 }

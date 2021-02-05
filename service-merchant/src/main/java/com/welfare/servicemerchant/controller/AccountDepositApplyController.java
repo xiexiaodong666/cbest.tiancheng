@@ -114,7 +114,6 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/approval")
   @ApiOperation("审批账号额度申请")
   @MerchantUser
-  @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 200, multiplier = 1.5))
   public R<String> approval(@Validated@RequestBody AccountDepositApprovalRequest request){
     return success(depositApplyService.approval(request)+"");
   }

@@ -62,15 +62,8 @@ public class AccountChangeEventRecordServiceImpl implements AccountChangeEventRe
       return;
     }
     accountChangeEventRecordCustomizeMapper.batchInsert(accountChangeEventRecordList);
-    if (accountChangeType.getChangeType().equals(AccountChangeType.ACCOUNT_NEW.getChangeType())) {
-      //批量回写
-      List<Map<String, Object>> mapList = AccountUtils.getMaps(accountChangeEventRecordList);
-      accountService.batchUpdateChangeEventId(mapList);
-    } else {
-      //新增操作记录之后
-      List<Map<String, Object>> list = AccountUtils.getMaps(accountChangeEventRecordList);
-      accountCustomizeMapper.batchUpdateChangeEventId(list);
-    }
+    List<Map<String, Object>> list = AccountUtils.getMaps(accountChangeEventRecordList);
+    accountCustomizeMapper.batchUpdateChangeEventId(list);
   }
 
   @Override

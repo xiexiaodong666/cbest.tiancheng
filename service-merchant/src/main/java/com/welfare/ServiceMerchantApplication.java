@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableFeignClients(basePackages = "com.welfare.service.remote")
 @SpringBootApplication(exclude = {MicaJacksonConfiguration.class})
 @EnableAsync
-@EnableRetry
 public class ServiceMerchantApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(ServiceMerchantApplication.class);

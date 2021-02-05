@@ -8,3 +8,6 @@ alter table account_bill_detail add column payment_type_info varchar(64) comment
 
 
 alter table order_info add column time_interval INT(4) comment '就餐时段: 1-早餐,2-午餐,3-晚餐,4-宵夜';
+
+# 删除订单表中order_id唯一约束
+alter table order_info drop index uk_order_id;

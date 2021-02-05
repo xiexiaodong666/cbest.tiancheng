@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -112,6 +114,7 @@ public class AccountDepositApplyController implements IController {
   @PostMapping("/approval")
   @ApiOperation("审批账号额度申请")
   @MerchantUser
+  @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 200, multiplier = 1.5))
   public R<String> approval(@Validated@RequestBody AccountDepositApprovalRequest request){
     return success(depositApplyService.approval(request)+"");
   }

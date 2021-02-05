@@ -29,6 +29,8 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
 
   private static final BigDecimal MAX_AMOUNT = BigDecimal.valueOf(99999999.99);
 
+  private static final Integer MAX_COUNT = 1000;
+
   private List<TempAccountDepositApply> applyList = new ArrayList<>();
 
   private TempAccountDepositApplyService depositApplyService;
@@ -75,6 +77,9 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
     }
     request.setPhone(request.getPhone().trim());
     phoneSet.add(request.getPhone().trim());
+    if (phoneSet.size() > MAX_COUNT) {
+      throw new BusiException("超过单次充值上限[1000]");
+    }
     requestList.add(request);
   }
 

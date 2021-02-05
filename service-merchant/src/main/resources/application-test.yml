@@ -18,11 +18,7 @@ spring:
     cluster:
       nodes:
         - 192.1.30.186:7000
-        - 192.1.30.186:7001
-        - 192.1.30.186:7002
-        - 192.1.30.186:7003
-        - 192.1.30.186:7004
-        - 192.1.30.186:7005
+
 logging:
   file:
     path: /home/finance/Logs/e-welfare-merchant.e-cbest.lotest

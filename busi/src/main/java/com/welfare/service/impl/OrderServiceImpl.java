@@ -565,12 +565,19 @@ public class OrderServiceImpl implements OrderService {
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.setOrderId(item.getOrderId());
             orderInfo.setPayCode(cardPayCode);
-            orderInfo.setTransNo(item.getTransNo());
-            orderInfo.setReturnTransNo(item.getReturnTransNo());
             orderInfo.setGoods(item.getGoods());
             orderInfo.setPayName("员工卡");
             orderInfo.setTransType(item.getTransType());
             orderInfo.setTransTypeName(WelfareConstant.TransType.valueOf(item.getTransType().toUpperCase()).desc());
+            if(WelfareConstant.TransType.REFUND.code().equals(item.getTransType())){
+                //退款处理（退款订单-- trans_no为订单退单交易号，return_trans_no为退单订单流水号）
+                orderInfo.setTransNo(item.getReturnTransNo());
+                orderInfo.setReturnTransNo(item.getTransNo());
+            }else {
+                orderInfo.setTransNo(item.getTransNo());
+                orderInfo.setReturnTransNo(item.getReturnTransNo());
+
+            }
             orderInfo.setCreateTime(new Date());
             orderInfo.setOrderTime(item.getTransTime());
             orderInfo.setAccountCode(item.getAccountCode());

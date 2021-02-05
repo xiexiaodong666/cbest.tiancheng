@@ -164,7 +164,6 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             } finally {
                 locks.forEach(DistributedLockUtil::unlock);
             }
-            DistributedLockUtil.unlock(lock);
         }
     }
 

@@ -47,7 +47,6 @@ public class DistributedLockUtil {
         return lockUnfairly(key,-1L);
     }
 
-
     public static void unlock(RLock lock){
         if (TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

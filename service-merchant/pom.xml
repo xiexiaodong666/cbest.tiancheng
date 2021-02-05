@@ -47,6 +47,15 @@
         </dependency>
 
         <dependency>
+            <artifactId>killbill-queue</artifactId>
+            <groupId>org.kill-bill.commons</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>ST4</artifactId>
+            <groupId>org.antlr</groupId>
+        </dependency>
+
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>

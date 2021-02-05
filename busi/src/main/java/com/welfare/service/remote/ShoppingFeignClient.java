@@ -1,6 +1,7 @@
 package com.welfare.service.remote;
 
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
+import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.*;
 import com.welfare.service.remote.fallback.ShoppingFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;

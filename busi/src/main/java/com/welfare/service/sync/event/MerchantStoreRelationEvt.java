@@ -3,13 +3,12 @@ package com.welfare.service.sync.event;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.killbill.bus.api.BusEvent;
-
-import java.util.UUID;
 
 /**
  * @author gaorui

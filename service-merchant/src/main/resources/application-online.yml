@@ -26,6 +26,10 @@ logging:
     path: /data/Logs/e-welfare-merchant
   level:
     root: info
+    com:
+      welfare:
+        service:
+          remote: debug
 #encrypt:
   #file: ${config.file:classpath:config/config.properties}
 

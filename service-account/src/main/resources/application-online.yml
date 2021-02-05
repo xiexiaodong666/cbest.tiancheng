@@ -37,9 +37,10 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 platformUser:
-  url:
+  url: http://welfare-internal.kube.cbestcd.com/backend-api/tc/store
+
 shopping:
-  url:
+  url: http://welfare-internal.kube.cbestcd.com/backend-api/rpc-base
 
 cbest:
   pay:

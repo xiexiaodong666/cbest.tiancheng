@@ -37,14 +37,14 @@ public interface TempAccountDepositApplyService {
    * @param fileId
    * @return
    */
-  Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(int current, int size, String fileId);
+  Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(int current, int size, String fileId, String merCode);
 
   /**
    * 通过fileId查询批量员工申请上传文件内容
    * @param fileId
    * @return
    */
-  List<TempAccountDepositApplyDTO> listByFileIdExistAccount(String fileId);
+  List<TempAccountDepositApplyDTO> listByFileIdExistAccount(String fileId, String merCode);
 
   /**
    * 通过fileId分页查询批量员工申请上传文件内容
@@ -73,6 +73,6 @@ public interface TempAccountDepositApplyService {
    * @param fileId
    * @return
    */
-  AccountApplyTotalDTO getUserCountAndTotalmount(String fileId);
+  AccountApplyTotalDTO getUserCountAndTotalmount(String fileId, String merCode);
 
 }

@@ -162,7 +162,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             // 初始化主表
             apply = depositApplyConverter.toAccountDepositApply(request);
             initAccountDepositApply(apply,request,merchant,merchantUser);
-            List<TempAccountDepositApplyDTO> deposits = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
+            List<TempAccountDepositApplyDTO> deposits = tempAccountDepositApplyService.listByFileIdExistAccount(fileId,
+                    merchantUser.getMerchantCode());
             if (CollectionUtils.isEmpty(deposits)) {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工", null);
             }
@@ -278,7 +279,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非批量申请修改", null);
             }
             if (StringUtils.isNotBlank(fileId)) {
-                List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId);
+                List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId,
+                        merchantUserInfo.getMerchantCode());
                 // 至少选一个员工
                 if (CollectionUtils.isEmpty(temps)) {
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "至少重新上传一个员工", null);
@@ -292,7 +294,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
                 }
                 List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
-                depositApplyDetailService.delByApplyCode(apply.getApplyCode());
+                depositApplyDetailService.physicalDelByApplyCode(apply.getApplyCode());
                 accountDepositApplyDetailDao.saveBatch(details);
                 tempAccountDepositApplyService.delByFileId(fileId);
                 apply.setRechargeAmount(sumAmount);

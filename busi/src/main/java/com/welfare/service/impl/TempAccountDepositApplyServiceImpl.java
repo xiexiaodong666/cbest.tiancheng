@@ -64,16 +64,16 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   }
 
   @Override
-  public Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(int current, int size, String fileId) {
+  public Page<TempAccountDepositApplyDTO> pageByFileIdByExistAccount(int current, int size, String fileId, String merCode) {
     Page<TempAccountDepositApply> page = new Page<>();
     page.setCurrent(current);
     page.setSize(size);
-    return tempAccountDepositApplyMapper.pageByFileIdByExistAccount(page, fileId);
+    return tempAccountDepositApplyMapper.pageByFileIdByExistAccount(page, fileId, merCode);
   }
 
   @Override
-  public List<TempAccountDepositApplyDTO> listByFileIdExistAccount(String fileId) {
-    return tempAccountDepositApplyMapper.pageByFileIdByExistAccount(fileId);
+  public List<TempAccountDepositApplyDTO> listByFileIdExistAccount(String fileId, String merCode) {
+    return tempAccountDepositApplyMapper.pageByFileIdByExistAccount(fileId, merCode);
   }
 
   @Override
@@ -135,7 +135,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   }
 
   @Override
-  public AccountApplyTotalDTO getUserCountAndTotalmount(String fileId) {
-    return tempAccountDepositApplyDao.getBaseMapper().getUserCountAndTotalAmount(fileId);
+  public AccountApplyTotalDTO getUserCountAndTotalmount(String fileId, String merCode) {
+    return tempAccountDepositApplyDao.getBaseMapper().getUserCountAndTotalAmount(fileId, merCode);
   }
 }

@@ -41,7 +41,7 @@ public class DefaultPersistentBusConfig {
     //被重新分发的单次数量
     properties.setProperty("org.killbill.persistent.bus.main.maxReDispatchCount", "500");
     //触发收割线程的周期
-    properties.setProperty("org.killbill.persistent.bus.main.reapSchedule", "1m");
+    properties.setProperty("org.killbill.persistent.bus.main.reapSchedule", "5m");
     properties.setProperty("org.killbill.persistent.bus.main.tableName", "bus_events");
     properties
         .setProperty("org.killbill.persistent.bus.main.historyTableName", "bus_events_history");

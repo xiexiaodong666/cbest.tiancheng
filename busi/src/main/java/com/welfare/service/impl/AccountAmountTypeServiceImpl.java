@@ -159,7 +159,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                             WelfareConstant.TransType.DEPOSIT_INCR));
                 }
                 accountAmountTypeDao.saveBatch(newAccountAmountTypes);
-                accountAmountTypeMapper.batchSaveOrUpdate(Lists.newArrayList(accountAmountTypeMap.values()));
+                if (!CollectionUtils.isEmpty(accountAmountTypeMap)) {
+                    accountAmountTypeMapper.batchSaveOrUpdate(Lists.newArrayList(accountAmountTypeMap.values()));
+                }
                 accountDao.getBaseMapper().batchUpdateAccountBalance(Lists.newArrayList(accountMap.values()));
 
                 accountChangeEventRecordService.batchSave(records, AccountChangeType.ACCOUNT_BALANCE_CHANGE);

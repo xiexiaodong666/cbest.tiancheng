@@ -224,7 +224,7 @@
             "system",now(),#{item.timeInterval}
             )
         </foreach>
-        ON DUPLICATE KEY UPDATE
+        <!--ON DUPLICATE KEY UPDATE
         trans_no = values(trans_no),
         return_trans_no = values(return_trans_no),
         goods = values(goods),
@@ -243,7 +243,7 @@
         trans_type_name = values(trans_type_name),
         update_user = values(update_user),
         update_time = values(update_time),
-        time_interval = values(time_interval)
+        time_interval = values(time_interval)-->
     </insert>
 
 </mapper>

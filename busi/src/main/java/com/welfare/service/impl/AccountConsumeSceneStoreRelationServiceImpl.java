@@ -68,6 +68,7 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
   }
 
   @Transactional(rollbackFor = Exception.class)
+  @Override
   public void deleteConsumeScene(String merCode,List<String> storeCodeList){
     log.info("商户门店删除,变更员工类型消费场景 merCode:{},storeCodeList:{}",merCode,storeCodeList);
     //要变更的账号信息

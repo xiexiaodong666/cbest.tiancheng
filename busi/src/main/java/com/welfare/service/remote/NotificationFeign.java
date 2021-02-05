@@ -1,5 +1,6 @@
 package com.welfare.service.remote;
 
+import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.remote.entity.NotificationReq;
 import com.welfare.service.remote.entity.NotificationResp;
 import com.welfare.service.remote.fallback.NotificationFallback;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @date 1/27/2021
  */
 @FeignClient(value = "notificationFeign", url = "${notification.url:http://test-welfare-internal.kube.cbestcd.com}", fallbackFactory = NotificationFallback.class)
+@ConditionalOnHavingProperty("notification.url")
 public interface NotificationFeign {
 
     /**

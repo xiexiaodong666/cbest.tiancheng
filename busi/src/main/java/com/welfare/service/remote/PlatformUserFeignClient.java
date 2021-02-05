@@ -1,9 +1,11 @@
 package com.welfare.service.remote;
 
+import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.remote.entity.PlatformUserDataResponse;
 import com.welfare.service.remote.entity.PlatformUserResponse;
 import com.welfare.service.remote.entity.ShoppingPlatformUser;
 import com.welfare.service.remote.fallback.PlatformUserFallback;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @date 2021/1/11 9:56 AM
  */
 @FeignClient(value = "platformUser", url = "${platformUser.url}", fallbackFactory = PlatformUserFallback.class)
+@ConditionalOnHavingProperty("platformUser.url")
 public interface PlatformUserFeignClient {
 
   /**

@@ -1,5 +1,6 @@
 package com.welfare.service.remote;
 
+import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.remote.entity.pos.*;
 import com.welfare.service.remote.fallback.CbestDmallFeignFallback;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,6 +17,7 @@ import java.util.Map;
  * @Date: 2021/1/29 10:36 上午
  */
 @FeignClient(value = "CbestDmall-Interface", url = "${cbest.dmall.url:http://dmall.e-cbest.com}", fallbackFactory = CbestDmallFeignFallback.class)
+@ConditionalOnHavingProperty("cbest.dmall.url")
 public interface CbestDmallFeign {
 
   String SUCCESS_CODE = "0000";

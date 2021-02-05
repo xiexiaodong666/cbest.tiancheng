@@ -47,6 +47,7 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 platformUser:
+  enabled: true
   url:
 shopping:
   url:

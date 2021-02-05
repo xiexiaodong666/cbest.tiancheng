@@ -1,6 +1,7 @@
 package com.welfare.service.sync.listener;
 
 import com.welfare.service.sync.event.AccountEvt;
+import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.killbill.bus.api.PersistentBus.EventBusException;
@@ -10,8 +11,6 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-
 /**
  * @author yaoxiao
  * @version 0.0.1
@@ -20,7 +19,7 @@ import javax.sql.DataSource;
 @Component
 @Slf4j
 public class AccountListener {
-  @Autowired
+  @Autowired(required = false)
   PersistentBus persistentBus;
 
   @Autowired

@@ -2,6 +2,7 @@ package com.welfare.service.sync.listener;
 
 
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
+import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.killbill.bus.api.PersistentBus.EventBusException;
@@ -10,8 +11,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.sql.DataSource;
 
 
 /**
@@ -23,7 +22,7 @@ import javax.sql.DataSource;
 @Slf4j
 public class MerchantStoreRelationListener {
 
-  @Autowired
+  @Autowired(required = false)
   PersistentBus persistentBus;
 
   @Autowired

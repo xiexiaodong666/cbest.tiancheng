@@ -45,10 +45,8 @@ public class AccountDepositApplyDetailServiceImpl implements AccountDepositApply
     }
 
     @Override
-    public Boolean delByApplyCode(String applyCode) {
-        QueryWrapper<AccountDepositApplyDetail> query = new QueryWrapper<>();
-        query.eq(AccountDepositApplyDetail.APPLY_CODE, applyCode);
-        return accountDepositApplyDetailDao.remove(query);
+    public Boolean physicalDelByApplyCode(String applyCode) {
+        return accountDepositApplyDetailDao.getBaseMapper().physicalDelByApplyCode(applyCode) > 0;
     }
 
     @Override

@@ -1,6 +1,7 @@
-package com.welfare.service.sync.handler;
+package com.welfare.servicemerchant.service.sync.handler;
 
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -22,14 +23,14 @@ import com.welfare.service.remote.entity.EmployerReqDTO;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author yaoxiao
@@ -43,7 +44,7 @@ public class AccountHandler {
 
   @Autowired
   PersistentBus persistentBus;
-  @Autowired
+  @Autowired(required = false)
   ShoppingFeignClient shoppingFeignClient;
   @Autowired
   private MerchantService merchantService;
@@ -107,6 +108,8 @@ public class AccountHandler {
         gson.toJson(employerReqDTO));
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateEmployer(employerReqDTO);
+    log.info("同步员工账户，resp【{}】", JSON.toJSONString(roleConsumptionResp));
+
     if (!("0000").equals(roleConsumptionResp.getCode())) {
       throw new BusiException("同步员工账户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
     }

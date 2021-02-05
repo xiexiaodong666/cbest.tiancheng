@@ -29,7 +29,7 @@ public interface AccountDepositApplyDetailService {
    * @param applyCode
    * @return
    */
-  Boolean delByApplyCode(String applyCode);
+  Boolean physicalDelByApplyCode(String applyCode);
 
   /**
    * 通过员工额度当申请id分页查询明细

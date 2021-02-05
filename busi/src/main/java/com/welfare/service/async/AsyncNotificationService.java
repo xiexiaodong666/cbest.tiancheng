@@ -6,6 +6,7 @@ import com.welfare.service.remote.entity.NotificationReq;
 import com.welfare.service.remote.entity.NotificationResp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,8 @@ import java.math.BigDecimal;
 public class AsyncNotificationService {
 
     public static final String SUCCEED = "0000";
-    private final NotificationFeign notificationFeign;
+    @Autowired(required = false)
+    private NotificationFeign notificationFeign;
     @Value("${notification.targetPath:https://test-welfare-app.sjgo365.com/tc/redirect?target=center}")
     private String targetPath;
 

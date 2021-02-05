@@ -1,4 +1,4 @@
-package com.welfare.service.sync.handler;
+package com.welfare.servicemerchant.service.sync.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -6,23 +6,20 @@ import com.google.common.eventbus.Subscribe;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
-import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantSyncDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.MerchantShoppingReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.sync.event.MerchantEvt;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -37,7 +34,7 @@ public class MerchantHandler  {
 
     @Autowired
     PersistentBus persistentBus;
-    @Autowired
+    @Autowired(required = false)
     ShoppingFeignClient shoppingFeignClient;
 
 

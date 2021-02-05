@@ -66,4 +66,8 @@
         on ac.account_code = ad.account_code
         where ad.apply_code = #{applyCode} and ac.deleted = 0 and ad.deleted = 0
     </select>
+
+    <delete id="physicalDelByApplyCode" >
+        delete from account_deposit_apply_detail where apply_code = #{applyCode}
+    </delete>
 </mapper>

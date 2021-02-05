@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.logging.log4j.util.Strings;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -85,7 +84,8 @@ public class AccountServiceImpl implements AccountService {
     private AccountTypeService accountTypeService;
     private final CardInfoDao cardInfoDao;
     private final CardApplyDao cardApplyDao;
-    private final ShoppingFeignClient shoppingFeignClient;
+    @Autowired(required = false)
+    private ShoppingFeignClient shoppingFeignClient;
     private final ObjectMapper mapper;
     @Autowired
     private final MerchantService merchantService;

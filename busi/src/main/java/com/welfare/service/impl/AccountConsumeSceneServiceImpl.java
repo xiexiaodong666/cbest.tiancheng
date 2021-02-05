@@ -58,7 +58,8 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final AccountConsumeSceneCustomizeMapper accountConsumeSceneCustomizeMapper;
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
   private final ObjectMapper mapper;
-  private final ShoppingFeignClient shoppingFeignClient;
+  @Autowired(required = false)
+  private ShoppingFeignClient shoppingFeignClient;
   @Autowired
   MerchantService merchantService;
   private final AccountTypeService accountTypeService;

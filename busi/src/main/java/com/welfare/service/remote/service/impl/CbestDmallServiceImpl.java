@@ -12,6 +12,7 @@ import com.welfare.service.remote.service.CbestDmallService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -29,8 +30,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CbestDmallServiceImpl implements CbestDmallService {
-
-  private final CbestDmallFeign cbestDmallFeign;
+  @Autowired(required = false)
+  private CbestDmallFeign cbestDmallFeign;
   private final SupplierStoreDao supplierStoreDao;
 
   @Override

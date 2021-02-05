@@ -1,7 +1,6 @@
 package com.welfare.service.remote;
 
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
 import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.MerchantCreditResp;

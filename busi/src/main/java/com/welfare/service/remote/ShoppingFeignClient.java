@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "shopping", url = "${shopping.url:http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base}", fallbackFactory = ShoppingFeignClientFallback.class)
+@FeignClient(value = "shopping", url = "${shopping.url:http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base}", fallbackFactory = ShoppingFeignClientFallback.class,configuration = FeignConfiguration.class)
 @ConditionalOnHavingProperty("shopping.url")
 public interface ShoppingFeignClient {
 

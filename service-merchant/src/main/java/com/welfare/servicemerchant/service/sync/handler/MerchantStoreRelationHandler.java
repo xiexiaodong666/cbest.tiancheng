@@ -47,7 +47,7 @@ public class MerchantStoreRelationHandler {
     log.info("消费门店同步返回数据:{}", resp);
 
     if (!("0000").equals(resp.getCode())) {
-      throw new BusiException("同步门店数据到商城中心失败msg【" + resp.getMsg() + "】");
+      throw new BusiException("同步消费门店数据到商城中心失败msg【" + resp.getMsg() + "】");
 
     }
   }

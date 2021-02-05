@@ -9,20 +9,14 @@
         id,account_code,mer_account_type_code,account_balance,deleted,create_user,create_time,update_user,update_time,version
     </sql>
 
-    <insert id="batchSaveOrUpdate" parameterType="list" >
-        insert into <include refid="tableName"/>
-        (account_code,mer_account_type_code,account_balance,deleted,create_user,create_time,update_user,update_time,version)
-        values
-        <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.accountCode},#{item.merAccountTypeCode},#{item.accountBalance},#{item.deleted},#{item.createUser},
-            #{item.createTime},#{item.updateUser},#{item.updateTime},#{item.version})
+    <update id="batchSaveOrUpdate" parameterType="list">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update <include refid="tableName"/>
+            set account_balance = #{item.accountBalance},update_time = now(),version = version + 1
+            where account_code = #{item.accountCode,jdbcType=BIGINT}
+            and mer_account_type_code = #{item.merAccountTypeCode}
         </foreach>
-        ON DUPLICATE KEY UPDATE
-        account_balance = account_balance + values(accountBalance),
-        update_time = values(updateTime),
-        update_user =  values(updateUser),
-        version = version + values(version)
-    </insert>
+    </update>
 
 
     <update id="incrBalance">

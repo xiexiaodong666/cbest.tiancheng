@@ -13,5 +13,13 @@
       UPDATE <include refid="tableName"/> set account_balance = account_balance + #{increaseBalance}, update_user = #{updateUser},update_time = now(),version = version + 1 where account_code = #{accountCode}
     </update>
 
+    <update id="batchUpdateAccountBalance">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE <include refid="tableName"/>
+                set account_balance = #{item.accountBalance},update_time = now(),version = version + 1
+            where account_code = #{item.accountCode}
+        </foreach>
+    </update>
+
 
 </mapper>

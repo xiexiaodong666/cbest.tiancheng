@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 账户信息(account)数据Mapper
@@ -27,4 +28,6 @@ public interface AccountMapper extends BaseMapper<Account> {
    * @return
    */
   Integer alwaysUpdateSomeColumnById(@Param(Constants.ENTITY) Account account);
+
+  int batchUpdateAccountBalance(List<Account> accountList);
 }

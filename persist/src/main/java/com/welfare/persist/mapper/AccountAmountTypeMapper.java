@@ -18,7 +18,7 @@ import java.util.List;
 @Mapper
 public interface AccountAmountTypeMapper extends BaseMapper<AccountAmountType> {
 
-  int batchSaveOrUpdate(@Param("list") List<AccountAmountType> list);
+  int batchSaveOrUpdate(List<AccountAmountType> list);
 
   /**
    *

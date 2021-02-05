@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dao.AccountAmountTypeDao;
@@ -159,10 +158,11 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                             deposit.getTransNo(),
                             WelfareConstant.TransType.DEPOSIT_INCR));
                 }
-                accountChangeEventRecordService.batchSave(records, AccountChangeType.ACCOUNT_BALANCE_CHANGE);
                 accountAmountTypeDao.saveBatch(newAccountAmountTypes);
-                accountAmountTypeDao.updateBatchById(accountAmountTypeMap.values(), accountAmountTypeMap.size());
-                accountDao.saveOrUpdateBatch(accountMap.values(), accountMap.size());
+                accountAmountTypeMapper.batchSaveOrUpdate(Lists.newArrayList(accountAmountTypeMap.values()));
+                accountDao.getBaseMapper().batchUpdateAccountBalance(Lists.newArrayList(accountMap.values()));
+
+                accountChangeEventRecordService.batchSave(records, AccountChangeType.ACCOUNT_BALANCE_CHANGE);
                 accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());
                 accountBillDetailDao.saveBatch(details, details.size());
                 orderTransRelationDao.saveBatch(relations, relations.size());

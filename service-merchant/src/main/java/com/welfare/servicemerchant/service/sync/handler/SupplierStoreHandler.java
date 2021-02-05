@@ -40,7 +40,7 @@ public class SupplierStoreHandler {
 
     @Autowired
     PersistentBus persistentBus;
-    @Autowired
+    @Autowired(required = false)
     ShoppingFeignClient shoppingFeignClient;
     @Autowired
     ObjectMapper mapper;

@@ -44,7 +44,7 @@ public class AccountConsumeSceneHandler {
 
   @Autowired
   PersistentBus persistentBus;
-  @Autowired
+  @Autowired(required = false)
   ShoppingFeignClient shoppingFeignClient;
 
   private Gson gson = new Gson();

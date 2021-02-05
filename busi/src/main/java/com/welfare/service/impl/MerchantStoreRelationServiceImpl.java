@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +62,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private final ObjectMapper mapper;
   private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final ApplicationContext applicationContext;
-  private final ShoppingFeignClient shoppingFeignClient;
+  @Autowired(required = false)
+  private ShoppingFeignClient shoppingFeignClient;
 
   @Override
   public Page<MerchantStoreRelation> pageQuery(Page<MerchantStoreRelation> page,

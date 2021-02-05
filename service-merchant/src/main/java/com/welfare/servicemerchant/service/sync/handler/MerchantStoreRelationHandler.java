@@ -24,9 +24,8 @@ public class MerchantStoreRelationHandler {
 
   @Autowired
   PersistentBus persistentBus;
-  @Autowired
+  @Autowired(required = false)
   private ShoppingFeignClient shoppingFeignClient;
-
 
   @PostConstruct
   private void register() {

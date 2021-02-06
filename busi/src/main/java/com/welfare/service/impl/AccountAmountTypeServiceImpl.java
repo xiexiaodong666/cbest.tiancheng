@@ -10,6 +10,7 @@ import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
+import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.*;
@@ -62,7 +63,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
 
     @Override
-    public int batchSaveOrUpdate(List<AccountAmountType> list) {
+    public int batchSaveOrUpdate(List<AccountDepositIncreDTO> list) {
         return accountAmountTypeMapper.batchSaveOrUpdate(list);
     }
 
@@ -98,7 +99,8 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
             accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
             accountChangeEventRecordService.save(accountChangeEventRecord);
-            accountDao.saveOrUpdate(account);
+            accountDao.getBaseMapper().updateAccountBalance(account.getAccountBalance(), account.getAccountCode());
+            System.out.println(accountDao.saveOrUpdate(account));
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType, account);
             orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),
                     deposit.getTransNo(),
@@ -158,11 +160,17 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                             deposit.getTransNo(),
                             WelfareConstant.TransType.DEPOSIT_INCR));
                 }
+                accountChangeEventRecordDao.getBaseMapper().batchInsert(records);
                 accountAmountTypeDao.saveBatch(newAccountAmountTypes);
+                Map<Long, BigDecimal> amountMap = deposits.stream().collect(Collectors.toMap(Deposit::getAccountCode, Deposit::getAmount));
                 if (!CollectionUtils.isEmpty(accountAmountTypeMap)) {
-                    accountAmountTypeMapper.batchSaveOrUpdate(Lists.newArrayList(accountAmountTypeMap.values()));
+                    List<AccountAmountType> amountTypes = Lists.newArrayList(accountAmountTypeMap.values());
+                    accountAmountTypeMapper.batchSaveOrUpdate(AccountDepositIncreDTO.of(amountTypes, amountMap));
                 }
-                accountDao.getBaseMapper().batchUpdateAccountBalance(Lists.newArrayList(accountMap.values()));
+                List<Account> accounts = Lists.newArrayList(accountMap.values());
+                Map<Long, Long> changeEventIdMap = records.stream().collect(Collectors.toMap(AccountChangeEventRecord::getAccountCode,
+                        AccountChangeEventRecord::getId));
+                accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(accounts, amountMap, changeEventIdMap));
 
                 accountChangeEventRecordService.batchSave(records, AccountChangeType.ACCOUNT_BALANCE_CHANGE);
                 accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());

@@ -12,7 +12,7 @@
     <update id="batchSaveOrUpdate" parameterType="list">
         <foreach collection="list" item="item" index="index" open="" close="" separator=";">
             update <include refid="tableName"/>
-            set account_balance = #{item.accountBalance},update_time = now(),version = version + 1
+            set account_balance = account_balance + #{item.amount},update_time = now(),version = version + 1
             where account_code = #{item.accountCode,jdbcType=BIGINT}
             and mer_account_type_code = #{item.merAccountTypeCode}
         </foreach>

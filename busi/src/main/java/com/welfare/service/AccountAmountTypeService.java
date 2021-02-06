@@ -1,5 +1,6 @@
 package com.welfare.service;
 
+import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.service.dto.Deposit;
@@ -24,7 +25,7 @@ public interface AccountAmountTypeService {
      * @param list
      * @return
      */
-    int batchSaveOrUpdate(List<AccountAmountType> list);
+    int batchSaveOrUpdate(List<AccountDepositIncreDTO> list);
 
     /**
      * 获取唯一一条accountAmountType

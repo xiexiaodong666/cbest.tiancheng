@@ -1,6 +1,7 @@
 package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.AccountAmountType;
 import java.math.BigDecimal;
 import org.apache.ibatis.annotations.Mapper;
@@ -18,7 +19,7 @@ import java.util.List;
 @Mapper
 public interface AccountAmountTypeMapper extends BaseMapper<AccountAmountType> {
 
-  int batchSaveOrUpdate(List<AccountAmountType> list);
+  int batchSaveOrUpdate(List<AccountDepositIncreDTO> list);
 
   /**
    *

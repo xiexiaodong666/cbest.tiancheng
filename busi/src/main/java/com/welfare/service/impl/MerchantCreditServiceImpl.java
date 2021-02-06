@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.exception.BusiException;
@@ -112,7 +113,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                     .map(MerchantAccountOperation::getMerchantBillDetail)
                     .collect(Collectors.toList());
             //上一句里面已经对merchantCredit进行了操作
-            merchantCreditDao.updateById(merchantCredit);
+            merchantCreditDao.getBaseMapper().decreaseRechargeLimit(merchantCredit.getRechargeLimit(), merchantCredit.getId());
             merchantBillDetailDao.saveBatch(merchantBillDetails);
             return operations;
         } finally {
@@ -152,10 +153,8 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                     operations.addAll(accountOperations);
                 }
                 // 批量更新金额
-                boolean isSuccess = merchantCreditDao.updateBatchById(merchantCreditMap.values(), merchantCreditMap.size());
-                if (!isSuccess) {
-                    throw new RuntimeException("充值失败，重试");
-                }
+                merchantCreditDao.getBaseMapper().batchUpdateRechargeLimit(Lists.newArrayList(merchantCreditMap.values()));
+
                 // 保存流水
                 List<MerchantBillDetail> merchantBillDetails = operations.stream()
                         .map(MerchantAccountOperation::getMerchantBillDetail)

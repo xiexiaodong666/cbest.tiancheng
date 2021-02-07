@@ -9,6 +9,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 供应商门店(supplier_store)数据DAO
  *
@@ -49,5 +51,15 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
         return super.updateById(entity);
     }
 
+    /**
+     * 返回门店列表，指定列
+     * @param columns
+     * @return
+     */
+    public List<SupplierStore> selectAll(String... columns){
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select(columns);
+        return list(queryWrapper);
+    }
 
 }

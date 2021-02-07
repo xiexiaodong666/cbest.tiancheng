@@ -172,7 +172,6 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                         AccountChangeEventRecord::getId));
                 accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(accounts, amountMap, changeEventIdMap));
 
-                accountChangeEventRecordService.batchSave(records, AccountChangeType.ACCOUNT_BALANCE_CHANGE);
                 accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());
                 accountBillDetailDao.saveBatch(details, details.size());
                 orderTransRelationDao.saveBatch(relations, relations.size());

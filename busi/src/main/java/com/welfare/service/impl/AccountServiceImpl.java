@@ -806,25 +806,21 @@ public class AccountServiceImpl implements AccountService {
         String updateUser = UserInfoHolder.getUserInfo().getUserId();
         if (CollectionUtils.isNotEmpty(accounts)) {
             accounts.forEach(account -> {
-                restoreSurplusQuotaByAccountCode(account.getAccountCode(), updateUser, settlementTransNo);
+                restoreSurplusQuotaByAccountCode(account, updateUser, settlementTransNo);
             });
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser,
+    public void restoreSurplusQuotaByAccountCode(Account account, String updateUser,
                                                  String settlementTransNo) {
-        String lockKey = ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + accountCode;
+        String lockKey = ACCOUNT_AMOUNT_TYPE_OPERATE + ":" + account.getAccountCode();
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
-            QueryWrapper<Account> queryCredit = new QueryWrapper<>();
-            queryCredit.eq(Account.ACCOUNT_CODE, accountCode);
-            queryCredit.eq(Account.CREDIT, Boolean.TRUE);
-            Account account = accountDao.getOne(queryCredit);
-            if (Objects.nonNull(account)) {
-                BigDecimal updateQuota = account.getMaxQuota().subtract(account.getSurplusQuota());
-                int isSuccess = accountCustomizeMapper
+          BigDecimal updateQuota = account.getMaxQuota().subtract(account.getSurplusQuota());
+          if (updateQuota.compareTo(BigDecimal.ZERO) != 0) {
+                accountCustomizeMapper
                         .restoreAccountSurplusQuota(account.getAccountCode(), updateUser);
                 accountAmountTypeMapper.updateBalance(
                         account.getAccountCode(),

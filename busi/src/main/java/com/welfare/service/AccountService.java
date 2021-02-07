@@ -97,11 +97,11 @@ public interface AccountService {
 
   /**
    * 恢复的账户的额度
-   * @param accountCode
+   * @param account
    * @param updateUser
    * @param settlementTransNo
    */
-  void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser, String settlementTransNo);
+  void restoreSurplusQuotaByAccountCode(Account account, String updateUser, String settlementTransNo);
 
   /**
    * 查询消费场景DO

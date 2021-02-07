@@ -41,4 +41,7 @@ public interface AccountDepositApplyDetailMapper extends BaseMapper<AccountDepos
    * @return
    */
   AccountApplyTotalDTO getUserCountAndTotalmount(@Param("applyCode") String applyCode);
+
+
+  int physicalDelByApplyCode(@Param("applyCode") String applyCode);
 }

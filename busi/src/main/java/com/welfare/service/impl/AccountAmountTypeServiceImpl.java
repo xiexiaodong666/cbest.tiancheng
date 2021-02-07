@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
@@ -102,7 +103,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(deposit, account, accountAmountType);
             accountDeductionDetailDao.save(deductionDetail);
         } finally {
-            lock.unlock();
+            DistributedLockUtil.unlock(lock);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.welfare.service.sync.handler;
+package com.welfare.servicemerchant.service.sync.handler;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;

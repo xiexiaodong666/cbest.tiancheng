@@ -1,4 +1,4 @@
-package com.welfare.service.sync.handler;
+package com.welfare.servicemerchant.service.sync.handler;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -7,12 +7,11 @@ import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author hao.yin

@@ -77,18 +77,18 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
         .getEventList(accounts, AccountChangeType.ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE);
     accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE);
 
-    //删除 AccountConsumeScene
-    List<AccountConsumeScene> updateAccountConsumerScene = accountConsumeSceneCustomizeMapper.queryDeleteSceneByMerCodeAndStoreCodeList(merCode,storeCodeList);
-    accountConsumeSceneDao.removeByIds(updateAccountConsumerScene.stream().map(accountConsumeScene -> {
-      return accountConsumeScene.getId();
-    }).collect(Collectors.toList()));
-
     //删除 AccountConsumeStoreRelation
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationMapper
         .queryDeleteRelationScene(merCode,storeCodeList);
     accountConsumeSceneStoreRelationDao.removeByIds(relationList.stream().map(accountConsumeSceneStoreRelation -> {
       return accountConsumeSceneStoreRelation.getId();
     }).collect(Collectors.toList()));
+
+    //删除 AccountConsumeScene
+    List<Long> deleteConsumeIdList = accountConsumeSceneCustomizeMapper.queryDeleteConsumeIdList(merCode);
+    if(CollectionUtils.isNotEmpty(deleteConsumeIdList)){
+      accountConsumeSceneDao.removeByIds(deleteConsumeIdList);
+    }
 
     List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(merCode);
     //下发数据

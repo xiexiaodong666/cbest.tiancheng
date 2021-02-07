@@ -223,4 +223,14 @@ WHERE
     #{id}
     </foreach>
   </select>
+
+  <select id = "queryDeleteConsumeIdList" resultType="java.lang.Long">
+    select
+      acs.id as bsId
+    from  account_consume_scene acs
+            left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
+    where acs.mer_code= #{merCode}
+    group by bsId
+    HAVING count(if(relation.deleted = 0,1,null)) = 0
+  </select>
 </mapper>

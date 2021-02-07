@@ -77,6 +77,11 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
         .getEventList(accounts, AccountChangeType.ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE);
     accountChangeEventRecordService.batchSave(recordList, AccountChangeType.ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE);
 
+    //删除 AccountConsumeScene
+    List<AccountConsumeScene> updateAccountConsumerScene = accountConsumeSceneCustomizeMapper.queryDeleteSceneByMerCodeAndStoreCodeList(merCode,storeCodeList);
+    accountConsumeSceneDao.removeByIds(updateAccountConsumerScene.stream().map(accountConsumeScene -> {
+      return accountConsumeScene.getId();
+    }).collect(Collectors.toList()));
 
     //删除 AccountConsumeStoreRelation
     List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationMapper

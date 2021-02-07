@@ -91,7 +91,11 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 accountAmountTypeDao.save(accountAmountType);
             } else {
                 accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
-                accountAmountTypeDao.updateById(accountAmountType);
+                accountAmountTypeDao.getBaseMapper().updateBalance(
+                        accountAmountType.getAccountCode(),
+                        accountAmountType.getMerAccountTypeCode(),
+                        accountAmountType.getAccountBalance(),
+                        "sys");
             }
             account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
             AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
@@ -100,7 +104,6 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
             accountChangeEventRecordService.save(accountChangeEventRecord);
             accountDao.getBaseMapper().updateAccountBalance(account.getAccountBalance(), account.getAccountCode());
-            System.out.println(accountDao.saveOrUpdate(account));
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType, account);
             orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),
                     deposit.getTransNo(),

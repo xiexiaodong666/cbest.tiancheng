@@ -11,6 +11,19 @@
   <sql id="baseColumn">
         id,mer_code,account_type_code,remark,create_user,create_time,update_user,update_time,flag,version
     </sql>
+  <sql id="baseMapColumn">
+    acs.id,
+	acs.mer_code AS merCode,
+	acs.account_type_code AS accountTypeCode,
+	acs.remark,
+	acs.STATUS as status,
+	acs.create_time AS createTime,
+	acs.deleted,
+	acs.create_user as createUser,
+	acs.update_user as updateUser,
+	acs.update_time as updateTime,
+	acs.version
+  </sql>
   <sql id="pageAndExport">
      SELECT
     GROUP_CONCAT( CONCAT( msr.store_alias, "-", msr.store_code ) ) AS storeInfo,
@@ -35,9 +48,17 @@
   </sql>
 
 
+
+
   <select id="getPageDTO" resultType="com.welfare.persist.dto.AccountConsumeScenePageDTO">
     SELECT
-    GROUP_CONCAT( CONCAT( msr.store_alias, "-", msr.store_code ) ) AS storeInfo,
+    GROUP_CONCAT(
+    DISTINCT(CONCAT(
+    msr.store_alias,
+    "-",
+    msr.store_code
+    ))
+    ) AS storeInfo,
     act.type_name AS accountTypeName,
     acs.id,
     acs.STATUS,
@@ -50,12 +71,12 @@
     acs.mer_code as merCode
     FROM
     account_consume_scene acs
-    inner join account_consume_scene_store_relation acstr on acs.id = acstr.account_consume_scene_id
-    inner JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code
-    AND acs.mer_code = msr.mer_code
-    inner JOIN account_type act ON act.type_code = acs.account_type_code
-    where acs.deleted =0 and acstr.deleted= 0 and msr.deleted = 0
-    and acs.mer_code = act.mer_code and acs.mer_code = msr.mer_code
+    INNER JOIN account_type act ON act.type_code = acs.account_type_code and  acs.mer_code = act.mer_code
+    INNER JOIN account_consume_scene_store_relation acstr ON acs.id = acstr.account_consume_scene_id
+    INNER JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code AND acs.mer_code = msr.mer_code
+    WHERE
+    acs.deleted = 0
+    AND acstr.deleted = 0
     <if test=" merCode !='' and merCode != null ">
       and acs.mer_code = #{merCode}
     </if>
@@ -71,7 +92,7 @@
     <if test="createTimeEnd != null ">
       and acs.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
-    GROUP BY acs.account_type_code,acs.mer_code
+    GROUP BY acs.id
     order by acs.create_time desc
   </select>
 
@@ -94,6 +115,7 @@
       <result property="sceneConsumType" column="sceneConsumType"/>
     </collection>
   </resultMap>
+
 
   <select id="queryAccountConsumerScene4Detail"
     resultMap="detailMap">
@@ -142,6 +164,31 @@ WHERE
 	acs.id = #{id}
   </select>
 
+  <select id="queryByIdList"
+    resultType="com.welfare.persist.entity.AccountConsumeScene">
+    SELECT
+      acs.id,
+      acs.mer_code AS merCode,
+      acs.account_type_code AS accountTypeCode,
+      acs.remark,
+      acs.STATUS as status,
+      acs.create_time AS createTime,
+      acs.deleted,
+      acs.create_user as createUser,
+      acs.update_user as updateUser,
+      acs.update_time as updateTime,
+      acs.version
+    FROM
+      account_consume_scene acs
+    WHERE
+      acs.id in
+    <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+
+
   <select id="getCountByMerCodeAndAccountTypeAndStoreCode" resultType="Integer">
     SELECT
 	count( 1 )
@@ -154,4 +201,26 @@ WHERE
 	AND acs.account_type_code = #{storeCode}
   </select>
 
+  <select id="queryDeleteScene" resultType="com.welfare.persist.entity.AccountConsumeScene">
+    select
+    DISTINCT(acs.id) as bsId,
+    <include refid="baseMapColumn"/>
+    from  account_consume_scene acs
+    left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
+    where acs.mer_code= #{merCode}
+  </select>
+
+
+  <select id="queryDeleteSceneByMerCodeAndStoreCodeList" resultType="com.welfare.persist.entity.AccountConsumeScene">
+    select
+    DISTINCT(acs.id) as bsId,
+    <include refid="baseMapColumn"/>
+    from  account_consume_scene acs
+    left join account_consume_scene_store_relation relation on relation.account_consume_scene_id = acs.id
+    where acs.mer_code= #{merCode}
+    and relation.store_code in
+    <foreach collection="storeCodeList" item="id" index="index" open="(" close=")" separator=",">
+    #{id}
+    </foreach>
+  </select>
 </mapper>

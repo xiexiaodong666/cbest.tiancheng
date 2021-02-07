@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
  * @date 2021/1/21 11:09
  */
 public class AccountUtil {
-  private static String regex = "^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17[013678])|(18[0,5-9]))\\d{8}$";
+
+  private static String regex = "^[1](([3|5|8][\\d])|([4][4,5,6,7,8,9])|([6][2,5,6,7])|([7][^9])|([9][1,8,9]))[\\d]{8}$";//"^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17[013678])|(18[0,5-9]))\\d{8}$";
 
   public static boolean validPhone(String phone){
     Pattern p = Pattern.compile(regex);

@@ -25,7 +25,6 @@ public class MerchantStoreRelationDao extends ServiceImpl<MerchantStoreRelationM
         queryWrapper.eq(MerchantStoreRelation.STORE_CODE,storeCode).eq(MerchantStoreRelation.MER_CODE,merCode);
         return getOne(queryWrapper);
     }
-
     public MerchantStoreRelation getOneByStoreCodeAndMerCode(String storeCode,String merCode){
         return this.getOneByStoreCodeAndMerCodeCacheable(storeCode, merCode);
     }

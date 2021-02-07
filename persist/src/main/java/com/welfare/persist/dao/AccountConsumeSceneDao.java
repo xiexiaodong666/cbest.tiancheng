@@ -6,6 +6,7 @@ import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.mapper.AccountConsumeSceneMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class AccountConsumeSceneDao extends ServiceImpl<AccountConsumeSceneMappe
         return getOne(queryWrapper);
     }
 
+    @Cacheable(value = "getAccountTypeAndMerCode",key = "#accountType+#merCode")
     public List<AccountConsumeScene> getAccountTypeAndMerCode(String accountType, String merCode){
         QueryWrapper<AccountConsumeScene> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountConsumeScene.ACCOUNT_TYPE_CODE,accountType)

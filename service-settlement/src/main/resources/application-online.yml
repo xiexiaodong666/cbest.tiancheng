@@ -60,7 +60,8 @@ cbest:
   oss:
     config:
       bucket: sjgo-img
-
+  dmall:
+    url: http://dmall.e-cbest.com
 xxl:
   job:
     admin:

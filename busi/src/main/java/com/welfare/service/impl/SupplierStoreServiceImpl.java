@@ -18,18 +18,21 @@ import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
+import com.welfare.persist.dao.StoreConsumeTypeDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantAddress;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import com.welfare.persist.entity.StoreConsumeType;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.SupplierStoreExMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.DictService;
 import com.welfare.service.MerchantAddressService;
 import com.welfare.service.MerchantService;
+import com.welfare.service.StoreConsumeTypeService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.converter.SupplierStoreAddConverter;
 import com.welfare.service.converter.SupplierStoreDetailConverter;
@@ -39,6 +42,8 @@ import com.welfare.service.dto.DictReq;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantAddressReq;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.StoreConsumeTypeDTO;
+import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.dto.SupplierStoreActivateReq;
 import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreDetailDTO;
@@ -67,7 +72,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
@@ -89,6 +96,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class SupplierStoreServiceImpl implements SupplierStoreService {
 
+  private final StoreConsumeTypeDao storeConsumeTypeDao;
+  private final StoreConsumeTypeService storeConsumeTypeService;
   private final SupplierStoreDao supplierStoreDao;
   private final SupplierStoreAddConverter supplierStoreAddConverter;
 
@@ -115,26 +124,43 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     List<SupplierStore> supplierStores = supplierStoreDao.list(q);
     if (SupplierStoreSourceEnum.MERCHANT_STORE_RELATION.getCode().equals(req.getSource())) {
       for (SupplierStore s:
-          supplierStores) {
-      try {
-
+              supplierStores) {
+        try {
           if (Strings.isNotEmpty(s.getConsumType())) {
             Map<String, Boolean> consumeTypeMap = mapper.readValue(
-                s.getConsumType(), Map.class);
+                    s.getConsumType(), Map.class);
             ConsumeTypesUtils.removeFalseKey(consumeTypeMap);
             s.setConsumType(mapper.writeValueAsString(consumeTypeMap));
           } else {
             log.error(s.getConsumType() + "########");
           }
-
-
-      } catch (JsonProcessingException e) {
-        log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
+        } catch (JsonProcessingException e) {
+          log.info("消费方式转换失败，格式错误【{}】", s.getConsumType());
+        }
       }
     }
+
+    if (CollectionUtils.isNotEmpty(supplierStores) && StringUtils.isNoneBlank(req.getConsumType())) {
+      supplierStores = supplierStores.stream().filter(s -> {
+        if (Strings.isNotEmpty(s.getConsumType())) {
+          Map<String, Boolean> consumeTypeMap;
+          try {
+            consumeTypeMap = mapper.readValue(s.getConsumType(), Map.class);
+            return consumeTypeMap.get(req.getConsumType()) != null
+                    && consumeTypeMap.get(req.getConsumType());
+          } catch (JsonProcessingException e) {
+            e.printStackTrace();
+          }
+          return false;
+        } else {
+          return false;
+        }
+      }).collect(Collectors.toList());
     }
-      return supplierStores;
+
+    return supplierStores;
   }
+
 
   @Override
   public List<SupplierStoreTreeDTO> tree(String merCode, String source) {
@@ -241,6 +267,22 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     //商户名称
     store.setMerName(merchantService.getMerchantByMerCode(store.getMerCode()).getMerName());
+
+    List<StoreConsumeTypeDTO> storeConsumeTypeDTOList = new ArrayList<>();
+    List<StoreConsumeType> storeConsumeTypeList = storeConsumeTypeService.getStoreConsumeTypeList(store.getStoreCode());
+    store.setStoreConsumeTypeList(storeConsumeTypeDTOList);
+
+    if(CollectionUtils.isNotEmpty(storeConsumeTypeList)) {
+      for (StoreConsumeType storeConsumeType:
+      storeConsumeTypeList) {
+        StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
+        storeConsumeTypeDTO.setCashierNo(storeConsumeType.getCashierNo());
+        storeConsumeTypeDTO.setConsumeType(storeConsumeType.getConsumType());
+
+        storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
+      }
+    }
+
     //自提点地址
     MerchantAddressReq merchantAddressReq = new MerchantAddressReq();
     merchantAddressReq.setRelatedType(SupplierStore.class.getSimpleName());
@@ -260,18 +302,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
+  @Cacheable(value = "getSupplierStoreByStoreCode",key = "#storeCode")
   public SupplierStore getSupplierStoreByStoreCode(String storeCode) {
     QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(SupplierStore.STORE_CODE, storeCode);
     return supplierStoreDao.getOne(queryWrapper);
   }
 
-  @Override
-  public SupplierStore getSupplierStoreByCashierNo(String cashierNo) {
-    QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
-    queryWrapper.eq(SupplierStore.CASHIER_NO, cashierNo);
-    return supplierStoreDao.getOne(queryWrapper);
-  }
 
   @Override
   @Transactional(rollbackFor = Exception.class)
@@ -306,14 +343,34 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     save.setStoreParent(save.getMerCode());
     boolean flag = supplierStoreDao.save(save) && merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), save.getId());
+
+    //
+    boolean saveStoreConsumeType = true;
+    List<StoreConsumeType> storeConsumeTypeList = new ArrayList<>();
+    List<StoreConsumeTypeDTO> consumeTypeDTOList = supplierStore.getStoreConsumeTypeList();
+    if(CollectionUtils.isNotEmpty(consumeTypeDTOList)) {
+      for (StoreConsumeTypeDTO storeConsumeTypeDTO:
+      consumeTypeDTOList) {
+        StoreConsumeType storeConsumeType = new StoreConsumeType();
+        storeConsumeType.setStoreCode(save.getStoreCode());
+        storeConsumeType.setCashierNo(storeConsumeTypeDTO.getCashierNo());
+        storeConsumeType.setConsumType(storeConsumeTypeDTO.getConsumeType());
+        storeConsumeType.setDeleted(false);
+        storeConsumeTypeList.add(storeConsumeType);
+      }
+      saveStoreConsumeType = storeConsumeTypeDao.saveBatch(storeConsumeTypeList);
+    }
+
+
     //同步商城中台
     //同步重百付
-    if (!flag) {
+    if (!flag || !saveStoreConsumeType) {
       throw new BusiException("新增门店失败");
     }
     SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(save);
     detailDTO.setId(save.getId());
     detailDTO.setAddressList(supplierStore.getAddressList());
+    detailDTO.setStoreConsumeTypeList(supplierStore.getStoreConsumeTypeList());
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
@@ -362,6 +419,19 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     merchantAddressReq.setRelatedId(sync.getId());
     List<MerchantAddressDTO> syncAddress = merchantAddressService.list(merchantAddressReq);
     sync.setAddressList(syncAddress);
+
+    List<StoreConsumeTypeDTO> storeConsumeTypeDTOList = new ArrayList<>();
+    List<StoreConsumeType> storeConsumeTypeList = storeConsumeTypeService.getStoreConsumeTypeList(supplierStore.getStoreCode());
+    if(CollectionUtils.isNotEmpty(storeConsumeTypeList)) {
+      for (StoreConsumeType storeConsumeType:
+      storeConsumeTypeList ) {
+        StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
+        storeConsumeTypeDTO.setConsumeType(storeConsumeType.getConsumType());
+        storeConsumeTypeDTO.setCashierNo(storeConsumeType.getCashierNo());
+        storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
+      }
+    }
+    sync.setStoreConsumeTypeList(storeConsumeTypeDTOList);
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(sync);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
@@ -382,8 +452,13 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     //存放门店code和地址的对应关系，用于批量新增门店后，存入对应地址
     Map<String, List<MerchantAddressDTO>> map = new HashMap<>();
+    Map<String, List<StoreConsumeTypeDTO>> stringListHashMap = new HashMap<>();
+
+    List<StoreConsumeType> storeConsumeTypeList = new ArrayList<>();
+
     for (SupplierStoreAddDTO supplierStoreAddDTO : list) {
       map.put(supplierStoreAddDTO.getStoreCode(), supplierStoreAddDTO.getAddressList());
+      stringListHashMap.put(supplierStoreAddDTO.getStoreCode(), supplierStoreAddDTO.getStoreConsumeTypeList());
     }
     List<MerchantAddressDTO> addressDTOList = new ArrayList<>();
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
@@ -398,12 +473,33 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         });
         addressDTOList.addAll(addressItemList);
       }
+
+      List<StoreConsumeTypeDTO> storeConsumeTypeDTOList = stringListHashMap.get(store.getStoreCode());
+      if (EmptyChecker.notEmpty(storeConsumeTypeDTOList)) {
+        syncDTO.setStoreConsumeTypeList(storeConsumeTypeDTOList);
+        for (StoreConsumeTypeDTO storeConsumeTypeDTO:
+        storeConsumeTypeDTOList) {
+          StoreConsumeType storeConsumeType = new StoreConsumeType();
+          storeConsumeType.setCashierNo(storeConsumeTypeDTO.getCashierNo());
+          storeConsumeType.setConsumType(storeConsumeTypeDTO.getConsumeType());
+          storeConsumeType.setStoreCode(store.getStoreCode());
+          storeConsumeType.setDeleted(false);
+          storeConsumeTypeList.add(storeConsumeType);
+        }
+      }
       syncList.add(syncDTO);
 
     }
+
     if (!merchantAddressService.batchSave(addressDTOList, SupplierStore.class.getSimpleName())) {
       throw new BusiException("导入门店--批量插入地址失败");
     }
+    if(CollectionUtils.isNotEmpty(storeConsumeTypeList)) {
+      if (!storeConsumeTypeDao.saveBatch(storeConsumeTypeList)) {
+        throw new BusiException("导入门店--批量插入关联门店消费方法收银机号失败");
+      }
+    }
+
     //同步商城中台
     //同步重百付
     for(SupplierStoreSyncDTO item: syncList){
@@ -442,6 +538,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public boolean delete(Long id) {
     SupplierStore supplierStore = supplierStoreDao.getById(id);
     if (EmptyChecker.isEmpty(supplierStore)) {
@@ -450,6 +547,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     Boolean flag = supplierStoreDao.removeById(id);
     merchantAddressService.delete(
         SupplierStore.class.getSimpleName(), id);
+    storeConsumeTypeService.removeByStore(supplierStore.getStoreCode());
+
     //同步商城中台
     if (!flag) {
       throw new BusiException("删除门店失败");
@@ -485,13 +584,34 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     boolean flag = 1 == supplierStoreDao.updateAllColumnById(update);
     boolean flag3 = merchantAddressService.saveOrUpdateBatch(
         supplierStore.getAddressList(), SupplierStore.class.getSimpleName(), supplierStore.getId());
+
+    //
+    boolean saveStoreConsumeType = true;
+    List<StoreConsumeType> storeConsumeTypeList = new ArrayList<>();
+    List<StoreConsumeTypeDTO> consumeTypeDTOList = supplierStore.getStoreConsumeTypeList();
+
+    storeConsumeTypeService.removeByStore(entity.getStoreCode());
+    if(CollectionUtils.isNotEmpty(consumeTypeDTOList)) {
+      for (StoreConsumeTypeDTO storeConsumeTypeDTO:
+          consumeTypeDTOList) {
+        StoreConsumeType storeConsumeType = new StoreConsumeType();
+        storeConsumeType.setStoreCode(entity.getStoreCode());
+        storeConsumeType.setCashierNo(storeConsumeTypeDTO.getCashierNo());
+        storeConsumeType.setConsumType(storeConsumeTypeDTO.getConsumeType());
+        storeConsumeType.setDeleted(false);
+        storeConsumeTypeList.add(storeConsumeType);
+      }
+      saveStoreConsumeType = storeConsumeTypeDao.saveBatch(storeConsumeTypeList);
+    }
+
     //同步商城中台
-    if (!(flag && flag2 && flag3)) {
+    if (!(flag && flag2 && flag3 && saveStoreConsumeType)) {
       throw new BusiException("更新门店失败");
     }
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(update);
     detailDTO.setAddressList(supplierStore.getAddressList());
+    detailDTO.setStoreConsumeTypeList(supplierStore.getStoreConsumeTypeList());
     syncList.add(detailDTO);
     applicationContext.publishEvent(SupplierStoreEvt.builder().typeEnum(
         ShoppingActionTypeEnum.UPDATE).supplierStoreDetailDTOS(syncList).timestamp(new Date()).build());
@@ -503,10 +623,10 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if (!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未输入正确的消费类型", null);
     }
-    if (consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
+    /*if (consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
             && consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "O2O和线上商城不能同时选择", null);
-    }
+    }*/
   }
 
   private SupplierStore buildUpdate(SupplierStore entity,SupplierStoreUpdateDTO update) {
@@ -515,7 +635,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     entity.setConsumType(update.getConsumType());
     entity.setUpdateUser(update.getUpdateUser());
     entity.setExternalCode(update.getExternalCode());
-    entity.setCashierNo(update.getCashierNo());
+
     return entity;
   }
 
@@ -621,16 +741,26 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         throw new BusiException("消费方法格式错误");
       }
 
-      // 同步员工消费方法
-      accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          storeRelation.getMerCode(), storeRelation.getStoreCode(), storeRelation.getConsumType());
     }
 
     boolean isSaveOrUpdateBatch = merchantStoreRelationDao.saveOrUpdateBatch(storeRelationList);
 
+
     Map<String, List<MerchantStoreRelation>> mapByMerCode = storeRelationList.stream()
         .collect(Collectors.groupingBy(t -> t.getMerCode()));
-    queryWrapper = new QueryWrapper<>();
+    for (Map.Entry<String, List<MerchantStoreRelation>> m : mapByMerCode.entrySet()) {
+      List<StoreConsumeRelationDTO> relationDTOList = new ArrayList<>();
+
+      for (MerchantStoreRelation merchantStoreRelation : m.getValue()) {
+        StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
+        storeConsumeRelationDTO.setStoreCode(merchantStoreRelation.getStoreCode());
+        storeConsumeRelationDTO.setConsumeType(merchantStoreRelation.getConsumType());
+        relationDTOList.add(storeConsumeRelationDTO);
+      }
+      
+      accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(m.getKey(), relationDTOList);
+    }
+      queryWrapper = new QueryWrapper<>();
     queryWrapper.in(MerchantStoreRelation.MER_CODE, mapByMerCode.keySet());
     List<MerchantStoreRelation> storeRelationListByMerCode = merchantStoreRelationDao.list(
         queryWrapper);

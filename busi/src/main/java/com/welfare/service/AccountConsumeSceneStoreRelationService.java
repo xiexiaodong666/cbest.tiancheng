@@ -2,7 +2,9 @@ package com.welfare.service;
 
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 
+import com.welfare.service.dto.StoreConsumeRelationDTO;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yaoxiao
@@ -12,10 +14,17 @@ import java.util.List;
 public interface AccountConsumeSceneStoreRelationService {
   public List<AccountConsumeSceneStoreRelation> getListByConsumeSceneId(Long accountConsumeSceneId);
 
+
   /**
-   * 门店修改了消费方式,员工类型同步修改消费方式
-   * @param storeCode
-   * @param consumeType
+   * 批量修改商户关联门店消费场景
+   * @param merCode
+   * @param relationDTOList
    */
-  public void updateStoreConsumeType(String merCode,String storeCode,String consumeType);
+  public void updateStoreConsumeTypeByDTOList(String merCode,List<StoreConsumeRelationDTO> relationDTOList);
+
+  /**
+   * 在商户门店配置列表删除所有的配置消费场景门店
+   * @param merCode
+   */
+  public void deleteConsumeScene(String merCode,List<String> storeCodeList);
 }

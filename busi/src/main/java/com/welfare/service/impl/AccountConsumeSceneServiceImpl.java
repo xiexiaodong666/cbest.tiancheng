@@ -20,6 +20,7 @@ import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
+import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
 import com.welfare.service.*;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
@@ -57,14 +58,16 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final AccountConsumeSceneCustomizeMapper accountConsumeSceneCustomizeMapper;
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
   private final ObjectMapper mapper;
-  private final ShoppingFeignClient shoppingFeignClient;
+  @Autowired(required = false)
+  private ShoppingFeignClient shoppingFeignClient;
   @Autowired
   MerchantService merchantService;
   private final AccountTypeService accountTypeService;
-  private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationList;
+  private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final AccountService accountService;
   private final AccountChangeEventRecordService accountChangeEventRecordService;
   private final ApplicationContext applicationContext;
+  private final AccountConsumeSceneStoreRelationMapper accountConsumeSceneStoreRelationMapper;
 
 
   @Override
@@ -174,7 +177,8 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if( updateResult ){
       accountChangeEventRecordService.batchSaveBySceneStoreRelation(accountConsumeSceneStoreRelationList);
       //下发数据
-      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(accountConsumeSceneStoreRelationList).build());
+      List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(accountConsumeSceneReq.getMerCode());
+      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(allRelations).build());
     }
     return true;
   }
@@ -191,9 +195,14 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if(deleteResult){
       accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.ACCOUNT_CONSUME_SCENE_DELETE);
     }
+    //删除关联relation
+    QueryWrapper<AccountConsumeSceneStoreRelation> queryWrapper = new QueryWrapper<AccountConsumeSceneStoreRelation>();
+    queryWrapper.eq(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,accountConsumeScene.getId());
+    accountConsumeSceneStoreRelationDao.remove(queryWrapper);
+
     //下发数据
-    List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
-    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE).relationList(relationList).build());
+    List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(accountConsumeScene.getMerCode());
+    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(allRelations).build());
     return deleteResult;
   }
 
@@ -211,8 +220,8 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     boolean updateResult =  accountConsumeSceneDao.update(accountConsumeScene, updateWrapper);
     if(updateResult){
       accountChangeEventRecordService.batchSaveByAccountTypeCode(accountConsumeScene.getAccountTypeCode(),AccountChangeType.getByAccountConsumeStatus(status));
-      List<AccountConsumeSceneStoreRelation> relationList = accountConsumeSceneStoreRelationList.getListByConsumeSceneId(id);
-      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(relationList).build());
+      List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(queryAC.getMerCode());
+      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(allRelations).build());
     }
     return updateResult;
   }

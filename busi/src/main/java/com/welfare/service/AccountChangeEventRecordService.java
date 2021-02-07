@@ -8,6 +8,12 @@ import java.util.List;
 
 public interface AccountChangeEventRecordService {
   public void save(AccountChangeEventRecord accountChangeEventRecord);
+
+  /**
+   * 调用方法之前account必须存在
+   * @param accountChangeEventRecordList
+   * @param accountChangeType
+   */
   public void batchSave(List<AccountChangeEventRecord> accountChangeEventRecordList,AccountChangeType accountChangeType);
   public void batchSaveByAccountTypeCode(String accountTypeCode,AccountChangeType accountChangeType);
   public void batchSaveBySceneStoreRelation(List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList);

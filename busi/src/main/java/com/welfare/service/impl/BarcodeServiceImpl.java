@@ -142,13 +142,13 @@ public class BarcodeServiceImpl implements BarcodeService {
 
     @Override
     public Long parseAccountFromBarcode(String barcode, Date scanDate, boolean isOffline) {
+        Assert.isTrue(barcode!=null && barcode.length() == 21,"条码必须为21位");
         if(!isOffline){
             PaymentBarcode paymentBarcode = redisTemplate.opsForValue().get(BARCODE_PREFIX + barcode);
             Assert.notNull(paymentBarcode,"条码过期或不存在");
         }
         BarcodeSalt barcodeSalt = queryPeriodSaltValue(scanDate);
-        Long accountCode = BarcodeUtil.calculateAccount(barcode, barcodeSalt.getSaltValue());
-        return accountCode;
+        return BarcodeUtil.calculateAccount(barcode, barcodeSalt.getSaltValue());
     }
 
     private BarcodeSalt getTheLatestSaltInDb() {
@@ -157,7 +157,6 @@ public class BarcodeServiceImpl implements BarcodeService {
         queryWrapper.ge(BarcodeSalt.VALID_PERIOD_NUMERIC,currentPeriod)
                 .orderByDesc(BarcodeSalt.VALID_PERIOD_NUMERIC)
                 .last("limit 1");
-        BarcodeSalt maxPeriodBarcodeSalt = barcodeSaltDao.getOne(queryWrapper);
-        return maxPeriodBarcodeSalt;
+        return barcodeSaltDao.getOne(queryWrapper);
     }
 }

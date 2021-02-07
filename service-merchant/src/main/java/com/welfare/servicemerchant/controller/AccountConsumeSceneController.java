@@ -7,6 +7,7 @@ import com.welfare.common.annotation.RepeatRequestVerification;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountChangeEventRecordDao;
+import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.Account;
@@ -17,6 +18,7 @@ import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
 import com.welfare.service.dto.AccountConsumeSceneReq;
+import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
 import com.welfare.servicemerchant.dto.AccountConsumePageReq;
 import com.welfare.servicemerchant.dto.UpdateStatusReq;
@@ -24,6 +26,8 @@ import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.Arrays;
+import java.util.LinkedList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -62,17 +66,18 @@ public class AccountConsumeSceneController implements IController {
   private AccountChangeEventRecordDao accountChangeEventRecordDao;
   @Autowired
   private AccountCustomizeMapper accountCustomizeMapper;
+  @Autowired
+  private AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
 
   @GetMapping("/test")
-  public void test(@RequestParam("list")List<Long> list){
-   /* List<AccountChangeEventRecord> list = new LinkedList<AccountChangeEventRecord>();
-    AccountChangeEventRecord a = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_TYPE_DELETE, 1l,"aaa");
-    AccountChangeEventRecord b = AccountUtils.assemableChangeEvent(AccountChangeType.ACCOUNT_TYPE_DELETE, 2l,"aaa");
-    list.add(a);
-    list.add(b);
-    accountChangeEventRecordService.batchSave(list,AccountChangeType.ACCOUNT_TYPE_DELETE);*/
-    List<Account>  accountList = accountCustomizeMapper.queryByConsumeSceneIdList(list);
-    System.out.println(accountList);
+  public void test( @RequestParam(value = "merCode")  String merCode,
+      @RequestParam(value = "storeCode")  String storeCode,
+      @RequestParam(value = "consumeType")  String consumeType){
+    accountConsumeSceneStoreRelationService.deleteConsumeScene(merCode,Arrays.asList(storeCode));
+   /* StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
+    storeConsumeRelationDTO.setStoreCode(storeCode);
+    storeConsumeRelationDTO.setConsumeType(consumeType);
+    accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(merCode, Arrays.asList(storeConsumeRelationDTO));*/
   }
 
   @GetMapping("/page")

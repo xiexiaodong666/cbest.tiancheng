@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.persist.entity.MerchantCredit;
+import com.welfare.service.dto.DecreaseMerchantCredit;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
 import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -40,6 +41,14 @@ public interface MerchantCreditService {
    * @return
    */
   List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType);
+
+
+  /**
+   * 批量减少额度
+   * @param decreaseMerchantCredits
+   * @return
+   */
+  void batchDecreaseLimit(List<DecreaseMerchantCredit> decreaseMerchantCredits);
 
   /**
    * 操作商户金额

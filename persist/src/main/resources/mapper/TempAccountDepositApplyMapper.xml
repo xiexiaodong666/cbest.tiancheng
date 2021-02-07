@@ -34,7 +34,7 @@
          a.store_code,
          de.department_name
         from temp_account_deposit_apply t
-            LEFT JOIN account a ON t.phone = a.phone
+            LEFT JOIN account a ON t.account_code = a.account_code
             LEFT JOIN department de ON de.department_code = a.store_code
         where file_id = #{fileId} and a.deleted = 0 and a.mer_code = #{merCode}
     </select>
@@ -44,7 +44,7 @@
         count(DISTINCT t.account_code) as userCount,
         SUM(t.recharge_amount) as totalAmount
         from temp_account_deposit_apply t
-        LEFT JOIN account a ON t.phone = a.phone
+        LEFT JOIN account a ON t.account_code = a.account_code
         where file_id = #{fileId} and a.deleted = 0 and a.mer_code = #{merCode}
     </select>
 </mapper>

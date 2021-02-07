@@ -8,7 +8,7 @@ import com.welfare.common.domain.AccountUserInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BaseControllerTest extends AbstractBaseControllerTest {
+public abstract class BaseControllerTest extends AbstractBaseControllerTest {
 
     @Override
     protected Map<String, String> getHeaders() {

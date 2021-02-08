@@ -77,3 +77,6 @@ pos:
   onlines: 1001
 cdn:
   server: http://img.sjgo365.com
+
+merchant:
+  url: http://welfaremerchant.api.cbest.gam

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.persist.dao.SequenceDao;
 import com.welfare.persist.entity.Sequence;
 import com.welfare.service.SequenceService;
+import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.sequence.MaxSequenceExceedHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -12,6 +13,8 @@ import org.apache.el.util.ReflectionUtil;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.welfare.common.constants.RedisKeyConstant.SEQUENCE_GENERATE;
 
@@ -68,6 +71,31 @@ public class SequenceServiceImpl implements SequenceService {
             }
             sequenceDao.updateById(sequence);
             return sequence;
+        }finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public BatchSequence batchGenerate(String sequenceType, int total){
+        RLock lock = redissonClient.getFairLock(SEQUENCE_GENERATE + ":" + sequenceType);
+        lock.lock();
+        try{
+            QueryWrapper<Sequence> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq(Sequence.SEQUENCE_TYPE,sequenceType);
+            Sequence sequence = sequenceDao.getOne(queryWrapper);
+            BatchSequence batchSequence = new BatchSequence();
+            for (int i = 0; i < total; i++) {
+                long targetSequenceNo = sequence.getSequenceNo() + 1;
+                if(targetSequenceNo > sequence.getMaxSequence()){
+                    sequence = handleWhenMaxSeqExceed(sequence);
+                }else{
+                    sequence.setSequenceNo(targetSequenceNo);
+                }
+                batchSequence.add(sequence);
+            }
+            sequenceDao.updateById(sequence);
+            return batchSequence;
         }finally {
             lock.unlock();
         }

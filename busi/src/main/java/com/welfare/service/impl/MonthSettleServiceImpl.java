@@ -60,7 +60,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     private final MonthSettleDao monthSettleDao;
     @Value("${pos.onlines:1001}")
     private String posOnlines;
-    @Autowired
+    @Autowired(required = false)
     private MerchantCreditFeign merchantCreditFeign;
 
 

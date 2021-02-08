@@ -120,11 +120,7 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     @ApiModelProperty("版本")  @Version 
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
-    /**
-     * 虚拟收银机号
-     */
-    @ApiModelProperty("虚拟收银机号")   
-    private String cashierNo;
+
     /**
      * 门店同步到商城状态
      */
@@ -208,10 +204,6 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     * 版本
     */
     public static final String VERSION = "version";
-    /**
-    * 虚拟收银机号
-    */
-    public static final String CASHIER_NO = "cashier_no";
     /**
     * 门店同步到商城状态
     */

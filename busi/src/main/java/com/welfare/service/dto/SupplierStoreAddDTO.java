@@ -22,9 +22,6 @@ public class SupplierStoreAddDTO {
     @ApiModelProperty("商户代码")
     @NotBlank
     private String merCode;
-    @ApiModelProperty("虚拟收银机号")
-    @Pattern(regexp = "^[V][0-9]{3}+$")
-    private String cashierNo;
     /**
      * 门店代码
      */
@@ -60,4 +57,9 @@ public class SupplierStoreAddDTO {
 
     List<MerchantAddressDTO> addressList;
 
+    /**
+     * 门店关联消费方法虚拟收银号
+     */
+    @ApiModelProperty("门店关联消费方法虚拟收银号")
+    List<StoreConsumeTypeDTO> storeConsumeTypeList;
 }

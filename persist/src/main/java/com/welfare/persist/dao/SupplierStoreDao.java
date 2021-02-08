@@ -30,17 +30,25 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
         return getBaseMapper().alwaysUpdateSomeColumnById(entity);
     }
 
-    //@Cacheable(value = "supplierStore-by-cashierNo",key="#cashierNo")
-    public SupplierStore getOneByCashierNo(String cashierNo){
-        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(SupplierStore.CASHIER_NO,cashierNo);
-        return getOne(queryWrapper);
-    }
 
     public SupplierStore getOneByCashierNoAndStoreCode(String cashierNo,String storeCode){
         QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(SupplierStore.CASHIER_NO,cashierNo)
-                .eq(SupplierStore.STORE_CODE,storeCode);
+        // TODO
+       /* queryWrapper.eq(SupplierStore.CASHIER_NO,cashierNo)
+                .eq(SupplierStore.STORE_CODE,storeCode);*/
+        return getOne(queryWrapper);
+    }
+
+    public List<SupplierStore> listByMerCode(String merCode){
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.MER_CODE, merCode);
+        return list(queryWrapper);
+    }
+
+    @Cacheable(value = "supplierStore-by-code",key = "#storeCode")
+    public SupplierStore getOneByCode(String storeCode){
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(SupplierStore.STORE_CODE, storeCode);
         return getOne(queryWrapper);
     }
 

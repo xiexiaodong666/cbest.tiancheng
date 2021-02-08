@@ -44,22 +44,29 @@ public class SupplierStoreImportDTO {
     @ExcelProperty(value = "门店消费类型", index =3)
     private String consumType;
     /**
-     * 虚拟收银机号
+     * O2O虚拟收银机号
      */
-    @ApiModelProperty("虚拟收银机号")
+    @ApiModelProperty("O2O虚拟收银机号")
     @ExcelProperty(value = "虚拟收银机号", index = 4)
-    private String cashierNo;
+    private String o2oCashierNo;
+
+    /**
+     * 线上商城虚拟收银机号
+     */
+    @ApiModelProperty("线上商城虚拟收银机号")
+    @ExcelProperty(value = "线上商城虚拟收银机号", index = 5)
+    private String onlineCashierNo;
     /**
      * 自提点名称
      */
     @ApiModelProperty("自提点名称")
-    @ExcelProperty(value = "自提点名称", index = 5)
+    @ExcelProperty(value = "自提点名称", index = 6)
     private String addressName;
     /**
      * 详细地址
      */
     @ApiModelProperty("详细地址")
-    @ExcelProperty(value = "详细地址", index = 6)
+    @ExcelProperty(value = "详细地址", index = 7)
     private String address;
 
 

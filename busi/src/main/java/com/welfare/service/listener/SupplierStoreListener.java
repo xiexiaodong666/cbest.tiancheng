@@ -14,11 +14,13 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantReq;
+import com.welfare.service.dto.StoreConsumeTypeDTO;
 import com.welfare.service.dto.SupplierStoreAddDTO;
 import com.welfare.service.dto.SupplierStoreImportDTO;
 import jodd.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -59,6 +61,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   public void invoke(SupplierStoreImportDTO storeImportDTO, AnalysisContext analysisContext) {
     SupplierStoreAddDTO store = new SupplierStoreAddDTO();
     BeanUtils.copyProperties(storeImportDTO, store);
+    List<StoreConsumeTypeDTO> storeConsumeTypeDTOList = new ArrayList<>();
 
     Integer row=analysisContext.readRowHolder().getRowIndex()+1;
     if(EmptyChecker.isEmpty(storeImportDTO.getStoreCode())){
@@ -89,27 +92,61 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     if(!excelAllType.containsAll(consumTypes)){
       uploadInfo.append("第").append(row.toString()).append("行").append("未输入正确的消费类型").append(";");
     }
-    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
+/*    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
             &&consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
       uploadInfo.append("第").append(row.toString()).append("行").append("线上商城和O2O不能同时选择").append(";");
-    }
-    if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())
-            ||consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType()))){
-      if(EmptyChecker.isEmpty(storeImportDTO.getCashierNo())){
-        uploadInfo.append("第").append(row.toString()).append("行").append("线上商城或者O2O必须输入虚拟收银机号").append(";");
-      }else{
-        if(storeImportDTO.getCashierNo().length()>255){
+    }*/
+
+    if(consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType())) {
+      if (EmptyChecker.isEmpty(storeImportDTO.getO2oCashierNo())) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("O2O必须输入虚拟收银机号")
+            .append(";");
+      } else {
+        if(storeImportDTO.getO2oCashierNo().length()>255){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
         }
         String regex = "^[V][0-9]{3}+$";
-        if(!storeImportDTO.getCashierNo().matches(regex)){
+        if(!storeImportDTO.getO2oCashierNo().matches(regex)){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
+        }
+        StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
+        storeConsumeTypeDTO.setConsumeType(ConsumeTypeEnum.O2O.getCode());
+        storeConsumeTypeDTO.setCashierNo(storeImportDTO.getO2oCashierNo());
+        storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
+      }
+    } else {
+      if(EmptyChecker.notEmpty(storeImportDTO.getO2oCashierNo())){
+        uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
+      }
+    }
+
+    if(consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getExcelType())) {
+      if (EmptyChecker.isEmpty(storeImportDTO.getOnlineCashierNo())) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("线上商城必须输入虚拟收银机号")
+            .append(";");
+      } else {
+        if(storeImportDTO.getOnlineCashierNo().length()>255){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
+        }
+        String regex = "^[V][0-9]{3}+$";
+        if(!storeImportDTO.getOnlineCashierNo().matches(regex)){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
         }
 
+        StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
+        storeConsumeTypeDTO.setConsumeType(ConsumeTypeEnum.ONLINE_MALL.getCode());
+        storeConsumeTypeDTO.setCashierNo(storeImportDTO.getOnlineCashierNo());
+        storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
       }
-    }else{
-      if(EmptyChecker.notEmpty(storeImportDTO.getCashierNo())){
+    } else {
+      if(EmptyChecker.notEmpty(storeImportDTO.getOnlineCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O允许输入虚拟收银机号").append(";");
+      }
+    }
+
+    if(Strings.isNotEmpty(storeImportDTO.getOnlineCashierNo()) && Strings.isNotEmpty(storeImportDTO.getO2oCashierNo())) {
+      if(storeImportDTO.getO2oCashierNo().equals(storeImportDTO.getOnlineCashierNo())) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("同一门店下虚拟收银机号不能相同").append(";");
       }
     }
 
@@ -138,7 +175,9 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         uploadInfo.append("第").append(row.toString()).append("行").append("只有O2O门店可以填写自提点").append(";");
       }
       }
-    store.setCashierNo(store.getCashierNo());
+    // store.setCashierNo(store.getCashierNo());
+
+    store.setStoreConsumeTypeList(storeConsumeTypeDTOList);
     store.setConsumType(JSON.toJSONString(ConsumeTypesUtils.transferWithExcel(consumTypes)));
     list.add(store);
     merCodeList.add(store.getMerCode());

@@ -2,7 +2,7 @@ spring:
   cache:
     type: redis
   datasource:
-    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.1.30.186:3306/e-welfare-0208?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: mysql@123
 
@@ -39,12 +39,15 @@ encrypt:
 e-welfare:
   distributed-lock:
     enabled: true
+  barcode:
+    expire: 180
 mybatis-plus:
   global-config:
     db-config:
       logic-delete-value: 1
       logic-not-delete-value: 0
 platformUser:
+  enabled: true
   url:
 shopping:
   url:
@@ -54,7 +57,8 @@ cbest:
     url: http://192.1.30.71:9999/gateway
     appId: yufu
     appKey: e4716980da4382e1f4cc6ee4bb640277
-
+  dmall:
+    url: http://172.30.37.22:4000
 exclude-header-interceptor:
   - /swagger*/**
   - /doc.html*

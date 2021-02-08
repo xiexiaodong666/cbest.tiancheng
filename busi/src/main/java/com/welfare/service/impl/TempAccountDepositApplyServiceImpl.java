@@ -7,12 +7,12 @@ import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.TempAccountDepositApplyDao;
 import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.TempAccountDepositApply;
 import com.welfare.persist.mapper.TempAccountDepositApplyMapper;
-import com.welfare.service.AccountService;
 import com.welfare.service.TempAccountDepositApplyService;
 import com.welfare.service.dto.AccountDepositRequest;
 import com.welfare.service.listener.DepositApplyUploadListener;
@@ -49,7 +49,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   private RedissonClient redissonClient;
 
   @Autowired
-  private AccountService accountService;
+  private AccountDao accountDao;
 
   @Override
   public Boolean saveAll(List<TempAccountDepositApply> applys) {
@@ -103,7 +103,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
         }
         fileId = UUID.randomUUID().toString();
         DepositApplyUploadListener listener = new DepositApplyUploadListener(this, requestId ,
-                fileId, accountService, MerchantUserHolder.getMerchantUser().getMerchantCode());
+                fileId, accountDao, MerchantUserHolder.getMerchantUser().getMerchantCode());
         EasyExcel.read(multipartFile.getInputStream(), AccountDepositRequest.class, listener).sheet().doRead();
         log.info("批量导入员工账号存储申请完成. requestId:{} fileId:{}", requestId, fileId);
 //        Page<TempAccountDepositApplyDTO> page = pageByFileIdByExistAccount(1 , 1, fileId);

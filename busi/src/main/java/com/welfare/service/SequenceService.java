@@ -1,5 +1,7 @@
 package com.welfare.service;
 
+import com.welfare.service.dto.BatchSequence;
+
 /**
  * Description:
  *
@@ -38,4 +40,12 @@ public interface SequenceService {
      */
 
     Long nextNo(String sequenceType, String prefix, Long startId, int num);
+
+    /**
+     *  批量生成序列号
+     * @param sequenceType
+     * @param total
+     * @return
+     */
+    BatchSequence batchGenerate(String sequenceType, int total);
 }

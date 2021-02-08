@@ -13,6 +13,7 @@ import com.welfare.service.remote.entity.*;
 import com.welfare.service.remote.service.CbestPayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -25,8 +26,8 @@ import java.util.stream.Collectors;
 public class CbestPayServiceImpl implements CbestPayService {
 
     private final CbestPayConfig cbestPayConfig;
-
-    private final CbestPayFeign cbestPayFeign;
+    @Autowired(required = false)
+    private CbestPayFeign cbestPayFeign;
 
     @Override
     public CbestPayBaseBizResp createWXH5Trade(String market, CreateWXH5TradeReq req) {

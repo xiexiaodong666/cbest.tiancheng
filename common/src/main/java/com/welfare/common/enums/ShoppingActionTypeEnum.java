@@ -14,7 +14,8 @@ public enum ShoppingActionTypeEnum {
   DELETE("DELETE", "删除",3L),
   BATCH_ADD("ADD", "批量添加",4L),
   ACTIVATE("UPDATE", "更改激活状态",5L),
-  ACCOUNT_BATCH_ADD("BATCH_ADD", "批量添加",4L),;
+  ACCOUNT_BATCH_ADD("BATCH_ADD", "批量添加",6L),
+  ACCOUNT_CONSUME_SCENE_BATCH_DELETE("ACCOUNT_CONSUME_SCENE_BATCH_DELETE","批量删除",7l);
 
 
 

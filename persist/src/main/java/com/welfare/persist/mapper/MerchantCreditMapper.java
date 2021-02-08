@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 商户额度信(merchant_credit)数据Mapper
@@ -19,4 +20,5 @@ public interface MerchantCreditMapper extends BaseMapper<MerchantCredit> {
 
   int decreaseRechargeLimit(@Param("increaseLimit")BigDecimal increaseLimit, @Param("id")Long id);
 
+  int batchUpdateRechargeLimit(List<MerchantCredit> merchantCreditList);
 }

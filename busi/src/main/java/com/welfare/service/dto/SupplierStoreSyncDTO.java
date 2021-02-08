@@ -40,5 +40,6 @@ public class SupplierStoreSyncDTO {
     private String consumType;
 
     List<MerchantAddressDTO> addressList;
+    List<StoreConsumeTypeDTO> storeConsumeTypeList;
 
 }

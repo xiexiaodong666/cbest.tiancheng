@@ -2,6 +2,8 @@ package com.welfare.service;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.persist.dto.AccountConsumeSceneDO;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
@@ -58,6 +60,8 @@ public interface AccountService {
 
   void batchSyncData(Integer staffStatus);
 
+  AccountBatchImgDTO uploadBatchImg(AccountBatchImgReq accountBatchImgReq);
+
   Boolean batchSave(List<Account> accountList);
 
   Boolean update(AccountReq accountReq);
@@ -93,9 +97,26 @@ public interface AccountService {
 
   /**
    * 恢复的账户的额度
-   * @param accountCode
+   * @param account
    * @param updateUser
    * @param settlementTransNo
    */
-  void restoreSurplusQuotaByAccountCode(Long accountCode, String updateUser, String settlementTransNo);
+  void restoreSurplusQuotaByAccountCode(Account account, String updateUser, String settlementTransNo);
+
+  /**
+   * 查询消费场景DO
+   * @param storeCode
+   * @param queryType
+   * @param queryInfo
+   * @return
+   */
+  AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode, WelfareConstant.ConsumeQueryType queryType, String queryInfo);
+
+  /**
+   * 根据queryInfo和queryType查询账户
+   * @param queryInfo
+   * @param queryType
+   * @return
+   */
+  AccountDO queryByQueryInfo(String queryInfo,String queryType);
 }

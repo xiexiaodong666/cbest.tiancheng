@@ -82,3 +82,6 @@ pos:
 
 cdn:
   server: http://img-test.sjgo365.com
+
+merchant:
+  url: http://172.30.37.188:10016

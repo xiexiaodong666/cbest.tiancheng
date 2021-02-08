@@ -108,6 +108,6 @@ public class DailyCheckBillServiceImpl implements DailyCheckBillService {
         fileOutputStream.write(cvsContent.getBytes(StandardCharsets.UTF_8));
         fileOutputStream.close();
         StringInputStream inputStream = new StringInputStream(cvsContent);
-        ftpUtil.upload(dateStr + ".cvs",inputStream);
+        ftpUtil.upload(dateStr + ".csv",inputStream);
     }
 }

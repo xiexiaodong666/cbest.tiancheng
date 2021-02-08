@@ -100,13 +100,6 @@ public class DailyCheckBillServiceImpl implements DailyCheckBillService {
     private void writeToFtp(String cvsContent, Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String dateStr = dateFormat.format(date);
-        File file = new File("D:/" + dateStr + ".cvs");
-        if (file.exists()) {
-            file.delete();
-        }
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        fileOutputStream.write(cvsContent.getBytes(StandardCharsets.UTF_8));
-        fileOutputStream.close();
         StringInputStream inputStream = new StringInputStream(cvsContent);
         ftpUtil.upload(dateStr + ".csv",inputStream);
     }

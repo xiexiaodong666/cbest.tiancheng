@@ -205,7 +205,6 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
-            boolean locked = lock.tryLock(4, TimeUnit.SECONDS);
             apply = accountDepositApplyDao.getById(request.getId());
             if (apply == null) {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "申请不存在", null);

@@ -5,8 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.SupplierStoreMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,6 +20,10 @@ import java.util.List;
 @Slf4j
 @Repository
 public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierStore> {
+
+    @Value("${e-welfare-cbest-mercodes:886623,M104,M105,M107}")
+    private List<String> cBestMerCodes;
+
 
     //@CacheEvict(value = "supplierStore-by-cashierNo",key="#entity.cashierNo")
     public Integer updateAllColumnById(SupplierStore entity){
@@ -52,13 +55,16 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
     }
 
     /**
-     * 返回门店列表，指定列
+     * 返回所有重百旗下门店，指定列名查询，如果不传，则全列名查询
      * @param columns
      * @return
      */
-    public List<SupplierStore> selectAll(String... columns){
+    public List<SupplierStore> selectAllCbest(String... columns){
         QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select(columns);
+        if(columns !=null){
+            queryWrapper.select(columns);
+        }
+        queryWrapper.in(SupplierStore.MER_CODE, cBestMerCodes);
         return list(queryWrapper);
     }
 

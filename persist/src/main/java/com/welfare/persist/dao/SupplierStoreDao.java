@@ -6,6 +6,7 @@ import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.SupplierStoreMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

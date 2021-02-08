@@ -1,5 +1,7 @@
 package com.welfare.service.settlement.impl;
 
+import com.amazonaws.util.StringInputStream;
+import com.welfare.common.util.FtpUtil;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.AccountBillDetail;
@@ -9,6 +11,7 @@ import com.welfare.service.settlement.domain.AccountBillDetailExcelModel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.sql.RowSet;
@@ -37,6 +40,10 @@ public class DailyCheckBillServiceImpl implements DailyCheckBillService {
     public static final String COMMA = ",";
     private final SupplierStoreDao supplierStoreDao;
     private final AccountBillDetailDao accountBillDetailDao;
+    private final FtpUtil ftpUtil;
+
+    @Value("${ftp.path:/test}")
+    private String targetFtpPath;
 
 
     @Override
@@ -100,5 +107,7 @@ public class DailyCheckBillServiceImpl implements DailyCheckBillService {
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         fileOutputStream.write(cvsContent.getBytes(StandardCharsets.UTF_8));
         fileOutputStream.close();
+        StringInputStream inputStream = new StringInputStream(cvsContent);
+        ftpUtil.upload(dateStr + ".cvs",inputStream);
     }
 }

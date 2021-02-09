@@ -60,7 +60,8 @@ cbest:
   oss:
     config:
       bucket: sjgo-img
-
+  dmall:
+    url: http://dmall.e-cbest.com
 xxl:
   job:
     admin:
@@ -76,3 +77,6 @@ pos:
   onlines: 1001
 cdn:
   server: http://img.sjgo365.com
+
+merchant:
+  url: http://welfaremerchant.api.cbest.gam

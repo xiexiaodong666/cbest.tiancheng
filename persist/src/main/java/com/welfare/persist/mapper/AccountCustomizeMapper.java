@@ -14,6 +14,9 @@ import java.util.Map;
 
 public interface AccountCustomizeMapper extends BaseMapper<Account> {
 
+  List<Account> getUpdateAccountByMerCode(@Param("merCode")String merCode,
+      @Param("storeCodeList")List<String> storeCodeList);
+
   int increaseAccountSurplusQuota(@Param("surplusQuota") BigDecimal surplusQuota,
       @Param("updateUser")String updateUser,
       @Param("accountCode")String accountCode);

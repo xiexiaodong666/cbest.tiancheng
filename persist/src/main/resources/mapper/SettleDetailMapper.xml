@@ -60,7 +60,7 @@
         from account_deduction_detail t1
         left join account t2 on t1.account_code=t2.account_code
         left join merchant t3 on t2.mer_code=t3.mer_code
-        left join merchant_store_relation t4 on t1.store_code = t4.store_code and t2.mer_code=t4.mer_code
+        left join merchant_store_relation t4 on t1.store_code = t4.store_code and t2.mer_code=t4.mer_code and t4.deleted=0
         left join merchant_account_type t5 on t2.mer_code = t5.mer_code and t1.mer_account_type=t5.mer_account_type_code
         <where>
             <if test="minId!=null">
@@ -94,7 +94,7 @@
             t1.mer_code,
             t1.mer_name,
             case when t3.mer_code = t1.mer_code then '自营'
-                 when t1.pos = t3.cashier_no then '第三方线上'
+                 when t1.pos = t5.cashier_no then '第三方线上'
                  else '第三方线下' end as type,
             t1.mer_account_type as welfare_type_code,
             t1.mer_account_type_name as welfare_type_name,
@@ -110,7 +110,8 @@
                  else 0 end as settle_amount
         from settle_detail t1
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
-        left join merchant t4 on t1.mer_code=t4.mer_code and t4.deleted=0
+        left join merchant t4 on t1.mer_code=t4.mer_code
+        left join store_consume_type t5 on t1.store_code = t5.store_code and t5.deleted=0
         <where>
             <if test="settleNo!=null and settleNo!=''">
                 and t1.settle_no = #{settleNo}
@@ -147,10 +148,10 @@
                     and t3.mer_code = t1.mer_code
                 </when>
                 <when test="storeType=='third_online'">
-                    and t3.mer_code != t1.mer_code and t1.pos = t3.cashier_no
+                    and t3.mer_code != t1.mer_code and t1.pos = t5.cashier_no
                 </when>
                 <when test="storeType=='third_offline'">
-                    and t3.mer_code != t1.mer_code and (t3.cashier_no is null or t3.cashier_no!=t1.pos)
+                    and t3.mer_code != t1.mer_code and (t5.cashier_no is null or t5.cashier_no!=t1.pos)
                 </when>
             </choose>
         </where>
@@ -190,8 +191,8 @@
         from settle_detail t1
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
-        left join merchant t4 on t1.mer_code=t4.mer_code and t4.deleted=0
-        left join merchant_credit t5 on t1.mer_code = t5.mer_code and t5.deleted=0
+        left join merchant t4 on t1.mer_code=t4.mer_code
+        left join merchant_credit t5 on t1.mer_code = t5.mer_code
         where t1.settle_flag = 'unsettled'
         <if test="merCode!=null and merCode!=''">
             and t1.mer_code=#{merCode}
@@ -275,7 +276,7 @@
         t1.mer_code as merCode,
         t1.mer_name as  merName,
         case when t3.mer_code = t1.mer_code then '自营'
-             when t1.pos = t3.cashier_no then '第三方线上'
+             when t1.pos = t5.cashier_no then '第三方线上'
              else '第三方线下' end as type,
         t1.mer_account_type as welfareTypeCode,
         t1.mer_account_type_name as welfareTypeName,
@@ -339,7 +340,8 @@
         from settle_detail t1
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
-        left join merchant t4 on t1.mer_code=t4.mer_code and t4.deleted=0
+        left join merchant t4 on t1.mer_code=t4.mer_code
+        left join store_consume_type t5 on t1.store_code = t5.store_code and t5.deleted=0
     </sql>
     <sql id="queryListCondition">
         <where>
@@ -375,10 +377,10 @@
                     and t3.mer_code = t1.mer_code
                 </when>
                 <when test="storeType=='third_online'">
-                    and t3.mer_code != t1.mer_code and t1.pos = t3.cashier_no
+                    and t3.mer_code != t1.mer_code and t1.pos = t5.cashier_no
                 </when>
                 <when test="storeType=='third_offline'">
-                    and t3.mer_code != t1.mer_code and (t3.cashier_no is null or t3.cashier_no!=t1.pos)
+                    and t3.mer_code != t1.mer_code and (t5.cashier_no is null or t5.cashier_no!=t1.pos)
                 </when>
             </choose>
             and t1.settle_flag='unsettled'

@@ -1,13 +1,16 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.DistributedLockUtil;
+import com.welfare.persist.dao.*;
 import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
+import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.*;
@@ -19,14 +22,13 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
@@ -50,6 +52,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountService accountService;
     private final OrderTransRelationService orderTransRelationService;
     private final AccountChangeEventRecordService accountChangeEventRecordService;
+    private final AccountChangeEventRecordDao accountChangeEventRecordDao;
+    private final AccountBillDetailDao accountBillDetailDao;
+    private final OrderTransRelationDao orderTransRelationDao;
     /**
      * 循环依赖问题，所以未采用构造器注入
      */
@@ -58,7 +63,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
 
     @Override
-    public int batchSaveOrUpdate(List<AccountAmountType> list) {
+    public int batchSaveOrUpdate(List<AccountDepositIncreDTO> list) {
         return accountAmountTypeMapper.batchSaveOrUpdate(list);
     }
 
@@ -73,8 +78,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
 
     @Override
     public void updateAccountAmountType(Deposit deposit) {
-        RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
-        lock.lock();
+        RLock lock = DistributedLockUtil.lockFairly(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
         try{
             AccountAmountType accountAmountType = this.queryOne(deposit.getAccountCode(),
                     deposit.getMerAccountTypeCode());
@@ -87,7 +91,11 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 accountAmountTypeDao.save(accountAmountType);
             } else {
                 accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
-                accountAmountTypeDao.updateById(accountAmountType);
+                accountAmountTypeDao.getBaseMapper().updateBalance(
+                        accountAmountType.getAccountCode(),
+                        accountAmountType.getMerAccountTypeCode(),
+                        accountAmountType.getAccountBalance(),
+                        "sys");
             }
             account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
             AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
@@ -95,7 +103,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
             accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
             accountChangeEventRecordService.save(accountChangeEventRecord);
-            accountDao.saveOrUpdate(account);
+            accountDao.getBaseMapper().updateAccountBalance(account.getAccountBalance(), account.getAccountCode());
             accountBillDetailService.saveNewAccountBillDetail(deposit, accountAmountType, account);
             orderTransRelationService.saveNewTransRelation(deposit.getApplyCode(),
                     deposit.getTransNo(),
@@ -107,6 +115,74 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchUpdateAccountAmountType(List<Deposit> deposits) {
+        if (!CollectionUtils.isEmpty(deposits)) {
+            List<RLock> locks = new ArrayList<>();
+            RLock multiLock = null;
+            try {
+                deposits.forEach(deposit -> {
+                    RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
+                    locks.add(lock);
+                });
+                multiLock = redissonClient.getMultiLock(locks.toArray(new RLock[]{}));
+                multiLock.lock(-1, TimeUnit.SECONDS);
+                String merAccountTypeCode = deposits.get(0).getMerAccountTypeCode();
+                List<Long> accountCodes = deposits.stream().map(Deposit::getAccountCode).collect(Collectors.toList());
+                Map<Long, Account> accountMap = accountDao.mapByAccountCodes(accountCodes);
+                Map<Long, AccountAmountType> accountAmountTypeMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, merAccountTypeCode);
+                List<AccountDeductionDetail> deductionDetails = new ArrayList<>();
+                List<AccountChangeEventRecord> records = new ArrayList<>();
+                List<AccountBillDetail> details = new ArrayList<>();
+                List<OrderTransRelation> relations = new ArrayList<>();
+                List<AccountAmountType> newAccountAmountTypes = new ArrayList<>();
+
+                for (Deposit deposit : deposits) {
+                    AccountAmountType accountAmountType = accountAmountTypeMap.get(deposit.getAccountCode());
+                    if (Objects.isNull(accountAmountType)) {
+                        accountAmountType = deposit.toNewAccountAmountType();
+                        BigDecimal afterAddAmount = accountAmountType.getAccountBalance().add(deposit.getAmount());
+                        accountAmountType.setAccountBalance(afterAddAmount);
+                        newAccountAmountTypes.add(accountAmountType);
+                    } else {
+                        accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
+                    }
+                    Account account = accountMap.get(deposit.getAccountCode());
+                    account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
+                    AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
+                    accountChangeEventRecord.setAccountCode(account.getAccountCode());
+                    accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
+                    accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
+                    records.add(accountChangeEventRecord);
+                    AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(deposit, account, accountAmountType);
+                    deductionDetails.add(deductionDetail);
+                    details.add(assemblyAccountBillDetail(deposit, accountAmountType, account));
+                    relations.add(assemblyNewTransRelation(
+                            deposit.getApplyCode(),
+                            deposit.getTransNo(),
+                            WelfareConstant.TransType.DEPOSIT_INCR));
+                }
+                accountChangeEventRecordDao.getBaseMapper().batchInsert(records);
+                accountAmountTypeDao.saveBatch(newAccountAmountTypes);
+                Map<Long, BigDecimal> amountMap = deposits.stream().collect(Collectors.toMap(Deposit::getAccountCode, Deposit::getAmount));
+                if (!CollectionUtils.isEmpty(accountAmountTypeMap)) {
+                    List<AccountAmountType> amountTypes = Lists.newArrayList(accountAmountTypeMap.values());
+                    accountAmountTypeMapper.batchSaveOrUpdate(AccountDepositIncreDTO.of(amountTypes, amountMap));
+                }
+                List<Account> accounts = Lists.newArrayList(accountMap.values());
+                Map<Long, Long> changeEventIdMap = records.stream().collect(Collectors.toMap(AccountChangeEventRecord::getAccountCode,
+                        AccountChangeEventRecord::getId));
+                accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(accounts, amountMap, changeEventIdMap));
+
+                accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());
+                accountBillDetailDao.saveBatch(details, details.size());
+                orderTransRelationDao.saveBatch(relations, relations.size());
+            } finally {
+                DistributedLockUtil.unlock(multiLock);
+            }
+        }
+    }
 
 
     @Override
@@ -165,5 +241,29 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         accountDeductionDetail.setCardId(deposit.getCardNo());
         accountDeductionDetail.setChanel(deposit.getChannel());
         return accountDeductionDetail;
+    }
+
+    private AccountBillDetail assemblyAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType,
+                                                        Account account) {
+        AccountBillDetail accountBillDetail = new AccountBillDetail();
+        Long accountCode = deposit.getAccountCode();
+        BigDecimal amount = deposit.getAmount();
+        accountBillDetail.setAccountCode(accountCode);
+        accountBillDetail.setAccountBalance(account.getAccountBalance());
+        accountBillDetail.setChannel(deposit.getChannel());
+        accountBillDetail.setTransNo(deposit.getTransNo());
+        accountBillDetail.setTransAmount(amount);
+        accountBillDetail.setTransTime(Calendar.getInstance().getTime());
+        accountBillDetail.setSurplusQuota(account.getSurplusQuota());
+        accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
+        return accountBillDetail;
+    }
+
+    private OrderTransRelation assemblyNewTransRelation(String orderId, String transNo, WelfareConstant.TransType transType) {
+        OrderTransRelation orderTransRelation = new OrderTransRelation();
+        orderTransRelation.setOrderId(orderId);
+        orderTransRelation.setTransNo(transNo);
+        orderTransRelation.setType(transType.code());
+        return orderTransRelation;
     }
 }

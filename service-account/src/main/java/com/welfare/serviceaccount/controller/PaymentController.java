@@ -3,10 +3,7 @@ package com.welfare.serviceaccount.controller;
 import com.welfare.service.PaymentService;
 import com.welfare.service.RefundService;
 import com.welfare.service.dto.RefundRequest;
-import com.welfare.service.dto.payment.BarcodePaymentRequest;
-import com.welfare.service.dto.payment.CardPaymentRequest;
-import com.welfare.service.dto.payment.OnlinePaymentRequest;
-import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.dto.payment.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -51,6 +48,12 @@ public class PaymentController implements IController {
     public R<CardPaymentRequest> newCardPaymentRequest(@RequestBody CardPaymentRequest paymentRequest) {
         paymentService.paymentRequest(paymentRequest);
         return success(paymentRequest);
+    }
+
+    @PostMapping("/door-access")
+    @ApiOperation("门禁系统支付（交投）")
+    public R<DoorAccessPaymentRequest> newDoorAccessPaymentRequest(@RequestBody DoorAccessPaymentRequest doorAccessPaymentRequest){
+        return success(doorAccessPaymentRequest);
     }
 
     @GetMapping

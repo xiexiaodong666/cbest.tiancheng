@@ -51,9 +51,11 @@ public class SupplierStoreUpdateDTO {
      */
     @ApiModelProperty("外部编码")  
     private String externalCode;
-    @ApiModelProperty("虚拟收银机号")
-    @Pattern(regexp = "^[V][0-9]{3}+$")
-    private String cashierNo;
+    /**
+     * 门店关联消费方法虚拟收银号
+     */
+    @ApiModelProperty("门店关联消费方法虚拟收银号")
+    List<StoreConsumeTypeDTO> storeConsumeTypeList;
 
     List<MerchantAddressDTO> addressList;
 

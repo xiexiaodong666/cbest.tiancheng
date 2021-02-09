@@ -28,9 +28,15 @@ public interface AccountConsumeSceneCustomizeMapper extends BaseMapper<AccountCo
   AccountConsumeSceneMapperDTO queryAccountConsumerScene4Detail(@Param("id")Long id);
   AccountConsumeScene queryById(@Param("id")Long id);
 
+  List<AccountConsumeScene> queryByIdList(@Param("idList") List<Long> idList);
+
   Integer getCountByMerCodeAndAccountTypeAndStoreCode(
       @Param("merCode")String merCode,
       @Param("typeCode")String typeCode,
       @Param("storeCode")String storeCode
   );
+  List<AccountConsumeScene> queryDeleteScene(@Param("merCode") String merCode);
+  List<AccountConsumeScene> queryDeleteSceneByMerCodeAndStoreCodeList(@Param("merCode") String merCode,
+      @Param("storeCodeList")List<String> storeCodeList);
+  List<Long> queryDeleteConsumeIdList(@Param("merCode") String merCode);
 }

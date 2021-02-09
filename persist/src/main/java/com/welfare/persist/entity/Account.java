@@ -1,24 +1,28 @@
 package com.welfare.persist.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import java.math.BigDecimal;
+import java.util.Date;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 账户信息(account)实体类
  *
  * @author Yuxiang Li
- * @since 2021-01-15 15:14:22
+ * @since 2021-02-01 11:20:41
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -121,12 +125,6 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("手机号")   
     private String phone;
-
-    /**
-     * 是否授信
-     */
-    @ApiModelProperty("是否授信")
-    private Boolean credit;
     /**
      * 最大授权额度
      */
@@ -147,6 +145,16 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("员工账号变更记录ID")   
     private Long changeEventId;
+    /**
+     * 是否授信
+     */
+    @ApiModelProperty("是否授信")   
+    private Boolean credit;
+    /**
+     * 文件存储关联id
+     */
+    @ApiModelProperty("文件存储关联id")   
+    private Long fileUniversalStorageId;
 
 //以下为列明常量
 
@@ -235,7 +243,12 @@ public class Account extends Model<Account> implements Serializable {
     */
     public static final String CHANGE_EVENT_ID = "change_event_id";
     /**
-     * 是否授信
-     */
+    * 是否授信
+    */
     public static final String CREDIT = "credit";
+    /**
+    * 文件存储关联id
+    */
+    public static final String FILE_UNIVERSAL_STORAGE_ID = "file_universal_storage_id";
+
 }

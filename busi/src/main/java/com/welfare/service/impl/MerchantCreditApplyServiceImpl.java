@@ -36,7 +36,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -67,26 +66,21 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             return String.valueOf(apply.getId());
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY_REQUEST_ID, request.getRequestId());
-        RLock lock = redissonClient.getFairLock(lockKey);
+        RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
-            boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
-            if (locked) {
-                apply = getByRequestId(request.getRequestId());
-                if (apply != null) {
-                    return apply.getId()+"";
-                }
-                validationParmas(request.getApplyType(), request.getMerCode());
-                apply = creditApplyConverter.toApply(request);
-                apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
-                apply.setApplyCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code()));
-                apply.setApplyUser(user.getUserName());
-                apply.setApplyTime(new Date());
-                merchantCreditApplyDao.save(apply);
-                merDepositApplyFileService.save(apply.getApplyCode(), request.getEnclosures());
-                return String.valueOf(apply.getId());
-            } else {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
+            apply = getByRequestId(request.getRequestId());
+            if (apply != null) {
+                return apply.getId()+"";
             }
+            validationParmas(request.getApplyType(), request.getMerCode());
+            apply = creditApplyConverter.toApply(request);
+            apply.setApprovalStatus(ApprovalStatus.AUDITING.getCode());
+            apply.setApplyCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.MERCHANT_CREDIT_APPLY.code()));
+            apply.setApplyUser(user.getUserName());
+            apply.setApplyTime(new Date());
+            merchantCreditApplyDao.save(apply);
+            merDepositApplyFileService.save(apply.getApplyCode(), request.getEnclosures());
+            return String.valueOf(apply.getId());
         } catch (Exception e) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
@@ -112,28 +106,23 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
-        RLock lock = redissonClient.getFairLock(lockKey);
+        RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
-            boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
-            if (locked) {
-                apply = merchantCreditApplyDao.getById(request.getId());
-                if (apply == null) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
-                }
-                if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
-                }
-                validationParmas(request.getApplyType(), apply.getMerCode());
-                apply.setApplyType(request.getApplyType());
-                apply.setBalance(request.getBalance());
-                apply.setRemark(request.getRemark());
-                apply.setApplyUser(user.getUserName());
-                merDepositApplyFileService.save(apply.getApplyCode(), request.getEnclosures());
-                merchantCreditApplyDao.saveOrUpdate(apply);
-                return String.valueOf(apply.getId());
-            } else {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
+            apply = merchantCreditApplyDao.getById(request.getId());
+            if (apply == null) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
             }
+            if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+            }
+            validationParmas(request.getApplyType(), apply.getMerCode());
+            apply.setApplyType(request.getApplyType());
+            apply.setBalance(request.getBalance());
+            apply.setRemark(request.getRemark());
+            apply.setApplyUser(user.getUserName());
+            merDepositApplyFileService.save(apply.getApplyCode(), request.getEnclosures());
+            merchantCreditApplyDao.saveOrUpdate(apply);
+            return String.valueOf(apply.getId());
         } catch (Exception e) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
@@ -152,32 +141,27 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
-        RLock lock = redissonClient.getFairLock(lockKey);
+        RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
-            boolean locked = lock.tryLock(2, TimeUnit.SECONDS);
-            if (locked) {
-                apply = merchantCreditApplyDao.getById(request.getId());
-                if (apply == null) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
-                }
-                if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
-                }
-                validationParmas(apply.getApplyType(), apply.getMerCode());
-                apply.setApprovalRemark(request.getApprovalRemark());
-                apply.setApprovalUser(user.getUserName());
-                apply.setApprovalStatus(request.getApprovalStatus().getCode());
-                apply.setApprovalTime(new Date());
-                merchantCreditApplyDao.saveOrUpdate(apply);
-                if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
-                    // 审批通过修改金额
-                    WelfareConstant.MerCreditType type = WelfareConstant.MerCreditType.findByCode(apply.getApplyType());
-                    operatorMerAccountByType(apply.getMerCode(),type,apply.getBalance(),apply.getApplyCode());
-                }
-                return String.valueOf(apply.getId());
-            } else {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
+            apply = merchantCreditApplyDao.getById(request.getId());
+            if (apply == null) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
             }
+            if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+            }
+            validationParmas(apply.getApplyType(), apply.getMerCode());
+            apply.setApprovalRemark(request.getApprovalRemark());
+            apply.setApprovalUser(user.getUserName());
+            apply.setApprovalStatus(request.getApprovalStatus().getCode());
+            apply.setApprovalTime(new Date());
+            merchantCreditApplyDao.saveOrUpdate(apply);
+            if (request.getApprovalStatus().equals(ApprovalStatus.AUDIT_SUCCESS)) {
+                // 审批通过修改金额
+                WelfareConstant.MerCreditType type = WelfareConstant.MerCreditType.findByCode(apply.getApplyType());
+                operatorMerAccountByType(apply.getMerCode(),type,apply.getBalance(),apply.getApplyCode());
+            }
+            return String.valueOf(apply.getId());
         } catch (Exception e) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -33,8 +34,8 @@ import static net.dreamlu.mica.core.result.R.success;
 @RequestMapping("/platformUser")
 @Api(tags = "商户用户接口接口")
 public class PlatformUserController {
-
-  private final PlatformUserFeignClient platformUserFeignClient;
+  @Autowired(required = false)
+  private PlatformUserFeignClient platformUserFeignClient;
   private final static Integer size = 1000;
   private final FileUploadService fileUploadService;
   private final static long sleepTime = 300;

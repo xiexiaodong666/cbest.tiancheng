@@ -2,7 +2,7 @@ spring:
   profiles: dev
   datasource:
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.1.30.186:3306/cbest_employee_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.1.30.186:3306/e-welfare-0208?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: mysql@123
     type: com.alibaba.druid.pool.DruidDataSource
@@ -73,9 +73,13 @@ cbest:
   oss:
     config:
       bucket: sjgo-img-test
-
+  dmall:
+    url: http://172.30.37.22:4000
 pos:
   onlines: 1001
 
 cdn:
   server: http://img-test.sjgo365.com
+
+merchant:
+  url: http://172.30.37.188:10016

@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +13,7 @@ import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
+import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.AdminMerchantStore;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
@@ -22,15 +24,18 @@ import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.SupplierStoreService;
+import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,10 +57,13 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private final MerchantStoreRelationDao merchantStoreRelationDao;
   private final MerchantStoreRelationMapper merchantStoreRelationMapper;
   private final SupplierStoreService supplierStoreService;
+  private final SupplierStoreDao supplierStoreDao;
+
   private final ObjectMapper mapper;
   private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final ApplicationContext applicationContext;
-  private final ShoppingFeignClient shoppingFeignClient;
+  @Autowired(required = false)
+  private ShoppingFeignClient shoppingFeignClient;
 
   @Override
   public Page<MerchantStoreRelation> pageQuery(Page<MerchantStoreRelation> page,
@@ -190,6 +198,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     List<MerchantStoreRelation> merchantStoreRelationNewList = new ArrayList<>();
     List<Long> deleteIds = new ArrayList<>();
+    List<String> storeCodeList = new ArrayList<>();
+
     List<AdminMerchantStore> adminMerchantStoreList = relationUpdateReq.getAdminMerchantStoreList();
 
     List<AdminMerchantStore> adminMerchantStoreUpdateList = new ArrayList<>();
@@ -262,6 +272,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
   List<MerchantStoreRelation> removeMerchantStoreRelationList = new ArrayList<>();
 
+    List<StoreConsumeRelationDTO> storeConsumeRelationDTOS = new ArrayList<>();
     for(
   MerchantStoreRelation m :
   merchantStoreRelations)
@@ -274,9 +285,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if (adminMerchantStoreOptional.isPresent()) {
       AdminMerchantStore adminMerchantStore = adminMerchantStoreOptional.get();
 
-      // 同步员工消费方法
-     accountConsumeSceneStoreRelationService.updateStoreConsumeType(
-          m.getMerCode(), adminMerchantStore.getStoreCode(), adminMerchantStore.getConsumType());
+      StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
+      storeConsumeRelationDTO.setStoreCode(adminMerchantStore.getStoreCode());
+      storeConsumeRelationDTO.setConsumeType(adminMerchantStore.getConsumType());
+
+      storeConsumeRelationDTOS.add(storeConsumeRelationDTO);
 
       m.setConsumType(adminMerchantStore.getConsumType());
       m.setStoreCode(adminMerchantStore.getStoreCode());
@@ -308,10 +321,16 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     } // delete
     else {
+      storeCodeList.add(m.getStoreCode());
       deleteIds.add(m.getId());
       removeMerchantStoreRelationList.add(m);
     }
   }
+
+    // 同步员工消费方法
+    accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(
+        merchantStoreRelation.getMerCode(), storeConsumeRelationDTOS);
+
 
     if(CollectionUtils.isNotEmpty(removeMerchantStoreRelationList))
 
@@ -325,12 +344,13 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if(CollectionUtils.isNotEmpty(deleteIds))
 
   {
+    accountConsumeSceneStoreRelationService.deleteConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
     remove = merchantStoreRelationDao.removeByIds(deleteIds);
   }
     if(CollectionUtils.isNotEmpty(merchantStoreRelations))
 
   {
-    updateBatch = merchantStoreRelationDao.saveOrUpdateBatch(merchantStoreRelations);
+    updateBatch = merchantStoreRelationDao.updateBatchById(merchantStoreRelations);
   }
     if(CollectionUtils.isNotEmpty(merchantStoreRelationNewList))
 
@@ -376,6 +396,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     }
 
     List<Long> removeIds = new ArrayList<>();
+    List<String> storeCodeList = new ArrayList<>();
 
     if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
       for (MerchantStoreRelation storeRelation :
@@ -383,6 +404,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         if (delete != null) {
           roleConsumptionReq.setActionType(ShoppingActionTypeEnum.DELETE.getCode());
 
+          storeCodeList.add(storeRelation.getStoreCode());
           removeIds.add(storeRelation.getId());
           storeRelation.setSyncStatus(0);
         }
@@ -417,6 +439,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     boolean remove = true;
     if (CollectionUtils.isNotEmpty(removeIds)) {
+      accountConsumeSceneStoreRelationService.deleteConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
       remove = merchantStoreRelationDao.removeByIds(removeIds);
     }
 
@@ -430,10 +453,19 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private boolean validateConsumeType(List<AdminMerchantStore> merchantStoreList) {
 
     boolean validate = true;
+    List<String> storeCodes =  merchantStoreList.stream().map(m->m.getStoreCode()).collect(Collectors.toList());
+    QueryWrapper<SupplierStore> wrapper = new QueryWrapper<>();
+    wrapper.in(SupplierStore.STORE_CODE, storeCodes);
+    List<SupplierStore> supplierStoreList = supplierStoreDao.list(wrapper);
     for (AdminMerchantStore merchantStore :
         merchantStoreList) {
-      SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(
-          merchantStore.getStoreCode());
+      SupplierStore supplierStore;
+      Optional<SupplierStore> supplierStoreOptional = supplierStoreList.stream().filter(s->s.getStoreCode().equals(merchantStore.getStoreCode())).findFirst();
+      if(supplierStoreOptional.isPresent()) {
+        supplierStore = supplierStoreOptional.get();
+      } else {
+        continue;
+      }
       try {
         Map<String, Boolean> consumeTypeMap = mapper.readValue(
             supplierStore.getConsumType(), Map.class);

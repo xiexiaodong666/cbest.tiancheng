@@ -7,6 +7,9 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.service.AccountService;
+import com.welfare.service.dto.AccountBatchImgDTO;
+import com.welfare.service.dto.AccountBatchImgInfoReq;
+import com.welfare.service.dto.AccountBatchImgReq;
 import com.welfare.service.dto.AccountBillDTO;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.AccountDTO;
@@ -21,14 +24,17 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +60,22 @@ public class AccountController implements IController {
   private final AccountService accountService;
   private final FileUploadService fileUploadService;
 
+
+
+  @PostMapping("/upload/batch/img")
+  @ApiOperation("批量上传员工照片")
+  public R<AccountBatchImgDTO> uploadBatchImg(@RequestBody @Validated AccountBatchImgReq accountBatchImgReq) {
+    accountBatchImgReq.getAccountBatchImgInfoReqList().forEach(c-> {
+      if(c.getPhone().contains(".")) {
+        c.setPhone(c.getPhone().substring(0, c.getPhone().indexOf(".")));
+      }
+    });
+
+    AccountBatchImgDTO accountBatchImgDTO = accountService.uploadBatchImg(accountBatchImgReq);
+
+
+    return success(accountBatchImgDTO);
+  }
 
   @GetMapping("/syncOldData")
   @ApiOperation("员工账户增量查询")

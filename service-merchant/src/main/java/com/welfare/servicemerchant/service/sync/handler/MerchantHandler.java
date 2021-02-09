@@ -34,7 +34,7 @@ public class MerchantHandler  {
 
     @Autowired
     PersistentBus persistentBus;
-    @Autowired
+    @Autowired(required = false)
     ShoppingFeignClient shoppingFeignClient;
 
 

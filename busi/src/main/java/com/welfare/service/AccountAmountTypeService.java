@@ -1,5 +1,6 @@
 package com.welfare.service;
 
+import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.service.dto.Deposit;
@@ -24,7 +25,7 @@ public interface AccountAmountTypeService {
      * @param list
      * @return
      */
-    int batchSaveOrUpdate(List<AccountAmountType> list);
+    int batchSaveOrUpdate(List<AccountDepositIncreDTO> list);
 
     /**
      * 获取唯一一条accountAmountType
@@ -41,6 +42,13 @@ public interface AccountAmountTypeService {
      * @param deposit
      */
     void updateAccountAmountType(Deposit deposit);
+
+    /**
+     * 批量更新账户accountAmountType(目前只支持对同一个余额类型操作)
+     *
+     * @param deposits
+     */
+    void batchUpdateAccountAmountType(List<Deposit> deposits);
 
     /**
      * 查询指定account的授信额度

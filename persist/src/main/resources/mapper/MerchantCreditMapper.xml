@@ -10,6 +10,14 @@
     </sql>
     
     <update id="decreaseRechargeLimit">
-        UPDATE <include refid="tableName"/> set recharge_limit = recharge_limit - #{increaseLimit},update_time = now(),version = version + 1 where id = #{id} and recharge_limit > #{increaseLimit}
+        UPDATE <include refid="tableName"/> set recharge_limit = #{increaseLimit},update_time = now(),version = version + 1 where id = #{id} and recharge_limit > #{increaseLimit}
     </update>
+
+
+    <update id="batchUpdateRechargeLimit">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE <include refid="tableName"/> set recharge_limit = #{item.rechargeLimit},update_time = now(),version = version + 1 where id = #{item.id}
+        </foreach>
+    </update>
+
 </mapper>

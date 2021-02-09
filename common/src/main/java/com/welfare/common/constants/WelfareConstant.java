@@ -385,4 +385,31 @@ public class WelfareConstant {
             return this.desc;
         }
     }
+
+    /**
+     * 渠道
+     */
+    public enum ConsumeQueryType {
+        /**
+         *
+         */
+        CARD("card", "卡信息"),
+        BARCODE("barcode", "条码");
+
+        private final String code;
+        private final String desc;
+
+        ConsumeQueryType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+    }
 }

@@ -29,8 +29,7 @@ public class SupplierStoreDetailDTO {
      */
     @ApiModelProperty("商户名称")
     private String merName;
-    @ApiModelProperty("虚拟收银机号")
-    private String cashierNo;
+
     /**
      * 门店代码
      */
@@ -90,5 +89,11 @@ public class SupplierStoreDetailDTO {
     private String externalCode;
 
     List<MerchantAddressDTO> addressList;
+
+    /**
+     * 门店关联消费方法虚拟收银号
+     */
+    @ApiModelProperty("门店关联消费方法虚拟收银号")
+    List<StoreConsumeTypeDTO> storeConsumeTypeList;
 
 }

@@ -1,10 +1,7 @@
 package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.welfare.persist.dto.MonthSettleDetailDTO;
-import com.welfare.persist.dto.SettleStatisticsInfoDTO;
-import com.welfare.persist.dto.WelfareSettleDTO;
-import com.welfare.persist.dto.WelfareSettleDetailDTO;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
@@ -46,6 +43,12 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
      */
     List<WelfareSettleDTO> getWelfareSettle(WelfareSettleQuery welfareSettleQuery);
 
+    /**
+     * 查询商户结算统计信息
+     * @param welfareSettleQuery
+     * @return
+     */
+    WelfareSettleSumDTO getWelfareSettleAllMerchant(WelfareSettleQuery welfareSettleQuery);
     /**
      * 查询商户未结算详细信息列表
      * @param welfareSettleDetailQuery

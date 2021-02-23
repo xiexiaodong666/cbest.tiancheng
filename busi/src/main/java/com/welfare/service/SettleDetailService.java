@@ -1,6 +1,8 @@
 package com.welfare.service;
 
 import com.welfare.common.base.BasePageVo;
+import com.welfare.persist.dto.WelfareSettleSumDTO;
+import com.welfare.persist.dto.query.WelfareSettleQuery;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantBillDetail;
 import com.welfare.persist.entity.MerchantCredit;
@@ -25,6 +27,12 @@ public interface SettleDetailService {
      */
     BasePageVo<WelfareSettleResp> queryWelfareSettlePage(WelfareSettlePageReq welfareSettlePageReq);
 
+    /**
+     * 查询商户结算信息summary
+     * @param welfareSettleQuery
+     * @return
+     */
+    WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery);
     /**
      * 查询商户未结算明细信息列表
      * @param welfareSettleDetailReq

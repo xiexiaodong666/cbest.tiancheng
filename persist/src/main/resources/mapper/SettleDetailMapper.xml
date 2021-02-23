@@ -166,34 +166,73 @@
         </if>
     </select>
 
+    <select id="getWelfareSettleAllMerchant" parameterType="com.welfare.persist.dto.query.WelfareSettleQuery" resultType="com.welfare.persist.dto.WelfareSettleSumDTO">
+        select
+        <include refid="getWelfareSettleSum"/>
+        from  merchant t4
+        left join settle_detail t1 on t1.mer_code=t4.mer_code
+        left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
+        left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
+        left join merchant_credit t5 on t1.mer_code = t5.mer_code
+        <where>
+            <include refid="getWelfareSettleWhere"/>
+        </where>
+    </select>
 
     <select id="getWelfareSettle" parameterType="com.welfare.persist.dto.query.WelfareSettleQuery" resultType="com.welfare.persist.dto.WelfareSettleDTO">
         select
         t1.mer_code as merCode,
         t1.mer_name as mer_name,
-        sum(
-        case
-            when t3.mer_code = t1.mer_code  then 0.00
-            when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.mer_credit_deduction_amount
-            when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
-            else 0 end
-        ) as unSettleAmount,
-        sum(
-        case when t3.mer_code != t1.mer_code and t1.trans_type='consume' and t1.mer_account_type='self' then t1.trans_amount
-        when t3.mer_code != t1.mer_code and t1.trans_type='refund' and t1.mer_account_type='self' then t1.trans_amount*-1
-        else 0 end
-        ) as unSettleSelfAmount,
         count(DISTINCT t1.trans_no) as orderNum,
-        t5.rebate_limit as rebateAmount,
         t4.mer_cooperation_mode as merCooperationMode,
-        case when t4.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
-        when t4.mer_cooperation_mode = 'PAYED' then '后付费' end as mer_cooperation_mode_name
-        from settle_detail t1
+        case
+            when t4.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
+            when t4.mer_cooperation_mode = 'PAYED' then '后付费'
+        end as mer_cooperation_mode_name,
+        <include refid="getWelfareSettleSum"/>
+        from  merchant t4
+        left join settle_detail t1 on t1.mer_code=t4.mer_code
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
-        left join merchant t4 on t1.mer_code=t4.mer_code
         left join merchant_credit t5 on t1.mer_code = t5.mer_code
-        where t1.settle_flag = 'unsettled'
+        <where>
+            <include refid="getWelfareSettleWhere"/>
+        </where>
+        group by t1.mer_code
+    </select>
+    <sql id = "getWelfareSettleSum">
+        sum(
+               case
+               when t1.settle_flag = 'unsettled' and t1.trans_type='consume' then t1.mer_credit_deduction_amount
+               when t1.settle_flag = 'unsettled' and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
+               else 0
+               end
+           ) as unSettleAmount,
+        sum(
+            case
+                when t1.settle_flag = 'unsettled' and t1.trans_type='consume' and t1.mer_account_type='self' then t1.trans_amount
+                when t1.settle_flag = 'unsettled' and t1.trans_type='refund' and t1.mer_account_type='self' then t1.trans_amount*-1
+                else 0
+            end
+        ) as unSettleSelfAmount,
+        sum(
+            case
+                when t1.trans_type = 'consume' then t1.mer_credit_deduction_amount + t1.mer_deduction_amount
+                when t1.trans_type = 'refund'  then (t1.mer_credit_deduction_amount + t1.mer_deduction_amount) * -1
+                else 0
+            end
+        ) as totalConsumeAmount,
+        sum(
+            case
+                when t1.trans_type = 'consume' then t1.mer_deduction_amount
+                when t1.trans_type = 'refund'  then t1.mer_deduction_amount * -1
+                else 0
+            end
+        ) as balanceConsumeAmount,
+        t5.rebate_limit as rebateAmount
+    </sql>
+    <sql id="getWelfareSettleWhere">
+        t3.mer_code != t1.mer_code
         <if test="merCode!=null and merCode!=''">
             and t1.mer_code=#{merCode}
         </if>
@@ -203,9 +242,13 @@
         <if test="merCooperationMode!=null and merCooperationMode!=''">
             and t4.mer_cooperation_mode=#{merCooperationMode}
         </if>
-        group by t1.mer_code
-    </select>
-
+        <if test="startTime!=null and startTime!=''">
+            and t1.trans_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and t1.trans_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </sql>
     <select id="getSettleByCondition" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery" resultType="com.welfare.persist.entity.MonthSettle">
         select
         concat(t1.mer_code,DATE_FORMAT(now(),'%Y%m%d%h%m%s')) as settleNo,

@@ -13,6 +13,7 @@ import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
+import com.welfare.persist.dto.WelfareSettleSumDTO;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
@@ -75,10 +76,13 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     private SupplierStoreDao supplierStoreDao;
 
     @Override
+    public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
+        return settleDetailMapper.getWelfareSettleAllMerchant(welfareSettleQuery);
+    }
+    @Override
     public BasePageVo<WelfareSettleResp> queryWelfareSettlePage(WelfareSettlePageReq welfareSettlePageReq) {
         WelfareSettleQuery welfareSettleQuery = new WelfareSettleQuery();
         BeanUtils.copyProperties(welfareSettlePageReq, welfareSettleQuery);
-
         PageInfo<WelfareSettleResp> welfareSettleDTOPageInfo = PageHelper.startPage(welfareSettlePageReq.getCurrent(), welfareSettlePageReq.getSize())
                 .doSelectPageInfo(() -> {
                     settleDetailMapper.getWelfareSettle(welfareSettleQuery).stream().map(welfareSettleDTO -> {

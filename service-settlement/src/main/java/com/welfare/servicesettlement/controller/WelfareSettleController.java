@@ -3,6 +3,8 @@ package com.welfare.servicesettlement.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.exception.BusiException;
+import com.welfare.persist.dto.WelfareSettleSumDTO;
+import com.welfare.persist.dto.query.WelfareSettleQuery;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
@@ -46,6 +48,13 @@ public class WelfareSettleController implements IController {
     public R<BasePageVo<WelfareSettleResp>> pageQuery(WelfareSettlePageReq welfareSettlePageReq){
         BasePageVo<WelfareSettleResp> welfareSettleRespBasePageVo =  settleDetailService.queryWelfareSettlePage(welfareSettlePageReq);
         return success(welfareSettleRespBasePageVo);
+
+    }
+    @GetMapping("/summary")
+    @ApiOperation("查询商户账单信息summary")
+    public R<WelfareSettleSumDTO> summary(WelfareSettleQuery welfareSettleQuery){
+        WelfareSettleSumDTO welfareSettleSumDTO = settleDetailService.queryWelfareSettleSum(welfareSettleQuery);
+        return success(welfareSettleSumDTO);
 
     }
 

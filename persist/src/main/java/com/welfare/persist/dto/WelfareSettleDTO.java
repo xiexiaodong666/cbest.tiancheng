@@ -1,5 +1,6 @@
 package com.welfare.persist.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -34,4 +35,10 @@ public class WelfareSettleDTO {
 
     @ApiModelProperty(value = "返利金额")
     private String rebateAmount;
+
+    @ApiModelProperty(value = "消费总金额")
+    private String totalConsumeAmount;
+
+    @ApiModelProperty(value = "余额消费金额")
+    private String balanceConsumeAmount;
 }

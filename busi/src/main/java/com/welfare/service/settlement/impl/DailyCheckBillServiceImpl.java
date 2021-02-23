@@ -4,10 +4,11 @@ import com.amazonaws.util.StringInputStream;
 import com.welfare.common.util.FtpUtil;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
-import com.welfare.persist.entity.AccountDeductionDetail;
+import com.welfare.persist.dto.CheckBillDetail;
 import com.welfare.persist.entity.SupplierStore;
+import com.welfare.persist.mapper.CheckBillMapper;
 import com.welfare.service.settlement.DailyCheckBillService;
-import com.welfare.service.settlement.domain.AccountDeductionDetailExcelModel;
+import com.welfare.service.settlement.domain.CheckBillDetailExcelModel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -20,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +38,7 @@ public class DailyCheckBillServiceImpl implements DailyCheckBillService {
     private final SupplierStoreDao supplierStoreDao;
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final FtpUtil ftpUtil;
+    private final CheckBillMapper checkBillMapper;
 
     @Value("${ftp.path:/test}")
     private String targetFtpPath;
@@ -57,26 +58,27 @@ public class DailyCheckBillServiceImpl implements DailyCheckBillService {
         end.set(Calendar.MILLISECOND, 0);
 
         List<SupplierStore> supplierStores = supplierStoreDao.selectAllCbest(SupplierStore.STORE_CODE, SupplierStore.MER_CODE);
-        Map<String, String> storeMerCodeMap = supplierStores.stream().collect(Collectors.toMap(SupplierStore::getStoreCode, SupplierStore::getMerCode));
-        List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao.queryByStoreNosAndDate(storeMerCodeMap.keySet(), from.getTime(), end.getTime());
-
-        String csvContent = this.generateExcel(accountDeductionDetails, storeMerCodeMap);
+        List<String> storeCodes = supplierStores.stream().map(SupplierStore::getStoreCode).collect(Collectors.toList());
+        List<CheckBillDetail> checkBillDetails = checkBillMapper.queryCheckBill(storeCodes,from.getTime(), end.getTime());
+        String csvContent = this.generateExcel(checkBillDetails);
 
         this.writeToFtp(csvContent, from.getTime());
 
 
     }
 
-    private String generateExcel(List<AccountDeductionDetail> accountDeductionDetails, Map<String, String> storeMerCodeMap) {
+    private String generateExcel(List<CheckBillDetail> checkBillDetails) {
         String lineSeparator = System.getProperty("line.separator");
-        StringBuilder csvBuilder = new StringBuilder("门店编号,商户号,账户号,重百付流水号,交易时间,交易类型,交易金额(元),服务费(元),");
+        StringBuilder csvBuilder = new StringBuilder("门店编号,商户号,商户名称,账户号,电话号码,重百付流水号,交易时间,交易类型,交易金额(元),服务费(元),");
         csvBuilder.append(lineSeparator);
-        accountDeductionDetails.stream()
-                .map(accountBillDetail -> AccountDeductionDetailExcelModel.of(accountBillDetail, storeMerCodeMap))
+        checkBillDetails.stream()
+                .map(CheckBillDetailExcelModel::of)
                 .forEach(model -> {
                     csvBuilder.append(model.getStoreCode()).append(COMMA);
                     csvBuilder.append(model.getMerCode()).append(COMMA);
+                    csvBuilder.append(model.getMerName()).append(COMMA);
                     csvBuilder.append(model.getAccountCode()).append(COMMA);
+                    csvBuilder.append(model.getPhone()).append(COMMA);
                     csvBuilder.append(model.getTransNo()).append(COMMA);
                     csvBuilder.append(model.getTransDate()).append(COMMA);
                     csvBuilder.append(model.getTransType()).append(COMMA);

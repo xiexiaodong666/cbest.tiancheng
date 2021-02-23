@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.CheckBillMapper">
+    <select id="queryCheckBill" resultType="com.welfare.persist.dto.CheckBillDetail">
+        SELECT
+            a.account_code as accountCode,
+            a.phone as phone,
+            s.store_code as storeCode,
+            m.mer_code as merCode,
+            m.mer_name as merName,
+            d.trans_amount as transAmount,
+            d.trans_time as transTime,
+            d.trans_type as transType,
+            d.trans_no as transNo,
+            d.related_trans_no as relatedTransNo
+        FROM
+            account_deduction_detail d
+                INNER JOIN account a ON d.account_code = a.account_code
+                INNER JOIN supplier_store s ON d.store_code = s.store_code
+                INNER JOIN merchant m ON m.mer_code = s.mer_code
+        where d.trans_time <![CDATA[>=]]> #{startTime} and d.trans_time <![CDATA[<]]> #{endTime}
+            and d.store_code in
+            <foreach collection="storeCodes" item = "item" open="(" close=")" separator=",">
+                #{item,jdbcType=VARCHAR}
+            </foreach>
+    </select>
+</mapper>

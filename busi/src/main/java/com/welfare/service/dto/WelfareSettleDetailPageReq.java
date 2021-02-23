@@ -30,6 +30,9 @@ public class WelfareSettleDetailPageReq  extends PageReq {
     @ApiModelProperty(value = "门店编号")
     private String storeCode;
 
+    @ApiModelProperty(value = "供应商编码")
+    private String supplierCode;
+
     @ApiModelProperty(value = "起始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -53,4 +56,13 @@ public class WelfareSettleDetailPageReq  extends PageReq {
 
     @ApiModelProperty(value = "需要剔除的id列表")
     private List<Long> excludeIdList;
+
+    @ApiModelProperty(value = "结算状态")
+    private String settleFlag;
+
+    @ApiModelProperty(value = "手机号")
+    private String phone;
+
+    @ApiModelProperty(value = "部门编码列表")
+    private List<String> departmentCodes;
 }

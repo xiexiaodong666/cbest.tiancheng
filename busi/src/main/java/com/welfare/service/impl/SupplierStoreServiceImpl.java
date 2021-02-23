@@ -812,5 +812,4 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
     return isSaveOrUpdateBatch;
   }
-
 }

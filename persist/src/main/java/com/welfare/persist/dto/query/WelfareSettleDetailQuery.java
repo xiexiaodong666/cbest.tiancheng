@@ -1,5 +1,6 @@
 package com.welfare.persist.dto.query;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -58,4 +59,13 @@ public class WelfareSettleDetailQuery {
      * 线上的pos
      */
     private String posOnlines;
+
+    @ApiModelProperty(value = "结算状态")
+    private String settleFlag;
+
+    @ApiModelProperty(value = "手机号")
+    private String phone;
+
+    @ApiModelProperty(value = "部门编码列表")
+    private List<String> departmentCodes;
 }

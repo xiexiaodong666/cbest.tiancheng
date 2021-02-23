@@ -1,13 +1,16 @@
 package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
+import com.welfare.persist.dto.query.ProprietaryConsumePageQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.entity.SettleDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -78,4 +81,6 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
     List<SettleStatisticsInfoDTO> getSettleStatisticsInfoByCondition(WelfareSettleDetailQuery welfareSettleDetailQuery);
 
     List<Long> getSettleDetailIdList(WelfareSettleDetailQuery welfareSettleDetailQuery);
+
+    Page<ProprietaryConsumeDTO> queryProprietaryConsumeInfo(Page<ProprietaryConsumeDTO> page, @Param("query") ProprietaryConsumePageQuery query);
 }

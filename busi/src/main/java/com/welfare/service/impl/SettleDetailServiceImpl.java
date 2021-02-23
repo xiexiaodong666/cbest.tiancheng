@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
@@ -12,9 +13,11 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
+import com.welfare.persist.dto.ProprietaryConsumeDTO;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.WelfareSettleSumDTO;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
+import com.welfare.persist.dto.query.ProprietaryConsumePageQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
 import com.welfare.persist.entity.*;
@@ -24,9 +27,13 @@ import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
+import com.welfare.service.dto.proprietary.ProprietaryConsumePageReq;
 import com.welfare.service.operator.merchant.RebateLimitOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
+import com.welfare.service.utils.PageReq;
+import com.welfare.service.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
@@ -324,5 +331,31 @@ public class SettleDetailServiceImpl implements SettleDetailService {
                 .flatMap(Collection::stream)
                 .map(MerchantAccountOperation::getMerchantBillDetail)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ProprietaryConsumeResp> queryProprietaryConsumePage(ProprietaryConsumePageReq welfareSettleDetailPageReq, PageReq pageReq) {
+        String merCode = welfareSettleDetailPageReq.getMerCode();
+        if(StringUtils.isBlank(merCode)){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+        }
+        ProprietaryConsumePageQuery proprietaryConsumePageQuery = new ProprietaryConsumePageQuery();
+        BeanUtils.copyProperties(welfareSettleDetailPageReq, proprietaryConsumePageQuery);
+        proprietaryConsumePageQuery.setStoreType("self");
+
+        Page<ProprietaryConsumeDTO> page = new Page<>();
+        page.setCurrent(pageReq.getCurrent());
+        page.setPages(pageReq.getSize());
+        settleDetailMapper.queryProprietaryConsumeInfo(page, proprietaryConsumePageQuery);
+        List<ProprietaryConsumeDTO> dtos = page.getRecords();
+        List<ProprietaryConsumeResp> resps = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(dtos)) {
+            dtos.forEach(proprietaryConsumeDTO -> {
+                ProprietaryConsumeResp resp = new ProprietaryConsumeResp();
+                BeanUtils.copyProperties(proprietaryConsumeDTO, resp);
+                resps.add(resp);
+            });
+        }
+        return PageUtils.toPage(page, resps);
     }
 }

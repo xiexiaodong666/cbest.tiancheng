@@ -2,6 +2,8 @@ package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.MonthSettleDetailResp;
 import com.welfare.service.dto.ProprietaryConsumeResp;
@@ -46,7 +48,8 @@ public class ProprietaryConsumeController implements IController {
   @ApiOperation("分页查询自营消费列表")
   @MerchantUser
   public R<Page<ProprietaryConsumeResp>> pageQueryMonthSettleDetail(ProprietaryConsumePageReq req, PageReq pageReq){
-    return null;
+    req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(settleDetailService.queryProprietaryConsumePage(req, pageReq));
   }
 
   @GetMapping("/totalAmount")

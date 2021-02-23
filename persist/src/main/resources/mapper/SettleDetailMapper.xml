@@ -242,10 +242,10 @@
         <if test="merCooperationMode!=null and merCooperationMode!=''">
             and t4.mer_cooperation_mode=#{merCooperationMode}
         </if>
-        <if test="startTime!=null and startTime!=''">
+        <if test="startTime!=null">
             and t1.trans_time <![CDATA[ >= ]]> #{startTime}
         </if>
-        <if test="endTime!=null and endTime!=''">
+        <if test="endTime!=null">
             and t1.trans_time <![CDATA[ <= ]]> #{endTime}
         </if>
     </sql>

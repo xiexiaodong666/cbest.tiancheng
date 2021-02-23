@@ -10,12 +10,11 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.AccountUtil;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
-import com.welfare.persist.dto.ProprietaryConsumeDTO;
-import com.welfare.persist.dto.SettleStatisticsInfoDTO;
-import com.welfare.persist.dto.WelfareSettleSumDTO;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.ProprietaryConsumePageQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
@@ -25,6 +24,7 @@ import com.welfare.persist.mapper.MerchantBillDetailMapper;
 import com.welfare.persist.mapper.MerchantCreditMapper;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
+import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
 import com.welfare.service.dto.proprietary.ProprietaryConsumePageReq;
@@ -81,6 +81,8 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     private RebateLimitOperator rebateLimitOperator;
     @Autowired
     private SupplierStoreDao supplierStoreDao;
+    @Autowired
+    private MerchantAccountTypeService accountTypeService;
 
     @Override
     public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
@@ -357,5 +359,70 @@ public class SettleDetailServiceImpl implements SettleDetailService {
             });
         }
         return PageUtils.toPage(page, resps);
+    }
+
+    @Override
+    public List<ProprietaryConsumeResp> queryProprietaryConsume(ProprietaryConsumePageReq welfareSettleDetailPageReq) {
+        String merCode = welfareSettleDetailPageReq.getMerCode();
+        if(StringUtils.isBlank(merCode)){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+        }
+        ProprietaryConsumePageQuery proprietaryConsumePageQuery = new ProprietaryConsumePageQuery();
+        BeanUtils.copyProperties(welfareSettleDetailPageReq, proprietaryConsumePageQuery);
+        proprietaryConsumePageQuery.setStoreType("self");
+
+        List<ProprietaryConsumeDTO> dtos =  settleDetailMapper.queryProprietaryConsumeInfo(proprietaryConsumePageQuery);
+        List<ProprietaryConsumeResp> resps = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(dtos)) {
+            dtos.forEach(proprietaryConsumeDTO -> {
+                ProprietaryConsumeResp resp = new ProprietaryConsumeResp();
+                BeanUtils.copyProperties(proprietaryConsumeDTO, resp);
+                resp.setPhone(AccountUtil.desensitizedPhoneNumber(resp.getPhone()));
+                resps.add(resp);
+            });
+        }
+        return resps;
+    }
+
+    @Override
+    public List<WelfareTypeTotalAmountResp> statisticalAmountGroupByWelfareTypeCode(ProprietaryConsumePageReq welfareSettleDetailPageReq) {
+        String merCode = welfareSettleDetailPageReq.getMerCode();
+        if(StringUtils.isBlank(merCode)){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+        }
+        ProprietaryConsumePageQuery proprietaryConsumePageQuery = new ProprietaryConsumePageQuery();
+        BeanUtils.copyProperties(welfareSettleDetailPageReq, proprietaryConsumePageQuery);
+        proprietaryConsumePageQuery.setStoreType("self");
+        List<WelfareTypeTotalAmountResp> typeTotalAmounts = new ArrayList<>();
+        // 查询商户下所有的余额类型
+        List<MerchantAccountType> accountTypeList = accountTypeService.queryAllByMerCode(merCode);
+        if (CollectionUtils.isNotEmpty(accountTypeList)) {
+            List<String> typeCodes = accountTypeList.stream().map(MerchantAccountType::getMerAccountTypeCode).collect(Collectors.toList());
+            // 根据余额类型分组统计金额
+            List<WelfareTypeTotalAmountDTO> amountDTOS = settleDetailMapper.statisticalAmountGroupByWelfareTypeCode(proprietaryConsumePageQuery);
+            Map<String,WelfareTypeTotalAmountDTO> amountDTOMap = new HashMap<>();
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            if (CollectionUtils.isNotEmpty(amountDTOS)) {
+                amountDTOMap = amountDTOS.stream().collect(Collectors.toMap(WelfareTypeTotalAmountDTO::getType, a -> a,(k1,k2)->k1));
+                totalAmount = amountDTOS.stream().map(WelfareTypeTotalAmountDTO::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            }
+            Map<String, WelfareTypeTotalAmountDTO> finalAmountDTOMap = amountDTOMap;
+            accountTypeList.forEach(merchantAccountType -> {
+                WelfareTypeTotalAmountResp amountResp = new WelfareTypeTotalAmountResp();
+                amountResp.setType(merchantAccountType.getMerAccountTypeCode());
+                amountResp.setTypeName(merchantAccountType.getMerAccountTypeName());
+                amountResp.setAmount(BigDecimal.ZERO);
+                if (finalAmountDTOMap.containsKey(merchantAccountType.getMerAccountTypeCode())) {
+                    amountResp.setAmount(finalAmountDTOMap.get(merchantAccountType.getMerAccountTypeCode()).getAmount());
+                }
+                typeTotalAmounts.add(amountResp);
+            });
+            // 计算总金额
+            WelfareTypeTotalAmountResp totalAmountResp = new WelfareTypeTotalAmountResp();
+            totalAmountResp.setTypeName("消费总金额");
+            totalAmountResp.setAmount(totalAmount);
+            typeTotalAmounts.add(totalAmountResp);
+        }
+        return typeTotalAmounts;
     }
 }

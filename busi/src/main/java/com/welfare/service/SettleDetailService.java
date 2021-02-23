@@ -81,4 +81,13 @@ public interface SettleDetailService {
      * @return
      */
     Page<ProprietaryConsumeResp> queryProprietaryConsumePage(ProprietaryConsumePageReq welfareSettleDetailPageReq, PageReq pageReq);
+
+    List<ProprietaryConsumeResp> queryProprietaryConsume(ProprietaryConsumePageReq welfareSettleDetailPageReq);
+
+    /**
+     * 按余额类型为维度统计总金额
+     * @param welfareSettleDetailPageReq
+     * @return
+     */
+    List<WelfareTypeTotalAmountResp> statisticalAmountGroupByWelfareTypeCode(ProprietaryConsumePageReq welfareSettleDetailPageReq);
 }

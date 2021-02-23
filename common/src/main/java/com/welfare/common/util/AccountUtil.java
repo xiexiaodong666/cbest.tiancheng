@@ -1,5 +1,7 @@
 package com.welfare.common.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -40,5 +42,17 @@ public class AccountUtil {
       result.add(value);
     }
     return result;
+  }
+
+  /**
+   * 手机号脱敏
+   * @param phoneNumber
+   * @return
+   */
+  public static String desensitizedPhoneNumber(String phoneNumber){
+    if(StringUtils.isNotEmpty(phoneNumber)){
+      phoneNumber = phoneNumber.replaceAll("(\\w{3})\\w*(\\w{4})", "$1****$2");
+    }
+    return phoneNumber;
   }
 }

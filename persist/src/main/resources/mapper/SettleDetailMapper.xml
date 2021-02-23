@@ -386,12 +386,14 @@
         t1.order_id as orderNO,
         t1.trans_time as transTime,
         t1.store_code as storeCode,
-        t1.store_name as storeName,
+        t1.store_name as storeNam,
         t1.mer_account_type as welfareTypeCode,
         t1.mer_account_type_name as welfareTypeName,
         case when t1.trans_type='consume' then t1.trans_amount
         when t1.trans_type='refund' then t1.trans_amount*-1 end as payAmount,
         ac.phone,
+        ac.account_name as accountName,
+        ac.account_code as accountCode,
         de.department_code as departmentCode,
         de.department_name as departmentName
         <include refid="queryListTable"></include>
@@ -421,7 +423,7 @@
                 and
                 <foreach collection="query.departmentPaths" item="item" index="index" open="(" close=")"
                          separator="or">
-                    de.department_code like CONCAT(#{item}, '%')
+                    de.department_path like CONCAT(#{item}, '%')
                 </foreach>
             </if>
             <if test="query.storeCodes!=null and query.storeCodes.size()  >0">
@@ -435,6 +437,59 @@
             and t1.data_type='welfare'
         </where>
         order by t1.trans_time desc
+    </select>
+
+    <select id="statisticalAmountGroupByWelfareTypeCode" parameterType="com.welfare.persist.dto.query.ProprietaryConsumePageQuery" resultType="com.welfare.persist.dto.WelfareTypeTotalAmountDTO">
+        select
+        t1.mer_account_type as `type`,
+        t1.mer_account_type_name as `typeName`,
+        SUM(
+        CASE
+        WHEN t1.trans_type='consume' THEN IFNULL(t1.trans_amount,0)
+        WHEN t1.trans_type='refund' THEN IFNULL(t1.trans_amount*-1,0)
+        ELSE 0 END
+        ) amount
+        <include refid="queryListTable"></include>
+        left join account ac on ac.account_code = t1.account_code
+        left join department de on de.department_code = ac.store_code
+        <where>
+            t3.mer_code = t1.mer_code
+            <if test="query.orderNo!=null and query.orderNo!=''">
+                and t1.order_id = #{query.orderNo}
+            </if>
+            <if test="query.startTime!=null">
+                and t1.trans_time &gt;=#{query.startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="query.endTime!=null">
+                and t1.trans_time &lt;=#{query.endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="query.transNo!=null and query.transNo!=''">
+                and t1.trans_no=#{query.transNo}
+            </if>
+            <if test="query.merCode!=null and query.merCode!=''">
+                and t1.mer_code = #{query.merCode}
+            </if>
+            <if test="query.phone!=null and query.phone!=''">
+                and ac.phone = #{query.phone}
+            </if>
+            <if test="query.departmentPaths!=null and query.departmentPaths.size()  >0">
+                and
+                <foreach collection="query.departmentPaths" item="item" index="index" open="(" close=")"
+                         separator="or">
+                    de.department_path like CONCAT(#{item}, '%')
+                </foreach>
+            </if>
+            <if test="query.storeCodes!=null and query.storeCodes.size()  >0">
+                and t1.store_code in
+                <foreach collection="query.storeCodes" item="item" index="index" open="(" close=")"
+                         separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            and t1.settle_flag='unsettled'
+            and t1.data_type='welfare'
+        </where>
+       group by t1.mer_account_type
     </select>
 
     <sql id="queryListTable">

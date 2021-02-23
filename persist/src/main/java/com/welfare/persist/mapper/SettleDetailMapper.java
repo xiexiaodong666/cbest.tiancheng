@@ -83,4 +83,8 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
     List<Long> getSettleDetailIdList(WelfareSettleDetailQuery welfareSettleDetailQuery);
 
     Page<ProprietaryConsumeDTO> queryProprietaryConsumeInfo(Page<ProprietaryConsumeDTO> page, @Param("query") ProprietaryConsumePageQuery query);
+
+    List<ProprietaryConsumeDTO> queryProprietaryConsumeInfo(@Param("query") ProprietaryConsumePageQuery query);
+
+    List<WelfareTypeTotalAmountDTO> statisticalAmountGroupByWelfareTypeCode(@Param("query")ProprietaryConsumePageQuery query);
 }

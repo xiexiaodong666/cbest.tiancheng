@@ -76,4 +76,11 @@ public interface MerchantAccountTypeService {
      * @return
      */
     List<MerchantAccountType> queryShowedByMerCode(String merCode);
+
+    /**
+     * 查询商户下的所有MerchantAccountType
+     * @param merCode
+     * @return
+     */
+    List<MerchantAccountType> queryAllByMerCode(String merCode);
 }

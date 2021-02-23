@@ -2,14 +2,10 @@ package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
-import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.service.SettleDetailService;
-import com.welfare.service.dto.MonthSettleDetailResp;
 import com.welfare.service.dto.ProprietaryConsumeResp;
-import com.welfare.service.dto.WelfareTypeTotalAmount;
-import com.welfare.service.dto.accountapply.AccountDepositApplyExcelInfo;
-import com.welfare.service.dto.accountapply.AccountDepositApplyQuery;
+import com.welfare.service.dto.WelfareTypeTotalAmountResp;
 import com.welfare.service.dto.proprietary.ProprietaryConsumePageReq;
 import com.welfare.service.utils.PageReq;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
@@ -20,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,15 +51,18 @@ public class ProprietaryConsumeController implements IController {
   @GetMapping("/totalAmount")
   @ApiOperation("查询所有员工消费支出类型的总金额")
   @MerchantUser
-  public R<List<WelfareTypeTotalAmount>> total(ProprietaryConsumePageReq req){
-    return null;
+  public R<List<WelfareTypeTotalAmountResp>> total(ProprietaryConsumePageReq req){
+    req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(settleDetailService.statisticalAmountGroupByWelfareTypeCode(req));
   }
 
   @PostMapping("/export")
   @ApiOperation("导出查询自营消费列表(返回文件下载地址)")
   @MerchantUser
   public R<String> export(@RequestBody ProprietaryConsumePageReq query) throws IOException {
-    List<ProprietaryConsumeResp> list = null;
+    query.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    List<ProprietaryConsumeResp> list = settleDetailService.queryProprietaryConsume(query);
+    list = list == null ? new ArrayList<>() : list;
     String path = fileUploadServiceUtil.uploadExcelFile(list, ProprietaryConsumeResp.class, "自营消费");
     return success(fileUploadServiceUtil.getFileServerUrl(path));
   }

@@ -11,10 +11,13 @@ import java.math.BigDecimal;
  * @Date: 2021/2/23 4:08 下午
  */
 @Data
-public class WelfareTypeTotalAmount {
+public class WelfareTypeTotalAmountResp {
 
-  @ApiModelProperty("消费支出类型")
+  @ApiModelProperty("消费支出类型编码")
   private String type;
+
+  @ApiModelProperty("消费支出类型名称")
+  private String typeName;
 
   @ApiModelProperty("总金额")
   private BigDecimal amount;

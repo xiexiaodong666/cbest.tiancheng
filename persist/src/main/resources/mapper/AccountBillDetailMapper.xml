@@ -29,7 +29,8 @@
         aded.trans_time AS transTime,
         aded.chanel AS channel,
         mat.mer_account_type_code AS merAccountTypeCode,
-        mat.mer_account_type_name AS merAccountTypeName
+        mat.mer_account_type_name AS merAccountTypeName,
+        aded.trans_no AS transNo
         FROM
         account_deduction_detail aded
         JOIN account a ON aded.account_code = a.account_code

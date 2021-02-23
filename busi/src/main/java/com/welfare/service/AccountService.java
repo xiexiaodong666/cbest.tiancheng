@@ -119,4 +119,11 @@ public interface AccountService {
    * @return
    */
   AccountDO queryByQueryInfo(String queryInfo,String queryType);
+
+  /**
+   * 按组织机构分组统计各层人员数量
+   * @param merCode
+   * @return
+   */
+  List<DepartmentTree> groupByDepartment(String merCode);
 }

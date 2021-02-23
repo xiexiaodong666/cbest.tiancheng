@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.welfare.persist.dto.AccountConsumeMerStoreRelationDTO;
 import com.welfare.persist.dto.AccountConsumeStoreRelationDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,11 +17,7 @@ import java.util.List;
 @Data
 @ApiModel("员工类型消费配置")
 public class AccountConsumeSceneDTO {
-  /**
-   * 商户代码
-   */
-  @ApiModelProperty("商户代码")
-  private String merCode;
+
   /**
    * 员工类型ID
    */
@@ -31,20 +28,11 @@ public class AccountConsumeSceneDTO {
    */
   @ApiModelProperty("员工类型名称")
   private String accountTypeName;
+
   /**
    * 消费配置配置门店
    */
   @ApiModelProperty("消费配置配置门店")
-  private List<AccountConsumeStoreRelationDTO> accountConsumeStoreRelationDTOListDTOList;
+  private List<AccountConsumeMerStoreRelationDTO> consumeMerStoreRelationDTOS;
 
-  /**
-   * 备注
-   */
-  @ApiModelProperty("备注")
-  private String remark;
-  /**
-   * 创建时间
-   */
-  @ApiModelProperty("创建时间")
-  private Date createTime;
 }

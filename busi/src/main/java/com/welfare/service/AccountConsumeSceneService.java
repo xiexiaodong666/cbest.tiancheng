@@ -8,6 +8,7 @@ import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.service.dto.AccountConsumeSceneAddReq;
 import com.welfare.service.dto.AccountConsumeSceneDTO;
+import com.welfare.service.dto.AccountConsumeSceneMainDTO;
 import com.welfare.service.dto.AccountConsumeSceneReq;
 
 import java.util.List;
@@ -33,4 +34,6 @@ public interface AccountConsumeSceneService {
   public List<AccountConsumeScenePageDTO> export(AccountConsumePageQuery accountConsumePageReq);
 
   public AccountConsumeSceneDTO findAccountConsumeSceneDTOById(Long id);
+
+  AccountConsumeSceneMainDTO findAllAccountConsumeSceneDTO(String merCode);
 }

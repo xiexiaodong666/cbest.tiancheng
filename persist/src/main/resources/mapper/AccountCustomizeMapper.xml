@@ -423,4 +423,15 @@
       AND a.phone = #{phone}
       AND a.mer_code = #{merCode}
   </select>
+
+  <select id ="countByDepartmentPath" resultType="java.lang.Integer">
+    SELECT
+      count(1)
+    FROM
+      account a
+        LEFT JOIN department d ON a.store_code = d.department_code
+    where
+      a.mer_code = #{merCode}
+      and d.department_path like '${departmentPath}%'
+  </select>
 </mapper>

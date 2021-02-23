@@ -22,10 +22,7 @@ import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
 import com.welfare.service.*;
-import com.welfare.service.dto.AccountConsumeSceneAddReq;
-import com.welfare.service.dto.AccountConsumeSceneDTO;
-import com.welfare.service.dto.AccountConsumeSceneReq;
-import com.welfare.service.dto.AccountConsumeSceneStoreRelationReq;
+import com.welfare.service.dto.*;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 import lombok.RequiredArgsConstructor;
@@ -248,5 +245,12 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
         .queryAccountConsumerScene4Detail(id);
     BeanUtils.copyProperties(accountConsumeSceneMapperDTO, accountConsumeSceneDTO);
     return accountConsumeSceneDTO;
+  }
+
+  @Override
+  public AccountConsumeSceneMainDTO findAllAccountConsumeSceneDTO(String merCode) {
+    // 获取所有员工类型
+    // 查询所有员工类型消费配置
+    return null;
   }
 }

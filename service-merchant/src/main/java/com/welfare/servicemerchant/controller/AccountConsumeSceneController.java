@@ -15,10 +15,7 @@ import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
-import com.welfare.service.dto.AccountConsumeSceneAddReq;
-import com.welfare.service.dto.AccountConsumeSceneDTO;
-import com.welfare.service.dto.AccountConsumeSceneReq;
-import com.welfare.service.dto.StoreConsumeRelationDTO;
+import com.welfare.service.dto.*;
 import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
 import com.welfare.servicemerchant.dto.AccountConsumePageReq;
 import com.welfare.servicemerchant.dto.UpdateStatusReq;
@@ -95,11 +92,20 @@ public class AccountConsumeSceneController implements IController {
     return success(accountConsumeSceneConverter.toD(result));
   }
 
+  @GetMapping("/all")
+  @ApiOperation("查询商户下所有员工消费配置详情")
+  @MerchantUser
+  public R<AccountConsumeSceneMainDTO> detail() {
+    AccountConsumeSceneMainDTO AccountConsumeSceneMainDTO = accountConsumeSceneService
+            .findAllAccountConsumeSceneDTO(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(AccountConsumeSceneMainDTO);
+  }
+
   @GetMapping("/{id}")
   @ApiOperation("员工消费配置详情")
   public R<AccountConsumeSceneDTO> detail(@PathVariable String id) {
     AccountConsumeSceneDTO accountConsumeSceneDTO = accountConsumeSceneService
-        .findAccountConsumeSceneDTOById(Long.parseLong(id));
+            .findAccountConsumeSceneDTOById(Long.parseLong(id));
     return success(accountConsumeSceneDTO);
   }
 

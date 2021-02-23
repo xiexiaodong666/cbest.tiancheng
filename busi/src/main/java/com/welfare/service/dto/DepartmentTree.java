@@ -49,6 +49,11 @@ public class DepartmentTree extends Tree {
     @ApiModelProperty("部门路径")
     private String departmentPath;
     /**
+     * 人员数量
+     */
+    @ApiModelProperty("人员数量")
+    private Integer accountTotal;
+    /**
      * 创建人
      */
     @ApiModelProperty("创建人")
@@ -73,5 +78,4 @@ public class DepartmentTree extends Tree {
      */
     @ApiModelProperty("外部编码")
     private String externalCode;
-
 }

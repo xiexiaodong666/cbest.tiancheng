@@ -77,4 +77,7 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
   List<Account> queryByConsumeSceneIdList(List<Long> list);
 
   AccountDetailMapperDTO queryDetailPhoneAndMer(@Param("phone") String phone, @Param("merCode") String merCode);
+
+  int countByDepartmentPath(@Param("merCode")String merCode, @Param("departmentPath")String departmentPath);
+
 }

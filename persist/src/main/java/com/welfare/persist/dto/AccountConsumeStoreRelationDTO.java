@@ -13,8 +13,6 @@ import lombok.Data;
 @ApiModel("员工类型消费配置")
 public class AccountConsumeStoreRelationDTO {
 
-  @ApiModelProperty("门店消费配置关联关系表ID")
-  private String id;
   /**
    * 门店编码
    */

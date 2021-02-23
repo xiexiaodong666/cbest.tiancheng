@@ -964,4 +964,28 @@ public class AccountServiceImpl implements AccountService {
         accountDeductionDetail.setSelfDeductionAmount(BigDecimal.ZERO);
         return accountDeductionDetail;
     }
+
+  @Override
+  public List<DepartmentTree> groupByDepartment(String merCode) {
+    List<DepartmentTree> trees = departmentService.tree(merCode);
+    if (CollectionUtils.isNotEmpty(trees)) {
+      trees = trees.get(0).getChildren();
+      // 查询各层的人员数量
+      recursiveCalculateAccountNum(trees);
+    }
+    return trees;
+  }
+
+  private void recursiveCalculateAccountNum(List<DepartmentTree> trees){
+    if (CollectionUtils.isNotEmpty(trees)) {
+      trees.forEach(departmentTree -> {
+        // 查询人员数量
+        int count = accountCustomizeMapper
+                .countByDepartmentPath(departmentTree.getMerCode(), departmentTree.getDepartmentPath());
+        departmentTree.setAccountTotal(count);
+        // 继续递归
+        recursiveCalculateAccountNum(departmentTree.getChildren());
+      });
+    }
+  }
 }

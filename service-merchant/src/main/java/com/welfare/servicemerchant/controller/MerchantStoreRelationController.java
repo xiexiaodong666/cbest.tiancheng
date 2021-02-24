@@ -246,7 +246,7 @@ public class MerchantStoreRelationController implements IController {
   }
 
   @GetMapping("/merSupplierStore/list")
-  @ApiOperation("查询商户下所有的供应商门店list")
+  @ApiOperation("查询商户下所有的供应商消费门店配置")
   @MerchantUser
   public R<List<MerSupplierStoreResp>> queryMerSupplierStoreDTList(){
     return null;

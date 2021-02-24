@@ -92,15 +92,6 @@ public class AccountConsumeSceneController implements IController {
     return success(accountConsumeSceneConverter.toD(result));
   }
 
-  @GetMapping("/all")
-  @ApiOperation("查询商户下所有员工消费配置详情")
-  @MerchantUser
-  public R<AccountConsumeSceneMainDTO> detail() {
-    AccountConsumeSceneMainDTO AccountConsumeSceneMainDTO = accountConsumeSceneService
-            .findAllAccountConsumeSceneDTO(MerchantUserHolder.getMerchantUser().getMerchantCode());
-    return success(AccountConsumeSceneMainDTO);
-  }
-
   @GetMapping("/{id}")
   @ApiOperation("员工消费配置详情")
   public R<AccountConsumeSceneDTO> detail(@PathVariable String id) {
@@ -167,5 +158,25 @@ public class AccountConsumeSceneController implements IController {
     String path = fileUploadService
         .uploadExcelFile(list, AccountConsumeScenePageDTO.class, "员工消费配置");
     return success(fileUploadService.getFileServerUrl(path));
+  }
+
+  @PostMapping("/edit")
+  @ApiOperation("编辑员工消费配置")
+  @MerchantUser
+  public R<Boolean> edit(@RequestBody List<AccountConsumeSceneEditReq> consumeSceneEditReqs) {
+    try {
+      return null;
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
+  }
+
+  @GetMapping("/details")
+  @ApiOperation("查询商户下所有员工消费配置详情")
+  @MerchantUser
+  public R<List<AccountConsumeSceneResp>> detail() {
+    List<AccountConsumeSceneResp> accountConsumeSceneResps = accountConsumeSceneService
+            .findAllAccountConsumeSceneDTO(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(accountConsumeSceneResps);
   }
 }

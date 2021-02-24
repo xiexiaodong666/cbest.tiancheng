@@ -14,8 +14,6 @@ import java.util.List;
 @Data
 public class AccountConsumeSceneMainDTO {
 
-  private Long id;
-
   /**
    * 商户代码
    */

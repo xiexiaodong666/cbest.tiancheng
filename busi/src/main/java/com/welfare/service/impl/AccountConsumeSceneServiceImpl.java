@@ -248,7 +248,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   }
 
   @Override
-  public AccountConsumeSceneMainDTO findAllAccountConsumeSceneDTO(String merCode) {
+  public List<AccountConsumeSceneResp> findAllAccountConsumeSceneDTO(String merCode) {
     // 获取所有员工类型
     // 查询所有员工类型消费配置
     return null;

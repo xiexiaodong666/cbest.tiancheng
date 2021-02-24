@@ -17,4 +17,5 @@ public interface AccountChangeEventRecordService {
   public void batchSave(List<AccountChangeEventRecord> accountChangeEventRecordList,AccountChangeType accountChangeType);
   public void batchSaveByAccountTypeCode(String accountTypeCode,AccountChangeType accountChangeType);
   public void batchSaveBySceneStoreRelation(List<AccountConsumeSceneStoreRelation> accountConsumeSceneStoreRelationList);
+  void batchSaveByAccountTypeCode(List<String> accountTypeCodes,AccountChangeType accountChangeType);
 }

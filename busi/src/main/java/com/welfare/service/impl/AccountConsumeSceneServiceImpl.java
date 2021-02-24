@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
@@ -12,18 +12,16 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
+import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
+import com.welfare.persist.dto.AccountConsumeStoreInfoDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
-import com.welfare.persist.entity.AccountConsumeScene;
-import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
-import com.welfare.persist.entity.AccountType;
-import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
 import com.welfare.service.*;
 import com.welfare.service.dto.*;
-import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +33,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 员工消费场景配置服务接口实现
@@ -54,18 +51,13 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final AccountConsumeSceneDao accountConsumeSceneDao;
   private final AccountConsumeSceneCustomizeMapper accountConsumeSceneCustomizeMapper;
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
-  private final ObjectMapper mapper;
-  @Autowired(required = false)
-  private ShoppingFeignClient shoppingFeignClient;
   @Autowired
   MerchantService merchantService;
   private final AccountTypeService accountTypeService;
-  private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
-  private final AccountService accountService;
   private final AccountChangeEventRecordService accountChangeEventRecordService;
   private final ApplicationContext applicationContext;
   private final AccountConsumeSceneStoreRelationMapper accountConsumeSceneStoreRelationMapper;
-
+  private final MerchantAccountTypeDao merchantAccountTypeDao;
 
   @Override
   public AccountConsumeScene getAccountConsumeScene(Long id) {
@@ -249,8 +241,88 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
 
   @Override
   public List<AccountConsumeSceneResp> findAllAccountConsumeSceneDTO(String merCode) {
-    // 获取所有员工类型
-    // 查询所有员工类型消费配置
+    List<AccountConsumeSceneResp> resps = new ArrayList<>();
+    List<AccountConsumeStoreInfoDTO> consumeStoreInfoDTOS = accountConsumeSceneCustomizeMapper.findAllAccountConsumeSceneDTO(merCode);
+    if (CollectionUtils.isNotEmpty(consumeStoreInfoDTOS)) {
+      //按消费id分组
+      consumeStoreInfoDTOS.stream()
+              .collect(Collectors.groupingBy(AccountConsumeStoreInfoDTO::getId))
+              .forEach((id, accountConsumeStoreInfoDTOS) -> {
+                AccountConsumeSceneResp resp = new AccountConsumeSceneResp();
+                resp.setId(String.valueOf(id));
+                AccountConsumeStoreInfoDTO storeInfoDTO = accountConsumeStoreInfoDTOS.get(0);
+                resp.setAccountTypeCode(storeInfoDTO.getAccountTypeCode());
+                resp.setAccountTypeName(storeInfoDTO.getAccountTypeName());
+                resp.setMerCode(storeInfoDTO.getMerCode());
+                resp.setConsumeSceneSupplierDTOS(new ArrayList<>());
+                //按供应商编码分组
+                accountConsumeStoreInfoDTOS.stream()
+                        .collect(Collectors.groupingBy(AccountConsumeStoreInfoDTO::getSupplierCode))
+                        .forEach((supplierCode, accountConsumeStoreInfos) -> {
+                          AccountConsumeSceneSupplierDTO consumeSceneSupplierDTO = new AccountConsumeSceneSupplierDTO();
+                          consumeSceneSupplierDTO.setSupplierCode(supplierCode);
+                          consumeSceneSupplierDTO.setSupplierName(accountConsumeStoreInfos.get(0).getSupplierName());
+                          consumeSceneSupplierDTO.setConsumeStoreRelationInfos(new ArrayList<>());
+                          // 封装具体的消费门店配置信息
+                          accountConsumeStoreInfos.forEach(accountConsume -> {
+                            AccountConsumeStoreRelationInfo storeRelationInfo = new AccountConsumeStoreRelationInfo();
+                            BeanUtils.copyProperties(accountConsume, storeRelationInfo);
+                            consumeSceneSupplierDTO.getConsumeStoreRelationInfos().add(storeRelationInfo);
+                          });
+                          resp.getConsumeSceneSupplierDTOS().add(consumeSceneSupplierDTO);
+                        });
+                resps.add(resp);
+              });
+    }
+    return resps;
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public Boolean edit(List<AccountConsumeSceneEditReq> consumeSceneEditReqs) {
+    if (CollectionUtils.isEmpty(consumeSceneEditReqs)) {
+      throw new BusiException("至少配置一个员工类型");
+    }
+    //删除已有配置
+    String merCode = consumeSceneEditReqs.get(0).getMerCode();
+    List<AccountConsumeScene> oldScenes = accountConsumeSceneDao.getAllByMercode(Lists.newArrayList(merCode));
+    List<Long> oldConsumeSceneIds = oldScenes.stream()
+            .map(AccountConsumeScene::getId).collect(Collectors.toList());
+    accountConsumeSceneDao.deleteConsumeSceneByIds(oldConsumeSceneIds);
+    accountConsumeSceneStoreRelationDao.deleteByConsumeSceneIds(oldConsumeSceneIds);
+    //保存最新配置
+    List<AccountConsumeScene> newScenes = new ArrayList<>();
+    Map<AccountConsumeSceneEditReq, AccountConsumeScene> sceneMap = new HashMap<>();
+    consumeSceneEditReqs.forEach(consumeSceneEditReq -> {
+      if (CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
+        AccountConsumeScene scene = new AccountConsumeScene();
+        BeanUtils.copyProperties(consumeSceneEditReq, scene);
+        scene.setId(null);
+        newScenes.add(scene);
+        sceneMap.put(consumeSceneEditReq, scene);
+      }
+    });
+    accountConsumeSceneDao.saveBatch(newScenes);
+    List<AccountConsumeSceneStoreRelation> newRelations = new ArrayList<>();
+    consumeSceneEditReqs.forEach(consumeSceneEditReq -> {
+      if (CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
+        consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs()
+                .forEach(consumeStoreRelation -> {
+                  AccountConsumeSceneStoreRelation relation = new AccountConsumeSceneStoreRelation();
+                  BeanUtils.copyProperties(consumeStoreRelation,relation);
+                  relation.setAccountConsumeSceneId(sceneMap.get(consumeSceneEditReq).getId());
+                  newRelations.add(relation);
+                });
+      }
+    });
+    accountConsumeSceneStoreRelationDao.saveBatch(newRelations);
+    //保存账户变更记录
+    List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(merCode);
+    List<String> accountTypeCodes = merchantAccountTypes.stream().map(MerchantAccountType::getMerAccountTypeCode).collect(Collectors.toList());
+    accountChangeEventRecordService.batchSaveByAccountTypeCode(accountTypeCodes, AccountChangeType.ACCOUNT_CONSUME_SCENE_EDIT);
+    //消费门店配置推送给商户端
+    List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(merCode);
+    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(allRelations).build());
     return null;
   }
 }

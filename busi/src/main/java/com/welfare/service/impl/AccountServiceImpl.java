@@ -712,7 +712,14 @@ public class AccountServiceImpl implements AccountService {
         return accountDao.list(queryWrapper);
     }
 
-    @Override
+  @Override
+  public List<Account> queryByAccountTypeCode(List<String> accountTypeCode) {
+    QueryWrapper<Account> queryWrapper = new QueryWrapper<Account>();
+    queryWrapper.in(Account.ACCOUNT_TYPE_CODE, accountTypeCode);
+    return accountDao.list(queryWrapper);
+  }
+
+  @Override
     public List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId) {
         return null;
     }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
@@ -249,6 +250,7 @@ public class MerchantStoreRelationController implements IController {
   @ApiOperation("查询商户下所有的供应商消费门店配置")
   @MerchantUser
   public R<List<MerSupplierStoreResp>> queryMerSupplierStoreDTList(){
-    return null;
+    List<MerSupplierStoreResp> supplierStoreResps = merchantStoreRelationService.queryMerSupplierStoreRelation(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(supplierStoreResps);
   }
 }

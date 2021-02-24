@@ -15,6 +15,8 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.AdminMerchantStore;
+import com.welfare.persist.dto.MerSupplierStoreDTO;
+import com.welfare.persist.dto.MerSupplierStoreResp;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
@@ -448,6 +450,24 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     applicationContext.publishEvent(evt);
 
     return remove && saveOrUpdateBatch;
+  }
+
+  @Override
+  public List<MerSupplierStoreResp> queryMerSupplierStoreRelation(String merCode) {
+    List<MerSupplierStoreResp> resps = new ArrayList<>();
+    List<MerSupplierStoreDTO> supplierStoreDTOS = merchantStoreRelationMapper.queryMerSupplierStoreRelation(merCode);
+    if (CollectionUtils.isNotEmpty(supplierStoreDTOS)) {
+      Map<String, List<MerSupplierStoreDTO>> merSupplierStoreMap =  supplierStoreDTOS.stream()
+              .collect(Collectors.groupingBy(MerSupplierStoreDTO::getSupplierCode));
+      merSupplierStoreMap.forEach((supplierCode, merSupplierStoreDTOS) -> {
+        MerSupplierStoreResp resp = new MerSupplierStoreResp();
+        resp.setSupplierCode(supplierCode);
+        resp.setSupplierStoreDTOS(merSupplierStoreDTOS);
+        resp.setSupplierName(merSupplierStoreDTOS.get(0).getSupplierName());
+        resps.add(resp);
+      });
+    }
+    return resps;
   }
 
   private boolean validateConsumeType(List<AdminMerchantStore> merchantStoreList) {

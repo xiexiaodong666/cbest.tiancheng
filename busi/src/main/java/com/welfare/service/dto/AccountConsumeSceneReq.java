@@ -35,6 +35,13 @@ public class AccountConsumeSceneReq implements Serializable {
   /**
    * 员工类型编码
    */
+  @ApiModelProperty("员工类型编码")
+  @NotEmpty(message = "员工类型编码为空")
+  private String accountTypeCode;
+
+  /**
+   * 员工类型编码
+   */
   @ApiModelProperty("对应门店")
   private List<AccountConsumeSceneStoreRelationReq> accountConsumeSceneStoreRelationReqList;
   /**

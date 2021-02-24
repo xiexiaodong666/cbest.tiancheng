@@ -40,18 +40,18 @@ public class ProprietaryConsumeController implements IController {
   @Autowired
   private FileUploadServiceUtil fileUploadServiceUtil;
 
-  @GetMapping("/page")
+  @PostMapping("/page")
   @ApiOperation("分页查询自营消费列表")
   @MerchantUser
-  public R<Page<ProprietaryConsumeResp>> pageQueryMonthSettleDetail(ProprietaryConsumePageReq req, PageReq pageReq){
+  public R<Page<ProprietaryConsumeResp>> pageQueryMonthSettleDetail(@RequestBody ProprietaryConsumePageReq req, PageReq pageReq){
     req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     return success(settleDetailService.queryProprietaryConsumePage(req, pageReq));
   }
 
-  @GetMapping("/totalAmount")
+  @PostMapping("/totalAmount")
   @ApiOperation("查询所有员工消费支出类型的总金额")
   @MerchantUser
-  public R<List<WelfareTypeTotalAmountResp>> total(ProprietaryConsumePageReq req){
+  public R<List<WelfareTypeTotalAmountResp>> total(@RequestBody ProprietaryConsumePageReq req){
     req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     return success(settleDetailService.statisticalAmountGroupByWelfareTypeCode(req));
   }

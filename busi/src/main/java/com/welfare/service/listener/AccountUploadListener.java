@@ -89,7 +89,9 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       uploadInfo.append("商户编码不合法:").append(account.getMerCode()).append(";");
       return false;
     }
-    if (!AccountUtil.validPhone(account.getPhone())) {
+    if (StringUtils.isEmpty(account.getPhone())
+            || !AccountUtil.isNumeric(account.getPhone())
+            || account.getPhone().length() != 11) {
       uploadInfo.append("手机号码不合法:").append(account.getPhone()).append(";");
       return false;
     }

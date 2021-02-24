@@ -548,7 +548,7 @@
                 and ac.phone = #{phone}
             </if>
             <if test="settleFlag!=null and settleFlag != ''">
-                and ac.settle_flag = #{settleFlag}
+                and t1.settle_flag = #{settleFlag}
             </if>
             <if test="departmentCodes!=null and departmentCodes.size()>0">
                 and de.department_code in

@@ -27,13 +27,6 @@ public class AccountConsumeSceneStoreRelationReq implements Serializable {
   private Long accountConsumeSceneId;
 
   /**
-   * 员工类型编码
-   */
-  @ApiModelProperty("员工类型编码")
-  @NotEmpty(message = "员工类型编码为空")
-  private String accountTypeCode;
-
-  /**
    * 门店编码
    */
   @ApiModelProperty("门店编码")

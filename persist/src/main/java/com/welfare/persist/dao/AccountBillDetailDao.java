@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.mapper.AccountBillDetailMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,5 +36,18 @@ public class AccountBillDetailDao extends ServiceImpl<AccountBillDetailMapper, A
         wrapper.eq(AccountBillDetail.TRANS_TYPE,transType);
         wrapper.last("limit 1");
         return getOne(wrapper);
+    }
+
+    /**
+     * 根据门店编码，tranDate区间（左开右闭）查询，
+     * @param storeNos
+     * @param from
+     * @param end
+     * @return
+     */
+    public List<AccountBillDetail> queryByStoreNosAndDate(Collection<String> storeNos, Date from, Date end){
+        QueryWrapper<AccountBillDetail> wrapper = new QueryWrapper<>();
+        wrapper.in(AccountBillDetail.STORE_CODE,storeNos).gt(AccountBillDetail.TRANS_TIME,from).le(AccountBillDetail.TRANS_TIME,end);
+        return super.list(wrapper);
     }
 }

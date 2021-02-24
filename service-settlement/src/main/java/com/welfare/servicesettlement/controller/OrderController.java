@@ -12,6 +12,7 @@ import com.welfare.service.OrderService;
 import com.welfare.service.dto.OrderReqDto;
 import com.welfare.service.dto.SynOrderDto;
 import com.welfare.service.impl.OrderServiceImpl;
+import com.welfare.service.settlement.DailyCheckBillService;
 import com.welfare.servicesettlement.dto.OrderRespDto;
 import com.welfare.servicesettlement.dto.PageVo;
 import io.swagger.annotations.Api;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +51,7 @@ public class OrderController implements IController {
 
     @Autowired
     private OrderServiceImpl orderService;
+    private final DailyCheckBillService dailyCheckBillService;
 
     @ApiOperation("分页查看线下订单")
     @RequestMapping(value = "page" , method = RequestMethod.POST)
@@ -140,6 +143,12 @@ public class OrderController implements IController {
         BeanUtils.copyProperties(orderInfo , orderRespDto);
         orderRespDto.setAccountCardId(orderInfo.getCardId());
         orderRespDto.setOrderAmount(orderInfo.getOrderAmount() != null ? orderInfo.getOrderAmount().toPlainString() : "0");
+    }
+
+    @GetMapping("/handleExecuteCheckBill")
+    public R handleExecuteCheckBill(){
+        dailyCheckBillService.generateDailyCheckBill();
+        return success();
     }
 
 }

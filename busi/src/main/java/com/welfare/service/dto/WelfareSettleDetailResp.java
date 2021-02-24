@@ -83,4 +83,21 @@ public class WelfareSettleDetailResp {
     @ExcelProperty(value = "部门名称")
     @ApiModelProperty(value = "部门名称")
     private String departmentName;
+
+    @ExcelProperty(value = "消费类型")
+    @ApiModelProperty("消费类型，线上消费、线下消费")
+    private String consumeTypeName;
+    @ApiModelProperty("消费类型，online offline")
+    private String consumeType;
+
+    @ExcelProperty(value = "供应商名称")
+    @ApiModelProperty("供应商名称")
+    private String supplierName;
+
+    @ExcelProperty(value = "供应商编码")
+    @ApiModelProperty("供应商编码")
+    private String supplierCode;
+
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionType;
 }

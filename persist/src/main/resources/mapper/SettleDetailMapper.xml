@@ -308,11 +308,49 @@
         group by t1.mer_code,t1.mer_account_type,t1.mer_account_type_name
     </select>
 
-    <select id="getSettleDetailInfoSummary" resultType="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
+    <select id="getSettleDetailInfoSummary" resultType="com.welfare.persist.dto.WelfareSettleSummaryDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
         select
-            <include refid="getWelfareSettleSum"/>
-            <include refid="queryListTable"/>
-            <include refid="queryListCondition"/>
+        t4.mer_code as merCode,
+        t4.mer_name as merName,
+        t4.mer_cooperation_mode as merCooperationMode,
+        sum(
+            case
+                when t1.trans_type = 'consume' then t1.trans_amount
+                when t1.trans_type = 'refund'  then (t1.trans_amount) * -1
+                else 0
+            end
+        ) as totalConsumeAmount,
+        sum(
+            case
+                when t1.pos = t5.cashier_no and t1.trans_type = 'consume' then t1.trans_amount
+                when t1.pos = t5.cashier_no and t1.trans_type = 'refund'  then t1.trans_amount * -1
+                else 0
+            end
+        ) as onlineConsumeAmount,
+        sum(
+            case
+                when t1.pos != t5.cashier_no and t1.trans_type = 'consume' then t1.trans_amount
+                when t1.pos != t5.cashier_no and t1.trans_type = 'refund'  then t1.trans_amount * -1
+                else 0
+            end
+        ) as offlineConsumeAmount,
+        sum(
+            case
+                when t1.trans_type = 'consume' then t1.mer_deduction_amount
+                when t1.trans_type = 'refund' then t1.mer_deduction_amount * -1
+                else 0
+            end
+        ) as balanceConsumeAmount,
+        sum(
+            case
+                when t1.settle_flag = 'unsettled' and t1.trans_type = 'consume' then t1.mer_credit_deduction_amount
+                when t1.settle_flag = 'unsettled' and t1.trans_type = 'refund' then t1.mer_credit_deduction_amount * -1
+                else 0
+            end
+        ) as unsettledAmount
+
+        <include refid="queryListTable"/>
+        <include refid="queryListCondition"/>
     </select>
 
     <select id="getSettleDetailInfo" resultType="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
@@ -329,10 +367,21 @@
         ac.store_code as departmentCode,
         de.department_name as departmentName,
         t1.settle_flag as settleFlag,
-        case when t1.pos = t5.cashier_no then '第三方线上'
-             else '第三方线下' end as type,
+        case when t1.pos = t5.cashier_no then '线上消费'
+             else '线下消费' end as type,
+        case when t1.pos = t5.cashier_no then 'online'
+            else 'offline'
+        end as consumeType,
+        case when t1.pos = t5.cashier_no then '线上消费'
+            else '线下消费'
+        end as consumeTypeName,
+        supplier.mer_code as supplierCode,
+        supplier.mer_name as supplierName,
         t1.mer_account_type as welfareTypeCode,
         t1.mer_account_type_name as welfareTypeName,
+        case when t1.mer_deduction_amount > 0 then 'balance'
+             when t1.mer_credit_deduction_amount > 0 then 'credit'
+        end as merDeductionType,
         case when t1.trans_type='consume' then t1.trans_amount
              when t1.trans_type='refund' then t1.trans_amount*-1
         end as payAmount,
@@ -380,8 +429,8 @@
             when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
         else 0 end
         ) as settleAmount
-        <include refid="queryListTable"></include>
-        <include refid="queryListCondition"></include>
+        <include refid="queryListTable"/>
+        <include refid="queryListCondition"/>
         <if test="excludeIdList!=null and excludeIdList.size!=0">
             and t1.id not in (
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
@@ -407,7 +456,7 @@
         ac.account_code as accountCode,
         de.department_code as departmentCode,
         de.department_name as departmentName
-        <include refid="queryListTable"></include>
+        <include refid="queryListTable"/>
         <where>
             t3.mer_code = t1.mer_code
             <if test="query.orderNo!=null and query.orderNo!=''">
@@ -508,6 +557,7 @@
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code
+        left join merchant supplier on supplier.mer_code = t3.mer_code
         left join store_consume_type t5 on t1.store_code = t5.store_code and t5.deleted=0
     </sql>
     <sql id="queryListCondition">
@@ -519,8 +569,11 @@
             <if test="storeName!=null and storeName!=''">
                 and t1.store_name like concat('%',#{storeName},'%')
             </if>
-            <if test="storeCode!=null and storeCode!=''">
-                and t1.store_code = #{storeCode}
+            <if test="storeCodes!=null and storeCodes.size()>0">
+                and t1.store_code in
+                <foreach collection="storeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
             <if test="startTime!=null">
                 and t1.trans_time &gt;=#{startTime,jdbcType=TIMESTAMP}
@@ -563,7 +616,22 @@
                     #{item}
                 </foreach>
             </if>
-            and t1.settle_flag='unsettled'
+            <if test="consumeType!=null and consumeType='online'">
+                and t1.pos = t5.cashier_no
+            </if>
+            <if test="supplierCode!=null and supplierCode!=''">
+                and supplier.mer_code = #{supplierCode}
+            </if>
+            <if test="merDeductionType!=null and merDeductionType != ''">
+                <choose>
+                    <when test="merDeductionType = 'balance'">
+                        and t1.mer_deduction_amount > 0
+                    </when>
+                    <when test="merDeductionType = 'credit'">
+                        and t1.mer_credit_decution_amount > 0
+                    </when>
+                </choose>
+            </if>
             and t1.data_type='welfare'
         </where>
     </sql>

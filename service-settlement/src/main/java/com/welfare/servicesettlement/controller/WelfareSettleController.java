@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dto.WelfareSettleSumDTO;
+import com.welfare.persist.dto.WelfareSettleSummaryDTO;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
@@ -66,6 +67,13 @@ public class WelfareSettleController implements IController {
         BasePageVo<WelfareSettleDetailResp> welfareSettleDetailRespBasePageVo =  settleDetailService.queryWelfareSettleDetailPage(welfareSettleDetailPageReq);
 
         return success(welfareSettleDetailRespBasePageVo);
+    }
+
+    @PostMapping("/detail/summary")
+    @ApiOperation("查询商户未结算账单明细summary")
+    public R<WelfareSettleSummaryDTO> pageQueryMonthSettleDetail(@RequestBody WelfareSettleDetailReq welfareSettleDetailReq){
+        WelfareSettleSummaryDTO welfareSettleSummaryDTO =  settleDetailService.queryWelfareSettleDetailSummary(welfareSettleDetailReq);
+        return success(welfareSettleSummaryDTO);
     }
 
     @PostMapping("/detail/export")

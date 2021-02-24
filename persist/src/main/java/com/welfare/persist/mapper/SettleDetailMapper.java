@@ -64,7 +64,7 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
      * @param welfareSettleDetailQuery
      * @return
      */
-    WelfareSettleDetailDTO getSettleDetailInfoSummary(WelfareSettleDetailQuery welfareSettleDetailQuery);
+    WelfareSettleSummaryDTO getSettleDetailInfoSummary(WelfareSettleDetailQuery welfareSettleDetailQuery);
     /**
      * 查询商户未结算详细信息统计
      * @param welfareSettleDetailQuery

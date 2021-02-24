@@ -20,6 +20,9 @@ public class WelfareSettleDetailReq{
     @ApiModelProperty(value = "商户编号")
     private String merCode;
 
+    @ApiModelProperty("供应商")
+    private String supplierCode;
+
     @ApiModelProperty(value = "订单编号")
     private String orderNo;
 
@@ -27,7 +30,7 @@ public class WelfareSettleDetailReq{
     private String storeName;
 
     @ApiModelProperty(value = "门店编号")
-    private String storeCode;
+    private List<String> storeCodes;
 
     @ApiModelProperty(value = "起始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -55,4 +58,10 @@ public class WelfareSettleDetailReq{
 
 
     private Long minId;
+
+    @ApiModelProperty(value = "消费类型,online offline  线上消费 线下消费")
+    private String consumeType;
+
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionType;
 }

@@ -121,6 +121,14 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
         return welfareSettleDetailRespList;
     }
+    @Override
+    public WelfareSettleSummaryDTO queryWelfareSettleDetailSummary(WelfareSettleDetailReq welfareSettleDetailReq) {
+        WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
+        BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
+        WelfareSettleSummaryDTO welfareSettleSummaryDTO = settleDetailMapper.getSettleDetailInfoSummary(welfareSettleDetailQuery);
+
+        return welfareSettleSummaryDTO;
+    }
 
     @Override
     public BasePageVo<WelfareSettleDetailResp> queryWelfareSettleDetailPage(WelfareSettleDetailPageReq welfareSettleDetailPageReq) {

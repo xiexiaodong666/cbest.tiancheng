@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 public class AccountUtil {
 
   private static String regex = "^[1](([3|5|8][\\d])|([4][4,5,6,7,8,9])|([6][2,5,6,7])|([7][^9])|([9][1,8,9]))[\\d]{8}$";//"^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17[013678])|(18[0,5-9]))\\d{8}$";
+  private static String numeric = "^[0-9]*$";
+
 
   public static boolean validPhone(String phone){
     Pattern p = Pattern.compile(regex);
@@ -40,5 +42,19 @@ public class AccountUtil {
       result.add(value);
     }
     return result;
+  }
+
+  /**
+   * 利用正则表达式判断字符串是否是数字
+   * @param str
+   * @return
+   */
+  public static boolean isNumeric(String str){
+    Pattern pattern = Pattern.compile(numeric);
+    Matcher isNum = pattern.matcher(str);
+    if( !isNum.matches() ){
+      return false;
+    }
+    return true;
   }
 }

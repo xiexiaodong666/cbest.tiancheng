@@ -12,7 +12,9 @@ import com.welfare.service.settlement.domain.CheckBillDetailExcelModel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.sql.RowSet;
@@ -37,7 +39,11 @@ public class DailyCheckBillServiceImpl implements DailyCheckBillService {
     public static final String COMMA = ",";
     private final SupplierStoreDao supplierStoreDao;
     private final AccountDeductionDetailDao accountDeductionDetailDao;
-    private final FtpUtil ftpUtil;
+    /**
+     * 有的模块可能不需要ftpUtil,但由于现在每个模块会打包所有busi代码，所以required = false
+     */
+    @Autowired(required = false)
+    private FtpUtil ftpUtil;
     private final CheckBillMapper checkBillMapper;
 
     @Value("${ftp.path:/test}")

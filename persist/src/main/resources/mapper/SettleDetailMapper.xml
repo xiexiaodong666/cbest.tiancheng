@@ -308,6 +308,13 @@
         group by t1.mer_code,t1.mer_account_type,t1.mer_account_type_name
     </select>
 
+    <select id="getSettleDetailInfoSummary" resultType="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
+        select
+            <include refid="getWelfareSettleSum"/>
+            <include refid="queryListTable"/>
+            <include refid="queryListCondition"/>
+    </select>
+
     <select id="getSettleDetailInfo" resultType="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
         select
         t1.id as id,

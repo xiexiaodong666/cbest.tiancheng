@@ -78,6 +78,10 @@ public class WelfareSettleDetailDTO {
     @ApiModelProperty(value = "手机号")
     private String phone;
 
+    @ExcelProperty(value = "消费人")
+    @ApiModelProperty(value = "消费人")
+    private String accountName;
+
     @ExcelProperty(value = "部门名称")
     @ApiModelProperty(value = "部门名称")
     private String departmentName;

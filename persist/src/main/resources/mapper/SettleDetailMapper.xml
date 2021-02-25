@@ -364,6 +364,7 @@
         t1.mer_code as merCode,
         t1.mer_name as  merName,
         ac.phone as phone,
+        ac.account_name as accountName,
         ac.store_code as departmentCode,
         de.department_name as departmentName,
         t1.settle_flag as settleFlag,

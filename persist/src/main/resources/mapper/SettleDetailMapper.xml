@@ -25,6 +25,13 @@
         <result property="refundAmount" column="refund_amount"/>
         <result property="realAmount" column="real_amount"/>
         <result property="settleAmount" column="settle_amount"/>
+        <result property="accountName" column="account_name"/>
+        <result property="phone" column="phone"/>
+        <result property="departmentName" column="department_name"/>
+        <result property="consumeType" column="consume_type"/>
+        <result property="settleFlag" column="settle_flag"/>
+        <result property="unsettledAmount" column="unsettled_amount"/>
+        <result property="merDeductionType" column="mer_deduction_type"/>
     </resultMap>
 
     <select id="getSettleDetailFromAccountDetail" parameterType="Map" resultType="com.welfare.persist.entity.SettleDetail">
@@ -85,34 +92,50 @@
 
     <select id="selectMonthSettleDetail" resultMap="monthSettleDetailDTO" parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
         select
-            t1.id,
-            t1.trans_no,
-            t1.order_id as order_no,
-            t1.trans_time,
-            t1.store_code,
-            t1.store_name,
-            t1.mer_code,
-            t1.mer_name,
-            case when t3.mer_code = t1.mer_code then '自营'
-                 when t1.pos = t5.cashier_no then '第三方线上'
-                 else '第三方线下' end as type,
-            t1.mer_account_type as welfare_type_code,
-            t1.mer_account_type_name as welfare_type_name,
-            case when t1.trans_type='consume' then t1.trans_amount
-                 when t1.trans_type='refund' then t1.trans_amount*-1 end as pay_amount,
-            case when t1.trans_type='consume' then 0.00
-                 when t1.trans_type='refund' then t1.trans_amount end as refund_amount,
-            case when t1.trans_type='consume' then t1.trans_amount
-                 when t1.trans_type='refund' then t1.trans_amount*-1 end as real_amount,
-            case when t3.mer_code = t1.mer_code then 0.00
-                 when t3.mer_code != t1.mer_code and t1.trans_type='consume' then t1.mer_credit_deduction_amount
-                 when t3.mer_code != t1.mer_code and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
-                 else 0 end as settle_amount
+        t1.id,
+        t1.trans_no,
+        t1.order_id as order_no,
+        t1.trans_time,
+        t1.store_code,
+        t1.store_name,
+        t1.mer_code,
+        t1.mer_name,
+        ac.account_name,
+        ac.phone,
+        d.department_name,
+        supplier.mer_name as supplier_name,
+        t1.settle_flag,
+        IF(t1.pos = t5.cashier_no, '第三方线上', '第三方线下') as type,
+        IF(t1.pos = t5.cashier_no, 'online', 'offline') as consume_type,
+        t1.mer_account_type as welfare_type_code,
+        t1.mer_account_type_name as welfare_type_name,
+        case
+            when t1.trans_type='consume' then t1.trans_amount
+            when t1.trans_type='refund' then t1.trans_amount*-1 end as pay_amount,
+        case
+            when t1.trans_type='consume' then 0.00
+            when t1.trans_type='refund' then t1.trans_amount end as refund_amount,
+        case
+            when t1.trans_type='consume' then t1.trans_amount
+            when t1.trans_type='refund' then t1.trans_amount*-1 end as real_amount,
+        case
+            when t1.settle_flag != 'settled' and t1.trans_type='consume' then t1.mer_credit_deduction_amount
+            when t1.settle_flag != 'settled' and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
+            else 0
+        end as unsettled_amount,
+        case
+            when t1.mer_deduction_amount > 0 then 'balance'
+            when t1.mer_credit_deduction_amount > 0 then 'credit'
+        end as mer_deduction_type
         from settle_detail t1
+        inner join account ac on t1.account_code = ac.account_code
+        inner join department d on d.department_code = ac.store_code
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code
+        left join merchant supplier on supplier.mer_code = t3.mer_code
         left join store_consume_type t5 on t1.store_code = t5.store_code and t5.deleted=0
         <where>
+            and t3.mer_code != t1.mer_code
             <if test="settleNo!=null and settleNo!=''">
                 and t1.settle_no = #{settleNo}
             </if>
@@ -154,6 +177,9 @@
                     and t3.mer_code != t1.mer_code and (t5.cashier_no is null or t5.cashier_no!=t1.pos)
                 </when>
             </choose>
+            <if test="consumeType!=null and consumeType='online'">
+                and t1.pos = t5.cashier_no
+            </if>
         </where>
 
         <if test="limit!=null and minId!=null">

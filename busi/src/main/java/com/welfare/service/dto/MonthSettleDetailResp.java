@@ -79,4 +79,28 @@ public class MonthSettleDetailResp{
     @ExcelProperty(value = "结算金额")
     @ApiModelProperty(value = "结算金额")
     private String settleAmount;
+
+    @ExcelProperty("手机号")
+    @ApiModelProperty("手机号")
+    private String phone;
+
+    @ExcelProperty("组织机构")
+    @ApiModelProperty("组织机构")
+    private String departmentName;
+
+    @ExcelProperty("消费人")
+    @ApiModelProperty("消费人")
+    private String accountName;
+
+    @ExcelProperty("供应商")
+    @ApiModelProperty("供应商")
+    private String supplierName;
+
+    @ExcelProperty("消费类型")
+    @ApiModelProperty("消费类型")
+    private String consumeType;
+
+    @ExcelProperty("待结算金额")
+    @ApiModelProperty("待结算金额")
+    private String unsettledAmount;
 }

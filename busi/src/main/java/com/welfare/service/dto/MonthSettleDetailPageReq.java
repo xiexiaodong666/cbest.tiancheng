@@ -46,4 +46,20 @@ public class MonthSettleDetailPageReq extends PageReq {
 
     @ApiModelProperty(value = "消费流水号")
     private String transNo;
+
+
+    @ApiModelProperty("电话号码")
+    private String phone;
+
+    @ApiModelProperty("部门编码")
+    private String departmentCode;
+
+    @ApiModelProperty("消费类型")
+    private String consumeType;
+
+    @ApiModelProperty("结算状态")
+    private String settleFlag;
+
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionType;
 }

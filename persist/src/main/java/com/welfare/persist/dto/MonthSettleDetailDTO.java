@@ -1,5 +1,7 @@
 package com.welfare.persist.dto;
 
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -40,5 +42,25 @@ public class MonthSettleDetailDTO{
 
     private String realAmount;
 
+
     private String settleAmount;
+
+
+
+    private String phone;
+
+    private String departmentName;
+
+    private String accountName;
+
+    private String supplierName;
+
+    private String consumeType;
+
+    private String settleFlag;
+
+    private String unsettledAmount;
+
+    private String merDeductionType;
+
 }

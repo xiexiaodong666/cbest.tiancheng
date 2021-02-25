@@ -40,4 +40,18 @@ public class MonthSettleDetailQuery{
      * 查询数据量限制
      */
     private Integer limit;
+
+    private String phone;
+
+    private String departmentCode;
+
+    /**
+     * 消费类型, 线上 线下
+     */
+    private String consumeType;
+
+    /**
+     * 结算状态
+     */
+    private String settleFlag;
 }

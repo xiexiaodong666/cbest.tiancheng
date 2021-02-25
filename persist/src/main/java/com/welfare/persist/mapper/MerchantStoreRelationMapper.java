@@ -2,6 +2,7 @@ package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerSupplierStoreDTO;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import org.apache.ibatis.annotations.Mapper;
@@ -32,4 +33,11 @@ public interface MerchantStoreRelationMapper extends BaseMapper<MerchantStoreRel
       @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
   List<MerchantStoreRelation> getMerchantStoreRelationListBySyncStatus(@Param("syncStatus") Integer syncStatus);
+
+  /**
+   * 通过商户编码查询商户配置的消费门店信息
+   * @param merCode
+   * @return
+   */
+  List<MerSupplierStoreDTO> queryMerSupplierStoreRelation(@Param("merCode")String merCode);
 }

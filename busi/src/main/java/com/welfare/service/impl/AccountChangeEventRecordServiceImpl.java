@@ -94,4 +94,12 @@ public class AccountChangeEventRecordServiceImpl implements AccountChangeEventRe
         AccountChangeType.ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE);
     this.batchSave(getEventList, AccountChangeType.ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE);
   }
+
+  @Override
+  public void batchSaveByAccountTypeCode(List<String> accountTypeCodes, AccountChangeType accountChangeType) {
+    List<Account> accounts = accountService.queryByAccountTypeCode(accountTypeCodes);
+    List<AccountChangeEventRecord> recordList = AccountUtils
+            .getEventList(accounts, accountChangeType);
+    this.batchSave(recordList, accountChangeType);
+  }
 }

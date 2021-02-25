@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
+import com.welfare.persist.dto.AccountConsumeStoreInfoDTO;
 import com.welfare.persist.entity.AccountConsumeScene;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,4 +40,6 @@ public interface AccountConsumeSceneCustomizeMapper extends BaseMapper<AccountCo
   List<AccountConsumeScene> queryDeleteSceneByMerCodeAndStoreCodeList(@Param("merCode") String merCode,
       @Param("storeCodeList")List<String> storeCodeList);
   List<Long> queryDeleteConsumeIdList(@Param("merCode") String merCode);
+
+  List<AccountConsumeStoreInfoDTO> findAllAccountConsumeSceneDTO(String merCode);
 }

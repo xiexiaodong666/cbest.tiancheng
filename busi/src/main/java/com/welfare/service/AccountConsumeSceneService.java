@@ -32,5 +32,17 @@ public interface AccountConsumeSceneService {
 
   public AccountConsumeSceneDTO findAccountConsumeSceneDTOById(Long id);
 
+  /**
+   * 查询商户下所有已配置的员工类型消费门店配置
+   * @param merCode
+   * @return
+   */
   List<AccountConsumeSceneResp> findAllAccountConsumeSceneDTO(String merCode);
+
+  /**
+   * 变更商户下对应员工类型的消费配置
+   * @param consumeSceneEditReq
+   * @return
+   */
+  Boolean edit(List<AccountConsumeSceneEditReq> consumeSceneEditReq);
 }

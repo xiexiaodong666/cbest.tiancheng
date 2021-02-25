@@ -17,6 +17,13 @@ public class MerSupplierStoreDTO implements Serializable {
    */
   @ApiModelProperty("商户代码")
   private String merCode;
+
+  @ApiModelProperty("供应商编码")
+  private String supplierCode;
+
+  @ApiModelProperty("供应商名称")
+  private String supplierName;
+
   /**
    * 门店代码
    */

@@ -3,6 +3,7 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
+import com.welfare.persist.dto.MonthSettleDetailDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.service.dto.*;
@@ -34,6 +35,14 @@ public interface MonthSettleService {
      * @return
      */
     Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(Long id, MonthSettleDetailPageReq monthSettleDetailReq);
+
+    /**
+     * 根据主键账单id、部分限制条件，查询月账单明细统计信息
+     * @param id
+     * @param monthSettleDetailReq
+     * @return
+     */
+    MonthSettleDetailDTO monthSettleDetailSummary(Long id, MonthSettleDetailReq monthSettleDetailReq);
 
     /**
      * 根据主键账单id、部分限制条件，导出账单数据

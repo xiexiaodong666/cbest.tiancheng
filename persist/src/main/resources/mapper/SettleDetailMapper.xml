@@ -130,6 +130,46 @@
             when t1.mer_deduction_amount > 0 then 'balance'
             when t1.mer_credit_deduction_amount > 0 then 'credit'
         end as mer_deduction_type
+        <include refid="monthSettleTableListAndCondition"></include>
+
+        <if test="limit!=null and minId!=null">
+            order by t1.id
+            limit #{limit}
+        </if>
+
+        <if test="minId==null and minId==null">
+            order by t1.trans_time desc
+        </if>
+    </select>
+
+    <select id="selectMonthSettleDetailSummary" resultType="com.welfare.persist.dto.MonthSettleDetailDTO"
+            parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
+        select
+            sum(
+                case
+                    when t1.pos = t5.cashier_no and t1.trans_type='consume' then t1.trans_amount
+                    when t1.pos = t5.cashier_no and t1.trans_type = 'refund' then t1.trans_amount * -1
+                    else 0
+                end
+            ) as onlineConsumeAmount,
+        sum(
+            case
+                when t1.pos != t5.cashier_no and t1.trans_type='consume' then t1.trans_amount
+                when t1.pos != t5.cashier_no and t1.trans_type = 'refund' then t1.trans_amount * -1
+                else 0
+            end
+        ) as offlineConsumeAmount,
+        sum(
+            case
+                when t1.trans_type = 'consume' then t1.mer_deduction_amount
+                when t1.trans_type = 'refund'  then t1.mer_deduction_amount * -1
+                else 0
+            end
+        ) as balanceConsumeAmount
+        <include refid="monthSettleTableListAndCondition"></include>
+    </select>
+
+    <sql id="monthSettleTableListAndCondition">
         from settle_detail t1
         inner join account ac on t1.account_code = ac.account_code
         inner join department d on d.department_code = ac.store_code
@@ -199,17 +239,7 @@
                 </foreach>
             </if>
         </where>
-
-        <if test="limit!=null and minId!=null">
-            order by t1.id
-            limit #{limit}
-        </if>
-
-        <if test="minId==null and minId==null">
-            order by t1.trans_time desc
-        </if>
-    </select>
-
+    </sql>
     <select id="getWelfareSettleAllMerchant" parameterType="com.welfare.persist.dto.query.WelfareSettleQuery" resultType="com.welfare.persist.dto.WelfareSettleSumDTO">
         select
         <include refid="getWelfareSettleSum"/>
@@ -594,6 +624,7 @@
         </where>
        group by t1.mer_account_type
     </select>
+
 
     <sql id="queryListTable">
         from settle_detail t1

@@ -152,6 +152,12 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
+    public MonthSettleDetailDTO monthSettleDetailSummary(Long id, MonthSettleDetailReq monthSettleDetailReq) {
+        MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
+        return settleDetailMapper.selectMonthSettleDetailSummary(monthSettleDetailQuery);
+    }
+
+    @Override
     public List<MonthSettleDetailResp> queryMonthSettleDetailLimit(Long id, MonthSettleDetailReq monthSettleDetailReq) {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);

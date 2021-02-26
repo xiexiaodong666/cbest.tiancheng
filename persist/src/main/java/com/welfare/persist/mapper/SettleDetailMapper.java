@@ -33,6 +33,12 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
     List<MonthSettleDetailDTO> selectMonthSettleDetail(MonthSettleDetailQuery monthSettleDetailQuery);
 
     /**
+     * 查询账单明细summary
+     * @param monthSettleDetailQuery
+     * @return
+     */
+    MonthSettleDetailDTO selectMonthSettleDetailSummary(MonthSettleDetailQuery monthSettleDetailQuery);
+    /**
      * 查询获取账户交易明细
      * @param params
      * @return
@@ -93,4 +99,6 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
     List<ProprietaryConsumeDTO> queryProprietaryConsumeInfo(@Param("query") ProprietaryConsumePageQuery query);
 
     List<WelfareTypeTotalAmountDTO> statisticalAmountGroupByWelfareTypeCode(@Param("query")ProprietaryConsumePageQuery query);
+
+
 }

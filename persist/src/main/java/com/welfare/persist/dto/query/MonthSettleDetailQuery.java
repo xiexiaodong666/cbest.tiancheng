@@ -44,7 +44,7 @@ public class MonthSettleDetailQuery{
 
     private String phone;
 
-    private List<String> departmentCode;
+    private List<String> departmentCodes;
 
     /**
      * 消费类型, 线上 线下

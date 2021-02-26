@@ -165,7 +165,7 @@ public class AccountConsumeSceneController implements IController {
   @MerchantUser
   public R<Boolean> edit(@RequestBody List<AccountConsumeSceneEditReq> consumeSceneEditReqs) {
     try {
-      return null;
+      return success(accountConsumeSceneService.edit(consumeSceneEditReqs));
     } catch (BusiException be) {
       return R.fail(be.getMessage());
     }

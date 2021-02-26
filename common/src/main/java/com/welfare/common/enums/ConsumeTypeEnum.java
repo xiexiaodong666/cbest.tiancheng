@@ -17,7 +17,8 @@ public enum ConsumeTypeEnum {
    */
   O2O("O2O", "O2O（线上下单，到店提货","1"),
   ONLINE_MALL("ONLINE_MALL", "线上商城","2"),
-  SHOP_SHOPPING("SHOP_CONSUMPTION", "到店消费","3");
+  SHOP_SHOPPING("SHOP_CONSUMPTION", "到店消费","3"),
+  WHOLESALE("WHOLESALE", "批发商城","4");
 
 
   public String getExcelType() {

@@ -286,10 +286,12 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     //删除已有配置
     String merCode = consumeSceneEditReqs.get(0).getMerCode();
     List<AccountConsumeScene> oldScenes = accountConsumeSceneDao.getAllByMercode(Lists.newArrayList(merCode));
-    List<Long> oldConsumeSceneIds = oldScenes.stream()
-            .map(AccountConsumeScene::getId).collect(Collectors.toList());
-    accountConsumeSceneDao.deleteConsumeSceneByIds(oldConsumeSceneIds);
-    accountConsumeSceneStoreRelationDao.deleteByConsumeSceneIds(oldConsumeSceneIds);
+    if (CollectionUtils.isNotEmpty(oldScenes)) {
+      List<Long> oldConsumeSceneIds = oldScenes.stream()
+              .map(AccountConsumeScene::getId).collect(Collectors.toList());
+      accountConsumeSceneDao.deleteConsumeSceneByIds(oldConsumeSceneIds);
+      accountConsumeSceneStoreRelationDao.deleteByConsumeSceneIds(oldConsumeSceneIds);
+    }
     //保存最新配置
     List<AccountConsumeScene> newScenes = new ArrayList<>();
     Map<AccountConsumeSceneEditReq, AccountConsumeScene> sceneMap = new HashMap<>();
@@ -323,6 +325,6 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     //消费门店配置推送给商户端
     List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(merCode);
     applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(allRelations).build());
-    return null;
+    return true;
   }
 }

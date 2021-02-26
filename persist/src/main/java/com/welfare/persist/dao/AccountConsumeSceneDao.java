@@ -44,8 +44,6 @@ public class AccountConsumeSceneDao extends ServiceImpl<AccountConsumeSceneMappe
     }
 
     public Boolean deleteConsumeSceneByIds(List<Long> ids) {
-        QueryWrapper<AccountConsumeScene> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in(AccountConsumeScene.ID, ids);
-        return getBaseMapper().delete(queryWrapper) > 0;
+        return getBaseMapper().deleteBatchIds(ids) > 0;
     }
 }

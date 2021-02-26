@@ -49,7 +49,7 @@ public class ProprietaryConsumeController implements IController {
   }
 
   @PostMapping("/totalAmount")
-  @ApiOperation("查询所有员工消费支出类型的总金额")
+  @ApiOperation("查询所有员工消费支出类MerCooperationModeEnum型的总金额")
   @MerchantUser
   public R<List<WelfareTypeTotalAmountResp>> total(@RequestBody ProprietaryConsumePageReq req){
     req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());

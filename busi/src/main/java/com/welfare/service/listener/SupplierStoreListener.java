@@ -4,6 +4,7 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.util.ConsumeTypesUtils;
@@ -143,10 +144,35 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
       }
     }
 
-    if(Strings.isNotEmpty(storeImportDTO.getOnlineCashierNo()) && Strings.isNotEmpty(storeImportDTO.getO2oCashierNo())) {
-      if(storeImportDTO.getO2oCashierNo().equals(storeImportDTO.getOnlineCashierNo())) {
-        uploadInfo.append("第").append(row.toString()).append("行").append("同一门店下虚拟收银机号不能相同").append(";");
+    if(consumTypes.contains(ConsumeTypeEnum.WHOLESALE.getExcelType())) {
+      if (EmptyChecker.isEmpty(storeImportDTO.getWholesaleCashierNo())) {
+        uploadInfo.append("第").append(row.toString()).append("行").append("批发商城必须输入虚拟收银机号")
+                .append(";");
+      } else {
+        if(storeImportDTO.getOnlineCashierNo().length()>255){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
+        }
+        String regex = "^[V][0-9]{3}+$";
+        if(!storeImportDTO.getOnlineCashierNo().matches(regex)){
+          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
+        }
+
+        StoreConsumeTypeDTO storeConsumeTypeDTO = new StoreConsumeTypeDTO();
+        storeConsumeTypeDTO.setConsumeType(ConsumeTypeEnum.WHOLESALE.getCode());
+        storeConsumeTypeDTO.setCashierNo(storeImportDTO.getWholesaleCashierNo());
+        storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
       }
+    } else {
+      if(EmptyChecker.notEmpty(storeImportDTO.getOnlineCashierNo())){
+        uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O或者批发商城允许输入虚拟收银机号").append(";");
+      }
+    }
+
+    if (checkIsEqual(Lists.newArrayList(
+            storeImportDTO.getOnlineCashierNo(),
+            storeImportDTO.getO2oCashierNo(),
+            storeImportDTO.getWholesaleCashierNo()))){
+      uploadInfo.append("第").append(row.toString()).append("行").append("同一门店下虚拟收银机号不能相同").append(";");
     }
 
     if((consumTypes.contains(ConsumeTypeEnum.O2O.getExcelType()))){
@@ -237,5 +263,21 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
 
   public StringBuilder getUploadInfo() {
     return uploadInfo;
+  }
+  
+  private boolean checkIsEqual(List<String> list) {
+    if (!CollectionUtils.isEmpty(list)) {
+      list = list.stream().filter(StringUtils::isEmpty).collect(Collectors.toList());
+      if (!CollectionUtils.isEmpty(list)) {
+        for (int i = 0; i < list.size(); i++) {
+          if (i < list.size() - 1) {
+            if (list.get(i).equals(list.get(i + 1))) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
   }
 }

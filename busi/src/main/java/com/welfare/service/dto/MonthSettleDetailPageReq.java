@@ -8,6 +8,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author qiang.deng
@@ -24,7 +25,7 @@ public class MonthSettleDetailPageReq extends PageReq {
     private String storeName;
 
     @ApiModelProperty(value = "门店编号")
-    private String storeCode;
+    private List<String> storeCodes;
 
     @ApiModelProperty(value = "起始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -52,7 +53,7 @@ public class MonthSettleDetailPageReq extends PageReq {
     private String phone;
 
     @ApiModelProperty("部门编码")
-    private String departmentCode;
+    private List<String> departmentCodes;
 
     @ApiModelProperty("消费类型")
     private String consumeType;

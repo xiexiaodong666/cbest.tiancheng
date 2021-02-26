@@ -137,7 +137,7 @@
       and a.mer_code = #{merCode} and at.mer_code = #{merCode}
     </if>
     <if test=" accountName !='' and accountName != null  ">
-      and a.account_name like '%${accountName}'
+      and a.account_name like '%${accountName}%'
     </if>
     <if test="departmentPathList != null ">
       and
@@ -165,7 +165,6 @@
     <if test=" phone !='' and phone != null ">
       and a.phone = #{phone}
     </if>
-    GROUP BY a.account_code
     order by a.create_time desc
   </select>
 

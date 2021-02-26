@@ -2,11 +2,14 @@ package com.welfare.persist.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.persist.mapper.AccountDeductionDetailMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,5 +35,11 @@ public class AccountDeductionDetailDao extends ServiceImpl<AccountDeductionDetai
         queryWrapper.eq(AccountDeductionDetail.RELATED_TRANS_NO, relatedTransNo);
         queryWrapper.eq(AccountDeductionDetail.TRANS_TYPE,transType);
         return list(queryWrapper);
+    }
+
+    public List<AccountDeductionDetail> queryByStoreNosAndDate(Collection<String> storeNos, Date from, Date end){
+        QueryWrapper<AccountDeductionDetail> wrapper = new QueryWrapper<>();
+        wrapper.in(AccountBillDetail.STORE_CODE,storeNos).gt(AccountBillDetail.TRANS_TIME,from).le(AccountBillDetail.TRANS_TIME,end);
+        return super.list(wrapper);
     }
 }

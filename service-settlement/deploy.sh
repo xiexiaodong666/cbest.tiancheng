@@ -1,6 +1,6 @@
 git pull
 cd ..
-mvn clean install
+mvn clean install -DskipTests
 cd ./service-settlement
 scp ./target/e-welfare-settlement.jar root@172.30.37.188:/home/finance/App/e-welfare-settlement.e-cbest.lotest/release/
 echo "sleeping 3 secs"

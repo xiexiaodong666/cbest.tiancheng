@@ -83,3 +83,11 @@ cdn:
 
 merchant:
   url: http://172.30.37.188:10016
+
+ftp:
+  enabled: true
+  host: paycheckftp.e-cbest.com
+  port: 2112
+  user: pay_tiancheng
+  password: 4m+Hatccc
+  default-path: /test

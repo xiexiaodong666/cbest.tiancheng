@@ -22,6 +22,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * Description:
@@ -90,14 +91,15 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"merchantUser required for http header");
             }
             try {
-                MerchantUserInfo merchantU = JSON.parseObject(new String(merchantUserInfo.getBytes("ISO-8859-1"),"utf8"), MerchantUserInfo.class);
+                MerchantUserInfo merchantU = JSON.parseObject(URLDecoder.decode(merchantUserInfo,"UTF-8"), MerchantUserInfo.class);
                 if (StringUtils.isEmpty(merchantU.getMerchantCode())) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"merchantUser.merchantCode required for http header");
                 }
                 MerchantUserHolder.setMerchantUser(merchantU);
             } catch (UnsupportedEncodingException e) {
-                log.error("设置用户信息MerchantUser异常",e);
+                log.error("json反序列化错误", e);
             }
+
         }
     }
 

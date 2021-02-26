@@ -12,4 +12,8 @@ public class FrameworkConstant {
 
     }
     public static final String TRACE_ID = "tranceId";
+    public static final String USER_ID = "userId";
+    public static final String USER_NAME = "userName";
+    public static final String TRACE_ID2 = "traceId";
+    public static final String TIMETAMP = "timestamp";
 }

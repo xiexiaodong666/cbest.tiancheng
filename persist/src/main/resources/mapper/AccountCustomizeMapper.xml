@@ -139,7 +139,7 @@
     <if test=" accountName !='' and accountName != null  ">
       and a.account_name like '%${accountName}%'
     </if>
-    <if test="departmentPathList != null and departmentPathList[0]!=''">
+    <if test="departmentPathList != null and departmentPathList.size() > 0">
       and
       <foreach collection="departmentPathList" item="item" index="index" open="(" close=")"
         separator="or">

@@ -3,6 +3,13 @@ spring:
     url: jdbc:mysql://192.1.30.186:3306/e-welfare-0208?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&rewriteBatchedStatements=true
     username: root
     password: mysql@123
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      maxActive: 200
+      minIdle: 1
+      testOnBorrow: true
+      testOnReturn: false
+      validationQuery: SELECT 1
   servlet:
     multipart:
       max-file-size: 100MB

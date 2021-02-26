@@ -142,7 +142,7 @@
         </if>
     </select>
 
-    <select id="selectMonthSettleDetailSummary" resultType="com.welfare.persist.dto.MonthSettleDetailDTO"
+    <select id="selectMonthSettleDetailSummary" resultType="com.welfare.persist.dto.MonthSettleDetailSummaryDTO"
             parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
         select
             sum(

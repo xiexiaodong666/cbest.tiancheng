@@ -16,6 +16,7 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MonthSettleDao;
 import com.welfare.persist.dto.MonthSettleDTO;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
@@ -152,7 +153,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
-    public MonthSettleDetailDTO monthSettleDetailSummary(Long id, MonthSettleDetailReq monthSettleDetailReq) {
+    public MonthSettleDetailSummaryDTO monthSettleDetailSummary(Long id, MonthSettleDetailReq monthSettleDetailReq) {
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
         return settleDetailMapper.selectMonthSettleDetailSummary(monthSettleDetailQuery);
     }

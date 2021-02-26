@@ -5,6 +5,12 @@ spring:
     password: 3uUacFIf3PDoBy
     driverClassName: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      maxActive: 200
+      minIdle: 1
+      testOnBorrow: true
+      testOnReturn: false
+      validationQuery: SELECT 1
   redis:
     lettuce:
       pool:

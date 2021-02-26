@@ -4,11 +4,12 @@ spring:
     username: jav_tclife_rw
     password: 3uUacFIf3PDoBy
     type: com.alibaba.druid.pool.DruidDataSource
-    maxActive: 200
-    minIdle: 1
-    testOnBorrow: true
-    testOnReturn: false
-    validationQuery: SELECT 1
+    druid:
+      maxActive: 200
+      minIdle: 1
+      testOnBorrow: true
+      testOnReturn: false
+      validationQuery: SELECT 1
   redis:
     lettuce:
       pool:

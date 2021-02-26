@@ -37,7 +37,7 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
      * @param monthSettleDetailQuery
      * @return
      */
-    MonthSettleDetailDTO selectMonthSettleDetailSummary(MonthSettleDetailQuery monthSettleDetailQuery);
+    MonthSettleDetailSummaryDTO selectMonthSettleDetailSummary(MonthSettleDetailQuery monthSettleDetailQuery);
     /**
      * 查询获取账户交易明细
      * @param params

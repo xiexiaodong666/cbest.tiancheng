@@ -5,6 +5,13 @@ spring:
     url: jdbc:mysql://db.haproxy.cbest.gam:36601/e_welfare?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: jav_tclife_rw
     password: 3uUacFIf3PDoBy
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      maxActive: 200
+      minIdle: 1
+      testOnBorrow: true
+      testOnReturn: false
+      validationQuery: SELECT 1
   redis:
     lettuce:
       pool:

@@ -103,4 +103,8 @@ public class MonthSettleDetailResp{
     @ExcelProperty("待结算金额")
     @ApiModelProperty("待结算金额")
     private String unsettledAmount;
+
+    @ExcelProperty("商户扣款方式")
+    @ApiModelProperty("商户扣款方式")
+    private String merDeductionType;
 }

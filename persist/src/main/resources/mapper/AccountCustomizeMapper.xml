@@ -152,8 +152,11 @@
     <if test="binding != null ">
       and a.binding = #{binding}
     </if>
-    <if test=" accountTypeCode !='' and accountTypeCode != null ">
-      and at.type_code = #{accountTypeCode}
+    <if test=" accountTypeCodes !='' and accountTypeCodes.size()>0">
+      and at.type_code = in
+      <foreach collection="accountTypeCodes" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
     </if>
     <if test=" cardId !='' and cardId != null ">
       and a. account_code in( select a1.account_code from account a1 left join card_info ci1 on

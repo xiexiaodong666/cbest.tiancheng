@@ -226,7 +226,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         int i = monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()
-                        .eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
+                        .eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.SETTLING.code())
                         .eq(MonthSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
                         .eq(MonthSettle::getId, id)
         );

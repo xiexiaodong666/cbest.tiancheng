@@ -75,7 +75,7 @@ public class WelfareSettleConstant {
          * 待结算
          */
         UNSETTLED("unsettled","待结算"),
-
+        SETTLING("settling","结算中"),
         /**
          * 已结算
          */

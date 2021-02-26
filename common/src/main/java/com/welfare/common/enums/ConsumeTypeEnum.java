@@ -60,10 +60,19 @@ public enum ConsumeTypeEnum {
   public static ConsumeTypeEnum getByType(String type) {
     return ENUM_MAP.get(type);
   }
+
   public static List<String> getCodeList() {
     List<String> codeList = new ArrayList<>();
     for (int i = 0; i < ConsumeTypeEnum.values().length; i++) {
       codeList.add(ConsumeTypeEnum.values()[i].getCode());
+    }
+    return codeList;
+  }
+
+  public static List<String> getExcelTypeList() {
+    List<String> codeList = new ArrayList<>();
+    for (int i = 0; i < ConsumeTypeEnum.values().length; i++) {
+      codeList.add(ConsumeTypeEnum.values()[i].getExcelType());
     }
     return codeList;
   }

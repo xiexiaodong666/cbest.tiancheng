@@ -294,6 +294,7 @@ public class RefundServiceImpl implements RefundService {
         refundDetail.setOrderChannel(orderChannel);
         refundDetail.setTransAmount(refundDeductionDetail.getTransAmount());
         refundDetail.setAccountCode(refundDeductionDetail.getAccountCode());
+        refundDetail.setOrderChannel(refundDeductionDetail.getOrderChannel());
         BigDecimal accountBalance = accountAmountTypes.stream()
                 .filter(accountAmountType -> !SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -340,6 +340,7 @@ public class PaymentServiceImpl implements PaymentService {
                                                     Account account, SupplierStore supplierStore, MerchantCredit merchantCredit) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(paymentRequest.calculateAccountCode());
+        accountDeductionDetail.setOrderChannel(paymentRequest.getPaymentScene());
         accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
         accountDeductionDetail.setAccountAmountTypeBalance(accountAmountType.getAccountBalance());
         accountDeductionDetail.setMerAccountType(accountAmountType.getMerAccountTypeCode());

@@ -55,7 +55,7 @@ public class DailyCheckBillServiceImpl implements DailyCheckBillService {
         from.set(Calendar.MILLISECOND, 0);
         Calendar end = Calendar.getInstance();
         //跑前一天的数据
-        from.set(Calendar.DAY_OF_MONTH,from.get(Calendar.DAY_OF_MONTH) - 1);
+        from.set(Calendar.DAY_OF_MONTH,end.get(Calendar.DAY_OF_MONTH) - 1);
         end.set(Calendar.HOUR_OF_DAY, 24);
         end.set(Calendar.MINUTE, 0);
         end.set(Calendar.SECOND, 0);

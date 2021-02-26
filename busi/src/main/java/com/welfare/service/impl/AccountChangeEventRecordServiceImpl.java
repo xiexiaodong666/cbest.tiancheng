@@ -98,8 +98,10 @@ public class AccountChangeEventRecordServiceImpl implements AccountChangeEventRe
   @Override
   public void batchSaveByAccountTypeCode(List<String> accountTypeCodes, AccountChangeType accountChangeType) {
     List<Account> accounts = accountService.queryByAccountTypeCode(accountTypeCodes);
-    List<AccountChangeEventRecord> recordList = AccountUtils
-            .getEventList(accounts, accountChangeType);
-    this.batchSave(recordList, accountChangeType);
+    if (CollectionUtils.isNotEmpty(accounts)) {
+      List<AccountChangeEventRecord> recordList = AccountUtils
+              .getEventList(accounts, accountChangeType);
+      this.batchSave(recordList, accountChangeType);
+    }
   }
 }

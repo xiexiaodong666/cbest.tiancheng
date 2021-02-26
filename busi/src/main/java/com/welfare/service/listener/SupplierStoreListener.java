@@ -45,14 +45,13 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
 
   private List<String> merCodeList = new LinkedList();
   private List<String> storeCodeList = new LinkedList();
-  private final static  List<String> excelAllType = Arrays.asList(new String[]{ConsumeTypeEnum.O2O.getExcelType(),ConsumeTypeEnum.ONLINE_MALL.getExcelType(),ConsumeTypeEnum.SHOP_SHOPPING.getExcelType()});
+  private final static  List<String> excelAllType = ConsumeTypeEnum.getExcelTypeList();
 
   public static  final String success="导入成功";
   public static  final String fail="入库失败";
   private final MerchantService merchantService;
 
   private final SupplierStoreService storeService;
-
 
   private static StringBuilder uploadInfo = new StringBuilder();
 

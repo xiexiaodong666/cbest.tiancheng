@@ -17,7 +17,8 @@ public enum ConsumeTypeEnum {
    */
   O2O("O2O", "O2O（线上下单，到店提货","1"),
   ONLINE_MALL("ONLINE_MALL", "线上商城","2"),
-  SHOP_SHOPPING("SHOP_CONSUMPTION", "到店消费","3");
+  SHOP_SHOPPING("SHOP_CONSUMPTION", "到店消费","3"),
+  WHOLESALE("WHOLESALE", "批发商城","4");
 
 
   public String getExcelType() {
@@ -59,12 +60,21 @@ public enum ConsumeTypeEnum {
   public static ConsumeTypeEnum getByType(String type) {
     return ENUM_MAP.get(type);
   }
+
   public static List<String> getCodeList() {
-    List<String> list = new ArrayList<>();
-    list.add(ConsumeTypeEnum.O2O.getCode());
-    list.add(ConsumeTypeEnum.ONLINE_MALL.getCode());
-    list.add(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
-    return list;
+    List<String> codeList = new ArrayList<>();
+    for (int i = 0; i < ConsumeTypeEnum.values().length; i++) {
+      codeList.add(ConsumeTypeEnum.values()[i].getCode());
+    }
+    return codeList;
+  }
+
+  public static List<String> getExcelTypeList() {
+    List<String> codeList = new ArrayList<>();
+    for (int i = 0; i < ConsumeTypeEnum.values().length; i++) {
+      codeList.add(ConsumeTypeEnum.values()[i].getExcelType());
+    }
+    return codeList;
   }
 
   public static String getTypeByExcelType(String excelType) {

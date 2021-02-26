@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,stroe_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,create_user,create_time,update_user,update_time,version
+        id,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,stroe_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,order_channel,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,create_user,create_time,update_user,update_time,version
     </sql>
 
     <resultMap id="monthSettleDetailDTO" type="com.welfare.persist.dto.MonthSettleDetailDTO">
@@ -30,6 +30,7 @@
         <result property="departmentName" column="department_name"/>
         <result property="consumeType" column="consume_type"/>
         <result property="settleFlag" column="settle_flag"/>
+        <result property="orderChannel" column="order_channel"/>
         <result property="unsettledAmount" column="unsettled_amount"/>
         <result property="merDeductionType" column="mer_deduction_type"/>
     </resultMap>
@@ -61,6 +62,7 @@
         t1.mer_deduction_amount as merDeductionAmount,
         t1.mer_deduction_credit_amount as merCreditDeductionAmount,
         t1.self_deduction_amount as selfDeductionAmount,
+        t1.order_channel as orderChannel,
         'unsettled' as settleFlag,
         'welfare' as dataType,
         'system' as create_user
@@ -105,6 +107,7 @@
         d.department_name,
         supplier.mer_name as supplier_name,
         t1.settle_flag,
+        t1.order_channel,
         IF(t1.pos = t5.cashier_no, '第三方线上', '第三方线下') as type,
         IF(t1.pos = t5.cashier_no, 'online', 'offline') as consume_type,
         t1.mer_account_type as welfare_type_code,
@@ -133,7 +136,7 @@
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code
         left join merchant supplier on supplier.mer_code = t3.mer_code
-        left join store_consume_type t5 on t1.store_code = t5.store_code and t5.deleted=0
+        left join store_consume_type t5 on t1.store_code = t5.store_code and t1.order_channel = t5.consum_type  and t5.deleted=0
         <where>
             and t3.mer_code != t1.mer_code
             <if test="settleNo!=null and settleNo!=''">

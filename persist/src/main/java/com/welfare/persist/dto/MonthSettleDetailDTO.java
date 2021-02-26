@@ -59,6 +59,8 @@ public class MonthSettleDetailDTO{
 
     private String settleFlag;
 
+    private String orderChannel;
+
     private String unsettledAmount;
 
     private String merDeductionType;

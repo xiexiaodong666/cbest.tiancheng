@@ -10,6 +10,7 @@ import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
@@ -33,6 +34,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.invoke.MethodHandleInfo;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -284,7 +286,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       throw new BusiException("至少配置一个员工类型");
     }
     //删除已有配置
-    String merCode = consumeSceneEditReqs.get(0).getMerCode();
+    String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
     List<AccountConsumeScene> oldScenes = accountConsumeSceneDao.getAllByMercode(Lists.newArrayList(merCode));
     if (CollectionUtils.isNotEmpty(oldScenes)) {
       List<Long> oldConsumeSceneIds = oldScenes.stream()

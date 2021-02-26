@@ -714,9 +714,13 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public List<Account> queryByAccountTypeCode(List<String> accountTypeCode) {
-    QueryWrapper<Account> queryWrapper = new QueryWrapper<Account>();
-    queryWrapper.in(Account.ACCOUNT_TYPE_CODE, accountTypeCode);
-    return accountDao.list(queryWrapper);
+    List<Account> list = new ArrayList<>();
+      if (CollectionUtils.isNotEmpty(accountTypeCode)) {
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<Account>();
+        queryWrapper.in(Account.ACCOUNT_TYPE_CODE, accountTypeCode);
+        list = accountDao.list(queryWrapper);
+      }
+      return list;
   }
 
   @Override

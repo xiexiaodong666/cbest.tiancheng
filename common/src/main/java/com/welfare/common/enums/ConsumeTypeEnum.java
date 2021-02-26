@@ -61,11 +61,11 @@ public enum ConsumeTypeEnum {
     return ENUM_MAP.get(type);
   }
   public static List<String> getCodeList() {
-    List<String> list = new ArrayList<>();
-    list.add(ConsumeTypeEnum.O2O.getCode());
-    list.add(ConsumeTypeEnum.ONLINE_MALL.getCode());
-    list.add(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
-    return list;
+    List<String> codeList = new ArrayList<>();
+    for (int i = 0; i < ConsumeTypeEnum.values().length; i++) {
+      codeList.add(ConsumeTypeEnum.values()[i].getCode());
+    }
+    return codeList;
   }
 
   public static String getTypeByExcelType(String excelType) {

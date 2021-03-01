@@ -152,7 +152,7 @@
     <if test="binding != null ">
       and a.binding = #{binding}
     </if>
-    <if test=" accountTypeCodes !='' and accountTypeCodes.size()>0">
+    <if test=" accountTypeCodes != null and accountTypeCodes.size()>0">
       and at.type_code in
       <foreach collection="accountTypeCodes" item="item" open="(" close=")" separator=",">
         #{item}

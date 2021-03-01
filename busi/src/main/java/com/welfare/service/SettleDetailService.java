@@ -97,11 +97,4 @@ public interface SettleDetailService {
      * @return
      */
     List<WelfareTypeTotalAmountResp> statisticalAmountGroupByWelfareTypeCode(ProprietaryConsumePageReq welfareSettleDetailPageReq);
-
-    /**
-     * 通过商户编码查询配置的门店是否有返利
-     * @param merCode
-     * @return
-     */
-    Boolean queryIsRabteByMerCOde(String merCode);
 }

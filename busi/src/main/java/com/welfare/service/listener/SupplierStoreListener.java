@@ -267,15 +267,9 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
   
   private boolean checkIsEqual(List<String> list) {
     if (!CollectionUtils.isEmpty(list)) {
-      list = list.stream().filter(StringUtils::isEmpty).collect(Collectors.toList());
-      if (!CollectionUtils.isEmpty(list)) {
-        for (int i = 0; i < list.size(); i++) {
-          if (i < list.size() - 1) {
-            if (list.get(i).equals(list.get(i + 1))) {
-              return true;
-            }
-          }
-        }
+      long count = list.stream().distinct().count();
+      if (count != list.size()) {
+        return true;
       }
     }
     return false;

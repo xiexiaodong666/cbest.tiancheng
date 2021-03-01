@@ -15,7 +15,11 @@
     mc.credit_limit creditLimit,
     mc.remaining_limit remainingLimit,
     mc.current_balance currentBalance,
-    m.create_time createTime
+    m.create_time createTime,
+    NULL merName2,
+    NULL merType2,
+    NULL merCooperationMode2,
+    NULL createTime2
     FROM
     merchant m
     LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code

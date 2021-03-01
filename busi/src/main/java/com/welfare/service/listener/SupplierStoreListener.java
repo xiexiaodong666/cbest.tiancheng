@@ -149,11 +149,11 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         uploadInfo.append("第").append(row.toString()).append("行").append("批发商城必须输入虚拟收银机号")
                 .append(";");
       } else {
-        if(storeImportDTO.getOnlineCashierNo().length()>255){
-          uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号长度不能大于255").append(";");
+        if(storeImportDTO.getWholesaleCashierNo().length()>255){
+          uploadInfo.append("第").append(row.toString()).append("行").append("批发商城收银机号长度不能大于255").append(";");
         }
         String regex = "^[V][0-9]{3}+$";
-        if(!storeImportDTO.getOnlineCashierNo().matches(regex)){
+        if(!storeImportDTO.getWholesaleCashierNo().matches(regex)){
           uploadInfo.append("第").append(row.toString()).append("行").append("虚拟收银机号格式错误").append(";");
         }
 
@@ -163,7 +163,7 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
         storeConsumeTypeDTOList.add(storeConsumeTypeDTO);
       }
     } else {
-      if(EmptyChecker.notEmpty(storeImportDTO.getOnlineCashierNo())){
+      if(EmptyChecker.notEmpty(storeImportDTO.getWholesaleCashierNo())){
         uploadInfo.append("第").append(row.toString()).append("行").append("只有线上商城或者O2O或者批发商城允许输入虚拟收银机号").append(";");
       }
     }
@@ -265,16 +265,13 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     return uploadInfo;
   }
   
-  private boolean checkIsEqual(List<String> list) {
+  private static boolean checkIsEqual(List<String> list) {
     if (!CollectionUtils.isEmpty(list)) {
-      list = list.stream().filter(StringUtils::isEmpty).collect(Collectors.toList());
+      list = list.stream().filter(org.apache.commons.lang3.StringUtils::isNoneBlank).collect(Collectors.toList());
       if (!CollectionUtils.isEmpty(list)) {
-        for (int i = 0; i < list.size(); i++) {
-          if (i < list.size() - 1) {
-            if (list.get(i).equals(list.get(i + 1))) {
-              return true;
-            }
-          }
+        long count = list.stream().distinct().count();
+        if (count != list.size()) {
+          return true;
         }
       }
     }

@@ -265,11 +265,14 @@ public class SupplierStoreListener extends AnalysisEventListener<SupplierStoreIm
     return uploadInfo;
   }
   
-  private boolean checkIsEqual(List<String> list) {
+  private static boolean checkIsEqual(List<String> list) {
     if (!CollectionUtils.isEmpty(list)) {
-      long count = list.stream().distinct().count();
-      if (count != list.size()) {
-        return true;
+      list = list.stream().filter(org.apache.commons.lang3.StringUtils::isNoneBlank).collect(Collectors.toList());
+      if (!CollectionUtils.isEmpty(list)) {
+        long count = list.stream().distinct().count();
+        if (count != list.size()) {
+          return true;
+        }
       }
     }
     return false;

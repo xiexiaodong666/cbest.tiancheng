@@ -167,8 +167,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             if (CollectionUtils.isEmpty(deposits)) {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工", null);
             }
-            double sumAmoun = deposits.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
-            BigDecimal sumAmount = BigDecimal.valueOf(sumAmoun);
+            BigDecimal sumAmount = deposits.stream().map(TempAccountDepositApplyDTO::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             validationParmas(request,merchant,merchantUser,sumAmount);
             apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
             // 设置充值总金额
@@ -285,8 +284,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                     throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "至少重新上传一个员工", null);
                 }
                 // 判断金额是否超限
-                double sumAmoun = temps.stream().mapToDouble(value -> value.getRechargeAmount().doubleValue()).sum();
-                BigDecimal sumAmount = BigDecimal.valueOf(sumAmoun);
+                BigDecimal sumAmount = temps.stream().map(TempAccountDepositApplyDTO::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                 MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
                 // 修改充值明细表
                 if (merchantCredit.getRechargeLimit().compareTo(sumAmount) < 0) {

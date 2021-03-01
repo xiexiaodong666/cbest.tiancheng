@@ -2,6 +2,8 @@ package com.welfare.common.config;
 
 import com.welfare.common.constants.FrameworkConstant;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.util.MerchantUserHolder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -25,6 +28,7 @@ public class FeignInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate template) {
         addTraceId(template);
+        addDmallHeaderParam(template);
         template.header(WelfareConstant.Header.SOURCE.code(),headerSource);
     }
 
@@ -34,5 +38,14 @@ public class FeignInterceptor implements RequestInterceptor {
             traceId = UUID.randomUUID().toString();
         }
         template.header(FrameworkConstant.TRACE_ID,traceId);
+    }
+
+    private void addDmallHeaderParam(RequestTemplate template){
+        MerchantUserInfo merchantUserInfo = MerchantUserHolder.getMerchantUser();
+        if (Objects.nonNull(merchantUserInfo)) {
+            template.header(FrameworkConstant.USER_ID, merchantUserInfo.getUserCode());
+            template.header(FrameworkConstant.USER_NAME, merchantUserInfo.getUsername());
+            template.header(FrameworkConstant.TIMETAMP, String.valueOf(System.currentTimeMillis()));
+        }
     }
 }

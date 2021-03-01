@@ -66,11 +66,4 @@ public class ProprietaryConsumeController implements IController {
     String path = fileUploadServiceUtil.uploadExcelFile(list, ProprietaryConsumeResp.class, "自营消费");
     return success(fileUploadServiceUtil.getFileServerUrl(path));
   }
-
-  @GetMapping("/hasRebate")
-  @ApiOperation("查询商户是否有配置返利")
-  @MerchantUser
-  public R<Boolean> hasRebateByMerCode(){
-    return success(settleDetailService.queryIsRabteByMerCOde(MerchantUserHolder.getMerchantUser().getMerchantCode()));
-  }
 }

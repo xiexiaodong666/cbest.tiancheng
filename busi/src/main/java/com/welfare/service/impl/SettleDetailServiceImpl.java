@@ -437,20 +437,4 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         }
         return typeTotalAmounts;
     }
-
-    @Override
-    public Boolean queryIsRabteByMerCOde(String merCode) {
-        QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(MerchantStoreRelation.MER_CODE, merCode);
-        List<MerchantStoreRelation> relations = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
-        if (CollectionUtils.isNotEmpty(relations)) {
-            long count = relations.stream()
-                    .filter(merchantStoreRelation -> merchantStoreRelation.getIsRebate() != null && merchantStoreRelation.getIsRebate() == 1)
-                    .count();
-            if (count > 0) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

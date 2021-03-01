@@ -14,7 +14,8 @@ public enum PaymentTypeEnum {
     ONLINE("online", "线上"),
     BARCODE("barcode","条码"),
     CARD("card","刷卡"),
-    DOOR_ACCESS("door_access","门禁");
+    DOOR_ACCESS("door_access","门禁"),
+    WHOLESALE("wholesale","批发");
 
 
     public String getCode() {

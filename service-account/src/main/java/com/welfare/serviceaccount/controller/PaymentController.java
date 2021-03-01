@@ -50,6 +50,13 @@ public class PaymentController implements IController {
         return success(paymentRequest);
     }
 
+    @PostMapping("/wholesale")
+    @ApiOperation("批发支付")
+    public R<WholesalePaymentRequest> newCardPaymentRequest(@RequestBody WholesalePaymentRequest paymentRequest) {
+        paymentService.paymentRequest(paymentRequest);
+        return success(paymentRequest);
+    }
+
     @PostMapping("/door-access")
     @ApiOperation("门禁系统支付（交投）")
     public R<DoorAccessPaymentRequest> newDoorAccessPaymentRequest(@RequestBody DoorAccessPaymentRequest doorAccessPaymentRequest){

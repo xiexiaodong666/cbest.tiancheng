@@ -66,7 +66,8 @@ public class PaymentController implements IController {
     @GetMapping
     @ApiOperation("查询支付结果")
     public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
-        PaymentRequest paymentRequest = paymentService.queryResult(transNo);
+        //cardPaymentRequest包含全量信息，所以以CardPaymentRequest查询
+        PaymentRequest paymentRequest = paymentService.queryResult(transNo,CardPaymentRequest.class);
         return success(paymentRequest);
     }
 

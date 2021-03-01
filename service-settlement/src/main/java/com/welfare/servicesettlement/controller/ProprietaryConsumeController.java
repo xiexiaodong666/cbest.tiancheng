@@ -43,9 +43,9 @@ public class ProprietaryConsumeController implements IController {
   @PostMapping("/page")
   @ApiOperation("分页查询自营消费列表")
   @MerchantUser
-  public R<Page<ProprietaryConsumeResp>> pageQueryMonthSettleDetail(@RequestBody ProprietaryConsumePageReq req, PageReq pageReq){
+  public R<Page<ProprietaryConsumeResp>> pageQueryMonthSettleDetail(@RequestBody ProprietaryConsumePageReq req){
     req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
-    return success(settleDetailService.queryProprietaryConsumePage(req, pageReq));
+    return success(settleDetailService.queryProprietaryConsumePage(req));
   }
 
   @PostMapping("/totalAmount")
@@ -65,5 +65,12 @@ public class ProprietaryConsumeController implements IController {
     list = list == null ? new ArrayList<>() : list;
     String path = fileUploadServiceUtil.uploadExcelFile(list, ProprietaryConsumeResp.class, "自营消费");
     return success(fileUploadServiceUtil.getFileServerUrl(path));
+  }
+
+  @GetMapping("/hasRebate")
+  @ApiOperation("查询商户是否有配置返利")
+  @MerchantUser
+  public R<Boolean> hasRebateByMerCode(){
+    return success(settleDetailService.queryIsRabteByMerCOde(MerchantUserHolder.getMerchantUser().getMerchantCode()));
   }
 }

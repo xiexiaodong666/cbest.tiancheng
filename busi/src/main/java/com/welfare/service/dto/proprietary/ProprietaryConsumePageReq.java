@@ -16,7 +16,7 @@ import java.util.List;
  * @Date: 2021/2/23 3:34 下午
  */
 @Data
-public class ProprietaryConsumePageReq  {
+public class ProprietaryConsumePageReq extends PageReq{
 
   @ApiModelProperty(value = "商户编码")
   private String merCode;

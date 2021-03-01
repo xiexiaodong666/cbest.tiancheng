@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
@@ -25,6 +26,7 @@ import com.welfare.persist.mapper.MerchantCreditMapper;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.MerchantAccountTypeService;
+import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
 import com.welfare.service.dto.proprietary.ProprietaryConsumePageReq;
@@ -83,6 +85,8 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     private SupplierStoreDao supplierStoreDao;
     @Autowired
     private MerchantAccountTypeService accountTypeService;
+    @Autowired
+    private MerchantStoreRelationService merchantStoreRelationService;
 
     @Override
     public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
@@ -344,7 +348,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     }
 
     @Override
-    public Page<ProprietaryConsumeResp> queryProprietaryConsumePage(ProprietaryConsumePageReq welfareSettleDetailPageReq, PageReq pageReq) {
+    public Page<ProprietaryConsumeResp> queryProprietaryConsumePage(ProprietaryConsumePageReq welfareSettleDetailPageReq) {
         String merCode = welfareSettleDetailPageReq.getMerCode();
         if(StringUtils.isBlank(merCode)){
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
@@ -354,8 +358,8 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         proprietaryConsumePageQuery.setStoreType("self");
 
         Page<ProprietaryConsumeDTO> page = new Page<>();
-        page.setCurrent(pageReq.getCurrent());
-        page.setPages(pageReq.getSize());
+        page.setCurrent(welfareSettleDetailPageReq.getCurrent());
+        page.setSize(welfareSettleDetailPageReq.getSize());
         settleDetailMapper.queryProprietaryConsumeInfo(page, proprietaryConsumePageQuery);
         List<ProprietaryConsumeDTO> dtos = page.getRecords();
         List<ProprietaryConsumeResp> resps = new ArrayList<>();
@@ -432,5 +436,21 @@ public class SettleDetailServiceImpl implements SettleDetailService {
             typeTotalAmounts.add(totalAmountResp);
         }
         return typeTotalAmounts;
+    }
+
+    @Override
+    public Boolean queryIsRabteByMerCOde(String merCode) {
+        QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(MerchantStoreRelation.MER_CODE, merCode);
+        List<MerchantStoreRelation> relations = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        if (CollectionUtils.isNotEmpty(relations)) {
+            long count = relations.stream()
+                    .filter(merchantStoreRelation -> merchantStoreRelation.getIsRebate() != null && merchantStoreRelation.getIsRebate() == 1)
+                    .count();
+            if (count > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

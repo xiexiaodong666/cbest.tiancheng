@@ -1,6 +1,5 @@
 package com.welfare.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,7 +24,6 @@ import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.MerchantStoreRelationService;
-import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
@@ -58,7 +56,6 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
   private final MerchantStoreRelationDao merchantStoreRelationDao;
   private final MerchantStoreRelationMapper merchantStoreRelationMapper;
-  private final SupplierStoreService supplierStoreService;
   private final SupplierStoreDao supplierStoreDao;
 
   private final ObjectMapper mapper;

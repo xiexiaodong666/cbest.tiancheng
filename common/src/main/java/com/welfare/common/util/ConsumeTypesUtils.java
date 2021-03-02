@@ -39,6 +39,18 @@ public class ConsumeTypesUtils {
         }
       });
     }
+    if (!map.get(ConsumeTypeEnum.O2O.getCode())) {
+      map.remove(ConsumeTypeEnum.O2O.getCode());
+    }
+    if (!map.get(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
+      map.remove(ConsumeTypeEnum.ONLINE_MALL.getCode());
+    }
+    if (!map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
+      map.remove(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+    }
+    if (!map.get(ConsumeTypeEnum.WHOLESALE.getCode())) {
+      map.remove(ConsumeTypeEnum.WHOLESALE.getCode());
+    }
   }
 
   public static Map<String, Boolean> transfer(String str) {

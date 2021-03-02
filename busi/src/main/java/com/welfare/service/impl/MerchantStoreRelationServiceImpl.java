@@ -512,7 +512,13 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
           validate = false;
           break;
         }
-
+        boolean isSelectWholeSale =
+                consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode());
+        if (!isSelectWholeSale && merchantStoreConsumeTypeMap.containsKey(
+                ConsumeTypeEnum.WHOLESALE.getCode())) {
+          validate = false;
+          break;
+        }
       } catch (JsonProcessingException e) {
         validate = false;
         log.error("[syncConsumeType] json convert error", e.getMessage());

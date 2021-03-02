@@ -32,13 +32,6 @@ public class ConsumeTypesUtils {
   }
 
   public static void removeFalseKey(Map<String, Boolean> map) {
-    if (map != null && map.size() > 0) {
-      map.forEach((consume, flag) -> {
-        if (!flag) {
-          map.remove(consume);
-        }
-      });
-    }
     if (!map.get(ConsumeTypeEnum.O2O.getCode())) {
       map.remove(ConsumeTypeEnum.O2O.getCode());
     }

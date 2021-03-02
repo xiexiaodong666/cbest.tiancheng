@@ -64,4 +64,7 @@ public class WelfareSettleDetailReq{
 
     @ApiModelProperty("商户支出方式")
     private String merDeductionType;
+
+    @ApiModelProperty("结算状态")
+    private String settleFlag;
 }

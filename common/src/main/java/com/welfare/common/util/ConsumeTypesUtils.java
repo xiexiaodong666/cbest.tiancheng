@@ -33,11 +33,8 @@ public class ConsumeTypesUtils {
 
   public static void removeFalseKey(Map<String, Boolean> map) {
     if (map != null && map.size() > 0) {
-      map.forEach((consume, flag) -> {
-        if (!flag) {
-          map.remove(consume);
-        }
-      });
+      Set<Map.Entry<String, Boolean>> set = map.entrySet();
+      set.removeIf(entry -> !entry.getValue());
     }
   }
 

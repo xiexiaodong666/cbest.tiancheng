@@ -89,7 +89,8 @@ public class AccountServiceImpl implements AccountService {
     private final ObjectMapper mapper;
     @Autowired
     private final MerchantService merchantService;
-    private final DepartmentService departmentService;
+    @Autowired
+    private  DepartmentService departmentService;
     private final SequenceService sequenceService;
     private final CardInfoService cardInfoService;
     @Autowired

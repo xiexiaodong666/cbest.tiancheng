@@ -12,6 +12,7 @@ import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.AccountUtil;
+import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
@@ -90,7 +91,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     private MerchantStoreRelationService merchantStoreRelationService;
 
     @Autowired
-    private MerchantService merchantService;
+    private MerchantDao merchantDao;
 
     @Override
     public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
@@ -136,7 +137,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         WelfareSettleSummaryDTO welfareSettleSummaryDTO = settleDetailMapper.getSettleDetailInfoSummary(welfareSettleDetailQuery);
         if(Objects.isNull(welfareSettleSummaryDTO)){
             welfareSettleSummaryDTO = new WelfareSettleSummaryDTO();
-            Merchant merchant = merchantService.queryByCode(welfareSettleDetailReq.getMerCode());
+            Merchant merchant = merchantDao.queryByCode(welfareSettleDetailReq.getMerCode());
             welfareSettleSummaryDTO.setMerCooperationMode(merchant.getMerCooperationMode());
             welfareSettleSummaryDTO.setBalanceConsumeAmount(BigDecimal.ZERO);
             welfareSettleSummaryDTO.setMerName(welfareSettleDetailReq.getMerCode());

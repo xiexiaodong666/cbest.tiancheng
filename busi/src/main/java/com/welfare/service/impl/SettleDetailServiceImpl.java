@@ -26,6 +26,7 @@ import com.welfare.persist.mapper.MerchantCreditMapper;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.MerchantAccountTypeService;
+import com.welfare.service.MerchantService;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
@@ -88,6 +89,9 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     @Autowired
     private MerchantStoreRelationService merchantStoreRelationService;
 
+    @Autowired
+    private MerchantService merchantService;
+
     @Override
     public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
         return settleDetailMapper.getWelfareSettleAllMerchant(welfareSettleQuery);
@@ -130,7 +134,18 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         WelfareSettleSummaryDTO welfareSettleSummaryDTO = settleDetailMapper.getSettleDetailInfoSummary(welfareSettleDetailQuery);
-
+        if(Objects.isNull(welfareSettleSummaryDTO)){
+            welfareSettleSummaryDTO = new WelfareSettleSummaryDTO();
+            Merchant merchant = merchantService.queryByCode(welfareSettleDetailReq.getMerCode());
+            welfareSettleSummaryDTO.setMerCooperationMode(merchant.getMerCooperationMode());
+            welfareSettleSummaryDTO.setBalanceConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setMerName(welfareSettleDetailReq.getMerCode());
+            welfareSettleSummaryDTO.setOfflineConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setOnlineConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setBalanceConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setTotalConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setUnsettledAmount(BigDecimal.ZERO);
+        }
         return welfareSettleSummaryDTO;
     }
 

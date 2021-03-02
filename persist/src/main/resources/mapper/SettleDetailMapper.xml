@@ -698,11 +698,11 @@
             </if>
             <if test="merDeductionType!=null and merDeductionType != ''">
                 <choose>
-                    <when test="merDeductionType = 'balance'">
+                    <when test="merDeductionType == 'balance'">
                         and t1.mer_deduction_amount > 0
                     </when>
-                    <when test="merDeductionType = 'credit'">
-                        and t1.mer_credit_decution_amount > 0
+                    <when test="merDeductionType == 'credit'">
+                        and t1.mer_credit_deduction_amount > 0
                     </when>
                 </choose>
             </if>

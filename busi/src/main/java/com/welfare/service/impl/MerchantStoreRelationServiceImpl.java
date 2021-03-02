@@ -512,8 +512,10 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
           validate = false;
           break;
         }
-        boolean isSelectWholeSale =
-                consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode());
+        boolean isSelectWholeSale = true;
+        if (consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode()) != null && consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode())) {
+          isSelectWholeSale = false;
+        }
         if (!isSelectWholeSale && merchantStoreConsumeTypeMap.containsKey(
                 ConsumeTypeEnum.WHOLESALE.getCode())) {
           validate = false;

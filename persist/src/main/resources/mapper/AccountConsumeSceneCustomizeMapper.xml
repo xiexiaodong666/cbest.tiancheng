@@ -250,7 +250,7 @@ WHERE
         FROM
             account_consume_scene acs
                 inner JOIN account_consume_scene_store_relation acstr ON acs.id = acstr.account_consume_scene_id
-                inner JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code
+                inner JOIN merchant_store_relation msr ON acstr.store_code = msr.store_code and acs.mer_code = msr.mer_code
                 inner JOIN account_type act ON act.type_code = acs.account_type_code
                 inner JOIN supplier_store sp ON sp.store_code = acstr.store_code
                 inner JOIN merchant m ON m.mer_code = sp.mer_code

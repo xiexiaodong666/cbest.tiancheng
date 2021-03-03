@@ -491,6 +491,7 @@
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
             )
         </if>
+        and t1.settle_status = 'unsettled'
         order by t1.id
         <if test="limit!=null">
             limit #{limit}

@@ -235,7 +235,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
                         .eq(MonthSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
                         .eq(MonthSettle::getId, id)
         );
-        settleDetailDao.updateToSettled(monthSettle.getSettleNo());
+        settleDetailDao.updateToSettled(monthSettleTemp.getSettleNo());
         RestoreRemainingLimitReq restoreRemainingLimitReq = new RestoreRemainingLimitReq();
         restoreRemainingLimitReq.setMerCode(monthSettleTemp.getMerCode());
         restoreRemainingLimitReq.setAmount(monthSettleTemp.getSettleAmount());

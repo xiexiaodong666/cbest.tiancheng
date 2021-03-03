@@ -4,20 +4,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.annotation.RepeatRequestVerification;
 import com.welfare.common.exception.BusiException;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.service.AccountService;
-import com.welfare.service.dto.AccountBatchImgDTO;
-import com.welfare.service.dto.AccountBatchImgInfoReq;
-import com.welfare.service.dto.AccountBatchImgReq;
-import com.welfare.service.dto.AccountBillDTO;
-import com.welfare.service.dto.AccountBillDetailDTO;
-import com.welfare.service.dto.AccountDTO;
-import com.welfare.service.dto.AccountDetailDTO;
-import com.welfare.service.dto.AccountDetailParam;
-import com.welfare.service.dto.AccountIncrementReq;
-import com.welfare.service.dto.AccountPageReq;
-import com.welfare.service.dto.AccountReq;
+import com.welfare.service.dto.*;
 import com.welfare.servicemerchant.dto.UpdateStatusReq;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
@@ -59,7 +50,6 @@ public class AccountController implements IController {
 
   private final AccountService accountService;
   private final FileUploadService fileUploadService;
-
 
 
   @PostMapping("/upload/batch/img")
@@ -258,5 +248,13 @@ public class AccountController implements IController {
   @MerchantUser
   public R<AccountDetailDTO> detailByPhoneAndMer(@RequestParam(required = false) @ApiParam(value = "员工手机号")  String phone){
     return success(accountService.queryDetailPhoneAndMer(phone));
+  }
+
+  @GetMapping("/groupByDepartment")
+  @ApiOperation("查询商户下组织机构树并统计各层级的人员数量")
+  @MerchantUser
+  public R<List<DepartmentTree>> groupByDepartment(){
+    List<DepartmentTree> list = accountService.groupByDepartment(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(list);
   }
 }

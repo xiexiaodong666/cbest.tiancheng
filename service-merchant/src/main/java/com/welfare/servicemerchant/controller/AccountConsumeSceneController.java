@@ -15,10 +15,7 @@ import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
-import com.welfare.service.dto.AccountConsumeSceneAddReq;
-import com.welfare.service.dto.AccountConsumeSceneDTO;
-import com.welfare.service.dto.AccountConsumeSceneReq;
-import com.welfare.service.dto.StoreConsumeRelationDTO;
+import com.welfare.service.dto.*;
 import com.welfare.servicemerchant.converter.AccountConsumeSceneConverter;
 import com.welfare.servicemerchant.dto.AccountConsumePageReq;
 import com.welfare.servicemerchant.dto.UpdateStatusReq;
@@ -99,7 +96,7 @@ public class AccountConsumeSceneController implements IController {
   @ApiOperation("员工消费配置详情")
   public R<AccountConsumeSceneDTO> detail(@PathVariable String id) {
     AccountConsumeSceneDTO accountConsumeSceneDTO = accountConsumeSceneService
-        .findAccountConsumeSceneDTOById(Long.parseLong(id));
+            .findAccountConsumeSceneDTOById(Long.parseLong(id));
     return success(accountConsumeSceneDTO);
   }
 
@@ -161,5 +158,25 @@ public class AccountConsumeSceneController implements IController {
     String path = fileUploadService
         .uploadExcelFile(list, AccountConsumeScenePageDTO.class, "员工消费配置");
     return success(fileUploadService.getFileServerUrl(path));
+  }
+
+  @PostMapping("/edit")
+  @ApiOperation("编辑员工消费配置")
+  @MerchantUser
+  public R<Boolean> edit(@RequestBody List<AccountConsumeSceneEditReq> consumeSceneEditReqs) {
+    try {
+      return success(accountConsumeSceneService.edit(consumeSceneEditReqs));
+    } catch (BusiException be) {
+      return R.fail(be.getMessage());
+    }
+  }
+
+  @GetMapping("/details")
+  @ApiOperation("查询商户下所有员工消费配置详情")
+  @MerchantUser
+  public R<List<AccountConsumeSceneResp>> detail() {
+    List<AccountConsumeSceneResp> accountConsumeSceneResps = accountConsumeSceneService
+            .findAllAccountConsumeSceneDTO(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(accountConsumeSceneResps);
   }
 }

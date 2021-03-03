@@ -3,7 +3,6 @@ package com.welfare.service.dto.payment;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.StoreConsumeTypeDao;
-import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.StoreConsumeType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -58,7 +57,7 @@ public abstract class PaymentRequest {
     private String paymentScene;
 
     public String calculatePaymentScene(){
-        String consumeType = o2oOrOnlineShopping(machineNo,storeNo);
+        String consumeType = queryPaymentScene(machineNo,storeNo);
         //不是O2O或者ONLINE_SHOPPING,则为到店消费
         this.paymentScene =  consumeType == null ? ConsumeTypeEnum.SHOP_SHOPPING.getCode() :consumeType;
         return paymentScene;
@@ -69,7 +68,7 @@ public abstract class PaymentRequest {
      * @param machineNo
      * @return
      */
-    private String o2oOrOnlineShopping(String machineNo,String storeCode) {
+    private String queryPaymentScene(String machineNo, String storeCode) {
         StoreConsumeTypeDao storeConsumeTypeDao = SpringBeanUtils.getBean(StoreConsumeTypeDao.class);
         StoreConsumeType storeConsumeType = storeConsumeTypeDao.getOneByCashierNoAndStoreNo(machineNo,storeCode);
         if(Objects.isNull(storeConsumeType)){

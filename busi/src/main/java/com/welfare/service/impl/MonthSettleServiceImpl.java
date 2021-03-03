@@ -16,6 +16,7 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MonthSettleDao;
 import com.welfare.persist.dto.MonthSettleDTO;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
 import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
@@ -152,6 +153,12 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     }
 
     @Override
+    public MonthSettleDetailSummaryDTO monthSettleDetailSummary(Long id, MonthSettleDetailReq monthSettleDetailReq) {
+        MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
+        return settleDetailMapper.selectMonthSettleDetailSummary(monthSettleDetailQuery);
+    }
+
+    @Override
     public List<MonthSettleDetailResp> queryMonthSettleDetailLimit(Long id, MonthSettleDetailReq monthSettleDetailReq) {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
@@ -219,7 +226,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         int i = monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()
-                        .eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code())
+                        .eq(MonthSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.SETTLING.code())
                         .eq(MonthSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
                         .eq(MonthSettle::getId, id)
         );

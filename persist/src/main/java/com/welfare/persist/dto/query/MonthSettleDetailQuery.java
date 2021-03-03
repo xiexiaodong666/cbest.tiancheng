@@ -3,6 +3,7 @@ package com.welfare.persist.dto.query;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author qiang.deng
@@ -16,7 +17,7 @@ public class MonthSettleDetailQuery{
 
     private String storeName;
 
-    private String storeCode;
+    private List<String> storeCodes;
 
     private Date startTime;
 
@@ -40,4 +41,20 @@ public class MonthSettleDetailQuery{
      * 查询数据量限制
      */
     private Integer limit;
+
+    private String phone;
+
+    private List<String> departmentCodes;
+
+    /**
+     * 消费类型, 线上 线下
+     */
+    private String consumeType;
+
+    /**
+     * 结算状态
+     */
+    private String settleFlag;
+
+    private String supplierCode;
 }

@@ -34,7 +34,7 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("accountName")String accountName,
       @Param("departmentPathList")List<String>  departmentPathList,
       @Param("accountStatus")Integer accountStatus,
-      @Param("accountTypeCode")String accountTypeCode,
+      @Param("accountTypeCodes")List<String> accountTypeCodes,
       @Param("binding") Integer binding,
       @Param("cardId")String cardId,
       @Param("phone")String phone);
@@ -43,7 +43,7 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("accountName")String accountName,
       @Param("departmentPathList")List<String>  departmentPathList,
       @Param("accountStatus")Integer accountStatus,
-      @Param("accountTypeCode")String accountTypeCode,
+      @Param("accountTypeCodes")List<String> accountTypeCodes,
       @Param("binding") Integer binding,
       @Param("cardId")String cardId,
       @Param("phone")String phone);
@@ -77,4 +77,7 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
   List<Account> queryByConsumeSceneIdList(List<Long> list);
 
   AccountDetailMapperDTO queryDetailPhoneAndMer(@Param("phone") String phone, @Param("merCode") String merCode);
+
+  int countByDepartmentPath(@Param("merCode")String merCode, @Param("departmentPath")String departmentPath);
+
 }

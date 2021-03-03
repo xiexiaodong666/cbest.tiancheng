@@ -84,7 +84,7 @@ public class SettlementBillBuildTask extends IJobHandler {
                         monthSettle = new MonthSettle();
                         monthSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code());
                         monthSettle.setRecStatus(WelfareSettleConstant.SettleRecStatusEnum.UNCONFIRMED.code());
-                        monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
+                        monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
                         monthSettle.setMerCode(merchant.getMerCode());
                         monthSettle.setSettleNo(merchant.getMerCode()+DateUtil.date2Str(finalToday, DateUtil.PURE_FORMATE_MONTH));
                         monthSettle.setSettleMonth(DateUtil.date2Str(finalToday, DateUtil.FORMAT_YEAR_MONTH));

@@ -36,4 +36,14 @@ public class AccountConsumeSceneDao extends ServiceImpl<AccountConsumeSceneMappe
                 .eq(AccountConsumeScene.STATUS, AccountConsumeSceneStatus.ENABLE.getCode());
         return list(queryWrapper);
     }
+
+    public List<AccountConsumeScene> getAllByMercode(List<String> merCodes){
+        QueryWrapper<AccountConsumeScene> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(AccountConsumeScene.MER_CODE, merCodes);
+        return list(queryWrapper);
+    }
+
+    public Boolean deleteConsumeSceneByIds(List<Long> ids) {
+        return getBaseMapper().deleteBatchIds(ids) > 0;
+    }
 }

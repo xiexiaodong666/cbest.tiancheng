@@ -17,12 +17,12 @@ public interface PaymentService {
      * @param paymentRequest
      * @return
      */
-    PaymentRequest paymentRequest(PaymentRequest paymentRequest);
+    <T extends PaymentRequest>T paymentRequest(T paymentRequest);
 
     /**
      * 查询支付结果
      * @param transNo
      * @return
      */
-    PaymentRequest queryResult(String transNo);
+    <T extends PaymentRequest> T queryResult(String transNo,Class<T> clazz);
 }

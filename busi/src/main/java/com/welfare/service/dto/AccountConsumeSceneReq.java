@@ -31,6 +31,7 @@ public class AccountConsumeSceneReq implements Serializable {
   @ApiModelProperty("商户代码")
   @NotEmpty(message = "商户代码为空")
   private String merCode;
+
   /**
    * 员工类型编码
    */

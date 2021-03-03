@@ -24,5 +24,4 @@
     <update id="updateAccountBalance">
         UPDATE <include refid="tableName"/> set account_balance = #{increaseBalance},update_time = now(),version = version + 1 where account_code = #{accountCode}
     </update>
-
 </mapper>

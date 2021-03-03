@@ -24,6 +24,7 @@ import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
@@ -73,10 +74,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
-    public PaymentRequest paymentRequest(PaymentRequest paymentRequest) {
+    public <T extends PaymentRequest>T paymentRequest(T paymentRequest) {
         paymentRequestPerfMonitor.start();
         ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) SpringBeanUtils.getBean("e-welfare-paymentQueryAsync");
-        Future<PaymentRequest> queryResultFuture = threadPoolTaskExecutor.submit(() -> queryResult(paymentRequest.getTransNo()));
+        Future<PaymentRequest> queryResultFuture = threadPoolTaskExecutor.submit(() -> queryResult(paymentRequest.getTransNo(),paymentRequest.getClass()));
 
         Long accountCode = paymentRequest.calculateAccountCode();
         Assert.notNull(accountCode, "账号不能为空。");
@@ -111,7 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
                         || WelfareConstant.AsyncStatus.REVERSED.code().equals(requestHandled.getPaymentStatus())) {
                     log.warn("重复的支付请求，直接返回已经处理完成的request{}", JSON.toJSONString(requestHandled));
                     BeanUtils.copyProperties(requestHandled, paymentRequest);
-                    return requestHandled;
+                    return (T)requestHandled;
                 }
 
                 SupplierStore supplierStore = supplierStoreFuture.get();
@@ -191,7 +192,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentRequest queryResult(String transNo) {
+    @SneakyThrows
+    public <T extends PaymentRequest> T queryResult(String transNo,Class<T> clazz) {
         List<AccountBillDetail> accountDeductionDetails = accountBillDetailDao.queryByTransNoAndTransType(
                 transNo,
                 WelfareConstant.TransType.CONSUME.code()
@@ -200,7 +202,7 @@ public class PaymentServiceImpl implements PaymentService {
                 transNo,
                 WelfareConstant.TransType.REFUND.code()
         );
-        CardPaymentRequest paymentRequest = new CardPaymentRequest();
+        T paymentRequest = clazz.newInstance();
         paymentRequest.setTransNo(transNo);
         if (CollectionUtils.isEmpty(accountDeductionDetails)) {
             paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.FAILED.code());
@@ -216,12 +218,16 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAccountCode(firstAccountBillDetail.getAccountCode());
             paymentRequest.setMachineNo(firstAccountBillDetail.getPos());
             paymentRequest.setPaymentDate(firstAccountBillDetail.getTransTime());
-            paymentRequest.setCardNo(firstAccountBillDetail.getCardId());
+            if(clazz.equals(CardPaymentRequest.class)){
+                ((CardPaymentRequest)paymentRequest).setCardNo(firstAccountBillDetail.getCardId());
+            }else if(clazz.equals(BarcodePaymentRequest.class)){
+                ((BarcodePaymentRequest)paymentRequest).setBarcode(firstAccountBillDetail.getPaymentTypeInfo());
+            }
+            @SuppressWarnings("duplicate")
             BigDecimal amount = accountDeductionDetails.stream()
                     .map(AccountBillDetail::getTransAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             paymentRequest.setAmount(amount);
-
             Account account = accountService.getByAccountCode(firstAccountBillDetail.getAccountCode());
             paymentRequest.setAccountMerCode(account.getMerCode());
             paymentRequest.setAccountBalance(account.getAccountBalance());
@@ -340,6 +346,7 @@ public class PaymentServiceImpl implements PaymentService {
                                                     Account account, SupplierStore supplierStore, MerchantCredit merchantCredit) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(paymentRequest.calculateAccountCode());
+        accountDeductionDetail.setOrderChannel(paymentRequest.getPaymentScene());
         accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
         accountDeductionDetail.setAccountAmountTypeBalance(accountAmountType.getAccountBalance());
         accountDeductionDetail.setMerAccountType(accountAmountType.getMerAccountTypeCode());
@@ -404,6 +411,8 @@ public class PaymentServiceImpl implements PaymentService {
             accountBillDetail.setPaymentType(PaymentTypeEnum.ONLINE.getCode());
         }else if(paymentRequest instanceof DoorAccessPaymentRequest){
             accountBillDetail.setPaymentType(PaymentTypeEnum.DOOR_ACCESS.getCode());
+        }else if (paymentRequest instanceof WholesalePaymentRequest){
+            accountBillDetail.setPaymentType(PaymentTypeEnum.WHOLESALE.getCode());
         }
 
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);

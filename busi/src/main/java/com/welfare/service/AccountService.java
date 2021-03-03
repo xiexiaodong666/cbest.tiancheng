@@ -79,6 +79,7 @@ public interface AccountService {
   AccountSimpleDTO queryAccountInfo(Long accountCode);
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
   List<Account> queryByAccountTypeCode(String accountTypeCode);
+  List<Account> queryByAccountTypeCode(List<String> accountTypeCode);
   List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId);
 
   boolean bindingCard(String accountCode,String cardId);
@@ -119,4 +120,11 @@ public interface AccountService {
    * @return
    */
   AccountDO queryByQueryInfo(String queryInfo,String queryType);
+
+  /**
+   * 按组织机构分组统计各层人员数量
+   * @param merCode
+   * @return
+   */
+  List<DepartmentTree> groupByDepartment(String merCode);
 }

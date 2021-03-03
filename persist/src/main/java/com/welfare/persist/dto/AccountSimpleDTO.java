@@ -22,6 +22,12 @@ public class AccountSimpleDTO {
     @ApiModelProperty("可用余额")
     private BigDecimal accountBalance;
 
+    @ApiModelProperty("最大授权额度")
+    private BigDecimal maxQuota;
+
     @ApiModelProperty("授信余额")
     private BigDecimal surplusQuota;
+
+    @ApiModelProperty("是否授信")
+    private Boolean credit;
 }

@@ -113,7 +113,7 @@ public class AccountServiceImpl implements AccountService {
         IPage<AccountPageDTO> iPage = accountCustomizeMapper
                 .queryPageDTO(page, accountPageReq.getMerCode(), accountPageReq.getAccountName(),
                         accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
-                        accountPageReq.getAccountTypeCode(), accountPageReq.getBinding(),
+                        accountPageReq.getAccountTypeCodes(), accountPageReq.getBinding(),
                         accountPageReq.getCardId(),
                         accountPageReq.getPhone());
         return accountConverter.toPage(iPage);
@@ -141,7 +141,7 @@ public class AccountServiceImpl implements AccountService {
 
                 .queryPageDTO(accountPageReq.getMerCode(), accountPageReq.getAccountName(),
                         accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
-                        accountPageReq.getAccountTypeCode(), accountPageReq.getBinding(),
+                        accountPageReq.getAccountTypeCodes(), accountPageReq.getBinding(),
                         accountPageReq.getCardId(),
                         accountPageReq.getPhone());
         return accountConverter.toAccountDTOList(list);
@@ -679,7 +679,9 @@ public class AccountServiceImpl implements AccountService {
         accountSimpleDTO.setPhone(account.getPhone());
         accountSimpleDTO.setAccountName(account.getAccountName());
         accountSimpleDTO.setAccountBalance(account.getAccountBalance());
+        accountSimpleDTO.setMaxQuota(account.getMaxQuota());
         accountSimpleDTO.setSurplusQuota(account.getSurplusQuota());
+        accountSimpleDTO.setCredit(account.getCredit());
         return accountSimpleDTO;
     }
 
@@ -710,7 +712,18 @@ public class AccountServiceImpl implements AccountService {
         return accountDao.list(queryWrapper);
     }
 
-    @Override
+  @Override
+  public List<Account> queryByAccountTypeCode(List<String> accountTypeCode) {
+    List<Account> list = new ArrayList<>();
+      if (CollectionUtils.isNotEmpty(accountTypeCode)) {
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<Account>();
+        queryWrapper.in(Account.ACCOUNT_TYPE_CODE, accountTypeCode);
+        list = accountDao.list(queryWrapper);
+      }
+      return list;
+  }
+
+  @Override
     public List<Account> queryAccountByConsumeSceneId(List<Long> consumeSceneId) {
         return null;
     }
@@ -962,4 +975,28 @@ public class AccountServiceImpl implements AccountService {
         accountDeductionDetail.setSelfDeductionAmount(BigDecimal.ZERO);
         return accountDeductionDetail;
     }
+
+  @Override
+  public List<DepartmentTree> groupByDepartment(String merCode) {
+    List<DepartmentTree> trees = departmentService.tree(merCode);
+    if (CollectionUtils.isNotEmpty(trees)) {
+      trees = trees.get(0).getChildren();
+      // 查询各层的人员数量
+      recursiveCalculateAccountNum(trees);
+    }
+    return trees;
+  }
+
+  private void recursiveCalculateAccountNum(List<DepartmentTree> trees){
+    if (CollectionUtils.isNotEmpty(trees)) {
+      trees.forEach(departmentTree -> {
+        // 查询人员数量
+        int count = accountCustomizeMapper
+                .countByDepartmentPath(departmentTree.getMerCode(), departmentTree.getDepartmentPath());
+        departmentTree.setAccountTotal(count);
+        // 继续递归
+        recursiveCalculateAccountNum(departmentTree.getChildren());
+      });
+    }
+  }
 }

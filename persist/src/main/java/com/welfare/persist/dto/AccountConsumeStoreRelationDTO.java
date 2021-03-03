@@ -15,6 +15,7 @@ public class AccountConsumeStoreRelationDTO {
 
   @ApiModelProperty("门店消费配置关联关系表ID")
   private String id;
+
   /**
    * 门店编码
    */

@@ -56,6 +56,7 @@
     msr.deleted != 1 and consum_type like"%true%" and msr.mer_code=#{merCode}
     </select>
 
+
   <select id="listUnionMerchant" resultType="com.welfare.persist.entity.SupplierStore">
     select * from (select * from (
     select

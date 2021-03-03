@@ -198,6 +198,13 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
+    public List<MerchantAccountType> queryAllByMerCode(String merCode) {
+        QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(MerchantAccountType.MER_CODE,merCode);
+        return merchantAccountTypeDao.list(queryWrapper);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean init(String merCode) {
         List<MerchantAccountType> initList=new ArrayList<>();

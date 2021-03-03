@@ -160,5 +160,34 @@ public class WelfareSettleConstant {
     }
 
 
+    /**
+     * 消费类型
+     */
+    public enum StoreTypeEnum {
+        /**
+         * 自营
+         */
+        SELF("self","自营"),
+        /**
+         * 第三方
+         */
+        THIRD("third","第三方");
+
+        private String code;
+        private String desc;
+
+        StoreTypeEnum(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
     public static final Integer LIMIT = 2000;
 }

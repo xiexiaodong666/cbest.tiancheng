@@ -382,6 +382,7 @@
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
             )
         </if>
+        and t1.settle_flag = 'unsettled'
         group by t1.mer_code,t1.mer_account_type,t1.mer_account_type_name
     </select>
 

@@ -238,6 +238,9 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="supplierCode != null and supplierCode != ''">
+                t3.mer_code = #{supplierCode}
+            </if>
         </where>
     </sql>
     <select id="getWelfareSettleAllMerchant" parameterType="com.welfare.persist.dto.query.WelfareSettleQuery" resultType="com.welfare.persist.dto.WelfareSettleSumDTO">

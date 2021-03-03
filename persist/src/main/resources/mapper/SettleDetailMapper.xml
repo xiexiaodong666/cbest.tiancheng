@@ -122,8 +122,8 @@
             when t1.trans_type='consume' then t1.trans_amount
             when t1.trans_type='refund' then t1.trans_amount*-1 end as real_amount,
         case
-            when t1.settle_flag != 'settled' and t1.trans_type='consume' then t1.mer_credit_deduction_amount
-            when t1.settle_flag != 'settled' and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
+            when t1.trans_type='consume' then t1.mer_credit_deduction_amount
+            when t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
             else 0
         end as unsettled_amount,
         case

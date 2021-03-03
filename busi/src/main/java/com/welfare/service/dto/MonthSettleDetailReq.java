@@ -64,4 +64,7 @@ public class MonthSettleDetailReq{
 
     @ApiModelProperty("商户支出方式")
     private String merDeductionType;
+
+    @ApiModelProperty("供应商")
+    private String supplierCode;
 }

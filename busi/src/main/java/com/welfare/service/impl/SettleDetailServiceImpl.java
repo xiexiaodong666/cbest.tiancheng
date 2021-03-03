@@ -215,7 +215,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
             if (!idList.isEmpty()) {
                 SettleDetail settleDetail = new SettleDetail();
                 settleDetail.setSettleNo(monthSettle.getSettleNo());
-                settleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
+                settleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
                 settleDetailMapper.update(settleDetail, Wrappers.<SettleDetail>lambdaUpdate()
                         .in(SettleDetail::getId, idList));
             } else {

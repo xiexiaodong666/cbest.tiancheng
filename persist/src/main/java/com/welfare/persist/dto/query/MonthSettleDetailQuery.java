@@ -55,4 +55,6 @@ public class MonthSettleDetailQuery{
      * 结算状态
      */
     private String settleFlag;
+
+    private String supplerCode;
 }

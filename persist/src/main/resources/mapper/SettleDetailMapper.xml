@@ -239,7 +239,7 @@
                 </foreach>
             </if>
             <if test="supplierCode != null and supplierCode != ''">
-                t3.mer_code = #{supplierCode}
+                and t3.mer_code = #{supplierCode}
             </if>
         </where>
     </sql>

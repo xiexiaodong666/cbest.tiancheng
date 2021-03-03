@@ -28,7 +28,7 @@ public class WelfareSettleDetailPageReq  extends PageReq {
     private String storeName;
 
     @ApiModelProperty(value = "门店编号")
-    private String storeCode;
+    private List<String> storeCodes;
 
     @ApiModelProperty(value = "供应商编码")
     private String supplierCode;

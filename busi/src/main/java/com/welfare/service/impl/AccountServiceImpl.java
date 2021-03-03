@@ -376,8 +376,12 @@ public class AccountServiceImpl implements AccountService {
         if (accountReq.getCredit()) {
             //授信额度
             AccountAmountType accountAmountType = getAccountAmountType(account.getAccountCode(),
-                    account.getMaxQuota(), account.getMerCode());
+                    account.getMaxQuota(), account.getMerCode(), MerAccountTypeCode.SURPLUS_QUOTA.code());
             accountAmountTypeMapper.insert(accountAmountType);
+            //授信额度溢缴款,额度没有上限
+            AccountAmountType accountAmountType2 = getAccountAmountType(account.getAccountCode(),
+                    null, account.getMerCode(), MerAccountTypeCode.SURPLUS_QUOTA_EXTRA.code());
+            accountAmountTypeMapper.insert(accountAmountType2);
             account.setSurplusQuota(account.getMaxQuota());
         }
 
@@ -409,10 +413,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private AccountAmountType getAccountAmountType(Long accountCode, BigDecimal accountBalance,
-                                                   String merCode) {
+                                                   String merCode, String merAccountTypeCode) {
         MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(
                 merCode,
-                MerAccountTypeCode.SURPLUS_QUOTA.code());
+                merAccountTypeCode);
         if (null == merchantAccountType) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无授信额度福利类型", null);
         }
@@ -421,7 +425,7 @@ public class AccountServiceImpl implements AccountService {
         accountAmountType.setAccountBalance(accountBalance);
         accountAmountType.setCreateTime(new Date());
         accountAmountType.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
-        accountAmountType.setMerAccountTypeCode(MerAccountTypeCode.SURPLUS_QUOTA.code());
+        accountAmountType.setMerAccountTypeCode(merAccountTypeCode);
         return accountAmountType;
     }
 
@@ -536,7 +540,7 @@ public class AccountServiceImpl implements AccountService {
             if (null == accountAmountType) {
                 //账户新增授信额度 修改account额度
                 AccountAmountType addAccountAmountType = getAccountAmountType(accountCode, newMaxQuota,
-                        merCode);
+                        merCode, MerAccountTypeCode.SURPLUS_QUOTA.code());
                 accountAmountTypeMapper.insert(addAccountAmountType);
                 accountCustomizeMapper
                         .updateMaxAndSurplusQuota(accountCode.toString(), newMaxQuota, newMaxQuota, updateUser);

@@ -172,7 +172,9 @@ public class WelfareConstant {
          * 账户类型
          */
         SELF("self","自主余额"),
-        SURPLUS_QUOTA("surplus_quota","授信额度");
+        SURPLUS_QUOTA("surplus_quota","授信额度"),
+        SURPLUS_QUOTA_EXTRA("surplus_quota_extra","授信额度溢缴款");
+
         private final String code;
         private final String desc;
 

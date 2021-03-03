@@ -56,5 +56,5 @@ public class MonthSettleDetailQuery{
      */
     private String settleFlag;
 
-    private String supplerCode;
+    private String supplierCode;
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.EmployeeSettleMapper">
+    <sql id="tableName">
+        employee_settle
+    </sql>
+
+    <sql id="baseColumn">
+        id,settle_no,settle_period,mer_code,trans_amount,settle_amount,order_num,settle_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,uppdate_user,update_time,deleted
+    </sql>
+
+</mapper>

@@ -16,7 +16,7 @@ import java.util.List;
 @ApiModel("完成结算请求对象")
 public class EmployeeSettleFinishReq {
 
-  @ApiModelProperty("结算单号")
+  @ApiModelProperty(value = "结算单号", required = true)
   @NotEmpty(message = "至少勾选一个结算单！")
   private List<String> settleNos;
 }

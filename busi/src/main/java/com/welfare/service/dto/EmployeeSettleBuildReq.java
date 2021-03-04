@@ -54,7 +54,7 @@ public class EmployeeSettleBuildReq {
   @ApiModelProperty("员工支出方式 授信额度:surplus_quota, 溢缴款:")
   private String merAccountType;
 
-  @ApiModelProperty("勾选的员工编码")
+  @ApiModelProperty(value = "勾选的员工编码", required = true)
   @NotEmpty(message = "至少勾选一个员工！")
   private List<String> selectedAccountCodes;
 }

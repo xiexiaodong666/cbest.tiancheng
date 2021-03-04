@@ -204,6 +204,11 @@ public class EmployeeSettleDetail extends Model<EmployeeSettleDetail> implements
      */
     @ApiModelProperty("商户余额")   
     private BigDecimal merBalance;
+    /**
+     * 门店类型
+     */
+    @ApiModelProperty("门店类型(自营:self,第三方:third)")
+    private String storeType;
 
 //以下为列明常量
 
@@ -339,5 +344,8 @@ public class EmployeeSettleDetail extends Model<EmployeeSettleDetail> implements
     * 商户余额
     */
     public static final String MER_BALANCE = "mer_balance";
-
+    /**
+     * 门店类型
+     */
+    public static final String STORE_TYPE = "storeType";
 }

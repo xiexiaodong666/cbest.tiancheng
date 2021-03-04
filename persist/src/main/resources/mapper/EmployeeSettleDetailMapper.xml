@@ -9,4 +9,57 @@
         id,settle_no,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,store_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,settle_flag,order_channel,create_user,create_time,update_user,update_time,version,mer_credit,mer_balance,store_type
     </sql>
 
+    <select id="getFromAccountDetail" parameterType="Map" resultType="com.welfare.persist.entity.EmployeeSettleDetail">
+        select
+        t1.id as id,
+        oi.order_id as orderId,
+        t1.trans_no as transNo,
+        t1.account_code as accountCode,
+        t2.account_name as accountName,
+        t1.card_id as cardId,
+        t3.mer_code as merCode,
+        t3.mer_name as merName,
+        t1.store_code as storeCode,
+        t4.store_alias as storeName,
+        t1.trans_time as transTime,
+        t1.pos as pos,
+        t1.pay_code as payCode,
+        '员工卡支付' as payName,
+        t1.trans_type as transType,
+        case when t1.trans_type='consume' then '消费'
+        when t1.trans_type='refund' then '退款' end as transTypeName,
+        t1.trans_amount as transAmount,
+        t1.mer_account_type as merAccountType,
+        t5.mer_account_type_name as merAccountTypeName,
+        t1.account_deduction_amount as accountAmount,
+        t1.account_amount_type_balance as accountBalance,
+        t1.mer_deduction_amount as merDeductionAmount,
+        t1.mer_deduction_credit_amount as merCreditDeductionAmount,
+        t1.order_channel as orderChannel,
+        'unsettled' as settleFlag,
+        'system' as create_user
+        from account_deduction_detail t1
+        left join account t2 on t1.account_code=t2.account_code
+        left join merchant t3 on t2.mer_code=t3.mer_code
+        left join merchant_store_relation t4 on t1.store_code = t4.store_code and t2.mer_code=t4.mer_code and t4.deleted=0
+        left join merchant_account_type t5 on t2.mer_code = t5.mer_code and t1.mer_account_type=t5.mer_account_type_code
+        left join order_info oi on oi.trans_no = t1.trans_no
+        <where>
+            <if test="minId!=null">
+                t1.id &gt;=#{minId}
+            </if>
+            <if test="startTime!=null">
+                and t1.trans_time &gt;=#{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime!=null">
+                and t1.trans_time &lt;=#{endTime,jdbcType=TIMESTAMP}
+            </if>
+            and t1.trans_type in('consume','refund')
+            and t1.mer_account_type in ('surplus_quota','surplus_quota_overpay')
+        </where>
+        order by t1.id
+        <if test="limit!=null">
+            limit ${limit}
+        </if>
+    </select>
 </mapper>

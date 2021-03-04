@@ -2,7 +2,11 @@ package com.welfare.persist.mapper;
 
 import com.welfare.persist.entity.EmployeeSettleDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.welfare.persist.entity.SettleDetail;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * (employee_settle_detail)数据Mapper
@@ -14,4 +18,10 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface EmployeeSettleDetailMapper extends BaseMapper<EmployeeSettleDetail> {
 
+  /**
+   * 查询获取账户交易明细
+   * @param params
+   * @return
+   */
+  List<EmployeeSettleDetail> getFromAccountDetail(Map<String, Object> params);
 }

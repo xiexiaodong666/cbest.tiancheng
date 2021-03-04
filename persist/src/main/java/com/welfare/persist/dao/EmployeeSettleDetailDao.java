@@ -21,8 +21,11 @@ import java.util.Date;
 public class EmployeeSettleDetailDao extends ServiceImpl<EmployeeSettleDetailMapper, EmployeeSettleDetail> {
 
   public int countByTransTime(Date transTimeStart, Date transTimeEnd) {
-    //QueryWrapper<>
-    return 0;
+    QueryWrapper<EmployeeSettleDetail> queryWrapper = new QueryWrapper<>();
+    queryWrapper
+            .ge(EmployeeSettleDetail.TRANS_TIME, transTimeStart)
+            .le(EmployeeSettleDetail.TRANS_TIME, transTimeEnd);
+    return this.count(queryWrapper);
   }
 
 }

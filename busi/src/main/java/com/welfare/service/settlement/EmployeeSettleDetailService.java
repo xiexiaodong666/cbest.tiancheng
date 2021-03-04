@@ -1,6 +1,8 @@
 package com.welfare.service.settlement;
 
 
+import java.util.Date;
+
 /**
  * 服务接口
  *
@@ -12,7 +14,7 @@ public interface EmployeeSettleDetailService {
 
   /**
    * 指定某一日期将员工授信额度、溢缴款流水同步到表employee_settle_detail
-   * @param dateStr
+   * @param date
    */
-  void pullAccountDetailByDate(String dateStr);
+  void pullAccountDetailByDate(Date date);
 }

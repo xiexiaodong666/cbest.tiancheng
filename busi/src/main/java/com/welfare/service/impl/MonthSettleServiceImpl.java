@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -14,6 +15,7 @@ import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MonthSettleDao;
+import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dto.MonthSettleDTO;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
 import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
@@ -21,6 +23,7 @@ import com.welfare.persist.dto.SettleStatisticsInfoDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.MonthSettleService;
@@ -63,6 +66,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     private String posOnlines;
     @Autowired(required = false)
     private MerchantCreditFeign merchantCreditFeign;
+    @Autowired
+    private SettleDetailDao settleDetailDao;
 
 
     @Override
@@ -230,7 +235,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
                         .eq(MonthSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
                         .eq(MonthSettle::getId, id)
         );
-
+        settleDetailDao.updateToSettled(monthSettleTemp.getSettleNo());
         RestoreRemainingLimitReq restoreRemainingLimitReq = new RestoreRemainingLimitReq();
         restoreRemainingLimitReq.setMerCode(monthSettleTemp.getMerCode());
         restoreRemainingLimitReq.setAmount(monthSettleTemp.getSettleAmount());

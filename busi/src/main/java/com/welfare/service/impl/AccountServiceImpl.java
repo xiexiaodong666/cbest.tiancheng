@@ -88,7 +88,7 @@ public class AccountServiceImpl implements AccountService {
     private ShoppingFeignClient shoppingFeignClient;
     private final ObjectMapper mapper;
     @Autowired
-    private final MerchantService merchantService;
+    private MerchantService merchantService;
     private final DepartmentService departmentService;
     private final SequenceService sequenceService;
     private final CardInfoService cardInfoService;

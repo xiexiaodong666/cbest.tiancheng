@@ -59,7 +59,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private final SupplierStoreDao supplierStoreDao;
 
   private final ObjectMapper mapper;
-  private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
+  @Autowired
+  private AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final ApplicationContext applicationContext;
   @Autowired(required = false)
   private ShoppingFeignClient shoppingFeignClient;

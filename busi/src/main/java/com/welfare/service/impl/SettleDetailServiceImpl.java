@@ -189,14 +189,17 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void buildSettle(WelfareSettleDetailReq welfareSettleDetailReq) {
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
-
-        if(monthSettle.getSettleAmount().compareTo(new BigDecimal(0)) == -1){
+        if(Objects.isNull(monthSettle)){
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "没有需要结算明细", null);
+        }
+        monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
+        if(monthSettle.getSettleAmount().compareTo(new BigDecimal(0)) < 0){
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "结算金额为负，无法生成结算单", null);
         }
 
@@ -215,7 +218,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
             if (!idList.isEmpty()) {
                 SettleDetail settleDetail = new SettleDetail();
                 settleDetail.setSettleNo(monthSettle.getSettleNo());
-                settleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
+                settleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
                 settleDetailMapper.update(settleDetail, Wrappers.<SettleDetail>lambdaUpdate()
                         .in(SettleDetail::getId, idList));
             } else {

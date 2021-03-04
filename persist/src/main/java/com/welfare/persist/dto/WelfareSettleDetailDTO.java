@@ -74,6 +74,9 @@ public class WelfareSettleDetailDTO {
     @ApiModelProperty(value = "结算状态")
     private String settleFlag;
 
+    @ApiModelProperty(value = "结算状态")
+    private String settleFlagName;
+
     @ExcelProperty(value = "手机号")
     @ApiModelProperty(value = "手机号")
     private String phone;
@@ -101,5 +104,7 @@ public class WelfareSettleDetailDTO {
     @ApiModelProperty("商户支出方式")
     private String merDeductionType;
 
-
+    @ExcelProperty(value = "商户支出方式")
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionTypeName;
 }

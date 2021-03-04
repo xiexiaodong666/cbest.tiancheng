@@ -380,7 +380,7 @@ public class AccountServiceImpl implements AccountService {
             accountAmountTypeMapper.insert(accountAmountType);
             //授信额度溢缴款,额度没有上限
             AccountAmountType accountAmountType2 = getAccountAmountType(account.getAccountCode(),
-                    null, account.getMerCode(), MerAccountTypeCode.SURPLUS_QUOTA_EXTRA.code());
+                    BigDecimal.ZERO, account.getMerCode(), MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
             accountAmountTypeMapper.insert(accountAmountType2);
             account.setSurplusQuota(account.getMaxQuota());
         }

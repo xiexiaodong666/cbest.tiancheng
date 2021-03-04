@@ -1,29 +1,25 @@
-package com.welfare.service.dto;
+package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-
 /**
+ * Description:
+ *
  * @author chengang
- * @version 1.0.0
- * @date 2021/3/7 4:46 下午
- * @desc 员工授信消费列表响应
+ * @date 2/23/2021
  */
 @Data
-public class EmployeeSettleResp {
+public class EmployeeSettleDTO {
 
-    @ApiModelProperty("员工编号")
-    private Long accountCode;
+    @ApiModelProperty("员工Id")
+    private Long accountId;
 
     @ApiModelProperty("员工姓名")
     private String accountName;
 
     @ApiModelProperty("手机号")
     private String phone;
-
-    @ApiModelProperty("组织code")
-    private String departmentCode;
 
     @ApiModelProperty("组织机构")
     private String departmentName;
@@ -42,7 +38,4 @@ public class EmployeeSettleResp {
 
     @ApiModelProperty("消费笔数")
     private String orderNum;
-
-
 }
-

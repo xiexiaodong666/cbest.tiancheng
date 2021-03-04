@@ -225,7 +225,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
         MerchantAccountType merchantAccountType3=new MerchantAccountType();
         merchantAccountType1.setMerAccountTypeName("员工授信额度溢缴款");
         merchantAccountType1.setMerCode(merCode);
-        merchantAccountType1.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_EXTRA.code());
+        merchantAccountType1.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
         merchantAccountType1.setDeductionOrder(9000);
         merchantAccountType1.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
         initList.add(merchantAccountType3);

@@ -1,20 +1,16 @@
 package com.welfare.servicesettlement.controller;
 
-import com.alibaba.druid.util.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
-import com.welfare.common.domain.MerchantUserInfo;
-import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.dto.query.EmployeeSettleQuery;
 import com.welfare.service.dto.EmployeeSettleBuildReq;
 import com.welfare.service.dto.EmployeeSettleFinishReq;
 import com.welfare.service.dto.EmployeeSettlePageReq;
 import com.welfare.service.dto.EmployeeSettleResp;
-import com.welfare.service.dto.MonthSettlePageReq;
-import com.welfare.service.dto.MonthSettleResp;
-import com.welfare.common.base.BasePageVo;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.service.dto.*;
+import com.welfare.service.settlement.EmployeeSettleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +22,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+
+import static net.dreamlu.mica.core.result.R.success;
 
 /**
  * @Author: duanhy
@@ -42,6 +39,8 @@ import java.util.List;
 @RequestMapping("/settlement/employee")
 @Api(tags = "员工授信结算相关")
 public class EmployeeSettleController {
+
+  private final EmployeeSettleService employeeSettleService;
 
   @PostMapping("/build")
   @ApiOperation("按条件生成结算单,并返回结算单号")
@@ -61,21 +60,27 @@ public class EmployeeSettleController {
   @GetMapping("/page")
   @ApiOperation("员工授信消费查询")
   public R<BasePageVo<EmployeeSettleResp>> pageQuery(EmployeeSettlePageReq employeeSettlePageReq){
-
-    return null;
+    return success(employeeSettleService.pageQuery(employeeSettlePageReq));
   }
 
   @GetMapping("/summary")
   @ApiOperation("员工授信消费查询summary")
-  public R<EmployeeSettleSumDTO> summary(EmployeeSettleSumReq employeeSettleSumReq){
+  public R<EmployeeSettleSumDTO> summary(EmployeeSettleQuery mployeeSettleQuery){
     return null;
 
   }
 
-  @GetMapping("/detail/{id}")
+  @GetMapping("/detail/{accountCode}")
   @ApiOperation("员工授信消费明细列表")
-  public R<Page<EmployeeSettleDetailResp>> pageQueryDetail(@PathVariable String id,
+  public R<Page<EmployeeSettleDetailResp>> pageQueryDetail(@PathVariable String accountCode,
                                                            EmployeeSettleDetailPageReq employeeSettleDetailPageReq){
+    return null;
+  }
+
+  @GetMapping("/detail/{id}/summary")
+  @ApiOperation("员工授信消费明细列表")
+  public R<Page<EmployeeSettleSumDTO>> detailSummary(@PathVariable String id,
+                                                     EmployeeSettleSumReq EmployeeSettleSumReq){
     return null;
   }
 

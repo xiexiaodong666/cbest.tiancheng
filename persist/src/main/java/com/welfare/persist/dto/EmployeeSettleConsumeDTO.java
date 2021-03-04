@@ -10,7 +10,7 @@ import lombok.Data;
  * @date 2/23/2021
  */
 @Data
-public class EmployeeSettleDTO {
+public class EmployeeSettleConsumeDTO {
 
     @ApiModelProperty("员工Id")
     private Long accountId;

@@ -6,8 +6,8 @@ import com.welfare.service.dto.EmployeeSettleBillPageReq;
 import com.welfare.service.dto.EmployeeSettleBillResp;
 
 import com.welfare.common.base.BasePageVo;
-import com.welfare.service.dto.EmployeeSettlePageReq;
-import com.welfare.service.dto.EmployeeSettleResp;
+import com.welfare.service.dto.EmployeeSettleConsumePageReq;
+import com.welfare.service.dto.EmployeeSettleConsumeResp;
 
 /**
  * 商户员工结算账单服务接口
@@ -25,11 +25,11 @@ public interface EmployeeSettleService {
    * @description 分页查询员工结算账单
    **/
   Page<EmployeeSettleBillResp> pageQueryBill(EmployeeSettleBillPageReq billPageReq);
-    /**
-     * 分页查询员工消费
-     * @param employeeSettlePageReq
-     * @return
-     */
-    BasePageVo<EmployeeSettleResp> pageQuery(EmployeeSettlePageReq employeeSettlePageReq);
+  /**
+   * 分页查询员工消费
+   * @param employeeSettleConsumePageReq
+   * @return
+   */
+  BasePageVo<EmployeeSettleConsumeResp> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq);
 
 }

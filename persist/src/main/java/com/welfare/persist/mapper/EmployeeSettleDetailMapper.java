@@ -1,8 +1,9 @@
 package com.welfare.persist.mapper;
 
+import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
+import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
 import com.welfare.persist.entity.EmployeeSettleDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.welfare.persist.entity.SettleDetail;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -24,4 +25,11 @@ public interface EmployeeSettleDetailMapper extends BaseMapper<EmployeeSettleDet
    * @return
    */
   List<EmployeeSettleDetail> getFromAccountDetail(Map<String, Object> params);
+
+  /**
+   * 查询商户员工授信消费列表
+   * @param employeeSettleConsumeQuery
+   * @return
+   */
+  List<EmployeeSettleConsumeDTO> getEmployeeSettleConsumeList(EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
 }

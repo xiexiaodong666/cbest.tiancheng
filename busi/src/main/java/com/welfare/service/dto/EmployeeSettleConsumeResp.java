@@ -11,7 +11,7 @@ import lombok.Data;
  * @desc 员工授信消费列表响应
  */
 @Data
-public class EmployeeSettleResp {
+public class EmployeeSettleConsumeResp {
 
     @ApiModelProperty("员工编号")
     private Long accountCode;

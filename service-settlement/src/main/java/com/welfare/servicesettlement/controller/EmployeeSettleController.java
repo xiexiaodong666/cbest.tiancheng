@@ -8,7 +8,7 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
-import com.welfare.persist.dto.query.EmployeeSettleQuery;
+import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
 import com.welfare.service.dto.EmployeeSettleBillPageReq;
 import com.welfare.service.dto.EmployeeSettleBillResp;
 import com.welfare.service.dto.EmployeeSettleBuildReq;
@@ -16,8 +16,8 @@ import com.welfare.service.dto.EmployeeSettleDetailPageReq;
 import com.welfare.service.dto.EmployeeSettleDetailReq;
 import com.welfare.service.dto.EmployeeSettleDetailResp;
 import com.welfare.service.dto.EmployeeSettleFinishReq;
-import com.welfare.service.dto.EmployeeSettlePageReq;
-import com.welfare.service.dto.EmployeeSettleResp;
+import com.welfare.service.dto.EmployeeSettleConsumePageReq;
+import com.welfare.service.dto.EmployeeSettleConsumeResp;
 import com.welfare.service.dto.EmployeeSettleSumReq;
 import com.welfare.service.settlement.EmployeeSettleService;
 import io.swagger.annotations.Api;
@@ -69,13 +69,13 @@ public class EmployeeSettleController {
 
   @GetMapping("/page")
   @ApiOperation("员工授信消费查询")
-  public R<BasePageVo<EmployeeSettleResp>> pageQuery(EmployeeSettlePageReq employeeSettlePageReq){
-    return success(employeeSettleService.pageQuery(employeeSettlePageReq));
+  public R<BasePageVo<EmployeeSettleConsumeResp>> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq){
+    return success(employeeSettleService.pageQuery(employeeSettleConsumePageReq));
   }
 
   @GetMapping("/summary")
   @ApiOperation("员工授信消费查询summary")
-  public R<EmployeeSettleSumDTO> summary(EmployeeSettleQuery mployeeSettleQuery){
+  public R<EmployeeSettleSumDTO> summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery){
     return null;
 
   }
@@ -87,16 +87,16 @@ public class EmployeeSettleController {
     return null;
   }
 
-  @GetMapping("/detail/{id}/summary")
-  @ApiOperation("员工授信消费明细列表")
-  public R<Page<EmployeeSettleSumDTO>> detailSummary(@PathVariable String id,
+  @GetMapping("/detail/{accountCode}/summary")
+  @ApiOperation("员工授信消费明细列表summary")
+  public R<Page<EmployeeSettleSumDTO>> detailSummary(@PathVariable String accountCode,
                                                      EmployeeSettleSumReq EmployeeSettleSumReq){
     return null;
   }
 
-  @GetMapping("/detail/{id}/export")
+  @GetMapping("/detail/{accountCode}/export")
   @ApiOperation("员工授信消费明细导出")
-  public Object exportDetail(@PathVariable String id,
+  public Object exportDetail(@PathVariable String accountCode,
                                         EmployeeSettleDetailReq employeeSettleDetailReq,
                                         HttpServletResponse response){
     return null;

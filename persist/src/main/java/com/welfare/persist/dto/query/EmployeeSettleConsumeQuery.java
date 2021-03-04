@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel("员工授信额度查询对象封装")
-public class EmployeeSettleQuery {
+public class EmployeeSettleConsumeQuery {
 
     @ApiModelProperty("员工姓名")
     private String accountName;

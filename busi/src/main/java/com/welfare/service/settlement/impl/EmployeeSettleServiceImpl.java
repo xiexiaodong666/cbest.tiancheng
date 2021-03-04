@@ -8,12 +8,13 @@ import com.welfare.common.util.DateUtil;
 import com.welfare.persist.dao.EmployeeSettleDao;
 import com.welfare.persist.dto.EmployeeSettleBillDTO;
 import com.welfare.persist.dto.query.EmployeeSettleBillQuery;
-import com.welfare.persist.dto.query.EmployeeSettleQuery;
+import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
+import com.welfare.persist.mapper.EmployeeSettleDetailMapper;
 import com.welfare.persist.mapper.EmployeeSettleMapper;
 import com.welfare.service.dto.EmployeeSettleBillPageReq;
 import com.welfare.service.dto.EmployeeSettleBillResp;
-import com.welfare.service.dto.EmployeeSettlePageReq;
-import com.welfare.service.dto.EmployeeSettleResp;
+import com.welfare.service.dto.EmployeeSettleConsumePageReq;
+import com.welfare.service.dto.EmployeeSettleConsumeResp;
 import com.welfare.service.settlement.EmployeeSettleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,8 @@ import java.util.stream.Collectors;
 public class EmployeeSettleServiceImpl implements EmployeeSettleService {
     private final EmployeeSettleDao employeeSettleDao;
     private final EmployeeSettleMapper employeeSettleMapper;
+
+    private final EmployeeSettleDetailMapper employeeSettleDetailMapper;
 
     @Override
     public Page<EmployeeSettleBillResp> pageQueryBill(EmployeeSettleBillPageReq billPageReq) {
@@ -69,21 +72,21 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
     }
 
     @Override
-    public BasePageVo<EmployeeSettleResp> pageQuery(EmployeeSettlePageReq employeeSettlePageReq) {
+    public BasePageVo<EmployeeSettleConsumeResp> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq) {
 
-        EmployeeSettleQuery employeeSettleQuery = new EmployeeSettleQuery();
-        BeanUtils.copyProperties(employeeSettlePageReq, employeeSettleQuery);
-        PageInfo<EmployeeSettleResp> employeeSettleDTOPageInfo = PageHelper.startPage(employeeSettlePageReq.getCurrent(), employeeSettlePageReq.getSize())
+        EmployeeSettleConsumeQuery employeeSettleConsumeQuery = new EmployeeSettleConsumeQuery();
+        BeanUtils.copyProperties(employeeSettleConsumePageReq, employeeSettleConsumeQuery);
+        PageInfo<EmployeeSettleConsumeResp> employeeSettleDTOPageInfo = PageHelper.startPage(employeeSettleConsumePageReq.getCurrent(), employeeSettleConsumePageReq.getSize())
                 .doSelectPageInfo(() -> {
-                    employeeSettleMapper.getEmployeeSettleList(employeeSettleQuery).stream().map(employeeSettleDTO -> {
-                        EmployeeSettleResp employeeSettleResp = new EmployeeSettleResp();
-                        BeanUtils.copyProperties(employeeSettleDTO, employeeSettleResp);
-                        return employeeSettleResp;
+                    employeeSettleDetailMapper.getEmployeeSettleConsumeList(employeeSettleConsumeQuery).stream().map(employeeSettleDTO -> {
+                        EmployeeSettleConsumeResp employeeSettleConsumeResp = new EmployeeSettleConsumeResp();
+                        BeanUtils.copyProperties(employeeSettleDTO, employeeSettleConsumeResp);
+                        return employeeSettleConsumeResp;
                     }).collect(Collectors.toList());
                 });
 
-        BasePageVo<EmployeeSettleResp> employeeSettleRespBasePageVo = new BasePageVo<>(employeeSettlePageReq.getCurrent(),
-                employeeSettlePageReq.getSize(), employeeSettleDTOPageInfo.getTotal(), employeeSettleDTOPageInfo.getList());
+        BasePageVo<EmployeeSettleConsumeResp> employeeSettleRespBasePageVo = new BasePageVo<>(employeeSettleConsumePageReq.getCurrent(),
+                employeeSettleConsumePageReq.getSize(), employeeSettleDTOPageInfo.getTotal(), employeeSettleDTOPageInfo.getList());
 
         return employeeSettleRespBasePageVo;
     }

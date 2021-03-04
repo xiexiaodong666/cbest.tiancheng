@@ -18,7 +18,7 @@ import java.util.Set;
  */
 @Data
 @ApiModel("员工授信额度查询对象")
-public class EmployeeSettlePageReq extends PageReq {
+public class EmployeeSettleConsumePageReq extends PageReq {
 
     @ApiModelProperty("员工姓名")
     private String accountName;

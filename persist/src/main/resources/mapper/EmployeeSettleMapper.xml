@@ -51,42 +51,5 @@
     </if>
     </select>
 
-    <sql id="getEmployeeSettleWhere">
-        esd.settle_flag = 'unsettled'
-        <if test="accountName!=null and accountName!=''">
-            and a.account_name=like concat('%',#{accountName},'%')
-        </if>
-        <if test="phone!=null and phone!=''">
-            and a.phone =#{phone}
-        </if>
-        <if test="departmentCode!=null and departmentCode!=''">
-            and a.store_code=#{departmentCode}
-        </if>
-        <if test="startTime!=null">
-            and t1.trans_time <![CDATA[ >= ]]> #{startTime}
-        </if>
-        <if test="endTime!=null">
-            and t1.trans_time <![CDATA[ <= ]]> #{endTime}
-        </if>
-    </sql>
-
-    <select id="getEmployeeSettleList" parameterType="com.welfare.persist.dto.query.EmployeeSettleQuery" resultType="com.welfare.persist.dto.EmployeeSettleDTO">
-        select
-        esd.account_code as accountCode,
-        a.account_name as accountName,
-        a.phone as phone,
-        d.department_name as departmentName,
-        CONCAT(a.surplus_quota + a.surplus_quota, '/',a.max_quota) as quota,
-        sum(case when esd.store_type ='self'  then esd.trans_amount else 0 end) as selfConsumerAmount,
-        sum(case when esd.store_type ='third'  then esd.trans_amount else 0 end) as thirdConsumerAmount,
-        sum(esd.trans_amount) as totalConsumerAmount,
-        count(esd.trans_amount) as orderNum
-        from employee_settle_detail esd left join account a on esd.account_code = a.account_code
-        left join department d on a.store_code = d.department_code
-        <where>
-            <include refid="getEmployeeSettleWhere"/>
-        </where>
-        group by esd.account_code
-    </select>
 
 </mapper>

@@ -7,6 +7,7 @@ import com.welfare.persist.dto.MonthSettleDetailDTO;
 import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.*;
 
 import java.util.List;
@@ -81,4 +82,11 @@ public interface MonthSettleService {
     MonthSettle getMonthSettleById(Long id);
 
     List<Map<String, Object>> getAccoutType(String merCode);
+
+    /**
+     * 结算单下的所有门店
+     * @param id
+     * @return
+     */
+    List<StoreCodeNameDTO> allStoresInMonthSettle(Long id);
 }

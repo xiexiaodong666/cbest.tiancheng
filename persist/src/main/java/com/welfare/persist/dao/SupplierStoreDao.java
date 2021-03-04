@@ -77,4 +77,13 @@ public class SupplierStoreDao extends ServiceImpl<SupplierStoreMapper, SupplierS
         return list(queryWrapper);
     }
 
+    public List<SupplierStore> selectByCodes(List<String> storeCodes,String ...columns){
+        QueryWrapper<SupplierStore> queryWrapper = new QueryWrapper<>();
+        if(columns !=null){
+            queryWrapper.select(columns);
+        }
+        queryWrapper.in(SupplierStore.STORE_CODE,storeCodes);
+        return list(queryWrapper);
+    }
+
 }

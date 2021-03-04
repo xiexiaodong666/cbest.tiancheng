@@ -49,7 +49,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final RedissonClient redissonClient;
     private final AccountDao accountDao;
     @Autowired
-    private final AccountService accountService;
+    private AccountService accountService;
     private final OrderTransRelationService orderTransRelationService;
     private final AccountChangeEventRecordService accountChangeEventRecordService;
     private final AccountChangeEventRecordDao accountChangeEventRecordDao;

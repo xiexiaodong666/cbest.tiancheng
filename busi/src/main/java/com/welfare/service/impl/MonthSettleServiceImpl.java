@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
@@ -16,6 +17,7 @@ import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MonthSettleDao;
 import com.welfare.persist.dao.SettleDetailDao;
+import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.MonthSettleDTO;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
 import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
@@ -24,6 +26,7 @@ import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.entity.SettleDetail;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.MonthSettleService;
@@ -68,6 +71,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     private MerchantCreditFeign merchantCreditFeign;
     @Autowired
     private SettleDetailDao settleDetailDao;
+    @Autowired
+    private SupplierStoreDao supplierStoreDao;
 
 
     @Override
@@ -266,6 +271,21 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     @Override
     public List<Map<String, Object>> getAccoutType(String merCode) {
         return monthSettleMapper.getAccountType(merCode);
+    }
+
+    @Override
+    public List<StoreCodeNameDTO> allStoresInMonthSettle(Long id) {
+        MonthSettle monthSettle = monthSettleDao.getById(id);
+        List<SettleDetail> settleDetails = settleDetailDao.query()
+                .select(SettleDetail.STORE_CODE, SettleDetail.STORE_NAME)
+                .eq(SettleDetail.SETTLE_NO, monthSettle.getSettleNo())
+                .groupBy(SettleDetail.STORE_CODE, SettleDetail.STORE_NAME).list();
+        return settleDetails.stream().map(settleDetail -> {
+            StoreCodeNameDTO storeCodeNameDTO = new StoreCodeNameDTO();
+            storeCodeNameDTO.setStoreName(settleDetail.getStoreName());
+            storeCodeNameDTO.setStoreCode(settleDetail.getStoreCode());
+            return storeCodeNameDTO;
+        }).collect(Collectors.toList());
     }
 
     /**

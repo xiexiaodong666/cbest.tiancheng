@@ -1,7 +1,9 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
@@ -27,6 +29,7 @@ import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -211,6 +214,13 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant entity=merchantDao.getById(merchant.getId());
         if(EmptyChecker.isEmpty(entity)){
             throw new BusiException("id不存在");
+        }
+        if (StringUtils.isNoneBlank(merchant.getMerIdentity())) {
+            List<String> merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
+            if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
+                merchant.setMerCooperationMode(null);
+                merchant.setSelfRecharge("0");
+            }
         }
         entity.setSelfRecharge(merchant.getSelfRecharge());
         entity.setMerName(merchant.getMerName());

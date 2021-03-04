@@ -66,8 +66,6 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
     @Autowired
     MerchantAccountTypeService merchantAccountTypeService;
-    @Autowired
-    private MerchantStoreRelationService merchantStoreRelationService;
 
 
     @Override
@@ -281,7 +279,7 @@ public class MerchantServiceImpl implements MerchantService {
     public Boolean queryIsRabteByMerCOde(String merCode) {
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(MerchantStoreRelation.MER_CODE, merCode);
-        List<MerchantStoreRelation> relations = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        List<MerchantStoreRelation> relations = merchantStoreRelationDao.list(queryWrapper);
         if (CollectionUtils.isNotEmpty(relations)) {
             long count = relations.stream()
                     .filter(merchantStoreRelation -> merchantStoreRelation.getIsRebate() != null && merchantStoreRelation.getIsRebate() == 1)

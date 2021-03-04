@@ -125,7 +125,7 @@
             when t1.trans_type='consume' then t1.mer_credit_deduction_amount
             when t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
             else 0
-        end as unsettled_amount,
+        end as settle_amount,
         case
             when t1.mer_deduction_amount > 0 then 'balance'
             when t1.mer_credit_deduction_amount > 0 then 'credit'
@@ -361,6 +361,7 @@
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
             )
         </if>
+        and t1.settle_flag = 'unsettled'
         group by t1.mer_code
     </select>
 
@@ -382,6 +383,7 @@
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
             )
         </if>
+        and t1.settle_flag = 'unsettled'
         group by t1.mer_code,t1.mer_account_type,t1.mer_account_type_name
     </select>
 
@@ -491,6 +493,7 @@
             <foreach collection="excludeIdList" item="obj" index="index" separator="," >#{obj}</foreach>
             )
         </if>
+        and t1.settle_flag = 'unsettled'
         order by t1.id
         <if test="limit!=null">
             limit #{limit}

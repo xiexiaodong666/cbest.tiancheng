@@ -65,7 +65,7 @@ public class EmployeeSettleController {
 
   @GetMapping("/detail/{id}/export")
   @ApiOperation("员工授信消费明细导出")
-  public Object exportMonthSettleDetail(@PathVariable String id,
+  public Object exportDetail(@PathVariable String id,
                                         EmployeeSettleDetailReq employeeSettleDetailReq,
                                         HttpServletResponse response){
     return null;

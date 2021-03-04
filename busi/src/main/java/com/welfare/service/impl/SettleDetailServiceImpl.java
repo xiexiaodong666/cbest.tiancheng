@@ -196,7 +196,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
         if(Objects.isNull(monthSettle)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "没有需要结算明细", null);
+            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "构选的消费明细正在结算中或结算已完成。", null);
         }
         monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
         if(monthSettle.getSettleAmount().compareTo(new BigDecimal(0)) < 0){

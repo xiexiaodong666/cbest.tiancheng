@@ -8,6 +8,48 @@
     <sql id="baseColumn">
         id,settle_no,settle_period,account_code,trans_amount,settle_amount,order_num,settle_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,uppdate_user,update_time,deleted
     </sql>
+    <select id="querySettleBills" resultType="com.welfare.persist.dto.EmployeeSettleBillDTO">
+        select es.id settleId,
+               es.settle_no settleNo,
+               es.create_time createTime,
+               a.account_name accountName,
+               a.phone phone,
+               a.store_code departmentCode,
+               d.department_name departmentName,
+               if(esd.store_type = 'self', sum(esd.trans_amount), 0) as selfAmount,
+               if(esd.store_type = 'third', sum(esd.trans_amount), 0) as thirdAmount,
+               es.trans_amount transAmount,
+               es.order_num orderNum,
+               es.settle_amount settleAmount,
+               case when es.settle_status = 'unsettled' then '待结算'
+                    when es.settle_status = 'settled' then '已结算' end settleStatus,
+               es.confirm_time settleTime
+        from employee_settle es
+                 left join account a on a.account_code = es.account_code
+                 left join department d on a.store_code = d.department_code
+                 left join employee_settle_detail esd on esd.settle_no=es.settle_no
+        where es.mer_code = #{query.merCode}
+    <if test="query.accountName != null and query.accountName != ''">
+      and a.account_name like concat('%', #{query.accountName} , '%')
+    </if>
+    <if test="query.phone != null and query.phone != ''">
+      and a.phone = #{query.phone}
+    </if>
+    <if test="query.departmentCode != null and query.departmentCode != ''">
+      and a.store_code = #{query.departmentCode}
+    </if>
+    <if test="query.settleStatus != null and query.settleStatus != ''">
+      and es.settle_status = #{query.settleStatus}
+    </if>
+    <if test="query.startTime != null">
+      and es.create_time >= #{query.startTime}
+    </if>
+    <if test="query.endTime != null">
+        <![CDATA[
+          and es.create_time <= #{query.endTime}
+        ]]>
+    </if>
+    </select>
 
     <sql id="getEmployeeSettleWhere">
         esd.settle_flag = 'unsettled'

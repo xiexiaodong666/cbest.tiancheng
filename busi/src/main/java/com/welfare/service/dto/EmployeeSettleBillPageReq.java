@@ -32,15 +32,18 @@ public class EmployeeSettleBillPageReq extends PageReq {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty("消费起始时间")
-    private Date transTimeStart;
+    @ApiModelProperty("创建时间start")
+    private Date startTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty("消费截止时间")
-    private Date transTimeEnd;
+    @ApiModelProperty("创建时间end")
+    private Date endTime;
 
     @ApiModelProperty(value = "结算状态:待结算-unsettled 已结算-settled")
     private String settleStatus;
+
+    @ApiModelProperty(value = "商户代码", hidden = true)
+    private String merCode;
 }

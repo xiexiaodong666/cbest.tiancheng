@@ -3,19 +3,29 @@ package com.welfare.servicesettlement.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
+import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleQuery;
+import com.welfare.service.dto.EmployeeSettleBillPageReq;
+import com.welfare.service.dto.EmployeeSettleBillResp;
 import com.welfare.service.dto.EmployeeSettleBuildReq;
+import com.welfare.service.dto.EmployeeSettleDetailPageReq;
+import com.welfare.service.dto.EmployeeSettleDetailReq;
+import com.welfare.service.dto.EmployeeSettleDetailResp;
 import com.welfare.service.dto.EmployeeSettleFinishReq;
 import com.welfare.service.dto.EmployeeSettlePageReq;
 import com.welfare.service.dto.EmployeeSettleResp;
-import com.welfare.persist.dto.EmployeeSettleSumDTO;
-import com.welfare.service.dto.*;
+import com.welfare.service.dto.EmployeeSettleSumReq;
 import com.welfare.service.settlement.EmployeeSettleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -94,9 +104,16 @@ public class EmployeeSettleController {
 
 
   @GetMapping("/bill/page")
-  @ApiOperation("分页查询用户结算账单列表")
-  public R<BasePageVo<EmployeeSettleBillResp>> pageQueryBill(EmployeeSettlePageReq employeeSettlePageReq){
-      return null;
+  @ApiOperation("分页查询员工授信消费账单列表")
+  public R<Page<EmployeeSettleBillResp>> pageQueryBill(EmployeeSettleBillPageReq billPageReq){
+    MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
+    if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
+      billPageReq.setMerCode(merchantUser.getMerchantCode());
+    }else {
+      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+    }
+    Page<EmployeeSettleBillResp> page = employeeSettleService.pageQueryBill(billPageReq);
+    return R.success(page);
   }
 
   @GetMapping("bill/{settleId}/detail")

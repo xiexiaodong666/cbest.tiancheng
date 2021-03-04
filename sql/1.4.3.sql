@@ -63,3 +63,9 @@ CREATE TABLE `employee_settle` (
 ) ENGINE=InnoDB AUTO_INCREMENT=255 DEFAULT CHARSET=utf8mb4 COMMENT='商户员工结算账单';
 
 create index idx_es_settle_no on employee_settle(settle_no);
+
+alter table account_amount_type add column max_balance DECIMAL(11,2) DEFAULT 999999999.99 comment '最大额度' after account_balance;
+
+#更新历史数据，额度最大值
+update account_amount_type t set t.max_balance = (select max_quota from account a where a.account_code = t.account_code) where t.mer_account_type_code = 'surplus_quota';
+

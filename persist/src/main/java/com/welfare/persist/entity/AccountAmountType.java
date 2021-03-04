@@ -50,6 +50,8 @@ public class AccountAmountType extends Model<AccountAmountType> implements Seria
      */
     @ApiModelProperty("余额")   
     private BigDecimal accountBalance;
+    @ApiModelProperty("最大额度，仅在个人授信类型上有业务意义")
+    private BigDecimal maxBalance;
     /**
      * 删除标志  1-删除、0-未删除
      */

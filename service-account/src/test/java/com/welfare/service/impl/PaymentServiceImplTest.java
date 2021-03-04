@@ -1,6 +1,5 @@
 package com.welfare.service.impl;
 
-import com.welfare.ServiceAccountApplication;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.entity.*;
 import com.welfare.service.dto.payment.OnlinePaymentRequest;
@@ -11,9 +10,6 @@ import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.serviceaccount.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.Assert;
 
 import java.math.BigDecimal;

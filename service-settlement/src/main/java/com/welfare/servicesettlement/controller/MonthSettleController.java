@@ -12,7 +12,10 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.UserInfoHolder;
+import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.*;
 import com.welfare.servicesettlement.task.SettlementBillBuildTask;
@@ -83,6 +86,16 @@ public class MonthSettleController implements IController {
         return success(monthSettleResp);
     }
 
+    @GetMapping("/{id}/stores")
+    @ApiOperation("查询结算单下所有门店name和code")
+    public R<List<StoreCodeNameDTO>> allStoresInMonthSettle(@PathVariable("id")Long id){
+
+        authMerchant(id);
+
+        List<StoreCodeNameDTO> supplierStores =  monthSettleService.allStoresInMonthSettle(id);
+        return success(supplierStores);
+    }
+
 
     @GetMapping("/{id}")
     @ApiOperation("分页查询结算账单明细列表")
@@ -92,6 +105,14 @@ public class MonthSettleController implements IController {
 
         Page<MonthSettleDetailResp>  monthSettleDetailRespDtoPage=  monthSettleService.pageQueryMonthSettleDetail(id, monthSettleDetailReq);
         return success(monthSettleDetailRespDtoPage);
+    }
+
+    @GetMapping("/{id}/summary")
+    @ApiOperation("分页查询结算账单明细列表summary")
+    public R<MonthSettleDetailSummaryDTO> monthSettleDetailSummary(@PathVariable("id")Long id, MonthSettleDetailReq monthSettleDetailReq){
+        authMerchant(id);
+        MonthSettleDetailSummaryDTO monthSettleDetailSummaryDTO=  monthSettleService.monthSettleDetailSummary(id, monthSettleDetailReq);
+        return success(monthSettleDetailSummaryDTO);
     }
 
 

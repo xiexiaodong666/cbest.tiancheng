@@ -1,16 +1,16 @@
 package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.welfare.persist.dto.MonthSettleDetailDTO;
-import com.welfare.persist.dto.SettleStatisticsInfoDTO;
-import com.welfare.persist.dto.WelfareSettleDTO;
-import com.welfare.persist.dto.WelfareSettleDetailDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
+import com.welfare.persist.dto.query.ProprietaryConsumePageQuery;
 import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
 import com.welfare.persist.entity.SettleDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +33,12 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
     List<MonthSettleDetailDTO> selectMonthSettleDetail(MonthSettleDetailQuery monthSettleDetailQuery);
 
     /**
+     * 查询账单明细summary
+     * @param monthSettleDetailQuery
+     * @return
+     */
+    MonthSettleDetailSummaryDTO selectMonthSettleDetailSummary(MonthSettleDetailQuery monthSettleDetailQuery);
+    /**
      * 查询获取账户交易明细
      * @param params
      * @return
@@ -47,12 +53,24 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
     List<WelfareSettleDTO> getWelfareSettle(WelfareSettleQuery welfareSettleQuery);
 
     /**
+     * 查询商户结算统计信息
+     * @param welfareSettleQuery
+     * @return
+     */
+    WelfareSettleSumDTO getWelfareSettleAllMerchant(WelfareSettleQuery welfareSettleQuery);
+    /**
      * 查询商户未结算详细信息列表
      * @param welfareSettleDetailQuery
      * @return
      */
     List<WelfareSettleDetailDTO> getSettleDetailInfo(WelfareSettleDetailQuery welfareSettleDetailQuery);
 
+    /**
+     * 查询商户结算详细信息summary
+     * @param welfareSettleDetailQuery
+     * @return
+     */
+    WelfareSettleSummaryDTO getSettleDetailInfoSummary(WelfareSettleDetailQuery welfareSettleDetailQuery);
     /**
      * 查询商户未结算详细信息统计
      * @param welfareSettleDetailQuery
@@ -75,4 +93,12 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
     List<SettleStatisticsInfoDTO> getSettleStatisticsInfoByCondition(WelfareSettleDetailQuery welfareSettleDetailQuery);
 
     List<Long> getSettleDetailIdList(WelfareSettleDetailQuery welfareSettleDetailQuery);
+
+    Page<ProprietaryConsumeDTO> queryProprietaryConsumeInfo(Page<ProprietaryConsumeDTO> page, @Param("query") ProprietaryConsumePageQuery query);
+
+    List<ProprietaryConsumeDTO> queryProprietaryConsumeInfo(@Param("query") ProprietaryConsumePageQuery query);
+
+    List<WelfareTypeTotalAmountDTO> statisticalAmountGroupByWelfareTypeCode(@Param("query")ProprietaryConsumePageQuery query);
+
+
 }

@@ -69,4 +69,42 @@ public class WelfareSettleDetailDTO {
     @ExcelProperty(value = "结算金额")
     @ApiModelProperty(value = "结算金额")
     private String settleAmount;
+
+    @ExcelProperty(value = "结算状态")
+    @ApiModelProperty(value = "结算状态")
+    private String settleFlag;
+
+    @ApiModelProperty(value = "结算状态")
+    private String settleFlagName;
+
+    @ExcelProperty(value = "手机号")
+    @ApiModelProperty(value = "手机号")
+    private String phone;
+
+    @ExcelProperty(value = "消费人")
+    @ApiModelProperty(value = "消费人")
+    private String accountName;
+
+    @ExcelProperty(value = "部门名称")
+    @ApiModelProperty(value = "部门名称")
+    private String departmentName;
+
+    @ExcelProperty(value = "消费类型")
+    @ApiModelProperty("消费类型，线上消费、线下消费")
+    private String consumeTypeName;
+    @ApiModelProperty("消费类型，online offline")
+    private String consumeType;
+    @ExcelProperty(value = "供应商编码")
+    @ApiModelProperty("供应商编码")
+    private String supplierCode;
+    @ExcelProperty(value = "供应商名称")
+    @ApiModelProperty("供应商名称")
+    private String supplierName;
+
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionType;
+
+    @ExcelProperty(value = "商户支出方式")
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionTypeName;
 }

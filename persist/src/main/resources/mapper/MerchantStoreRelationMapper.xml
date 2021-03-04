@@ -93,4 +93,21 @@
   <update id="updateMerchantStoreRelationStatus">
    update merchant_store_relation set sync_status = 1 where id = #{id}
   </update>
+
+  <select id="queryMerSupplierStoreRelation" resultType="com.welfare.persist.dto.MerSupplierStoreDTO">
+    SELECT
+      msr.mer_code as merCode,
+      msr.store_code as storeCode,
+      msr.store_alias as storeName,
+      msr.consum_type as consumType,
+      ss.mer_code as supplierCode,
+      sup.mer_name as supplierName
+    FROM
+      merchant_store_relation msr
+        LEFT JOIN merchant m ON m.mer_code = msr.mer_code
+        LEFT JOIN supplier_store ss ON ss.store_code = msr.store_code
+        LEFT JOIN merchant sup ON ss.mer_code = sup.mer_code
+    where
+      msr.deleted != 1 and msr.consum_type like"%true%" and msr.mer_code=#{merCode}
+  </select>
 </mapper>

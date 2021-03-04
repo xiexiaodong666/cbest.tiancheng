@@ -159,6 +159,9 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     @ApiModelProperty("结算标志 settled已结算 unsettled未结算")
     private String settleFlag;
 
+    @ApiModelProperty("订单渠道")
+    private String orderChannel;
+
     /**
      * 数据支付类型 welfare-员工卡支付 third-其它三方支付
      */
@@ -211,7 +214,7 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     /**
     * 订单编码
     */
-    public static final String SETTLE_NO = "settleNo";
+    public static final String SETTLE_NO = "settle_no";
     /**
     * 交易流水号
     */

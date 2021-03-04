@@ -6,9 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.AccountConsumeScene;
-import com.welfare.service.dto.AccountConsumeSceneAddReq;
-import com.welfare.service.dto.AccountConsumeSceneDTO;
-import com.welfare.service.dto.AccountConsumeSceneReq;
+import com.welfare.service.dto.*;
 
 import java.util.List;
 
@@ -33,4 +31,18 @@ public interface AccountConsumeSceneService {
   public List<AccountConsumeScenePageDTO> export(AccountConsumePageQuery accountConsumePageReq);
 
   public AccountConsumeSceneDTO findAccountConsumeSceneDTOById(Long id);
+
+  /**
+   * 查询商户下所有已配置的员工类型消费门店配置
+   * @param merCode
+   * @return
+   */
+  List<AccountConsumeSceneResp> findAllAccountConsumeSceneDTO(String merCode);
+
+  /**
+   * 变更商户下对应员工类型的消费配置
+   * @param consumeSceneEditReq
+   * @return
+   */
+  Boolean edit(List<AccountConsumeSceneEditReq> consumeSceneEditReq);
 }

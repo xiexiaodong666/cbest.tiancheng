@@ -25,6 +25,7 @@ public class AccountConsumeSceneStoreRelationReq implements Serializable {
    */
   @ApiModelProperty("accountConsumeSceneId")
   private Long accountConsumeSceneId;
+
   /**
    * 门店编码
    */

@@ -122,6 +122,9 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      */
     @ApiModelProperty("自费扣款金额")   
     private BigDecimal selfDeductionAmount;
+
+    @ApiModelProperty("订单渠道")
+    private String orderChannel;
     /**
      * 创建人
      */

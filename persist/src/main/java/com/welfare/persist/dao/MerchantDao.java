@@ -1,5 +1,6 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.mapper.MerchantMapper;
@@ -18,5 +19,11 @@ import org.springframework.stereotype.Repository;
 public class MerchantDao extends ServiceImpl<MerchantMapper, Merchant> {
     public Integer updateAllColumnById(Merchant entity){
         return getBaseMapper().alwaysUpdateSomeColumnById(entity);
+    }
+
+    public Merchant queryByCode(String merCode){
+        QueryWrapper<Merchant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Merchant.MER_CODE,merCode);
+        return getOne(queryWrapper);
     }
 }

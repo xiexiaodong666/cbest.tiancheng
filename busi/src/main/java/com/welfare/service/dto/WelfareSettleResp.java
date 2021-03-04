@@ -23,7 +23,10 @@ public class WelfareSettleResp {
 
     @ApiModelProperty(value = "待结算员工充值金额")
     private String unSettleSelfAmount;
-
+    @ApiModelProperty("总消费金额")
+    private String totalConsumeAmount;
+    @ApiModelProperty("余额消费金额")
+    private String balanceConsumeAmount;
     @ApiModelProperty(value = "交易笔数")
     private String orderNum;
 

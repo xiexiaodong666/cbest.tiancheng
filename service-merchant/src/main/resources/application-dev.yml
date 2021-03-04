@@ -6,6 +6,12 @@ spring:
     password: mysql@123
     driverClassName: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      maxActive: 200
+      minIdle: 1
+      testOnBorrow: true
+      testOnReturn: false
+      validationQuery: SELECT 1
   servlet:
     multipart:
       max-file-size: 100MB

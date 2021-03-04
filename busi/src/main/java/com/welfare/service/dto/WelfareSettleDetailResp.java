@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -16,6 +17,7 @@ import java.util.Date;
  * @desc 账单明细请求dto
  */
 @Data
+@ExcelIgnoreUnannotated
 public class WelfareSettleDetailResp {
     @ExcelProperty(value = "序号")
     @ApiModelProperty(value = "序号")
@@ -71,4 +73,44 @@ public class WelfareSettleDetailResp {
     @ExcelProperty(value = "结算金额")
     @ApiModelProperty(value = "结算金额")
     private String settleAmount;
+
+    @ApiModelProperty(value = "结算状态")
+    private String settleFlag;
+
+    @ExcelProperty(value = "结算状态")
+    @ApiModelProperty(value = "结算状态")
+    private String settleFlagName;
+
+    @ExcelProperty(value = "手机号")
+    @ApiModelProperty(value = "手机号")
+    private String phone;
+
+    @ExcelProperty("消费人")
+    @ApiModelProperty("消费人")
+    private String accountName;
+
+    @ExcelProperty(value = "部门名称")
+    @ApiModelProperty(value = "部门名称")
+    private String departmentName;
+
+    @ExcelProperty(value = "消费类型")
+    @ApiModelProperty("消费类型，线上消费、线下消费")
+    private String consumeTypeName;
+    @ApiModelProperty("消费类型，online offline")
+    private String consumeType;
+
+    @ExcelProperty(value = "供应商名称")
+    @ApiModelProperty("供应商名称")
+    private String supplierName;
+
+    @ExcelProperty(value = "供应商编码")
+    @ApiModelProperty("供应商编码")
+    private String supplierCode;
+
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionType;
+
+    @ExcelProperty(value = "商户支出方式")
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionTypeName;
 }

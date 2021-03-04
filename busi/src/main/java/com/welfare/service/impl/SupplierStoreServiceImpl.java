@@ -69,10 +69,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -672,6 +672,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         map.get(ConsumeTypeEnum.ONLINE_MALL.getCode());
     boolean isSelectShopShopping =
         map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+    boolean isSelectWholeSaleShopping =
+            map.get(ConsumeTypeEnum.WHOLESALE.getCode());
 
     for (MerchantStoreRelation storeRelation :
         storeRelationList) {
@@ -711,9 +713,18 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         }
       }
 
+      if (!isSelectWholeSaleShopping) {
+        consumeTypeMap.remove(ConsumeTypeEnum.WHOLESALE.getCode());
+      } else {
+        if (!consumeTypeMap.containsKey(ConsumeTypeEnum.WHOLESALE.getCode())) {
+          consumeTypeMap.put(ConsumeTypeEnum.WHOLESALE.getCode(), false);
+        }
+      }
+
       boolean isSelectO2OSync = true;
       boolean isSelectOnlineMallSync = true;
       boolean isSelectShopShoppingSync = true;
+      boolean isSelectWholeSaleSync = true;
 
       if (consumeTypeMap.get(ConsumeTypeEnum.O2O.getCode()) == null || !consumeTypeMap.get(
           ConsumeTypeEnum.O2O.getCode())) {
@@ -729,10 +740,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
           .get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
         isSelectShopShoppingSync = false;
       }
+      if (consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode()) == null || !consumeTypeMap
+              .get(ConsumeTypeEnum.WHOLESALE.getCode())) {
+        isSelectWholeSaleSync = false;
+      }
 
       Assert.isTrue(
-          isSelectO2OSync || isSelectOnlineMallSync || isSelectShopShoppingSync,
-          "消费门店下消费方法不能全被置为空"
+          isSelectO2OSync || isSelectOnlineMallSync || isSelectShopShoppingSync || isSelectWholeSaleSync,
+          "商户消费门店下消费方法不能全被置为空"
       );
       try {
         storeRelation.setConsumType(mapper.writeValueAsString(consumeTypeMap));
@@ -812,5 +827,4 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
     return isSaveOrUpdateBatch;
   }
-
 }

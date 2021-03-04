@@ -2,6 +2,7 @@ package com.welfare.persist.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -33,5 +34,11 @@ public class AccountConsumeSceneStoreRelationDao extends
         queryWrapper.in(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,sceneIds)
                 .eq(AccountConsumeSceneStoreRelation.STORE_CODE,storeNo);
         return list(queryWrapper);
+    }
+
+    public Boolean deleteByConsumeSceneIds(List<Long> ids) {
+        QueryWrapper<AccountConsumeSceneStoreRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID, ids);
+        return getBaseMapper().delete(queryWrapper) > 0;
     }
 }

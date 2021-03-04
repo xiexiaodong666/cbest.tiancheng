@@ -1,6 +1,7 @@
 package com.welfare.common.util;
 
 import com.welfare.common.enums.ConsumeTypeEnum;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
@@ -17,20 +18,12 @@ public class ConsumeTypesUtils {
     if (map == null) {
       return new ArrayList<>(0);
     }
-
     List<String> list = new ArrayList<>();
-    if (map.get(ConsumeTypeEnum.O2O.getCode()) != null && map.get(ConsumeTypeEnum.O2O.getCode())) {
-      list.add(ConsumeTypeEnum.O2O.getCode());
-    }
-    if (map.get(ConsumeTypeEnum.ONLINE_MALL.getCode()) != null && map.get(
-        ConsumeTypeEnum.ONLINE_MALL.getCode())) {
-      list.add(ConsumeTypeEnum.ONLINE_MALL.getCode());
-    }
-    if (map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode()) != null && map.get(
-        ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
-      list.add(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
-    }
-
+    map.forEach((consume, flag) -> {
+      if (flag) {
+        list.add(consume);
+      }
+    });
     return list;
   }
 
@@ -39,17 +32,11 @@ public class ConsumeTypesUtils {
   }
 
   public static void removeFalseKey(Map<String, Boolean> map) {
-    if (!map.get(ConsumeTypeEnum.O2O.getCode())) {
-      map.remove(ConsumeTypeEnum.O2O.getCode());
-    }
-    if (!map.get(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
-      map.remove(ConsumeTypeEnum.ONLINE_MALL.getCode());
-    }
-    if (!map.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
-      map.remove(ConsumeTypeEnum.SHOP_SHOPPING.getCode());
+    if (map != null && map.size() > 0) {
+      Set<Map.Entry<String, Boolean>> set = map.entrySet();
+      set.removeIf(entry -> !entry.getValue());
     }
   }
-
 
   public static Map<String, Boolean> transfer(String str) {
     List<String> list = Arrays.asList(str.split(","));
@@ -64,9 +51,9 @@ public class ConsumeTypesUtils {
   }
   public static Map<String, Boolean> defaultMap(){
     Map<String, Boolean> map = new HashMap<>();
-    map.put(ConsumeTypeEnum.O2O.getCode(),Boolean.FALSE);
-    map.put(ConsumeTypeEnum.ONLINE_MALL.getCode(),Boolean.FALSE);
-    map.put(ConsumeTypeEnum.SHOP_SHOPPING.getCode(),Boolean.FALSE);
+    for (ConsumeTypeEnum consumeTypeEnum : ConsumeTypeEnum.values()) {
+      map.put(consumeTypeEnum.getCode(),Boolean.FALSE);
+    }
     return map;
   }
 

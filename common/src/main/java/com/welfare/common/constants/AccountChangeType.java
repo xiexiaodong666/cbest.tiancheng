@@ -16,7 +16,8 @@ public enum  AccountChangeType {
   ACCOUNT_CONSUME_SCENE_ENABLE("account_consume_scene_enable","员工类型消费配置启用"),
   ACCOUNT_CONSUME_SCENE_DISABLE("account_consume_scene_disable","员工类型消费配置禁用"),
   ACCOUNT_CONSUME_SCENE_DELETE("account_consume_scene_delete","员工类型消费删除"),
-  ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE("account_consume_scene_consumetype_change","员工类型消费配置门店选择的消费方式变更");
+  ACCOUNT_CONSUME_SCENE_CONSUMETYPE_CHANGE("account_consume_scene_consumetype_change","员工类型消费配置门店选择的消费方式变更"),
+  ACCOUNT_CONSUME_SCENE_EDIT("account_consume_scene_edit","员工类型消费配置编辑");
   private String changeType;
   private String changeValue;
 

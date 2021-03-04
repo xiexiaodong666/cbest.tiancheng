@@ -137,9 +137,9 @@
       and a.mer_code = #{merCode} and at.mer_code = #{merCode}
     </if>
     <if test=" accountName !='' and accountName != null  ">
-      and a.account_name like '%${accountName}'
+      and a.account_name like '%${accountName}%'
     </if>
-    <if test="departmentPathList != null ">
+    <if test="departmentPathList != null and departmentPathList.size() > 0">
       and
       <foreach collection="departmentPathList" item="item" index="index" open="(" close=")"
         separator="or">
@@ -152,11 +152,14 @@
     <if test="binding != null ">
       and a.binding = #{binding}
     </if>
-    <if test=" accountTypeCode !='' and accountTypeCode != null ">
-      and at.type_code = #{accountTypeCode}
+    <if test=" accountTypeCodes != null and accountTypeCodes.size()>0">
+      and at.type_code in
+      <foreach collection="accountTypeCodes" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
     </if>
     <if test=" cardId !='' and cardId != null ">
-      and a. account_code in( select a1.account_code from account a1 left join card_info ci1 on
+      and a. account_code in ( select a1.account_code from account a1 left join card_info ci1 on
       ci1.account_code = a1.account_code where ci1.card_id = #{cardId})
     </if>
     <if test=" phone !='' and phone != null ">
@@ -422,5 +425,16 @@
       a.deleted = 0
       AND a.phone = #{phone}
       AND a.mer_code = #{merCode}
+  </select>
+
+  <select id ="countByDepartmentPath" resultType="java.lang.Integer">
+    SELECT
+      count(1)
+    FROM
+      account a
+        LEFT JOIN department d ON a.store_code = d.department_code
+    where
+      a.mer_code = #{merCode}
+      and d.department_path like '${departmentPath}%'
   </select>
 </mapper>

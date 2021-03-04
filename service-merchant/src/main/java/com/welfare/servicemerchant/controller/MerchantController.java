@@ -1,9 +1,11 @@
 package com.welfare.servicemerchant.controller;
 
 import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.EmptyChecker;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.service.MerchantService;
 import com.welfare.service.dto.*;
@@ -83,5 +85,13 @@ public class MerchantController implements IController {
     @ApiOperation("导出商户列表")
     public R<String> exportList(@RequestBody(required = false) MerchantPageReq merchantPageReq) throws IOException {
         return R.success(fileUploadService.getFileServerUrl(fileUploadService.uploadExcelFile(merchantService.exportList(merchantPageReq), MerchantWithCreditAndTreeDTO.class, "商户导出")));
+    }
+
+
+    @GetMapping("/hasRebate")
+    @ApiOperation("查询商户是否有配置返利")
+    @MerchantUser
+    public R<Boolean> hasRebateByMerCode(){
+        return success(merchantService.queryIsRabteByMerCOde(MerchantUserHolder.getMerchantUser().getMerchantCode()));
     }
 }

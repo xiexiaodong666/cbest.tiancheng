@@ -3,8 +3,11 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
+import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.*;
 
 import java.util.List;
@@ -34,6 +37,14 @@ public interface MonthSettleService {
      * @return
      */
     Page<MonthSettleDetailResp> pageQueryMonthSettleDetail(Long id, MonthSettleDetailPageReq monthSettleDetailReq);
+
+    /**
+     * 根据主键账单id、部分限制条件，查询月账单明细统计信息
+     * @param id
+     * @param monthSettleDetailReq
+     * @return
+     */
+    MonthSettleDetailSummaryDTO monthSettleDetailSummary(Long id, MonthSettleDetailReq monthSettleDetailReq);
 
     /**
      * 根据主键账单id、部分限制条件，导出账单数据
@@ -71,4 +82,11 @@ public interface MonthSettleService {
     MonthSettle getMonthSettleById(Long id);
 
     List<Map<String, Object>> getAccoutType(String merCode);
+
+    /**
+     * 结算单下的所有门店
+     * @param id
+     * @return
+     */
+    List<StoreCodeNameDTO> allStoresInMonthSettle(Long id);
 }

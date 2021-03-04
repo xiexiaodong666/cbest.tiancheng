@@ -1,6 +1,5 @@
 package com.welfare.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +14,8 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.AdminMerchantStore;
+import com.welfare.persist.dto.MerSupplierStoreDTO;
+import com.welfare.persist.dto.MerSupplierStoreResp;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
@@ -23,7 +24,6 @@ import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.MerchantStoreRelationService;
-import com.welfare.service.SupplierStoreService;
 import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
@@ -56,11 +56,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
   private final MerchantStoreRelationDao merchantStoreRelationDao;
   private final MerchantStoreRelationMapper merchantStoreRelationMapper;
-  private final SupplierStoreService supplierStoreService;
   private final SupplierStoreDao supplierStoreDao;
 
   private final ObjectMapper mapper;
-  private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
+  @Autowired
+  private AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final ApplicationContext applicationContext;
   @Autowired(required = false)
   private ShoppingFeignClient shoppingFeignClient;
@@ -450,6 +450,24 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     return remove && saveOrUpdateBatch;
   }
 
+  @Override
+  public List<MerSupplierStoreResp> queryMerSupplierStoreRelation(String merCode) {
+    List<MerSupplierStoreResp> resps = new ArrayList<>();
+    List<MerSupplierStoreDTO> supplierStoreDTOS = merchantStoreRelationMapper.queryMerSupplierStoreRelation(merCode);
+    if (CollectionUtils.isNotEmpty(supplierStoreDTOS)) {
+      Map<String, List<MerSupplierStoreDTO>> merSupplierStoreMap =  supplierStoreDTOS.stream()
+              .collect(Collectors.groupingBy(MerSupplierStoreDTO::getSupplierCode));
+      merSupplierStoreMap.forEach((supplierCode, merSupplierStoreDTOS) -> {
+        MerSupplierStoreResp resp = new MerSupplierStoreResp();
+        resp.setSupplierCode(supplierCode);
+        resp.setSupplierStoreDTOS(merSupplierStoreDTOS);
+        resp.setSupplierName(merSupplierStoreDTOS.get(0).getSupplierName());
+        resps.add(resp);
+      });
+    }
+    return resps;
+  }
+
   private boolean validateConsumeType(List<AdminMerchantStore> merchantStoreList) {
 
     boolean validate = true;
@@ -492,7 +510,15 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
           validate = false;
           break;
         }
-
+        boolean isSelectWholeSale = false;
+        if (consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode()) != null && consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode())) {
+          isSelectWholeSale = true;
+        }
+        if (!isSelectWholeSale && merchantStoreConsumeTypeMap.containsKey(
+                ConsumeTypeEnum.WHOLESALE.getCode())) {
+          validate = false;
+          break;
+        }
       } catch (JsonProcessingException e) {
         validate = false;
         log.error("[syncConsumeType] json convert error", e.getMessage());

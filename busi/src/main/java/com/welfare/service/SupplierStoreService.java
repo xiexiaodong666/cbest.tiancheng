@@ -97,5 +97,4 @@ public interface SupplierStoreService {
      * 同步门店消费能力数据
      */
     boolean syncConsumeType(String storeCode, String consumeType);
-
 }

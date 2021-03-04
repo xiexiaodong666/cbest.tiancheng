@@ -39,6 +39,6 @@ public class AccountBillDetailSimpleDTO {
     @ApiModelProperty("账户类型名称")
     private String merAccountTypeName;
 
-//    @ApiModelProperty("子账户扣款金额")
-//    private BigDecimal accountDeductionAmount;
+    @ApiModelProperty("交易流水号")
+    private String transNo;
 }

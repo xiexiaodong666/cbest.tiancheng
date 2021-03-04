@@ -61,7 +61,7 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
             params.put("minId", 0);
             params.put("limit", 2000);
             do {
-                log.info("employeeSettleDetailMapper循employeeSettleDetailMapper循环拉取账户授信详细交易数据环拉取账户授信详细交易数据，请求参数：{}", JSONObject.toJSONString(params));
+                log.info("employeeSettleDetailMapper循环拉取账户授信详细交易数据环拉取账户授信详细交易数据，请求参数：{}", JSONObject.toJSONString(params));
                 List<EmployeeSettleDetail> settleDetails = employeeSettleDetailMapper.getFromAccountDetail(params);
                 if (!settleDetails.isEmpty()) {
                     params.put("minId", settleDetails.get(settleDetails.size() - 1).getId() + 1);

@@ -46,15 +46,15 @@ public class EmployeeSettlementDetailDealTask extends IJobHandler {
         log.error("exception when parse date:",e);
       }
     }
+    String dateStr = DateUtil.date2Str(today,  DateUtil.DEFAULT_DATE_FORMAT);
     try {
 
     } catch (Exception e) {
-      log.info("============结算账单明细数据生成任务,任务执行【异常】===================");
-      log.info("任务执行异常,异常信息：{}", e);
+      log.info("员工授信结算账单明细数据生成任务异常,日期:{},异常信息", dateStr, e);
       return ReturnT.FAIL;
     }
 
-    log.info("============结算账单明细数据生成任务,任务执行【完成】===================");
+    log.info("============员工授信结算账单明细数据生成任务,日期:{} 任务执行【完成】===================", dateStr);
     return ReturnT.SUCCESS;
   }
 }

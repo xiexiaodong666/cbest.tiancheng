@@ -19,4 +19,4 @@ INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `dele
 INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('84', 'SettleConsumeType', 'offline', '线下消费', '1', '0', '2');
 
 #填充商户结算明细的订单号
-update settle_detail d set d.order_id = (select order_id from order_info oi where oi.trans_no = d.trans_no limit 1);
+update settle_detail d set d.order_id = (select order_id from order_info oi where oi.trans_no = d.trans_no limit 1) where d.order_id is null;

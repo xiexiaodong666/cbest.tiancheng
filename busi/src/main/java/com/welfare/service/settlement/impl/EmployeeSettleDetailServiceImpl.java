@@ -51,10 +51,6 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
         try {
             Date dateStart = DateUtil.getDayMin(date, -1);
             Date dateEnd = DateUtil.getDayMax(date, -1);
-            if (employeeSettleDetailDao.countByTransTime(dateStart, dateEnd) > 0) {
-                log.info("日期:{}的员工授信流水数据已经同步过了", dateStr);
-                return;
-            }
             Map<String, Object> params = new HashMap<>();
             params.put("startTime", dateStart);
             params.put("endTime", dateEnd);

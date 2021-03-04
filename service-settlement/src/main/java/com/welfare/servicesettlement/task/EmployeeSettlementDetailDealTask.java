@@ -48,12 +48,11 @@ public class EmployeeSettlementDetailDealTask extends IJobHandler {
     }
     String dateStr = DateUtil.date2Str(today,  DateUtil.DEFAULT_DATE_FORMAT);
     try {
-
+      employeeSettleDetailService.pullAccountDetailByDate(today);
     } catch (Exception e) {
-      log.info("员工授信结算账单明细数据生成任务异常,日期:{},异常信息", dateStr, e);
+      log.error("员工授信结算账单明细数据生成任务异常,日期:{},异常信息", dateStr, e);
       return ReturnT.FAIL;
     }
-
     log.info("============员工授信结算账单明细数据生成任务,日期:{} 任务执行【完成】===================", dateStr);
     return ReturnT.SUCCESS;
   }

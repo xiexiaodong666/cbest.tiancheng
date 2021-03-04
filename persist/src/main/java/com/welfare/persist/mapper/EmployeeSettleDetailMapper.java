@@ -1,10 +1,13 @@
 package com.welfare.persist.mapper;
 
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
+import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
+import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
 import com.welfare.persist.entity.EmployeeSettleDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -31,5 +34,14 @@ public interface EmployeeSettleDetailMapper extends BaseMapper<EmployeeSettleDet
    * @param employeeSettleConsumeQuery
    * @return
    */
-  List<EmployeeSettleConsumeDTO> getEmployeeSettleConsumeList(EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
+  List<EmployeeSettleConsumeDTO> getEmployeeSettleConsumeList(@Param("query") EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
+
+  /**
+   * 查询商户员工授信消费汇总
+   * @param employeeSettleConsumeQuery
+   * @return
+   */
+  EmployeeSettleSumDTO getEmployeeSettleConsumeSum(@Param("query") EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
+
+  EmployeeSettleSumDTO getEmployeeSettleDetailSum(@Param("accountCode") String accountCode,@Param("query") EmployeeSettleDetailQuery employeeSettleDetailQuery);
 }

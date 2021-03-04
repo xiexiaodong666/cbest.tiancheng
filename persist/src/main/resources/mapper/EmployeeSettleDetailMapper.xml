@@ -68,34 +68,63 @@
 
     <sql id="getEmployeeSettleConsumeWhere">
         esd.settle_flag = 'unsettled'
-        <if test="accountName!=null and accountName!=''">
-            and a.account_name=like concat('%',#{accountName},'%')
+        <if test="query.accountName!=null and query.accountName!=''">
+            and a.account_name like concat('%',#{query.accountName},'%')
         </if>
-        <if test="phone!=null and phone!=''">
-            and a.phone =#{phone}
+        <if test="query.phone!=null and query.phone!=''">
+            and a.phone =#{query.phone}
         </if>
-        <if test="departmentCode!=null and departmentCode!=''">
-            and a.store_code=#{departmentCode}
+        <if test="query.departmentCode!=null and query.departmentCode!=''">
+            and a.store_code=#{query.departmentCode}
         </if>
-        <if test="startTime!=null">
-            and t1.trans_time <![CDATA[ >= ]]> #{startTime}
+        <if test="query.startTime!=null">
+            and t1.trans_time <![CDATA[ >= ]]> #{query.startTime}
         </if>
-        <if test="endTime!=null">
-            and t1.trans_time <![CDATA[ <= ]]> #{endTime}
+        <if test="query.endTime!=null">
+            and t1.trans_time <![CDATA[ <= ]]> #{query.endTime}
         </if>
     </sql>
 
-    <select id="getEmployeeSettleConsumeList" parameterType="com.welfare.persist.dto.query.EmployeeSettleConsumeQuery" resultType="com.welfare.persist.dto.EmployeeSettleConsumeDTO">
+    <sql id="getEmployeeSettleSumWhere">
+        esd.settle_flag = 'unsettled' and esd.account_code = #{accountCode}
+        <if test="query.orderId!=null and query.orderId!=''">
+            and esd.order_id like concat('%',#{query.orderId},'%')
+        </if>
+        <if test="query.transNo!=null and query.transNo!=''">
+            and esd.trans_no like concat('%',#{query.transNo},'%')
+        </if>
+        <if test="query.storeType!=null and query.storeType!=''">
+            and esd.store_type =#{query.storeType}
+        </if>
+        <if test="query.storeCode!=null and query.storeCode!=''">
+            and esd.store_code=#{query.storeCode}
+        </if>
+        <if test="query.merAccountType!=null and query.merAccountType!=''">
+            and esd.mer_account_type=#{query.merAccountType}
+        </if>
+        <if test="query.startTime!=null">
+            and t1.trans_time <![CDATA[ >= ]]> #{query.startTime}
+        </if>
+        <if test="query.endTime!=null">
+            and t1.trans_time <![CDATA[ <= ]]> #{query.endTime}
+        </if>
+    </sql>
+
+    <sql id="employeeSettleSum">
+        sum(case when esd.store_type ='self'  then esd.trans_amount else 0 end) as selfConsumerAmount,
+        sum(case when esd.store_type ='third'  then esd.trans_amount else 0 end) as thirdConsumerAmount,
+        sum(esd.trans_amount) as totalConsumerAmount
+    </sql>
+
+    <select id="getEmployeeSettleConsumeList" resultType="com.welfare.persist.dto.EmployeeSettleConsumeDTO">
         select
         esd.account_code as accountCode,
         a.account_name as accountName,
         a.phone as phone,
         d.department_name as departmentName,
         CONCAT(a.surplus_quota + a.surplus_quota_overpay, '/',a.max_quota) as quota,
-        sum(case when esd.store_type ='self'  then esd.trans_amount else 0 end) as selfConsumerAmount,
-        sum(case when esd.store_type ='third'  then esd.trans_amount else 0 end) as thirdConsumerAmount,
-        sum(esd.trans_amount) as totalConsumerAmount,
-        count(esd.trans_amount) as orderNum
+        count(esd.trans_amount) as orderNum,
+        <include refid="employeeSettleSum"></include>
         from employee_settle_detail esd left join account a on esd.account_code = a.account_code
         left join department d on a.store_code = d.department_code
         <where>
@@ -103,4 +132,21 @@
         </where>
         group by esd.account_code
     </select>
+
+    <select id="getEmployeeSettleConsumeSum" resultType="com.welfare.persist.dto.EmployeeSettleSumDTO">
+        select
+            <include refid="employeeSettleSum"></include>
+        <where>
+            <include refid="getEmployeeSettleConsumeWhere"/>
+        </where>
+    </select>
+
+    <select id="getEmployeeSettleDetailSum" resultType="com.welfare.persist.dto.EmployeeSettleSumDTO">
+        select
+        <include refid="employeeSettleSum"></include>
+        <where>
+            <include refid="getEmployeeSettleSumWhere"/>
+        </where>
+    </select>
+
 </mapper>

@@ -19,6 +19,6 @@ public class EmployeeSettleSumDTO {
     private String selfConsumeAmountSum;
 
     @ApiModelProperty(value = "消费总金额")
-    private String totalAmount;
+    private String totalConsumeAmount;
 
 }

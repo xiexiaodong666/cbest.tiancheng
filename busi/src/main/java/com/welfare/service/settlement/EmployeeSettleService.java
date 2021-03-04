@@ -2,12 +2,13 @@ package com.welfare.service.settlement;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.service.dto.EmployeeSettleBillPageReq;
-import com.welfare.service.dto.EmployeeSettleBillResp;
+import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
+import com.welfare.persist.dto.EmployeeSettleSumDTO;
+import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
+import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
+import com.welfare.service.dto.*;
 
 import com.welfare.common.base.BasePageVo;
-import com.welfare.service.dto.EmployeeSettleConsumePageReq;
-import com.welfare.service.dto.EmployeeSettleConsumeResp;
 
 /**
  * 商户员工结算账单服务接口
@@ -30,6 +31,10 @@ public interface EmployeeSettleService {
    * @param employeeSettleConsumePageReq
    * @return
    */
-  BasePageVo<EmployeeSettleConsumeResp> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq);
+  BasePageVo<EmployeeSettleConsumeDTO> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq);
+
+  EmployeeSettleSumDTO summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
+
+  EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailQuery employeeSettleDetailQuery);
 
 }

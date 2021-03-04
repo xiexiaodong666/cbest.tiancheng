@@ -105,6 +105,7 @@ public class EmployeeSettleController {
 
   @GetMapping("/bill/page")
   @ApiOperation("分页查询员工授信消费账单列表")
+  @MerchantUser
   public R<Page<EmployeeSettleBillResp>> pageQueryBill(EmployeeSettleBillPageReq billPageReq){
     MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
     if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
@@ -118,7 +119,7 @@ public class EmployeeSettleController {
 
   @GetMapping("bill/{settleId}/detail")
   @ApiOperation("分页查询用户结算账单明细列表")
-  public R<Page<EmployeeSettleDetailResp>> pageQueryEmployeeSettleDetail(@PathVariable("settleId")Long settleId, EmployeeSettleDetailReq employeeSettlePageReq){
+  public R<Page<EmployeeSettleDetailResp>> pageQueryEmployeeSettleDetail(@PathVariable("settleId")Long settleId, EmployeeSettleDetailPageReq employeeSettlePageReq){
       return null;
   }
 

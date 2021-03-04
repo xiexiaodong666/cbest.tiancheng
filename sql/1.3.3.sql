@@ -15,4 +15,6 @@ update settle_detail d set d.order_channel = (select order_channel from account_
 #新增字典类型 批发收货地址 批发商城
 INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES (81, 'MerchantAddress.addressType', 'WHOLESALE', '批发收货地址', 1, 0, 3);
 INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES (82, 'SupplierStore.consumType', 'WHOLESALE', '批发商城', 1, 0, 4);
+INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('83', 'SettleConsumeType', 'online', '线上消费', '1', '0', '1');
+INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('84', 'SettleConsumeType', 'offline', '线下消费', '1', '0', '2');
 

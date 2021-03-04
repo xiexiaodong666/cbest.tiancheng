@@ -97,7 +97,7 @@ public class MonthSettleController implements IController {
     }
 
     @GetMapping("/{id}/summary")
-    @ApiOperation("分页查询结算账单明细列表")
+    @ApiOperation("分页查询结算账单明细列表summary")
     public R<MonthSettleDetailSummaryDTO> monthSettleDetailSummary(@PathVariable("id")Long id, MonthSettleDetailReq monthSettleDetailReq){
         authMerchant(id);
         MonthSettleDetailSummaryDTO monthSettleDetailSummaryDTO=  monthSettleService.monthSettleDetailSummary(id, monthSettleDetailReq);

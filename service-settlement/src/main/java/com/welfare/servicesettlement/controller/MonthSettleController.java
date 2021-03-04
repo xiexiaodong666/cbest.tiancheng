@@ -15,6 +15,7 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
 import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.*;
 import com.welfare.servicesettlement.task.SettlementBillBuildTask;
@@ -83,6 +84,16 @@ public class MonthSettleController implements IController {
 
         MonthSettleResp monthSettleResp =  monthSettleService.queryById(id);
         return success(monthSettleResp);
+    }
+
+    @GetMapping("/{id}/stores")
+    @ApiOperation("查询结算单下所有门店name和code")
+    public R<List<StoreCodeNameDTO>> allStoresInMonthSettle(@PathVariable("id")Long id){
+
+        authMerchant(id);
+
+        List<StoreCodeNameDTO> supplierStores =  monthSettleService.allStoresInMonthSettle(id);
+        return success(supplierStores);
     }
 
 

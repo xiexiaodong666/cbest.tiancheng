@@ -32,6 +32,7 @@ CREATE TABLE `employee_settle_detail` (
                                           `version` int(11) DEFAULT NULL COMMENT '版本',
                                           `mer_credit` decimal(10,2) DEFAULT NULL COMMENT '商户授信额度',
                                           `mer_balance` decimal(10,2) DEFAULT NULL COMMENT '商户余额',
+                                          `store_type` varchar(20) NOT NULL COMMENT '门店类型(自营:self,第三方:third)',
                                           PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 

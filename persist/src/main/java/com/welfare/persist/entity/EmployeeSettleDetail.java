@@ -209,6 +209,11 @@ public class EmployeeSettleDetail extends Model<EmployeeSettleDetail> implements
      */
     @ApiModelProperty("门店类型(自营:self,第三方:third)")
     private String storeType;
+    /**
+     * 用户交易流水明细表主键
+     */
+    @ApiModelProperty("用户交易流水明细表主键")
+    private Long accountDeductionAmountId;
 
 //以下为列明常量
 
@@ -348,4 +353,8 @@ public class EmployeeSettleDetail extends Model<EmployeeSettleDetail> implements
      * 门店类型
      */
     public static final String STORE_TYPE = "storeType";
+    /**
+     * 用户交易流水明细表主键
+     */
+    public static final String ACCOUNT_DEDUCTION_AMOUNT_ID = "account_deduction_amount_id";
 }

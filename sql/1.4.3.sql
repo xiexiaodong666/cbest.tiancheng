@@ -33,12 +33,15 @@ CREATE TABLE `employee_settle_detail` (
                                           `mer_credit` decimal(10,2) DEFAULT NULL COMMENT '商户授信额度',
                                           `mer_balance` decimal(10,2) DEFAULT NULL COMMENT '商户余额',
                                           `store_type` varchar(20) NOT NULL COMMENT '门店类型(自营:self,第三方:third)',
+                                          `account_deduction_amount_id` bigint(20) NOT NULL COMMENT '用户交易流水明细表主键',
                                           PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 create index idx_esd_trans_no on employee_settle_detail(trans_no);
 create index idx_esd_trans_time on employee_settle_detail(trans_time);
 create index idx_esd_settle_no on employee_settle_detail(settle_no);
+create unique index uk_account_deduction_amount_id on employee_settle_detail(account_deduction_amount_id);
+
 
 CREATE TABLE `employee_settle` (
                                    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',

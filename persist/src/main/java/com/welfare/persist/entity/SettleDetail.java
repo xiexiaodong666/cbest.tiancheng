@@ -214,7 +214,7 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     /**
     * 订单编码
     */
-    public static final String SETTLE_NO = "settleNo";
+    public static final String SETTLE_NO = "settle_no";
     /**
     * 交易流水号
     */

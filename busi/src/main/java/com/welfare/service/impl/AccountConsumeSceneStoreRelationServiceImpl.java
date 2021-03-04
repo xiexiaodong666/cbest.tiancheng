@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,8 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
   private final AccountCustomizeMapper accountCustomizeMapper;
   private final AccountConsumeSceneStoreRelationMapper accountConsumeSceneStoreRelationMapper;
-  private final AccountChangeEventRecordService accountChangeEventRecordService;
+  @Autowired
+  private AccountChangeEventRecordService accountChangeEventRecordService;
   private final ApplicationContext applicationContext;
   private final AccountConsumeSceneCustomizeMapper accountConsumeSceneCustomizeMapper;
   private final AccountConsumeSceneDao accountConsumeSceneDao;

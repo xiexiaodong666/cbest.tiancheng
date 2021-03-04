@@ -19,14 +19,14 @@ import java.util.Set;
 @ApiModel("员工授信额度查询对象封装")
 public class EmployeeSettleSumReq {
 
-    @ApiModelProperty("员工姓名")
-    private String accountName;
+    @ApiModelProperty("订单编号")
+    private String orderId;
 
-    @ApiModelProperty("手机号")
-    private String phone;
+    @ApiModelProperty("消费流水号")
+    private String transNo;
 
-    @ApiModelProperty("机构编码")
-    private String departmentCode;
+    @ApiModelProperty("消费类型 自营:self, 第三方:third")
+    private String storeType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -39,4 +39,10 @@ public class EmployeeSettleSumReq {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("消费截止时间")
     private Date transTimeEnd;
+
+    @ApiModelProperty("员工支出方式 授信额度:surplus_quota, 溢缴款:")
+    private String merAccountType;
+
+    @ApiModelProperty(value = "门店编号")
+    private String storeCode;
 }

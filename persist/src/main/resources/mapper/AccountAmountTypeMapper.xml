@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,account_code,mer_account_type_code,account_balance,max_balance,deleted,create_user,create_time,update_user,update_time,version
+        id,account_code,mer_account_type_code,account_balance,deleted,create_user,create_time,update_user,update_time,version
     </sql>
 
     <update id="batchSaveOrUpdate" parameterType="list">

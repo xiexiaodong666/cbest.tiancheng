@@ -1,10 +1,13 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.persist.entity.EmployeeSettleDetail;
 import com.welfare.persist.mapper.EmployeeSettleDetailMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
 
 /**
  * (employee_settle_detail)数据DAO
@@ -16,5 +19,10 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class EmployeeSettleDetailDao extends ServiceImpl<EmployeeSettleDetailMapper, EmployeeSettleDetail> {
+
+  public int countByTransTime(Date transTimeStart, Date transTimeEnd) {
+    //QueryWrapper<>
+    return 0;
+  }
 
 }

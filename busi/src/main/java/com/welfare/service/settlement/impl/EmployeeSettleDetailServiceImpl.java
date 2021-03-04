@@ -5,6 +5,7 @@ import com.welfare.service.settlement.EmployeeSettleDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 服务接口实现
@@ -19,4 +20,9 @@ import org.springframework.stereotype.Service;
 public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailService {
     private final EmployeeSettleDetailDao employeeSettleDetailDao;
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void pullAccountDetailByDate(String dateStr) {
+
+    }
 }

@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DateUtil;
@@ -93,6 +94,7 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
 
         EmployeeSettleConsumeQuery employeeSettleConsumeQuery = new EmployeeSettleConsumeQuery();
         BeanUtils.copyProperties(employeeSettleConsumePageReq, employeeSettleConsumeQuery);
+        employeeSettleConsumeQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
         PageInfo<EmployeeSettleConsumeDTO> employeeSettleDTOPageInfo = PageHelper.startPage(employeeSettleConsumePageReq.getCurrent(), employeeSettleConsumePageReq.getSize())
                 .doSelectPageInfo(() -> employeeSettleDetailMapper.getEmployeeSettleConsumeList(employeeSettleConsumeQuery));
 
@@ -104,6 +106,7 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
 
     @Override
     public EmployeeSettleSumDTO summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery) {
+        employeeSettleConsumeQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
         return employeeSettleDetailMapper.getEmployeeSettleConsumeSum(employeeSettleConsumeQuery);
     }
 
@@ -112,12 +115,42 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
         EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
         BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
         employeeSettleDetailQuery.setAccountCode(accountCode);
+        employeeSettleDetailQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
         return employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
     }
 
     @Override
     public BasePageVo<EmployeeSettleDetailResp> pageQueryDetail(String accountCode, EmployeeSettleDetailPageReq employeeSettleDetailPageReq) {
-        return null;
+        EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
+        BeanUtils.copyProperties(employeeSettleDetailPageReq, employeeSettleDetailQuery);
+        employeeSettleDetailQuery.setAccountCode(accountCode);
+        employeeSettleDetailQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
+        PageInfo<EmployeeSettleDetailResp> employeeSettleDetailResp = PageHelper.startPage(employeeSettleDetailPageReq.getCurrent(),
+                employeeSettleDetailPageReq.getSize()).doSelectPageInfo(() -> {
+                    employeeSettleDetailMapper.querySettleDetail(employeeSettleDetailQuery).stream().map(employeeSettleDetailDTO -> {
+                        EmployeeSettleDetailResp resp= new EmployeeSettleDetailResp();
+                        BeanUtils.copyProperties(employeeSettleDetailDTO, resp);
+                        return resp;
+                    });
+                });
+        return new BasePageVo<>(employeeSettleDetailPageReq.getCurrent(), employeeSettleDetailPageReq.getSize(),
+                employeeSettleDetailResp.getTotal(), employeeSettleDetailResp.getList());
+    }
+
+    @Override
+    public List<EmployeeSettleDetailResp> detailExport(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq) {
+        EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
+        BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
+        employeeSettleDetailQuery.setAccountCode(accountCode);
+        employeeSettleDetailQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
+        employeeSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
+        List<EmployeeSettleDetailResp> employeeSettleDetailList =
+            employeeSettleDetailMapper.querySettleDetail(employeeSettleDetailQuery).stream().map(employeeSettleDetailDTO -> {
+                EmployeeSettleDetailResp resp= new EmployeeSettleDetailResp();
+                BeanUtils.copyProperties(employeeSettleDetailDTO, resp);
+                return resp;
+            }).collect(Collectors.toList());
+        return employeeSettleDetailList;
     }
 
     @Override

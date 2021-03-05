@@ -12,6 +12,7 @@ import com.welfare.service.dto.EmployeeSettleDetailReq;
 import com.welfare.service.dto.EmployeeSettleDetailResp;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 服务接口
@@ -64,4 +65,12 @@ public interface EmployeeSettleDetailService {
    * @return
    */
   Page<EmployeeSettleDetailResp> pageQueryEmployeeSettleDetail(String settleNo, EmployeeSettleDetailPageReq employeeSettlePageReq);
+
+  /**
+   * 工授信额度消费详情导出
+   * @param accountCode accountCode
+   * @param employeeSettleDetailReq employeeSettleDetailReq
+   * @return
+   */
+  List<EmployeeSettleDetailResp> detailExport(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq);
 }

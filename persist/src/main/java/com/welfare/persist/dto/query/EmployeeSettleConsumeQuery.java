@@ -39,4 +39,7 @@ public class EmployeeSettleConsumeQuery {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("消费截止时间")
     private Date transTimeEnd;
+
+    @ApiModelProperty("结算标志")
+    private String settleFlag;
 }

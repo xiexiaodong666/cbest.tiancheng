@@ -67,7 +67,6 @@
     </select>
 
     <sql id="getEmployeeSettleConsumeWhere">
-        esd.settle_flag = 'unsettled'
         <if test="query.accountName!=null and query.accountName!=''">
             and a.account_name like concat('%',#{query.accountName},'%')
         </if>
@@ -77,11 +76,14 @@
         <if test="query.departmentCode!=null and query.departmentCode!=''">
             and a.store_code=#{query.departmentCode}
         </if>
+        <if test="query.settleFlag!=null and query.settleFlag!=''">
+            and esd.settle_flag=#{query.settleFlag}
+        </if>
         <if test="query.startTime!=null">
-            and t1.trans_time <![CDATA[ >= ]]> #{query.startTime}
+            and esd.trans_time <![CDATA[ >= ]]> #{query.startTime}
         </if>
         <if test="query.endTime!=null">
-            and t1.trans_time <![CDATA[ <= ]]> #{query.endTime}
+            and esd.trans_time <![CDATA[ <= ]]> #{query.endTime}
         </if>
     </sql>
 
@@ -113,11 +115,12 @@
         <if test="query.settleNo!=null and query.settleNo!=''">
             and esd.settle_no = #{query.settleNo}
         </if>
-    </sql>
-
-    <sql id="getEmployeeSettleDetailWhere">
-        esd.settle_flag = 'unsettled'
-        <include refid="employeeSettleDetailQuery"></include>
+        <if test="query.settleFlag!=null and query.settleFlag!=''">
+            and esd.settle_flag = #{query.settleFlag}
+        </if>
+        <if test="query.minId!=null">
+            and esd.id <![CDATA[ >= ]]> #{query.minId}
+        </if>
     </sql>
 
     <sql id="employeeSettleSum">
@@ -137,29 +140,28 @@
         <include refid="employeeSettleSum"></include>
         from employee_settle_detail esd left join account a on esd.account_code = a.account_code
         left join department d on a.store_code = d.department_code
-        <where>
-            <include refid="getEmployeeSettleConsumeWhere"/>
-        </where>
+        where 1 = 1
+        <include refid="getEmployeeSettleConsumeWhere"/>
         group by esd.account_code
     </select>
 
     <select id="getEmployeeSettleConsumeSum" resultType="com.welfare.persist.dto.EmployeeSettleSumDTO">
         select
-            <include refid="employeeSettleSum"></include>
-        <where>
-            <include refid="getEmployeeSettleConsumeWhere"/>
-        </where>
+        <include refid="employeeSettleSum"></include>
+        where 1=1
+        <include refid="getEmployeeSettleConsumeWhere"/>
+
     </select>
 
     <select id="getEmployeeSettleDetailSum" resultType="com.welfare.persist.dto.EmployeeSettleSumDTO">
         select
         <include refid="employeeSettleSum"></include>
-        <where>
-            <include refid="getEmployeeSettleDetailWhere"/>
-        </where>
+        where 1=1
+        <include refid="employeeSettleDetailQuery"></include>
     </select>
     <select id="querySettleDetail" resultType="com.welfare.persist.dto.EmployeeSettleDetailDTO">
-        select esd.trans_no transNo,
+        select esd.id id,
+               esd.trans_no transNo,
                esd.order_id orderId,
                esd.trans_time transTime,
                esd.mer_account_type_name merAccountType,
@@ -174,11 +176,22 @@
                esd.trans_amount transAmount,
                if(esd.mer_account_type = 'surplus_quota_overpay' and esd.trans_type = 'refund', 0, esd.trans_amount) as settleAmount,
                case when esd.settle_flag = 'unsettled' then '待结算'
+                    when esd.settle_flag = 'settling' then '结算中'
                     when esd.settle_flag = 'settled' then '已结算' end as settleFlag
         from employee_settle_detail esd
         left join account a on esd.account_code = a.account_code
-        left join department d on a.store_code=d.department_code where 1=1
+        left join department d on a.store_code=d.department_code
+        where 1=1
         <include refid="employeeSettleDetailQuery"/>
+        <if test="query.limit!=null and query.minId!=null">
+            order by esd.id
+            limit #{query.limit}
+        </if>
+
+        <if test="query.limit==null and query.minId==null">
+            order by esd.trans_time desc
+        </if>
+
     </select>
 
 </mapper>

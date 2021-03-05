@@ -1,5 +1,6 @@
 package com.welfare.servicesettlement.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
@@ -23,6 +24,7 @@ import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
 import com.welfare.service.dto.*;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
 import com.welfare.service.settlement.EmployeeSettleService;
+import com.welfare.servicesettlement.util.FileUploadServiceUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static net.dreamlu.mica.core.result.R.success;
@@ -55,6 +60,7 @@ public class EmployeeSettleController {
 
   private final EmployeeSettleService employeeSettleService;
   private final EmployeeSettleDetailService employeeSettleDetailService;
+  private final FileUploadServiceUtil fileUploadService;
 
   @PostMapping("/build")
   @ApiOperation("按条件生成结算单,并返回结算单号")
@@ -100,10 +106,29 @@ public class EmployeeSettleController {
 
   @GetMapping("/detail/{accountCode}/export")
   @ApiOperation("员工授信消费明细导出")
-  public Object exportDetail(@PathVariable String accountCode,
-                                        EmployeeSettleDetailReq employeeSettleDetailReq,
-                                        HttpServletResponse response){
-    return null;
+  @MerchantUser
+  public Object exportDetail(@PathVariable String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq){
+    List<EmployeeSettleDetailResp> employeeSettleDetailRespList = new ArrayList<>();
+    List<EmployeeSettleDetailResp> employeeSettleDetailRespTemp;
+    employeeSettleDetailReq.setMinId(0L);
+    do {
+      employeeSettleDetailRespTemp = employeeSettleDetailService.detailExport(accountCode, employeeSettleDetailReq);
+      if(CollectionUtil.isNotEmpty(employeeSettleDetailRespTemp)){
+        employeeSettleDetailRespList.addAll(employeeSettleDetailRespTemp);
+        employeeSettleDetailReq.setMinId(employeeSettleDetailRespTemp.get(employeeSettleDetailRespTemp.size()-1).getId() + 1);
+      }else {
+        break;
+      }
+    }while (true);
+
+    String path = null;
+    try {
+      path = fileUploadService.uploadExcelFile(
+              employeeSettleDetailRespList, EmployeeSettleDetailResp.class, "未结算账单明细");
+    } catch (IOException e) {
+      throw new BusiException(null, "文件导出异常", null);
+    }
+    return success(fileUploadService.getFileServerUrl(path));
   }
 
 

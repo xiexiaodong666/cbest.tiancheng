@@ -14,37 +14,43 @@ import java.util.Date;
 @Data
 public class EmployeeSettleDetailResp {
 
+    @ExcelProperty(value = "序号")
+    @ApiModelProperty(value = "序号")
+    private Long id;
+
     @ApiModelProperty(value = "交易流水号")
     @ExcelProperty(value = "交易流水号")
     private String transNo;
 
+    @ExcelProperty(value = "订单号")
     @ApiModelProperty(value = "订单号")
     private String orderId;
 
+    @ExcelProperty(value = "消费时间")
     @ApiModelProperty(value = "消费时间")
     private Date transTime;
 
+    @ExcelProperty(value = "员工支出方式")
     @ApiModelProperty("员工支出方式 授信额度:surplus_quota, 溢缴款:")
     private String merAccountType;
 
-    @ApiModelProperty("员工姓名")
+    @ExcelProperty(value = "消费人")
+    @ApiModelProperty("消费人")
     private String accountName;
 
+    @ExcelProperty(value = "手机号")
     @ApiModelProperty("手机号")
     private String phone;
 
-    @ApiModelProperty("组织code")
-    private String departmentCode;
-
+    @ExcelProperty(value = "组织机构")
     @ApiModelProperty("组织机构")
     private String departmentName;
 
-    @ApiModelProperty(value = "门店号" )
-    private String storeCode;
-
-    @ApiModelProperty(value = "门店名称")
+    @ExcelProperty(value = "消费门店")
+    @ApiModelProperty(value = "消费门店")
     private String storeName;
 
+    @ExcelProperty(value = "消费类型")
     @ApiModelProperty("消费类型 自营:self, 第三方:third")
     private String storeType;
 

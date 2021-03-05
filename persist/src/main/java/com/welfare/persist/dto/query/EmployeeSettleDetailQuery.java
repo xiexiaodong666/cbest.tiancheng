@@ -33,4 +33,10 @@ public class EmployeeSettleDetailQuery {
     private String accountCode;
 
     private String settleNo;
+
+    private String settleFlag;
+
+    private Integer limit;
+
+    private Long minId;
 }

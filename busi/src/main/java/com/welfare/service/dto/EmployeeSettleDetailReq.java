@@ -2,6 +2,7 @@ package com.welfare.service.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,7 +13,9 @@ import java.util.Date;
  * @Author: chenggang
  * @Version: 0.0.1
  * @Date: 2021/3/3 5:10 下午
- */@Data
+ */
+@Data
+@ApiModel("员工授信额度查询对象")
 public class EmployeeSettleDetailReq {
 
     @ApiModelProperty("订单编号")
@@ -41,4 +44,7 @@ public class EmployeeSettleDetailReq {
 
     @ApiModelProperty(value = "门店编号")
     private String storeCode;
+
+    @ApiModelProperty(hidden = true)
+    private Long minId;
 }

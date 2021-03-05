@@ -12,6 +12,8 @@ import java.util.Date;
 @Data
 public class EmployeeSettleDetailDTO {
 
+    private Long id;
+
     private String transNo;
 
     private String orderId;

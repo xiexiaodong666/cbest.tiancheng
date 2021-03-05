@@ -991,6 +991,23 @@ public class AccountServiceImpl implements AccountService {
     });
     TreeUtil treeUtil=new TreeUtil(treeDTOList,"0");
     treeDTOList = treeUtil.getTree();
-    return CollectionUtils.isNotEmpty(treeDTOList) ? treeDTOList.get(0).getChildren() : new ArrayList<>();
+    treeDTOList = CollectionUtils.isNotEmpty(treeDTOList) ? treeDTOList.get(0).getChildren() : new ArrayList<>();
+    Map<String, DepartmentAndAccountTreeResp> treeMap = treeDTOList.stream().collect(Collectors.toMap(DepartmentAndAccountTreeResp::getDepartmentCode, a -> a,(k1,k2)->k1));
+    recursiveCalculateAccountNum(treeDTOList, treeMap);
+    return treeDTOList;
+  }
+
+  private void recursiveCalculateAccountNum(List<DepartmentAndAccountTreeResp> trees, Map<String, DepartmentAndAccountTreeResp> treeMap){
+    if (CollectionUtils.isNotEmpty(trees)) {
+      trees.forEach(departmentTree -> {
+        // 查询人员数量
+        recursiveCalculateAccountNum(departmentTree.getChildren(), treeMap);
+        // 找到父级，把本级人数加到父级上
+        if (treeMap.containsKey(departmentTree.getDepartmentParent())) {
+          DepartmentAndAccountTreeResp p = treeMap.get(departmentTree.getDepartmentParent());
+          p.setAccountTotal(p.getAccountTotal() + departmentTree.getAccountTotal());
+        }
+      });
+    }
   }
 }

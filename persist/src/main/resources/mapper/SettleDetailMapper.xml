@@ -232,8 +232,15 @@
                     and t3.mer_code != t1.mer_code and (t5.cashier_no is null or t5.cashier_no!=t1.pos)
                 </when>
             </choose>
-            <if test="consumeType!=null and consumeType == 'online'">
-                and t1.pos = t5.cashier_no
+            <if test="consumeType!=null">
+                <choose>
+                    <when test="consumeType=='online'">
+                        and t1.pos = t5.cashier_no
+                    </when>
+                    <when test="consumeType=='offline'">
+                        and t1.pos != ifnull(t5.cashier_no,'')
+                    </when>
+                </choose>
             </if>
             <if test="phone!=null and phone != ''">
                 and ac.phone = #{phone}

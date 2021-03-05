@@ -47,4 +47,7 @@ public class ProprietaryConsumePageReq extends PageReq{
 
   @ApiModelProperty(value = "组织机构路径")
   private List<String> departmentPaths;
+
+  @ApiModelProperty(value = "员工支出方式")
+  private String merAccountType;
 }

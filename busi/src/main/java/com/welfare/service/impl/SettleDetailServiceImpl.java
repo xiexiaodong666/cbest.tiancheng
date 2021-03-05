@@ -408,7 +408,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
             dtos.forEach(proprietaryConsumeDTO -> {
                 ProprietaryConsumeResp resp = new ProprietaryConsumeResp();
                 BeanUtils.copyProperties(proprietaryConsumeDTO, resp);
-                resp.setPhone(AccountUtil.desensitizedPhoneNumber(resp.getPhone()));
+                //resp.setPhone(AccountUtil.desensitizedPhoneNumber(resp.getPhone()));
                 resps.add(resp);
             });
         }

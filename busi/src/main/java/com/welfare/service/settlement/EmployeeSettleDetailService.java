@@ -73,11 +73,12 @@ public interface EmployeeSettleDetailService {
    * @return
    */
   List<EmployeeSettleDetailResp> detailExport(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq);
-    /**
-     * 账单页查询具体员工授信额度消费汇总
-     * @param settleNo settleNo
-     * @param employeeSettleDetailReq employeeSettleDetailReq
-     * @return
-     */
-    EmployeeSettleSumDTO detailSummaryWithSettleNo(String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq);
+
+  /**
+   * 账单页查询具体员工授信额度消费汇总
+   * @param settleNo settleNo
+   * @param employeeSettleDetailReq employeeSettleDetailReq
+   * @return
+   */
+  EmployeeSettleSumDTO detailSummaryWithSettleNo(String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq);
 }

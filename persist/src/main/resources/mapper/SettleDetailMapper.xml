@@ -602,6 +602,9 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="query.merAccountType!=null and query.merAccountType!=''">
+                and t1.mer_account_type = #{query.merAccountType}
+            </if>
             and t1.settle_flag='unsettled'
             and t1.data_type='welfare'
         </where>
@@ -652,6 +655,9 @@
                          separator=",">
                     #{item}
                 </foreach>
+            </if>
+            <if test="query.merAccountType!=null and query.merAccountType!=''">
+                and t1.mer_account_type = #{query.merAccountType}
             </if>
             and t1.settle_flag='unsettled'
             and t1.data_type='welfare'

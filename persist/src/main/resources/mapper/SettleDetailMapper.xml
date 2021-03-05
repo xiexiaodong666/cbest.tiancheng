@@ -726,9 +726,17 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="consumeType!=null and consumeType=='online'">
-                and t1.pos = t5.cashier_no
+            <if test="consumeType!=null">
+                <choose>
+                    <when test="consumeType=='online'">
+                        and t1.pos = t5.cashier_no
+                    </when>
+                    <when test="consumeType=='offline'">
+                        and t1.pos != ifnull(t5.cashier_no,'')
+                    </when>
+                </choose>
             </if>
+
             <if test="supplierCode!=null and supplierCode!=''">
                 and supplier.mer_code = #{supplierCode}
             </if>

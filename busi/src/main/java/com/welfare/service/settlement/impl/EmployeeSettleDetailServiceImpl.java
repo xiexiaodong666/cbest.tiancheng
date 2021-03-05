@@ -140,4 +140,12 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
 
         return respPage;
     }
+
+    @Override
+    public EmployeeSettleSumDTO detailSummaryWithSettleNo(String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq) {
+        EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
+        BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
+        employeeSettleDetailQuery.setSettleNo(settleNo);
+        return employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
+    }
 }

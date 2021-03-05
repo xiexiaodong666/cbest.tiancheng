@@ -58,10 +58,18 @@ public interface EmployeeSettleDetailService {
   BasePageVo<EmployeeSettleDetailResp> pageQueryDetail(String accountCode, EmployeeSettleDetailPageReq employeeSettleDetailPageReq);
 
   /**
-   * 分页查询具体员工授信额度消费详情
+   * 分页查询具体员工授信额度消费账单详情
    * @param settleNo settleNo
    * @param employeeSettlePageReq employeeSettlePageReq
    * @return
    */
   Page<EmployeeSettleDetailResp> pageQueryEmployeeSettleDetail(String settleNo, EmployeeSettleDetailPageReq employeeSettlePageReq);
+
+  /**
+   * 账单页查询具体员工授信额度消费汇总
+   * @param settleNo settleNo
+   * @param employeeSettleDetailReq employeeSettleDetailReq
+   * @return
+   */
+  EmployeeSettleSumDTO detailSummaryWithSettleNo(String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq);
 }

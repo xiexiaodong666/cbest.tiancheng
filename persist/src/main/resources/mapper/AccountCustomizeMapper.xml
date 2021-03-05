@@ -427,14 +427,43 @@
       AND a.mer_code = #{merCode}
   </select>
 
-  <select id ="countByDepartmentPath" resultType="java.lang.Integer">
+  <select id ="getAllAccountCodeAndDepatmentPath" resultType="com.welfare.persist.dto.DepartmentAndAccountTreeDTO">
     SELECT
-      count(1)
+    m.id id,
+    m.mer_name departmentName,
+    m.mer_code departmentCode,
+    m.mer_code merCode,
+    m.mer_code departmentPath,
+    0 departmentParent,
+    m.create_time createTime,
+    0 AS accountTotal
     FROM
-      account a
-        LEFT JOIN department d ON a.store_code = d.department_code
-    where
-      a.mer_code = #{merCode}
-      and d.department_path like '${departmentPath}%'
+    merchant m
+    <where>
+      m.deleted=0
+      <if test="merCode!=null and merCode!=''">
+        and m.mer_code=#{merCode}
+      </if>
+    </where>
+    UNION
+    SELECT
+      de.id id,
+      de.department_name departmentName,
+      de.department_code departmentCode,
+      de.mer_code merCode,
+      de.department_path departmentPath,
+      de.department_parent departmentParent,
+      de.create_time createTime,
+      count( if((a.id IS NOT NULL and a.deleted = 0),TRUE,NULL) ) AS accountTotal
+    FROM
+      department de
+      LEFT JOIN account a ON de.department_code = a.store_code
+    <where>
+      <if test="merCode!=null and merCode!=''">
+        de.mer_code = #{merCode}
+      </if>
+    </where>
+    GROUP BY
+      de.department_code
   </select>
 </mapper>

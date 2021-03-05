@@ -48,9 +48,9 @@ public class EmployeeSettleDetailResp {
     @ApiModelProperty("消费类型 自营:self, 第三方:third")
     private String storeType;
 
-    @ExcelProperty(value = "实际付款金额")
-    @ApiModelProperty(value = "实际付款金额")
-    private String payAmount;
+    @ExcelProperty(value = "消费金额")
+    @ApiModelProperty(value = "消费金额")
+    private String transAmount;
 
     @ExcelProperty(value = "结算金额")
     @ApiModelProperty(value = "结算金额")

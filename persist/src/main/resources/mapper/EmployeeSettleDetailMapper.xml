@@ -104,11 +104,14 @@
         <if test="query.merAccountType!=null and query.merAccountType!=''">
             and esd.mer_account_type=#{query.merAccountType}
         </if>
-        <if test="query.startTime!=null">
-            and t1.trans_time <![CDATA[ >= ]]> #{query.startTime}
+        <if test="query.transTimeStart!=null">
+            and esd.trans_time <![CDATA[ >= ]]> #{query.transTimeStart}
         </if>
-        <if test="query.endTime!=null">
-            and t1.trans_time <![CDATA[ <= ]]> #{query.endTime}
+        <if test="query.transTimeEnd!=null">
+            and esd.trans_time <![CDATA[ <= ]]> #{query.transTimeEnd}
+        </if>
+        <if test="query.settleNo!=null and query.settleNo!=''">
+            and esd.settle_no = #{query.settleNo}
         </if>
     </sql>
 
@@ -154,6 +157,28 @@
         <where>
             <include refid="getEmployeeSettleDetailWhere"/>
         </where>
+    </select>
+    <select id="querySettleDetail" resultType="com.welfare.persist.dto.EmployeeSettleDetailDTO">
+        select esd.trans_no transNo,
+               esd.order_id orderId,
+               esd.trans_time transTime,
+               esd.mer_account_type_name merAccountType,
+               a.account_name accountName,
+               a.phone phone,
+               a.store_code departmentCode,
+               d.department_name departmentName,
+               esd.store_code storeCode,
+               esd.store_name storeName,
+               case when esd.store_type = 'self' then '自营'
+                    when esd.store_type = 'third' then '第三方' end as storeType,
+               esd.trans_amount transAmount,
+               if(esd.mer_account_type = 'surplus_quota_overpay' and esd.trans_type = 'refund', 0, esd.trans_amount) as settleAmount,
+               case when esd.settle_flag = 'unsettled' then '待结算'
+                    when esd.settle_flag = 'settled' then '已结算' end as settleFlag
+        from employee_settle_detail esd
+        left join account a on esd.account_code = a.account_code
+        left join department d on a.store_code=d.department_code where 1=1
+        <include refid="employeeSettleDetailQuery"/>
     </select>
 
 </mapper>

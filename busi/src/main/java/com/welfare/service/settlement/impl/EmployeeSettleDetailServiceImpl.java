@@ -1,6 +1,7 @@
 package com.welfare.service.settlement.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
@@ -12,6 +13,7 @@ import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.EmployeeSettleDetailDao;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
+import com.welfare.persist.dto.EmployeeSettleDetailDTO;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
 import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
@@ -116,5 +118,26 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
     @Override
     public BasePageVo<EmployeeSettleDetailResp> pageQueryDetail(String accountCode, EmployeeSettleDetailPageReq employeeSettleDetailPageReq) {
         return null;
+    }
+
+    @Override
+    public Page<EmployeeSettleDetailResp> pageQueryEmployeeSettleDetail(String settleNo, EmployeeSettleDetailPageReq req) {
+        EmployeeSettleDetailQuery query = new EmployeeSettleDetailQuery();
+        BeanUtils.copyProperties(req, query);
+        query.setSettleNo(settleNo);
+        PageInfo<EmployeeSettleDetailDTO> pageInfo = PageHelper.startPage(req.getCurrent(), req.getSize()).doSelectPageInfo(()->employeeSettleDetailMapper.querySettleDetail(query));
+        Page<EmployeeSettleDetailResp> respPage = new Page<>(req.getCurrent(), req.getSize(),pageInfo.getTotal());
+
+        if(pageInfo.getList().isEmpty()){
+            return respPage;
+        }
+
+        respPage.setRecords(pageInfo.getList().stream().map(dto -> {
+            EmployeeSettleDetailResp resp = new EmployeeSettleDetailResp();
+            BeanUtils.copyProperties(dto, resp);
+            return resp;
+        }).collect(Collectors.toList()));
+
+        return respPage;
     }
 }

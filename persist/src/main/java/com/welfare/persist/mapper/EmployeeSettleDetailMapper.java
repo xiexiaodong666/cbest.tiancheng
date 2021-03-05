@@ -1,6 +1,7 @@
 package com.welfare.persist.mapper;
 
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
+import com.welfare.persist.dto.EmployeeSettleDetailDTO;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
 import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
@@ -44,4 +45,11 @@ public interface EmployeeSettleDetailMapper extends BaseMapper<EmployeeSettleDet
   EmployeeSettleSumDTO getEmployeeSettleConsumeSum(@Param("query") EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
 
   EmployeeSettleSumDTO getEmployeeSettleDetailSum(@Param("query") EmployeeSettleDetailQuery employeeSettleDetailQuery);
+
+  /**
+   * 结算单明细列表
+   * @param query
+   * @return List<EmployeeSettleDetailDTO>
+   **/
+  List<EmployeeSettleDetailDTO> querySettleDetail(@Param("query")EmployeeSettleDetailQuery query);
 }

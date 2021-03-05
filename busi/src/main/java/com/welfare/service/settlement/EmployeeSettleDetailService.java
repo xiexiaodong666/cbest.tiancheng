@@ -1,6 +1,7 @@
 package com.welfare.service.settlement;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
@@ -55,4 +56,12 @@ public interface EmployeeSettleDetailService {
    * @return
    */
   BasePageVo<EmployeeSettleDetailResp> pageQueryDetail(String accountCode, EmployeeSettleDetailPageReq employeeSettleDetailPageReq);
+
+  /**
+   * 分页查询具体员工授信额度消费详情
+   * @param settleNo settleNo
+   * @param employeeSettlePageReq employeeSettlePageReq
+   * @return
+   */
+  Page<EmployeeSettleDetailResp> pageQueryEmployeeSettleDetail(String settleNo, EmployeeSettleDetailPageReq employeeSettlePageReq);
 }

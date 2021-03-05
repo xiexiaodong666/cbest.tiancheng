@@ -10,6 +10,15 @@ import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
+import com.welfare.service.dto.EmployeeSettleBillPageReq;
+import com.welfare.service.dto.EmployeeSettleBillResp;
+import com.welfare.service.dto.EmployeeSettleBuildReq;
+import com.welfare.service.dto.EmployeeSettleConsumePageReq;
+import com.welfare.service.dto.EmployeeSettleDetailPageReq;
+import com.welfare.service.dto.EmployeeSettleDetailReq;
+import com.welfare.service.dto.EmployeeSettleDetailResp;
+import com.welfare.service.dto.EmployeeSettleFinishReq;
+import com.welfare.service.dto.EmployeeSettleSumReq;
 import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
 import com.welfare.service.dto.*;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
@@ -109,24 +118,25 @@ public class EmployeeSettleController {
       throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账户门店异常", null);
     }
     Page<EmployeeSettleBillResp> page = employeeSettleService.pageQueryBill(billPageReq);
-    return R.success(page);
+    return success(page);
   }
 
-  @GetMapping("bill/{settleId}/detail")
+  @GetMapping("bill/{settleNo}")
   @ApiOperation("分页查询用户结算账单明细列表")
-  public R<Page<EmployeeSettleDetailResp>> pageQueryEmployeeSettleDetail(@PathVariable("settleId")Long settleId, EmployeeSettleDetailPageReq employeeSettlePageReq){
-      return null;
+  public R<Page<EmployeeSettleDetailResp>> pageQueryEmployeeSettleDetail(@PathVariable("settleNo")String settleNo, EmployeeSettleDetailPageReq employeeSettlePageReq){
+    Page<EmployeeSettleDetailResp> page= employeeSettleDetailService.pageQueryEmployeeSettleDetail(settleNo, employeeSettlePageReq);
+    return success(page);
   }
 
-  @GetMapping("bill/{settleId}/detail/export")
+  @GetMapping("bill/{settleNo}/export")
   @ApiOperation("员工授信消费账单明细导出")
-  public Object exportEmployeeSettleDetail(@PathVariable("settleId")Long settleId, EmployeeSettleDetailReq employeeSettleDetailReq, HttpServletResponse response){
+  public Object exportEmployeeSettleDetail(@PathVariable("settleNo")String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq, HttpServletResponse response){
       return null;
   }
 
-  @GetMapping("bill/{settleId}/summary")
+  @GetMapping("bill/{settleNo}/summary")
   @ApiOperation("员工授信消费账单详情查询summary")
-  public R<EmployeeSettleSumDTO> employeeSettleDetailSummery(@PathVariable("settleId")Long settleId,EmployeeSettleSumReq employeeSettleSumReq){
+  public R<EmployeeSettleSumDTO> employeeSettleDetailSummery(@PathVariable("settleNo")Long settleId,EmployeeSettleSumReq employeeSettleSumReq){
     return null;
   }
 

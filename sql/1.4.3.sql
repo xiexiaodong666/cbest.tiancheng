@@ -72,3 +72,11 @@ alter table account_amount_type add column max_balance DECIMAL(11,2) DEFAULT 999
 #更新历史数据，额度最大值
 update account_amount_type t set t.max_balance = (select max_quota from account a where a.account_code = t.account_code) where t.mer_account_type_code = 'surplus_quota';
 
+insert into account_amount_type (id, account_code, mer_account_type_code, account_balance, deleted, create_user, create_time, update_user, update_time, version)
+select floor( 10000 + rand() * (99999 - 10000)), aat.account_code, 'surplus_quota_overpay', 0, 0, 'anonymous', now(), null, null, 0
+from account_amount_type aat where aat.mer_account_type_code = 'surplus_quota';
+
+insert into merchant_account_type (id, mer_code, mer_account_type_code, mer_account_type_name, deduction_order, deleted, remark, create_user, create_time, update_user, update_time, version, show_status)
+select floor( 10000 + rand() * (99999 - 10000)), mat.mer_code, 'surplus_quota_overpay', '员工授信额度溢缴额', 9000, 0, null, 'anonymous', now(), null, null, 0, 0
+from merchant_account_type mat where mat.mer_account_type_code = 'surplus_quota';
+

@@ -80,3 +80,10 @@ insert into merchant_account_type (id, mer_code, mer_account_type_code, mer_acco
 select floor( 10000 + rand() * (99999 - 10000)), mat.mer_code, 'surplus_quota_overpay', '员工授信额度溢缴额', 9000, 0, null, 'anonymous', now(), null, null, 0, 0
 from merchant_account_type mat where mat.mer_account_type_code = 'surplus_quota';
 
+alter table account_amount_type modify mer_account_type_code varchar(32) null comment '商家账户类型';
+alter table account_deduction_detail modify mer_account_type varchar(32) null comment '子账户类型(例如餐费、交通费等)';
+alter table account_deposit_apply modify mer_account_type_code varchar(32) null comment '商家账户类型';
+alter table merchant_account_type modify mer_account_type_code varchar(32) not null comment '商户账户类型编码';
+alter table settle_detail modify mer_account_type varchar(32) null comment '福利类型(餐费、交通费等)';
+alter table employee_settle_detail modify mer_account_type varchar(32) null comment '福利类型(个人授信，个人授信溢缴款)';
+

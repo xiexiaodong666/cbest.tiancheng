@@ -26,15 +26,5 @@ public interface EmployeeSettleService {
    * @description 分页查询员工结算账单
    **/
   Page<EmployeeSettleBillResp> pageQueryBill(EmployeeSettleBillPageReq billPageReq);
-  /**
-   * 分页查询员工消费
-   * @param employeeSettleConsumePageReq
-   * @return
-   */
-  BasePageVo<EmployeeSettleConsumeDTO> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq);
-
-  EmployeeSettleSumDTO summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
-
-  EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq);
 
 }

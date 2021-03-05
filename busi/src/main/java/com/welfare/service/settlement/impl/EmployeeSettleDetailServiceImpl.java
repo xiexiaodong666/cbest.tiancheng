@@ -1,6 +1,9 @@
 package com.welfare.service.settlement.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
@@ -8,15 +11,24 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.EmployeeSettleDetailDao;
+import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
+import com.welfare.persist.dto.EmployeeSettleSumDTO;
+import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
+import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
 import com.welfare.persist.entity.EmployeeSettleDetail;
 import com.welfare.persist.entity.MerchantBillDetail;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.mapper.EmployeeSettleDetailMapper;
+import com.welfare.service.dto.EmployeeSettleConsumePageReq;
+import com.welfare.service.dto.EmployeeSettleDetailPageReq;
+import com.welfare.service.dto.EmployeeSettleDetailReq;
+import com.welfare.service.dto.EmployeeSettleDetailResp;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -41,6 +53,8 @@ import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPE
 @Service
 public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailService {
     private final EmployeeSettleDetailDao employeeSettleDetailDao;
+
+    private final EmployeeSettleDetailMapper employeeSettleDetailMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -70,5 +84,37 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
         } finally {
             DistributedLockUtil.unlock(lock);
         }
+    }
+
+    @Override
+    public BasePageVo<EmployeeSettleConsumeDTO> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq) {
+
+        EmployeeSettleConsumeQuery employeeSettleConsumeQuery = new EmployeeSettleConsumeQuery();
+        BeanUtils.copyProperties(employeeSettleConsumePageReq, employeeSettleConsumeQuery);
+        PageInfo<EmployeeSettleConsumeDTO> employeeSettleDTOPageInfo = PageHelper.startPage(employeeSettleConsumePageReq.getCurrent(), employeeSettleConsumePageReq.getSize())
+                .doSelectPageInfo(() -> employeeSettleDetailMapper.getEmployeeSettleConsumeList(employeeSettleConsumeQuery));
+
+        BasePageVo<EmployeeSettleConsumeDTO> employeeSettleRespBasePageVo = new BasePageVo<>(employeeSettleConsumePageReq.getCurrent(),
+                employeeSettleConsumePageReq.getSize(), employeeSettleDTOPageInfo.getTotal(), employeeSettleDTOPageInfo.getList());
+
+        return employeeSettleRespBasePageVo;
+    }
+
+    @Override
+    public EmployeeSettleSumDTO summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery) {
+        return employeeSettleDetailMapper.getEmployeeSettleConsumeSum(employeeSettleConsumeQuery);
+    }
+
+    @Override
+    public EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq) {
+        EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
+        BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
+        employeeSettleDetailQuery.setAccountCode(accountCode);
+        return employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
+    }
+
+    @Override
+    public BasePageVo<EmployeeSettleDetailResp> pageQueryDetail(String accountCode, EmployeeSettleDetailPageReq employeeSettleDetailPageReq) {
+        return null;
     }
 }

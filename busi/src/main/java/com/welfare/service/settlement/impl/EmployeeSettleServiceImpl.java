@@ -37,7 +37,6 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
     private final EmployeeSettleDao employeeSettleDao;
     private final EmployeeSettleMapper employeeSettleMapper;
 
-    private final EmployeeSettleDetailMapper employeeSettleDetailMapper;
 
     @Override
     public Page<EmployeeSettleBillResp> pageQueryBill(EmployeeSettleBillPageReq billPageReq) {
@@ -71,30 +70,5 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
         return respPage;
     }
 
-    @Override
-    public BasePageVo<EmployeeSettleConsumeDTO> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq) {
 
-        EmployeeSettleConsumeQuery employeeSettleConsumeQuery = new EmployeeSettleConsumeQuery();
-        BeanUtils.copyProperties(employeeSettleConsumePageReq, employeeSettleConsumeQuery);
-        PageInfo<EmployeeSettleConsumeDTO> employeeSettleDTOPageInfo = PageHelper.startPage(employeeSettleConsumePageReq.getCurrent(), employeeSettleConsumePageReq.getSize())
-                .doSelectPageInfo(() -> employeeSettleDetailMapper.getEmployeeSettleConsumeList(employeeSettleConsumeQuery));
-
-        BasePageVo<EmployeeSettleConsumeDTO> employeeSettleRespBasePageVo = new BasePageVo<>(employeeSettleConsumePageReq.getCurrent(),
-                employeeSettleConsumePageReq.getSize(), employeeSettleDTOPageInfo.getTotal(), employeeSettleDTOPageInfo.getList());
-
-        return employeeSettleRespBasePageVo;
-    }
-
-    @Override
-    public EmployeeSettleSumDTO summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery) {
-        return employeeSettleDetailMapper.getEmployeeSettleConsumeSum(employeeSettleConsumeQuery);
-    }
-
-    @Override
-    public EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq) {
-        EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
-        BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
-        employeeSettleDetailQuery.setAccountCode(accountCode);
-        return employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
-    }
 }

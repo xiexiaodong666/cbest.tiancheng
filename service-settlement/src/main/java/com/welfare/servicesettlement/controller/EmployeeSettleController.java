@@ -12,6 +12,7 @@ import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
 import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
 import com.welfare.service.dto.*;
+import com.welfare.service.settlement.EmployeeSettleDetailService;
 import com.welfare.service.settlement.EmployeeSettleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,6 +45,7 @@ import static net.dreamlu.mica.core.result.R.success;
 public class EmployeeSettleController {
 
   private final EmployeeSettleService employeeSettleService;
+  private final EmployeeSettleDetailService employeeSettleDetailService;
 
   @PostMapping("/build")
   @ApiOperation("按条件生成结算单,并返回结算单号")
@@ -63,28 +65,28 @@ public class EmployeeSettleController {
   @GetMapping("/page")
   @ApiOperation("员工授信消费查询")
   public R<BasePageVo<EmployeeSettleConsumeDTO>> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq){
-    return success(employeeSettleService.pageQuery(employeeSettleConsumePageReq));
+    return success(employeeSettleDetailService.pageQuery(employeeSettleConsumePageReq));
   }
 
   @GetMapping("/summary")
   @ApiOperation("员工授信消费查询summary")
   public R<EmployeeSettleSumDTO> summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery){
-    return success(employeeSettleService.summary(employeeSettleConsumeQuery));
+    return success(employeeSettleDetailService.summary(employeeSettleConsumeQuery));
 
   }
 
   @GetMapping("/detail/{accountCode}")
   @ApiOperation("员工授信消费明细列表")
-  public R<Page<EmployeeSettleDetailResp>> pageQueryDetail(@PathVariable String accountCode,
+  public R<BasePageVo<EmployeeSettleDetailResp>> pageQueryDetail(@PathVariable String accountCode,
                                                            EmployeeSettleDetailPageReq employeeSettleDetailPageReq){
-    return null;
+    return success(employeeSettleDetailService.pageQueryDetail(accountCode, employeeSettleDetailPageReq));
   }
 
   @GetMapping("/detail/{accountCode}/summary")
   @ApiOperation("员工授信消费明细列表summary")
   public R<EmployeeSettleSumDTO> detailSummary(@PathVariable String accountCode,
                                                EmployeeSettleDetailReq employeeSettleDetailReq){
-    return success(employeeSettleService.detailSummary(accountCode, employeeSettleDetailReq));
+    return success(employeeSettleDetailService.detailSummary(accountCode, employeeSettleDetailReq));
   }
 
   @GetMapping("/detail/{accountCode}/export")

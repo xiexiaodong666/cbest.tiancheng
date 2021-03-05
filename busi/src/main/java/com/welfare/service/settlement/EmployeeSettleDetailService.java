@@ -1,6 +1,15 @@
 package com.welfare.service.settlement;
 
 
+import com.welfare.common.base.BasePageVo;
+import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
+import com.welfare.persist.dto.EmployeeSettleSumDTO;
+import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
+import com.welfare.service.dto.EmployeeSettleConsumePageReq;
+import com.welfare.service.dto.EmployeeSettleDetailPageReq;
+import com.welfare.service.dto.EmployeeSettleDetailReq;
+import com.welfare.service.dto.EmployeeSettleDetailResp;
+
 import java.util.Date;
 
 /**
@@ -17,4 +26,33 @@ public interface EmployeeSettleDetailService {
    * @param date
    */
   void pullAccountDetailByDate(Date date);
+
+  /**
+   * 分页查询员工消费
+   * @param employeeSettleConsumePageReq
+   * @return
+   */
+  BasePageVo<EmployeeSettleConsumeDTO> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq);
+
+  /**
+   * 分页查询员工授信额度消费汇总
+   * @param employeeSettleConsumeQuery employeeSettleConsumeQuery
+   * @return
+   */
+  EmployeeSettleSumDTO summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
+
+  /**
+   * 分页查询具体员工授信额度消费汇总
+   * @param accountCode accountCode
+   * @param employeeSettleDetailReq employeeSettleDetailReq
+   * @return
+   */
+  EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq);
+  /**
+   * 分页查询具体员工授信额度消费详情
+   * @param accountCode accountCode
+   * @param employeeSettleDetailPageReq employeeSettleDetailPageReq
+   * @return
+   */
+  BasePageVo<EmployeeSettleDetailResp> pageQueryDetail(String accountCode, EmployeeSettleDetailPageReq employeeSettleDetailPageReq);
 }

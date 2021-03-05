@@ -43,5 +43,5 @@ public interface EmployeeSettleDetailMapper extends BaseMapper<EmployeeSettleDet
    */
   EmployeeSettleSumDTO getEmployeeSettleConsumeSum(@Param("query") EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
 
-  EmployeeSettleSumDTO getEmployeeSettleDetailSum(@Param("accountCode") String accountCode,@Param("query") EmployeeSettleDetailQuery employeeSettleDetailQuery);
+  EmployeeSettleSumDTO getEmployeeSettleDetailSum(@Param("query") EmployeeSettleDetailQuery employeeSettleDetailQuery);
 }

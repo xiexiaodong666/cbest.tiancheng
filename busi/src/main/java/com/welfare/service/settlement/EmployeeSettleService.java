@@ -35,6 +35,6 @@ public interface EmployeeSettleService {
 
   EmployeeSettleSumDTO summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery);
 
-  EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailQuery employeeSettleDetailQuery);
+  EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq);
 
 }

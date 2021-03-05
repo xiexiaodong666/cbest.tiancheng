@@ -83,8 +83,8 @@ public class EmployeeSettleController {
   @GetMapping("/detail/{accountCode}/summary")
   @ApiOperation("员工授信消费明细列表summary")
   public R<EmployeeSettleSumDTO> detailSummary(@PathVariable String accountCode,
-                                               EmployeeSettleDetailQuery employeeSettleDetailQuery){
-    return success(employeeSettleService.detailSummary(accountCode, employeeSettleDetailQuery));
+                                               EmployeeSettleDetailReq employeeSettleDetailReq){
+    return success(employeeSettleService.detailSummary(accountCode, employeeSettleDetailReq));
   }
 
   @GetMapping("/detail/{accountCode}/export")

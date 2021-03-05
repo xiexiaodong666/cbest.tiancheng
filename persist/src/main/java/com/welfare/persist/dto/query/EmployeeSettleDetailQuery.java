@@ -42,4 +42,10 @@ public class EmployeeSettleDetailQuery {
 
     @ApiModelProperty(value = "门店编号")
     private String storeCode;
+
+    @ApiModelProperty(value = "员工编码")
+    private String accountCode;
+
+    @ApiModelProperty(value = "结算单号")
+    private Long  settleId;
 }

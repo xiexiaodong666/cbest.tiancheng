@@ -91,7 +91,10 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
     }
 
     @Override
-    public EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailQuery employeeSettleDetailQuery) {
-        return employeeSettleDetailMapper.getEmployeeSettleDetailSum(accountCode, employeeSettleDetailQuery);
+    public EmployeeSettleSumDTO detailSummary(String accountCode, EmployeeSettleDetailReq employeeSettleDetailReq) {
+        EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
+        BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
+        employeeSettleDetailQuery.setAccountCode(accountCode);
+        return employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
     }
 }

@@ -85,8 +85,10 @@
         </if>
     </sql>
 
-    <sql id="getEmployeeSettleSumWhere">
-        esd.settle_flag = 'unsettled' and esd.account_code = #{accountCode}
+    <sql id="employeeSettleDetailQuery">
+        <if test="query.accountCode!=null and query.accountCode!=''">
+            and esd.account_code = #{query.accountCode}
+        </if>
         <if test="query.orderId!=null and query.orderId!=''">
             and esd.order_id like concat('%',#{query.orderId},'%')
         </if>
@@ -108,6 +110,11 @@
         <if test="query.endTime!=null">
             and t1.trans_time <![CDATA[ <= ]]> #{query.endTime}
         </if>
+    </sql>
+
+    <sql id="getEmployeeSettleDetailWhere">
+        esd.settle_flag = 'unsettled'
+        <include refid="employeeSettleDetailQuery"></include>
     </sql>
 
     <sql id="employeeSettleSum">
@@ -145,7 +152,7 @@
         select
         <include refid="employeeSettleSum"></include>
         <where>
-            <include refid="getEmployeeSettleSumWhere"/>
+            <include refid="getEmployeeSettleDetailWhere"/>
         </where>
     </select>
 

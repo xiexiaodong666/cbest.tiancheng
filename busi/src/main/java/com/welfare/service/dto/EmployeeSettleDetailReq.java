@@ -15,9 +15,6 @@ import java.util.Date;
  */@Data
 public class EmployeeSettleDetailReq {
 
-    @ApiModelProperty("账户编码")
-    private Long accountCode;
-
     @ApiModelProperty("订单编号")
     private String orderId;
 

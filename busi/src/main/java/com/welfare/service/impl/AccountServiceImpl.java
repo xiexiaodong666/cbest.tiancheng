@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 import com.welfare.common.enums.FileUniversalStorageEnum;
+import com.welfare.service.converter.DepartmentAndAccountTreeConverter;
 import com.welfare.service.dto.UploadImgErrorMsgDTO;
 import java.util.Date;
 
@@ -49,6 +50,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -108,6 +110,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountConsumeSceneDao accountConsumeSceneDao;
     private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
     private final SupplierStoreDao supplierStoreDao;
+    @Autowired
+    private DepartmentAndAccountTreeConverter andAccountTreeConverter;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -978,26 +982,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
   @Override
-  public List<DepartmentTree> groupByDepartment(String merCode) {
-    List<DepartmentTree> trees = departmentService.tree(merCode);
-    if (CollectionUtils.isNotEmpty(trees)) {
-      trees = trees.get(0).getChildren();
-      // 查询各层的人员数量
-      recursiveCalculateAccountNum(trees);
-    }
-    return trees;
-  }
-
-  private void recursiveCalculateAccountNum(List<DepartmentTree> trees){
-    if (CollectionUtils.isNotEmpty(trees)) {
-      trees.forEach(departmentTree -> {
-        // 查询人员数量
-        int count = accountCustomizeMapper
-                .countByDepartmentPath(departmentTree.getMerCode(), departmentTree.getDepartmentPath());
-        departmentTree.setAccountTotal(count);
-        // 继续递归
-        recursiveCalculateAccountNum(departmentTree.getChildren());
-      });
-    }
+  public List<DepartmentAndAccountTreeResp> groupByDepartment(String merCode) {
+    List<DepartmentAndAccountTreeResp> treeDTOList = andAccountTreeConverter
+            .toE(accountCustomizeMapper.getAllAccountCodeAndDepatmentPath(merCode));
+    treeDTOList.forEach(item-> {
+      item.setCode(item.getDepartmentCode());
+      item.setParentCode(item.getDepartmentParent());
+    });
+    TreeUtil treeUtil=new TreeUtil(treeDTOList,"0");
+    treeDTOList = treeUtil.getTree();
+    return CollectionUtils.isNotEmpty(treeDTOList) ? treeDTOList.get(0).getChildren() : new ArrayList<>();
   }
 }

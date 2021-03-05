@@ -78,6 +78,5 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
 
   AccountDetailMapperDTO queryDetailPhoneAndMer(@Param("phone") String phone, @Param("merCode") String merCode);
 
-  int countByDepartmentPath(@Param("merCode")String merCode, @Param("departmentPath")String departmentPath);
-
+  List<DepartmentAndAccountTreeDTO> getAllAccountCodeAndDepatmentPath(@Param("merCode")String merCode);
 }

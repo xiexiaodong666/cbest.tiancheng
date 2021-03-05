@@ -20,8 +20,6 @@ import com.welfare.service.dto.EmployeeSettleDetailReq;
 import com.welfare.service.dto.EmployeeSettleDetailResp;
 import com.welfare.service.dto.EmployeeSettleFinishReq;
 import com.welfare.service.dto.EmployeeSettleSumReq;
-import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
-import com.welfare.service.dto.*;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
 import com.welfare.service.settlement.EmployeeSettleService;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
@@ -147,7 +145,7 @@ public class EmployeeSettleController {
   }
 
   @GetMapping("bill/{settleNo}")
-  @ApiOperation("分页查询用户结算账单明细列表")
+  @ApiOperation("分页查询用户消费账单明细列表")
   public R<Page<EmployeeSettleDetailResp>> pageQueryEmployeeSettleDetail(@PathVariable("settleNo")String settleNo, EmployeeSettleDetailPageReq employeeSettlePageReq){
     Page<EmployeeSettleDetailResp> page= employeeSettleDetailService.pageQueryEmployeeSettleDetail(settleNo, employeeSettlePageReq);
     return success(page);
@@ -161,8 +159,8 @@ public class EmployeeSettleController {
 
   @GetMapping("bill/{settleNo}/summary")
   @ApiOperation("员工授信消费账单详情查询summary")
-  public R<EmployeeSettleSumDTO> employeeSettleDetailSummery(@PathVariable("settleNo")Long settleId,EmployeeSettleSumReq employeeSettleSumReq){
-    return null;
+  public R<EmployeeSettleSumDTO> employeeSettleDetailSummery(@PathVariable("settleNo")String settleNo,EmployeeSettleDetailReq employeeSettleDetailReq){
+    return success(employeeSettleDetailService.detailSummaryWithSettleNo(settleNo, employeeSettleDetailReq));
   }
 
 }

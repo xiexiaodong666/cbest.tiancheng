@@ -64,14 +64,14 @@ public class EmployeeSettleController {
   @ApiOperation("按条件生成结算单,并返回结算单号")
   @MerchantUser
   public R<List<String>> buildSettle(@RequestBody EmployeeSettleBuildReq employeeSettleBuildReq){
-    return null;
+    return success(employeeSettleService.buildEmployeeSettle(employeeSettleBuildReq));
   }
 
   @PostMapping("/finish")
   @ApiOperation("完成结算")
   @MerchantUser
   public R<Boolean> finishSettle(@RequestBody EmployeeSettleFinishReq employeeSettleFinishReq){
-    return null;
+    return success(employeeSettleService.finishEmployeeSettle(employeeSettleFinishReq));
   }
 
 

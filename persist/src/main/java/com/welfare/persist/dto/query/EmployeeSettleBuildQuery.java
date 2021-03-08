@@ -1,8 +1,7 @@
-package com.welfare.service.dto;
+package com.welfare.persist.dto.query;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,17 +14,13 @@ import java.util.Set;
 /**
  * @Author: duanhy
  * @Version: 0.0.1
- * @Date: 2021/3/3 5:10 下午
+ * @Date: 2021/3/8 10:13 上午
  */
 @Data
-@ApiModel("员工授信额度结算生成对象")
-public class EmployeeSettleBuildReq {
+public class EmployeeSettleBuildQuery {
 
   @ApiModelProperty("员工姓名")
   private String accountName;
-
-  @ApiModelProperty("员工编码")
-  private String accountCode;
 
   @ApiModelProperty("手机号")
   private String phone;

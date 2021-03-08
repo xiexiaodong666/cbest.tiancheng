@@ -53,7 +53,7 @@ public class EmployeeSettle extends Model<EmployeeSettle> implements Serializabl
      * 账户
      */
     @ApiModelProperty("账户")
-    private Integer accountCode;
+    private Long accountCode;
     /**
      * 交易金额
      */
@@ -123,6 +123,12 @@ public class EmployeeSettle extends Model<EmployeeSettle> implements Serializabl
     @ApiModelProperty("删除标志") @TableLogic   
     @TableField(fill = FieldFill.INSERT)
 	private Boolean deleted;
+
+    /**
+     * 账单生成时间
+     */
+    @ApiModelProperty("账单生成时间")
+    private Date buildTime;
 
 //以下为列明常量
 
@@ -194,5 +200,8 @@ public class EmployeeSettle extends Model<EmployeeSettle> implements Serializabl
     * 删除标志
     */
     public static final String DELETED = "deleted";
-
+    /**
+     * 账单生成时间
+     */
+    public static final String BUILD_TIME = "buildTime";
 }

@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,settle_no,settle_period,account_code,trans_amount,settle_amount,order_num,settle_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,uppdate_user,update_time,deleted
+        id,settle_no,settle_period,account_code,trans_amount,settle_amount,order_num,settle_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,uppdate_user,update_time,deleted,buildTime
     </sql>
     <select id="querySettleBills" resultType="com.welfare.persist.dto.EmployeeSettleBillDTO">
         select es.id settleId,

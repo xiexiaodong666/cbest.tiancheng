@@ -200,4 +200,134 @@
 
     </select>
 
+    <select id="getBuildDetailGroupByAccount"  resultType="com.welfare.persist.dto.EmployeeSettleBuildDTO">
+        select
+        esd.account_code as accountCode,
+        a.account_name as accountName,
+        a.phone as phone,
+        d.department_name as departmentName,
+        count(esd.trans_amount) as orderNum,
+        sum(
+        case when esd.mer_account_type ='surplus_quota_overpay' then 0
+        else esd.trans_amount end
+        ) as totalSettleAmount,
+        sum(esd.trans_amount) as totalConsumerAmount,
+        min(esd.trans_time) as minTransTime,
+        max(esd.trans_time) as maxTransTime
+        from employee_settle_detail esd
+        left join account a on esd.account_code = a.account_code
+        left join department d on a.store_code = d.department_code
+        <where>
+            esd.settle_flag='unsettled'
+            <if test="query.accountName!=null and query.accountName!=''">
+                and a.account_name like concat('%',#{query.accountName},'%')
+            </if>
+            <if test="query.phone!=null and query.phone!=''">
+                and a.phone =#{query.phone}
+            </if>
+            <if test="query.departmentPaths!=null and query.departmentPaths.size()  >0">
+                and
+                <foreach collection="query.departmentPaths" item="item" index="index" open="(" close=")"
+                         separator="or">
+                    d.department_path like CONCAT(#{item}, '%')
+                </foreach>
+            </if>
+            <if test="query.orderId!=null and query.orderId!=''">
+                and esd.order_id = #{query.orderId}
+            </if>
+            <if test="query.transNo!=null and query.transNo!=''">
+                and esd.trans_no=#{query.transNo}
+            </if>
+            <if test="query.storeType!=null and query.storeType!=''">
+                and esd.store_type =#{query.storeType}
+            </if>
+            <if test="query.transTimeStart!=null">
+                and esd.trans_time &gt;=#{query.transTimeStart,jdbcType=TIMESTAMP}
+            </if>
+            <if test="query.transTimeEnd!=null">
+                and esd.trans_time &lt;=#{query.transTimeEnd,jdbcType=TIMESTAMP}
+            </if>
+            <if test="query.merAccountType!=null and query.merAccountType!=''">
+                and esd.mer_account_type=#{query.merAccountType}
+            </if>
+            <if test="query.selectedAccountCodes!=null and query.selectedAccountCodes.size()  >0">
+                and a.account_code in
+                <foreach collection="query.selectedAccountCodes" item="item" index="index" open="(" close=")"
+                         separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        group by esd.account_code
+    </select>
+
+    <select id="getBuildEmployeeSettleDetail"  resultType="com.welfare.persist.entity.EmployeeSettleDetail">
+        select
+        esd.id as id,
+        esd.account_code as accountCode,
+        esd.trans_no as transNo,
+        esd.mer_code as merCode,
+        esd.trans_amount as transAmount,
+        esd.mer_account_type as merAccountType,
+        esd.settle_flag as settleFlag,
+        esd.store_type as storeType
+        from employee_settle_detail esd
+        left join account a on esd.account_code = a.account_code
+        left join department d on a.store_code = d.department_code
+        <where>
+            esd.settle_flag='unsettled'
+            <if test="query.accountName!=null and query.accountName!=''">
+                and a.account_name like concat('%',#{query.accountName},'%')
+            </if>
+            <if test="query.phone!=null and query.phone!=''">
+                and a.phone =#{query.phone}
+            </if>
+            <if test="query.departmentPaths!=null and query.departmentPaths.size()  >0">
+                and
+                <foreach collection="query.departmentPaths" item="item" index="index" open="(" close=")"
+                         separator="or">
+                    d.department_path like CONCAT(#{item}, '%')
+                </foreach>
+            </if>
+            <if test="query.orderId!=null and query.orderId!=''">
+                and esd.order_id = #{query.orderId}
+            </if>
+            <if test="query.transNo!=null and query.transNo!=''">
+                and esd.trans_no=#{query.transNo}
+            </if>
+            <if test="query.storeType!=null and query.storeType!=''">
+                and esd.store_type =#{query.storeType}
+            </if>
+            <if test="query.transTimeStart!=null">
+                and esd.trans_time &gt;=#{query.transTimeStart,jdbcType=TIMESTAMP}
+            </if>
+            <if test="query.transTimeEnd!=null">
+                and esd.trans_time &lt;=#{query.transTimeEnd,jdbcType=TIMESTAMP}
+            </if>
+            <if test="query.merAccountType!=null and query.merAccountType!=''">
+                and esd.mer_account_type=#{query.merAccountType}
+            </if>
+            <if test="query.selectedAccountCodes!=null and query.selectedAccountCodes.size()  >0">
+                and a.account_code in
+                <foreach collection="query.selectedAccountCodes" item="item" index="index" open="(" close=")"
+                         separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <update id="batchUpdateStatusBySettleNo">
+        update employee_settle_detail set settle_flag = #{status}, update_user = #{updateUser}, update_time = now(), version = version + 1
+        where
+        <if test="settleNos!=null and settleNos.size()>0">
+            settle_no in
+            <foreach collection="settleNos" item="item" index="index" open="(" close=")"
+                     separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+
 </mapper>

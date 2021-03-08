@@ -62,10 +62,12 @@ CREATE TABLE `employee_settle` (
                                    `uppdate_user` varchar(20) DEFAULT NULL COMMENT '更新人',
                                    `update_time` datetime DEFAULT NULL COMMENT '更新时间',
                                    `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
+                                   `build_time` datetime DEFAULT NULL COMMENT '生成时间',
                                    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=255 DEFAULT CHARSET=utf8mb4 COMMENT='商户员工结算账单';
 
 create index idx_es_settle_no on employee_settle(settle_no);
+create index idx_build_time on employee_settle(build_time);
 
 alter table account_amount_type modify mer_account_type_code varchar(32) null comment '商家账户类型';
 alter table account_deduction_detail modify mer_account_type varchar(32) null comment '子账户类型(例如餐费、交通费等)';

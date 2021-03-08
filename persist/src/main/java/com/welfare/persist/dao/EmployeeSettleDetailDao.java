@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import com.welfare.persist.entity.EmployeeSettleDetail;
 import com.welfare.persist.mapper.EmployeeSettleDetailMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * (employee_settle_detail)数据DAO
@@ -28,4 +31,11 @@ public class EmployeeSettleDetailDao extends ServiceImpl<EmployeeSettleDetailMap
     return this.count(queryWrapper);
   }
 
+  public boolean batchUpdateStatusBySettleNo(String status, String updateUser, List<String> settleNos) {
+    if (CollectionUtils.isNotEmpty(settleNos)) {
+      return this.baseMapper.batchUpdateStatusBySettleNo(status, settleNos, updateUser) > 0;
+    } else {
+      return false;
+    }
+  }
 }

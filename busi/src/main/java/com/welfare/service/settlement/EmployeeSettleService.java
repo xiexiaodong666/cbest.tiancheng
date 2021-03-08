@@ -10,6 +10,8 @@ import com.welfare.service.dto.*;
 
 import com.welfare.common.base.BasePageVo;
 
+import java.util.List;
+
 /**
  * 商户员工结算账单服务接口
  *
@@ -27,4 +29,15 @@ public interface EmployeeSettleService {
    **/
   Page<EmployeeSettleBillResp> pageQueryBill(EmployeeSettleBillPageReq billPageReq);
 
+  /**
+   * 按条件生成员工授信结算单
+   * @param settleBuildReq
+   */
+  List<String> buildEmployeeSettle(EmployeeSettleBuildReq settleBuildReq);
+
+  /**
+   * 完成结算
+   * @param employeeSettleFinishReq 结算单号
+   */
+  boolean finishEmployeeSettle(EmployeeSettleFinishReq employeeSettleFinishReq);
 }

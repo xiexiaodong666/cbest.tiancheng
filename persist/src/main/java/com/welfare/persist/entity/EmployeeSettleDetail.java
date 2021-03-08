@@ -58,7 +58,7 @@ public class EmployeeSettleDetail extends Model<EmployeeSettleDetail> implements
      * 账户
      */
     @ApiModelProperty("账户")   
-    private Integer accountCode;
+    private Long accountCode;
     /**
      * 账户名称
      */

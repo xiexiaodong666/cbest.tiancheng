@@ -18,10 +18,7 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MonthSettleDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
-import com.welfare.persist.dto.MonthSettleDTO;
-import com.welfare.persist.dto.MonthSettleDetailDTO;
-import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
-import com.welfare.persist.dto.SettleStatisticsInfoDTO;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
@@ -286,6 +283,12 @@ public class MonthSettleServiceImpl implements MonthSettleService {
             storeCodeNameDTO.setStoreCode(settleDetail.getStoreCode());
             return storeCodeNameDTO;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MonthSettleDetailMerchantSummaryDTO> monthSettleDetailMerchantSummary(Long id, MonthSettleDetailReq monthSettleDetailReq) {
+        MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
+        return settleDetailMapper.sumSettleDetailGroupByMerAccountType(monthSettleDetailQuery);
     }
 
     /**

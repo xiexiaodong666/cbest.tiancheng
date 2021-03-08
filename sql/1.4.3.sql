@@ -88,4 +88,8 @@ insert into merchant_account_type (id, mer_code, mer_account_type_code, mer_acco
 select floor( 10000 + rand() * (99999 - 10000)), mat.mer_code, 'surplus_quota_overpay', '员工授信额度溢缴额', 9000, 0, null, 'anonymous', now(), null, null, 0, 0
 from merchant_account_type mat where mat.mer_account_type_code = 'surplus_quota';
 
+#新增字段赋初始值
+update account a set a.surplus_quota_overpay = 0;
 
+#新增字段赋初始值
+update account_bill_detail a set a.surplus_quota_overpay = 0;

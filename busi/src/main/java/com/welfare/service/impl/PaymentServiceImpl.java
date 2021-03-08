@@ -144,7 +144,7 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
                 paymentRequest.setAccountName(account.getAccountName());
                 paymentRequest.setAccountBalance(account.getAccountBalance());
-                paymentRequest.setAccountCredit(account.getSurplusQuota());
+                paymentRequest.setAccountCredit(account.getSurplusQuota().add(account.getSurplusQuotaOverpay()));
                 paymentRequest.setPhone(account.getPhone());
 
                 if (ConsumeTypeEnum.SHOP_SHOPPING.getCode().equals(paymentRequest.getPaymentScene())) {
@@ -242,7 +242,9 @@ public class PaymentServiceImpl implements PaymentService {
     public List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
                                                   Account account, List<AccountAmountDO> accountAmountDOList,
                                                   SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        BigDecimal usableAmount = account.getAccountBalance().add(account.getSurplusQuota());
+        BigDecimal usableAmount = account.getAccountBalance()
+                .add(account.getSurplusQuota())
+                .add(account.getSurplusQuotaOverpay());
         BigDecimal amount = paymentRequest.getAmount();
         boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
         Assert.isTrue(enough, "用户账户总余额不足");

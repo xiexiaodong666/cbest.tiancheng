@@ -686,6 +686,7 @@ public class AccountServiceImpl implements AccountService {
         accountSimpleDTO.setAccountBalance(account.getAccountBalance());
         accountSimpleDTO.setMaxQuota(account.getMaxQuota());
         accountSimpleDTO.setSurplusQuota(account.getSurplusQuota());
+        accountSimpleDTO.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
         accountSimpleDTO.setCredit(account.getCredit());
         return accountSimpleDTO;
     }

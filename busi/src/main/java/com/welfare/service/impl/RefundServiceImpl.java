@@ -326,7 +326,7 @@ public class RefundServiceImpl implements RefundService {
             Account account = accountService.getByAccountCode(detail.getAccountCode());
             refundRequest.setAccountMerCode(account.getMerCode());
             refundRequest.setAccountBalance(account.getAccountBalance());
-            refundRequest.setAccountCredit(account.getSurplusQuota());
+            refundRequest.setAccountCredit(account.getSurplusQuota().add(account.getSurplusQuotaOverpay()));
             refundRequest.setAccountCode(account.getAccountCode());
             refundRequest.setAccountName(account.getAccountName());
             refundRequest.setPhone(account.getPhone());

@@ -74,17 +74,17 @@ alter table merchant_account_type modify mer_account_type_code varchar(32) not n
 alter table settle_detail modify mer_account_type varchar(32) null comment '福利类型(餐费、交通费等)';
 alter table employee_settle_detail modify mer_account_type varchar(32) null comment '福利类型(个人授信，个人授信溢缴款)';
 alter table account_bill_detail add column surplus_quota_overpay decimal(10,2) comment '个人授信溢缴款' after surplus_quota;
-alter table account add column surplus_quota_overpay decimal(10,2) comment '个人授信溢缴款' after surplus_quota;
+alter table account add column surplus_quota_overpay decimal(10,2) DEFAULT 0.00 comment '个人授信溢缴款' after surplus_quota;
 
 
 ### DML
 
 insert into account_amount_type (id, account_code, mer_account_type_code, account_balance, deleted, create_user, create_time, update_user, update_time, version)
-select floor( 10000 + rand() * (99999 - 10000)), aat.account_code, 'surplus_quota_overpay', 0, 0, 'anonymous', now(), null, null, 0
+select floor( 10000000 + rand() * (99999999 - 10000000)), aat.account_code, 'surplus_quota_overpay', 0, 0, 'anonymous', now(), null, null, 0
 from account_amount_type aat where aat.mer_account_type_code = 'surplus_quota';
 
 insert into merchant_account_type (id, mer_code, mer_account_type_code, mer_account_type_name, deduction_order, deleted, remark, create_user, create_time, update_user, update_time, version, show_status)
-select floor( 10000 + rand() * (99999 - 10000)), mat.mer_code, 'surplus_quota_overpay', '员工授信额度溢缴额', 9000, 0, null, 'anonymous', now(), null, null, 0, 0
+select floor( 10000000 + rand() * (99999999 - 10000000)), mat.mer_code, 'surplus_quota_overpay', '员工授信额度溢缴额', 9000, 0, null, 'anonymous', now(), null, null, 0, 0
 from merchant_account_type mat where mat.mer_account_type_code = 'surplus_quota';
 
 #新增字段赋初始值

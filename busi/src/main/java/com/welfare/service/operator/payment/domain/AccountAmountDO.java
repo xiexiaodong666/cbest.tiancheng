@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
+import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY;
 
 /**
  * Description:
@@ -43,6 +44,12 @@ public class AccountAmountDO {
     public static BigDecimal calculateAccountBalance(List<AccountAmountType> accountTypes) {
         return accountTypes.stream()
                 .filter(accountAmountType -> !SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public static BigDecimal calculateAccountCreditOverpay(List<AccountAmountType> accountAmountTypes) {
+        return accountAmountTypes.stream()
+                .filter(accountAmountType -> SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode()))
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

@@ -284,8 +284,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
         BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
+        BigDecimal accountCreditOverpay = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
         account.setAccountBalance(accountBalance);
         account.setSurplusQuota(accountCreditBalance);
+        account.setSurplusQuotaOverpay(accountCreditOverpay);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
@@ -417,8 +419,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
         BigDecimal accountSurplusQuota = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
+        BigDecimal accountSurplusOverpay = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
         accountBillDetail.setAccountBalance(accountBalance);
         accountBillDetail.setSurplusQuota(accountSurplusQuota);
+        accountBillDetail.setSurplusQuotaOverpay(accountSurplusOverpay);
         return accountBillDetail;
     }
 }

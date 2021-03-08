@@ -628,6 +628,7 @@ public class AccountServiceImpl implements AccountService {
         accountBillDetail.setTransAmount(transAmout);
         accountBillDetail.setTransTime(new Date());
         accountBillDetail.setSurplusQuota(account.getSurplusQuota());
+        accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
         accountBillDetail.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
         accountBillDetail.setCreateTime(new Date());
         return accountBillDetail;
@@ -949,6 +950,7 @@ public class AccountServiceImpl implements AccountService {
         accountBillDetail.setTransAmount(updateQuota);
         accountBillDetail.setTransTime(Calendar.getInstance().getTime());
         accountBillDetail.setSurplusQuota(account.getMaxQuota());
+        accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
         if (updateQuota.compareTo(BigDecimal.ZERO) < 0) {
             accountBillDetail.setTransType(TransType.RESET_DECR.code());
         } else {

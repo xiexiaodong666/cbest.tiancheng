@@ -67,8 +67,8 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         accountBillDetail.setTransNo(deposit.getTransNo());
         accountBillDetail.setTransAmount(amount);
         accountBillDetail.setTransTime(Calendar.getInstance().getTime());
-        //AccountAmountType surplusQuota = accountAmountTypeService.querySurplusQuota(accountCode);
         accountBillDetail.setSurplusQuota(account.getSurplusQuota());
+        accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
         accountBillDetail.setTransType(TransType.DEPOSIT_INCR.code());
         accountBillDetailDao.save(accountBillDetail);
     }

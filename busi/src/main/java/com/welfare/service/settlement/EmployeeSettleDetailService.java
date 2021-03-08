@@ -81,4 +81,12 @@ public interface EmployeeSettleDetailService {
    * @return
    */
   EmployeeSettleSumDTO detailSummaryWithSettleNo(String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq);
+
+  /**
+   * 工授信额度消费账单详情导出
+   * @param settleNo settleNo
+   * @param employeeSettleDetailReq employeeSettleDetailReq
+   * @return
+   */
+  List<EmployeeSettleDetailResp> detailExportWithSettleNo(String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq);
 }

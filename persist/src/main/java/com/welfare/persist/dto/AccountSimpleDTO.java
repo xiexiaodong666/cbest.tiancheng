@@ -28,6 +28,9 @@ public class AccountSimpleDTO {
     @ApiModelProperty("授信余额")
     private BigDecimal surplusQuota;
 
+    @ApiModelProperty("个人授信余额溢缴款")
+    private BigDecimal surplusQuotaOverpay;
+
     @ApiModelProperty("是否授信")
     private Boolean credit;
 }

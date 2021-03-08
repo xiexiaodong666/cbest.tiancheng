@@ -184,4 +184,18 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
         EmployeeSettleSumDTO result = employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
         return result == null ? new EmployeeSettleSumDTO() : result;
     }
+
+    @Override
+    public List<EmployeeSettleDetailResp> detailExportWithSettleNo(String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq) {
+        EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
+        BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
+        employeeSettleDetailQuery.setSettleNo(settleNo);
+        employeeSettleDetailQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
+        employeeSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
+        return employeeSettleDetailMapper.querySettleDetail(employeeSettleDetailQuery).stream().map(employeeSettleDetailDTO -> {
+                EmployeeSettleDetailResp resp= new EmployeeSettleDetailResp();
+                BeanUtils.copyProperties(employeeSettleDetailDTO, resp);
+                return resp;
+            }).collect(Collectors.toList());
+    }
 }

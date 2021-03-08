@@ -154,7 +154,27 @@ public class EmployeeSettleController {
   @GetMapping("bill/{settleNo}/export")
   @ApiOperation("员工授信消费账单明细导出")
   public Object exportEmployeeSettleDetail(@PathVariable("settleNo")String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq, HttpServletResponse response){
-      return null;
+    List<EmployeeSettleDetailResp> employeeSettleDetailRespList = new ArrayList<>();
+    List<EmployeeSettleDetailResp> employeeSettleDetailRespTemp;
+    employeeSettleDetailReq.setMinId(0L);
+    do {
+      employeeSettleDetailRespTemp = employeeSettleDetailService.detailExportWithSettleNo(settleNo, employeeSettleDetailReq);
+      if(CollectionUtil.isNotEmpty(employeeSettleDetailRespTemp)){
+        employeeSettleDetailRespList.addAll(employeeSettleDetailRespTemp);
+        employeeSettleDetailReq.setMinId(employeeSettleDetailRespTemp.get(employeeSettleDetailRespTemp.size()-1).getId() + 1);
+      }else {
+        break;
+      }
+    }while (true);
+
+    String path = null;
+    try {
+      path = fileUploadService.uploadExcelFile(
+          employeeSettleDetailRespList, EmployeeSettleDetailResp.class, "账单明细");
+    } catch (IOException e) {
+      throw new BusiException(null, "文件导出异常", null);
+    }
+    return success(fileUploadService.getFileServerUrl(path));
   }
 
   @GetMapping("bill/{settleNo}/summary")

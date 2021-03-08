@@ -68,7 +68,7 @@
 
     <sql id="getEmployeeSettleConsumeWhere">
         <if test="query.accountName!=null and query.accountName!=''">
-            and a.account_name like concat('%',#{query.accountName},'%')
+            and esd.account_name like concat('%',#{query.accountName},'%')
         </if>
         <if test="query.phone!=null and query.phone!=''">
             and a.phone =#{query.phone}
@@ -79,11 +79,11 @@
         <if test="query.settleFlag!=null and query.settleFlag!=''">
             and esd.settle_flag=#{query.settleFlag}
         </if>
-        <if test="query.startTime!=null">
-            and esd.trans_time <![CDATA[ >= ]]> #{query.startTime}
+        <if test="query.transTimeStart!=null">
+            and esd.trans_time <![CDATA[ >= ]]> #{query.transTimeStart}
         </if>
-        <if test="query.endTime!=null">
-            and esd.trans_time <![CDATA[ <= ]]> #{query.endTime}
+        <if test="query.transTimeEnd!=null">
+            and esd.trans_time <![CDATA[ <= ]]> #{query.transTimeEnd}
         </if>
     </sql>
 
@@ -124,20 +124,22 @@
     </sql>
 
     <sql id="employeeSettleSum">
-        sum(case when esd.store_type ='self'  then esd.trans_amount else 0 end) as selfConsumerAmount,
-        sum(case when esd.store_type ='third'  then esd.trans_amount else 0 end) as thirdConsumerAmount,
-        sum(esd.trans_amount) as totalConsumerAmount
+        sum(case when esd.store_type ='self'  then esd.trans_amount else 0 end) as selfConsumerAmountSum,
+        sum(case when esd.store_type ='third'  then esd.trans_amount else 0 end) as thirdConsumerAmountSum,
+        sum(esd.trans_amount) as totalConsumerAmountSum
     </sql>
 
     <select id="getEmployeeSettleConsumeList" resultType="com.welfare.persist.dto.EmployeeSettleConsumeDTO">
         select
         esd.account_code as accountCode,
-        a.account_name as accountName,
+        esd.account_name as accountName,
         a.phone as phone,
         d.department_name as departmentName,
         CONCAT(a.surplus_quota + a.surplus_quota_overpay, '/',a.max_quota) as quota,
         count(esd.trans_amount) as orderNum,
-        <include refid="employeeSettleSum"></include>
+        sum(case when esd.store_type ='self'  then esd.trans_amount else 0 end) as selfConsumerAmount,
+        sum(case when esd.store_type ='third'  then esd.trans_amount else 0 end) as thirdConsumerAmount,
+        sum(esd.trans_amount) as totalConsumerAmount
         from employee_settle_detail esd left join account a on esd.account_code = a.account_code
         left join department d on a.store_code = d.department_code
         where 1 = 1
@@ -148,6 +150,8 @@
     <select id="getEmployeeSettleConsumeSum" resultType="com.welfare.persist.dto.EmployeeSettleSumDTO">
         select
         <include refid="employeeSettleSum"></include>
+        from employee_settle_detail esd left join account a on esd.account_code = a.account_code
+        left join department d on a.store_code = d.department_code
         where 1=1
         <include refid="getEmployeeSettleConsumeWhere"/>
 
@@ -156,6 +160,8 @@
     <select id="getEmployeeSettleDetailSum" resultType="com.welfare.persist.dto.EmployeeSettleSumDTO">
         select
         <include refid="employeeSettleSum"></include>
+        from employee_settle_detail esd left join account a on esd.account_code = a.account_code
+        left join department d on a.store_code = d.department_code
         where 1=1
         <include refid="employeeSettleDetailQuery"></include>
     </select>
@@ -165,7 +171,7 @@
                esd.order_id orderId,
                esd.trans_time transTime,
                esd.mer_account_type_name merAccountType,
-               a.account_name accountName,
+               esd.account_name accountName,
                a.phone phone,
                a.store_code departmentCode,
                d.department_name departmentName,

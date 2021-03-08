@@ -107,7 +107,8 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
     @Override
     public EmployeeSettleSumDTO summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery) {
         employeeSettleConsumeQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
-        return employeeSettleDetailMapper.getEmployeeSettleConsumeSum(employeeSettleConsumeQuery);
+        EmployeeSettleSumDTO result = employeeSettleDetailMapper.getEmployeeSettleConsumeSum(employeeSettleConsumeQuery);
+        return result == null ?  new EmployeeSettleSumDTO() : result;
     }
 
     @Override
@@ -116,7 +117,8 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
         BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
         employeeSettleDetailQuery.setAccountCode(accountCode);
         employeeSettleDetailQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
-        return employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
+        EmployeeSettleSumDTO result = employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
+        return result == null ?  new EmployeeSettleSumDTO() : result;
     }
 
     @Override
@@ -179,6 +181,7 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
         EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
         BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
         employeeSettleDetailQuery.setSettleNo(settleNo);
-        return employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
+        EmployeeSettleSumDTO result = employeeSettleDetailMapper.getEmployeeSettleDetailSum(employeeSettleDetailQuery);
+        return result == null ? new EmployeeSettleSumDTO() : result;
     }
 }

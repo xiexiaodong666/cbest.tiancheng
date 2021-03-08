@@ -38,7 +38,7 @@ public class EmployeeSettleDetailPageReq extends PageReq {
     @ApiModelProperty("消费截止时间")
     private Date transTimeEnd;
 
-    @ApiModelProperty("员工支出方式 授信额度:surplus_quota, 溢缴款:")
+    @ApiModelProperty("员工支出方式 授信额度:surplus_quota, 溢缴款:surplus_quota_overpay")
     private String merAccountType;
 
     @ApiModelProperty(value = "门店编号")

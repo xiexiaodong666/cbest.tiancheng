@@ -13,12 +13,12 @@ import lombok.Data;
 public class EmployeeSettleSumDTO {
 
     @ApiModelProperty(value = "第三方消费金额")
-    private String thirdConsumeAmountSum;
+    private String thirdConsumerAmountSum = "0.00";
 
     @ApiModelProperty(value = "自营消费金额")
-    private String selfConsumeAmountSum;
+    private String selfConsumerAmountSum = "0.00";
 
     @ApiModelProperty(value = "消费总金额")
-    private String totalConsumeAmount;
+    private String totalConsumerAmountSum = "0.00";
 
 }

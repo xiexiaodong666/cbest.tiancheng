@@ -72,3 +72,4 @@ alter table account_amount_type add column max_balance DECIMAL(11,2) DEFAULT 999
 #更新历史数据，额度最大值
 update account_amount_type t set t.max_balance = (select max_quota from account a where a.account_code = t.account_code) where t.mer_account_type_code = 'surplus_quota';
 
+alter table account add column surplus_quota_overpay DECIMAL(11,2) DEFAULT 0.00 comment '员工授信溢缴款' after surplus_quota;

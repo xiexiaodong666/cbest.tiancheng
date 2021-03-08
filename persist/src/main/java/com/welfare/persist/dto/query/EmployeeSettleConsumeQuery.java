@@ -40,6 +40,6 @@ public class EmployeeSettleConsumeQuery {
     @ApiModelProperty("消费截止时间")
     private Date transTimeEnd;
 
-    @ApiModelProperty("结算标志")
+    @ApiModelProperty(value = "结算标志", hidden = true)
     private String settleFlag;
 }

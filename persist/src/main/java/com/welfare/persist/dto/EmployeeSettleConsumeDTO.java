@@ -12,8 +12,8 @@ import lombok.Data;
 @Data
 public class EmployeeSettleConsumeDTO {
 
-    @ApiModelProperty("员工Id")
-    private Long accountId;
+    @ApiModelProperty("员工Code")
+    private Long accountCode;
 
     @ApiModelProperty("员工姓名")
     private String accountName;

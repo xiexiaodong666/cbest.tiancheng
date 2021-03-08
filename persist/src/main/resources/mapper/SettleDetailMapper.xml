@@ -178,6 +178,21 @@
         <include refid="monthSettleTableListAndCondition"></include>
     </select>
 
+    <select id="sumSettleDetailGroupByMerAccountType"
+            resultType="com.welfare.persist.dto.MonthSettleDetailMerchantSummaryDTO"
+            parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
+        select t1.mer_account_type,
+               t1.mer_account_type_name,
+               sum(
+                   case when t1.trans_type = 'consume' then t1.trans_amount
+                        when t1.trans_type = 'refund' then t1.trans_amount * -1
+                        else 0
+                   end
+               ) as totalAmount
+        <include refid="monthSettleTableListAndCondition"></include>
+        group by t1.mer_account_type,t1.mer_account_type_name
+    </select>
+
     <sql id="monthSettleTableListAndCondition">
         from settle_detail t1
         inner join account ac on t1.account_code = ac.account_code
@@ -671,6 +686,7 @@
         </where>
        group by t1.mer_account_type
     </select>
+    
 
 
     <sql id="queryListTable">

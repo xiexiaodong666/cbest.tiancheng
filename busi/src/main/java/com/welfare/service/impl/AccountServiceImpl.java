@@ -992,8 +992,10 @@ public class AccountServiceImpl implements AccountService {
     TreeUtil treeUtil=new TreeUtil(treeDTOList,"0");
     treeDTOList = treeUtil.getTree();
     treeDTOList = CollectionUtils.isNotEmpty(treeDTOList) ? treeDTOList.get(0).getChildren() : new ArrayList<>();
-    Map<String, DepartmentAndAccountTreeResp> treeMap = treeDTOList.stream().collect(Collectors.toMap(DepartmentAndAccountTreeResp::getDepartmentCode, a -> a,(k1,k2)->k1));
-    recursiveCalculateAccountNum(treeDTOList, treeMap);
+    if (CollectionUtils.isNotEmpty(treeDTOList)) {
+      Map<String, DepartmentAndAccountTreeResp> treeMap = treeDTOList.stream().collect(Collectors.toMap(DepartmentAndAccountTreeResp::getDepartmentCode, a -> a,(k1,k2)->k1));
+      recursiveCalculateAccountNum(treeDTOList, treeMap);
+    }
     return treeDTOList;
   }
 

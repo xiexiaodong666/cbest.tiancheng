@@ -92,5 +92,3 @@ update account a set a.surplus_quota_overpay = 0;
 
 #新增字段赋初始值
 update account_bill_detail a set a.surplus_quota_overpay = 0;
-
-alter table account add column surplus_quota_overpay DECIMAL(11,2) DEFAULT 0.00 comment '员工授信溢缴款' after surplus_quota;

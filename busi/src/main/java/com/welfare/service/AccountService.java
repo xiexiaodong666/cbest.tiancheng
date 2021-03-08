@@ -126,5 +126,5 @@ public interface AccountService {
    * @param merCode
    * @return
    */
-  List<DepartmentTree> groupByDepartment(String merCode);
+  List<DepartmentAndAccountTreeResp> groupByDepartment(String merCode);
 }

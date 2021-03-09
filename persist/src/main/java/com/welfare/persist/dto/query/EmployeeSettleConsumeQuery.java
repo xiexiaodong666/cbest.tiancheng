@@ -42,4 +42,7 @@ public class EmployeeSettleConsumeQuery {
 
     @ApiModelProperty(value = "结算标志", hidden = true)
     private String settleFlag;
+
+    @ApiModelProperty(value = "商户代码", hidden = true)
+    private String merCode;
 }

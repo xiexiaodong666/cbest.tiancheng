@@ -85,6 +85,9 @@
         <if test="query.transTimeEnd!=null">
             and esd.trans_time <![CDATA[ <= ]]> #{query.transTimeEnd}
         </if>
+        <if test="query.merCode!=null and query.merCode!=''">
+            and esd.mer_code=#{query.merCode}
+        </if>
     </sql>
 
     <sql id="employeeSettleDetailQuery">
@@ -142,7 +145,7 @@
         sum(esd.trans_amount) as totalConsumerAmount
         from employee_settle_detail esd left join account a on esd.account_code = a.account_code
         left join department d on a.store_code = d.department_code
-        where 1 = 1
+        where esd.mer_code = #{query.merCode}
         <include refid="getEmployeeSettleConsumeWhere"/>
         group by esd.account_code
     </select>
@@ -152,7 +155,7 @@
         <include refid="employeeSettleSum"></include>
         from employee_settle_detail esd left join account a on esd.account_code = a.account_code
         left join department d on a.store_code = d.department_code
-        where 1=1
+        where esd.mer_code = #{query.merCode}
         <include refid="getEmployeeSettleConsumeWhere"/>
 
     </select>

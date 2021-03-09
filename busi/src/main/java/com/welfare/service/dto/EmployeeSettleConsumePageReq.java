@@ -40,4 +40,7 @@ public class EmployeeSettleConsumePageReq extends PageReq {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("消费截止时间")
     private Date transTimeEnd;
+
+    @ApiModelProperty(value = "商户代码", hidden = true)
+    private String merCode;
 }

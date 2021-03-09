@@ -77,14 +77,28 @@ public class EmployeeSettleController {
 
   @GetMapping("/page")
   @ApiOperation("员工授信消费查询")
+  @MerchantUser
   public R<BasePageVo<EmployeeSettleConsumeDTO>> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq){
-    return success(employeeSettleDetailService.pageQuery(employeeSettleConsumePageReq));
+     MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
+     if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
+         employeeSettleConsumePageReq.setMerCode(merchantUser.getMerchantCode());
+     }else {
+         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+     }
+     return success(employeeSettleDetailService.pageQuery(employeeSettleConsumePageReq));
   }
 
   @GetMapping("/summary")
   @ApiOperation("员工授信消费查询summary")
+  @MerchantUser
   public R<EmployeeSettleSumDTO> summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery){
-    return success(employeeSettleDetailService.summary(employeeSettleConsumeQuery));
+     MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
+     if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
+         employeeSettleConsumeQuery.setMerCode(merchantUser.getMerchantCode());
+     }else {
+         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+     }
+     return success(employeeSettleDetailService.summary(employeeSettleConsumeQuery));
 
   }
 

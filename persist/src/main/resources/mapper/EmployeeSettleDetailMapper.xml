@@ -85,9 +85,6 @@
         <if test="query.transTimeEnd!=null">
             and esd.trans_time <![CDATA[ <= ]]> #{query.transTimeEnd}
         </if>
-        <if test="query.merCode!=null and query.merCode!=''">
-            and esd.mer_code=#{query.merCode}
-        </if>
     </sql>
 
     <sql id="employeeSettleDetailQuery">

@@ -54,7 +54,7 @@ public class EmployeeSettleBuildReq {
   @ApiModelProperty("消费截止时间")
   private Date transTimeEnd;
 
-  @ApiModelProperty("员工支出方式 授信额度:surplus_quota, 溢缴款:")
+  @ApiModelProperty("员工支出方式 授信额度:surplus_quota, 溢缴款:surplus_quota_overpay")
   private String merAccountType;
 
   @ApiModelProperty(value = "勾选的员工编码", required = true)

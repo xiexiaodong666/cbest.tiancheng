@@ -23,6 +23,7 @@ import com.welfare.service.listener.DepartmentListener;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +45,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentDao departmentDao;
     private final DepartmentTreeConverter departmentTreeConverter;
     private final DepartmentTreeWithoutMerchantConverter departmentTreeWithoutMerchantConverter;
-    private final MerchantService merchantService;
+    @Autowired
+    private MerchantService merchantService;
     private final DepartmentConverter departmentConverter;
     private final SequenceService sequenceService;
     private final DictService dictService;

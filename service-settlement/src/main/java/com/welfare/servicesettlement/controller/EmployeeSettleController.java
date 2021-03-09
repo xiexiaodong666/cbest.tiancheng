@@ -7,6 +7,7 @@ import com.welfare.common.base.BasePageVo;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import static net.dreamlu.mica.core.result.R.success;
@@ -56,7 +59,8 @@ import static net.dreamlu.mica.core.result.R.success;
 @Api(tags = "员工授信结算相关")
 public class EmployeeSettleController {
 
-  private final EmployeeSettleService employeeSettleService;
+  @Autowired
+  private EmployeeSettleService employeeSettleService;
   private final EmployeeSettleDetailService employeeSettleDetailService;
   private final FileUploadServiceUtil fileUploadService;
 
@@ -197,4 +201,18 @@ public class EmployeeSettleController {
     return success(employeeSettleDetailService.detailSummaryWithSettleNo(settleNo, employeeSettleDetailReq));
   }
 
+  @GetMapping("/pullAccountDetailByDate")
+  @ApiOperation("员工授信交易数据手工拉取")
+  public R settlementDetailDealTask(String dateStr) {
+    Date date = null;
+    if (StringUtils.isNoneBlank(dateStr)) {
+      try {
+        date = DateUtil.str2Date(dateStr, DateUtil.DEFAULT_DATE_FORMAT);
+      } catch (Exception e) {
+        throw new BusiException("时间转换失败");
+      }
+    }
+    employeeSettleDetailService.pullAccountDetailByDate(date);
+    return R.success();
+  }
 }

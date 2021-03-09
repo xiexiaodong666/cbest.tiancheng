@@ -99,7 +99,7 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             throw new BusiException("至少勾选一个员工！");
         }
         List<RLock> locks = new ArrayList<>();
-        RLock multiLock = null;
+        RLock multiLock;
         settleBuildReq.getSelectedAccountCodes().forEach(accountCode -> {
             RLock lock = redissonClient.getFairLock(BUILD_EMPLOYEE_SETTLE + accountCode);
             locks.add(lock);
@@ -108,11 +108,18 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
         multiLock.lock(-1, TimeUnit.SECONDS);
         try {
             EmployeeSettleBuildQuery query = new EmployeeSettleBuildQuery();
-            BeanUtils.copyProperties(query, settleBuildReq);
+            BeanUtils.copyProperties(settleBuildReq, query);
+            query.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
             List<EmployeeSettleDetail> settleDetails = employeeSettleDetailMapper.getBuildEmployeeSettleDetail(query);
             if (CollectionUtils.isEmpty(settleDetails)) {
                 throw new BusiException("没有符合条件结算数据！");
             }
+            List<Long> accountCodes = settleDetails.stream().map(EmployeeSettleDetail::getAccountCode).collect(Collectors.toList());
+            settleBuildReq.getSelectedAccountCodes().forEach(accountCode -> {
+                if (!accountCodes.contains(Long.parseLong(accountCode))) {
+                    throw new BusiException(String.format("员工[%s]没有可结算的数据！", accountCode));
+                }
+            });
             List<EmployeeSettle> employeeSettles = assemblyEmployeeSettles(settleDetails, settleBuildReq);
             boolean flag1 = employeeSettleDao.saveBatch(employeeSettles);
             boolean flag2 = employeeSettleDetailDao.updateBatchById(settleDetails);
@@ -170,9 +177,6 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 throw new BusiException("操作繁忙，请稍后再试！");
             }
             return true;
-        } catch (Exception e) {
-            log.error("完成员工授信结算单失败,请求:{}", JSON.toJSONString(employeeSettleFinishReq), e);
-            throw e;
         } finally {
             DistributedLockUtil.unlock(multiLock);
         }
@@ -186,24 +190,28 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             BatchSequence batchSequence = sequenceService.batchGenerate(WelfareConstant.SequenceType.EMPLOYEE_SETTLE_NO.code(), settleDetailsMap.size());
             AtomicInteger sequenceIndex = new AtomicInteger();
             settleDetailsMap.forEach((accountCode, details) -> {
-                String settleNo = accountCode
-                        + DateUtil.dateTime2Str(now, "yyyyMMdd")
+                String settleNo = accountCode + ""
                         + batchSequence.getSequences().get(sequenceIndex.getAndIncrement()).getSequenceNo();
                 BigDecimal totalSettleAmount = BigDecimal.ZERO;
                 BigDecimal totalConsumerAmount = BigDecimal.ZERO;
-                for (int i = 0; i < details.size(); i++) {
-                    EmployeeSettleDetail detail = details.get(i);
-                    totalConsumerAmount = totalConsumerAmount.add(detail.getTransAmount());
+                for (EmployeeSettleDetail detail : details) {
                     if (detail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
-                        && WelfareConstant.TransType.REFUND.code().equals(detail.getTransType())) {
+                            && WelfareConstant.TransType.REFUND.code().equals(detail.getTransType())) {
                         totalSettleAmount = totalSettleAmount.add(BigDecimal.ZERO);
+                        totalConsumerAmount = totalConsumerAmount.add(detail.getTransAmount().abs());
+                    } else if (detail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())
+                            && WelfareConstant.TransType.REFUND.code().equals(detail.getTransType())) {
+                        totalSettleAmount = totalSettleAmount.add(detail.getTransAmount().abs().negate());
+                        totalConsumerAmount = totalConsumerAmount.add(detail.getTransAmount().abs().negate());
                     } else {
-                        totalSettleAmount = totalSettleAmount.add(detail.getTransAmount());
+                        totalSettleAmount = totalSettleAmount.add(detail.getTransAmount().abs());
+                        totalConsumerAmount = totalConsumerAmount.add(detail.getTransAmount().abs());
                     }
                     detail.setSettleNo(settleNo);
                     detail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
                 }
                 EmployeeSettle employeeSettle = new EmployeeSettle();
+                employeeSettle.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
                 employeeSettle.setAccountCode(accountCode);
                 employeeSettle.setTransAmount(totalConsumerAmount);
                 employeeSettle.setSettleAmount(totalSettleAmount);
@@ -212,8 +220,9 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 employeeSettle.setBuildTime(now);
                 employeeSettle.setCreateUser(MerchantUserHolder.getMerchantUser().getUserCode());
                 employeeSettle.setSettleNo(settleNo);
+                details = details.stream().sorted(Comparator.comparing(EmployeeSettleDetail::getTransTime)).collect(Collectors.toList());
                 if (totalSettleAmount.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new BusiException(String.format("员工[%s]结算金额不能小于零！", accountCode));
+                    throw new BusiException(String.format("员工[%s]结算金额[%s]不能小于零！", totalSettleAmount, accountCode));
                 }
                 if (settleBuildReq.getTransTimeStart() == null) {
                     settleBuildReq.setTransTimeStart(details.get(0).getTransTime());
@@ -225,6 +234,7 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 } else {
                     employeeSettle.setSettleEndTime(settleBuildReq.getTransTimeEnd());
                 }
+                employeeSettles.add(employeeSettle);
             });
         };
         return employeeSettles;

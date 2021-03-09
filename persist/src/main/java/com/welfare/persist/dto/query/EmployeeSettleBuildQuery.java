@@ -55,4 +55,6 @@ public class EmployeeSettleBuildQuery {
   @ApiModelProperty(value = "勾选的员工编码", required = true)
   @NotEmpty(message = "至少勾选一个员工！")
   private List<String> selectedAccountCodes;
+
+  private String merCode;
 }

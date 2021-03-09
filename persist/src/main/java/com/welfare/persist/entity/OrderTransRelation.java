@@ -32,7 +32,7 @@ public class OrderTransRelation extends Model<OrderTransRelation> implements Ser
      * id
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId
+    @TableId(type = IdType.ASSIGN_ID)
 	private Long id;
     /**
      * 订单号

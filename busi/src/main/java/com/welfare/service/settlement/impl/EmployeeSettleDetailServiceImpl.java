@@ -62,30 +62,34 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void pullAccountDetailByDate(Date date) {
-        String dateStr = DateUtil.date2Str(date, DateUtil.DEFAULT_DATE_FORMAT);
-        RLock lock = DistributedLockUtil.lockFairly(RedisKeyConstant.buidKey(RedisKeyConstant.PULL_EMPLOYEE_SETTLE_DETAIL, dateStr));
-        EmployeeSettleDetailMapper employeeSettleDetailMapper = employeeSettleDetailDao.getBaseMapper();
         try {
-            Date dateStart = DateUtil.getDayMin(date, -1);
-            Date dateEnd = DateUtil.getDayMax(date, -1);
+            EmployeeSettleDetailMapper employeeSettleDetailMapper = employeeSettleDetailDao.getBaseMapper();
             Map<String, Object> params = new HashMap<>();
-            params.put("startTime", dateStart);
-            params.put("endTime", dateEnd);
+            if (date != null) {
+                Date dateStart = DateUtil.getDayMin(date, -1);
+                Date dateEnd = DateUtil.getDayMax(date, -1);
+                params.put("startTime", dateStart);
+                params.put("endTime", dateEnd);
+            }
             params.put("minId", 0);
             params.put("limit", 2000);
             do {
                 log.info("employeeSettleDetailMapper循环拉取账户授信详细交易数据环拉取账户授信详细交易数据，请求参数：{}", JSONObject.toJSONString(params));
                 List<EmployeeSettleDetail> settleDetails = employeeSettleDetailMapper.getFromAccountDetail(params);
                 if (!settleDetails.isEmpty()) {
-                    params.put("minId", settleDetails.get(settleDetails.size() - 1).getId() + 1);
-                    employeeSettleDetailDao.saveBatch(settleDetails);
+                    params.put("minId", settleDetails.get(settleDetails.size() - 1).getAccountDeductionAmountId() + 1);
+                    employeeSettleDetailDao.saveBatch(settleDetails, settleDetails.size());
+                } else {
+                    break;
                 }
             } while (true);
         } catch (Exception e) {
+            String dateStr = "";
+            if (date != null) {
+                dateStr = DateUtil.date2Str(DateUtil.getDayMin(date, -1), DateUtil.DEFAULT_DATE_FORMAT);
+            }
             log.error("同步{}的员工授信流水数据失败", dateStr, e);
             throw new BusiException(String.format("同步%s的员工授信流水数据失败", dateStr));
-        } finally {
-            DistributedLockUtil.unlock(lock);
         }
     }
 

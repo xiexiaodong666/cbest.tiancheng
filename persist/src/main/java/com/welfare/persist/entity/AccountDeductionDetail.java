@@ -33,7 +33,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
      * id
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId
 	private Long id;
     /**
      * 员工账号

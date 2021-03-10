@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableMap;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.AccountStatus;
 import com.welfare.common.constants.RedisKeyConstant;
@@ -70,6 +71,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final MerchantCreditDao merchantCreditDao;
     private final AsyncNotificationService asyncNotificationService;
     PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
+    private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
+            ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -180,6 +183,12 @@ public class PaymentServiceImpl implements PaymentService {
         Assert.isTrue(SupplierStoreStatusEnum.ACTIVATED.getCode().equals(supplierStore.getStatus()),
                 "门店未激活:" + supplierStore.getStoreCode());
 
+        //写死的逻辑，紧急上线，没有时间重新设计逻辑，支持店中店模式
+        if(ConsumeTypeEnum.SHOP_SHOPPING.getCode().equals(paymentScene)
+                && SPECIAL_STORE_ACCOUNT_TYPE_MAP.containsKey(paymentRequest.getStoreNo())
+                && SPECIAL_STORE_ACCOUNT_TYPE_MAP.get(paymentRequest.getStoreNo()).contains(account.getAccountTypeCode())){
+            Assert.isTrue("9001".equals(paymentRequest.getMachineNo()),"当前用户仅允许在9001收银机消费");
+        }
         Assert.isTrue(!CollectionUtils.isEmpty(sceneStoreRelations), "未找到该门店的可用交易场景配置");
         List<String> sceneConsumeTypes = sceneStoreRelations.stream().map(relation -> Arrays.asList(relation.getSceneConsumType().split(",")))
                 .flatMap(Collection::stream)

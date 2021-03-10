@@ -21,7 +21,7 @@
                es.trans_amount transAmount,
                es.order_num orderNum,
                es.settle_amount settleAmount,
-               case when es.settle_status = 'unsettled' then '待结算'
+               case when es.settle_status = 'settling' then '结算中'
                     when es.settle_status = 'settled' then '已结算' end settleStatus,
                es.confirm_time settleTime
         from employee_settle es
@@ -53,6 +53,7 @@
           and es.create_time <= #{query.endTime}
         ]]>
     </if>
+      order by es.create_time desc
     </select>
 
 

@@ -52,7 +52,7 @@ CREATE TABLE `employee_settle` (
                                    `trans_amount` decimal(10,2) DEFAULT NULL COMMENT '交易金额',
                                    `settle_amount` decimal(10,2) DEFAULT NULL COMMENT '结算金额',
                                    `order_num` int(11) DEFAULT NULL COMMENT '交易笔数',
-                                   `settle_status` varchar(20) DEFAULT NULL COMMENT '结算状态（待结算-unsettled；已结算-settled）',
+                                   `settle_status` varchar(20) DEFAULT NULL COMMENT '结算状态（结算中-settling；已结算-settled）',
                                    `send_time` datetime DEFAULT NULL COMMENT '发送时间',
                                    `confirm_time` datetime DEFAULT NULL COMMENT '确定时间',
                                    `settle_start_time` datetime DEFAULT NULL COMMENT '账单开始时间',

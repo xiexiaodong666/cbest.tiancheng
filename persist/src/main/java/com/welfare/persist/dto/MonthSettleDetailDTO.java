@@ -18,7 +18,7 @@ public class MonthSettleDetailDTO{
 
     private String transNo;
 
-    private String orderNO;
+    private String orderNo;
 
     private Date transTime;
 

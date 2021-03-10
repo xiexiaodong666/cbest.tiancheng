@@ -12,7 +12,7 @@
     <resultMap id="monthSettleDetailDTO" type="com.welfare.persist.dto.MonthSettleDetailDTO">
         <result property="id" column="id"/>
         <result property="transNo" column="trans_no"/>
-        <result property="orderNO" column="order_no"/>
+        <result property="orderNo" column="order_no"/>
         <result property="transTime" column="trans_time" jdbcType="TIMESTAMP"/>
         <result property="storeCode" column="store_code"/>
         <result property="storeName" column="store_name"/>
@@ -477,7 +477,7 @@
         select
         t1.id as id,
         t1.trans_no as transNo,
-        t1.order_id as orderNO,
+        t1.order_id as orderNo,
         t1.trans_time as transTime,
         t1.store_code as storeCode,
         t1.store_name as storeName,
@@ -576,7 +576,7 @@
         select
         t1.id as id,
         t1.trans_no as transNo,
-        t1.order_id as orderNO,
+        t1.order_id as orderNo,
         t1.trans_time as transTime,
         t1.store_code as storeCode,
         t1.store_name as storeNam,

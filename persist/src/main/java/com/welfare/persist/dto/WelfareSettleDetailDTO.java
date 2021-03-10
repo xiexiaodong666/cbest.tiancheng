@@ -26,7 +26,7 @@ public class WelfareSettleDetailDTO {
 
     @ExcelProperty(value = "订单号")
     @ApiModelProperty(value = "订单号")
-    private String orderNO;
+    private String orderNo;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

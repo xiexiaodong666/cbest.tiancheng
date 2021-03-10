@@ -6,6 +6,7 @@ import java.util.Date;
 
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.RedisKeyConstant.FINISH_EMPLOYEE_SETTLE;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -79,7 +80,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountDao accountDao;
     private final FileUniversalStorageDao fileUniversalStorageDao;
 
-  private final AccountMapper accountMapper;
+    private final AccountMapper accountMapper;
     private final AccountCustomizeMapper accountCustomizeMapper;
     private final AccountConverter accountConverter;
     @Autowired
@@ -91,14 +92,16 @@ public class AccountServiceImpl implements AccountService {
     private final ObjectMapper mapper;
     @Autowired
     private MerchantService merchantService;
-    private final DepartmentService departmentService;
+    @Autowired
+    private DepartmentService departmentService;
     private final SequenceService sequenceService;
     private final CardInfoService cardInfoService;
     @Autowired
     private AccountChangeEventRecordService accountChangeEventRecordService;
     private final AccountChangeEventRecordCustomizeMapper accountChangeEventRecordCustomizeMapper;
     private final ApplicationContext applicationContext;
-    private final MerchantAccountTypeService merchantAccountTypeService;
+    @Autowired
+    private MerchantAccountTypeService merchantAccountTypeService;
     private final AccountAmountTypeMapper accountAmountTypeMapper;
     private final RedissonClient redissonClient;
     private final AccountBillDetailMapper accountBillDetailMapper;
@@ -884,115 +887,121 @@ public class AccountServiceImpl implements AccountService {
     }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void batchRestoreCreditLimit(List<RestoreCreditLimitDTO> restoreCreditLimitDTOS) {
     if (CollectionUtils.isNotEmpty(restoreCreditLimitDTOS)) {
       List<Long> accountCodes = restoreCreditLimitDTOS.stream().map(RestoreCreditLimitDTO::getAccountCode).collect(Collectors.toList());;
       List<RLock> locks = new ArrayList<>();
       RLock multiLock;
       accountCodes.forEach(accountCode -> {
-        RLock lock = DistributedLockUtil.lockFairly(ACCOUNT_AMOUNT_TYPE_OPERATE + accountCode);
-        locks.add(lock);
+          RLock lock = redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_OPERATE + accountCode);
+          locks.add(lock);
       });
       multiLock = redissonClient.getMultiLock(locks.toArray(new RLock[]{}));
       multiLock.lock(-1, TimeUnit.SECONDS);
       try {
-        Map<Long ,Account> accountsMap = accountDao.mapByAccountCodes(accountCodes);
-        Map<Long ,AccountAmountType> surplusQuotaMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, MerAccountTypeCode.SURPLUS_QUOTA.code());
-        Map<Long ,AccountAmountType> surplusQuotaOverpayMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
-        Map<Long ,RestoreCreditLimitDTO> restoreCreditLimitMap = restoreCreditLimitDTOS.stream().collect(Collectors.toMap(RestoreCreditLimitDTO::getAccountCode, a -> a,(k1,k2)->k1));
-        List<Account> updatedAccounts = new ArrayList<>();
-        List<AccountAmountType> updatedAccountTypes = new ArrayList<>();
-        List<AccountBillDetail> accountBillDetails = new ArrayList<>();
-        List<AccountDeductionDetail> accountDeductionDetails = new ArrayList<>();
-        List<OrderTransRelation> orderTransRelations = new ArrayList<>();
-        List<AccountChangeEventRecord> records = new ArrayList<>();
+          Map<Long ,Account> accountsMap = accountDao.mapByAccountCodes(accountCodes);
+          Map<Long ,AccountAmountType> surplusQuotaMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, MerAccountTypeCode.SURPLUS_QUOTA.code());
+          Map<Long ,AccountAmountType> surplusQuotaOverpayMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
+          Map<Long ,RestoreCreditLimitDTO> restoreCreditLimitMap = restoreCreditLimitDTOS.stream().collect(Collectors.toMap(RestoreCreditLimitDTO::getAccountCode, a -> a,(k1,k2)->k1));
+          List<Account> updatedAccounts = new ArrayList<>();
+          List<AccountAmountType> updatedAccountTypes = new ArrayList<>();
+          List<AccountBillDetail> accountBillDetails = new ArrayList<>();
+          List<AccountDeductionDetail> accountDeductionDetails = new ArrayList<>();
+          List<OrderTransRelation> orderTransRelations = new ArrayList<>();
+          List<AccountChangeEventRecord> records = new ArrayList<>();
 
-        restoreCreditLimitDTOS.forEach(restoreLimit -> {
-          Long accountCode = restoreLimit.getAccountCode();
-          BigDecimal restoreAmount = restoreLimit.getRestoreAmount();
-          Account account = accountsMap.get(accountCode);
-          if (account == null) {
-            throw new BusiException(String.format("员工不存在[%s]", accountCode));
+          restoreCreditLimitDTOS.forEach(restoreLimit -> {
+              Long accountCode = restoreLimit.getAccountCode();
+              BigDecimal restoreAmount = restoreLimit.getRestoreAmount();
+              Account account = accountsMap.get(accountCode);
+              if (account == null) {
+                  throw new BusiException(String.format("员工不存在[%s]", accountCode));
+              }
+              AccountAmountType surplusQuota = surplusQuotaMap.get(accountCode);
+              if (Objects.isNull(surplusQuota)) {
+                  throw new BusiException(String.format("员工授信额度账户不存在[%s]", accountCode));
+              }
+              BigDecimal overAmount = surplusQuota.getAccountBalance().add(restoreAmount).subtract(account.getMaxQuota());
+              if (overAmount.compareTo(BigDecimal.ZERO) < 0) {
+                  // 恢复授信额度
+                  surplusQuota.setAccountBalance(surplusQuota.getAccountBalance().add(restoreAmount));
+                  account.setSurplusQuota(surplusQuota.getAccountBalance().add(restoreAmount));
+                  updatedAccounts.add(account);
+                  updatedAccountTypes.add(surplusQuota);
+                  // 保存变更流水
+                  AccountBillDetail billDetail = assemblyAccountBillDetail(account, overAmount, "", TransType.RESET_INCR);
+                  AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account, overAmount, "", TransType.RESET_INCR, MerAccountTypeCode.SURPLUS_QUOTA);
+                  accountBillDetails.add(billDetail);
+                  accountDeductionDetails.add(deductionDetail);
+              } else {
+                  if (surplusQuota.getAccountBalance().compareTo(account.getMaxQuota()) < 0) {
+                      // 恢复授信额度
+                      surplusQuota.setAccountBalance(account.getMaxQuota());
+                      account.setSurplusQuota(account.getMaxQuota());
+                      updatedAccounts.add(account);
+                      updatedAccountTypes.add(surplusQuota);
+                      // 保存变更流水
+                      BigDecimal updateAmount = account.getMaxQuota().subtract(surplusQuota.getAccountBalance());
+                      AccountBillDetail billDetail = assemblyAccountBillDetail(account, updateAmount, "", TransType.RESET_INCR);
+                      AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account, updateAmount, "", TransType.RESET_INCR, MerAccountTypeCode.SURPLUS_QUOTA);
+                      accountBillDetails.add(billDetail);
+                      accountDeductionDetails.add(deductionDetail);
+                  }
+                  // 溢出部分汇入溢缴款账户
+                  AccountAmountType surplusQuotaOverpay = surplusQuotaOverpayMap.get(accountCode);
+                  if (Objects.isNull(surplusQuotaOverpay)) {
+                      throw new BusiException(String.format("员工溢缴款账户不存在[%s]", accountCode));
+                  }
+                  surplusQuotaOverpay.setAccountBalance(surplusQuotaOverpay.getAccountBalance().add(overAmount.abs()));
+                  updatedAccountTypes.add(surplusQuotaOverpay);
+                  // 保存变更流水
+                  AccountBillDetail billDetail = assemblyAccountBillDetail(account, overAmount.abs(), "", TransType.RESET_INCR);
+                  AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account, overAmount.abs(), "", TransType.RESET_INCR, MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY);
+                  accountBillDetails.add(billDetail);
+                  accountDeductionDetails.add(deductionDetail);
+              }
+              AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
+              accountChangeEventRecord.setAccountCode(account.getAccountCode());
+              accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_SETTLE_RESTORE.getChangeType());
+              accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_SETTLE_RESTORE.getChangeValue());
+              records.add(accountChangeEventRecord);
+          });
+          BatchSequence batchSequence = sequenceService.batchGenerate(WelfareConstant.SequenceType.DEPOSIT.code(), accountBillDetails.size() + accountDeductionDetails.size());
+          int sequenceIndex = 0;
+          for (AccountBillDetail billDetail : accountBillDetails) {
+              String transNo = batchSequence.getSequences().get(sequenceIndex++).getSequenceNo()+"";
+              String settleNo = restoreCreditLimitMap.get(billDetail.getAccountCode()).getSettleNo();
+              billDetail.setTransNo(transNo);
+              OrderTransRelation orderTransRelation = assemblyOrderTransRelation(billDetail.getTransAmount(), transNo, settleNo, TransType.RESET_INCR);
+              orderTransRelations.add(orderTransRelation);
           }
-          AccountAmountType surplusQuota = surplusQuotaMap.get(accountCode);
-          if (Objects.isNull(surplusQuota)) {
-            throw new BusiException(String.format("员工授信额度账户不存在[%s]", accountCode));
+          for (AccountDeductionDetail deductionDetail : accountDeductionDetails) {
+              String transNo = batchSequence.getSequences().get(sequenceIndex++).getSequenceNo()+"";
+              String settleNo = restoreCreditLimitMap.get(deductionDetail.getAccountCode()).getSettleNo();
+              deductionDetail.setTransNo(transNo);
+              OrderTransRelation orderTransRelation = assemblyOrderTransRelation(deductionDetail.getTransAmount(), transNo, settleNo, TransType.RESET_INCR);
+              orderTransRelations.add(orderTransRelation);
           }
-          BigDecimal overAmount = surplusQuota.getAccountBalance().add(restoreAmount).subtract(account.getMaxQuota());
-          if (overAmount.compareTo(BigDecimal.ZERO) < 0) {
-            // 恢复授信额度
-            surplusQuota.setAccountBalance(surplusQuota.getAccountBalance().add(restoreAmount));
-            account.setSurplusQuota(surplusQuota.getAccountBalance().add(restoreAmount));
-            updatedAccounts.add(account);
-            updatedAccountTypes.add(surplusQuota);
-            // 保存变更流水
-            AccountBillDetail billDetail = assemblyAccountBillDetail(account, overAmount, "", TransType.RESET_INCR);
-            AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account, overAmount, "", TransType.RESET_INCR, MerAccountTypeCode.SURPLUS_QUOTA);
-            accountBillDetails.add(billDetail);
-            accountDeductionDetails.add(deductionDetail);
-          } else {
-            if (surplusQuota.getAccountBalance().compareTo(account.getMaxQuota()) < 0) {
-              // 恢复授信额度
-              surplusQuota.setAccountBalance(account.getMaxQuota());
-              account.setSurplusQuota(account.getMaxQuota());
-              updatedAccounts.add(account);
-              updatedAccountTypes.add(surplusQuota);
-              // 保存变更流水
-              BigDecimal updateAmount = account.getMaxQuota().subtract(surplusQuota.getAccountBalance());
-              AccountBillDetail billDetail = assemblyAccountBillDetail(account, updateAmount, "", TransType.RESET_INCR);
-              AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account, updateAmount, "", TransType.RESET_INCR, MerAccountTypeCode.SURPLUS_QUOTA);
-              accountBillDetails.add(billDetail);
-              accountDeductionDetails.add(deductionDetail);
-            }
-            // 溢出部分汇入溢缴款账户
-            AccountAmountType surplusQuotaOverpay = surplusQuotaOverpayMap.get(accountCode);
-            surplusQuotaOverpay.setAccountBalance(surplusQuotaOverpay.getAccountBalance().add(overAmount.abs()));
-            updatedAccountTypes.add(surplusQuotaOverpay);
-            // 保存变更流水
-            AccountBillDetail billDetail = assemblyAccountBillDetail(account, overAmount.abs(), "", TransType.RESET_INCR);
-            AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account, overAmount.abs(), "", TransType.RESET_INCR, MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY);
-            accountBillDetails.add(billDetail);
-            accountDeductionDetails.add(deductionDetail);
+          accountDeductionDetailDao.saveBatch(accountDeductionDetails, accountDeductionDetails.size());
+          accountBillDetailDao.saveBatch(accountBillDetails, accountBillDetails.size());
+          orderTransRelationDao.saveBatch(orderTransRelations, orderTransRelations.size());
+          accountChangeEventRecordDao.saveBatch(records, records.size());
+          Map<Long, AccountChangeEventRecord> recordMap = records.stream().collect(Collectors.toMap(AccountChangeEventRecord::getAccountCode, a -> a,(k1,k2)->k1));
+          updatedAccounts.forEach(account -> {
+              account.setChangeEventId(recordMap.get(account.getAccountCode()).getId());
+          });
+          boolean flag1 = true;
+          boolean flag2 = true;
+          if (CollectionUtils.isNotEmpty(updatedAccounts)) {
+              flag1 = accountDao.updateBatchById(updatedAccounts);
           }
-          AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
-          accountChangeEventRecord.setAccountCode(account.getAccountCode());
-          accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_SETTLE_RESTORE.getChangeType());
-          accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_SETTLE_RESTORE.getChangeValue());
-          records.add(accountChangeEventRecord);
-        });
-        BatchSequence batchSequence = sequenceService.batchGenerate(WelfareConstant.SequenceType.DEPOSIT.code(), accountBillDetails.size() + accountDeductionDetails.size());
-        int sequenceIndex = 0;
-        for (AccountBillDetail billDetail : accountBillDetails) {
-          String transNo = batchSequence.getSequences().get(sequenceIndex++).getSequenceNo()+"";
-          String settleNo = restoreCreditLimitMap.get(billDetail.getAccountCode()).getSettleNo();
-          billDetail.setTransNo(transNo);
-          OrderTransRelation orderTransRelation = assemblyOrderTransRelation(billDetail.getTransAmount(), transNo, settleNo, TransType.RESET_INCR);
-          orderTransRelations.add(orderTransRelation);
-        }
-        for (AccountDeductionDetail deductionDetail : accountDeductionDetails) {
-          String transNo = batchSequence.getSequences().get(sequenceIndex++).getSequenceNo()+"";
-          String settleNo = restoreCreditLimitMap.get(deductionDetail.getAccountCode()).getSettleNo();
-          deductionDetail.setTransNo(transNo);
-          OrderTransRelation orderTransRelation = assemblyOrderTransRelation(deductionDetail.getTransAmount(), transNo, settleNo, TransType.RESET_INCR);
-          orderTransRelations.add(orderTransRelation);
-        }
-
-        accountBillDetailDao.saveBatch(accountBillDetails);
-        accountDeductionDetailDao.saveBatch(accountDeductionDetails);
-        orderTransRelationDao.saveBatch(orderTransRelations);
-        accountChangeEventRecordDao.saveBatch(records);
-        Map<Long, AccountChangeEventRecord> recordMap = records.stream().collect(Collectors.toMap(AccountChangeEventRecord::getAccountCode, a -> a,(k1,k2)->k1));
-        updatedAccounts.forEach(account -> {
-          account.setChangeEventId(recordMap.get(account.getAccountCode()).getId());
-        });
-        boolean flag1 = accountDao.updateBatchById(updatedAccounts);
-        boolean flag2 = accountAmountTypeDao.updateBatchById(updatedAccountTypes);
-        if (!flag1 || !flag2) {
-          throw new BusiException("操作繁忙，请稍后再试！");
-        }
-      } catch (Exception e) {
-        log.error("批量恢复员工授信额度,请求:{}", JSON.toJSONString(restoreCreditLimitDTOS), e);
-        throw e;
+          if (CollectionUtils.isNotEmpty(updatedAccountTypes)) {
+              flag2 = accountAmountTypeDao.updateBatchById(updatedAccountTypes);
+          }
+          if (!flag1 || !flag2) {
+              throw new BusiException("操作繁忙，请稍后再试！");
+          }
       } finally {
         DistributedLockUtil.unlock(multiLock);
       }

@@ -50,6 +50,11 @@ public class EmployeeSettle extends Model<EmployeeSettle> implements Serializabl
     @ApiModelProperty("账单周期")   
     private String settlePeriod;
     /**
+     * 商户代码
+     */
+    @ApiModelProperty("商户代码")
+    private String merCode;
+    /**
      * 账户
      */
     @ApiModelProperty("账户")
@@ -144,6 +149,10 @@ public class EmployeeSettle extends Model<EmployeeSettle> implements Serializabl
     * 账单周期
     */
     public static final String SETTLE_PERIOD = "settle_period";
+    /**
+     * 商户代码
+     */
+    public static final String MER_CODE = "mer_code";
     /**
     * 商户代码
     */

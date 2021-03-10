@@ -55,7 +55,7 @@ CREATE TABLE `employee_settle` (
                                    `settle_status` varchar(20) DEFAULT NULL COMMENT '结算状态（待结算-unsettled；已结算-settled）',
                                    `send_time` datetime DEFAULT NULL COMMENT '发送时间',
                                    `confirm_time` datetime DEFAULT NULL COMMENT '确定时间',
-                                   `settle_start_time` date DEFAULT NULL COMMENT '账单开始时间',
+                                   `settle_start_time` datetime DEFAULT NULL COMMENT '账单开始时间',
                                    `settle_end_time` datetime DEFAULT NULL COMMENT '账单结束时间',
                                    `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
                                    `create_time` datetime DEFAULT NULL COMMENT '创建时间',

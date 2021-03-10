@@ -133,6 +133,11 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     @ApiModelProperty("type 1商户，2门店")
     @TableField(exist = false)
     private Boolean isMerchant;
+    /**
+     * 门店手机号
+     */
+    @ApiModelProperty("门店手机号")
+    private String mobile;
 
 //以下为列明常量
 
@@ -208,5 +213,9 @@ public class SupplierStore extends Model<SupplierStore> implements Serializable 
     * 门店同步到商城状态
     */
     public static final String SYNC_STATUS = "sync_status";
+    /**
+     * 门店手机号
+     */
+    public static final String MOBILE = "mobile";
 
 }

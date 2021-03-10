@@ -73,8 +73,12 @@
         <if test="query.phone!=null and query.phone!=''">
             and a.phone =#{query.phone}
         </if>
-        <if test="query.departmentCode!=null and query.departmentCode!=''">
-            and a.store_code=#{query.departmentCode}
+        <if test="query.departmentPaths!=null and query.departmentPaths.size()  >0">
+            and
+            <foreach collection="query.departmentPaths" item="item" index="index" open="(" close=")"
+                     separator="or">
+                d.department_path like CONCAT(#{item}, '%')
+            </foreach>
         </if>
         <if test="query.settleFlag!=null and query.settleFlag!=''">
             and esd.settle_flag=#{query.settleFlag}

@@ -26,8 +26,8 @@ public class EmployeeSettleBillPageReq extends PageReq {
     @ApiModelProperty("手机号")
     private String phone;
 
-    @ApiModelProperty("机构编码")
-    private String departmentCode;
+    @ApiModelProperty("机构编码path")
+    private Set<String> departmentPaths;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -9,6 +9,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @Author: chengang
@@ -25,8 +26,8 @@ public class EmployeeSettleConsumeQuery {
     @ApiModelProperty("手机号")
     private String phone;
 
-    @ApiModelProperty("机构编码")
-    private String departmentCode;
+    @ApiModelProperty("机构编码path")
+    private Set<String> departmentPaths;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

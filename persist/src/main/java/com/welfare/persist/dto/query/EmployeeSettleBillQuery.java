@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author Rongya.huang
@@ -20,7 +21,7 @@ public class EmployeeSettleBillQuery {
 
     private String phone;
 
-    private String departmentCode;
+    private Set<String> departmentPaths;
 
     private Date startTime;
 

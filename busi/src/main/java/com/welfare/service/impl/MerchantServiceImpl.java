@@ -1,7 +1,9 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
@@ -27,6 +29,7 @@ import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -63,8 +66,6 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
     @Autowired
     MerchantAccountTypeService merchantAccountTypeService;
-    @Autowired
-    private MerchantStoreRelationService merchantStoreRelationService;
 
 
     @Override
@@ -212,6 +213,13 @@ public class MerchantServiceImpl implements MerchantService {
         if(EmptyChecker.isEmpty(entity)){
             throw new BusiException("id不存在");
         }
+        if (StringUtils.isNoneBlank(merchant.getMerIdentity())) {
+            List<String> merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
+            if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
+                merchant.setMerCooperationMode(null);
+                merchant.setSelfRecharge("0");
+            }
+        }
         entity.setSelfRecharge(merchant.getSelfRecharge());
         entity.setMerName(merchant.getMerName());
         entity.setMerType(merchant.getMerType());
@@ -271,7 +279,7 @@ public class MerchantServiceImpl implements MerchantService {
     public Boolean queryIsRabteByMerCOde(String merCode) {
         QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(MerchantStoreRelation.MER_CODE, merCode);
-        List<MerchantStoreRelation> relations = merchantStoreRelationService.getMerchantStoreRelationListByMerCode(queryWrapper);
+        List<MerchantStoreRelation> relations = merchantStoreRelationDao.list(queryWrapper);
         if (CollectionUtils.isNotEmpty(relations)) {
             long count = relations.stream()
                     .filter(merchantStoreRelation -> merchantStoreRelation.getIsRebate() != null && merchantStoreRelation.getIsRebate() == 1)

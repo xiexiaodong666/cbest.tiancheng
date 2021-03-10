@@ -4,6 +4,7 @@ package com.welfare.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.persist.dto.MonthSettleDetailDTO;
+import com.welfare.persist.dto.MonthSettleDetailMerchantSummaryDTO;
 import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.entity.MonthSettle;
@@ -89,4 +90,12 @@ public interface MonthSettleService {
      * @return
      */
     List<StoreCodeNameDTO> allStoresInMonthSettle(Long id);
+
+    /**
+     * 结算单下按照福利类型分组统计
+     * @param id
+     * @param monthSettleDetailReq
+     * @return
+     */
+    List<MonthSettleDetailMerchantSummaryDTO> monthSettleDetailMerchantSummary(Long id, MonthSettleDetailReq monthSettleDetailReq);
 }

@@ -110,8 +110,7 @@ public interface AccountService {
    * @param merCode
    * @return
    */
-  List<DepartmentTree> groupByDepartment(String merCode);
-
+  List<DepartmentAndAccountTreeResp> groupByDepartment(String merCode);
   /**
    * 批量恢复员工授信额度，如果超过最大授信额度将多余部分汇入溢缴款账户
    * @param restoreCreditLimitDTOS

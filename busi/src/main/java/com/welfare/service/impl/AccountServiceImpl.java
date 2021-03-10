@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.enums.FileUniversalStorageEnum;
+import com.welfare.service.converter.DepartmentAndAccountTreeConverter;
 import com.welfare.service.dto.UploadImgErrorMsgDTO;
 import java.util.Date;
 
@@ -52,6 +53,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -112,6 +114,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountConsumeSceneDao accountConsumeSceneDao;
     private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
     private final SupplierStoreDao supplierStoreDao;
+    @Autowired
+    private DepartmentAndAccountTreeConverter andAccountTreeConverter;
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountChangeEventRecordDao accountChangeEventRecordDao;
 
@@ -1054,25 +1058,33 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public List<DepartmentTree> groupByDepartment(String merCode) {
-    List<DepartmentTree> trees = departmentService.tree(merCode);
-    if (CollectionUtils.isNotEmpty(trees)) {
-      trees = trees.get(0).getChildren();
-      // 查询各层的人员数量
-      recursiveCalculateAccountNum(trees);
+  public List<DepartmentAndAccountTreeResp> groupByDepartment(String merCode) {
+    List<DepartmentAndAccountTreeResp> treeDTOList = andAccountTreeConverter
+            .toE(accountCustomizeMapper.getAllAccountCodeAndDepatmentPath(merCode));
+    treeDTOList.forEach(item-> {
+      item.setCode(item.getDepartmentCode());
+      item.setParentCode(item.getDepartmentParent());
+    });
+    TreeUtil treeUtil=new TreeUtil(treeDTOList,"0");
+    treeDTOList = treeUtil.getTree();
+    treeDTOList = CollectionUtils.isNotEmpty(treeDTOList) ? treeDTOList.get(0).getChildren() : new ArrayList<>();
+    if (CollectionUtils.isNotEmpty(treeDTOList)) {
+      Map<String, DepartmentAndAccountTreeResp> treeMap = treeDTOList.stream().collect(Collectors.toMap(DepartmentAndAccountTreeResp::getDepartmentCode, a -> a,(k1,k2)->k1));
+      recursiveCalculateAccountNum(treeDTOList, treeMap);
     }
-    return trees;
+    return treeDTOList;
   }
 
-  private void recursiveCalculateAccountNum(List<DepartmentTree> trees){
+  private void recursiveCalculateAccountNum(List<DepartmentAndAccountTreeResp> trees, Map<String, DepartmentAndAccountTreeResp> treeMap){
     if (CollectionUtils.isNotEmpty(trees)) {
       trees.forEach(departmentTree -> {
         // 查询人员数量
-        int count = accountCustomizeMapper
-                .countByDepartmentPath(departmentTree.getMerCode(), departmentTree.getDepartmentPath());
-        departmentTree.setAccountTotal(count);
-        // 继续递归
-        recursiveCalculateAccountNum(departmentTree.getChildren());
+        recursiveCalculateAccountNum(departmentTree.getChildren(), treeMap);
+        // 找到父级，把本级人数加到父级上
+        if (treeMap.containsKey(departmentTree.getDepartmentParent())) {
+          DepartmentAndAccountTreeResp p = treeMap.get(departmentTree.getDepartmentParent());
+          p.setAccountTotal(p.getAccountTotal() + departmentTree.getAccountTotal());
+        }
       });
     }
   }

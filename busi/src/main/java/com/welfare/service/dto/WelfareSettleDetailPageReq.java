@@ -65,4 +65,10 @@ public class WelfareSettleDetailPageReq  extends PageReq {
 
     @ApiModelProperty(value = "部门编码列表")
     private List<String> departmentCodes;
+
+    @ApiModelProperty(value = "消费类型 online,offlinee")
+    private String consumeType;
+
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionType;
 }

@@ -255,6 +255,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         accountBillDetail.setTransAmount(amount);
         accountBillDetail.setTransTime(Calendar.getInstance().getTime());
         accountBillDetail.setSurplusQuota(account.getSurplusQuota());
+        accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
         accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
         return accountBillDetail;
     }

@@ -89,22 +89,6 @@ public interface AccountService {
   AccountDetailDTO queryDetailPhoneAndMer(String phone);
 
   /**
-   * 恢复商户下所有的账户的额度
-   * @param merCode
-   * @param merUpdateCreditAmount
-   * @param settlementTransNo
-   */
-  void restoreSurplusQuotaByMerCode(String merCode, BigDecimal merUpdateCreditAmount, String settlementTransNo);
-
-  /**
-   * 恢复的账户的额度
-   * @param account
-   * @param updateUser
-   * @param settlementTransNo
-   */
-  void restoreSurplusQuotaByAccountCode(Account account, String updateUser, String settlementTransNo);
-
-  /**
    * 查询消费场景DO
    * @param storeCode
    * @param queryType
@@ -127,4 +111,9 @@ public interface AccountService {
    * @return
    */
   List<DepartmentAndAccountTreeResp> groupByDepartment(String merCode);
+  /**
+   * 批量恢复员工授信额度，如果超过最大授信额度将多余部分汇入溢缴款账户
+   * @param restoreCreditLimitDTOS
+   */
+  void batchRestoreCreditLimit(List<RestoreCreditLimitDTO> restoreCreditLimitDTOS);
 }

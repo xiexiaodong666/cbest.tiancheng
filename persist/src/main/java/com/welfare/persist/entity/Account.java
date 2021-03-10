@@ -135,6 +135,8 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("剩余授权额度")   
     private BigDecimal surplusQuota;
+    @ApiModelProperty("个人授信额度溢缴款")
+    private BigDecimal surplusQuotaOverpay;
     /**
      * 备注
      */
@@ -234,6 +236,11 @@ public class Account extends Model<Account> implements Serializable {
     * 剩余授权额度
     */
     public static final String SURPLUS_QUOTA = "surplus_quota";
+
+    /**
+     * 个人授权额度溢缴款
+     */
+    public static final String SURPLUS_QUOTA_OVERPAY = "surplus_quota_overpay";
     /**
     * 备注
     */

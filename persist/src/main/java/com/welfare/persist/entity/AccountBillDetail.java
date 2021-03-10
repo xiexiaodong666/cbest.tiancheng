@@ -90,6 +90,8 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
      */
     @ApiModelProperty("授信余额")   
     private BigDecimal surplusQuota;
+    @ApiModelProperty("个人授信溢缴款")
+    private BigDecimal surplusQuotaOverpay;
     @ApiModelProperty("订单渠道（o2o,online,shop_shopping）")
     private String orderChannel;
 
@@ -212,7 +214,8 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     */
     public static final String VERSION = "version";
     public static final String ORDER_CHANNEL = "order_channel";
-    public static final String PAYMENT_TYPE = "支付识别信息，二维码或者卡内磁条号";
-    public static final String PAYMENT_TYPE_INFO = "支付识别信息，二维码或者卡内磁条号";
+    public static final String PAYMENT_TYPE = "payment_type";
+    public static final String PAYMENT_TYPE_INFO = "payment_type_info";
+    public static final String SURPLUS_QUOTA_OVERPAY = "surplus_quota_overpay";
     public static final String PAYMENT_CHANNEL = "payment_channel";
 }

@@ -125,6 +125,9 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
 
     @ApiModelProperty("订单渠道")
     private String orderChannel;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
     /**
      * 创建人
      */
@@ -260,5 +263,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     * 版本
     */
     public static final String VERSION = "version";
+
+    public static final String PAYMENT_CHANNEL = "payment_channel";
 
 }

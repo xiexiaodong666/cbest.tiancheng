@@ -79,10 +79,10 @@ public class EmployeeSettleController {
   }
 
 
-  @GetMapping("/page")
+  @PostMapping("/page")
   @ApiOperation("员工授信消费查询")
   @MerchantUser
-  public R<BasePageVo<EmployeeSettleConsumeDTO>> pageQuery(EmployeeSettleConsumePageReq employeeSettleConsumePageReq){
+  public R<BasePageVo<EmployeeSettleConsumeDTO>> pageQuery(@RequestBody EmployeeSettleConsumePageReq employeeSettleConsumePageReq){
      MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
      if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
          employeeSettleConsumePageReq.setMerCode(merchantUser.getMerchantCode());
@@ -92,10 +92,10 @@ public class EmployeeSettleController {
      return success(employeeSettleDetailService.pageQuery(employeeSettleConsumePageReq));
   }
 
-  @GetMapping("/summary")
+  @PostMapping("/summary")
   @ApiOperation("员工授信消费查询summary")
   @MerchantUser
-  public R<EmployeeSettleSumDTO> summary(EmployeeSettleConsumeQuery employeeSettleConsumeQuery){
+  public R<EmployeeSettleSumDTO> summary(@RequestBody EmployeeSettleConsumeQuery employeeSettleConsumeQuery){
      MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
      if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
          employeeSettleConsumeQuery.setMerCode(merchantUser.getMerchantCode());
@@ -148,10 +148,10 @@ public class EmployeeSettleController {
   }
 
 
-  @GetMapping("/bill/page")
+  @PostMapping("/bill/page")
   @ApiOperation("分页查询员工授信消费账单列表")
   @MerchantUser
-  public R<Page<EmployeeSettleBillResp>> pageQueryBill(EmployeeSettleBillPageReq billPageReq){
+  public R<Page<EmployeeSettleBillResp>> pageQueryBill(@RequestBody EmployeeSettleBillPageReq billPageReq){
     MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
     if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
       billPageReq.setMerCode(merchantUser.getMerchantCode());

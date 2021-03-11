@@ -321,6 +321,16 @@
             </if>
         </where>
     </select>
+    <select id="allStoresInMonthSettle" resultType="com.welfare.persist.dto.EmployeeSettleStoreDTO">
+        select store_code storeCode, store_name storeName from employee_settle_detail where 1=1
+        <if test="accountCode!=null and accountCode!=''">
+            and account_code=#{accountCode} and settle_flag='unsettled'
+        </if>
+        <if test="settleNo!=null and settleNo!=''">
+            and settle_no=#{settleNo}
+        </if>
+            group by store_code
+    </select>
 
     <update id="batchUpdateStatusBySettleNo">
         update employee_settle_detail set settle_flag = #{status}, update_user = #{updateUser}, update_time = now(), version = version + 1

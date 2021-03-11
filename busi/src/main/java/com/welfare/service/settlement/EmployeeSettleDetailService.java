@@ -10,6 +10,7 @@ import com.welfare.service.dto.EmployeeSettleConsumePageReq;
 import com.welfare.service.dto.EmployeeSettleDetailPageReq;
 import com.welfare.service.dto.EmployeeSettleDetailReq;
 import com.welfare.service.dto.EmployeeSettleDetailResp;
+import com.welfare.service.dto.StoreCodeNameDTO;
 
 import java.util.Date;
 import java.util.List;
@@ -89,4 +90,12 @@ public interface EmployeeSettleDetailService {
    * @return
    */
   List<EmployeeSettleDetailResp> detailExportWithSettleNo(String settleNo, EmployeeSettleDetailReq employeeSettleDetailReq);
+
+  /**
+   * 查询员工授信消费所有门店name和code
+   * @param settleNo settleNo
+   * @param accountCode accountCode
+   * @return
+   */
+  List<StoreCodeNameDTO> allStoresInMonthSettle(String settleNo, String accountCode);
 }

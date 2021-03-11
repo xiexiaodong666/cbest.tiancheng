@@ -230,6 +230,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setOrganizationCode(orderReqDto.getOrganizationCode());
         orderPageQuery.setAccountType(orderReqDto.getAccountType());
         orderPageQuery.setTimeInterval(orderReqDto.getTimeInterval());
+        orderPageQuery.setPaymentChannel(orderReqDto.getPaymentChannel());
 
         Page<OrderInfoDTO> orderInfoPage = orderMapper.searchOrder(page, orderPageQuery);
         return orderInfoPage;

@@ -264,6 +264,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setOrganizationCode(orderReqDto.getOrganizationCode());
         orderPageQuery.setAccountType(orderReqDto.getAccountType());
         orderPageQuery.setTimeInterval(orderReqDto.getTimeInterval());
+        orderPageQuery.setPaymentChannel(orderReqDto.getPaymentChannel());
 
         OrderSummary orderSummary = orderMapper.searchOrderSum( orderPageQuery);
         return orderSummary;
@@ -370,6 +371,7 @@ public class OrderServiceImpl implements OrderService {
         orderPageQuery.setMerchantCode(orderReqDto.getMerchantCode());
         orderPageQuery.setPageNo(orderReqDto.getCurrent());
         orderPageQuery.setPageSize(orderReqDto.getSize());
+        orderPageQuery.setPaymentChannel(orderReqDto.getPaymentChannel());
 
         List<OrderInfoDTO> orderInfoList = orderMapper.searchOrder(orderPageQuery);
         return orderInfoList;

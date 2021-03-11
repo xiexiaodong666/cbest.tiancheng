@@ -179,6 +179,9 @@
                 <if test="orderPageQuery.supplierMerCode != null">
                     and m.mer_code = #{orderPageQuery.supplierMerCode}
                 </if>
+                <if test="orderPageQuery.paymentChannel != null">
+                    and ab.payment_channel = #{orderPageQuery.paymentChannel}
+                </if>
             </where>
             ) tt LEFT JOIN merchant mm
             on tt.accountMerCode = mm.mer_code

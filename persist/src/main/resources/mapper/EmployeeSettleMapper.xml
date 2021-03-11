@@ -23,8 +23,7 @@
                es.trans_amount transAmount,
                es.order_num orderNum,
                es.settle_amount settleAmount,
-               case when es.settle_status = 'settling' then '结算中'
-                    when es.settle_status = 'settled' then '已结算' end settleStatus,
+               es.settle_status settleStatus,
                es.confirm_time settleTime
         from employee_settle es
                  left join account a on a.account_code = es.account_code

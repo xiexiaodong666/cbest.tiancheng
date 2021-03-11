@@ -53,7 +53,7 @@
           and es.create_time <= #{query.endTime}
         ]]>
     </if>
-      order by es.create_time desc
+      group by es.id order by es.create_time desc
     </select>
 
 

@@ -113,4 +113,7 @@ public class MonthSettleDetailResp{
     @ExcelProperty("商户扣款方式")
     @ApiModelProperty("商户扣款方式")
     private String merDeductionTypeName;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

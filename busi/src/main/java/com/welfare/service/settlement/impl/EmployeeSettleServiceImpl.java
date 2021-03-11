@@ -194,6 +194,14 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
         }
     }
 
+    @Override
+    public EmployeeSettleBillResp queryBillInfo(String settleNo) {
+        EmployeeSettleBillDTO dto = employeeSettleMapper.queryBillInfo(settleNo);
+        EmployeeSettleBillResp resp = new EmployeeSettleBillResp();
+        BeanUtils.copyProperties(dto, resp);
+        return resp;
+    }
+
     private List<EmployeeSettle> assemblyEmployeeSettles(List<EmployeeSettleDetail> settleDetails, EmployeeSettleBuildReq settleBuildReq) {
         List<EmployeeSettle> employeeSettles = new ArrayList<>();
         Date now = new Date();

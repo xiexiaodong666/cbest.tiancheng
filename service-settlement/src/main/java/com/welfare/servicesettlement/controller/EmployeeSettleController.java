@@ -228,4 +228,13 @@ public class EmployeeSettleController {
     List<StoreCodeNameDTO> supplierStores =  employeeSettleDetailService.allStoresInMonthSettle(settleNo, accountCode);
     return success(supplierStores);
     }
+
+
+  @GetMapping("/bill/{settleNo}/info")
+  @ApiOperation("分页查询员工授信消费账单列表")
+  @MerchantUser
+  public R<EmployeeSettleBillResp> queryBillInfo(@PathVariable("settleNo")String settleNo){
+    EmployeeSettleBillResp page = employeeSettleService.queryBillInfo(settleNo);
+    return success(page);
+  }
 }

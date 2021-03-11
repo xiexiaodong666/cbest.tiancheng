@@ -22,4 +22,10 @@ public interface EmployeeSettleMapper extends BaseMapper<EmployeeSettle> {
   List<EmployeeSettleBillDTO> querySettleBills(@Param("query") EmployeeSettleBillQuery query);
 
 
+  /**
+   * @author Rongya.huang
+   * @date 17:56 2021/3/11
+   * @description 查询账单信息
+   **/
+  EmployeeSettleBillDTO queryBillInfo(@Param("settleNo")String settleNo);
 }

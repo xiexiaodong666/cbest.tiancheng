@@ -133,7 +133,7 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             return employeeSettles.stream().map(EmployeeSettle::getSettleNo).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("生成员工授信结算单失败,请求:{}", JSON.toJSONString(settleBuildReq), e);
-            throw e;
+            throw new BusiException("生成账单失败");
         } finally {
             DistributedLockUtil.unlock(multiLock);
         }
@@ -186,6 +186,9 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 throw new BusiException("完成结算失败，请重新操作！");
             }
             return true;
+        } catch (Exception e) {
+            log.error("完成员工授信结算单失败,请求:{}", JSON.toJSONString(employeeSettleFinishReq), e);
+            throw new BusiException("完成结算单失败");
         } finally {
             DistributedLockUtil.unlock(multiLock);
         }

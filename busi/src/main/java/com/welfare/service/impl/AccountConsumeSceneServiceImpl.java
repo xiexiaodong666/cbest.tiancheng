@@ -30,9 +30,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.invoke.MethodHandleInfo;
 import java.util.*;
@@ -60,7 +65,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private final ApplicationContext applicationContext;
   private final AccountConsumeSceneStoreRelationMapper accountConsumeSceneStoreRelationMapper;
   private final MerchantAccountTypeDao merchantAccountTypeDao;
-
+  private final CacheManager cacheManager;
   @Override
   public AccountConsumeScene getAccountConsumeScene(Long id) {
     return accountConsumeSceneDao.getById(id);
@@ -288,45 +293,64 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     //删除已有配置
     String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
     List<AccountConsumeScene> oldScenes = accountConsumeSceneDao.getAllByMercode(Lists.newArrayList(merCode));
-    if (CollectionUtils.isNotEmpty(oldScenes)) {
-      List<Long> oldConsumeSceneIds = oldScenes.stream()
-              .map(AccountConsumeScene::getId).collect(Collectors.toList());
-      accountConsumeSceneDao.deleteConsumeSceneByIds(oldConsumeSceneIds);
-      accountConsumeSceneStoreRelationDao.deleteByConsumeSceneIds(oldConsumeSceneIds);
-    }
-    //保存最新配置
-    List<AccountConsumeScene> newScenes = new ArrayList<>();
-    Map<AccountConsumeSceneEditReq, AccountConsumeScene> sceneMap = new HashMap<>();
-    consumeSceneEditReqs.forEach(consumeSceneEditReq -> {
-      if (CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
-        AccountConsumeScene scene = new AccountConsumeScene();
-        BeanUtils.copyProperties(consumeSceneEditReq, scene);
-        scene.setId(null);
-        newScenes.add(scene);
-        sceneMap.put(consumeSceneEditReq, scene);
+    try {
+      if (CollectionUtils.isNotEmpty(oldScenes)) {
+        List<Long> oldConsumeSceneIds = oldScenes.stream()
+                .map(AccountConsumeScene::getId).collect(Collectors.toList());
+        accountConsumeSceneDao.deleteConsumeSceneByIds(oldConsumeSceneIds);
+        accountConsumeSceneStoreRelationDao.deleteByConsumeSceneIds(oldConsumeSceneIds);
       }
-    });
-    accountConsumeSceneDao.saveBatch(newScenes);
-    List<AccountConsumeSceneStoreRelation> newRelations = new ArrayList<>();
-    consumeSceneEditReqs.forEach(consumeSceneEditReq -> {
-      if (CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
-        consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs()
-                .forEach(consumeStoreRelation -> {
-                  AccountConsumeSceneStoreRelation relation = new AccountConsumeSceneStoreRelation();
-                  BeanUtils.copyProperties(consumeStoreRelation,relation);
-                  relation.setAccountConsumeSceneId(sceneMap.get(consumeSceneEditReq).getId());
-                  newRelations.add(relation);
+
+      //保存最新配置
+      List<AccountConsumeScene> newScenes = new ArrayList<>();
+      Map<AccountConsumeSceneEditReq, AccountConsumeScene> sceneMap = new HashMap<>();
+      consumeSceneEditReqs.forEach(consumeSceneEditReq -> {
+        if (CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
+          AccountConsumeScene scene = new AccountConsumeScene();
+          BeanUtils.copyProperties(consumeSceneEditReq, scene);
+          scene.setId(null);
+          newScenes.add(scene);
+          sceneMap.put(consumeSceneEditReq, scene);
+        }
+      });
+      accountConsumeSceneDao.saveBatch(newScenes);
+      List<AccountConsumeSceneStoreRelation> newRelations = new ArrayList<>();
+      consumeSceneEditReqs.forEach(consumeSceneEditReq -> {
+        if (CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
+          consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs()
+                  .forEach(consumeStoreRelation -> {
+                    AccountConsumeSceneStoreRelation relation = new AccountConsumeSceneStoreRelation();
+                    BeanUtils.copyProperties(consumeStoreRelation,relation);
+                    relation.setAccountConsumeSceneId(sceneMap.get(consumeSceneEditReq).getId());
+                    newRelations.add(relation);
+                  });
+        }
+      });
+      accountConsumeSceneStoreRelationDao.saveBatch(newRelations);
+      //保存账户变更记录
+      List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(merCode);
+      List<String> accountTypeCodes = merchantAccountTypes.stream().map(MerchantAccountType::getMerAccountTypeCode).collect(Collectors.toList());
+      accountChangeEventRecordService.batchSaveByAccountTypeCode(accountTypeCodes, AccountChangeType.ACCOUNT_CONSUME_SCENE_EDIT);
+      //消费门店配置推送给商户端
+      List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(merCode);
+      applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(allRelations).build());
+      return true;
+    } finally {
+      if (TransactionSynchronizationManager.isActualTransactionActive()) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+          @Override
+          public void afterCompletion(int status) {
+            if (CollectionUtils.isNotEmpty(oldScenes)) {
+              Cache cache = cacheManager.getCache("getAccountTypeAndMerCode");
+              if (cache != null) {
+                oldScenes.forEach(scene -> {
+                  cache.evictIfPresent("#"+scene.getMerCode()+"#"+scene.getAccountTypeCode());
                 });
+              }
+            }
+          }
+        });
       }
-    });
-    accountConsumeSceneStoreRelationDao.saveBatch(newRelations);
-    //保存账户变更记录
-    List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(merCode);
-    List<String> accountTypeCodes = merchantAccountTypes.stream().map(MerchantAccountType::getMerAccountTypeCode).collect(Collectors.toList());
-    accountChangeEventRecordService.batchSaveByAccountTypeCode(accountTypeCodes, AccountChangeType.ACCOUNT_CONSUME_SCENE_EDIT);
-    //消费门店配置推送给商户端
-    List<AccountConsumeSceneStoreRelation> allRelations = accountConsumeSceneStoreRelationMapper.queryAllRelationList(merCode);
-    applicationContext.publishEvent( AccountConsumeSceneEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).relationList(allRelations).build());
-    return true;
+    }
   }
 }

@@ -107,4 +107,10 @@ public class SupplierStoreWithMerchantDTO {
     @ExcelProperty(value = "商户名称",index = 3)
     private String merName;
 
+    /**
+     * 门店手机号
+     */
+    @ApiModelProperty("门店手机号")
+    @ExcelProperty(value = "门店手机号",index = 6)
+    private String mobile;
 }

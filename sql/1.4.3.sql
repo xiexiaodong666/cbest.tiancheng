@@ -77,7 +77,7 @@ alter table settle_detail modify mer_account_type varchar(32) null comment '福�
 alter table employee_settle_detail modify mer_account_type varchar(32) null comment '福利类型(个人授信，个人授信溢缴款)';
 alter table account_bill_detail add column surplus_quota_overpay decimal(10,2) comment '个人授信溢缴款' after surplus_quota;
 alter table account add column surplus_quota_overpay decimal(10,2) DEFAULT 0.00 comment '个人授信溢缴款' after surplus_quota;
-
+alter table supplier_store add mobile varchar(32) null comment '门店手机号';
 
 ### DML
 

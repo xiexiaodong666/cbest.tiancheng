@@ -253,8 +253,8 @@ public class AccountController implements IController {
   @GetMapping("/groupByDepartment")
   @ApiOperation("查询商户下组织机构树并统计各层级的人员数量")
   @MerchantUser
-  public R<List<DepartmentTree>> groupByDepartment(){
-    List<DepartmentTree> list = accountService.groupByDepartment(MerchantUserHolder.getMerchantUser().getMerchantCode());
+  public R<List<DepartmentAndAccountTreeResp>> groupByDepartment(){
+    List<DepartmentAndAccountTreeResp> list = accountService.groupByDepartment(MerchantUserHolder.getMerchantUser().getMerchantCode());
     return success(list);
   }
 }

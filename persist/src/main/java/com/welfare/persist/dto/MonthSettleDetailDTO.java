@@ -65,4 +65,7 @@ public class MonthSettleDetailDTO{
 
     private String merDeductionType;
 
+    private String merDeductionTypeName;
+
+    private String consumeTypeName;
 }

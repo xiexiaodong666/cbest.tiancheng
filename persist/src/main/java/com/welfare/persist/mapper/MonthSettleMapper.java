@@ -2,6 +2,7 @@ package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.welfare.persist.dto.MonthSettleDTO;
+import com.welfare.persist.dto.MonthSettleDetailMerchantSummaryDTO;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
@@ -27,4 +28,5 @@ public interface MonthSettleMapper extends BaseMapper<MonthSettle> {
     Map<String, Object> selectMonthSettleSummaryInfo(MonthSettleQuery monthSettleQuery);
 
     List<Map<String, Object>> getAccountType(String merCode);
+
 }

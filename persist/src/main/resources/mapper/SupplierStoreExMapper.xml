@@ -10,7 +10,8 @@
     m.mer_name as merName,
     ss.mer_code as merCode,
     ss.STATUS as status,
-    ss.create_time as createTime
+    ss.create_time as createTime,
+    ss.mobile as mobile
     FROM
     supplier_store ss
     LEFT JOIN merchant m ON ss.mer_code = m.mer_code
@@ -70,7 +71,8 @@
     consum_type consumType,
     status ,
     create_time createTime,
-    0 as isMerchant
+    0 as isMerchant,
+    ss.mobile as mobile
     from supplier_store ss where ss.deleted=0
     ) temp0
     <where>
@@ -95,8 +97,8 @@
     null consumType,
     status ,
     create_time createTime,
-    true as isMerchant
-
+    true as isMerchant,
+    null as mobile
     from merchant m where m.deleted=0
 
     ) temp

@@ -197,7 +197,6 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
         EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
         BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
         employeeSettleDetailQuery.setSettleNo(settleNo);
-        employeeSettleDetailQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
         employeeSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         return employeeSettleDetailMapper.querySettleDetail(employeeSettleDetailQuery).stream().map(employeeSettleDetailDTO -> {
                 EmployeeSettleDetailResp resp= new EmployeeSettleDetailResp();

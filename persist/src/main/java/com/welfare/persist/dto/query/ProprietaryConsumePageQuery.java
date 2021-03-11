@@ -49,4 +49,7 @@ public class ProprietaryConsumePageQuery {
 
   @ApiModelProperty(value = "门店类型 自营：self，第三方：third")
   private String storeType;
+
+  @ApiModelProperty(value = "员工支出方式")
+  private String merAccountType;
 }

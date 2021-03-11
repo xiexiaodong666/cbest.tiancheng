@@ -101,4 +101,5 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
     List<WelfareTypeTotalAmountDTO> statisticalAmountGroupByWelfareTypeCode(@Param("query")ProprietaryConsumePageQuery query);
 
 
+    List<MonthSettleDetailMerchantSummaryDTO> sumSettleDetailGroupByMerAccountType(MonthSettleDetailQuery monthSettleDetailQuery);
 }

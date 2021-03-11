@@ -33,6 +33,8 @@
         <result property="orderChannel" column="order_channel"/>
         <result property="unsettledAmount" column="unsettled_amount"/>
         <result property="merDeductionType" column="mer_deduction_type"/>
+        <result property="merDeductionTypeName" column="mer_deduction_type_name"/>
+        <result property="consumeTypeName" column="consume_type_name"/>
     </resultMap>
 
     <select id="getSettleDetailFromAccountDetail" parameterType="Map" resultType="com.welfare.persist.entity.SettleDetail">
@@ -63,6 +65,7 @@
         t1.mer_deduction_credit_amount as merCreditDeductionAmount,
         t1.self_deduction_amount as selfDeductionAmount,
         t1.order_channel as orderChannel,
+        oi.order_id as order_id,
         'unsettled' as settleFlag,
         'welfare' as dataType,
         'system' as create_user
@@ -71,6 +74,7 @@
         left join merchant t3 on t2.mer_code=t3.mer_code
         left join merchant_store_relation t4 on t1.store_code = t4.store_code and t2.mer_code=t4.mer_code and t4.deleted=0
         left join merchant_account_type t5 on t2.mer_code = t5.mer_code and t1.mer_account_type=t5.mer_account_type_code
+        left join order_info oi on t1.trans_no = oi.trans_no
         <where>
             <if test="minId!=null">
                 t1.id &gt;=#{minId}
@@ -109,6 +113,7 @@
         t1.settle_flag,
         t1.order_channel,
         IF(t1.pos = t5.cashier_no, '第三方线上', '第三方线下') as type,
+        IF(t1.pos = t5.cashier_no, '线上消费', '线下消费') as consume_type_name,
         IF(t1.pos = t5.cashier_no, 'online', 'offline') as consume_type,
         t1.mer_account_type as welfare_type_code,
         t1.mer_account_type_name as welfare_type_name,
@@ -129,7 +134,11 @@
         case
             when t1.mer_deduction_amount > 0 then 'balance'
             when t1.mer_credit_deduction_amount > 0 then 'credit'
-        end as mer_deduction_type
+        end as mer_deduction_type,
+        case
+        when t1.mer_deduction_amount > 0 then '余额'
+        when t1.mer_credit_deduction_amount > 0 then '授信余额'
+        end as mer_deduction_type_name
         <include refid="monthSettleTableListAndCondition"></include>
 
         <if test="limit!=null and minId!=null">
@@ -167,6 +176,21 @@
             end
         ) as balanceConsumeAmount
         <include refid="monthSettleTableListAndCondition"></include>
+    </select>
+
+    <select id="sumSettleDetailGroupByMerAccountType"
+            resultType="com.welfare.persist.dto.MonthSettleDetailMerchantSummaryDTO"
+            parameterType="com.welfare.persist.dto.query.MonthSettleDetailQuery">
+        select t1.mer_account_type,
+               t1.mer_account_type_name,
+               sum(
+                   case when t1.trans_type = 'consume' then t1.trans_amount
+                        when t1.trans_type = 'refund' then t1.trans_amount * -1
+                        else 0
+                   end
+               ) as totalAmount
+        <include refid="monthSettleTableListAndCondition"></include>
+        group by t1.mer_account_type,t1.mer_account_type_name
     </select>
 
     <sql id="monthSettleTableListAndCondition">
@@ -223,8 +247,15 @@
                     and t3.mer_code != t1.mer_code and (t5.cashier_no is null or t5.cashier_no!=t1.pos)
                 </when>
             </choose>
-            <if test="consumeType!=null and consumeType == 'online'">
-                and t1.pos = t5.cashier_no
+            <if test="consumeType!=null">
+                <choose>
+                    <when test="consumeType=='online'">
+                        and t1.pos = t5.cashier_no
+                    </when>
+                    <when test="consumeType=='offline'">
+                        and t1.pos != ifnull(t5.cashier_no,'')
+                    </when>
+                </choose>
             </if>
             <if test="phone!=null and phone != ''">
                 and ac.phone = #{phone}
@@ -316,7 +347,7 @@
                 else 0
             end
         ) as balanceConsumeAmount,
-        t5.rebate_limit as rebateAmount
+        sum(ifnull(t1.rebate_amount,0)) as rebateAmount
     </sql>
     <sql id="getWelfareSettleWhere">
         t3.mer_code != t1.mer_code
@@ -457,6 +488,11 @@
         ac.store_code as departmentCode,
         de.department_name as departmentName,
         t1.settle_flag as settleFlag,
+        case when t1.settle_flag = 'unsettled' then '未结算'
+             when t1.settle_flag = 'settling'  then '结算中'
+             when t1.settle_flag = 'settled'  then '已结算'
+             else t1.settle_flag
+        end as settleFlagName,
         case when t1.pos = t5.cashier_no then '线上消费'
              else '线下消费' end as type,
         case when t1.pos = t5.cashier_no then 'online'
@@ -472,6 +508,12 @@
         case when t1.mer_deduction_amount > 0 then 'balance'
              when t1.mer_credit_deduction_amount > 0 then 'credit'
         end as merDeductionType,
+        case when t1.mer_deduction_amount > 0 then '余额'
+        when t1.mer_credit_deduction_amount > 0 then '授信余额'
+        end as merDeductionTypeName,
+        case when t1.mer_deduction_amount > 0 then '余额'
+        when t1.mer_credit_deduction_amount > 0 then '授信余额'
+        end as merDeductionTypeName,
         case when t1.trans_type='consume' then t1.trans_amount
              when t1.trans_type='refund' then t1.trans_amount*-1
         end as payAmount,
@@ -582,6 +624,9 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="query.merAccountType!=null and query.merAccountType!=''">
+                and t1.mer_account_type = #{query.merAccountType}
+            </if>
             and t1.settle_flag='unsettled'
             and t1.data_type='welfare'
         </where>
@@ -633,11 +678,15 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="query.merAccountType!=null and query.merAccountType!=''">
+                and t1.mer_account_type = #{query.merAccountType}
+            </if>
             and t1.settle_flag='unsettled'
             and t1.data_type='welfare'
         </where>
        group by t1.mer_account_type
     </select>
+    
 
 
     <sql id="queryListTable">
@@ -706,9 +755,17 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="consumeType!=null and consumeType=='online'">
-                and t1.pos = t5.cashier_no
+            <if test="consumeType!=null">
+                <choose>
+                    <when test="consumeType=='online'">
+                        and t1.pos = t5.cashier_no
+                    </when>
+                    <when test="consumeType=='offline'">
+                        and t1.pos != ifnull(t5.cashier_no,'')
+                    </when>
+                </choose>
             </if>
+
             <if test="supplierCode!=null and supplierCode!=''">
                 and supplier.mer_code = #{supplierCode}
             </if>

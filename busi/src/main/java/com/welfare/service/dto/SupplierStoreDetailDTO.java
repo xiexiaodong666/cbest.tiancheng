@@ -96,4 +96,9 @@ public class SupplierStoreDetailDTO {
     @ApiModelProperty("门店关联消费方法虚拟收银号")
     List<StoreConsumeTypeDTO> storeConsumeTypeList;
 
+    /**
+     * 门店手机号
+     */
+    @ApiModelProperty("门店手机号")
+    private String mobile;
 }

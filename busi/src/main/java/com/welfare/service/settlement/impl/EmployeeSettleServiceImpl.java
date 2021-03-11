@@ -22,6 +22,8 @@ import com.welfare.persist.mapper.EmployeeSettleMapper;
 import com.welfare.service.AccountService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.dto.*;
+import com.welfare.service.remote.AccountCreditFeign;
+import com.welfare.service.remote.entity.WelfareResp;
 import com.welfare.service.settlement.EmployeeSettleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +60,8 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
     private final EmployeeSettleDetailDao employeeSettleDetailDao;
     private final RedissonClient redissonClient;
     private final SequenceService sequenceService;
+    @Autowired(required = false)
+    private AccountCreditFeign accountCreditFeign;
     @Autowired
     private AccountService accountService;
     @Override
@@ -165,8 +169,6 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 employeeSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
                 employeeSettle.setUppdateUser(MerchantUserHolder.getMerchantUser().getUserCode());
             });
-            // 恢复员工授信额度或溢缴款账户额度
-            accountService.batchRestoreCreditLimit(RestoreCreditLimitDTO.of(employeeSettles));
             // 修改结算状态
             boolean flag1 = employeeSettleDao.updateBatchById(employeeSettles);
             boolean flag2 = employeeSettleDetailDao.batchUpdateStatusBySettleNo(
@@ -174,7 +176,14 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                     MerchantUserHolder.getMerchantUser().getUserCode(),
                     settleNos);
             if (!flag1 || !flag2) {
-                throw new BusiException("操作繁忙，请稍后再试！");
+                throw new BusiException("完成结算失败，请重新操作！");
+            }
+            // 恢复员工授信额度或溢缴款账户额度
+            AccountRestoreCreditLimitReq req = new AccountRestoreCreditLimitReq();
+            req.setCreditLimitDtos(AccountRestoreCreditLimitReq.RestoreCreditLimitDTO.of(employeeSettles));
+            WelfareResp resp = accountCreditFeign.remainingLimit(req, "settlement-api");
+            if (resp == null || resp.getCode() != 1) {
+                throw new BusiException("完成结算失败，请重新操作！");
             }
             return true;
         } finally {
@@ -222,7 +231,7 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 employeeSettle.setSettleNo(settleNo);
                 details = details.stream().sorted(Comparator.comparing(EmployeeSettleDetail::getTransTime)).collect(Collectors.toList());
                 if (totalSettleAmount.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new BusiException(String.format("员工[%s]结算金额[%s]不能小于零！", totalSettleAmount, accountCode));
+                    throw new BusiException(String.format("员工[%s]结算金额[%s]必须大于零！", totalSettleAmount, accountCode));
                 }
                 if (settleBuildReq.getTransTimeStart() == null) {
                     settleBuildReq.setTransTimeStart(details.get(0).getTransTime());

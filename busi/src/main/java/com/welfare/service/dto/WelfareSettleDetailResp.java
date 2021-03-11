@@ -1,5 +1,6 @@
 package com.welfare.service.dto;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -16,6 +17,7 @@ import java.util.Date;
  * @desc 账单明细请求dto
  */
 @Data
+@ExcelIgnoreUnannotated
 public class WelfareSettleDetailResp {
     @ExcelProperty(value = "序号")
     @ApiModelProperty(value = "序号")
@@ -72,9 +74,12 @@ public class WelfareSettleDetailResp {
     @ApiModelProperty(value = "结算金额")
     private String settleAmount;
 
-    @ExcelProperty(value = "结算状态")
     @ApiModelProperty(value = "结算状态")
     private String settleFlag;
+
+    @ExcelProperty(value = "结算状态")
+    @ApiModelProperty(value = "结算状态")
+    private String settleFlagName;
 
     @ExcelProperty(value = "手机号")
     @ApiModelProperty(value = "手机号")
@@ -104,4 +109,8 @@ public class WelfareSettleDetailResp {
 
     @ApiModelProperty("商户支出方式")
     private String merDeductionType;
+
+    @ExcelProperty(value = "商户支出方式")
+    @ApiModelProperty("商户支出方式")
+    private String merDeductionTypeName;
 }

@@ -52,7 +52,7 @@ CREATE TABLE `employee_settle` (
                                    `trans_amount` decimal(10,2) DEFAULT NULL COMMENT '交易金额',
                                    `settle_amount` decimal(10,2) DEFAULT NULL COMMENT '结算金额',
                                    `order_num` int(11) DEFAULT NULL COMMENT '交易笔数',
-                                   `settle_status` varchar(20) DEFAULT NULL COMMENT '结算状态（待结算-unsettled；已结算-settled）',
+                                   `settle_status` varchar(20) DEFAULT NULL COMMENT '结算状态（结算中-settling；已结算-settled）',
                                    `send_time` datetime DEFAULT NULL COMMENT '发送时间',
                                    `confirm_time` datetime DEFAULT NULL COMMENT '确定时间',
                                    `settle_start_time` datetime DEFAULT NULL COMMENT '账单开始时间',
@@ -77,7 +77,7 @@ alter table settle_detail modify mer_account_type varchar(32) null comment '福�
 alter table employee_settle_detail modify mer_account_type varchar(32) null comment '福利类型(个人授信，个人授信溢缴款)';
 alter table account_bill_detail add column surplus_quota_overpay decimal(10,2) comment '个人授信溢缴款' after surplus_quota;
 alter table account add column surplus_quota_overpay decimal(10,2) DEFAULT 0.00 comment '个人授信溢缴款' after surplus_quota;
-
+alter table supplier_store add mobile varchar(32) null comment '门店手机号';
 
 ### DML
 

@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -59,4 +60,11 @@ public class SupplierStoreUpdateDTO {
 
     List<MerchantAddressDTO> addressList;
 
+    /**
+     * 门店手机号
+     */
+    @ApiModelProperty("手机号（11位)")
+    @Size(max=11, min = 11, message = "手机号必须为11位")
+    @Pattern(regexp = "^[1](([3|5|8][\\d])|([4][4,5,6,7,8,9])|([6][2,5,6,7])|([7][^9])|([9][1,8,9]))[\\d]{8}$", message = "手机号不合法")
+    private String mobile;
 }

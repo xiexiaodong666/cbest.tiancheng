@@ -40,6 +40,8 @@ encrypt:
 e-welfare:
   distributed-lock:
     enabled: true
+  account:
+    url: http://welfareaccount.api.cbest.gam
 mybatis-plus:
   global-config:
     db-config:

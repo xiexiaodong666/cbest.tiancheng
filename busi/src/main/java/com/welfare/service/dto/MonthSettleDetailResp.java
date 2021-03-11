@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -116,4 +117,10 @@ public class MonthSettleDetailResp{
 
     @ApiModelProperty("支付渠道")
     private String paymentChannel;
+
+    @ApiModelProperty("商户余额支出")
+    private BigDecimal merDeductionAmount;
+
+    @ApiModelProperty("商户授信支出")
+    private BigDecimal merDeductionCreditAmount;
 }

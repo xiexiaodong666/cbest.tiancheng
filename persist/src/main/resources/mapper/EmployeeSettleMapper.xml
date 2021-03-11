@@ -17,6 +17,7 @@
                a.phone phone,
                a.store_code departmentCode,
                d.department_name departmentName,
+                CONCAT(a.surplus_quota + a.surplus_quota_overpay, '/',a.max_quota) as quota,
                if(esd.store_type = 'self', sum(esd.trans_amount), 0) as selfAmount,
                if(esd.store_type = 'third', sum(esd.trans_amount), 0) as thirdAmount,
                es.trans_amount transAmount,

@@ -39,6 +39,8 @@ public class EmployeeSettleBillDTO {
 
     private String settleStatus;
 
+    private String quota;
+
     private Date settleTime;
 
     private String settlePeriod;

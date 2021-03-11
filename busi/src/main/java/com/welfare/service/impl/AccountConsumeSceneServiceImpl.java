@@ -345,7 +345,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
               Cache cache = cacheManager.getCache(cacheName);
               if (cache != null) {
                 oldScenes.forEach(scene -> {
-                  String key = "#"+scene.getMerCode()+"#"+scene.getAccountTypeCode();
+                  String key = "#"+scene.getAccountTypeCode()+"#"+scene.getMerCode();
                   if (cache.evictIfPresent(key)) {
                     log.info("删除缓存，name:{} key:{}", cacheName, key);
                   } else {

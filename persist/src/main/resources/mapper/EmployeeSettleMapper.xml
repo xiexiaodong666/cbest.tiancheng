@@ -12,6 +12,7 @@
         select es.id settleId,
                es.settle_no settleNo,
                es.create_time createTime,
+               es.settle_period settlePeriod,
                a.account_name accountName,
                a.phone phone,
                a.store_code departmentCode,

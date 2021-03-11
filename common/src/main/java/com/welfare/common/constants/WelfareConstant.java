@@ -11,6 +11,31 @@ public class WelfareConstant {
     private WelfareConstant() {
 
     }
+
+    public enum PaymentChannel {
+        /**
+         * 沃支付
+         */
+        VOL_PAY("VOL_PAY", "沃支付");
+
+        private final String code;
+        private final String desc;
+
+        PaymentChannel(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+    }
+
+
     public enum DictType {
         /**
          * 门店消费类型

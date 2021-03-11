@@ -138,7 +138,7 @@
                 aty.type_code,
                 aty.type_name
             FROM
-            (select account_code,sum(trans_amount) as trans_amount ,
+            (select account_code,sum(trans_amount) as trans_amount ,payment_channel,
         trans_no , max(trans_time) as trans_time ,store_code,trans_type
         from account_bill_detail
         where trans_type in ('consume','refund')

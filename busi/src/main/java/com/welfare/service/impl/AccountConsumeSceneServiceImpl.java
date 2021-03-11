@@ -341,10 +341,13 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
           @Override
           public void afterCompletion(int status) {
             if (CollectionUtils.isNotEmpty(oldScenes)) {
-              Cache cache = cacheManager.getCache("getAccountTypeAndMerCode");
+              String cacheName = "getAccountTypeAndMerCode";
+              Cache cache = cacheManager.getCache(cacheName);
               if (cache != null) {
                 oldScenes.forEach(scene -> {
-                  cache.evictIfPresent("#"+scene.getMerCode()+"#"+scene.getAccountTypeCode());
+                  String key = "#"+scene.getMerCode()+"#"+scene.getAccountTypeCode();
+                  cache.evictIfPresent(key);
+                  log.info("删除缓存，name:{} key:{}", cacheName, key);
                 });
               }
             }

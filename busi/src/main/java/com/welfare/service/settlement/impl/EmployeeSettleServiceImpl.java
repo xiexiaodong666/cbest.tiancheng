@@ -234,12 +234,12 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                     throw new BusiException(String.format("员工[%s]结算金额[%s]必须大于零！", totalSettleAmount, accountCode));
                 }
                 if (settleBuildReq.getTransTimeStart() == null) {
-                    settleBuildReq.setTransTimeStart(details.get(0).getTransTime());
+                    employeeSettle.setSettleStartTime(details.get(0).getTransTime());
                 } else {
                     employeeSettle.setSettleStartTime(settleBuildReq.getTransTimeStart());
                 }
                 if (settleBuildReq.getTransTimeEnd() == null) {
-                    settleBuildReq.setTransTimeEnd(details.get(details.size() - 1).getTransTime());
+                    employeeSettle.setSettleEndTime(details.get(details.size() - 1).getTransTime());
                 } else {
                     employeeSettle.setSettleEndTime(settleBuildReq.getTransTimeEnd());
                 }

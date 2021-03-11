@@ -16,8 +16,10 @@ public class WelfareConstant {
         /**
          * 沃支付
          */
-        VOL_PAY("VOL_PAY", "沃支付");
-
+        VOL_PAY("VOL_PAY", "沃支付"),
+        WECHAT("wechat", "微信"),
+        ALIPAY("alipay", "支付宝"),
+        WELFARE("welfare", "甜橙卡");
         private final String code;
         private final String desc;
 

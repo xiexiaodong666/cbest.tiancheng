@@ -348,6 +348,8 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
                   String key = "#"+scene.getMerCode()+"#"+scene.getAccountTypeCode();
                   if (cache.evictIfPresent(key)) {
                     log.info("删除缓存，name:{} key:{}", cacheName, key);
+                  } else {
+                    log.info("没有缓存，name:{} key:{}", cacheName, key);
                   }
                 });
               }

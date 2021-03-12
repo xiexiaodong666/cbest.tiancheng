@@ -185,6 +185,12 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             // 恢复员工授信额度或溢缴款账户额度
             AccountRestoreCreditLimitReq req = new AccountRestoreCreditLimitReq();
             req.setCreditLimitDtos(AccountRestoreCreditLimitReq.RestoreCreditLimitDTO.of(employeeSettles));
+            List<AccountRestoreCreditLimitReq.RestoreCreditLimitDTO> restoreCreditLimitDtos = req.getCreditLimitDtos()
+                    .stream()
+                    .filter(restore -> Objects.nonNull(restore.getRestoreAmount())
+                            && restore.getRestoreAmount().compareTo(BigDecimal.ZERO) > 0)
+                    .collect(Collectors.toList());
+            req.setCreditLimitDtos(restoreCreditLimitDtos);
             WelfareResp resp = accountCreditFeign.remainingLimit(req, "settlement-api");
             if (resp == null || resp.getCode() != 1) {
                 throw new BusiException("完成结算失败，请重新操作！");
@@ -245,9 +251,6 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 employeeSettle.setCreateUser(MerchantUserHolder.getMerchantUser().getUserCode());
                 employeeSettle.setSettleNo(settleNo);
                 details = details.stream().sorted(Comparator.comparing(EmployeeSettleDetail::getTransTime)).collect(Collectors.toList());
-                if (totalSettleAmount.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new BusiException(String.format("员工[%s]结算金额[%s]必须大于零！", totalSettleAmount, accountCode));
-                }
                 if (settleBuildReq.getTransTimeStart() == null) {
                     employeeSettle.setSettleStartTime(details.get(0).getTransTime());
                 } else {

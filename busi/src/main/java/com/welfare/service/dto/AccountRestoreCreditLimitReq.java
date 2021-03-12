@@ -19,7 +19,6 @@ import java.util.List;
 @Data
 public class AccountRestoreCreditLimitReq {
 
-  @NotEmpty(message = "恢复明细数据不能为空")
   private List<RestoreCreditLimitDTO> creditLimitDtos;
 
   @Data

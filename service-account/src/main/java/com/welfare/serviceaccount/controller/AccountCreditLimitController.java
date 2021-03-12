@@ -32,7 +32,7 @@ public class AccountCreditLimitController implements IController {
   private AccountService accountService;
 
   @PostMapping("/batchRestore")
-  @ApiOperation("批量充值")
+  @ApiOperation("恢复授信额度")
   public R newDepositBatch(@RequestBody @Valid AccountRestoreCreditLimitReq req){
     accountService.batchRestoreCreditLimit(req);
     return success();

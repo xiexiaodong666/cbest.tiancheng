@@ -213,7 +213,9 @@
                esd.store_name storeName,
                case when esd.store_type = 'self' then '自营'
                     when esd.store_type = 'third' then '第三方' end as storeType,
-               esd.trans_amount transAmount,
+               case when esd.trans_type='consume' then IFNULL(esd.trans_amount,0)
+                    when esd.trans_type='refund' then IFNULL(esd.trans_amount*-1,0)
+                    else 0 end transAmount,
                if(esd.mer_account_type = 'surplus_quota_overpay' and esd.trans_type = 'refund', 0, esd.trans_amount) as settleAmount,
                case when esd.settle_flag = 'unsettled' then '待结算'
                     when esd.settle_flag = 'settling' then '结算中'

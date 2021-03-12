@@ -33,7 +33,7 @@ public class PaymentChannelServiceImpl implements PaymentChannelService {
         List<PaymentChannelDTO> result = new ArrayList<>();
         for (WelfareConstant.PaymentChannel paymentChannel : WelfareConstant.PaymentChannel.values()) {
             PaymentChannelDTO paymentChannelDTO = new PaymentChannelDTO();
-            paymentChannelDTO.setPaymentChannelName(paymentChannel.name());
+            paymentChannelDTO.setPaymentChannelName(paymentChannel.desc());
             paymentChannelDTO.setPaymentChannelCode(paymentChannel.code());
             result.add(paymentChannelDTO);
         }

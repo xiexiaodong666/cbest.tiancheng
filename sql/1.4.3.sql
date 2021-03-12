@@ -10,7 +10,7 @@ CREATE TABLE `employee_settle_detail` (
                                           `mer_name` varchar(50) DEFAULT NULL COMMENT '商户名称',
                                           `store_code` varchar(20) DEFAULT NULL COMMENT '门店编码',
                                           `store_name` varchar(50) DEFAULT NULL COMMENT '门店名称',
-                                          `trans_time` datetime DEFAULT NULL COMMENT '交易时间',
+                                          `trans_time` datetime NOT NULL COMMENT '交易时间',
                                           `pos` varchar(20) DEFAULT NULL COMMENT 'pos机器编码',
                                           `pay_code` varchar(20) DEFAULT NULL COMMENT '支付编码',
                                           `pay_name` varchar(50) DEFAULT NULL COMMENT '支付名称',

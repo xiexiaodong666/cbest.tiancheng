@@ -19,6 +19,7 @@ CREATE TABLE `payment_channel` (
                                    `code` varchar(20) NOT NULL COMMENT '支出渠道编码',
                                    `name` varchar(20) NOT NULL COMMENT '支付渠道名称',
                                    `merchant_code` varchar(20) NOT NULL COMMENT '商户编码',
+                                   `show_order` int(11) NOT NULL COMMENT '展示顺序',
                                    `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志  1-删除、0-未删除',
                                    `create_user` varchar(50) DEFAULT NULL COMMENT '创建人',
                                    `create_time` datetime DEFAULT NULL COMMENT '创建时间',

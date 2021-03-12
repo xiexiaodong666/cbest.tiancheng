@@ -3,8 +3,6 @@ package com.welfare.service.remote;
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
-import com.welfare.service.remote.entity.request.WoLifeGetAccountDeductionRequest;
-import com.welfare.service.remote.entity.request.WoLifeGetAccountWriteOffRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
@@ -28,7 +26,7 @@ public interface WoLifeFeignClient {
   /**
    * 账户余额查询
    */
-  @RequestMapping(value = "/webrdp-web/_saas/_app/lifehouse.app/service/jsonService.db/getUserMoney.jssp", method = RequestMethod.POST)
+  @RequestMapping(value = "/webrdp-web/_saas/_app/lifehouse.app/service/jsonService.db/getUserMoney.jssp", method = RequestMethod.POST, consumes = "application/json")
   WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(
       @RequestParam(value = "phone", required = true) String phone
   );

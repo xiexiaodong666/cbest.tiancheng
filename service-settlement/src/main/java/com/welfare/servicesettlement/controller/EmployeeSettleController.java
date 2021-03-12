@@ -231,7 +231,7 @@ public class EmployeeSettleController {
 
 
   @GetMapping("/bill/{settleNo}/info")
-  @ApiOperation("分页查询员工授信消费账单列表")
+  @ApiOperation("通过账单编号查询账单信息")
   @MerchantUser
   public R<EmployeeSettleBillResp> queryBillInfo(@PathVariable("settleNo")String settleNo){
     EmployeeSettleBillResp page = employeeSettleService.queryBillInfo(settleNo);

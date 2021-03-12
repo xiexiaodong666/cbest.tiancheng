@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,code,name,merchant_code,deleted,create_user,create_time,update_user,update_time,version
+        id,code,name,merchant_code,deleted,create_user,create_time,update_user,update_time,version,show_order
     </sql>
 
 </mapper>

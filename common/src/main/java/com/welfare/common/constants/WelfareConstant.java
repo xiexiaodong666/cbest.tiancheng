@@ -17,8 +17,8 @@ public class WelfareConstant {
          * 沃生活馆
          */
         WO_LIFE("wo_life", "沃生活馆支付"),
-        WECHAT("wechat", "微信"),
-        ALIPAY("alipay", "支付宝"),
+        WECHAT("wechat", "微信支付"),
+        ALIPAY("alipay", "支付宝支付"),
         WELFARE("welfare", "甜橙卡");
 
         private final String code;

@@ -1,6 +1,11 @@
 package com.welfare.service;
 
 
+import com.welfare.service.dto.PaymentChannelDTO;
+import com.welfare.service.dto.PaymentChannelReq;
+
+import java.util.List;
+
 /**
  * 服务接口
  *
@@ -10,4 +15,9 @@ package com.welfare.service;
  */
 public interface PaymentChannelService {
 
+  /**
+   * 根据条件查询支付取代
+   * @return
+   */
+  List<PaymentChannelDTO> list(PaymentChannelReq req);
 }

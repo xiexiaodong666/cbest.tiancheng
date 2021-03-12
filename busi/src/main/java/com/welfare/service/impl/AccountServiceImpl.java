@@ -3,11 +3,15 @@ package com.welfare.service.impl;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.welfare.common.constants.AccountBalanceType.Welfare;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant.PaymentChannel;
 import com.welfare.common.enums.FileUniversalStorageEnum;
 import com.welfare.service.converter.DepartmentAndAccountTreeConverter;
 import com.welfare.service.dto.UploadImgErrorMsgDTO;
+import com.welfare.service.enums.AccountBalanceType;
+import com.welfare.service.enums.AccountBalanceType.Welfare;
+import com.welfare.service.enums.AccountBalanceType.WoLife;
+import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
 import java.util.Date;
 
 
@@ -715,6 +719,16 @@ public class AccountServiceImpl implements AccountService {
         return accountSimpleDTO;
     }
 
+    private <T> AccountBalanceDTO getAccountBalanceValue(AccountBalanceType<T> accountBalanceType,
+        T t) {
+        AccountBalanceDTO accountBalanceDTO = new AccountBalanceDTO();
+        accountBalanceDTO.setCode(accountBalanceType.toString());
+        accountBalanceDTO.setName(accountBalanceType.getName());
+        Object fieldValue = accountBalanceType.getFieldFunc().apply(t);
+        accountBalanceDTO.setValue(fieldValue);
+        return accountBalanceDTO;
+    }
+
     @Override
     public AccountOverviewDTO queryAccountOverview(Long accountCode, String paymentChannel) {
         Account account = getByAccountCode(accountCode);
@@ -724,18 +738,18 @@ public class AccountServiceImpl implements AccountService {
 
         switch (paymentChannelEnum) {
             case WELFARE:
-                Welfare[] values = Welfare.values();
-                for (Welfare welfare : values) {
-                    AccountBalanceDTO accountBalanceDTO = new AccountBalanceDTO();
-                    accountBalanceDTO.setCode(welfare.toString());
-                    accountBalanceDTO.setName(welfare.getName());
-                    Object fieldValue = ReflectUtil.getFieldValue(account, welfare.getKey());
-                    accountBalanceDTO.setValue(fieldValue);
-                    balanceList.add(accountBalanceDTO);
-                }
+                balanceList = Lists.newArrayList(Welfare.values())
+                    .stream()
+                    .map(welfare -> getAccountBalanceValue(welfare, account))
+                    .collect(Collectors.toList());
                 break;
             case WO_LIFE:
                 //TODO
+                WoLifeGetUserMoneyResponse woLifeGetUserMoneyResponse = new WoLifeGetUserMoneyResponse();
+                balanceList = Lists.newArrayList(WoLife.values())
+                    .stream()
+                    .map(woLife -> getAccountBalanceValue(woLife, woLifeGetUserMoneyResponse))
+                    .collect(Collectors.toList());
                 break;
         }
 

@@ -116,12 +116,12 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             query.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
             List<EmployeeSettleDetail> settleDetails = employeeSettleDetailMapper.getBuildEmployeeSettleDetail(query);
             if (CollectionUtils.isEmpty(settleDetails)) {
-                throw new BusiException("没有符合条件结算数据！");
+                throw new BusiException(String.format("员工在当前查询条件下没有结算数据！"));
             }
             List<Long> accountCodes = settleDetails.stream().map(EmployeeSettleDetail::getAccountCode).collect(Collectors.toList());
             settleBuildReq.getSelectedAccountCodes().forEach(accountCode -> {
                 if (!accountCodes.contains(Long.parseLong(accountCode))) {
-                    throw new BusiException(String.format("员工[%s]没有可结算的数据！", accountCode));
+                    throw new BusiException(String.format("员工[%s]在当前查询条件下没有结算数据！", accountCode));
                 }
             });
             List<EmployeeSettle> employeeSettles = assemblyEmployeeSettles(settleDetails, settleBuildReq);
@@ -133,7 +133,11 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             return employeeSettles.stream().map(EmployeeSettle::getSettleNo).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("生成员工授信结算单失败,请求:{}", JSON.toJSONString(settleBuildReq), e);
-            throw new BusiException("生成账单失败");
+            if (e instanceof BusiException) {
+                throw e;
+            } else {
+                throw new BusiException("生成账单失败");
+            }
         } finally {
             DistributedLockUtil.unlock(multiLock);
         }

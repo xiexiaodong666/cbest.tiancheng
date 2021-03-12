@@ -16,17 +16,19 @@ public class WelfareConstant {
         /**
          * 沃生活馆
          */
-        WO_LIFE("wo_life", "沃生活馆支付"),
-        WECHAT("wechat", "微信"),
-        ALIPAY("alipay", "支付宝"),
-        WELFARE("welfare", "甜橙卡");
+        WO_LIFE("wo_life", "沃生活馆支付","70"),
+        WECHAT("wechat", "微信","71"),
+        ALIPAY("alipay", "支付宝","72"),
+        WELFARE("welfare", "甜橙卡","69");
 
         private final String code;
         private final String desc;
+        private final String barcodePrefix;
 
-        PaymentChannel(String code, String desc) {
+        PaymentChannel(String code, String desc,String barcodePrefix) {
             this.code = code;
             this.desc = desc;
+            this.barcodePrefix = barcodePrefix;
         }
 
         public String code() {
@@ -36,6 +38,8 @@ public class WelfareConstant {
         public String desc() {
             return this.desc;
         }
+
+        public String barcodePrefix(){return this.barcodePrefix;}
     }
 
 

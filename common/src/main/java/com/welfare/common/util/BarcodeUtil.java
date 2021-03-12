@@ -1,5 +1,7 @@
 package com.welfare.common.util;
 
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.PaymentChannel;
 import jodd.util.MathUtil;
 import jodd.util.StringUtil;
 import lombok.SneakyThrows;
@@ -27,9 +29,10 @@ public class BarcodeUtil {
     /**
      * 生成条码
      * @param accountCode
+     * @param paymentChannel
      * @return
      */
-    public static String generateBarcode(Long accountCode, Long secretKey){
+    public static String generateBarcode(Long accountCode, Long secretKey, String paymentChannel){
         /**
          *  barcode = 69 + [account + secretKey] 9位 + [rand1]3位 + [rand2]3位 + [(account + secretKey) % rand1]3位
          */
@@ -44,7 +47,7 @@ public class BarcodeUtil {
                 rand1 +
                 rand2 +
                 String.format("%03d", mod);
-        return "69" + StringUtil.reverse(stringBuilder);
+        return PaymentChannel.valueOf(paymentChannel).barcodePrefix() + StringUtil.reverse(stringBuilder);
     }
 
     /**

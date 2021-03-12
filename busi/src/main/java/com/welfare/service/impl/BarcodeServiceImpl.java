@@ -125,10 +125,16 @@ public class BarcodeServiceImpl implements BarcodeService {
     public BarcodeSalt querySaltByPeriodNumeric(Long period) {
         QueryWrapper<BarcodeSalt> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(BarcodeSalt.VALID_PERIOD, period);
-        return barcodeSaltDao.getOne(queryWrapper);
+        BarcodeSalt barcodeSalt = barcodeSaltDao.getOne(queryWrapper);
+        if(Objects.isNull(barcodeSalt)){
+            batchGenerateSalt();
+            barcodeSalt = barcodeSaltDao.getOne(queryWrapper);
+        }
+        return barcodeSalt;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PaymentBarcode getBarcode(Long accountCode) {
         BarcodeSalt barcodeSalt =  queryPeriodSaltValue(Calendar.getInstance().getTime());
         PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue());

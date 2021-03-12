@@ -258,8 +258,8 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 } else {
                     employeeSettle.setSettleEndTime(settleBuildReq.getTransTimeEnd());
                 }
-                String dateStartStr = DateUtil.date2Str(settleBuildReq.getTransTimeStart(), "yyyy-MM-dd");
-                String dateStartEnd = DateUtil.date2Str(settleBuildReq.getTransTimeEnd(), "yyyy-MM-dd");
+                String dateStartStr = DateUtil.date2Str(employeeSettle.getSettleStartTime(), "yyyy-MM-dd");
+                String dateStartEnd = DateUtil.date2Str(employeeSettle.getSettleEndTime(), "yyyy-MM-dd");
                 employeeSettle.setSettlePeriod(dateStartStr + "至" + dateStartEnd);
                 employeeSettles.add(employeeSettle);
             });

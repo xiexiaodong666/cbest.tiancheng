@@ -11,9 +11,9 @@ import lombok.Data;
 @Data
 public class PaymentChannelDTO {
 
-  @ApiModelProperty("编码")
+  @ApiModelProperty("支付渠道编码")
   private String paymentChannelCode;
 
-  @ApiModelProperty("名称")
+  @ApiModelProperty("支付渠道名称")
   private String paymentChannelName;
 }

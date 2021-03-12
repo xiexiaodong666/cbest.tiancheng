@@ -82,7 +82,11 @@ public class PaymentChannel extends Model<PaymentChannel> implements Serializabl
      */
     @ApiModelProperty("版本") @Version 
     private Integer version;
-
+    /**
+     * 展示顺序
+     */
+    @ApiModelProperty("展示顺序")
+    private Integer showOrder;
 //以下为列明常量
 
     /**
@@ -125,5 +129,8 @@ public class PaymentChannel extends Model<PaymentChannel> implements Serializabl
     * 版本
     */
     public static final String VERSION = "version";
-
+    /**
+     * 展示顺序
+     */
+    public static final String SHOW_ORDER = "showOrder";
 }

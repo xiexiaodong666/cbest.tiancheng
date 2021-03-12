@@ -43,6 +43,9 @@ public class BarcodeController implements IController {
     @GetMapping
     @ApiOperation("用户获取支付条码")
     public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode){
+        if(1==1){
+            throw new IllegalArgumentException("123");
+        }
         PaymentBarcode barcode = barcodeService.getBarcode(accountCode);
         return success(barcode);
     }

@@ -30,7 +30,8 @@
         aded.chanel AS channel,
         mat.mer_account_type_code AS merAccountTypeCode,
         mat.mer_account_type_name AS merAccountTypeName,
-        aded.trans_no AS transNo
+        aded.trans_no AS transNo,
+        aded.payment_channel AS paymentChannel
         FROM
         account_deduction_detail aded
         JOIN account a ON aded.account_code = a.account_code
@@ -41,6 +42,9 @@
         <where>
             <if test="accountCode != null">
                 AND aded.account_code = #{accountCode}
+            </if>
+            <if test="paymentChannel != null">
+                AND aded.payment_channel = #{paymentChannel}
             </if>
             <if test="startTransTime != null ">
                 <![CDATA[AND aded.trans_time >= #{startTransTime}]]>

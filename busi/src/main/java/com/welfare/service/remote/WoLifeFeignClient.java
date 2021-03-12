@@ -21,14 +21,14 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "wo_life", url = "${wo_life.url}", fallbackFactory = WoLifeFeignClientFallback.class, configuration = FeignConfiguration.class)
+@FeignClient(value = "wo_life", url = "${wo_life.url:http://113.204.98.245:9081}", fallbackFactory = WoLifeFeignClientFallback.class, configuration = FeignConfiguration.class)
 @ConditionalOnHavingProperty("wo_life.url")
 public interface WoLifeFeignClient {
 
   /**
    * 账户余额查询
    */
-  @RequestMapping(value = "/getUserMoney.jssp", method = RequestMethod.GET)
+  @RequestMapping(value = "/webrdp-web/_saas/_app/lifehouse.app/service/jsonService.db/getUserMoney.jssp", method = RequestMethod.POST)
   WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(
       @RequestParam(value = "phone", required = true) String phone
   );
@@ -36,28 +36,28 @@ public interface WoLifeFeignClient {
   /**
    * 账户扣款
    */
-  @RequestMapping(value = "/", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/webrdp-web/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
   WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
       @RequestBody WoLifeAccountDeductionRequest request);
 
   /**
    * 退款销账
    */
-  @RequestMapping(value = "/", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/webrdp-web/_saas/_app/lifehouse.app/service/jsonService.db/refundForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
   WoLifeBasicResponse refundWriteOff(
       @RequestBody WoLifeRefundWriteOffRequest request);
 
   /**
    * 扣款查询
    */
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+  /*@RequestMapping(value = "/", method = RequestMethod.GET)
   WoLifeBasicResponse getAccountDeduction(
-      @RequestBody WoLifeGetAccountDeductionRequest request);
+      @RequestBody WoLifeGetAccountDeductionRequest request);*/
 
   /**
    * 销账查询
    */
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+/*  @RequestMapping(value = "/", method = RequestMethod.GET)
   WoLifeBasicResponse getAccountWriteOff(
-      @RequestBody WoLifeGetAccountWriteOffRequest request);
+      @RequestBody WoLifeGetAccountWriteOffRequest request);*/
 }

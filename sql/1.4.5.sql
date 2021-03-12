@@ -34,3 +34,11 @@ CREATE TABLE `payment_channel` (
 alter table account_deduction_detail add column payment_channel varchar(20) comment '支付渠道' after order_channel;
 alter table account_bill_detail add column payment_channel varchar(20) comment '支付渠道' after order_channel;
 alter table settle_detail add column payment_channel varchar(20) comment '支付渠道' after order_channel;
+
+
+INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('87', 'PaymentChannel', 'welfare', '甜橙卡', '1', '0', '1');
+INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('88', 'PaymentChannel', 'bestpay', '翼支付', '1', '0', '4');
+INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('89', 'PaymentChannel', 'wechat', '微信支付', '1', '0', '3');
+INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('90', 'PaymentChannel', 'alipay', '支付宝支付', '1', '0', '2');
+INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('91', 'PaymentChannel', 'wo_life', '沃生活馆支付', '1', '0', '5');
+

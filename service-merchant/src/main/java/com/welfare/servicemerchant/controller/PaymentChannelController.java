@@ -2,14 +2,13 @@ package com.welfare.servicemerchant.controller;
 
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.service.dto.PaymentChannelDTO;
+import com.welfare.service.dto.PaymentChannelReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,10 +24,9 @@ import java.util.List;
 @Api(tags = "支付渠道配置控制器")
 public class PaymentChannelController {
 
-  @GetMapping("/list")
+  @PostMapping("/list")
   @ApiOperation("根据商户编码查询支付渠道配列表")
-  @MerchantUser
-  public R<List<PaymentChannelDTO>> list() {
+  public R<List<PaymentChannelDTO>> list(@RequestBody PaymentChannelReq req) {
     return R.success(null);
   }
 

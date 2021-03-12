@@ -158,10 +158,8 @@ public class BarcodeServiceImpl implements BarcodeService {
     }
 
     private BarcodeSalt getTheLatestSaltInDb() {
-        Long currentPeriod = BarcodeUtil.dateAsPeriod(Calendar.getInstance().getTime());
         QueryWrapper<BarcodeSalt> queryWrapper = new QueryWrapper<>();
-        queryWrapper.ge(BarcodeSalt.VALID_PERIOD_NUMERIC,currentPeriod)
-                .orderByDesc(BarcodeSalt.VALID_PERIOD_NUMERIC)
+        queryWrapper.orderByDesc(BarcodeSalt.VALID_PERIOD_NUMERIC)
                 .last("limit 1");
         return barcodeSaltDao.getOne(queryWrapper);
     }

@@ -134,7 +134,7 @@ public class EmployeeSettleController {
       employeeSettleDetailRespTemp = employeeSettleDetailService.detailExport(accountCode, employeeSettleDetailReq);
       if(CollectionUtil.isNotEmpty(employeeSettleDetailRespTemp)){
         employeeSettleDetailRespList.addAll(employeeSettleDetailRespTemp);
-        employeeSettleDetailReq.setMinId(employeeSettleDetailRespTemp.get(employeeSettleDetailRespTemp.size()-1).getId() + 1);
+        employeeSettleDetailReq.setMinId(employeeSettleDetailRespTemp.get(employeeSettleDetailRespTemp.size()-1).getId() - 1);
       }else {
         break;
       }

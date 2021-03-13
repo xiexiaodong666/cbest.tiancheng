@@ -226,7 +226,7 @@
         where 1=1
         <include refid="employeeSettleDetailQuery"/>
         <if test="query.limit!=null and query.minId!=null">
-            order by esd.id desc
+            order by esd.id
             limit #{query.limit}
         </if>
 

@@ -228,6 +228,10 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                     if (detail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
                             && WelfareConstant.TransType.REFUND.code().equals(detail.getTransType())) {
                         totalSettleAmount = totalSettleAmount.add(BigDecimal.ZERO);
+                        totalConsumerAmount = totalConsumerAmount.add(detail.getTransAmount().abs().negate());
+                    } else if (detail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
+                            && WelfareConstant.TransType.CONSUME.code().equals(detail.getTransType())) {
+                        totalSettleAmount = totalSettleAmount.add(BigDecimal.ZERO);
                         totalConsumerAmount = totalConsumerAmount.add(detail.getTransAmount().abs());
                     } else if (detail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())
                             && WelfareConstant.TransType.REFUND.code().equals(detail.getTransType())) {

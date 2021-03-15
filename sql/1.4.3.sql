@@ -46,7 +46,7 @@ create unique index uk_account_deduction_amount_id on employee_settle_detail(acc
 CREATE TABLE `employee_settle` (
                                    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
                                    `settle_no` varchar(50) DEFAULT NULL COMMENT '账单编号',
-                                   `settle_period` varchar(20) DEFAULT NULL COMMENT '账单周期',
+                                   `settle_period` varchar(50) DEFAULT NULL COMMENT '账单周期',
                                    `mer_code` varchar(20) DEFAULT NULL COMMENT '商户代码',
                                    `account_code` bigint(20) COMMENT '账户号',
                                    `trans_amount` decimal(10,2) DEFAULT NULL COMMENT '交易金额',
@@ -77,7 +77,7 @@ alter table settle_detail modify mer_account_type varchar(32) null comment '福�
 alter table employee_settle_detail modify mer_account_type varchar(32) null comment '福利类型(个人授信，个人授信溢缴款)';
 alter table account_bill_detail add column surplus_quota_overpay decimal(10,2) comment '个人授信溢缴款' after surplus_quota;
 alter table account add column surplus_quota_overpay decimal(10,2) DEFAULT 0.00 comment '个人授信溢缴款' after surplus_quota;
-
+alter table supplier_store add mobile varchar(32) null comment '门店手机号';
 
 ### DML
 

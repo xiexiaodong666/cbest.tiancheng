@@ -15,6 +15,7 @@ import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.EmployeeSettleDetailDao;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
 import com.welfare.persist.dto.EmployeeSettleDetailDTO;
+import com.welfare.persist.dto.EmployeeSettleStoreDTO;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
 import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
@@ -27,6 +28,7 @@ import com.welfare.service.dto.EmployeeSettleConsumePageReq;
 import com.welfare.service.dto.EmployeeSettleDetailPageReq;
 import com.welfare.service.dto.EmployeeSettleDetailReq;
 import com.welfare.service.dto.EmployeeSettleDetailResp;
+import com.welfare.service.dto.StoreCodeNameDTO;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -194,12 +197,23 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
         EmployeeSettleDetailQuery employeeSettleDetailQuery = new EmployeeSettleDetailQuery();
         BeanUtils.copyProperties(employeeSettleDetailReq, employeeSettleDetailQuery);
         employeeSettleDetailQuery.setSettleNo(settleNo);
-        employeeSettleDetailQuery.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
         employeeSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         return employeeSettleDetailMapper.querySettleDetail(employeeSettleDetailQuery).stream().map(employeeSettleDetailDTO -> {
                 EmployeeSettleDetailResp resp= new EmployeeSettleDetailResp();
                 BeanUtils.copyProperties(employeeSettleDetailDTO, resp);
                 return resp;
             }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StoreCodeNameDTO> allStoresInMonthSettle(String settleNo, String accountCode) {
+        List<EmployeeSettleStoreDTO> dtos = employeeSettleDetailMapper.allStoresInMonthSettle(settleNo, accountCode);
+        List<StoreCodeNameDTO> list = new ArrayList<>();
+        dtos.forEach(dto -> {
+            StoreCodeNameDTO storeCodeNameDTO = new StoreCodeNameDTO();
+            BeanUtils.copyProperties(dto, storeCodeNameDTO);
+            list.add(storeCodeNameDTO);
+        });
+        return list;
     }
 }

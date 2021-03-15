@@ -21,6 +21,7 @@ import com.welfare.service.dto.EmployeeSettleDetailReq;
 import com.welfare.service.dto.EmployeeSettleDetailResp;
 import com.welfare.service.dto.EmployeeSettleFinishReq;
 import com.welfare.service.dto.EmployeeSettleSumReq;
+import com.welfare.service.dto.StoreCodeNameDTO;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
 import com.welfare.service.settlement.EmployeeSettleService;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +47,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import static com.welfare.common.exception.ExceptionCode.ILLEGALITY_ARGURMENTS;
 import static net.dreamlu.mica.core.result.R.success;
 
 /**
@@ -87,7 +90,7 @@ public class EmployeeSettleController {
      if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
          employeeSettleConsumePageReq.setMerCode(merchantUser.getMerchantCode());
      }else {
-         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+         throw new BusiException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
      }
      return success(employeeSettleDetailService.pageQuery(employeeSettleConsumePageReq));
   }
@@ -100,7 +103,7 @@ public class EmployeeSettleController {
      if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
          employeeSettleConsumeQuery.setMerCode(merchantUser.getMerchantCode());
      }else {
-         throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+         throw new BusiException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
      }
      return success(employeeSettleDetailService.summary(employeeSettleConsumeQuery));
 
@@ -156,7 +159,7 @@ public class EmployeeSettleController {
     if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
       billPageReq.setMerCode(merchantUser.getMerchantCode());
     }else {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+      throw new BusiException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
     }
     Page<EmployeeSettleBillResp> page = employeeSettleService.pageQueryBill(billPageReq);
     return success(page);
@@ -215,4 +218,14 @@ public class EmployeeSettleController {
     employeeSettleDetailService.pullAccountDetailByDate(date);
     return R.success();
   }
+
+    @GetMapping("/stores")
+    @ApiOperation("查询员工授信消费所有门店name和code")
+    public R<List<StoreCodeNameDTO>> allStoresInMonthSettle(@RequestParam(value = "settleNo", required = false)String settleNo, @RequestParam(value = "accountCode", required = false)String accountCode){
+    if (StringUtils.isBlank(settleNo)&&StringUtils.isBlank(accountCode)){
+        throw new BusiException(ILLEGALITY_ARGURMENTS, "缺少参数", null);
+    }
+    List<StoreCodeNameDTO> supplierStores =  employeeSettleDetailService.allStoresInMonthSettle(settleNo, accountCode);
+    return success(supplierStores);
+    }
 }

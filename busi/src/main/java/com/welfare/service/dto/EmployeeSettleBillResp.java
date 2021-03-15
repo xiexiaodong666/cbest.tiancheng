@@ -53,6 +53,12 @@ public class EmployeeSettleBillResp {
     @ApiModelProperty(value = "账单结算金额")
     private String settleAmount;
 
+    @ApiModelProperty(value = "账单结算周期")
+    private String settlePeriod;
+
+    @ApiModelProperty(value = "员工授信额度")
+    private String quota;
+
     @ApiModelProperty(value = "结算状态:待结算-unsettled 已结算-settled")
     private String settleStatus;
 

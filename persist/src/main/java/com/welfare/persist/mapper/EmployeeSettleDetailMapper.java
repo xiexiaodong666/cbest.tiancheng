@@ -3,6 +3,7 @@ package com.welfare.persist.mapper;
 import com.welfare.persist.dto.EmployeeSettleBuildDTO;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
 import com.welfare.persist.dto.EmployeeSettleDetailDTO;
+import com.welfare.persist.dto.EmployeeSettleStoreDTO;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleBuildQuery;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
@@ -61,4 +62,6 @@ public interface EmployeeSettleDetailMapper extends BaseMapper<EmployeeSettleDet
   List<EmployeeSettleDetail> getBuildEmployeeSettleDetail(@Param("query") EmployeeSettleBuildQuery query);
 
   int batchUpdateStatusBySettleNo(@Param("status") String status, @Param("settleNos") List<String> settleNos,  @Param("updateUser") String updateUser);
+
+  List<EmployeeSettleStoreDTO> allStoresInMonthSettle(@Param("settleNo")String settleNo, @Param("accountCode")String accountCode);
 }

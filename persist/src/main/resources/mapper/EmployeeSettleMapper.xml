@@ -12,17 +12,18 @@
         select es.id settleId,
                es.settle_no settleNo,
                es.create_time createTime,
+               es.settle_period settlePeriod,
                a.account_name accountName,
                a.phone phone,
                a.store_code departmentCode,
                d.department_name departmentName,
+                CONCAT(a.surplus_quota + a.surplus_quota_overpay, '/',a.max_quota) as quota,
                if(esd.store_type = 'self', sum(esd.trans_amount), 0) as selfAmount,
                if(esd.store_type = 'third', sum(esd.trans_amount), 0) as thirdAmount,
                es.trans_amount transAmount,
                es.order_num orderNum,
                es.settle_amount settleAmount,
-               case when es.settle_status = 'settling' then '结算中'
-                    when es.settle_status = 'settled' then '已结算' end settleStatus,
+               es.settle_status settleStatus,
                es.confirm_time settleTime
         from employee_settle es
                  left join account a on a.account_code = es.account_code
@@ -53,7 +54,7 @@
           and es.create_time <= #{query.endTime}
         ]]>
     </if>
-      order by es.create_time desc
+      group by es.id order by es.create_time desc
     </select>
 
 

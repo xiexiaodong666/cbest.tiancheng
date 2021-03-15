@@ -45,6 +45,8 @@ encrypt:
 e-welfare:
   distributed-lock:
     enabled: true
+  account:
+    url: http://127.0.0.1:10015
 mybatis-plus:
   global-config:
     db-config:

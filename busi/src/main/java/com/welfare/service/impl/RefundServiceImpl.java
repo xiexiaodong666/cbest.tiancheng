@@ -187,6 +187,7 @@ public class RefundServiceImpl implements RefundService {
                 AccountDeductionDetail surplusOverpayDeductionDetail = new AccountDeductionDetail();
                 BeanUtils.copyProperties(surPlusQuotaDeductionDetail,surplusOverpayDeductionDetail);
                 surplusOverpayDeductionDetail.setTransAmount(BigDecimal.ZERO);
+                surplusOverpayDeductionDetail.setMerAccountType(SURPLUS_QUOTA_OVERPAY.code());
                 AccountDeductionDetail surplusOverpayRefundDeductionDetail = toRefundDeductionDetail(surplusOverpayDeductionDetail, refundRequest, surplusQuotaOverpayAmount, surplusOverpayType);
                 AccountBillDetail overpayRefundBillDetail = toRefundBillDetail(surplusOverpayRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
                 operateMerchantCredit(account,surplusOverpayRefundDeductionDetail);

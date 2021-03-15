@@ -1,10 +1,8 @@
 package com.welfare.service.impl;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
-import com.welfare.common.constants.WelfareConstant.PaymentChannel;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.FileUniversalStorageEnum;
 import com.welfare.service.converter.DepartmentAndAccountTreeConverter;
 import com.welfare.service.dto.UploadImgErrorMsgDTO;
@@ -16,7 +14,6 @@ import java.util.Date;
 
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
-import static com.welfare.common.constants.RedisKeyConstant.FINISH_EMPLOYEE_SETTLE;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.AccountStatus;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.constants.WelfareConstant.TransType;
@@ -38,7 +34,6 @@ import com.welfare.common.util.AccountUtil;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.SpringBeanUtils;
-import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.entity.*;
@@ -130,10 +125,11 @@ public class AccountServiceImpl implements AccountService {
     private final AccountChangeEventRecordDao accountChangeEventRecordDao;
 
     private final SubAccountDao subAccountDao;
+    private final PaymentChannelDao paymentChannelDao;
 
-    private final static Map<String, PaymentChannel> PAYMENT_CHANNEL_MAP = Stream
-        .of(PaymentChannel.values()).collect(Collectors
-            .toMap(PaymentChannel::code,
+    private final static Map<String, WelfareConstant.PaymentChannel> PAYMENT_CHANNEL_MAP = Stream
+        .of(WelfareConstant.PaymentChannel.values()).collect(Collectors
+            .toMap(WelfareConstant.PaymentChannel::code,
                 e -> e));
 
     @Override
@@ -732,7 +728,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountOverviewDTO queryAccountOverview(Long accountCode, String paymentChannel) {
         Account account = getByAccountCode(accountCode);
-        PaymentChannel paymentChannelEnum = paymentChannel == null ? PaymentChannel.WELFARE
+        WelfareConstant.PaymentChannel paymentChannelEnum = paymentChannel == null ? WelfareConstant.PaymentChannel.WELFARE
             : PAYMENT_CHANNEL_MAP.get(paymentChannel);
         List<AccountBalanceDTO> balanceList = new ArrayList<>();
 
@@ -753,7 +749,20 @@ public class AccountServiceImpl implements AccountService {
                 break;
         }
 
-        List<AccountPaymentChannelDTO> paymentChannelList = queryPaymentChannelList(accountCode);
+        List<SubAccount> subAccountList = subAccountDao.getBaseMapper()
+            .selectList(Wrappers.<SubAccount>lambdaQuery()
+                .eq(SubAccount::getAccountCode, accountCode)
+                .eq(SubAccount::getDeleted, 0));
+        List<AccountPaymentChannelDTO> paymentChannelList = subAccountList.stream().map(subAccount -> {
+            AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
+            String subAccountType = subAccount.getSubAccountType();
+            accountPaymentChannelDTO.setPaymentChannel(subAccountType);
+            WelfareConstant.PaymentChannel channel = PAYMENT_CHANNEL_MAP
+                .get(subAccountType);
+            accountPaymentChannelDTO.setPaymentChannelDesc(channel.desc());
+            return accountPaymentChannelDTO;
+        }).collect(Collectors.toList());
+
 
         AccountOverviewDTO accountOverviewDTO = new AccountOverviewDTO();
         String storeCode = account.getStoreCode();
@@ -773,18 +782,19 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<AccountPaymentChannelDTO> queryPaymentChannelList(Long accountCode) {
-        List<SubAccount> subAccountList = subAccountDao.getBaseMapper().selectList(
-            Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode));
+        Account account = getByAccountCode(accountCode);
+        List<PaymentChannel> channelList = paymentChannelDao.getBaseMapper().selectList(
+            Wrappers.<PaymentChannel>lambdaQuery()
+                .eq(PaymentChannel::getMerchantCode, account.getMerCode())
+                .eq(PaymentChannel::getDeleted, 0)
+                .orderByAsc(PaymentChannel::getShowOrder));
 
-        List<AccountPaymentChannelDTO> paymentChannelList = new ArrayList<>();
-        for (SubAccount subAccount : subAccountList) {
-            String subAccountType = subAccount.getSubAccountType();
-            PaymentChannel channelEnum = PAYMENT_CHANNEL_MAP.get(subAccountType);
+        List<AccountPaymentChannelDTO> paymentChannelList = channelList.stream().map(paymentChannel -> {
             AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
-            accountPaymentChannelDTO.setPaymentChannel(channelEnum.code());
-            accountPaymentChannelDTO.setPaymentChannelDesc(channelEnum.desc());
-            paymentChannelList.add(accountPaymentChannelDTO);
-        }
+            accountPaymentChannelDTO.setPaymentChannel(paymentChannel.getCode());
+            accountPaymentChannelDTO.setPaymentChannelDesc(paymentChannel.getName());
+            return accountPaymentChannelDTO;
+        }).collect(Collectors.toList());
         return paymentChannelList;
     }
 

@@ -49,10 +49,10 @@ public class AccountController implements IController {
     }
 
     @ApiOperation("账号概览信息")
-    @GetMapping("/overview/{paymentChannel}")
+    @GetMapping("/overview")
     @AccountUser
     public R<AccountOverviewDTO> overview(
-        @PathVariable(value = "paymentChannel") @ApiParam("支付渠道") String paymentChannel) {
+        @RequestParam("paymentChannel") @ApiParam("支付渠道") String paymentChannel) {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.queryAccountOverview(accountCode, paymentChannel));
     }

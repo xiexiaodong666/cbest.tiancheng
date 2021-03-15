@@ -1,5 +1,6 @@
 package com.welfare.persist.dto.query;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -59,4 +60,8 @@ public class MonthSettleDetailQuery{
     private String supplierCode;
 
     private String merDeductionType;
+
+    private String paymentChannel;
 }
+
+

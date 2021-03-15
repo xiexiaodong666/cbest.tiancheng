@@ -27,6 +27,7 @@ import com.welfare.service.wolife.WoLifePaymentService;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -48,7 +49,8 @@ import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPE
 @RequiredArgsConstructor
 @Service
 public class WoLifePaymentServiceImpl implements WoLifePaymentService {
-    private final WoLifeFeignClient woLifeFeignClient;
+    @Autowired(required = false)
+    private WoLifeFeignClient woLifeFeignClient;
     private final MerchantCreditService merchantCreditService;
     private final AccountDao accountDao;
     private final AccountBillDetailDao accountBillDetailDao;

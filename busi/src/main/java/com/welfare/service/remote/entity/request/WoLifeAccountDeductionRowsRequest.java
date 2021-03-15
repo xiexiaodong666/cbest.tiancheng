@@ -3,6 +3,8 @@ package com.welfare.service.remote.entity.request;
 import java.math.BigDecimal;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
 
 /**
@@ -36,4 +38,13 @@ public class WoLifeAccountDeductionRowsRequest {
    */
   @NotBlank
   private String saleUnId;
+
+  public static WoLifeAccountDeductionRowsRequest of(PaymentRequest paymentRequest){
+    WoLifeAccountDeductionRowsRequest woLifeAccountDeductionRowsRequest = new WoLifeAccountDeductionRowsRequest();
+    woLifeAccountDeductionRowsRequest.setCount(1);
+    woLifeAccountDeductionRowsRequest.setName("");
+    woLifeAccountDeductionRowsRequest.setPrice(paymentRequest.getAmount());
+    woLifeAccountDeductionRowsRequest.setSaleUnId("");
+    return woLifeAccountDeductionRowsRequest;
+  }
 }

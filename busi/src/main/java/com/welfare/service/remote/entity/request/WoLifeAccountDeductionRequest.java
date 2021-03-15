@@ -2,6 +2,8 @@ package com.welfare.service.remote.entity.request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
 
 /**
@@ -23,4 +25,11 @@ public class WoLifeAccountDeductionRequest {
    */
   @NotNull
   private WoLifeAccountDeductionDataRequest data;
+
+  public static WoLifeAccountDeductionRequest of(PaymentRequest paymentRequest){
+    WoLifeAccountDeductionRequest woLifeAccountDeductionRequest = new WoLifeAccountDeductionRequest();
+    woLifeAccountDeductionRequest.setPhone(paymentRequest.getPhone());
+    woLifeAccountDeductionRequest.setData(WoLifeAccountDeductionDataRequest.of(paymentRequest));
+    return woLifeAccountDeductionRequest;
+  }
 }

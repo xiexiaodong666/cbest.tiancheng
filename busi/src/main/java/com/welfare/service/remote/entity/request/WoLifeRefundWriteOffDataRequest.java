@@ -1,8 +1,11 @@
 package com.welfare.service.remote.entity.request;
 
+import java.util.Collections;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import com.welfare.service.dto.RefundRequest;
 import lombok.Data;
 
 /**
@@ -25,4 +28,11 @@ public class WoLifeRefundWriteOffDataRequest {
    */
   @NotNull
   private List<WoLifeRefundWriteOffRowsRequest> rows;
+
+  public static WoLifeRefundWriteOffDataRequest of(RefundRequest refundRequest){
+    WoLifeRefundWriteOffDataRequest woLifeRefundWriteOffDataRequest = new WoLifeRefundWriteOffDataRequest();
+    woLifeRefundWriteOffDataRequest.setOid(refundRequest.getOriginalTransNo());
+    woLifeRefundWriteOffDataRequest.setRows(Collections.singletonList(WoLifeRefundWriteOffRowsRequest.of(refundRequest)));
+    return woLifeRefundWriteOffDataRequest;
+  }
 }

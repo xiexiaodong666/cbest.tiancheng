@@ -9,6 +9,8 @@ import lombok.Data;
  */
 @Data
 public class WoLifeBasicResponse<T> {
+  private final String SUCCEED = "1";
+  private final String FAILED = "0";
 
   /**
    * 0表示请求失败,1=请求成功
@@ -24,4 +26,8 @@ public class WoLifeBasicResponse<T> {
    * 返回对象
    */
   private T response;
+
+  public boolean isSuccess(){
+    return SUCCEED.equals(responseCode);
+  }
 }

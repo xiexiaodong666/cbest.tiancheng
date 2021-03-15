@@ -3,6 +3,7 @@ package com.welfare.serviceaccount.controller;
 import com.alibaba.fastjson.JSON;
 import com.welfare.service.remote.WoLifeFeignClient;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
+import com.welfare.service.remote.entity.request.WoLifeGetUserMoneyRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
@@ -39,10 +40,10 @@ public class WoLifeTest implements IController {
    */
   @RequestMapping(value = "/getUserMoney", method = RequestMethod.POST)
   WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(
-      @RequestParam(value = "phone", required = true) String phone) {
+      WoLifeGetUserMoneyRequest request) {
 
-    log.info("getUserMoney", phone);
-    return woLifeFeignClient.getUserMoney(phone);
+    log.info("getUserMoney",  JSON.toJSONString(request));
+    return woLifeFeignClient.getUserMoney(request);
   }
 
   /**

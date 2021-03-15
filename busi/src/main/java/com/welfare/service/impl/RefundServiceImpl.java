@@ -166,11 +166,15 @@ public class RefundServiceImpl implements RefundService {
         if(!Objects.isNull(surplusType) && !Objects.isNull(surPlusQuotaDeductionDetail)){
             BigDecimal currentSurplusQuota = account.getSurplusQuota();
             BigDecimal maxQuota = account.getMaxQuota();
+            //最多允许退款到授信的金额
             BigDecimal maxRefundToSurplusQuota = maxQuota.subtract(currentSurplusQuota);
-            //应该退款的金额
-            BigDecimal shouldRefundAmount = surPlusQuotaDeductionDetail.getTransAmount();
-            //溢缴款金额
-            BigDecimal surplusQuotaOverpayAmount = shouldRefundAmount.subtract(maxRefundToSurplusQuota);
+            //本应该退款到授信的金额(依赖于请求的退款金额和个人授信在付款的时候扣款金额综合得到)
+            BigDecimal shouldRefundToSurplusQuotaAmount = refundRequest.getAmount()
+                    .subtract(surPlusQuotaDeductionDetail.getTransAmount()).compareTo(BigDecimal.ZERO)>0
+                    ?surPlusQuotaDeductionDetail.getTransAmount()
+                    :surPlusQuotaDeductionDetail.getTransAmount().subtract(refundRequest.getAmount());
+            //超出部分溢缴款金额
+            BigDecimal surplusQuotaOverpayAmount = shouldRefundToSurplusQuotaAmount.subtract(maxRefundToSurplusQuota);
             if(surplusQuotaOverpayAmount.compareTo(BigDecimal.ZERO)>0){
                 surplusType.setAccountBalance(surplusType.getAccountBalance().add(maxRefundToSurplusQuota));
                 Assert.isTrue(surplusType.getAccountBalance().compareTo(maxQuota) == 0,"退款金额异常，请联系管理员。");
@@ -179,13 +183,17 @@ public class RefundServiceImpl implements RefundService {
                     AccountDeductionDetail surplusRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, maxRefundToSurplusQuota,surplusType);
                     //设置退款金额为需要退款到授信额度的值
                     surplusRefundDeductionDetail.setTransAmount(maxRefundToSurplusQuota);
+                    refundedAmount = refundedAmount.add(maxRefundToSurplusQuota);
                     AccountBillDetail refundBillDetail = toRefundBillDetail(surplusRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
+                    surplusType.setAccountBalance(surplusType.getAccountBalance().add(maxRefundToSurplusQuota));
                     operateMerchantCredit(account, surplusRefundDeductionDetail);
                     RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail);
                     refundOperations.add(refundOperation);
                 }
                 AccountDeductionDetail surplusOverpayRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, surplusQuotaOverpayAmount, surplusOverpayType);
                 AccountBillDetail overpayRefundBillDetail = toRefundBillDetail(surplusOverpayRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
+                surplusOverpayType.setAccountBalance(surplusOverpayType.getAccountBalance().add(surplusQuotaOverpayAmount));
+                refundedAmount = refundedAmount.add(surplusQuotaOverpayAmount);
                 operateMerchantCredit(account,surplusOverpayRefundDeductionDetail);
                 RefundOperation overpayRefundOperation = RefundOperation.of(overpayRefundBillDetail, surplusOverpayRefundDeductionDetail);
                 refundOperations.add(overpayRefundOperation);
@@ -193,7 +201,9 @@ public class RefundServiceImpl implements RefundService {
             }
         }
 
-        BigDecimal remainingRefundAmount = refundRequest.getAmount();
+        //剩余的退款金额等于总的退款金额减去
+        BigDecimal remainingRefundAmount = refundRequest.getAmount()
+                .subtract(surPlusQuotaDeductionDetail==null?BigDecimal.ZERO:surPlusQuotaDeductionDetail.getTransAmount());
         handlePartlyRefundCommon(accountAmountTypes,
                 refundRequest,
                 account,
@@ -255,9 +265,9 @@ public class RefundServiceImpl implements RefundService {
                 break;
             }
         }
-/*        if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
+        if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
             throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常，退款金额计算错误", null);
-        }*/
+        }
     }
 
     @Deprecated

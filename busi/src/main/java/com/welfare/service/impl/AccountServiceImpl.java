@@ -970,7 +970,6 @@ public class AccountServiceImpl implements AccountService {
                         if (overAmount.compareTo(BigDecimal.ZERO) > 0) {
                             surplusQuotaOverpay.setAccountBalance(surplusQuotaOverpay.getAccountBalance().add(overAmount.abs()));
                             updatedAccountTypes.add(surplusQuotaOverpay);
-                            account.setAccountBalance(account.getAccountBalance().add(overAmount.abs()));
                             account.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay().add(overAmount.abs()));
                             updatedAccounts.add(account);
                             // 保存变更流水

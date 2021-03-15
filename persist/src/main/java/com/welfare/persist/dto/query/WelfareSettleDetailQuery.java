@@ -78,4 +78,6 @@ public class WelfareSettleDetailQuery {
     @ApiModelProperty("供应商编码")
     private String supplierCode;
 
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

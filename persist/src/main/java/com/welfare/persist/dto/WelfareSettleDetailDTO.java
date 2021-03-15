@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -107,4 +108,13 @@ public class WelfareSettleDetailDTO {
     @ExcelProperty(value = "商户支出方式")
     @ApiModelProperty("商户支出方式")
     private String merDeductionTypeName;
+
+    @ApiModelProperty("商户余额支出")
+    private BigDecimal merDeductionAmount;
+
+    @ApiModelProperty("商户授信支出")
+    private BigDecimal merDeductionCreditAmount;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

@@ -116,12 +116,12 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             query.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
             List<EmployeeSettleDetail> settleDetails = employeeSettleDetailMapper.getBuildEmployeeSettleDetail(query);
             if (CollectionUtils.isEmpty(settleDetails)) {
-                throw new BusiException("没有符合条件结算数据！");
+                throw new BusiException(String.format("员工在当前查询条件下没有结算数据！"));
             }
             List<Long> accountCodes = settleDetails.stream().map(EmployeeSettleDetail::getAccountCode).collect(Collectors.toList());
             settleBuildReq.getSelectedAccountCodes().forEach(accountCode -> {
                 if (!accountCodes.contains(Long.parseLong(accountCode))) {
-                    throw new BusiException(String.format("员工[%s]没有可结算的数据！", accountCode));
+                    throw new BusiException(String.format("员工[%s]在当前查询条件下没有结算数据！", accountCode));
                 }
             });
             List<EmployeeSettle> employeeSettles = assemblyEmployeeSettles(settleDetails, settleBuildReq);
@@ -133,7 +133,11 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             return employeeSettles.stream().map(EmployeeSettle::getSettleNo).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("生成员工授信结算单失败,请求:{}", JSON.toJSONString(settleBuildReq), e);
-            throw new BusiException("生成账单失败");
+            if (e instanceof BusiException) {
+                throw e;
+            } else {
+                throw new BusiException("生成账单失败");
+            }
         } finally {
             DistributedLockUtil.unlock(multiLock);
         }
@@ -181,6 +185,12 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             // 恢复员工授信额度或溢缴款账户额度
             AccountRestoreCreditLimitReq req = new AccountRestoreCreditLimitReq();
             req.setCreditLimitDtos(AccountRestoreCreditLimitReq.RestoreCreditLimitDTO.of(employeeSettles));
+            List<AccountRestoreCreditLimitReq.RestoreCreditLimitDTO> restoreCreditLimitDtos = req.getCreditLimitDtos()
+                    .stream()
+                    .filter(restore -> Objects.nonNull(restore.getRestoreAmount())
+                            && restore.getRestoreAmount().compareTo(BigDecimal.ZERO) > 0)
+                    .collect(Collectors.toList());
+            req.setCreditLimitDtos(restoreCreditLimitDtos);
             WelfareResp resp = accountCreditFeign.remainingLimit(req, "settlement-api");
             if (resp == null || resp.getCode() != 1) {
                 throw new BusiException("完成结算失败，请重新操作！");
@@ -192,6 +202,14 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
         } finally {
             DistributedLockUtil.unlock(multiLock);
         }
+    }
+
+    @Override
+    public EmployeeSettleBillResp queryBillInfo(String settleNo) {
+        EmployeeSettleBillDTO dto = employeeSettleMapper.queryBillInfo(settleNo);
+        EmployeeSettleBillResp resp = new EmployeeSettleBillResp();
+        BeanUtils.copyProperties(dto, resp);
+        return resp;
     }
 
     private List<EmployeeSettle> assemblyEmployeeSettles(List<EmployeeSettleDetail> settleDetails, EmployeeSettleBuildReq settleBuildReq) {
@@ -209,6 +227,10 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 for (EmployeeSettleDetail detail : details) {
                     if (detail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
                             && WelfareConstant.TransType.REFUND.code().equals(detail.getTransType())) {
+                        totalSettleAmount = totalSettleAmount.add(BigDecimal.ZERO);
+                        totalConsumerAmount = totalConsumerAmount.add(detail.getTransAmount().abs().negate());
+                    } else if (detail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
+                            && WelfareConstant.TransType.CONSUME.code().equals(detail.getTransType())) {
                         totalSettleAmount = totalSettleAmount.add(BigDecimal.ZERO);
                         totalConsumerAmount = totalConsumerAmount.add(detail.getTransAmount().abs());
                     } else if (detail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())
@@ -233,9 +255,6 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 employeeSettle.setCreateUser(MerchantUserHolder.getMerchantUser().getUserCode());
                 employeeSettle.setSettleNo(settleNo);
                 details = details.stream().sorted(Comparator.comparing(EmployeeSettleDetail::getTransTime)).collect(Collectors.toList());
-                if (totalSettleAmount.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new BusiException(String.format("员工[%s]结算金额[%s]必须大于零！", totalSettleAmount, accountCode));
-                }
                 if (settleBuildReq.getTransTimeStart() == null) {
                     employeeSettle.setSettleStartTime(details.get(0).getTransTime());
                 } else {
@@ -246,8 +265,8 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                 } else {
                     employeeSettle.setSettleEndTime(settleBuildReq.getTransTimeEnd());
                 }
-                String dateStartStr = DateUtil.date2Str(settleBuildReq.getTransTimeStart(), "yyyy-MM-dd");
-                String dateStartEnd = DateUtil.date2Str(settleBuildReq.getTransTimeEnd(), "yyyy-MM-dd");
+                String dateStartStr = DateUtil.date2Str(employeeSettle.getSettleStartTime(), "yyyy-MM-dd");
+                String dateStartEnd = DateUtil.date2Str(employeeSettle.getSettleEndTime(), "yyyy-MM-dd");
                 employeeSettle.setSettlePeriod(dateStartStr + "至" + dateStartEnd);
                 employeeSettles.add(employeeSettle);
             });

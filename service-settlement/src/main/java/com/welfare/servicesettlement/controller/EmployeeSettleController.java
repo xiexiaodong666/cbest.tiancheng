@@ -139,7 +139,8 @@ public class EmployeeSettleController {
         break;
       }
     }while (true);
-
+    //要求倒叙
+    employeeSettleDetailRespList = CollectionUtil.reverse(employeeSettleDetailRespList);
     String path = null;
     try {
       path = fileUploadService.uploadExcelFile(
@@ -187,7 +188,8 @@ public class EmployeeSettleController {
         break;
       }
     }while (true);
-
+    //要求倒叙
+    employeeSettleDetailRespList = CollectionUtil.reverse(employeeSettleDetailRespList);
     String path = null;
     try {
       path = fileUploadService.uploadExcelFile(
@@ -228,4 +230,13 @@ public class EmployeeSettleController {
     List<StoreCodeNameDTO> supplierStores =  employeeSettleDetailService.allStoresInMonthSettle(settleNo, accountCode);
     return success(supplierStores);
     }
+
+
+  @GetMapping("/bill/{settleNo}/info")
+  @ApiOperation("通过账单编号查询账单信息")
+  @MerchantUser
+  public R<EmployeeSettleBillResp> queryBillInfo(@PathVariable("settleNo")String settleNo){
+    EmployeeSettleBillResp page = employeeSettleService.queryBillInfo(settleNo);
+    return success(page);
+  }
 }

@@ -2,13 +2,10 @@ package com.welfare.service.settlement;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
-import com.welfare.persist.dto.EmployeeSettleSumDTO;
-import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
-import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
-import com.welfare.service.dto.*;
-
-import com.welfare.common.base.BasePageVo;
+import com.welfare.service.dto.EmployeeSettleBillPageReq;
+import com.welfare.service.dto.EmployeeSettleBillResp;
+import com.welfare.service.dto.EmployeeSettleBuildReq;
+import com.welfare.service.dto.EmployeeSettleFinishReq;
 
 import java.util.List;
 
@@ -40,4 +37,10 @@ public interface EmployeeSettleService {
    * @param employeeSettleFinishReq 结算单号
    */
   boolean finishEmployeeSettle(EmployeeSettleFinishReq employeeSettleFinishReq);
+
+  /**
+   * 查询结算单信息
+   * @param settleNo 结算单号
+   */
+  EmployeeSettleBillResp queryBillInfo(String settleNo);
 }

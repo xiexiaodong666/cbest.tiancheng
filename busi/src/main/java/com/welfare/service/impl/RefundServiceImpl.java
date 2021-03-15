@@ -253,9 +253,9 @@ public class RefundServiceImpl implements RefundService {
                 break;
             }
         }
-        if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
+/*        if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
             throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常，退款金额计算错误", null);
-        }
+        }*/
     }
 
     @Deprecated

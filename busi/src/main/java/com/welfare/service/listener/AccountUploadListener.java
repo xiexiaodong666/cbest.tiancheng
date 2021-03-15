@@ -80,6 +80,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       account.setSurplusQuotaOverpay(BigDecimal.ZERO);
       account.setMaxQuota(BigDecimal.ZERO);
       account.setCredit(false);
+      account.setDepartment(accountUploadDTO.getStoreCode());
       accountUploadList.add(account);
     }
   }

@@ -184,11 +184,7 @@ public class RefundServiceImpl implements RefundService {
                     RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail);
                     refundOperations.add(refundOperation);
                 }
-                AccountDeductionDetail surplusOverpayDeductionDetail = new AccountDeductionDetail();
-                BeanUtils.copyProperties(surPlusQuotaDeductionDetail,surplusOverpayDeductionDetail);
-                surplusOverpayDeductionDetail.setTransAmount(BigDecimal.ZERO);
-                surplusOverpayDeductionDetail.setMerAccountType(SURPLUS_QUOTA_OVERPAY.code());
-                AccountDeductionDetail surplusOverpayRefundDeductionDetail = toRefundDeductionDetail(surplusOverpayDeductionDetail, refundRequest, surplusQuotaOverpayAmount, surplusOverpayType);
+                AccountDeductionDetail surplusOverpayRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, surplusQuotaOverpayAmount, surplusOverpayType);
                 AccountBillDetail overpayRefundBillDetail = toRefundBillDetail(surplusOverpayRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
                 operateMerchantCredit(account,surplusOverpayRefundDeductionDetail);
                 RefundOperation overpayRefundOperation = RefundOperation.of(overpayRefundBillDetail, surplusOverpayRefundDeductionDetail);
@@ -395,10 +391,10 @@ public class RefundServiceImpl implements RefundService {
     /**
      * 单条退款
      *
-     * @param accountDeductionDetail
-     * @param refundRequest
+     * @param accountDeductionDetail 支付的时候交易明细
+     * @param refundRequest 退款请求
      * @param refundAmountForThis    这条退款金额多少
-     * @param accountAmountType
+     * @param accountAmountType 操作的福利类型
      * @return
      */
     private AccountDeductionDetail toRefundDeductionDetail(AccountDeductionDetail accountDeductionDetail,
@@ -414,6 +410,7 @@ public class RefundServiceImpl implements RefundService {
         refundDeductionDetail.setTransNo(refundRequest.getTransNo());
         refundDeductionDetail.setRelatedTransNo(accountDeductionDetail.getTransNo());
         refundDeductionDetail.setAccountAmountTypeBalance(accountAmountType.getAccountBalance());
+        refundDeductionDetail.setMerAccountType(accountAmountType.getMerAccountTypeCode());
         //保存时自动赋值
         refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);

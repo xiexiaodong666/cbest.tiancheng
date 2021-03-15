@@ -90,7 +90,7 @@ public class AccountHandler {
       merchantMap.put(merchant.getMerCode(), merchant);
     });
     // 查询员工机构名称
-    Set<String> departmentCodeSet = accountList.stream().map(Account::getStoreCode).collect(Collectors.toSet());
+    Set<String> departmentCodeSet = accountList.stream().map(Account::getDepartment).collect(Collectors.toSet());
     Map<String, Department> departmentMap = departmentDao.mapByDepartmentCodes(departmentCodeSet);
     // 查询员工类型名称
     Set<String> accountTypeCodeSet = accountList.stream().map(Account::getAccountTypeCode).collect(Collectors.toSet());

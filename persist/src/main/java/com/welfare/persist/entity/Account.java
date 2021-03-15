@@ -63,7 +63,7 @@ public class Account extends Model<Account> implements Serializable {
      * 所属部门
      */
     @ApiModelProperty("所属部门")   
-    private String storeCode;
+    private String department;
     /**
      * 账号状态(1正常2禁用)
      */
@@ -183,7 +183,7 @@ public class Account extends Model<Account> implements Serializable {
     /**
     * 所属部门
     */
-    public static final String STORE_CODE = "store_code";
+    public static final String DEPARTMENT = "department";
     /**
     * 账号状态(1正常2禁用)
     */

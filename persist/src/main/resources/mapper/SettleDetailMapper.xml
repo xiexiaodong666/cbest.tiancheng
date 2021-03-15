@@ -71,7 +71,8 @@
         oi.order_id as order_id,
         'unsettled' as settleFlag,
         'welfare' as dataType,
-        'system' as create_user
+        'system' as create_user,
+        t1.payment_channel as paymentChannel
         from account_deduction_detail t1
         left join account t2 on t1.account_code=t2.account_code
         left join merchant t3 on t2.mer_code=t3.mer_code
@@ -202,7 +203,7 @@
     <sql id="monthSettleTableListAndCondition">
         from settle_detail t1
         inner join account ac on t1.account_code = ac.account_code
-        inner join department d on d.department_code = ac.store_code
+        inner join department d on d.department_code = ac.department
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code
         left join merchant supplier on supplier.mer_code = t3.mer_code
@@ -500,7 +501,7 @@
         t1.mer_name as  merName,
         ac.phone as phone,
         ac.account_name as accountName,
-        ac.store_code as departmentCode,
+        ac.department as departmentCode,
         de.department_name as departmentName,
         t1.settle_flag as settleFlag,
         case when t1.settle_flag = 'unsettled' then '未结算'
@@ -710,7 +711,7 @@
     <sql id="queryListTable">
         from settle_detail t1
         inner join account ac on ac.account_code = t1.account_code
-        inner join department de on de.department_code = ac.store_code
+        inner join department de on de.department_code = ac.department
         left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
         left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
         left join merchant t4 on t1.mer_code=t4.mer_code

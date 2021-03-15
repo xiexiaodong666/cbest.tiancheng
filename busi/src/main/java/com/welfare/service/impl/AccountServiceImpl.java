@@ -431,7 +431,7 @@ public class AccountServiceImpl implements AccountService {
         Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
         BeanUtils.copyProperties(accountReq, account);
         account.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
-        account.setStoreCode(accountReq.getDepartmentCode());
+        account.setDepartment(accountReq.getDepartmentCode());
         account.setAccountCode(accounCode);
         return account;
     }
@@ -463,7 +463,7 @@ public class AccountServiceImpl implements AccountService {
         if (null == accountType) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在", null);
         }
-        Department department = departmentService.getByDepartmentCode(account.getStoreCode());
+        Department department = departmentService.getByDepartmentCode(account.getDepartment());
         if (null == department) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
         }
@@ -548,7 +548,7 @@ public class AccountServiceImpl implements AccountService {
     private Account assemableAccount4update(AccountReq accountReq) {
         Account account = new Account();
         BeanUtils.copyProperties(accountReq, account);
-        account.setStoreCode(accountReq.getDepartmentCode());
+        account.setDepartment(accountReq.getDepartmentCode());
         account.setUpdateUser(MerchantUserHolder.getMerchantUser().getUsername());
         return account;
     }
@@ -700,7 +700,7 @@ public class AccountServiceImpl implements AccountService {
     public AccountSimpleDTO queryAccountInfo(Long accountCode) {
         Account account = getByAccountCode(accountCode);
         AccountSimpleDTO accountSimpleDTO = new AccountSimpleDTO();
-        String storeCode = account.getStoreCode();
+        String storeCode = account.getDepartment();
         List<Department> parentDepartmentList = getParentDepartmentList(storeCode);
         accountSimpleDTO.setMerName(
             parentDepartmentList.size() > 1 ? parentDepartmentList.get(1).getDepartmentName()
@@ -765,7 +765,7 @@ public class AccountServiceImpl implements AccountService {
 
 
         AccountOverviewDTO accountOverviewDTO = new AccountOverviewDTO();
-        String storeCode = account.getStoreCode();
+        String storeCode = account.getDepartment();
         List<Department> parentDepartmentList = getParentDepartmentList(storeCode);
         accountOverviewDTO.setMerName(
             parentDepartmentList.size() > 1 ? parentDepartmentList.get(1).getDepartmentName()

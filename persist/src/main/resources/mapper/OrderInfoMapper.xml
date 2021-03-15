@@ -53,7 +53,7 @@
         LEFT JOIN supplier_store s on ab.store_code = s.store_code
         LEFT JOIN merchant m on s.mer_code = m.mer_code
         LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
-        LEFT JOIN department d on d.department_code = t.store_code
+        LEFT JOIN department d on d.department_code = t.department
         LEFT JOIN account_type aty on aty.type_code = t.account_type_code
         <where>
             <if test="orderPageQuery.accountName != null">
@@ -148,7 +148,7 @@
             LEFT JOIN supplier_store s on ab.store_code = s.store_code
             LEFT JOIN merchant m on s.mer_code = m.mer_code
             LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
-            LEFT JOIN department d on d.department_code = t.store_code
+            LEFT JOIN department d on d.department_code = t.department
             LEFT JOIN account_type aty on aty.type_code = t.account_type_code
             <where>
                 <if test="orderPageQuery.accountName != null">

@@ -113,9 +113,9 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       return false;
     }
     Department department = departmentService
-        .getByDepartmentCodeAndMerCode(account.getStoreCode(), merCode);
+        .getByDepartmentCodeAndMerCode(account.getDepartment(), merCode);
     if (null == department) {
-      uploadInfo.append("不存在的员工部门:").append(account.getStoreCode()).append(";");
+      uploadInfo.append("不存在的员工部门:").append(account.getDepartment()).append(";");
       return false;
     }
 

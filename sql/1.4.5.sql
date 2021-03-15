@@ -27,9 +27,9 @@ CREATE TABLE `payment_channel` (
                                    `update_time` datetime DEFAULT NULL COMMENT '更新时间',
                                    `version` int(11) DEFAULT NULL COMMENT '版本',
                                    PRIMARY KEY (`id`),
-                                   KEY `idx_code` (`code`) USING BTREE,
-                                   KEY `idx_merchant_code` (`merchant_code`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='子账户信息';
+                                   UNIQUE KEY `uk_code_mer_code` (`code`,`merchant_code`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付渠道商户关联表';
+
 
 # 增加支付渠道字段
 alter table account_deduction_detail add column payment_channel varchar(20) comment '支付渠道' after order_channel;
@@ -54,3 +54,7 @@ SELECT floor( 10000000 + rand() * (99999999 - 10000000)),'wechat','微信支付'
 
 INSERT INTO payment_channel (id,code,name,merchant_code,show_order,deleted,create_user,create_time,update_user,update_time,version)
 SELECT floor( 10000000 + rand() * (99999999 - 10000000)),'cbestpay','翼支付',m.mer_code,4,0,'anonymous',now(),NULL,NULL,0 from merchant m where m.mer_identity = 'PARTER' AND m.deleted = 0;
+
+UPDATE account_bill_detail set payment_channel = 'welfare', update_time = NOW() ,version = version + 1;
+UPDATE account_deduction_detail set payment_channel = 'welfare' ,update_time = NOW() ,version = version + 1;
+UPDATE settle_detail set payment_channel = 'welfare' ,update_time = NOW(), version = version + 1;

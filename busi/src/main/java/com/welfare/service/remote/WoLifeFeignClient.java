@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "wo_life", url = "${wo_life.url:http://113.204.98.245:8900}", fallbackFactory = WoLifeFeignClientFallback.class, configuration = FeignConfiguration.class)
-@ConditionalOnHavingProperty("wo_life.url")
+@FeignClient(value = "wo-life", url = "${wo-life.url:http://113.204.98.245:8900}", fallbackFactory = WoLifeFeignClientFallback.class, configuration = FeignConfiguration.class)
+@ConditionalOnHavingProperty("wo-life.url")
 public interface WoLifeFeignClient {
 
   /**

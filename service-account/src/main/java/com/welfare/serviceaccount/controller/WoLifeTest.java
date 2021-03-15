@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,16 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "沃支付联调测试, 上线后删除")
 public class WoLifeTest implements IController {
 
-  private final WoLifeFeignClient woLifeFeignClient;
+  @Autowired(required = false)
+  WoLifeFeignClient woLifeFeignClient;
 
   /**
    * 账户余额查询
    */
-  @RequestMapping(value = "/getUserMone", method = RequestMethod.GET)
+  @RequestMapping(value = "/getUserMoney", method = RequestMethod.POST)
   WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(
       @RequestParam(value = "phone", required = true) String phone) {
 
-    log.info("getUserMone", phone);
+    log.info("getUserMoney", phone);
     return woLifeFeignClient.getUserMoney(phone);
   }
 

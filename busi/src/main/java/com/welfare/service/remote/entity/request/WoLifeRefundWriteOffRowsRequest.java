@@ -1,6 +1,8 @@
 package com.welfare.service.remote.entity.request;
 
 import javax.validation.constraints.NotBlank;
+
+import com.welfare.service.dto.RefundRequest;
 import lombok.Data;
 
 /**
@@ -16,4 +18,10 @@ public class WoLifeRefundWriteOffRowsRequest {
    */
   @NotBlank
   private String saleUnId;
+
+  public static WoLifeRefundWriteOffRowsRequest of(RefundRequest refundRequest){
+    WoLifeRefundWriteOffRowsRequest woLifeRefundWriteOffRowsRequest = new WoLifeRefundWriteOffRowsRequest();
+    woLifeRefundWriteOffRowsRequest.setSaleUnId("");
+    return woLifeRefundWriteOffRowsRequest;
+  }
 }

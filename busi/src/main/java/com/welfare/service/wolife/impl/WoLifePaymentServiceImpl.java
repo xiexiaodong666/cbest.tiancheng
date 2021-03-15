@@ -20,6 +20,7 @@ import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.service.operator.payment.domain.RefundOperation;
 import com.welfare.service.remote.WoLifeFeignClient;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
+import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.wolife.WoLifePaymentService;
@@ -87,7 +88,6 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         try {
             //沃生活馆支付只会有一条记录
             AccountDeductionDetail thePaidDeductionDetail = paidDeductionDetails.get(0);
-
             AccountBillDetail thePaidBilDetail = accountBillDetailDao.getOneByTransNoAndTransType(
                     refundRequest.getOriginalTransNo(),
                     WelfareConstant.TransType.CONSUME.code()
@@ -98,6 +98,11 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             Assert.isTrue(paidAmount.subtract(refundRequest.getAmount())
                     .compareTo(BigDecimal.ZERO) == 0, "沃支付的退款必须全额退款");
             Account account = accountDao.queryByAccountCode(accountCode);
+            refundRequest.setPhone(account.getPhone());
+
+            WoLifeBasicResponse woLifeBasicResponse = woLifeFeignClient.refundWriteOff(WoLifeRefundWriteOffRequest.of(refundRequest));
+            Assert.isTrue(woLifeBasicResponse.isSuccess(),woLifeBasicResponse.getResponseMessage());
+
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail);
             AccountBillDetail refundBillDetail = toRefundBillDetail(thePaidBilDetail);
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());

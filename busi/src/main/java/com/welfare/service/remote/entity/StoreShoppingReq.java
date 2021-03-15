@@ -23,6 +23,7 @@ public class StoreShoppingReq implements Serializable {
     private String merchantCode;
     private String storeName;
     private String storeCode;
+    private String phone;
     private List<AddressBean> address;
     private List<ConsumeSettingsBean> consumeSettings;
     @Data

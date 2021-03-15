@@ -39,6 +39,12 @@ public class SupplierStoreSyncDTO {
     @ApiModelProperty("消费方式(前端多个用逗号分隔)")
     private String consumType;
 
+    /**
+     * 门店手机号
+     */
+    @ApiModelProperty("门店手机号")
+    private String mobile;
+
     List<MerchantAddressDTO> addressList;
     List<StoreConsumeTypeDTO> storeConsumeTypeList;
 

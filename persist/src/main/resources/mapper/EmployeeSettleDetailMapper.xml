@@ -216,7 +216,9 @@
                case when esd.trans_type='consume' then IFNULL(esd.trans_amount,0)
                     when esd.trans_type='refund' then IFNULL(esd.trans_amount*-1,0)
                     else 0 end transAmount,
-               if(esd.mer_account_type = 'surplus_quota_overpay' and esd.trans_type = 'refund', 0, esd.trans_amount) as settleAmount,
+               case when esd.trans_type = 'consume' then IFNULL(esd.trans_amount, 0)
+                    when esd.trans_type = 'refund' and esd.mer_account_type != 'surplus_quota_overpay'  then IFNULL(esd.trans_amount*-1,0)
+                    else 0 end as settleAmount,
                case when esd.settle_flag = 'unsettled' then '待结算'
                     when esd.settle_flag = 'settling' then '结算中'
                     when esd.settle_flag = 'settled' then '已结算' end as settleFlag

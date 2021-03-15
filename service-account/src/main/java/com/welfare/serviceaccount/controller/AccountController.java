@@ -52,7 +52,7 @@ public class AccountController implements IController {
     @GetMapping("/overview")
     @AccountUser
     public R<AccountOverviewDTO> overview(
-        @RequestParam("paymentChannel") @ApiParam("支付渠道") String paymentChannel) {
+        @RequestParam(value = "paymentChannel", required = false) @ApiParam("支付渠道") String paymentChannel) {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.queryAccountOverview(accountCode, paymentChannel));
     }

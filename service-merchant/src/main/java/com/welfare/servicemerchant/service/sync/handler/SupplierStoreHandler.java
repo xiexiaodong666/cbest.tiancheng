@@ -88,6 +88,7 @@ public class SupplierStoreHandler {
             listBean.setMerchantCode(supplierStoreDetailDTO.getMerCode());
             listBean.setStoreName(supplierStoreDetailDTO.getStoreName());
             listBean.setStoreCode(supplierStoreDetailDTO.getStoreCode());
+            listBean.setPhone(supplierStoreDetailDTO.getMerCode());
             if(EmptyChecker.notEmpty(supplierStoreDetailDTO.getStoreConsumeTypeList())) {
 
                 for (StoreConsumeTypeDTO storeConsumeTypeDTO:

@@ -8,4 +8,9 @@ public class AccountControllerTest extends BaseControllerTest {
     public void info() {
         get("/account/info");
     }
+
+    @Test
+    public void overview() {
+        get("/account/overview");
+    }
 }

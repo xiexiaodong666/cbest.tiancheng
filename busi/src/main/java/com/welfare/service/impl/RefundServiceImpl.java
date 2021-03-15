@@ -174,11 +174,16 @@ public class RefundServiceImpl implements RefundService {
             if(surplusQuotaOverpayAmount.compareTo(BigDecimal.ZERO)>0){
                 surplusType.setAccountBalance(surplusType.getAccountBalance().add(maxRefundToSurplusQuota));
                 Assert.isTrue(surplusType.getAccountBalance().compareTo(maxQuota) == 0,"退款金额异常，请联系管理员。");
-                AccountDeductionDetail surplusRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, maxRefundToSurplusQuota,surplusType);
-                AccountBillDetail refundBillDetail = toRefundBillDetail(surplusRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
-                operateMerchantCredit(account, surplusRefundDeductionDetail);
-                RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail);
-                refundOperations.add(refundOperation);
+                if(maxRefundToSurplusQuota.compareTo(BigDecimal.ZERO)>0){
+                    //有需要退款到授信额度的，才走授信额度退款
+                    AccountDeductionDetail surplusRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, maxRefundToSurplusQuota,surplusType);
+                    //设置退款金额为需要退款到授信额度的值
+                    surplusRefundDeductionDetail.setTransAmount(maxRefundToSurplusQuota);
+                    AccountBillDetail refundBillDetail = toRefundBillDetail(surplusRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
+                    operateMerchantCredit(account, surplusRefundDeductionDetail);
+                    RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail);
+                    refundOperations.add(refundOperation);
+                }
                 AccountDeductionDetail surplusOverpayDeductionDetail = new AccountDeductionDetail();
                 BeanUtils.copyProperties(surPlusQuotaDeductionDetail,surplusOverpayDeductionDetail);
                 surplusOverpayDeductionDetail.setTransAmount(BigDecimal.ZERO);

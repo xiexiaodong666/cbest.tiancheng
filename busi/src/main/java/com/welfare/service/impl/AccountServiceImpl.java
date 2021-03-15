@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
@@ -728,7 +729,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountOverviewDTO queryAccountOverview(Long accountCode, String paymentChannel) {
         Account account = getByAccountCode(accountCode);
-        WelfareConstant.PaymentChannel paymentChannelEnum = paymentChannel == null ? WelfareConstant.PaymentChannel.WELFARE
+        WelfareConstant.PaymentChannel paymentChannelEnum = StrUtil.isEmpty(paymentChannel) ? WelfareConstant.PaymentChannel.WELFARE
             : PAYMENT_CHANNEL_MAP.get(paymentChannel);
         List<AccountBalanceDTO> balanceList = new ArrayList<>();
 

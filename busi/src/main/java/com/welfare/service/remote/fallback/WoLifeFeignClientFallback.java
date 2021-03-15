@@ -8,6 +8,7 @@ import com.welfare.service.remote.WoLifeFeignClient;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
 import com.welfare.service.remote.entity.request.WoLifeGetAccountDeductionRequest;
 import com.welfare.service.remote.entity.request.WoLifeGetAccountWriteOffRequest;
+import com.welfare.service.remote.entity.request.WoLifeGetUserMoneyRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
@@ -30,8 +31,8 @@ public class WoLifeFeignClientFallback implements FallbackFactory<WoLifeFeignCli
   public WoLifeFeignClient create(Throwable throwable) {
     return new WoLifeFeignClient() {
       @Override
-      public WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(String phone) {
-        log.error("沃生活馆账户余额查询失败, 请求:{}", phone, throwable);
+      public WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(WoLifeGetUserMoneyRequest request) {
+        log.error("沃生活馆账户余额查询失败, 请求:{}", JSON.toJSONString(request), throwable);
         throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
       }
 

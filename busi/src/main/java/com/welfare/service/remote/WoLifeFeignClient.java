@@ -34,7 +34,7 @@ public interface WoLifeFeignClient {
   /**
    * 账户扣款
    */
-  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitOrderForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
   WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
       @RequestBody WoLifeAccountDeductionRequest request);
 

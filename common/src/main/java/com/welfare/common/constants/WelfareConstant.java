@@ -40,6 +40,15 @@ public class WelfareConstant {
         }
 
         public String barcodePrefix(){return this.barcodePrefix;}
+
+        public static PaymentChannel findByCode(String code) {
+            for (PaymentChannel type : PaymentChannel.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的PaymentChannel类型");
+        }
     }
 
 

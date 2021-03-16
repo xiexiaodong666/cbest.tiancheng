@@ -64,7 +64,7 @@ CREATE TABLE `employee_settle` (
                                    `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
                                    `build_time` datetime DEFAULT NULL COMMENT '生成时间',
                                    PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=255 DEFAULT CHARSET=utf8mb4 COMMENT='商户员工结算账单';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='商户员工结算账单';
 
 create index idx_es_settle_no on employee_settle(settle_no);
 create index idx_build_time on employee_settle(build_time);
@@ -94,3 +94,5 @@ update account a set a.surplus_quota_overpay = 0;
 
 #新增字段赋初始值
 update account_bill_detail a set a.surplus_quota_overpay = 0;
+
+INSERT INTO `sequence`(`id`, `sequence_type`, `prefix`, `sequence_no`, `min_sequence`, `max_sequence`, `handler_for_max`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`) VALUES (12, 'employee_settle_no', NULL, 1000000000, 1000000000, 9999999999, 'com.welfare.service.sequence.CommonMaxHandler', 'anonymous', '2021-03-08 16:59:23', 'zxadmin', '2021-03-16 10:44:35', 0, 0);

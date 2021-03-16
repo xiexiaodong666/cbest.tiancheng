@@ -7,8 +7,7 @@
             a.account_code as accountCode,
             a.phone as phone,
             s.store_code as storeCode,
-            m.mer_code a
-            s merCode,
+            m.mer_code as merCode,
             m.mer_name as merName,
             d.trans_amount as transAmount,
             d.trans_time as transTime,

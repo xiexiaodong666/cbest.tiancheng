@@ -43,13 +43,13 @@
             <if test="accountCode != null">
                 AND aded.account_code = #{accountCode}
             </if>
-            <if test="paymentChannel != null">
+            <if test="paymentChannel != null and paymentChannel != ''">
                 AND aded.payment_channel = #{paymentChannel}
             </if>
-            <if test="startTransTime != null ">
+            <if test="startTransTime != null and startTransTime != ''">
                 <![CDATA[AND aded.trans_time >= #{startTransTime}]]>
             </if>
-            <if test="endTransTime != null ">
+            <if test="endTransTime != null and endTransTime != ''">
                 <![CDATA[AND aded.trans_time <= #{endTransTime}]]>
             </if>
         </where>

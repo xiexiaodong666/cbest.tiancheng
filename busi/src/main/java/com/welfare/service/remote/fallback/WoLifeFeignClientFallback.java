@@ -6,9 +6,6 @@ import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.service.remote.WoLifeFeignClient;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
-import com.welfare.service.remote.entity.request.WoLifeGetAccountDeductionRequest;
-import com.welfare.service.remote.entity.request.WoLifeGetAccountWriteOffRequest;
-import com.welfare.service.remote.entity.request.WoLifeGetUserMoneyRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
@@ -38,14 +35,15 @@ public class WoLifeFeignClientFallback implements FallbackFactory<WoLifeFeignCli
 
       @Override
       public WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
-          WoLifeAccountDeductionRequest request) {
-        log.error("沃生活馆账户扣款失败, 请求:{}", JSON.toJSONString(request), throwable);
+          String phone, WoLifeAccountDeductionRequest request) {
+        log.error("沃生活馆账户扣款失败, 请求:{},{}", phone, JSON.toJSONString(request), throwable);
         throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
       }
 
       @Override
-      public WoLifeBasicResponse refundWriteOff(WoLifeRefundWriteOffRequest request) {
-        log.error("沃生活馆退款销账失败, 请求:{}", JSON.toJSONString(request), throwable);
+      public WoLifeBasicResponse refundWriteOff(String phone,
+          WoLifeRefundWriteOffRequest request) {
+        log.error("沃生活馆退款销账失败, 请求:{},{}", phone, JSON.toJSONString(request), throwable);
         throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
       }
 

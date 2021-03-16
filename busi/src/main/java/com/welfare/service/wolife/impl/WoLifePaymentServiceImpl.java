@@ -62,7 +62,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse =
-                woLifeFeignClient.accountDeduction(WoLifeAccountDeductionRequest.of(paymentRequest));
+                woLifeFeignClient.accountDeduction(paymentRequest.getPhone(),WoLifeAccountDeductionRequest.of(paymentRequest));
         Assert.isTrue(basicResponse.isSuccess(), basicResponse.getResponseMessage());
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();
@@ -102,7 +102,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             Account account = accountDao.queryByAccountCode(accountCode);
             refundRequest.setPhone(account.getPhone());
 
-            WoLifeBasicResponse woLifeBasicResponse = woLifeFeignClient.refundWriteOff(WoLifeRefundWriteOffRequest.of(refundRequest));
+            WoLifeBasicResponse woLifeBasicResponse = woLifeFeignClient.refundWriteOff(refundRequest.getPhone(), WoLifeRefundWriteOffRequest.of(refundRequest));
             Assert.isTrue(woLifeBasicResponse.isSuccess(),woLifeBasicResponse.getResponseMessage());
 
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail);

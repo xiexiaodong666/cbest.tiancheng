@@ -15,12 +15,6 @@ import lombok.Data;
 public class WoLifeRefundWriteOffRequest {
 
   /**
-   * 用户手机号
-   */
-  @NotBlank
-  private String phone;
-
-  /**
    * data
    */
   @NotNull
@@ -28,7 +22,7 @@ public class WoLifeRefundWriteOffRequest {
 
   public static WoLifeRefundWriteOffRequest of(RefundRequest refundRequest){
     WoLifeRefundWriteOffRequest woLifeRefundWriteOffRequest = new WoLifeRefundWriteOffRequest();
-    woLifeRefundWriteOffRequest.setPhone(refundRequest.getPhone());
+    // woLifeRefundWriteOffRequest.setPhone(refundRequest.getPhone());
     woLifeRefundWriteOffRequest.setData(WoLifeRefundWriteOffDataRequest.of(refundRequest));
     return woLifeRefundWriteOffRequest;
   }

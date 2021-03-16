@@ -51,10 +51,9 @@ public class WoLifeTest implements IController {
    */
   @RequestMapping(value = "/accountDeduction", method = RequestMethod.POST)
   WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
-      @RequestBody WoLifeAccountDeductionRequest request) {
+      @RequestParam(name = "phone") String phone, @RequestBody WoLifeAccountDeductionRequest request) {
 
-    log.info("accountDeduction", JSON.toJSONString(request));
-    return woLifeFeignClient.accountDeduction(request);
+    return woLifeFeignClient.accountDeduction(phone, request);
   }
 
   /**
@@ -62,9 +61,9 @@ public class WoLifeTest implements IController {
    */
   @RequestMapping(value = "/refundWriteOff", method = RequestMethod.POST)
   WoLifeBasicResponse refundWriteOff(
-      @RequestBody WoLifeRefundWriteOffRequest request) {
-    log.info("refundWriteOff", JSON.toJSONString(request));
-    return woLifeFeignClient.refundWriteOff(request);
+      @RequestParam(name = "phone") String phone, @RequestBody WoLifeRefundWriteOffRequest request) {
+
+    return woLifeFeignClient.refundWriteOff(phone, request);
   }
 
 

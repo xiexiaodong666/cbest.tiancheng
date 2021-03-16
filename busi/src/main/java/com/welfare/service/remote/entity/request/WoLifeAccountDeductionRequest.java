@@ -14,11 +14,6 @@ import lombok.Data;
 @Data
 public class WoLifeAccountDeductionRequest {
 
-  /**
-   * 用户手机号
-   */
-  @NotBlank
-  private String phone;
 
   /**
    * data
@@ -28,7 +23,7 @@ public class WoLifeAccountDeductionRequest {
 
   public static WoLifeAccountDeductionRequest of(PaymentRequest paymentRequest){
     WoLifeAccountDeductionRequest woLifeAccountDeductionRequest = new WoLifeAccountDeductionRequest();
-    woLifeAccountDeductionRequest.setPhone(paymentRequest.getPhone());
+    // woLifeAccountDeductionRequest.setPhone(paymentRequest.getPhone());
     woLifeAccountDeductionRequest.setData(WoLifeAccountDeductionDataRequest.of(paymentRequest));
     return woLifeAccountDeductionRequest;
   }

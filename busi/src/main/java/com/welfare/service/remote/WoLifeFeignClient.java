@@ -34,16 +34,16 @@ public interface WoLifeFeignClient {
   /**
    * 账户扣款
    */
-  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitOrderForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitOrderForTC.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
   WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
-      @RequestBody WoLifeAccountDeductionRequest request);
+      @RequestParam(name = "phone") String phone, @RequestBody WoLifeAccountDeductionRequest request);
 
   /**
    * 退款销账
    */
-  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/refundForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/refundForTC.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
   WoLifeBasicResponse refundWriteOff(
-      @RequestBody WoLifeRefundWriteOffRequest request);
+      @RequestParam(name = "phone") String phone, @RequestBody WoLifeRefundWriteOffRequest request);
 
   /**
    * 扣款查询

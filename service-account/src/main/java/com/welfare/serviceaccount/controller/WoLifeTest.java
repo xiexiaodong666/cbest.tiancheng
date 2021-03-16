@@ -40,10 +40,10 @@ public class WoLifeTest implements IController {
    */
   @RequestMapping(value = "/getUserMoney", method = RequestMethod.POST)
   WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(
-      WoLifeGetUserMoneyRequest request) {
+      String phone) {
 
-    log.info("getUserMoney",  JSON.toJSONString(request));
-    return woLifeFeignClient.getUserMoney(request);
+    log.info("getUserMoney", phone);
+    return woLifeFeignClient.getUserMoney(phone);
   }
 
   /**

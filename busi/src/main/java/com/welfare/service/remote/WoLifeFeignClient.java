@@ -3,7 +3,6 @@ package com.welfare.service.remote;
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
-import com.welfare.service.remote.entity.request.WoLifeGetUserMoneyRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
@@ -27,22 +26,22 @@ public interface WoLifeFeignClient {
   /**
    * 账户余额查询
    */
-  @RequestMapping(value = "/testlivingroom/getUserMoney.jssp", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getUserMoney.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
   WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(
-      @RequestBody WoLifeGetUserMoneyRequest request
+      @RequestParam(name = "phone") String phone
   );
 
   /**
    * 账户扣款
    */
-  @RequestMapping(value = "/testlivingroom/getSubmitForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
   WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
       @RequestBody WoLifeAccountDeductionRequest request);
 
   /**
    * 退款销账
    */
-  @RequestMapping(value = "/testlivingroom/refundForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/refundForTC.jssp", method = RequestMethod.POST, consumes = "application/json")
   WoLifeBasicResponse refundWriteOff(
       @RequestBody WoLifeRefundWriteOffRequest request);
 

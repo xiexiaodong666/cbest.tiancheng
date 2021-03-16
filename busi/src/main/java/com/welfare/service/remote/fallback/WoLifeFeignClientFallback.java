@@ -31,8 +31,8 @@ public class WoLifeFeignClientFallback implements FallbackFactory<WoLifeFeignCli
   public WoLifeFeignClient create(Throwable throwable) {
     return new WoLifeFeignClient() {
       @Override
-      public WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(WoLifeGetUserMoneyRequest request) {
-        log.error("沃生活馆账户余额查询失败, 请求:{}", JSON.toJSONString(request), throwable);
+      public WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(String phone) {
+        log.error("沃生活馆账户余额查询失败, 请求:{}", phone, throwable);
         throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
       }
 

@@ -54,9 +54,4 @@ public class WoLifeGetUserMoneyResponse {
    * 当前可用福利积分
    */
   private String availableWelfareIntegral;
-
-  /**
-   * 状态，默认为”0”
-   */
-  private String status;
 }

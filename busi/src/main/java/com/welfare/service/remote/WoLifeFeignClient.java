@@ -2,14 +2,11 @@ package com.welfare.service.remote;
 
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.remote.config.FeignConfiguration;
-import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
-import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
 import com.welfare.service.remote.fallback.WoLifeFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,14 +33,15 @@ public interface WoLifeFeignClient {
    */
   @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitOrderForTC.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
   WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
-      @RequestParam(name = "phone") String phone, @RequestBody WoLifeAccountDeductionRequest request);
+      @RequestParam(name = "phone") String phone, @RequestParam(name = "data") String data);
 
   /**
    * 退款销账
    */
   @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/refundForTC.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
   WoLifeBasicResponse refundWriteOff(
-      @RequestParam(name = "phone") String phone, @RequestBody WoLifeRefundWriteOffRequest request);
+      @RequestParam(name = "phone") String phone,
+      @RequestParam(name = "data") String data);
 
   /**
    * 扣款查询

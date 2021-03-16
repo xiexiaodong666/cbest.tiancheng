@@ -1,5 +1,6 @@
 package com.welfare.service.wolife.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
@@ -19,7 +20,9 @@ import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.service.operator.payment.domain.RefundOperation;
 import com.welfare.service.remote.WoLifeFeignClient;
+import com.welfare.service.remote.entity.request.WoLifeAccountDeductionDataRequest;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
+import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffDataRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
@@ -62,7 +65,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse =
-                woLifeFeignClient.accountDeduction(paymentRequest.getPhone(),WoLifeAccountDeductionRequest.of(paymentRequest));
+                woLifeFeignClient.accountDeduction(paymentRequest.getPhone(), JSON.toJSONString(WoLifeAccountDeductionDataRequest.of(paymentRequest)));
         Assert.isTrue(basicResponse.isSuccess(), basicResponse.getResponseMessage());
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();
@@ -102,7 +105,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             Account account = accountDao.queryByAccountCode(accountCode);
             refundRequest.setPhone(account.getPhone());
 
-            WoLifeBasicResponse woLifeBasicResponse = woLifeFeignClient.refundWriteOff(refundRequest.getPhone(), WoLifeRefundWriteOffRequest.of(refundRequest));
+            WoLifeBasicResponse woLifeBasicResponse = woLifeFeignClient.refundWriteOff(refundRequest.getPhone(), JSON.toJSONString(WoLifeRefundWriteOffDataRequest.of(refundRequest)));
             Assert.isTrue(woLifeBasicResponse.isSuccess(),woLifeBasicResponse.getResponseMessage());
 
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail);

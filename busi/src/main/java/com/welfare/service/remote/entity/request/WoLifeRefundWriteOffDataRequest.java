@@ -33,6 +33,7 @@ public class WoLifeRefundWriteOffDataRequest {
     WoLifeRefundWriteOffDataRequest woLifeRefundWriteOffDataRequest = new WoLifeRefundWriteOffDataRequest();
     woLifeRefundWriteOffDataRequest.setOid(refundRequest.getOriginalTransNo());
     woLifeRefundWriteOffDataRequest.setRows(Collections.singletonList(WoLifeRefundWriteOffRowsRequest.of(refundRequest)));
+
     return woLifeRefundWriteOffDataRequest;
   }
 }

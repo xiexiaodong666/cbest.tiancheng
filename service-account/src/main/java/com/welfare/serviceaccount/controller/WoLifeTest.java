@@ -1,10 +1,6 @@
 package com.welfare.serviceaccount.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.welfare.service.remote.WoLifeFeignClient;
-import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
-import com.welfare.service.remote.entity.request.WoLifeGetUserMoneyRequest;
-import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
@@ -13,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,9 +46,9 @@ public class WoLifeTest implements IController {
    */
   @RequestMapping(value = "/accountDeduction", method = RequestMethod.POST)
   WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
-      @RequestParam(name = "phone") String phone, @RequestBody WoLifeAccountDeductionRequest request) {
+      @RequestParam(name = "phone") String phone, @RequestParam(name = "data") String data) {
 
-    return woLifeFeignClient.accountDeduction(phone, request);
+    return woLifeFeignClient.accountDeduction(phone, data);
   }
 
   /**
@@ -61,9 +56,9 @@ public class WoLifeTest implements IController {
    */
   @RequestMapping(value = "/refundWriteOff", method = RequestMethod.POST)
   WoLifeBasicResponse refundWriteOff(
-      @RequestParam(name = "phone") String phone, @RequestBody WoLifeRefundWriteOffRequest request) {
+      @RequestParam(name = "phone") String phone, @RequestParam(name = "data") String data) {
 
-    return woLifeFeignClient.refundWriteOff(phone, request);
+    return woLifeFeignClient.refundWriteOff(phone, data);
   }
 
 

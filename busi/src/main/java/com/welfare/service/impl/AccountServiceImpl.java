@@ -10,7 +10,9 @@ import com.welfare.service.dto.UploadImgErrorMsgDTO;
 import com.welfare.service.enums.AccountBalanceType;
 import com.welfare.service.enums.AccountBalanceType.Welfare;
 import com.welfare.service.enums.AccountBalanceType.WoLife;
+import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
+import com.welfare.service.remote.service.WoLifeFeignService;
 import java.util.Date;
 
 
@@ -132,6 +134,8 @@ public class AccountServiceImpl implements AccountService {
         .of(WelfareConstant.PaymentChannel.values()).collect(Collectors
             .toMap(WelfareConstant.PaymentChannel::code,
                 e -> e));
+
+    private final WoLifeFeignService woLifeFeignService;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -741,8 +745,12 @@ public class AccountServiceImpl implements AccountService {
                     .collect(Collectors.toList());
                 break;
             case WO_LIFE:
-                //TODO
-                WoLifeGetUserMoneyResponse woLifeGetUserMoneyResponse = new WoLifeGetUserMoneyResponse();
+                WoLifeBasicResponse<WoLifeGetUserMoneyResponse> woLifeBasicResponse = woLifeFeignService
+                    .getUserMoney(account.getPhone());
+                if(!woLifeBasicResponse.isSuccess()) {
+                    throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "账户余额查询失败", null);
+                }
+                WoLifeGetUserMoneyResponse woLifeGetUserMoneyResponse = woLifeBasicResponse.getResponse();
                 balanceList = Lists.newArrayList(WoLife.values())
                     .stream()
                     .map(woLife -> getAccountBalanceValue(woLife, woLifeGetUserMoneyResponse))

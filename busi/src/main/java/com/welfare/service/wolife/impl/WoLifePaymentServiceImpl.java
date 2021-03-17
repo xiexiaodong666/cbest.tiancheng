@@ -65,14 +65,11 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
     @DistributedLock(lockPrefix = "wo-life-pay", lockKey = "#paymentRequest.transNo")
     public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, MerchantCredit merchantCredit, SupplierStore supplierStore) {
         paymentRequest.setPhone(account.getPhone());
-        ThirdPartyPaymentRequest thirdPartyPaymentRequest = generateThirdPartyPaymentRequest(paymentRequest);
-        thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse =
             woLifeFeignService.accountDeduction(paymentRequest.getPhone(), WoLifeAccountDeductionDataRequest.of(paymentRequest));
         Assert.isTrue(basicResponse.isSuccess(), "[沃生活馆]:"+basicResponse.getResponseMessage());
-        thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();
         AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, paymentAmount, accountAmountTypes);
@@ -89,6 +86,11 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
         paymentOperation.setOperateAmount(paymentAmount);
         paymentOperation.setMerchantAccountType(null);
+
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = generateThirdPartyPaymentRequest(paymentRequest);
+        thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+        thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
+
         return Collections.singletonList(paymentOperation);
     }
 

@@ -56,7 +56,7 @@ public class RefundServiceImpl implements RefundService {
     public void handleRefundRequest(RefundRequest refundRequest) {
         String originalTransNo = refundRequest.getOriginalTransNo();
         List<AccountDeductionDetail> paymentDeductionDetailInDb = accountDeductionDetailDao
-                .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
+                .queryByTransNoAndTransType(refundRequest.getTransNo(), WelfareConstant.TransType.CONSUME.code());
         Assert.isTrue(CollectionUtils.isEmpty(paymentDeductionDetailInDb),"退款交易单号不能和付款的交易单号一样。");
         List<AccountDeductionDetail> refundDeductionDetailInDb = accountDeductionDetailDao
                 .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
@@ -94,7 +94,7 @@ public class RefundServiceImpl implements RefundService {
 
     private boolean hasRefunded(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionDetailInDb) {
         if (!CollectionUtils.isEmpty(refundDeductionDetailInDb)) {
-            String transNoInDb = refundDeductionDetailInDb.get(0).getTransNo();
+            List<String> transNoInDbs = refundDeductionDetailInDb.stream().map(AccountDeductionDetail::getTransNo).collect(Collectors.toList());
             BigDecimal refundedAmount = refundDeductionDetailInDb.stream()
                     .map(AccountDeductionDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             List<AccountDeductionDetail> paidDetails = accountDeductionDetailDao
@@ -104,8 +104,8 @@ public class RefundServiceImpl implements RefundService {
             if (refundedAmount.add(refundRequest.getAmount()).compareTo(paidAmount) > 0) {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款总额不能大于已付款金额", null);
             }
-            if (refundRequest.getTransNo().equals(transNoInDb)) {
-                RefundRequest refundRequestInDb = queryResult(transNoInDb);
+            if (transNoInDbs.contains(refundRequest.getTransNo())) {
+                RefundRequest refundRequestInDb = queryResult(refundRequest.getTransNo());
                 log.warn("交易已经处理过，直接返回处理结果:{}", JSON.toJSONString(refundRequestInDb));
                 BeanUtils.copyProperties(refundRequestInDb, refundRequest);
                 return true;

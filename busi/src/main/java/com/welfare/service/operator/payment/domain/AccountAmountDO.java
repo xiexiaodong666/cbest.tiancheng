@@ -43,7 +43,8 @@ public class AccountAmountDO {
 
     public static BigDecimal calculateAccountBalance(List<AccountAmountType> accountTypes) {
         return accountTypes.stream()
-                .filter(accountAmountType -> !SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .filter(accountAmountType -> !(SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())
+                        || SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode())))
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 

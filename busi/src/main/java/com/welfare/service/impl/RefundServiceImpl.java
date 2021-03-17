@@ -56,7 +56,7 @@ public class RefundServiceImpl implements RefundService {
     public void handleRefundRequest(RefundRequest refundRequest) {
         String originalTransNo = refundRequest.getOriginalTransNo();
         List<AccountDeductionDetail> paymentDeductionDetailInDb = accountDeductionDetailDao
-                .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
+                .queryByTransNoAndTransType(refundRequest.getTransNo(), WelfareConstant.TransType.CONSUME.code());
         Assert.isTrue(CollectionUtils.isEmpty(paymentDeductionDetailInDb),"退款交易单号不能和付款的交易单号一样。");
         List<AccountDeductionDetail> refundDeductionDetailInDb = accountDeductionDetailDao
                 .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
@@ -94,7 +94,7 @@ public class RefundServiceImpl implements RefundService {
 
     private boolean hasRefunded(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionDetailInDb) {
         if (!CollectionUtils.isEmpty(refundDeductionDetailInDb)) {
-            String transNoInDb = refundDeductionDetailInDb.get(0).getTransNo();
+            List<String> transNoInDbs = refundDeductionDetailInDb.stream().map(AccountDeductionDetail::getTransNo).collect(Collectors.toList());
             BigDecimal refundedAmount = refundDeductionDetailInDb.stream()
                     .map(AccountDeductionDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             List<AccountDeductionDetail> paidDetails = accountDeductionDetailDao
@@ -104,8 +104,8 @@ public class RefundServiceImpl implements RefundService {
             if (refundedAmount.add(refundRequest.getAmount()).compareTo(paidAmount) > 0) {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款总额不能大于已付款金额", null);
             }
-            if (refundRequest.getTransNo().equals(transNoInDb)) {
-                RefundRequest refundRequestInDb = queryResult(transNoInDb);
+            if (transNoInDbs.contains(refundRequest.getTransNo())) {
+                RefundRequest refundRequestInDb = queryResult(refundRequest.getTransNo());
                 log.warn("交易已经处理过，直接返回处理结果:{}", JSON.toJSONString(refundRequestInDb));
                 BeanUtils.copyProperties(refundRequestInDb, refundRequest);
                 return true;
@@ -171,14 +171,12 @@ public class RefundServiceImpl implements RefundService {
             BigDecimal maxRefundToSurplusQuota = maxQuota.subtract(currentSurplusQuota);
             //本应该退款到授信的金额(依赖于请求的退款金额和个人授信在付款的时候扣款金额综合得到)
             BigDecimal shouldRefundToSurplusQuotaAmount = refundRequest.getAmount()
-                    .subtract(surPlusQuotaDeductionDetail.getTransAmount()).compareTo(BigDecimal.ZERO)>0
-                    ?surPlusQuotaDeductionDetail.getTransAmount()
+                    .subtract(surPlusQuotaDeductionDetail.getTransAmount()).subtract(surPlusQuotaDeductionDetail.getReversedAmount()).compareTo(BigDecimal.ZERO)>0
+                    ?surPlusQuotaDeductionDetail.getTransAmount().subtract(surPlusQuotaDeductionDetail.getReversedAmount())
                     :refundRequest.getAmount();
             //超出部分溢缴款金额
             BigDecimal surplusQuotaOverpayAmount = shouldRefundToSurplusQuotaAmount.subtract(maxRefundToSurplusQuota);
             if(surplusQuotaOverpayAmount.compareTo(BigDecimal.ZERO)>0){
-                surplusType.setAccountBalance(surplusType.getAccountBalance().add(maxRefundToSurplusQuota));
-                Assert.isTrue(surplusType.getAccountBalance().compareTo(maxQuota) == 0,"退款金额异常，请联系管理员。");
                 if(maxRefundToSurplusQuota.compareTo(BigDecimal.ZERO)>0){
                     //有需要退款到授信额度的，才走授信额度退款
                     AccountDeductionDetail surplusRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, maxRefundToSurplusQuota,surplusType);
@@ -188,6 +186,7 @@ public class RefundServiceImpl implements RefundService {
                     remainingRefundAmount = remainingRefundAmount.subtract(maxRefundToSurplusQuota);
                     AccountBillDetail refundBillDetail = toRefundBillDetail(surplusRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
                     surplusType.setAccountBalance(surplusType.getAccountBalance().add(maxRefundToSurplusQuota));
+                    Assert.isTrue(surplusType.getAccountBalance().compareTo(maxQuota) == 0,"退款金额异常，请联系管理员。");
                     operateMerchantCredit(account, surplusRefundDeductionDetail);
                     RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail);
                     refundOperations.add(refundOperation);
@@ -383,7 +382,8 @@ public class RefundServiceImpl implements RefundService {
         refundDetail.setAccountCode(refundDeductionDetail.getAccountCode());
         refundDetail.setOrderChannel(refundDeductionDetail.getOrderChannel());
         BigDecimal accountBalance = accountAmountTypes.stream()
-                .filter(accountAmountType -> !SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .filter(accountAmountType -> !(SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())
+                        || SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode())))
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal accountCreditBalance = accountAmountTypes.stream()
                 .filter(accountAmountType -> SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))

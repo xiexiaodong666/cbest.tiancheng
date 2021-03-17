@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
@@ -325,12 +326,16 @@ public class AccountServiceImpl implements AccountService {
         Map<String, FileUniversalStorage> map = new HashMap<>();
 
         String merCode = accountBatchImgReq.getMerCode();
-      List<AccountBatchImgInfoReq> batchImgInfoListReq = accountBatchImgReq.getAccountBatchImgInfoReqList();
+        List<AccountBatchImgInfoReq> batchImgInfoListReq = accountBatchImgReq
+            .getAccountBatchImgInfoReqList();
 
         batchImgInfoListReq = batchImgInfoListReq.stream().collect(
-          Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getPhone()))), ArrayList::new));
+            Collectors.collectingAndThen(Collectors
+                    .toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getPhone()))),
+                ArrayList::new));
 
-      List<String> phones = batchImgInfoListReq.stream().map(b->b.getPhone()).collect(Collectors.toList());
+        List<String> phones = batchImgInfoListReq.stream().map(b -> b.getPhone())
+            .collect(Collectors.toList());
 
         QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
         accountQueryWrapper.in(Account.PHONE, phones);
@@ -340,11 +345,14 @@ public class AccountServiceImpl implements AccountService {
         List<FileUniversalStorage> fileUniversalStorageList = new ArrayList<>();
 
         for (Account account : accountList) {
-        AccountBatchImgInfoReq accountOptional = batchImgInfoListReq.stream().filter(i->i.getPhone().equals(account.getPhone())).findFirst().get();
+            AccountBatchImgInfoReq accountOptional = batchImgInfoListReq.stream()
+                .filter(i -> i.getPhone().equals(account.getPhone())).findFirst().get();
             successList.add(accountOptional.getPhone());
             FileUniversalStorage fileUniversalStorage;
-        if(account.getFileUniversalStorageId() != null && account.getFileUniversalStorageId() != 0) {
-          fileUniversalStorage = fileUniversalStorageDao.getById(account.getFileUniversalStorageId());
+            if (account.getFileUniversalStorageId() != null
+                && account.getFileUniversalStorageId() != 0) {
+                fileUniversalStorage = fileUniversalStorageDao
+                    .getById(account.getFileUniversalStorageId());
                 fileUniversalStorage.setUrl(accountOptional.getUrl());
             } else {
                 fileUniversalStorage = new FileUniversalStorage();
@@ -361,7 +369,8 @@ public class AccountServiceImpl implements AccountService {
 
         fileUniversalStorageDao.saveOrUpdateBatch(fileUniversalStorageList);
         for (int i = 0; i < accountList.size(); i++) {
-        accountList.get(i).setFileUniversalStorageId(map.get(accountList.get(i).getPhone()).getId());
+            accountList.get(i)
+                .setFileUniversalStorageId(map.get(accountList.get(i).getPhone()).getId());
         }
         accountDao.updateBatchById(accountList);
 
@@ -405,11 +414,13 @@ public class AccountServiceImpl implements AccountService {
         if (accountReq.getCredit()) {
             //授信额度
             AccountAmountType accountAmountType = getAccountAmountType(account.getAccountCode(),
-                    account.getMaxQuota(), account.getMerCode(), MerAccountTypeCode.SURPLUS_QUOTA.code());
+                account.getMaxQuota(), account.getMerCode(),
+                MerAccountTypeCode.SURPLUS_QUOTA.code());
             accountAmountTypeMapper.insert(accountAmountType);
             //授信额度溢缴款,额度没有上限
             AccountAmountType accountAmountType2 = getAccountAmountType(account.getAccountCode(),
-                    BigDecimal.ZERO, account.getMerCode(), MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
+                BigDecimal.ZERO, account.getMerCode(),
+                MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
             accountAmountTypeMapper.insert(accountAmountType2);
             account.setSurplusQuota(account.getMaxQuota());
         }
@@ -420,7 +431,6 @@ public class AccountServiceImpl implements AccountService {
         fileUniversalStorage.setDeleted(false);
         fileUniversalStorageDao.save(fileUniversalStorage);
         account.setFileUniversalStorageId(fileUniversalStorage.getId());
-
 
         // 添加
         account.setChangeEventId(accountChangeEventRecord.getId());
@@ -479,7 +489,8 @@ public class AccountServiceImpl implements AccountService {
             }
         } else {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
-            if (queryAccount != null && queryAccount.getId().longValue() != account.getId().longValue()) {
+            if (queryAccount != null && queryAccount.getId().longValue() != account.getId()
+                .longValue()) {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经有其他员工绑定了该手机", null);
             }
             Account syncAccount = accountMapper.selectById(account.getId());
@@ -507,7 +518,8 @@ public class AccountServiceImpl implements AccountService {
 
             // 上传照片
             if (oldAccount.getFileUniversalStorageId() != null) {
-            FileUniversalStorage fileUniversalStorage = fileUniversalStorageDao.getById(oldAccount.getFileUniversalStorageId());
+                FileUniversalStorage fileUniversalStorage = fileUniversalStorageDao
+                    .getById(oldAccount.getFileUniversalStorageId());
                 fileUniversalStorage.setUrl(accountReq.getImgUrl());
                 fileUniversalStorageDao.updateById(fileUniversalStorage);
             } else {
@@ -558,7 +570,8 @@ public class AccountServiceImpl implements AccountService {
         return account;
     }
 
-    private void updateSurPlusQuota(Long accountCode, BigDecimal oldMaxQuota, BigDecimal surplusQuota,
+    private void updateSurPlusQuota(Long accountCode, BigDecimal oldMaxQuota,
+        BigDecimal surplusQuota,
         BigDecimal newMaxQuota, String updateUser, Boolean credit, String merCode) {
 
         if (credit) {
@@ -568,11 +581,13 @@ public class AccountServiceImpl implements AccountService {
                 .queryOne(accountCode, MerAccountTypeCode.SURPLUS_QUOTA.code());
             if (null == accountAmountType) {
                 //账户新增授信额度 修改account额度
-                AccountAmountType addAccountAmountType = getAccountAmountType(accountCode, newMaxQuota,
+                AccountAmountType addAccountAmountType = getAccountAmountType(accountCode,
+                    newMaxQuota,
                     merCode, MerAccountTypeCode.SURPLUS_QUOTA.code());
                 accountAmountTypeMapper.insert(addAccountAmountType);
                 accountCustomizeMapper
-                        .updateMaxAndSurplusQuota(accountCode.toString(), newMaxQuota, newMaxQuota, updateUser);
+                    .updateMaxAndSurplusQuota(accountCode.toString(), newMaxQuota, newMaxQuota,
+                        updateUser);
             } else {
                 //判断剩余授信额度  如果是增加,那么额度就是
                 if (surplusQuota.compareTo(oldMaxQuota.subtract(newMaxQuota)) < 0) {
@@ -595,7 +610,8 @@ public class AccountServiceImpl implements AccountService {
             if (oldMaxQuota.compareTo(surplusQuota) != 0) {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "授信额度已使用 无法关闭", null);
             }
-            accountAmountTypeMapper.updateBalance(accountCode, MerAccountTypeCode.SURPLUS_QUOTA.code(),
+            accountAmountTypeMapper
+                .updateBalance(accountCode, MerAccountTypeCode.SURPLUS_QUOTA.code(),
                     BigDecimal.ZERO, updateUser);
             accountCustomizeMapper.updateMaxAndSurplusQuota(accountCode.toString(), BigDecimal.ZERO,
                 BigDecimal.ZERO, updateUser);
@@ -621,7 +637,8 @@ public class AccountServiceImpl implements AccountService {
         }
         Account account = this.getByAccountCode(accountCode);
         String transNo = String.valueOf(
-                sequenceService.nextNo(WelfareConstant.SequenceType.RESET_ACCOUNT_SURPLUS_QUOTA.code()));
+            sequenceService
+                .nextNo(WelfareConstant.SequenceType.RESET_ACCOUNT_SURPLUS_QUOTA.code()));
         ;
         AccountBillDetail accountBillDetail = getAccountBillDetail(accountCode,
             transType, transAmout, account, transNo);
@@ -725,16 +742,19 @@ public class AccountServiceImpl implements AccountService {
         AccountBalanceDTO accountBalanceDTO = new AccountBalanceDTO();
         accountBalanceDTO.setCode(accountBalanceType.toString());
         accountBalanceDTO.setName(accountBalanceType.getName());
-        Object fieldValue = accountBalanceType.getFieldFunc().apply(t);
-        accountBalanceDTO.setValue(fieldValue);
+        if (t != null) {
+            Object fieldValue = accountBalanceType.getFieldFunc().apply(t);
+            accountBalanceDTO.setValue(fieldValue);
+        }
         return accountBalanceDTO;
     }
 
     @Override
     public AccountOverviewDTO queryAccountOverview(Long accountCode, String paymentChannel) {
         Account account = getByAccountCode(accountCode);
-        WelfareConstant.PaymentChannel paymentChannelEnum = StrUtil.isEmpty(paymentChannel) ? WelfareConstant.PaymentChannel.WELFARE
-            : PAYMENT_CHANNEL_MAP.get(paymentChannel);
+        WelfareConstant.PaymentChannel paymentChannelEnum =
+            StrUtil.isEmpty(paymentChannel) ? WelfareConstant.PaymentChannel.WELFARE
+                : PAYMENT_CHANNEL_MAP.get(paymentChannel);
         List<AccountBalanceDTO> balanceList = new ArrayList<>();
 
         switch (paymentChannelEnum) {
@@ -745,12 +765,15 @@ public class AccountServiceImpl implements AccountService {
                     .collect(Collectors.toList());
                 break;
             case WO_LIFE:
+                String phone = account.getPhone();
                 WoLifeBasicResponse<WoLifeGetUserMoneyResponse> woLifeBasicResponse = woLifeFeignService
-                    .getUserMoney(account.getPhone());
-                if(!woLifeBasicResponse.isSuccess()) {
-                    throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "账户余额查询失败", null);
+                    .getUserMoney(phone);
+                if (!woLifeBasicResponse.isSuccess()) {
+                    log.error("账户余额查询返回失败, phone: {}, response: {}", phone,
+                        JSON.toJSONString(woLifeBasicResponse));
                 }
-                WoLifeGetUserMoneyResponse woLifeGetUserMoneyResponse = woLifeBasicResponse.getResponse();
+                WoLifeGetUserMoneyResponse woLifeGetUserMoneyResponse = woLifeBasicResponse
+                    .getResponse();
                 balanceList = Lists.newArrayList(WoLife.values())
                     .stream()
                     .map(woLife -> getAccountBalanceValue(woLife, woLifeGetUserMoneyResponse))
@@ -762,16 +785,16 @@ public class AccountServiceImpl implements AccountService {
             .selectList(Wrappers.<SubAccount>lambdaQuery()
                 .eq(SubAccount::getAccountCode, accountCode)
                 .eq(SubAccount::getDeleted, 0));
-        List<AccountPaymentChannelDTO> paymentChannelList = subAccountList.stream().map(subAccount -> {
-            AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
-            String subAccountType = subAccount.getSubAccountType();
-            accountPaymentChannelDTO.setPaymentChannel(subAccountType);
-            WelfareConstant.PaymentChannel channel = PAYMENT_CHANNEL_MAP
-                .get(subAccountType);
-            accountPaymentChannelDTO.setPaymentChannelDesc(channel.desc());
-            return accountPaymentChannelDTO;
-        }).collect(Collectors.toList());
-
+        List<AccountPaymentChannelDTO> paymentChannelList = subAccountList.stream()
+            .map(subAccount -> {
+                AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
+                String subAccountType = subAccount.getSubAccountType();
+                accountPaymentChannelDTO.setPaymentChannel(subAccountType);
+                WelfareConstant.PaymentChannel channel = PAYMENT_CHANNEL_MAP
+                    .get(subAccountType);
+                accountPaymentChannelDTO.setPaymentChannelDesc(channel.desc());
+                return accountPaymentChannelDTO;
+            }).collect(Collectors.toList());
 
         AccountOverviewDTO accountOverviewDTO = new AccountOverviewDTO();
         String storeCode = account.getDepartment();
@@ -798,12 +821,13 @@ public class AccountServiceImpl implements AccountService {
                 .eq(PaymentChannel::getDeleted, 0)
                 .orderByAsc(PaymentChannel::getShowOrder));
 
-        List<AccountPaymentChannelDTO> paymentChannelList = channelList.stream().map(paymentChannel -> {
-            AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
-            accountPaymentChannelDTO.setPaymentChannel(paymentChannel.getCode());
-            accountPaymentChannelDTO.setPaymentChannelDesc(paymentChannel.getName());
-            return accountPaymentChannelDTO;
-        }).collect(Collectors.toList());
+        List<AccountPaymentChannelDTO> paymentChannelList = channelList.stream()
+            .map(paymentChannel -> {
+                AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
+                accountPaymentChannelDTO.setPaymentChannel(paymentChannel.getCode());
+                accountPaymentChannelDTO.setPaymentChannelDesc(paymentChannel.getName());
+                return accountPaymentChannelDTO;
+            }).collect(Collectors.toList());
         return paymentChannelList;
     }
 
@@ -931,7 +955,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode, WelfareConstant.ConsumeQueryType queryType, String queryInfo) {
+    public AccountConsumeSceneDO queryAccountConsumeSceneDO(String storeCode,
+        WelfareConstant.ConsumeQueryType queryType, String queryInfo) {
         Long accountCode = null;
         AccountConsumeSceneDO accountConsumeSceneDO = new AccountConsumeSceneDO();
         accountConsumeSceneDO.setQueryInfo(queryInfo);
@@ -941,12 +966,15 @@ public class AccountServiceImpl implements AccountService {
                 CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
                 CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(queryInfo);
                 Assert.notNull(cardInfo, "根据磁条号未找到卡片:" + queryInfo);
-                Assert.isTrue(WelfareConstant.CardEnable.ENABLE.code().equals(cardInfo.getEnabled()), "卡片已禁用");
+                Assert
+                    .isTrue(WelfareConstant.CardEnable.ENABLE.code().equals(cardInfo.getEnabled()),
+                        "卡片已禁用");
                 accountCode = cardInfo.getAccountCode();
                 break;
             case BARCODE:
                 BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
-                accountCode = barcodeService.parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
+                accountCode = barcodeService
+                    .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
                 break;
             default:
                 break;
@@ -956,7 +984,8 @@ public class AccountServiceImpl implements AccountService {
         accountConsumeSceneDO.setAccount(account);
         SupplierStore supplierStore = supplierStoreDao.getOneByCode(storeCode);
         List<AccountConsumeScene> accountConsumeScenes
-                = accountConsumeSceneDao.getAccountTypeAndMerCode(account.getAccountTypeCode(), supplierStore.getMerCode());
+            = accountConsumeSceneDao
+            .getAccountTypeAndMerCode(account.getAccountTypeCode(), supplierStore.getMerCode());
         if (CollectionUtils.isEmpty(accountConsumeScenes)) {
             log.warn("没有找到消费场景");
             accountConsumeSceneDO.setAccountConsumeTypes(Collections.emptyList());
@@ -985,11 +1014,13 @@ public class AccountServiceImpl implements AccountService {
             CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
             CardInfo cardInfo = cardInfoDao.getOneByMagneticStripe(queryInfo);
             Assert.notNull(cardInfo, "根据磁条号未找到卡片:" + queryInfo);
-            Assert.isTrue(WelfareConstant.CardEnable.ENABLE.code().equals(cardInfo.getEnabled()), "卡片已禁用");
+            Assert.isTrue(WelfareConstant.CardEnable.ENABLE.code().equals(cardInfo.getEnabled()),
+                "卡片已禁用");
             accountCode = cardInfo.getAccountCode();
         } else if (WelfareConstant.ConsumeQueryType.BARCODE.code().equals(queryType)) {
             BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
-            accountCode = barcodeService.parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
+            accountCode = barcodeService
+                .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
         }
         Assert.notNull(accountCode, "根据条件没有解析出账号");
         return AccountDO.of(this.getByAccountCode(accountCode));
@@ -998,9 +1029,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchRestoreCreditLimit(AccountRestoreCreditLimitReq creditLimitReq) {
-        if (creditLimitReq != null && CollectionUtils.isNotEmpty(creditLimitReq.getCreditLimitDtos())) {
-            List<AccountRestoreCreditLimitReq.RestoreCreditLimitDTO> restoreCreditLimitDtos = creditLimitReq.getCreditLimitDtos();
-            List<Long> accountCodes = restoreCreditLimitDtos.stream().map(AccountRestoreCreditLimitReq.RestoreCreditLimitDTO::getAccountCode).collect(Collectors.toList());;
+        if (creditLimitReq != null && CollectionUtils
+            .isNotEmpty(creditLimitReq.getCreditLimitDtos())) {
+            List<AccountRestoreCreditLimitReq.RestoreCreditLimitDTO> restoreCreditLimitDtos = creditLimitReq
+                .getCreditLimitDtos();
+            List<Long> accountCodes = restoreCreditLimitDtos.stream()
+                .map(AccountRestoreCreditLimitReq.RestoreCreditLimitDTO::getAccountCode)
+                .collect(Collectors.toList());
+            ;
             List<RLock> locks = new ArrayList<>();
             RLock multiLock;
             accountCodes.forEach(accountCode -> {
@@ -1010,11 +1046,17 @@ public class AccountServiceImpl implements AccountService {
             multiLock = redissonClient.getMultiLock(locks.toArray(new RLock[]{}));
             multiLock.lock(-1, TimeUnit.SECONDS);
             try {
-                Map<Long ,Account> accountsMap = accountDao.mapByAccountCodes(accountCodes);
-                Map<Long ,AccountAmountType> surplusQuotaMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, MerAccountTypeCode.SURPLUS_QUOTA.code());
-                Map<Long ,AccountAmountType> surplusQuotaOverpayMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
-                Map<Long , AccountRestoreCreditLimitReq.RestoreCreditLimitDTO> restoreCreditLimitMap = restoreCreditLimitDtos.stream()
-                        .collect(Collectors.toMap(AccountRestoreCreditLimitReq.RestoreCreditLimitDTO::getAccountCode, a -> a,(k1, k2)->k1));
+                Map<Long, Account> accountsMap = accountDao.mapByAccountCodes(accountCodes);
+                Map<Long, AccountAmountType> surplusQuotaMap = accountAmountTypeDao
+                    .mapByAccountCodes(accountCodes, MerAccountTypeCode.SURPLUS_QUOTA.code());
+                Map<Long, AccountAmountType> surplusQuotaOverpayMap = accountAmountTypeDao
+                    .mapByAccountCodes(accountCodes,
+                        MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
+                Map<Long, AccountRestoreCreditLimitReq.RestoreCreditLimitDTO> restoreCreditLimitMap = restoreCreditLimitDtos
+                    .stream()
+                    .collect(Collectors
+                        .toMap(AccountRestoreCreditLimitReq.RestoreCreditLimitDTO::getAccountCode,
+                            a -> a, (k1, k2) -> k1));
                 List<Account> updatedAccounts = new ArrayList<>();
                 List<AccountAmountType> updatedAccountTypes = new ArrayList<>();
                 List<AccountBillDetail> accountBillDetails = new ArrayList<>();
@@ -1039,78 +1081,106 @@ public class AccountServiceImpl implements AccountService {
                         throw new BusiException(String.format("员工溢缴款账户不存在[%s]", accountCode));
                     }
                     if (surplusQuota.getAccountBalance().compareTo(account.getMaxQuota()) > 0
-                            || account.getSurplusQuota().compareTo(account.getMaxQuota()) > 0) {
-                        throw new BusiException(String.format("数据异常，剩余授信额度超过最大额度[%s]", accountCode));
+                        || account.getSurplusQuota().compareTo(account.getMaxQuota()) > 0) {
+                        throw new BusiException(
+                            String.format("数据异常，剩余授信额度超过最大额度[%s]", accountCode));
                     }
-                    BigDecimal overAmount = surplusQuota.getAccountBalance().add(restoreAmount).subtract(account.getMaxQuota());
+                    BigDecimal overAmount = surplusQuota.getAccountBalance().add(restoreAmount)
+                        .subtract(account.getMaxQuota());
                     if (overAmount.compareTo(BigDecimal.ZERO) < 0) {
                         // 恢复授信额度
-                        surplusQuota.setAccountBalance(surplusQuota.getAccountBalance().add(restoreAmount));
+                        surplusQuota
+                            .setAccountBalance(surplusQuota.getAccountBalance().add(restoreAmount));
                         account.setSurplusQuota(account.getSurplusQuota().add(restoreAmount));
                         updatedAccounts.add(account);
                         updatedAccountTypes.add(surplusQuota);
                         // 保存变更流水
-                        AccountBillDetail billDetail = assemblyAccountBillDetail(account, restoreAmount, "", TransType.RESET_INCR, surplusQuotaOverpay.getAccountBalance());
-                        AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account,
-                                restoreAmount,
-                                "",
-                                TransType.RESET_INCR,
-                                surplusQuota);
+                        AccountBillDetail billDetail = assemblyAccountBillDetail(account,
+                            restoreAmount, "", TransType.RESET_INCR,
+                            surplusQuotaOverpay.getAccountBalance());
+                        AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(
+                            account,
+                            restoreAmount,
+                            "",
+                            TransType.RESET_INCR,
+                            surplusQuota);
                         accountBillDetails.add(billDetail);
                         accountDeductionDetails.add(deductionDetail);
                     } else {
                         if (surplusQuota.getAccountBalance().compareTo(account.getMaxQuota()) < 0) {
                             // 变更金额
-                            BigDecimal updateAmount = account.getMaxQuota().subtract(surplusQuota.getAccountBalance());
+                            BigDecimal updateAmount = account.getMaxQuota()
+                                .subtract(surplusQuota.getAccountBalance());
                             // 恢复授信额度
                             surplusQuota.setAccountBalance(account.getMaxQuota());
                             account.setSurplusQuota(account.getMaxQuota());
                             updatedAccounts.add(account);
                             updatedAccountTypes.add(surplusQuota);
-                            AccountBillDetail billDetail = assemblyAccountBillDetail(account, updateAmount, "", TransType.RESET_INCR,surplusQuotaOverpay.getAccountBalance());
-                            AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account, updateAmount, "", TransType.RESET_INCR, surplusQuota);
+                            AccountBillDetail billDetail = assemblyAccountBillDetail(account,
+                                updateAmount, "", TransType.RESET_INCR,
+                                surplusQuotaOverpay.getAccountBalance());
+                            AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(
+                                account, updateAmount, "", TransType.RESET_INCR, surplusQuota);
                             accountBillDetails.add(billDetail);
                             accountDeductionDetails.add(deductionDetail);
                         }
                         if (overAmount.compareTo(BigDecimal.ZERO) > 0) {
-                            surplusQuotaOverpay.setAccountBalance(surplusQuotaOverpay.getAccountBalance().add(overAmount.abs()));
+                            surplusQuotaOverpay.setAccountBalance(
+                                surplusQuotaOverpay.getAccountBalance().add(overAmount.abs()));
                             updatedAccountTypes.add(surplusQuotaOverpay);
-                            account.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay().add(overAmount.abs()));
+                            account.setSurplusQuotaOverpay(
+                                account.getSurplusQuotaOverpay().add(overAmount.abs()));
                             updatedAccounts.add(account);
                             // 保存变更流水
-                            AccountBillDetail billDetail = assemblyAccountBillDetail(account, overAmount.abs(), "", TransType.RESET_INCR,surplusQuotaOverpay.getAccountBalance());
-                            AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(account, overAmount.abs(), "", TransType.RESET_INCR, surplusQuotaOverpay);
+                            AccountBillDetail billDetail = assemblyAccountBillDetail(account,
+                                overAmount.abs(), "", TransType.RESET_INCR,
+                                surplusQuotaOverpay.getAccountBalance());
+                            AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(
+                                account, overAmount.abs(), "", TransType.RESET_INCR,
+                                surplusQuotaOverpay);
                             accountBillDetails.add(billDetail);
                             accountDeductionDetails.add(deductionDetail);
                         }
                     }
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
                     accountChangeEventRecord.setAccountCode(account.getAccountCode());
-                    accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_SETTLE_RESTORE.getChangeType());
-                    accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_SETTLE_RESTORE.getChangeValue());
+                    accountChangeEventRecord
+                        .setChangeType(AccountChangeType.ACCOUNT_SETTLE_RESTORE.getChangeType());
+                    accountChangeEventRecord
+                        .setChangeValue(AccountChangeType.ACCOUNT_SETTLE_RESTORE.getChangeValue());
                     records.add(accountChangeEventRecord);
                 });
-                BatchSequence batchSequence = sequenceService.batchGenerate(WelfareConstant.SequenceType.DEPOSIT.code(), accountBillDetails.size() + accountDeductionDetails.size());
+                BatchSequence batchSequence = sequenceService
+                    .batchGenerate(WelfareConstant.SequenceType.DEPOSIT.code(),
+                        accountBillDetails.size() + accountDeductionDetails.size());
                 int sequenceIndex = 0;
                 for (AccountBillDetail billDetail : accountBillDetails) {
-                    String transNo = batchSequence.getSequences().get(sequenceIndex++).getSequenceNo()+"";
-                    String settleNo = restoreCreditLimitMap.get(billDetail.getAccountCode()).getSettleNo();
+                    String transNo =
+                        batchSequence.getSequences().get(sequenceIndex++).getSequenceNo() + "";
+                    String settleNo = restoreCreditLimitMap.get(billDetail.getAccountCode())
+                        .getSettleNo();
                     billDetail.setTransNo(transNo);
-                    OrderTransRelation orderTransRelation = assemblyOrderTransRelation(billDetail.getTransAmount(), transNo, settleNo, TransType.RESET_INCR);
+                    OrderTransRelation orderTransRelation = assemblyOrderTransRelation(
+                        billDetail.getTransAmount(), transNo, settleNo, TransType.RESET_INCR);
                     orderTransRelations.add(orderTransRelation);
                 }
                 for (AccountDeductionDetail deductionDetail : accountDeductionDetails) {
-                    String transNo = batchSequence.getSequences().get(sequenceIndex++).getSequenceNo()+"";
-                    String settleNo = restoreCreditLimitMap.get(deductionDetail.getAccountCode()).getSettleNo();
+                    String transNo =
+                        batchSequence.getSequences().get(sequenceIndex++).getSequenceNo() + "";
+                    String settleNo = restoreCreditLimitMap.get(deductionDetail.getAccountCode())
+                        .getSettleNo();
                     deductionDetail.setTransNo(transNo);
-                    OrderTransRelation orderTransRelation = assemblyOrderTransRelation(deductionDetail.getTransAmount(), transNo, settleNo, TransType.RESET_INCR);
+                    OrderTransRelation orderTransRelation = assemblyOrderTransRelation(
+                        deductionDetail.getTransAmount(), transNo, settleNo, TransType.RESET_INCR);
                     orderTransRelations.add(orderTransRelation);
                 }
-                accountDeductionDetailDao.saveBatch(accountDeductionDetails, accountDeductionDetails.size());
+                accountDeductionDetailDao
+                    .saveBatch(accountDeductionDetails, accountDeductionDetails.size());
                 accountBillDetailDao.saveBatch(accountBillDetails, accountBillDetails.size());
                 orderTransRelationDao.saveBatch(orderTransRelations, orderTransRelations.size());
                 accountChangeEventRecordDao.saveBatch(records, records.size());
-                Map<Long, AccountChangeEventRecord> recordMap = records.stream().collect(Collectors.toMap(AccountChangeEventRecord::getAccountCode, a -> a,(k1,k2)->k1));
+                Map<Long, AccountChangeEventRecord> recordMap = records.stream().collect(Collectors
+                    .toMap(AccountChangeEventRecord::getAccountCode, a -> a, (k1, k2) -> k1));
                 updatedAccounts.forEach(account -> {
                     account.setChangeEventId(recordMap.get(account.getAccountCode()).getId());
                 });
@@ -1132,8 +1202,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private OrderTransRelation assemblyOrderTransRelation(BigDecimal updateQuota,
-                                                          String transNo, String settlementTransNo,
-                                                          WelfareConstant.TransType transType) {
+        String transNo, String settlementTransNo,
+        WelfareConstant.TransType transType) {
         OrderTransRelation transRelation = new OrderTransRelation();
         transRelation.setTransNo(transNo);
         transRelation.setOrderId(settlementTransNo);
@@ -1142,8 +1212,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private AccountBillDetail assemblyAccountBillDetail(Account account, BigDecimal updateQuota,
-                                                        String transNo, WelfareConstant.TransType transType,
-                                                        BigDecimal surplusQuotaOverpay) {
+        String transNo, WelfareConstant.TransType transType,
+        BigDecimal surplusQuotaOverpay) {
         AccountBillDetail accountBillDetail = new AccountBillDetail();
         accountBillDetail.setAccountCode(account.getAccountCode());
         accountBillDetail.setAccountBalance(account.getAccountBalance());
@@ -1158,9 +1228,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private AccountDeductionDetail assemblyAccountDeductionDetail(Account account,
-                                                                  BigDecimal updateQuota, String transNo,
-                                                                  TransType transType,
-                                                                  AccountAmountType accountAmountType) {
+        BigDecimal updateQuota, String transNo,
+        TransType transType,
+        AccountAmountType accountAmountType) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(account.getAccountCode());
         accountDeductionDetail.setAccountDeductionAmount(updateQuota.abs());
@@ -1179,9 +1249,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
-  @Override
-  public List<DepartmentAndAccountTreeResp> groupByDepartment(String merCode) {
-    List<DepartmentAndAccountTreeResp> treeDTOList = andAccountTreeConverter
+    @Override
+    public List<DepartmentAndAccountTreeResp> groupByDepartment(String merCode) {
+        List<DepartmentAndAccountTreeResp> treeDTOList = andAccountTreeConverter
             .toE(accountCustomizeMapper.getAllAccountCodeAndDepatmentPath(merCode));
         treeDTOList.forEach(item -> {
             item.setCode(item.getDepartmentCode());
@@ -1189,22 +1259,27 @@ public class AccountServiceImpl implements AccountService {
         });
         TreeUtil treeUtil = new TreeUtil(treeDTOList, "0");
         treeDTOList = treeUtil.getTree();
-    treeDTOList = CollectionUtils.isNotEmpty(treeDTOList) ? treeDTOList.get(0).getChildren() : new ArrayList<>();
+        treeDTOList = CollectionUtils.isNotEmpty(treeDTOList) ? treeDTOList.get(0).getChildren()
+            : new ArrayList<>();
         if (CollectionUtils.isNotEmpty(treeDTOList)) {
-      Map<String, DepartmentAndAccountTreeResp> treeMap = treeDTOList.stream().collect(Collectors.toMap(DepartmentAndAccountTreeResp::getDepartmentCode, a -> a,(k1,k2)->k1));
+            Map<String, DepartmentAndAccountTreeResp> treeMap = treeDTOList.stream().collect(
+                Collectors.toMap(DepartmentAndAccountTreeResp::getDepartmentCode, a -> a,
+                    (k1, k2) -> k1));
             recursiveCalculateAccountNum(treeDTOList, treeMap);
         }
         return treeDTOList;
     }
 
-  private void recursiveCalculateAccountNum(List<DepartmentAndAccountTreeResp> trees, Map<String, DepartmentAndAccountTreeResp> treeMap){
+    private void recursiveCalculateAccountNum(List<DepartmentAndAccountTreeResp> trees,
+        Map<String, DepartmentAndAccountTreeResp> treeMap) {
         if (CollectionUtils.isNotEmpty(trees)) {
             trees.forEach(departmentTree -> {
                 // 查询人员数量
                 recursiveCalculateAccountNum(departmentTree.getChildren(), treeMap);
                 // 找到父级，把本级人数加到父级上
                 if (treeMap.containsKey(departmentTree.getDepartmentParent())) {
-          DepartmentAndAccountTreeResp p = treeMap.get(departmentTree.getDepartmentParent());
+                    DepartmentAndAccountTreeResp p = treeMap
+                        .get(departmentTree.getDepartmentParent());
                     p.setAccountTotal(p.getAccountTotal() + departmentTree.getAccountTotal());
                 }
             });

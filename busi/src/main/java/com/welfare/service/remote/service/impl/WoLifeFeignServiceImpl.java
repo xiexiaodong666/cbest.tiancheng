@@ -41,25 +41,25 @@ public class WoLifeFeignServiceImpl implements WoLifeFeignService {
   @Override
   public WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(String phone,
       WoLifeAccountDeductionDataRequest data) {
-    log.info("沃生活馆账户余额查询, 请求:{},{}", phone, data);
+    log.info("沃生活馆账户扣款, 请求:{},{}", phone, data);
 
     WoLifeBasicResponse<WoLifeAccountDeductionResponse> response = woLifeFeignClient.accountDeduction(phone, JSON.toJSONString(data));
-    log.info("沃生活馆账户余额查询, 返回:{}", response);
+    log.info("沃生活馆账户扣款, 返回:{}", response);
 
     return response;
   }
 
   @Override
   public WoLifeBasicResponse refundWriteOff(String phone, WoLifeRefundWriteOffDataRequest data) {
-    log.info("沃生活馆账户余额查询, 请求:{},{}", phone, data);
+    log.info("沃生活馆账户退款, 请求:{},{}", phone, data);
     WoLifeBasicResponse response = woLifeFeignClient.refundWriteOff(phone, JSON.toJSONString(data));
-    log.info("沃生活馆账户余额查询, 返回:{}", response);
+    log.info("沃生活馆账户退款, 返回:{}", response);
 
     return response;
   }
 
-  @Override
+/*  @Override
   public WoLifeBasicResponse queryDeduction(PaymentRequest paymentRequest){
     return woLifeFeignClient.getAccountDeduction(WoLifeGetAccountDeductionRequest.of(paymentRequest));
-  }
+  }*/
 }

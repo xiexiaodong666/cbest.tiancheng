@@ -48,9 +48,9 @@ public interface WoLifeFeignClient {
   /**
    * 扣款查询
    */
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+ /* @RequestMapping(value = "/", method = RequestMethod.GET)
   WoLifeBasicResponse getAccountDeduction(
-      @RequestBody WoLifeGetAccountDeductionRequest request);
+      @RequestBody WoLifeGetAccountDeductionRequest request);*/
 
   /**
    * 销账查询

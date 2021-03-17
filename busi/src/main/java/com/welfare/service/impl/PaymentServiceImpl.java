@@ -306,7 +306,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(PaymentOperation::getAccountDeductionDetail)
                 .collect(Collectors.toList());
         List<AccountAmountType> accountTypes = paymentOperations.stream()
-                .map(PaymentOperation::getAccountAmountType)
+                .map(PaymentOperation::getAccountAmountType).filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);

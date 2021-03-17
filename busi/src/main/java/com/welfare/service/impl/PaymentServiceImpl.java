@@ -318,7 +318,10 @@ public class PaymentServiceImpl implements PaymentService {
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
-        accountAmountTypeDao.saveOrUpdateBatch(accountTypes);
+        if(!CollectionUtils.isEmpty(accountTypes)){
+            //联通沃支付，没有修改accountTypes，所以if判断
+            accountAmountTypeDao.saveOrUpdateBatch(accountTypes);
+        }
     }
 
 

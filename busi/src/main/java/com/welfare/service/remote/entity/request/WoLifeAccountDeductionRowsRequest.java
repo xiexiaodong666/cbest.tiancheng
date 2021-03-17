@@ -42,9 +42,9 @@ public class WoLifeAccountDeductionRowsRequest {
   public static WoLifeAccountDeductionRowsRequest of(PaymentRequest paymentRequest){
     WoLifeAccountDeductionRowsRequest woLifeAccountDeductionRowsRequest = new WoLifeAccountDeductionRowsRequest();
     woLifeAccountDeductionRowsRequest.setCount(1);
-    woLifeAccountDeductionRowsRequest.setName("");
+    woLifeAccountDeductionRowsRequest.setName("重百线下消费商品");
     woLifeAccountDeductionRowsRequest.setPrice(paymentRequest.getAmount());
-    woLifeAccountDeductionRowsRequest.setSaleUnId("");
+    woLifeAccountDeductionRowsRequest.setSaleUnId("cbest-offline-default");
     return woLifeAccountDeductionRowsRequest;
   }
 }

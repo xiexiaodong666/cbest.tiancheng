@@ -1,6 +1,8 @@
 package com.welfare.service.remote.entity.request;
 
 import javax.validation.constraints.NotBlank;
+
+import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
 
 /**
@@ -16,4 +18,10 @@ public class WoLifeGetAccountDeductionDataRequest {
    */
   @NotBlank
   private String oid;
+
+  public static WoLifeGetAccountDeductionDataRequest of(PaymentRequest paymentRequest){
+    WoLifeGetAccountDeductionDataRequest woLifeGetAccountDeductionDataRequest = new WoLifeGetAccountDeductionDataRequest();
+    woLifeGetAccountDeductionDataRequest.setOid(paymentRequest.getTransNo());
+    return woLifeGetAccountDeductionDataRequest;
+  }
 }

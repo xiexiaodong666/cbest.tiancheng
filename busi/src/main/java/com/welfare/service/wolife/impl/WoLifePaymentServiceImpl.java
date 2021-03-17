@@ -9,6 +9,7 @@ import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
+import com.welfare.persist.dto.ThirdPartyPaymentRequestDao;
 import com.welfare.persist.entity.*;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.dto.RefundRequest;
@@ -58,16 +59,19 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
     private final AccountDao accountDao;
     private final AccountBillDetailDao accountBillDetailDao;
     private final AccountDeductionDetailDao accountDeductionDetailDao;
+    private final ThirdPartyPaymentRequestDao thirdPartyPaymentRequestDao;
 
     @Override
     @DistributedLock(lockPrefix = "wo-life-pay", lockKey = "#paymentRequest.transNo")
     public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, MerchantCredit merchantCredit, SupplierStore supplierStore) {
-
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = generateThirdPartyPaymentRequest(paymentRequest);
+        thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse =
             woLifeFeignService.accountDeduction(paymentRequest.getPhone(), WoLifeAccountDeductionDataRequest.of(paymentRequest));
         Assert.isTrue(basicResponse.isSuccess(), basicResponse.getResponseMessage());
+        thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();
         AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, paymentAmount, accountAmountTypes);
@@ -85,6 +89,17 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         paymentOperation.setOperateAmount(paymentAmount);
         paymentOperation.setMerchantAccountType(null);
         return Collections.singletonList(paymentOperation);
+    }
+
+    private ThirdPartyPaymentRequest generateThirdPartyPaymentRequest(PaymentRequest paymentRequest) {
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
+        thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(paymentRequest));
+        thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.HANDLING.code());
+        thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
+        thirdPartyPaymentRequest.setPaymentTypeInfo(((BarcodePaymentRequest) paymentRequest).getBarcode());
+        thirdPartyPaymentRequest.setTransNo(paymentRequest.getTransNo());
+        thirdPartyPaymentRequest.setTransAmount(paymentRequest.getAmount());
+        return thirdPartyPaymentRequest;
     }
 
     @Override

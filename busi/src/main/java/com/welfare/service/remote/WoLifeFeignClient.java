@@ -2,11 +2,13 @@ package com.welfare.service.remote;
 
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.remote.config.FeignConfiguration;
+import com.welfare.service.remote.entity.request.WoLifeGetAccountDeductionRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
 import com.welfare.service.remote.fallback.WoLifeFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,9 +48,9 @@ public interface WoLifeFeignClient {
   /**
    * 扣款查询
    */
-  /*@RequestMapping(value = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "/", method = RequestMethod.GET)
   WoLifeBasicResponse getAccountDeduction(
-      @RequestBody WoLifeGetAccountDeductionRequest request);*/
+      @RequestBody WoLifeGetAccountDeductionRequest request);
 
   /**
    * 销账查询

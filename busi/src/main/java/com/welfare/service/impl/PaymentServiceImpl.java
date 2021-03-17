@@ -131,7 +131,7 @@ public class PaymentServiceImpl implements PaymentService {
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
 
                 String paymentChannel = paymentRequest.getPaymentChannel();
-                List<PaymentOperation> paymentOperations = null;
+                List<PaymentOperation> paymentOperations;
                 List<MerchantBillDetail> merchantBillDetails = null;
                 if(paymentChannel.equals(WelfareConstant.PaymentChannel.WO_LIFE.code())){
                     if (thirdPartyPaymentRequestService.chargeWhetherHandled(paymentRequest)) {

@@ -1,10 +1,14 @@
 package com.welfare.service.impl;
 
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dto.ThirdPartyPaymentRequestDao;
 import com.welfare.persist.entity.ThirdPartyPaymentRequest;
 import com.welfare.service.ThirdPartyPaymentRequestService;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
+import com.welfare.service.remote.service.WoLifeFeignService;
+import com.welfare.service.wolife.WoLifePaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +25,9 @@ import java.util.Objects;
 @Service
 public class ThirdPartyPaymentRequestServiceImpl implements ThirdPartyPaymentRequestService {
     private final ThirdPartyPaymentRequestDao thirdPartyPaymentRequestDao;
+    private final WoLifeFeignService woLifeFeignService;
     @Override
     public boolean chargeWhetherHandled(PaymentRequest paymentRequest) {
-        String transNo = paymentRequest.getTransNo();
         ThirdPartyPaymentRequest thirdPartyPaymentRequestInDb = null;
         thirdPartyPaymentRequestInDb = thirdPartyPaymentRequestDao.queryByTransNo(paymentRequest.getTransNo());
         if(paymentRequest instanceof BarcodePaymentRequest){
@@ -32,7 +36,15 @@ public class ThirdPartyPaymentRequestServiceImpl implements ThirdPartyPaymentReq
         if(Objects.isNull(thirdPartyPaymentRequestInDb)){
             return false;
         }
-
+        WoLifeBasicResponse woLifeBasicResponse = woLifeFeignService.queryDeduction(paymentRequest);
+        if(woLifeBasicResponse.isSuccess()){
+            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            thirdPartyPaymentRequestInDb.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+        }else{
+            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.FAILED.code());
+            thirdPartyPaymentRequestInDb.setTransStatus(WelfareConstant.AsyncStatus.FAILED.code());
+        }
+        thirdPartyPaymentRequestDao.updateById(thirdPartyPaymentRequestInDb);
         return true;
     }
 }

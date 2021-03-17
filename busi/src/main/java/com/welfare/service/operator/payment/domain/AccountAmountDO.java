@@ -72,6 +72,7 @@ public class AccountAmountDO {
         accountBillDetail.setStoreCode(paymentRequest.getStoreNo());
         accountBillDetail.setCardId(paymentRequest.getCardNo());
         accountBillDetail.setOrderChannel(paymentRequest.getPaymentScene());
+        accountBillDetail.setPaymentChannel(paymentRequest.getPaymentChannel());
         if(paymentRequest instanceof CardPaymentRequest){
             accountBillDetail.setPaymentType(PaymentTypeEnum.CARD.getCode());
             accountBillDetail.setPaymentTypeInfo(((CardPaymentRequest) paymentRequest).getCardInsideInfo());
@@ -116,6 +117,7 @@ public class AccountAmountDO {
         accountDeductionDetail.setReversedAmount(BigDecimal.ZERO);
         accountDeductionDetail.setTransTime(paymentRequest.getPaymentDate());
         accountDeductionDetail.setStoreCode(paymentRequest.getStoreNo());
+        accountDeductionDetail.setPaymentChannel(paymentRequest.getPaymentChannel());
         if (paymentRequest instanceof CardPaymentRequest) {
             accountDeductionDetail.setCardId(paymentRequest.getCardNo());
         }

@@ -35,6 +35,6 @@ public interface WoLifeFeignService {
    * @param paymentRequest
    * @return
    */
-  WoLifeBasicResponse queryDeduction(PaymentRequest paymentRequest);
+ /* WoLifeBasicResponse queryDeduction(PaymentRequest paymentRequest);*/
 
 }

@@ -48,11 +48,11 @@ public class WoLifeFeignClientFallback implements FallbackFactory<WoLifeFeignCli
         throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
       }
 
-      @Override
+  /*    @Override
       public WoLifeBasicResponse getAccountDeduction(WoLifeGetAccountDeductionRequest request) {
         log.error("沃生活馆退款销账失败, 请求:{}", JSON.toJSONString(request), throwable);
         throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
-      }
+      }*/
 
 /*      @Override
       public WoLifeBasicResponse getAccountDeduction(WoLifeGetAccountDeductionRequest request) {

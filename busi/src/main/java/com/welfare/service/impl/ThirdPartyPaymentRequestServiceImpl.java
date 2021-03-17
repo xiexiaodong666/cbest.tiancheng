@@ -27,6 +27,7 @@ public class ThirdPartyPaymentRequestServiceImpl implements ThirdPartyPaymentReq
     private final ThirdPartyPaymentRequestDao thirdPartyPaymentRequestDao;
     private final WoLifeFeignService woLifeFeignService;
     @Override
+    @Deprecated
     public boolean chargeWhetherHandled(PaymentRequest paymentRequest) {
         ThirdPartyPaymentRequest thirdPartyPaymentRequestInDb = null;
         thirdPartyPaymentRequestInDb = thirdPartyPaymentRequestDao.queryByTransNo(paymentRequest.getTransNo());
@@ -36,14 +37,10 @@ public class ThirdPartyPaymentRequestServiceImpl implements ThirdPartyPaymentReq
         if(Objects.isNull(thirdPartyPaymentRequestInDb)){
             return false;
         }
-        WoLifeBasicResponse woLifeBasicResponse = woLifeFeignService.queryDeduction(paymentRequest);
-        if(woLifeBasicResponse.isSuccess()){
-            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-            thirdPartyPaymentRequestInDb.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-        }else{
-            paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.FAILED.code());
-            thirdPartyPaymentRequestInDb.setTransStatus(WelfareConstant.AsyncStatus.FAILED.code());
-        }
+
+        paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+        thirdPartyPaymentRequestInDb.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+
         thirdPartyPaymentRequestDao.updateById(thirdPartyPaymentRequestInDb);
         return true;
     }

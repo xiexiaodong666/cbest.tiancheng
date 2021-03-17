@@ -103,6 +103,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         thirdPartyPaymentRequest.setPaymentTypeInfo(((BarcodePaymentRequest) paymentRequest).getBarcode());
         thirdPartyPaymentRequest.setTransNo(paymentRequest.getTransNo());
         thirdPartyPaymentRequest.setTransAmount(paymentRequest.getAmount());
+        thirdPartyPaymentRequest.setPaymentChannel(WelfareConstant.PaymentChannel.WO_LIFE.code());
         return thirdPartyPaymentRequest;
     }
 

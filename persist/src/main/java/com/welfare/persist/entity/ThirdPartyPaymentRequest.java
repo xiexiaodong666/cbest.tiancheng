@@ -76,6 +76,9 @@ public class ThirdPartyPaymentRequest extends Model<ThirdPartyPaymentRequest> im
      */
     @ApiModelProperty("状态")   
     private Integer transStatus;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
     /**
      * 创建人
      */

@@ -47,7 +47,7 @@ public class BarcodeUtil {
                 rand1 +
                 rand2 +
                 String.format("%03d", mod);
-        return PaymentChannel.valueOf(paymentChannel).barcodePrefix() + StringUtil.reverse(stringBuilder);
+        return PaymentChannel.findByCode(paymentChannel).barcodePrefix() + StringUtil.reverse(stringBuilder);
     }
 
     /**

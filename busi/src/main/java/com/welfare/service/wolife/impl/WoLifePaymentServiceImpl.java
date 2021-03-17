@@ -64,13 +64,14 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
     @Override
     @DistributedLock(lockPrefix = "wo-life-pay", lockKey = "#paymentRequest.transNo")
     public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, MerchantCredit merchantCredit, SupplierStore supplierStore) {
+        paymentRequest.setPhone(account.getPhone());
         ThirdPartyPaymentRequest thirdPartyPaymentRequest = generateThirdPartyPaymentRequest(paymentRequest);
         thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse =
             woLifeFeignService.accountDeduction(paymentRequest.getPhone(), WoLifeAccountDeductionDataRequest.of(paymentRequest));
-        Assert.isTrue(basicResponse.isSuccess(), basicResponse.getResponseMessage());
+        Assert.isTrue(basicResponse.isSuccess(), "[沃生活馆]:"+basicResponse.getResponseMessage());
         thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();
@@ -96,6 +97,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(paymentRequest));
         thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.HANDLING.code());
         thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
+        thirdPartyPaymentRequest.setAccountCode(paymentRequest.getAccountCode());
         thirdPartyPaymentRequest.setPaymentTypeInfo(((BarcodePaymentRequest) paymentRequest).getBarcode());
         thirdPartyPaymentRequest.setTransNo(paymentRequest.getTransNo());
         thirdPartyPaymentRequest.setTransAmount(paymentRequest.getAmount());

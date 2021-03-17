@@ -49,6 +49,8 @@ public class ThirdPartyPaymentRequest extends Model<ThirdPartyPaymentRequest> im
      */
     @ApiModelProperty("交易金额")   
     private BigDecimal transAmount;
+    @ApiModelProperty("账号")
+    private Long accountCode;
     /**
      * 支付方式
      */

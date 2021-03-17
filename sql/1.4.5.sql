@@ -34,6 +34,7 @@ create table third_party_payment_request(
                                             id bigint(20) primary key comment 'pk',
                                             trans_no varchar(60) comment '交易流水号',
                                             trans_amount decimal(10,2) comment '交易金额',
+                                            account_code bigint(12) comment '账号',
                                             payment_type varchar(20) comment '支付方式',
                                             payment_type_info varchar(50) comment '支付方式内容（条码或者磁卡信息）',
                                             payment_request_type varchar(20) comment '支付请求类型',

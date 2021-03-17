@@ -44,12 +44,6 @@ public class SupplierStoreSyncDTO {
     @ApiModelProperty("门店手机号")
     private String mobile;
 
-    /**
-     * 门店手机号
-     */
-    @ApiModelProperty("门店手机号")
-    private String mobile;
-
     List<MerchantAddressDTO> addressList;
     List<StoreConsumeTypeDTO> storeConsumeTypeList;
 

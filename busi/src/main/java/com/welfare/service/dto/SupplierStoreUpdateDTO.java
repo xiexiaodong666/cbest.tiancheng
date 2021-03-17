@@ -64,7 +64,7 @@ public class SupplierStoreUpdateDTO {
      * 门店手机号
      */
     @ApiModelProperty("手机号（11位)")
-    @Size(max=11, min = 11, message = "手机号必须为11位")
-    @Pattern(regexp = "^[\\d]{11}$", message = "手机号不合法")
+    @Size(max = 12, min = 8, message = "手机号不合法")
+    @Pattern(regexp = "^-?[0-9]+$", message = "手机号不合法")
     private String mobile;
 }

@@ -73,6 +73,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final MerchantCreditDao merchantCreditDao;
     private final AsyncNotificationService asyncNotificationService;
     private final WoLifePaymentService woLifePaymentService;
+    private final ThirdPartyPaymentRequestService thirdPartyPaymentRequestService;
     PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
@@ -133,6 +134,9 @@ public class PaymentServiceImpl implements PaymentService {
                 List<PaymentOperation> paymentOperations = null;
                 List<MerchantBillDetail> merchantBillDetails = null;
                 if(paymentChannel.equals(WelfareConstant.PaymentChannel.WO_LIFE.code())){
+                    if (thirdPartyPaymentRequestService.chargeWhetherHandled(paymentRequest)) {
+                        return paymentRequest;
+                    }
                     paymentOperations = woLifePaymentService.pay(paymentRequest, account, accountAmountDOList, merchantCredit, supplierStore);
                 }else{
                     paymentOperations = decreaseAccount(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit);

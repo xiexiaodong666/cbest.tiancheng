@@ -62,6 +62,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
     @Override
     @DistributedLock(lockPrefix = "wo-life-pay", lockKey = "#paymentRequest.transNo")
     public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, MerchantCredit merchantCredit, SupplierStore supplierStore) {
+
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse =

@@ -30,6 +30,25 @@ CREATE TABLE `payment_channel` (
                                    UNIQUE KEY `uk_code_mer_code` (`code`,`merchant_code`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付渠道商户关联表';
 
+create table third_party_payment_request(
+                                            id bigint(20) primary key comment 'pk',
+                                            trans_no varchar(60) comment '交易流水号',
+                                            trans_amount decimal(10,2) comment '交易金额',
+                                            payment_type varchar(20) comment '支付方式',
+                                            payment_type_info varchar(50) comment '支付方式内容（条码或者磁卡信息）',
+                                            payment_request_type varchar(20) comment '支付请求类型',
+                                            payment_request text comment '支付请求',
+                                            `trans_status` int(2) comment '状态',
+                                            `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
+                                            `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+                                            `update_user` varchar(20) DEFAULT NULL COMMENT '更新人',
+                                            `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+                                            `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='第三方支付请求';
+
+create index idx_tppr_trans_no on third_party_payment_request(trans_no);
+create index idx_tppr_payment_type_info on third_party_payment_request(payment_type_info);
+
 
 # 增加支付渠道字段
 alter table account_deduction_detail add column payment_channel varchar(20) comment '支付渠道' after order_channel;

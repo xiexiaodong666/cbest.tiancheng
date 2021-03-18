@@ -148,7 +148,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             try {
                 merchantCreditService.increaseAccountType(
                         account.getMerCode(),
-                        WelfareConstant.MerCreditType.CREDIT_LIMIT,
+                        WelfareConstant.MerCreditType.REMAINING_LIMIT,
                         refundRequest.getAmount(),
                         refundRequest.getTransNo(),
                         WelfareConstant.TransType.REFUND.code());

@@ -51,6 +51,8 @@ public class ThirdPartyPaymentRequest extends Model<ThirdPartyPaymentRequest> im
     private BigDecimal transAmount;
     @ApiModelProperty("账号")
     private Long accountCode;
+    @ApiModelProperty("交易类型 consume refund")
+    private String transType;
     /**
      * 支付方式
      */
@@ -71,6 +73,8 @@ public class ThirdPartyPaymentRequest extends Model<ThirdPartyPaymentRequest> im
      */
     @ApiModelProperty("支付请求")   
     private String paymentRequest;
+    @ApiModelProperty("返回")
+    private String response;
     /**
      * 状态
      */

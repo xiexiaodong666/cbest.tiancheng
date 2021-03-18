@@ -87,24 +87,37 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         paymentOperation.setOperateAmount(paymentAmount);
         paymentOperation.setMerchantAccountType(null);
 
-        ThirdPartyPaymentRequest thirdPartyPaymentRequest = generateThirdPartyPaymentRequest(paymentRequest);
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = generateThirdPartyPaymentRequest(paymentRequest,basicResponse);
         thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
         thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
 
         return Collections.singletonList(paymentOperation);
     }
 
-    private ThirdPartyPaymentRequest generateThirdPartyPaymentRequest(PaymentRequest paymentRequest) {
+    private ThirdPartyPaymentRequest generateThirdPartyPaymentRequest(PaymentRequest paymentRequest, WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse) {
         ThirdPartyPaymentRequest thirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
         thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(paymentRequest));
+        thirdPartyPaymentRequest.setResponse(JSON.toJSONString(basicResponse));
         thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.HANDLING.code());
         thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
         thirdPartyPaymentRequest.setAccountCode(paymentRequest.getAccountCode());
+        thirdPartyPaymentRequest.setTransType(WelfareConstant.TransType.CONSUME.code());
         thirdPartyPaymentRequest.setPaymentTypeInfo(((BarcodePaymentRequest) paymentRequest).getBarcode());
         thirdPartyPaymentRequest.setTransNo(paymentRequest.getTransNo());
         thirdPartyPaymentRequest.setTransAmount(paymentRequest.getAmount());
         thirdPartyPaymentRequest.setPaymentChannel(WelfareConstant.PaymentChannel.WO_LIFE.code());
         return thirdPartyPaymentRequest;
+    }
+
+    private ThirdPartyPaymentRequest refundThirdPartyPaymentRequest(RefundRequest refundRequest, WoLifeBasicResponse woLifeBasicResponse){
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestDao.queryByTransNo(refundRequest.getOriginalTransNo());
+        ThirdPartyPaymentRequest refundThirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
+        BeanUtils.copyProperties(thirdPartyPaymentRequest,refundThirdPartyPaymentRequest);
+        refundThirdPartyPaymentRequest.setResponse(JSON.toJSONString(woLifeBasicResponse));
+        refundThirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(refundRequest));
+        refundThirdPartyPaymentRequest.setId(null);
+        refundThirdPartyPaymentRequest.setTransType(WelfareConstant.TransType.REFUND.code());
+        return refundThirdPartyPaymentRequest;
     }
 
     @Override
@@ -142,7 +155,8 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             } finally {
                 DistributedLockUtil.unlock(merAccountLock);
             }
-
+            ThirdPartyPaymentRequest thirdPartyPaymentRequest = refundThirdPartyPaymentRequest(refundRequest,woLifeBasicResponse);
+            thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
             accountBillDetailDao.saveOrUpdateBatch(Arrays.asList(refundBillDetail, thePaidBilDetail));
             accountDeductionDetailDao.saveOrUpdateBatch(Arrays.asList(refundDeductionDetail, thePaidDeductionDetail));
         } finally {

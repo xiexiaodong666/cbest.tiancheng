@@ -47,6 +47,8 @@ create table third_party_payment_request(
                                             `update_time` datetime DEFAULT NULL COMMENT '更新时间',
                                             `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='第三方支付请求';
+alter table third_party_payment_request add column trans_type varchar(20) comment '账号'  after account_code;
+alter table third_party_payment_request add column response text comment '返回'  after payment_request;
 
 create index idx_tppr_trans_no on third_party_payment_request(trans_no);
 create index idx_tppr_payment_type_info on third_party_payment_request(payment_type_info);

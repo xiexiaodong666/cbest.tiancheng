@@ -142,8 +142,8 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             WoLifeBasicResponse woLifeBasicResponse = woLifeFeignService.refundWriteOff(refundRequest.getPhone(), WoLifeRefundWriteOffDataRequest.of(refundRequest));
             Assert.isTrue(woLifeBasicResponse.isSuccess(),woLifeBasicResponse.getResponseMessage());
 
-            AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail);
-            AccountBillDetail refundBillDetail = toRefundBillDetail(thePaidBilDetail);
+            AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail,refundRequest);
+            AccountBillDetail refundBillDetail = toRefundBillDetail(thePaidBilDetail,refundRequest);
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             try {
                 merchantCreditService.increaseAccountType(
@@ -164,9 +164,11 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         }
     }
 
-    private AccountDeductionDetail toRefundDeductionDetail(AccountDeductionDetail thePayDeductionDetail) {
+    private AccountDeductionDetail toRefundDeductionDetail(AccountDeductionDetail thePayDeductionDetail, RefundRequest refundRequest) {
         AccountDeductionDetail refundDeductionDetail = new AccountDeductionDetail();
         BeanUtils.copyProperties(thePayDeductionDetail, refundDeductionDetail);
+        refundDeductionDetail.setTransNo(refundRequest.getTransNo());
+        refundDeductionDetail.setRelatedTransNo(refundRequest.getOriginalTransNo());
         refundDeductionDetail.setTransType(WelfareConstant.TransType.REFUND.code());
         refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);
@@ -175,9 +177,10 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         return refundDeductionDetail;
     }
 
-    private AccountBillDetail toRefundBillDetail(AccountBillDetail thePayBillDetail) {
+    private AccountBillDetail toRefundBillDetail(AccountBillDetail thePayBillDetail, RefundRequest refundRequest) {
         AccountBillDetail refundBillDetail = new AccountBillDetail();
         BeanUtils.copyProperties(thePayBillDetail, refundBillDetail);
+        refundBillDetail.setTransNo(refundRequest.getTransNo());
         refundBillDetail.setTransType(WelfareConstant.TransType.REFUND.code());
         refundBillDetail.setId(null);
         refundBillDetail.setVersion(0);

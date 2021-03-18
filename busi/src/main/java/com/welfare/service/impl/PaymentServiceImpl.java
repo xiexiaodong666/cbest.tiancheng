@@ -134,17 +134,14 @@ public class PaymentServiceImpl implements PaymentService {
                 List<PaymentOperation> paymentOperations;
                 List<MerchantBillDetail> merchantBillDetails = null;
                 if(paymentChannel.equals(WelfareConstant.PaymentChannel.WO_LIFE.code())){
-                    /*if (thirdPartyPaymentRequestService.chargeWhetherHandled(paymentRequest)) {
-                        return paymentRequest;
-                    }*/
                     paymentOperations = woLifePaymentService.pay(paymentRequest, account, accountAmountDOList, merchantCredit, supplierStore);
                 }else{
                     paymentOperations = decreaseAccount(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit);
-                    merchantBillDetails = paymentOperations.stream()
-                            .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
-                            .map(MerchantAccountOperation::getMerchantBillDetail)
-                            .collect(Collectors.toList());
                 }
+                merchantBillDetails = paymentOperations.stream()
+                        .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
+                        .map(MerchantAccountOperation::getMerchantBillDetail)
+                        .collect(Collectors.toList());
 
 
 

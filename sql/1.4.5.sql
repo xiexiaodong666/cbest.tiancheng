@@ -60,11 +60,7 @@ alter table account_bill_detail add column payment_channel varchar(20) comment '
 alter table settle_detail add column payment_channel varchar(20) comment '支付渠道' after order_channel;
 
 
-INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('87', 'PaymentChannel', 'welfare', '甜橙卡', '1', '0', '1');
-INSERT INTO `dict` (`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES ('88', 'PaymentChannel', 'wo_life', '沃生活馆支付', '1', '0', '2');
-
-INSERT INTO payment_channel (id,code,name,merchant_code,show_order,deleted,create_user,create_time,update_user,update_time,version)
-SELECT floor( 10000000 + rand() * (99999999 - 10000000)),'welfare','甜橙卡',m.mer_code,1,0,'anonymous',now(),NULL,NULL,0 from merchant m where m.mer_identity LIKE '%PARTER%' AND m.deleted = 0;
+INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (floor( 10000000 + rand() * (99999999 - 10000000)), 'welfare', '甜橙卡', 'default', 1, 0, 'anonymous', '2021-03-18 14:59:29', NULL, NULL, 0);
 
 UPDATE account_bill_detail set payment_channel = 'welfare', update_time = NOW() ,version = version + 1;
 UPDATE account_deduction_detail set payment_channel = 'welfare' ,update_time = NOW() ,version = version + 1;

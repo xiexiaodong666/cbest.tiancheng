@@ -70,7 +70,7 @@
         t1.order_channel as orderChannel,
         oi.order_id as order_id,
         'unsettled' as settleFlag,
-        'welfare' as dataType,
+        t1.payment_channel as dataType,
         'system' as create_user,
         t1.payment_channel as paymentChannel
         from account_deduction_detail t1
@@ -93,6 +93,7 @@
                 and t2.mer_code=#{merCode}
             </if>
             and t1.trans_type in('consume','refund')
+            and t1.payment_channel in ('welfare', 'wo_life')
         </where>
         order by t1.id
         <if test="limit!=null">

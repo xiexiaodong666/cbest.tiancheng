@@ -108,7 +108,7 @@ public class AccountHandler {
         gson.toJson(employerReqDTO));
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateEmployer(employerReqDTO);
-    log.info("同步员工账户，resp【{}】", JSON.toJSONString(roleConsumptionResp));
+    log.info("同步员工账户，resp【{}】req【{}】", JSON.toJSONString(roleConsumptionResp), JSON.toJSONString(employerReqDTO));
 
     if (!("0000").equals(roleConsumptionResp.getCode())) {
       throw new BusiException("同步员工账户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");

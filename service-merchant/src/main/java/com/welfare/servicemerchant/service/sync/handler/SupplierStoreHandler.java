@@ -123,7 +123,7 @@ public class SupplierStoreHandler {
         storeShoppingReq.setList(listBeans);
         log.info("同步门店到商城中台，req【{}】", JSON.toJSONString(storeShoppingReq));
         RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateStore(storeShoppingReq);
-        log.info("同步门店到商城中台，res【{}】", JSON.toJSONString(resp));
+        log.info("同步门店到商城中台，res【{}】req【{}】", JSON.toJSONString(resp), JSON.toJSONString(storeShoppingReq));
         if (!("0000").equals(resp.getCode())) {
             throw new BusiException("同步门店数据到商城中心失败msg【"+resp.getMsg()+"】");
         }

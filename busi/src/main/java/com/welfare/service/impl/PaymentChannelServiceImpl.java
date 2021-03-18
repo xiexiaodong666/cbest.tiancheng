@@ -10,6 +10,7 @@ import com.welfare.service.dto.PaymentChannelDTO;
 import com.welfare.service.dto.PaymentChannelReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,27 +31,24 @@ import java.util.stream.Collectors;
 @Service
 public class PaymentChannelServiceImpl implements PaymentChannelService {
     private final PaymentChannelDao paymentChannelDao;
-    @Autowired
-    private DictService dictService;
-
-    public static final String PAYMENTCHANNEL_DICT_NAME = "PaymentChannel";
 
     @Override
     public List<PaymentChannelDTO> list(PaymentChannelReq req) {
+        List<PaymentChannelDTO> result;
         if (StringUtils.isNoneBlank(req.getMerCode())) {
-            List<PaymentChannelDTO> result = PaymentChannelDTO.of(paymentChannelDao.listByMerCodeGroupByCode(req.getMerCode()));
-            if (req.getFiltered() != null && req.getFiltered()) {
-                result = result.stream().filter(paymentChannelDTO ->
-                        !Lists.newArrayList(WelfareConstant.PaymentChannel.ALIPAY.code(),WelfareConstant.PaymentChannel.WECHAT.code())
-                                .contains(paymentChannelDTO.getPaymentChannelCode()))
-                        .collect(Collectors.toList());
+            result = PaymentChannelDTO.of(paymentChannelDao.listByMerCodeGroupByCode(req.getMerCode()));
+            if (CollectionUtils.isEmpty(result)) {
+                result = PaymentChannelDTO.of(paymentChannelDao.listByDefaultGroupByCode());
             }
-            return result;
         } else {
-            DictReq dictReq = new DictReq();
-            dictReq.setDictType(PAYMENTCHANNEL_DICT_NAME);
-            return PaymentChannelDTO.of2(dictService.getByType(dictReq));
+            result = PaymentChannelDTO.of(paymentChannelDao.listByDefaultGroupByCode());
         }
-
+        result = result.stream().filter(paymentChannelDTO ->
+                !Lists.newArrayList(WelfareConstant.PaymentChannel.ALIPAY.code(),WelfareConstant.PaymentChannel.WECHAT.code())
+                        .contains(paymentChannelDTO.getPaymentChannelCode()))
+                .collect(Collectors.toList());
+        return result;
     }
+
+
 }

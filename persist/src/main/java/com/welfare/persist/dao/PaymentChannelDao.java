@@ -21,11 +21,21 @@ import java.util.List;
 @Repository
 public class PaymentChannelDao extends ServiceImpl<PaymentChannelMapper, PaymentChannel> {
 
+  private static final String DEFAULT_MERCHANT_NAME = "default";
+
   public List<PaymentChannel> listByMerCodeGroupByCode(String merCode) {
     QueryWrapper<PaymentChannel> queryWrapper = new QueryWrapper<>();
     if (StringUtils.isNoneBlank(merCode)) {
       queryWrapper.eq(PaymentChannel.MERCHANT_CODE, merCode);
     }
+    queryWrapper.eq(PaymentChannel.DELETED, "0");
+    queryWrapper.groupBy(PaymentChannel.CODE);
+    return list(queryWrapper);
+  }
+
+  public List<PaymentChannel> listByDefaultGroupByCode() {
+    QueryWrapper<PaymentChannel> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(PaymentChannel.MERCHANT_CODE, DEFAULT_MERCHANT_NAME);
     queryWrapper.eq(PaymentChannel.DELETED, "0");
     queryWrapper.groupBy(PaymentChannel.CODE);
     return list(queryWrapper);

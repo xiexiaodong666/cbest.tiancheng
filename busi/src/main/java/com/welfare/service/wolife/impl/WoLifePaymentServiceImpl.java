@@ -17,6 +17,7 @@ import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.operator.merchant.CreditLimitOperator;
+import com.welfare.service.operator.merchant.RemainingLimitOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
@@ -63,6 +64,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final ThirdPartyPaymentRequestDao thirdPartyPaymentRequestDao;
     private final SupplierStoreDao supplierStoreDao;
+    private final RemainingLimitOperator remainingLimitOperator;
 
     @Override
     @DistributedLock(lockPrefix = "wo-life-pay", lockKey = "#paymentRequest.transNo")
@@ -85,7 +87,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
                 account,
                 supplierStore,
                 merchantCredit,
-                null);
+                remainingLimitOperator);
         paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
         paymentOperation.setOperateAmount(paymentAmount);
         paymentOperation.setMerchantAccountType(null);

@@ -9,6 +9,7 @@ import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
+import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.ThirdPartyPaymentRequestDao;
 import com.welfare.persist.entity.*;
 import com.welfare.service.MerchantCreditService;
@@ -40,6 +41,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
@@ -60,6 +62,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
     private final AccountBillDetailDao accountBillDetailDao;
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final ThirdPartyPaymentRequestDao thirdPartyPaymentRequestDao;
+    private final SupplierStoreDao supplierStoreDao;
 
     @Override
     @DistributedLock(lockPrefix = "wo-life-pay", lockKey = "#paymentRequest.transNo")
@@ -144,16 +147,10 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
 
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail,refundRequest);
             AccountBillDetail refundBillDetail = toRefundBillDetail(thePaidBilDetail,refundRequest);
-            RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
-            try {
-                merchantCreditService.increaseAccountType(
-                        account.getMerCode(),
-                        WelfareConstant.MerCreditType.REMAINING_LIMIT,
-                        refundRequest.getAmount(),
-                        refundRequest.getTransNo(),
-                        WelfareConstant.TransType.REFUND.code());
-            } finally {
-                DistributedLockUtil.unlock(merAccountLock);
+            SupplierStore supplierStore = supplierStoreDao.getOneByCode(refundBillDetail.getStoreCode());
+            if(Objects.equals(account.getMerCode(),supplierStore.getMerCode())){
+                //非自营才有退回商户操作,和扣款时保持一致
+                operateMerchant(refundRequest, account);
             }
             ThirdPartyPaymentRequest thirdPartyPaymentRequest = refundThirdPartyPaymentRequest(refundRequest,woLifeBasicResponse);
             thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
@@ -161,6 +158,20 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             accountDeductionDetailDao.saveOrUpdateBatch(Arrays.asList(refundDeductionDetail, thePaidDeductionDetail));
         } finally {
             DistributedLockUtil.unlock(accountLock);
+        }
+    }
+
+    private void operateMerchant(RefundRequest refundRequest, Account account) {
+        RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
+        try {
+            merchantCreditService.increaseAccountType(
+                    account.getMerCode(),
+                    WelfareConstant.MerCreditType.REMAINING_LIMIT,
+                    refundRequest.getAmount(),
+                    refundRequest.getTransNo(),
+                    WelfareConstant.TransType.REFUND.code());
+        } finally {
+            DistributedLockUtil.unlock(merAccountLock);
         }
     }
 

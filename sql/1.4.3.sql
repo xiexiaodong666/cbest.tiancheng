@@ -82,11 +82,11 @@ alter table supplier_store add mobile varchar(32) null comment '门店手机号'
 ### DML
 
 insert into account_amount_type (id, account_code, mer_account_type_code, account_balance, deleted, create_user, create_time, update_user, update_time, version)
-select (select max(id)+1 from  account_amount_type), aat.account_code, 'surplus_quota_overpay', 0, 0, 'anonymous', now(), null, null, 0
+select aat.id-1000000000000000000, aat.account_code, 'surplus_quota_overpay', 0, 0, 'anonymous', now(), null, null, 0
 from account_amount_type aat where aat.mer_account_type_code = 'surplus_quota';
 
 insert into merchant_account_type (id, mer_code, mer_account_type_code, mer_account_type_name, deduction_order, deleted, remark, create_user, create_time, update_user, update_time, version, show_status)
-select (select max(id)+1 from  merchant_account_type), mat.mer_code, 'surplus_quota_overpay', '员工授信额度溢缴额', 9000, 0, null, 'anonymous', now(), null, null, 0, 0
+select mat.id-1000000000000000000, mat.mer_code, 'surplus_quota_overpay', '员工授信额度溢缴额', 9000, 0, null, 'anonymous', now(), null, null, 0, 0
 from merchant_account_type mat where mat.mer_account_type_code = 'surplus_quota';
 
 #新增字段赋初始值

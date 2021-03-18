@@ -482,11 +482,6 @@
 
         <include refid="queryListTable"/>
         <include refid="queryListCondition"/>
-        <where>
-            <if test="paymentChannel!=null and paymentChannel != ''">
-                and t1.payment_channel = #{paymentChannel}
-            </if>
-        </where>
     </select>
 
     <select id="getSettleDetailInfo" resultType="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">

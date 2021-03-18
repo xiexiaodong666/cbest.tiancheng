@@ -61,6 +61,7 @@ public class MonthSettleDetailQuery{
 
     private String merDeductionType;
 
+    @ApiModelProperty("支付渠道")
     private String paymentChannel;
 }
 

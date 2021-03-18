@@ -6,6 +6,8 @@ import com.welfare.persist.entity.Merchant;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 商户信息(merchant)数据Mapper
  *
@@ -22,4 +24,10 @@ public interface MerchantMapper extends BaseMapper<Merchant> {
     Integer alwaysUpdateSomeColumnById(@Param(Constants.ENTITY) Merchant merchant);
 
     //List<Merchant> selectRebateMerList();
+
+    /**
+     * 查询商户的供应商列表（不分页）
+     * @return
+     */
+    List<Merchant> supplierByMer(@Param("merCode") String merCode);
 }

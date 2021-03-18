@@ -76,4 +76,9 @@ public class SupplierStoreTreeDTO extends Tree{
     @ApiModelProperty("type 1商户，2门店")
     private Boolean isMerchant;
 
+    /**
+     * 门店手机号
+     */
+    @ApiModelProperty("门店手机号")
+    private String mobile;
 }

@@ -147,7 +147,7 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
                 paymentRequest.setAccountName(account.getAccountName());
                 paymentRequest.setAccountBalance(account.getAccountBalance());
-                paymentRequest.setAccountCredit(account.getSurplusQuota());
+                paymentRequest.setAccountCredit(account.getSurplusQuota().add(account.getSurplusQuotaOverpay()));
                 paymentRequest.setPhone(account.getPhone());
 
                 if (ConsumeTypeEnum.SHOP_SHOPPING.getCode().equals(paymentRequest.getPaymentScene())) {
@@ -251,7 +251,9 @@ public class PaymentServiceImpl implements PaymentService {
     public List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
                                                   Account account, List<AccountAmountDO> accountAmountDOList,
                                                   SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        BigDecimal usableAmount = account.getAccountBalance().add(account.getSurplusQuota());
+        BigDecimal usableAmount = account.getAccountBalance()
+                .add(account.getSurplusQuota())
+                .add(account.getSurplusQuotaOverpay());
         BigDecimal amount = paymentRequest.getAmount();
         boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
         Assert.isTrue(enough, "用户账户总余额不足");
@@ -293,8 +295,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
         BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
+        BigDecimal accountCreditOverpay = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
         account.setAccountBalance(accountBalance);
         account.setSurplusQuota(accountCreditBalance);
+        account.setSurplusQuotaOverpay(accountCreditOverpay);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
@@ -426,8 +430,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
         BigDecimal accountSurplusQuota = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
+        BigDecimal accountSurplusOverpay = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
         accountBillDetail.setAccountBalance(accountBalance);
         accountBillDetail.setSurplusQuota(accountSurplusQuota);
+        accountBillDetail.setSurplusQuotaOverpay(accountSurplusOverpay);
         return accountBillDetail;
     }
 }

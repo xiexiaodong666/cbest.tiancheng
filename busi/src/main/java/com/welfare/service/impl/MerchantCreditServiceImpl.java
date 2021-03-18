@@ -246,9 +246,6 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                     req.getAmount(),
                     req.getTransNo(),
                     WelfareConstant.TransType.RESET_INCR.code());
-            // 恢复员工的信用额度
-            AccountService accountService = SpringBeanUtils.getBean(AccountService.class);
-            accountService.restoreSurplusQuotaByMerCode(req.getMerCode(), req.getAmount(), req.getTransNo());
         } finally {
             DistributedLockUtil.unlock(lock);
         }

@@ -635,7 +635,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     entity.setConsumType(update.getConsumType());
     entity.setUpdateUser(update.getUpdateUser());
     entity.setExternalCode(update.getExternalCode());
-
+    entity.setMobile(update.getMobile());
     return entity;
   }
 

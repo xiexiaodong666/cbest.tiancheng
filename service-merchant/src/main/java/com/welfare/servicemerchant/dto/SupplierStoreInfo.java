@@ -84,4 +84,9 @@ public class SupplierStoreInfo  {
     @ApiModelProperty("外部编码")  
     private String externalCode;
 
+    /**
+     * 门店手机号
+     */
+    @ApiModelProperty("门店手机号")
+    private String mobile;
 }

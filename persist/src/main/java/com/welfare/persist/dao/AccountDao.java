@@ -8,10 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -54,5 +51,15 @@ public class AccountDao extends ServiceImpl<AccountMapper, Account> {
             map = list.stream().collect(Collectors.toMap(Account::getPhone, a -> a,(k1, k2)->k1));
         }
         return map;
+    }
+
+    public List<Account> listByAccountCodes(List<Long> accountCodes) {
+        List<Account> list = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(accountCodes)) {
+            QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+            queryWrapper.in(Account.ACCOUNT_CODE, accountCodes);
+            return list(queryWrapper);
+        }
+        return list;
     }
 }

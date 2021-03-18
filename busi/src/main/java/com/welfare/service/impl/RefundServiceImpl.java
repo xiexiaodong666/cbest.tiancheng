@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA;
+import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY;
 
 /**
  * Description: 退款
@@ -55,7 +56,7 @@ public class RefundServiceImpl implements RefundService {
     public void handleRefundRequest(RefundRequest refundRequest) {
         String originalTransNo = refundRequest.getOriginalTransNo();
         List<AccountDeductionDetail> paymentDeductionDetailInDb = accountDeductionDetailDao
-                .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
+                .queryByTransNoAndTransType(refundRequest.getTransNo(), WelfareConstant.TransType.CONSUME.code());
         Assert.isTrue(CollectionUtils.isEmpty(paymentDeductionDetailInDb),"退款交易单号不能和付款的交易单号一样。");
         List<AccountDeductionDetail> refundDeductionDetailInDb = accountDeductionDetailDao
                 .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
@@ -93,7 +94,7 @@ public class RefundServiceImpl implements RefundService {
 
     private boolean hasRefunded(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionDetailInDb) {
         if (!CollectionUtils.isEmpty(refundDeductionDetailInDb)) {
-            String transNoInDb = refundDeductionDetailInDb.get(0).getTransNo();
+            List<String> transNoInDbs = refundDeductionDetailInDb.stream().map(AccountDeductionDetail::getTransNo).collect(Collectors.toList());
             BigDecimal refundedAmount = refundDeductionDetailInDb.stream()
                     .map(AccountDeductionDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             List<AccountDeductionDetail> paidDetails = accountDeductionDetailDao
@@ -103,8 +104,8 @@ public class RefundServiceImpl implements RefundService {
             if (refundedAmount.add(refundRequest.getAmount()).compareTo(paidAmount) > 0) {
                 throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款总额不能大于已付款金额", null);
             }
-            if (refundRequest.getTransNo().equals(transNoInDb)) {
-                RefundRequest refundRequestInDb = queryResult(transNoInDb);
+            if (transNoInDbs.contains(refundRequest.getTransNo())) {
+                RefundRequest refundRequestInDb = queryResult(refundRequest.getTransNo());
                 log.warn("交易已经处理过，直接返回处理结果:{}", JSON.toJSONString(refundRequestInDb));
                 BeanUtils.copyProperties(refundRequestInDb, refundRequest);
                 return true;
@@ -129,8 +130,6 @@ public class RefundServiceImpl implements RefundService {
         List<RefundOperation> refundOperations;
         if (compareTo < 0) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款金额大于付款金额:" + totalToRefundAmount + ":" + paidAmount, null);
-        } else if (compareTo == 0) {
-            refundOperations = fullyRefund(refundRequest, paidDeductionDetails, account, accountAmountTypes, accountAmountTypeMap);
         } else {
             refundOperations = partlyRefund(paidDeductionDetails, accountAmountTypes, refundRequest, account);
         }
@@ -147,15 +146,97 @@ public class RefundServiceImpl implements RefundService {
 
     private List<RefundOperation> partlyRefund(List<AccountDeductionDetail> accountDeductionDetails, List<AccountAmountType> accountAmountTypes, RefundRequest refundRequest, Account account) {
         List<RefundOperation> refundOperations = new ArrayList<>();
-        BigDecimal remainingRefundAmount = refundRequest.getAmount();
         Map<String, AccountDeductionDetail> groupedPaidDetail = accountDeductionDetails.stream()
                 //已经全额退款的，不再处理退款
                 .filter(paidDetail -> paidDetail.getTransAmount().compareTo(paidDetail.getReversedAmount()) > 0)
                 .collect(Collectors.toMap(AccountDeductionDetail::getMerAccountType, detail -> detail));
         BigDecimal refundedAmount = BigDecimal.ZERO;
+        BigDecimal remainingRefundAmount = refundRequest.getAmount();
         AccountBillDetail tmpAccountBillDetail = accountBillDetailDao.getOneByTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
         Assert.notNull(tmpAccountBillDetail,"未找到正向支付明细");
+        //单独处理个人授信的退款逻辑
+        AccountAmountType surplusType = accountAmountTypes.stream()
+                .filter(accountAmountType -> SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .findFirst().orElse(null);
+        AccountAmountType surplusOverpayType = accountAmountTypes.stream()
+                .filter(accountAmountType -> SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .findFirst().orElse(null);
+
+        AccountDeductionDetail surPlusQuotaDeductionDetail = groupedPaidDetail.get(SURPLUS_QUOTA.code());
+        boolean isSurplusHandled = false;
+        if(!Objects.isNull(surplusType) && !Objects.isNull(surPlusQuotaDeductionDetail)){
+            BigDecimal currentSurplusQuota = account.getSurplusQuota();
+            BigDecimal maxQuota = account.getMaxQuota();
+            //最多允许退款到授信的金额
+            BigDecimal maxRefundToSurplusQuota = maxQuota.subtract(currentSurplusQuota);
+            //本应该退款到授信的金额(依赖于请求的退款金额和个人授信在付款的时候扣款金额综合得到)
+            BigDecimal shouldRefundToSurplusQuotaAmount = refundRequest.getAmount()
+                    .subtract(surPlusQuotaDeductionDetail.getTransAmount()).subtract(surPlusQuotaDeductionDetail.getReversedAmount()).compareTo(BigDecimal.ZERO)>0
+                    ?surPlusQuotaDeductionDetail.getTransAmount().subtract(surPlusQuotaDeductionDetail.getReversedAmount())
+                    :refundRequest.getAmount();
+            //超出部分溢缴款金额
+            BigDecimal surplusQuotaOverpayAmount = shouldRefundToSurplusQuotaAmount.subtract(maxRefundToSurplusQuota);
+            if(surplusQuotaOverpayAmount.compareTo(BigDecimal.ZERO)>0){
+                if(maxRefundToSurplusQuota.compareTo(BigDecimal.ZERO)>0){
+                    //有需要退款到授信额度的，才走授信额度退款
+                    AccountDeductionDetail surplusRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, maxRefundToSurplusQuota,surplusType);
+                    //设置退款金额为需要退款到授信额度的值
+                    surplusRefundDeductionDetail.setTransAmount(maxRefundToSurplusQuota);
+                    refundedAmount = refundedAmount.add(maxRefundToSurplusQuota);
+                    remainingRefundAmount = remainingRefundAmount.subtract(maxRefundToSurplusQuota);
+                    AccountBillDetail refundBillDetail = toRefundBillDetail(surplusRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
+                    surplusType.setAccountBalance(surplusType.getAccountBalance().add(maxRefundToSurplusQuota));
+                    Assert.isTrue(surplusType.getAccountBalance().compareTo(maxQuota) == 0,"退款金额异常，请联系管理员。");
+                    operateMerchantCredit(account, surplusRefundDeductionDetail);
+                    RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail);
+                    refundOperations.add(refundOperation);
+                }
+                AccountDeductionDetail surplusOverpayRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, surplusQuotaOverpayAmount, surplusOverpayType);
+                AccountBillDetail overpayRefundBillDetail = toRefundBillDetail(surplusOverpayRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
+                surplusOverpayType.setAccountBalance(surplusOverpayType.getAccountBalance().add(surplusQuotaOverpayAmount));
+                refundedAmount = refundedAmount.add(surplusQuotaOverpayAmount);
+                remainingRefundAmount = remainingRefundAmount.subtract(surplusQuotaOverpayAmount);
+                operateMerchantCredit(account,surplusOverpayRefundDeductionDetail);
+                RefundOperation overpayRefundOperation = RefundOperation.of(overpayRefundBillDetail, surplusOverpayRefundDeductionDetail);
+                refundOperations.add(overpayRefundOperation);
+                isSurplusHandled = true;
+            }
+        }
+
+        handlePartlyRefundCommon(accountAmountTypes,
+                refundRequest,
+                account,
+                refundOperations,
+                remainingRefundAmount,
+                groupedPaidDetail, refundedAmount, tmpAccountBillDetail,isSurplusHandled);
+        return refundOperations;
+    }
+
+    /**
+     * 除了个人授信的退款逻辑
+     * @param accountAmountTypes
+     * @param refundRequest
+     * @param account
+     * @param refundOperations
+     * @param remainingRefundAmount
+     * @param groupedPaidDetail
+     * @param refundedAmount
+     * @param tmpAccountBillDetail
+     * @param isSurplusHandled
+     */
+    private void handlePartlyRefundCommon(List<AccountAmountType> accountAmountTypes,
+                                          RefundRequest refundRequest,
+                                          Account account,
+                                          List<RefundOperation> refundOperations,
+                                          BigDecimal remainingRefundAmount,
+                                          Map<String, AccountDeductionDetail> groupedPaidDetail,
+                                          BigDecimal refundedAmount,
+                                          AccountBillDetail tmpAccountBillDetail, boolean isSurplusHandled) {
         for (AccountAmountType accountAmountType : accountAmountTypes) {
+            if(SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()) && isSurplusHandled){
+                //个人授信已经处理过（适用于有溢缴款的逻辑）,则跳过，否则个人授信额度也按照通用逻辑处理（没有溢缴款）
+                continue;
+            }
             AccountDeductionDetail accountDeductionDetail = groupedPaidDetail.get(accountAmountType.getMerAccountTypeCode());
             if (accountDeductionDetail == null || remainingRefundAmount.compareTo(BigDecimal.ZERO) == 0) {
                 //这个子账户在支付的时候没有扣款金额
@@ -174,7 +255,7 @@ public class RefundServiceImpl implements RefundService {
             accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(thisAccountTypeRefundAmount));
             refundedAmount = refundedAmount.add(thisAccountTypeRefundAmount);
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(accountDeductionDetail, refundRequest, thisAccountTypeRefundAmount,accountAmountType);
-            AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes,tmpAccountBillDetail.getOrderChannel());
+            AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
             operateMerchantCredit(account, refundDeductionDetail);
             RefundOperation refundOperation = RefundOperation.of(refundBillDetail, refundDeductionDetail);
             refundOperations.add(refundOperation);
@@ -186,9 +267,12 @@ public class RefundServiceImpl implements RefundService {
         if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
             throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常，退款金额计算错误", null);
         }
-        return refundOperations;
     }
 
+    @Deprecated
+    /**
+     * deprecated，部分退款已经覆盖全额退款的逻辑。且全额退款不适用于溢缴款的逻辑。
+     */
     private List<RefundOperation> fullyRefund(RefundRequest refundRequest, List<AccountDeductionDetail> accountDeductionDetails, Account account, List<AccountAmountType> accountAmountTypes, Map<String, AccountAmountType> accountAmountTypeMap) {
         List<RefundOperation> refundOperations;
         AccountBillDetail tmpAccountBillDetail = accountBillDetailDao.getOneByTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
@@ -253,7 +337,7 @@ public class RefundServiceImpl implements RefundService {
             Account account = accountService.getByAccountCode(detail.getAccountCode());
             refundRequest.setAccountMerCode(account.getMerCode());
             refundRequest.setAccountBalance(account.getAccountBalance());
-            refundRequest.setAccountCredit(account.getSurplusQuota());
+            refundRequest.setAccountCredit(account.getSurplusQuota().add(account.getSurplusQuotaOverpay()));
             refundRequest.setAccountCode(account.getAccountCode());
             refundRequest.setAccountName(account.getAccountName());
             refundRequest.setPhone(account.getPhone());
@@ -273,8 +357,10 @@ public class RefundServiceImpl implements RefundService {
                 .collect(Collectors.toList());
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
         BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
+        BigDecimal accountCreditOverpayBalance = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
         account.setAccountBalance(accountBalance);
         account.setSurplusQuota(accountCreditBalance);
+        account.setSurplusQuotaOverpay(accountCreditOverpayBalance);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(refundBillDetails);
         accountAmountTypeDao.updateBatchById(accountAmountTypes);
@@ -296,13 +382,18 @@ public class RefundServiceImpl implements RefundService {
         refundDetail.setAccountCode(refundDeductionDetail.getAccountCode());
         refundDetail.setOrderChannel(refundDeductionDetail.getOrderChannel());
         BigDecimal accountBalance = accountAmountTypes.stream()
-                .filter(accountAmountType -> !SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .filter(accountAmountType -> !(SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())
+                        || SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode())))
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal accountCreditBalance = accountAmountTypes.stream()
                 .filter(accountAmountType -> SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode()))
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal accountCreditOverpayBalance = accountAmountTypes.stream()
+                .filter(accountAmountType -> SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode()))
+                .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
         refundDetail.setAccountBalance(accountBalance);
         refundDetail.setSurplusQuota(accountCreditBalance);
+        refundDetail.setSurplusQuotaOverpay(accountCreditOverpayBalance);
         return refundDetail;
     }
 
@@ -310,10 +401,10 @@ public class RefundServiceImpl implements RefundService {
     /**
      * 单条退款
      *
-     * @param accountDeductionDetail
-     * @param refundRequest
+     * @param accountDeductionDetail 支付的时候交易明细
+     * @param refundRequest 退款请求
      * @param refundAmountForThis    这条退款金额多少
-     * @param accountAmountType
+     * @param accountAmountType 操作的福利类型
      * @return
      */
     private AccountDeductionDetail toRefundDeductionDetail(AccountDeductionDetail accountDeductionDetail,
@@ -329,6 +420,7 @@ public class RefundServiceImpl implements RefundService {
         refundDeductionDetail.setTransNo(refundRequest.getTransNo());
         refundDeductionDetail.setRelatedTransNo(accountDeductionDetail.getTransNo());
         refundDeductionDetail.setAccountAmountTypeBalance(accountAmountType.getAccountBalance());
+        refundDeductionDetail.setMerAccountType(accountAmountType.getMerAccountTypeCode());
         //保存时自动赋值
         refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);

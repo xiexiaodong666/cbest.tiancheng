@@ -18,7 +18,7 @@ import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
-import com.welfare.service.async.AsyncNotificationService;
+import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.payment.*;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -69,7 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final SupplierStoreService supplierStoreService;
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantCreditDao merchantCreditDao;
-    private final AsyncNotificationService asyncNotificationService;
+    private final AsyncService asyncService;
     PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
@@ -138,6 +138,8 @@ public class PaymentServiceImpl implements PaymentService {
                         .collect(Collectors.toList());
                 //在循环里面已经对merchantCredit进行了更新
                 merchantCreditDao.updateById(merchantCredit);
+                //支付成功要将账户的离线模式启用
+                account.setOfflineFlag(WelfareConstant.AccountOfflineFlag.ENABLE.code());
                 saveDetails(paymentOperations, account, accountAmountTypes);
 
                 if (!CollectionUtils.isEmpty(merchantBillDetails)) {
@@ -151,7 +153,7 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRequest.setPhone(account.getPhone());
 
                 if (ConsumeTypeEnum.SHOP_SHOPPING.getCode().equals(paymentRequest.getPaymentScene())) {
-                    asyncNotificationService.paymentNotify(paymentRequest.getPhone(), paymentRequest.getAmount());
+                    asyncService.paymentNotify(paymentRequest.getPhone(), paymentRequest.getAmount());
                 }
             } finally {
                 DistributedLockUtil.unlock(merAccountLock);
@@ -256,7 +258,13 @@ public class PaymentServiceImpl implements PaymentService {
                 .add(account.getSurplusQuotaOverpay());
         BigDecimal amount = paymentRequest.getAmount();
         boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-        Assert.isTrue(enough, "用户账户总余额不足");
+        if(!enough){
+            if(paymentRequest.getOffline()){
+                account.setOfflineFlag(WelfareConstant.AccountOfflineFlag.DISABLE.code());
+                asyncService.updateAccount(account);
+            }
+            throw new BusiException(ExceptionCode.INSUFFICIENT_BALANCE,"账户余额不足",null);
+        }
         BigDecimal allTypeBalance = accountAmountDOList.stream()
                 .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -1,6 +1,8 @@
 package com.welfare.service.async;
 
 import com.alibaba.fastjson.JSON;
+import com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.entity.Account;
 import com.welfare.service.remote.NotificationFeign;
 import com.welfare.service.remote.entity.NotificationReq;
 import com.welfare.service.remote.entity.NotificationResp;
@@ -23,13 +25,14 @@ import java.math.BigDecimal;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class AsyncNotificationService {
+public class AsyncService {
 
     public static final String SUCCEED = "0000";
     @Autowired(required = false)
     private NotificationFeign notificationFeign;
     @Value("${notification.targetPath:https://test-welfare-app.sjgo365.com/tc/redirect?target=center}")
     private String targetPath;
+    private final AccountDao accountDao;
 
     @Async("e-welfare-taskExecutor")
     public void paymentNotify(String phone, BigDecimal amount){
@@ -39,5 +42,10 @@ public class AsyncNotificationService {
         if(!SUCCEED.equals(notificationResp.getCode())){
             log.error("调用通知系统出错,msg:{},failureData:{}",notificationResp.getMsg(),JSON.toJSONString(notificationResp.getFailureData()));
         }
+    }
+
+    @Async("e-welfare-taskExecutor")
+    public void updateAccount(Account account){
+        accountDao.updateById(account);
     }
 }

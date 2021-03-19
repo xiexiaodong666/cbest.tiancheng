@@ -11,6 +11,36 @@ public class WelfareConstant {
     private WelfareConstant() {
 
     }
+
+    /**
+     * 离线是否启用
+     */
+    public enum AccountOfflineFlag{
+        /**
+         * 启用，禁用
+         */
+        ENABLE(1,"启用"),
+        DISABLE(0,"禁用");
+
+        private final Integer code;
+        private final String desc;
+
+        AccountOfflineFlag(Integer code,String desc){
+            this.code = code;
+            this.desc  =desc;
+        }
+
+        public Integer code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+
+
+    }
+
     public enum DictType {
         /**
          * 门店消费类型

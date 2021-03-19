@@ -33,7 +33,7 @@ public enum ExceptionCode {
      * 达到商户充值限额
      */
     MERCHANT_RECHARGE_LIMIT_EXCEED(0x00000101),
-
+    INSUFFICIENT_BALANCE(0x00000102),
 
 
     //------条码相关异常------

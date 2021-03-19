@@ -1,5 +1,6 @@
 package com.welfare.common.exception;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
@@ -70,6 +71,18 @@ public class BizAssert {
     public static void notEmpty(Object[] objs, ExceptionCode exceptionCode, String msg){
         if(objs == null || objs.length == 0){
             throw new BizException(exceptionCode);
+        }
+    }
+
+    public static void notBlank(String str){
+        if(StringUtils.isBlank(str)){
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
+        }
+    }
+
+    public static void notBlank(String str, ExceptionCode exceptionCode,String exceptionMsg){
+        if(StringUtils.isBlank(str)){
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
         }
     }
 }

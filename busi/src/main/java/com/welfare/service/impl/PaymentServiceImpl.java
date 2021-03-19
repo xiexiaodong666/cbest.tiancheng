@@ -10,7 +10,7 @@ import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.perf.PerfMonitor;
 import com.welfare.common.util.DistributedLockUtil;
@@ -139,7 +139,7 @@ public class PaymentServiceImpl implements PaymentService {
                 //在循环里面已经对merchantCredit进行了更新
                 merchantCreditDao.updateById(merchantCredit);
                 //支付成功要将账户的离线模式启用
-                account.setOfflineFlag(WelfareConstant.AccountOfflineFlag.ENABLE.code());
+                account.setOfflineLock(WelfareConstant.AccountOfflineFlag.ENABLE.code());
                 saveDetails(paymentOperations, account, accountAmountTypes);
 
                 if (!CollectionUtils.isEmpty(merchantBillDetails)) {
@@ -161,7 +161,7 @@ public class PaymentServiceImpl implements PaymentService {
             return paymentRequest;
         } catch (InterruptedException | ExecutionException e) {
             log.error("异步执行查询异常", e);
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(accountLock);
             paymentRequestPerfMonitor.stop();
@@ -197,7 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .distinct()
                 .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
         }
         return paymentScene;
     }
@@ -259,11 +259,7 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal amount = paymentRequest.getAmount();
         boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
         if(!enough){
-            if(paymentRequest.getOffline()){
-                account.setOfflineFlag(WelfareConstant.AccountOfflineFlag.DISABLE.code());
-                asyncService.updateAccount(account);
-            }
-            throw new BusiException(ExceptionCode.INSUFFICIENT_BALANCE,"账户余额不足",null);
+            onInsufficientBalance(paymentRequest, account);
         }
         BigDecimal allTypeBalance = accountAmountDOList.stream()
                 .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
@@ -288,6 +284,15 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
         return paymentOperations;
+    }
+
+    private void onInsufficientBalance(PaymentRequest paymentRequest, Account account) {
+        if(paymentRequest.getOffline()){
+            //离线模式需要锁定其离线交易
+            account.setOfflineLock(WelfareConstant.AccountOfflineFlag.DISABLE.code());
+            asyncService.updateAccount(account);
+        }
+        throw new BizException(ExceptionCode.INSUFFICIENT_BALANCE);
     }
 
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {

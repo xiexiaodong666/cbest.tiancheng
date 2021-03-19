@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.MerchantSyncDTO;
@@ -91,7 +91,7 @@ public class MerchantHandler  {
         RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateMerchant(req);
         log.info("同步商户到商城中台，resp【{}】", JSON.toJSONString(resp));
         if (!("0000").equals(resp.getCode())) {
-            throw new BusiException("同步商户数据到商城中心失败msg【"+resp.getMsg()+"】");
+            throw new BizException("同步商户数据到商城中心失败msg【"+resp.getMsg()+"】");
         }
     }
 }

@@ -5,7 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
 import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
@@ -16,7 +16,7 @@ import com.welfare.service.remote.entity.StoreBinding;
 import com.welfare.service.remote.entity.UserRoleBinding;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,7 +83,7 @@ public class AccountConsumeSceneHandler {
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateUserRoleBinding(userRoleBindingReqDTO);
     if (!("0000").equals(roleConsumptionResp.getCode())) {
-      throw new BusiException("同步员工类型数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
+      throw new BizException("同步员工类型数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
     }
   }
 

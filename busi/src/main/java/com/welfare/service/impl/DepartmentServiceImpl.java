@@ -3,7 +3,7 @@ package com.welfare.service.impl;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.DepartmentDao;
@@ -67,7 +67,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public DepartmentDTO detail(Long id) {
         DepartmentDTO department=departmentConverter.toD(departmentDao.getById(id));
         if(EmptyChecker.isEmpty(department)){
-            throw new BusiException("部门不存在");
+            throw new BizException("部门不存在");
         }
         //顶级部门的父级为机构
         if(department.getDepartmentParent().equals(department.getMerCode())){
@@ -85,7 +85,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public boolean add(DepartmentAddDTO department) {
         if(EmptyChecker.isEmpty(department.getDepartmentParent())){
-            throw new BusiException("上级编码不能为空");
+            throw new BizException("上级编码不能为空");
         }
         Department save=new Department();
         save.setDepartmentType(department.getDepartmentType());
@@ -100,7 +100,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         }else{
             Department parent=this.getByDepartmentCode(department.getDepartmentParent());
             if(EmptyChecker.isEmpty(parent)){
-                throw new BusiException("上级编码不存在");
+                throw new BizException("上级编码不存在");
             }
             save.setDepartmentPath(parent.getDepartmentPath()+"-"+departmentCode);
         }
@@ -125,12 +125,12 @@ public class DepartmentServiceImpl implements DepartmentService {
             EasyExcel.read(multipartFile.getInputStream(), DepartmentImportDTO.class, listener).sheet()
                     .doRead();
         } catch (IOException e) {
-            throw new BusiException("excel解析失败");
+            throw new BizException("excel解析失败");
         }
         String result = listener.getUploadInfo().toString();
         listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
         if (!DepartmentListener.success.equals(result)) {
-            throw new BusiException(result);
+            throw new BizException(result);
         }
         return result;
     }

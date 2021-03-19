@@ -3,7 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.enums.MerIdentityEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.query.MerchantPageReq;
@@ -65,7 +65,7 @@ public class MerchantController implements IController {
     public R add(@RequestBody @Valid MerchantAddDTO merchant) {
         if (MerIdentityEnum.customer.getCode().equals(merchant.getMerType())
                 && EmptyChecker.isEmpty(merchant.getAddressList())) {
-            throw new BusiException("身份属性为客户时，收获地址必填");
+            throw new BizException("身份属性为客户时，收获地址必填");
         }
         return R.status(merchantService.add(merchant), "新增失败");
     }
@@ -76,7 +76,7 @@ public class MerchantController implements IController {
     public R update(@RequestBody @Valid MerchantUpdateDTO merchant) {
         if (MerIdentityEnum.customer.getCode().equals(merchant.getMerType())
                 && EmptyChecker.isEmpty(merchant.getAddressList())) {
-            throw new BusiException("身份属性为客户时，收货地址必填");
+            throw new BizException("身份属性为客户时，收货地址必填");
         }
         return R.status(merchantService.update(merchant), "更新失败");
     }

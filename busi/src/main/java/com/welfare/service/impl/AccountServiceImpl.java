@@ -1,5 +1,4 @@
 package com.welfare.service.impl;
-import com.alibaba.fastjson.JSON;
 import com.welfare.common.enums.FileUniversalStorageEnum;
 import com.welfare.service.converter.DepartmentAndAccountTreeConverter;
 import com.welfare.service.dto.UploadImgErrorMsgDTO;
@@ -7,7 +6,6 @@ import java.util.Date;
 
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
-import static com.welfare.common.constants.RedisKeyConstant.FINISH_EMPLOYEE_SETTLE;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -23,13 +21,12 @@ import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.AccountUtil;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.SpringBeanUtils;
-import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.entity.*;
@@ -209,7 +206,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean delete(Long id) {
         Account syncAccount = accountMapper.selectById(id);
         if (null == syncAccount) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         boolean result = accountDao.removeById(id);
 
@@ -225,7 +222,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean active(Long id, Integer accountStatus) {
         Account syncAccount = accountMapper.selectById(id);
         if (null == syncAccount) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         Account account = new Account();
         account.setId(id);
@@ -262,7 +259,7 @@ public class AccountServiceImpl implements AccountService {
                 .queryDetailByParam(accountDetailParam.getId(), accountDetailParam.getAccountCode(),
                         accountDetailParam.getPhone(), accountDetailParam.getMerCode());
         if (null == accountDetailMapperDTO) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该员工账号不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该员工账号不存在", null);
         }
         AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
         BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
@@ -429,7 +426,7 @@ public class AccountServiceImpl implements AccountService {
                 merCode,
                 merAccountTypeCode);
         if (null == merchantAccountType) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无授信额度福利类型", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无授信额度福利类型", null);
         }
         AccountAmountType accountAmountType = new AccountAmountType();
         accountAmountType.setAccountCode(accountCode);
@@ -443,30 +440,30 @@ public class AccountServiceImpl implements AccountService {
     private void validationAccount(Account account, Boolean isNew) {
         Merchant merchant = merchantService.detailByMerCode(account.getMerCode());
         if (null == merchant) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
         }
         AccountType accountType = accountTypeService
                 .queryByTypeCode(account.getMerCode(), account.getAccountTypeCode());
         if (null == accountType) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在", null);
         }
         Department department = departmentService.getByDepartmentCode(account.getStoreCode());
         if (null == department) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
         }
         if (isNew) {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
             if (null != queryAccount) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
             }
         } else {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
             if (queryAccount != null && queryAccount.getId().longValue() != account.getId().longValue()) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经有其他员工绑定了该手机", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经有其他员工绑定了该手机", null);
             }
             Account syncAccount = accountMapper.selectById(account.getId());
             if (null == syncAccount) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
             }
         }
     }
@@ -558,7 +555,7 @@ public class AccountServiceImpl implements AccountService {
             } else {
                 //判断剩余授信额度  如果是增加,那么额度就是
                 if (surplusQuota.compareTo(oldMaxQuota.subtract(newMaxQuota)) < 0) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
                 }
                 //修改了额度
                 int incrAccountResult = accountCustomizeMapper
@@ -569,13 +566,13 @@ public class AccountServiceImpl implements AccountService {
                         newMaxQuota.subtract(oldMaxQuota),
                         updateUser);//先判断有没有记录 如果没有插入 如果有减少
                 if (incrAccountResult <= 0 || incrAmountResult <= 0) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
                 }
             }
         } else {
             //关闭授信额度,账户以及账户金额类型表变0
             if (oldMaxQuota.compareTo(surplusQuota) != 0) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "授信额度已使用 无法关闭", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "授信额度已使用 无法关闭", null);
             }
             accountAmountTypeMapper.updateBalance(accountCode, MerAccountTypeCode.SURPLUS_QUOTA.code(),
                     BigDecimal.ZERO, updateUser);
@@ -753,17 +750,17 @@ public class AccountServiceImpl implements AccountService {
     public boolean bindingCard(String accountCode, String cardId) {
         Account account = this.getByAccountCode(Long.parseLong(accountCode));
         if (null == account) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         CardInfo cardInfo = cardInfoService.getByCardNo(cardId);
         if (null == cardInfo) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号不存在", null);
         }
         if (cardInfoService.cardIsBind(cardId)) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
         }
         if (cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue()) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请确认该卡片状态", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请确认该卡片状态", null);
         }
         //绑定创建卡号信息
         cardInfo.setAccountCode(account.getAccountCode());
@@ -925,20 +922,20 @@ public class AccountServiceImpl implements AccountService {
                     BigDecimal restoreAmount = restoreLimit.getRestoreAmount();
                     Account account = accountsMap.get(accountCode);
                     if (account == null) {
-                        throw new BusiException(String.format("员工不存在[%s]", accountCode));
+                        throw new BizException(String.format("员工不存在[%s]", accountCode));
                     }
                     AccountAmountType surplusQuota = surplusQuotaMap.get(accountCode);
                     if (Objects.isNull(surplusQuota)) {
-                        throw new BusiException(String.format("员工授信额度账户不存在[%s]", accountCode));
+                        throw new BizException(String.format("员工授信额度账户不存在[%s]", accountCode));
                     }
                     // 溢缴款账户
                     AccountAmountType surplusQuotaOverpay = surplusQuotaOverpayMap.get(accountCode);
                     if (Objects.isNull(surplusQuotaOverpay)) {
-                        throw new BusiException(String.format("员工溢缴款账户不存在[%s]", accountCode));
+                        throw new BizException(String.format("员工溢缴款账户不存在[%s]", accountCode));
                     }
                     if (surplusQuota.getAccountBalance().compareTo(account.getMaxQuota()) > 0
                             || account.getSurplusQuota().compareTo(account.getMaxQuota()) > 0) {
-                        throw new BusiException(String.format("数据异常，剩余授信额度超过最大额度[%s]", accountCode));
+                        throw new BizException(String.format("数据异常，剩余授信额度超过最大额度[%s]", accountCode));
                     }
                     BigDecimal overAmount = surplusQuota.getAccountBalance().add(restoreAmount).subtract(account.getMaxQuota());
                     if (overAmount.compareTo(BigDecimal.ZERO) < 0) {
@@ -1021,7 +1018,7 @@ public class AccountServiceImpl implements AccountService {
                     flag2 = accountAmountTypeDao.updateBatchById(updatedAccountTypes);
                 }
                 if (!flag1 || !flag2) {
-                    throw new BusiException("操作繁忙，请稍后再试！");
+                    throw new BizException("操作繁忙，请稍后再试！");
                 }
             } finally {
                 DistributedLockUtil.unlock(multiLock);

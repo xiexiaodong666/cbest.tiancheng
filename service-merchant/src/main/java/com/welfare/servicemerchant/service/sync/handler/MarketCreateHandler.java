@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.SupplierStoreSyncDTO;
 import com.welfare.service.remote.entity.CbestPayBaseBizResp;
@@ -80,17 +80,17 @@ public class MarketCreateHandler {
                     try {
                         map = mapper.readValue(resp.getBizContent(), Map.class);
                     } catch (JsonProcessingException e) {
-                        throw new BusiException("重百付创建门店接口，response转换失败" + resp);
+                        throw new BizException("重百付创建门店接口，response转换失败" + resp);
                     }
                     if (CbestPayRespRetryConstant.Y.equals(map.get(retryField))){
-                        throw new BusiException("重百付创建门店未成功，需要重试，" + resp.getBizMsg());
+                        throw new BizException("重百付创建门店未成功，需要重试，" + resp.getBizMsg());
                     }else{
                         //如果传入的门店编号，重百付已存在，或者为重百门店，或者符合重百编码规则，则重百付不会创建，且不需要重试
                         log.info("重百付创建门店未成功,不需要重试【{}】",resp.getBizMsg());
                     }
                     break;
                 default:
-                    throw new BusiException("重百付创建门店失败【"+resp.getBizMsg()+"】，未知返回状态" + bizStatus);
+                    throw new BizException("重百付创建门店失败【"+resp.getBizMsg()+"】，未知返回状态" + bizStatus);
             }
         }
     }

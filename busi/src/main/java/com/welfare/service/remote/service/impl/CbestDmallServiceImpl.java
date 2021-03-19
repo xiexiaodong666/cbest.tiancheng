@@ -2,7 +2,7 @@ package com.welfare.service.remote.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.SupplierStore;
@@ -49,7 +49,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PagingResult<PriceTemplateBrief>> resp = cbestDmallFeign.listPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("分页查询价格模板失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(resp));
-      throw new BusiException(resp.getMsg());
+      throw new BizException(resp.getMsg());
     }
     return toPage(resp.getData(), req.getPaging());
   }
@@ -61,7 +61,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PosPriceTemplate> response = cbestDmallFeign.queryPriceTemplate(parma);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(response.getCode())) {
       log.error("查询价格模板失败 请求:{} 响应:{}", id, JSON.toJSONString(response));
-      throw new BusiException(response.getMsg());
+      throw new BizException(response.getMsg());
     }
     return response.getData();
   }
@@ -71,7 +71,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PosPriceTemplate> response = cbestDmallFeign.createPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(response.getCode())) {
       log.error("创建价格模板失败失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(response));
-      throw new BusiException(response.getMsg());
+      throw new BizException(response.getMsg());
     }
     return response.getData();
   }
@@ -81,7 +81,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PosPriceTemplate> response = cbestDmallFeign.modifyPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(response.getCode())) {
       log.error("修改价格模板失败失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(response));
-      throw new BusiException(response.getMsg());
+      throw new BizException(response.getMsg());
     }
     return response.getData();
   }
@@ -101,7 +101,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PagingResult<PosTerminalPriceTemplateResp>> resp = cbestDmallFeign.listTerminalPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("分页查询收银机价格模板失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(resp));
-      throw new BusiException(resp.getMsg());
+      throw new BizException(resp.getMsg());
     }
     return toPage(resp.getData(), req.getPaging());
   }
@@ -111,7 +111,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PosTerminalPriceTemplateResp> response = cbestDmallFeign.modifyTerminalPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(response.getCode())) {
       log.error("修改收银机价格模板失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(response));
-      throw new BusiException(response.getMsg());
+      throw new BizException(response.getMsg());
     }
     return response.getData();
   }

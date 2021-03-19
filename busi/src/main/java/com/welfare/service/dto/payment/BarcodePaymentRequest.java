@@ -1,9 +1,8 @@
 package com.welfare.service.dto.payment;
 
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.SpringBeanUtils;
-import com.welfare.common.util.StringUtil;
 import com.welfare.service.BarcodeService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -43,7 +42,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
                 .getProperty("e-welfare.barcode.expire", "210");
         String barcodeInRedis = redisTemplate.opsForValue().get("BARCODE:" + barcode);
         if(!StringUtils.isEmpty(barcodeInRedis)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该支付码已被使用",null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该支付码已被使用",null);
         }else{
             redisTemplate.opsForValue().set("BARCODE:"+barcode,barcode,Long.parseLong(expireSecs), TimeUnit.SECONDS);
         }

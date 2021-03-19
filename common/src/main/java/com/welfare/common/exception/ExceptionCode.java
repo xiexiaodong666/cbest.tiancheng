@@ -8,51 +8,43 @@ public enum ExceptionCode {
     /**
      * 成功
      */
-    SUCCESS(0),
+    SUCCESS(200,"成功"),
     /**
      * 未知异常
      */
-    UNKNOWON_EXCEPTION(0xffffffff),
+    UNKNOWON_EXCEPTION(5000000,"未知异常"),
 
     //----------系统异常-----------
-    /**
-     * 参数校验异常
-     */
-    ILLEGALITY_ARGURMENTS(0x00010000), //参数校验异常
-    DATA_BASE_ERROR(0x00020000), //数据库访问异常
+    ILLEGALITY_ARGURMENTS(5001001,"参数校验异常"),
+    DATA_BASE_ERROR(5001002,"数据库异常"),
 
     //----------业务异常-----------
-    BUSI_ERROR_LOGIN_FAILED(0x00000001),  //登录失败
-    /**
-     * 无权限
-     */
-    BUSI_ERROR_NO_PERMISSION(0x00000002),
 
     //---------资金相关异常----
-    /**
-     * 达到商户充值限额
-     */
-    MERCHANT_RECHARGE_LIMIT_EXCEED(0x00000101),
-    INSUFFICIENT_BALANCE(0x00000102),
+    MERCHANT_RECHARGE_LIMIT_EXCEED(5002001,"商户余额不足"),
+    INSUFFICIENT_BALANCE(5002002,"用户余额不足"),
 
 
     //------条码相关异常------
-    BARCODE_EXPIRE(0x00000201);
+    BARCODE_EXPIRE(5003001,"条码过期");
 
 
 
 
 
 
-    int code;   //错误码， int的2进制 (前8位为服务编码)（后24位为异常编码（前8位为系统异常，后16位为业务异常））
-    final int app = 0x01000000; //应用编码
+    private int code;
+    private String msg;
 
-    ExceptionCode(int code) {
-        this.code = app | code;
+    ExceptionCode(int code,String msg) {
+        this.code =  code;
+        this.msg = msg;
     }
 
-    public String getCode(){
-        return String.valueOf(this.code);
+    public Integer getCode(){
+        return this.code;
     }
-
+    public String getMsg(){
+        return this.msg;
+    }
 }

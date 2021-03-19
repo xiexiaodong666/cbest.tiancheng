@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.AccountConsumeSceneStatus;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
@@ -33,13 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.lang.invoke.MethodHandleInfo;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,7 +74,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   public Boolean save(AccountConsumeSceneAddReq accountConsumeSceneAddReq) {
     List<String> accountTypeCodeList = accountConsumeSceneAddReq.getAccountTypeCodeList();
     if( CollectionUtils.isEmpty(accountTypeCodeList)  || accountTypeCodeList.size() == 0){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不能为空", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不能为空", null);
     }
     List<AccountConsumeSceneStoreRelation> sendData = new LinkedList<AccountConsumeSceneStoreRelation>();
     accountTypeCodeList.forEach(accountTypeCode -> {
@@ -99,25 +97,25 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   private void validationAccountConsumeScene(AccountConsumeScene accountConsumeScene,boolean isNew){
     Merchant merchant = merchantService.detailByMerCode(accountConsumeScene.getMerCode());
     if( null == merchant ) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
     }
     AccountType queryAccountType = accountTypeService.queryByTypeCode(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
     if( null == queryAccountType ) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户员工类型不存在",null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户员工类型不存在",null);
     }
     if(!isNew){
       AccountConsumeScene queryAccountConsumeScene = accountConsumeSceneDao.getById(accountConsumeScene.getId());
       if( null == queryAccountConsumeScene ){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景不存在",null);
+        throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型消费场景不存在",null);
       }
       AccountConsumeScene sameTypeScene = queryAccountConsumeScene(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
       if( sameTypeScene.getId().compareTo(accountConsumeScene.getId())!= 0){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同员工类型的消费场景配置",null);
+        throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同员工类型的消费场景配置",null);
       }
     }else{
       AccountConsumeScene queryAccountConsumeScene = queryAccountConsumeScene(accountConsumeScene.getMerCode(),accountConsumeScene.getAccountTypeCode());
       if(null != queryAccountConsumeScene){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同员工类型的消费场景配置",null);
+        throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该商户已经存在相同员工类型的消费场景配置",null);
       }
     }
   }
@@ -138,7 +136,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
         accountConsumeSceneStoreRelationReqList.size());
     accountConsumeSceneStoreRelationReqList.forEach(accountConsumeSceneStoreRelationReq -> {
       if(StringUtils.isBlank(accountConsumeSceneStoreRelationReq.getSceneConsumType())){
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"请选择该员工类型在该门店下得消费方式", null);
+        throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"请选择该员工类型在该门店下得消费方式", null);
       }
       AccountConsumeSceneStoreRelation accountConsumeSceneStoreRelation = new AccountConsumeSceneStoreRelation();
       BeanUtils
@@ -185,7 +183,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   public Boolean delete(Long id) {
     AccountConsumeScene accountConsumeScene = accountConsumeSceneDao.getById(id);
     if( null == accountConsumeScene ) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"消费场景不存在",null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"消费场景不存在",null);
     }
     boolean deleteResult =  accountConsumeSceneDao.removeById(id);
     if(deleteResult){
@@ -207,7 +205,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   public Boolean updateStatus(Long id, Integer status) {
     AccountConsumeScene queryAC = accountConsumeSceneDao.getById(id);
     if( null == queryAC ) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该消费场景不存在",null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该消费场景不存在",null);
     }
     UpdateWrapper<AccountConsumeScene> updateWrapper = new UpdateWrapper();
     updateWrapper.eq(AccountConsumeScene.ID, id);
@@ -288,7 +286,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   @Transactional(rollbackFor = Exception.class)
   public Boolean edit(List<AccountConsumeSceneEditReq> consumeSceneEditReqs) {
     if (CollectionUtils.isEmpty(consumeSceneEditReqs)) {
-      throw new BusiException("至少配置一个员工类型");
+      throw new BizException("至少配置一个员工类型");
     }
     //删除已有配置
     String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();

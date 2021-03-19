@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.welfare.common.constants.WelfareSettleConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.DateUtil;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.entity.Merchant;
@@ -98,7 +98,7 @@ public class SettlementBillBuildTask extends IJobHandler {
                 });
                 Boolean aBoolean = monthSettleService.addMonthSettleList(monthSettleList);
                 if(!aBoolean){
-                    throw new BusiException(null, "批量保存账单数据异常", null);
+                    throw new BizException(null, "批量保存账单数据异常", null);
                 }
             } catch (Exception e) {
                 log.info("============结算账单生成任务,任务执行【异常】===================");

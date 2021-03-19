@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.config.CbestPayConfig;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.service.remote.CbestPayFeign;
 import com.welfare.service.remote.entity.*;
@@ -72,7 +72,7 @@ public class CbestPayServiceImpl implements CbestPayService {
             log.error(StrUtil
                 .format("调用重百付{}接口异常-req: {}, resp: {}", method, JSON.toJSONString(req),
                     JSON.toJSONString(resp)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
         }
         log.info(StrUtil.format("调用重百付{}接口-req: {}, resp: {}", method, JSON.toJSONString(req),
             JSON.toJSONString(resp)));

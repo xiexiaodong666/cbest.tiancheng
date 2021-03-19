@@ -5,13 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
-import com.welfare.common.constants.RedisKeyConstant;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.DateUtil;
-import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.EmployeeSettleDetailDao;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
 import com.welfare.persist.dto.EmployeeSettleDetailDTO;
@@ -20,9 +16,6 @@ import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
 import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
 import com.welfare.persist.entity.EmployeeSettleDetail;
-import com.welfare.persist.entity.MerchantBillDetail;
-import com.welfare.persist.entity.MerchantCredit;
-import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.mapper.EmployeeSettleDetailMapper;
 import com.welfare.service.dto.EmployeeSettleConsumePageReq;
 import com.welfare.service.dto.EmployeeSettleDetailPageReq;
@@ -32,11 +25,9 @@ import com.welfare.service.dto.StoreCodeNameDTO;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,8 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 
 /**
  * 服务接口实现
@@ -92,7 +81,7 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
                 dateStr = DateUtil.date2Str(DateUtil.getDayMin(date, -1), DateUtil.DEFAULT_DATE_FORMAT);
             }
             log.error("同步{}的员工授信流水数据失败", dateStr, e);
-            throw new BusiException(String.format("同步%s的员工授信流水数据失败", dateStr));
+            throw new BizException(String.format("同步%s的员工授信流水数据失败", dateStr));
         }
     }
 

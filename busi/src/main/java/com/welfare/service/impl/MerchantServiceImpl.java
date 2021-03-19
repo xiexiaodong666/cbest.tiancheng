@@ -7,7 +7,7 @@ import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.enums.SupplierStoreSourceEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
@@ -120,7 +120,7 @@ public class MerchantServiceImpl implements MerchantService {
         //商户详情
         MerchantDetailDTO merchantDetailDTO = merchantDetailConverter.toD(merchantDao.getById(id));
         if(EmptyChecker.isEmpty(merchantDetailDTO)){
-            throw new BusiException("商户不存在");
+            throw new BizException("商户不存在");
         }
         MerchantAddressReq merchantAddressReq = new MerchantAddressReq();
         merchantAddressReq.setRelatedType(Merchant.class.getSimpleName());
@@ -165,7 +165,7 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean add(MerchantAddDTO merchant) {
         if(EmptyChecker.notEmpty(merchant.getAddressList())
                 &&merchant.getAddressList().size()>10){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
         }
         String merCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code());
         merchant.setMerCode(merCode);
@@ -176,7 +176,7 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag3=merchantAccountTypeService.init(merCode);
         //同步商城中台
         if(!(flag&&flag2&flag3)){
-            throw new BusiException("新增商户失败");
+            throw new BizException("新增商户失败");
         }
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
         detailDTO.setAddressList(merchant.getAddressList());
@@ -192,14 +192,14 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean update(MerchantUpdateDTO merchant) {
         if(EmptyChecker.notEmpty(merchant.getAddressList())
                 &&merchant.getAddressList().size()>10){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
         }
         Merchant update=buildEntity(merchant);
         boolean flag= 1==merchantDao.updateAllColumnById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
         //同步商城中台
         if(!(flag&&flag2)){
-            throw new BusiException("更新商户失败");
+            throw new BizException("更新商户失败");
         }
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
@@ -211,7 +211,7 @@ public class MerchantServiceImpl implements MerchantService {
     private Merchant buildEntity(MerchantUpdateDTO merchant){
         Merchant entity=merchantDao.getById(merchant.getId());
         if(EmptyChecker.isEmpty(entity)){
-            throw new BusiException("id不存在");
+            throw new BizException("id不存在");
         }
         if (StringUtils.isNoneBlank(merchant.getMerIdentity())) {
             List<String> merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
@@ -249,7 +249,7 @@ public class MerchantServiceImpl implements MerchantService {
         queryWrapper.eq(Merchant.MER_CODE,merCode);
         Merchant merchant=this.getMerchantByMerCode(queryWrapper);
         if(EmptyChecker.isEmpty(merchant)){
-            throw new BusiException("商户不存在");
+            throw new BizException("商户不存在");
         }
         return merchant;
     }

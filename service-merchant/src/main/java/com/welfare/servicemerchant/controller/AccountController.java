@@ -3,7 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.annotation.RepeatRequestVerification;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
@@ -15,15 +15,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -122,7 +119,7 @@ public class AccountController implements IController {
     try {
 
       return success(accountService.save(accountReq));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -135,7 +132,7 @@ public class AccountController implements IController {
     try {
 
       return success(accountService.update(accountReq));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -146,7 +143,7 @@ public class AccountController implements IController {
   public R<Boolean> delete(@RequestBody UpdateStatusReq updateStatusReq) {
     try {
       return success(accountService.delete(Long.parseLong(updateStatusReq.getId())));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -159,7 +156,7 @@ public class AccountController implements IController {
 
     try {
       return success(accountService.active(Long.parseLong(updateStatusReq.getId()), updateStatusReq.getAccountStatus()));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -179,7 +176,7 @@ public class AccountController implements IController {
       @RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile) {
     try {
       return success(accountService.uploadAccount(multipartFile));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -190,7 +187,7 @@ public class AccountController implements IController {
   public R<String> batchBindCard(@RequestParam(name = "file") MultipartFile multipartFile) {
     try {
       return success(accountService.accountBatchBindCard(multipartFile));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -237,7 +234,7 @@ public class AccountController implements IController {
       @RequestParam @ApiParam("cardId") String cardId){
     try {
       return success(accountService.bindingCard(accountCode,cardId));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }

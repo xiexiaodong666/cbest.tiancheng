@@ -5,10 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.CardEnable;
 import com.welfare.common.enums.SequenceTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.GenerateCodeUtil;
-import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.CardApplyDTO;
@@ -190,7 +189,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       queryWrapperCardInfo.ne(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.NEW.code());
       List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapperCardInfo);
       if (CollectionUtils.isNotEmpty(cardInfoList)) {
-        throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "卡片已被写入或者绑定, 不能删除", null);
+        throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "卡片已被写入或者绑定, 不能删除", null);
       } else {
         queryWrapperCardInfo.clear();
         queryWrapperCardInfo.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());

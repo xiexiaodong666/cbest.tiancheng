@@ -3,8 +3,7 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.constants.WelfareConstant.CardEnable;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.CardInfoApiDTO;
@@ -60,7 +59,7 @@ public class CardInfoServiceImpl implements CardInfoService {
 
     cardInfo = cardInfoDao.getById(cardInfo.getId());
     if (cardInfo == null) {
-      throw new BusiException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
+      throw new BizException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
     }
     if (WelfareConstant.CardStatus.NEW.code().equals(cardInfo.getCardStatus())) {
       cardInfo.setCardStatus(WelfareConstant.CardStatus.WRITTEN.code());
@@ -69,7 +68,7 @@ public class CardInfoServiceImpl implements CardInfoService {
       if (cardInfoDao.saveOrUpdate(cardInfo)) {
         return cardInfo;
       } else {
-        throw new BusiException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
+        throw new BizException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
       }
     }
 
@@ -83,7 +82,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     queryWrapper.in(CardInfo.CARD_ID, cardIdSet);
     List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapper);
     if (CollectionUtils.isEmpty(cardInfoList)) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未找到对应卡号", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未找到对应卡号", null);
     }
 
     for (CardInfo cardInfo :

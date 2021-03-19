@@ -11,8 +11,11 @@ import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountBillDetail;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountBillDetailService;
+import com.welfare.service.AccountService;
+import com.welfare.service.MerchantService;
 import com.welfare.service.dto.Deposit;
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -38,6 +41,10 @@ import org.springframework.stereotype.Service;
 public class AccountBillDetailServiceImpl implements AccountBillDetailService {
 
     private final AccountBillDetailDao accountBillDetailDao;
+
+    private final AccountService accountService;
+
+    private final MerchantService merchantService;
 
     /**
      * 循环依赖问题，所以未采用构造器注入
@@ -86,7 +93,12 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         AccountBillDetailSimpleReq accountBillDetailSimpleReq) {
         List<AccountBillDetailSimpleDTO> accountBillDetailSimpleDTOList = accountBillDetailDao
             .getBaseMapper().selectAccountBillDetailSimpleList(accountBillDetailSimpleReq);
-
+        Account account = accountService
+            .getByAccountCode(accountBillDetailSimpleReq.getAccountCode());
+        Merchant merchant = merchantService
+            .getMerchantByMerCode(account.getMerCode());
+        String billDetailShowStoreName = merchant.getBillDetailShowStoreName();
+        boolean showStoreName = "1".equals(billDetailShowStoreName);
         accountBillDetailSimpleDTOList = accountBillDetailSimpleDTOList.stream()
             .map(accountBillDetailSimpleDTO -> {
                 String channel = accountBillDetailSimpleDTO.getChannel();
@@ -99,6 +111,10 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
                         accountBillDetailSimpleDTO.setStoreName("员工自主充值");
                         accountBillDetailSimpleDTO.setTransTypeName(channelEnum.desc());
                     }
+                }
+                if(!showStoreName) {
+                    accountBillDetailSimpleDTO.setStoreCode("");
+                    accountBillDetailSimpleDTO.setStoreName("");
                 }
                 return accountBillDetailSimpleDTO;
             }).collect(Collectors.toList());

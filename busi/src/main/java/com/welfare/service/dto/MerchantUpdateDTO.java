@@ -63,4 +63,7 @@ public class MerchantUpdateDTO {
   @Length(max = 50)
   private String remark;
   List<MerchantAddressDTO> addressList;
+
+    @ApiModelProperty("员工卡消费明细门店显示")
+    private String billDetailShowStoreName;
 }

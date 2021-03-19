@@ -69,6 +69,13 @@ public class Merchant extends Model<Merchant> implements Serializable {
      */
     @ApiModelProperty("备注")   
     private String remark;
+
+    /**
+     * 员工卡消费明细门店显示
+     */
+    @ApiModelProperty("员工卡消费明细门店显示")
+    private String billDetailShowStoreName;
+
     /**
      * 创建人
      */
@@ -110,6 +117,7 @@ public class Merchant extends Model<Merchant> implements Serializable {
     @ApiModelProperty("版本")  @Version 
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
+
 
 //以下为列明常量
 

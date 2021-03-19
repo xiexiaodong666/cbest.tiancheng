@@ -14,6 +14,7 @@ import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.RefundOperation;
+import com.welfare.service.wolife.WoLifePaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -50,6 +51,7 @@ public class RefundServiceImpl implements RefundService {
     private final MerchantCreditService merchantCreditService;
     private final AccountAmountTypeService accountAmountTypeService;
     private final SupplierStoreService supplierStoreService;
+    private final WoLifePaymentService woLifePaymentService;
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DistributedLock(lockPrefix = "e-welfare-refund::", lockKey = "#refundRequest.originalTransNo")
@@ -69,10 +71,20 @@ public class RefundServiceImpl implements RefundService {
         );
         Assert.isTrue(!CollectionUtils.isEmpty(accountDeductionDetails), "未找到正向支付流水");
         AccountDeductionDetail first = accountDeductionDetails.get(0);
-        String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + first.getAccountCode();
+        Long accountCode = first.getAccountCode();
+        if(WelfareConstant.PaymentChannel.WELFARE.code().equals(first.getPaymentChannel())){
+            welfareRefund(refundRequest, refundDeductionDetailInDb, accountDeductionDetails, accountCode);
+        }else if(WelfareConstant.PaymentChannel.WO_LIFE.code().equals(first.getPaymentChannel())){
+            woLifePaymentService.refund(refundRequest,accountDeductionDetails, accountCode);
+        }
+
+    }
+
+    private void welfareRefund(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionDetailInDb, List<AccountDeductionDetail> accountDeductionDetails,Long accountCode) {
+        String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + accountCode;
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
-            Account account = accountService.getByAccountCode(first.getAccountCode());
+            Account account = accountService.getByAccountCode(accountCode);
             refundRequest.setAccountMerCode(account.getMerCode());
             log.error("accountInfo:{}",account);
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
@@ -89,7 +101,6 @@ public class RefundServiceImpl implements RefundService {
         } finally {
             DistributedLockUtil.unlock(accountLock);
         }
-
     }
 
     private boolean hasRefunded(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionDetailInDb) {

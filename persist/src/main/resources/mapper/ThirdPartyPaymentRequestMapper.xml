@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.ThirdPartyPaymentRequestMapper">
+    <sql id="tableName">
+        third_party_payment_request
+    </sql>
+
+    <sql id="baseColumn">
+        id,trans_no,trans_amount,payment_type,payment_type_info,payment_request_type,payment_request,trans_status,create_user,create_time,update_user,update_time,deleted
+    </sql>
+
+</mapper>

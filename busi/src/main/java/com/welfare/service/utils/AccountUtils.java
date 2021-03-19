@@ -29,8 +29,8 @@ public class AccountUtils {
       BeanUtils.copyProperties(account,accountSyncDTO);
       Long merId = merchantMap.get(account.getMerCode()).getId();
       accountSyncDTO.setMerchantId(String.valueOf(merId));
-      accountSyncDTO.setDepartmentCode(account.getStoreCode());
-      accountSyncDTO.setDepartmentName(departmentMap.get(account.getStoreCode()).getDepartmentName());
+      accountSyncDTO.setDepartmentCode(account.getDepartment());
+      accountSyncDTO.setDepartmentName(departmentMap.get(account.getDepartment()).getDepartmentName());
       List<AccountType> accountTypes = accountTypeMap.get(account.getAccountTypeCode());
       if (!CollectionUtils.isEmpty(accountTypes)) {
         if (accountTypes.size() == 1) {

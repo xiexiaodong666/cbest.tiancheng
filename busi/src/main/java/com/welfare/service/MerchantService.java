@@ -91,4 +91,10 @@ public interface MerchantService {
      * @return
      */
     Boolean queryIsRabteByMerCOde(String merCode);
+
+    /**
+     * 查询商户的供应商列表（不分页）
+     * @return
+     */
+    List<Merchant> supplierByMer(String merCode);
 }

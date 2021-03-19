@@ -20,10 +20,12 @@ import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.payment.*;
+import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
+import com.welfare.service.wolife.WoLifePaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +72,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantCreditDao merchantCreditDao;
     private final AsyncService asyncService;
+    private final WoLifePaymentService woLifePaymentService;
+    private final ThirdPartyPaymentRequestService thirdPartyPaymentRequestService;
     PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
@@ -126,11 +130,19 @@ public class PaymentServiceImpl implements PaymentService {
                 List<AccountAmountDO> accountAmountDOList = accountAmountDOFuture.get();
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
 
-                List<PaymentOperation> paymentOperations = decreaseAccount(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit);
-                List<MerchantBillDetail> merchantBillDetails = paymentOperations.stream()
+                String paymentChannel = paymentRequest.getPaymentChannel();
+                List<PaymentOperation> paymentOperations;
+                List<MerchantBillDetail> merchantBillDetails = null;
+                if(paymentChannel.equals(WelfareConstant.PaymentChannel.WO_LIFE.code())){
+                    paymentOperations = woLifePaymentService.pay(paymentRequest, account, accountAmountDOList, merchantCredit, supplierStore);
+                }else{
+                    paymentOperations = decreaseAccount(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit);
+                }
+                merchantBillDetails = paymentOperations.stream()
                         .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
                         .map(MerchantAccountOperation::getMerchantBillDetail)
                         .collect(Collectors.toList());
+
 
 
                 //执行更新数据库
@@ -168,6 +180,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
     }
+
 
     /**
      * 判断消费场景是否符合配置
@@ -303,7 +316,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(PaymentOperation::getAccountDeductionDetail)
                 .collect(Collectors.toList());
         List<AccountAmountType> accountTypes = paymentOperations.stream()
-                .map(PaymentOperation::getAccountAmountType)
+                .map(PaymentOperation::getAccountAmountType).filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
@@ -315,7 +328,10 @@ public class PaymentServiceImpl implements PaymentService {
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
-        accountAmountTypeDao.saveOrUpdateBatch(accountTypes);
+        if(!CollectionUtils.isEmpty(accountTypes)){
+            //联通沃支付，没有修改accountTypes，所以if判断
+            accountAmountTypeDao.saveOrUpdateBatch(accountTypes);
+        }
     }
 
 
@@ -345,20 +361,21 @@ public class PaymentServiceImpl implements PaymentService {
         paymentOperation.setAccountAmountType(accountAmountType);
         paymentOperation.setMerchantAccountType(merchantAccountType);
         paymentOperation.setTransNo(paymentRequest.getTransNo());
-        AccountBillDetail accountBillDetail = generateAccountBillDetail(paymentRequest, operatedAmount, accountAmountTypes);
+        AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, operatedAmount, accountAmountTypes);
         paymentOperation.setAccountBillDetail(accountBillDetail);
         paymentOperation.setEnough(isCurrentEnough);
         /**
          * 扣减商户账户
          */
-        AccountDeductionDetail accountDeductionDetail = decreaseMerchant(
+        AccountDeductionDetail accountDeductionDetail = AccountAmountDO.decreaseMerchant(
                 paymentRequest,
                 accountAmountType,
                 operatedAmount,
                 paymentOperation,
                 accountAmountDO.getAccount(),
                 supplierStore,
-                merchantCredit
+                merchantCredit,
+                currentBalanceOperator
         );
         paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
         return paymentOperation;

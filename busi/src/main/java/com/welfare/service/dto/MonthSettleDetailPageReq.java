@@ -66,4 +66,7 @@ public class MonthSettleDetailPageReq extends PageReq {
 
     @ApiModelProperty("供应商")
     private String supplierCode;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

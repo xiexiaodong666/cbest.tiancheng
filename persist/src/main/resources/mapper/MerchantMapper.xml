@@ -9,4 +9,24 @@
         id,mer_name,mer_code,mer_type,mer_identity,mer_cooperation_mode,self_recharge,remark,create_user,create_time,update_user,update_time,status,version
     </sql>
 
+    <select id="supplierByMer" resultType="com.welfare.persist.entity.Merchant" >
+        select
+               supplier.id as id,
+               supplier.mer_code as merCode,
+               supplier.mer_name as merName,
+               supplier.mer_type as merType,
+               supplier.mer_identity as merIdentity,
+               supplier.mer_cooperation_mode as merCooperationMode,
+               supplier.self_recharge as selfRecharge
+        from merchant_store_relation r
+                 INNER JOIN supplier_store s on r.store_code = s.store_code
+                 INNER JOIN merchant supplier on supplier.mer_code = s.mer_code
+        <where>
+            <if test="merCode != null and merCode != ''">
+                r.mer_code = #{merCode}
+            </if>
+        </where>
+        GROUP BY supplier.mer_code
+    </select>
+
 </mapper>

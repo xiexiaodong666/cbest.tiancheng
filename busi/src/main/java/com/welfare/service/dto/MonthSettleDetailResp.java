@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -29,7 +30,7 @@ public class MonthSettleDetailResp{
 
     @ExcelProperty(value = "订单号")
     @ApiModelProperty(value = "订单号")
-    private String orderNO;
+    private String orderNo;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -113,4 +114,13 @@ public class MonthSettleDetailResp{
     @ExcelProperty("商户扣款方式")
     @ApiModelProperty("商户扣款方式")
     private String merDeductionTypeName;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
+
+    @ApiModelProperty("商户余额支出")
+    private BigDecimal merDeductionAmount;
+
+    @ApiModelProperty("商户授信支出")
+    private BigDecimal merDeductionCreditAmount;
 }

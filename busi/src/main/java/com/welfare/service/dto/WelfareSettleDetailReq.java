@@ -67,4 +67,7 @@ public class WelfareSettleDetailReq{
 
     @ApiModelProperty("结算状态")
     private String settleFlag;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

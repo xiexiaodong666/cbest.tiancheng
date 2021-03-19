@@ -50,9 +50,10 @@ public interface BarcodeService {
     /**
      * 获取一个支付条码
      * @param accountCode
+     * @param paymentChannel
      * @return
      */
-    PaymentBarcode getBarcode(Long accountCode);
+    PaymentBarcode getBarcode(Long accountCode, String paymentChannel);
 
     /**
      * 从barcode解析账户号

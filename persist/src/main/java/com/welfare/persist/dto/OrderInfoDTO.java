@@ -129,6 +129,11 @@ public class OrderInfoDTO extends Model<OrderInfoDTO> implements Serializable {
      * 更新时间
      */
 	private Date updateTime;
+
+    /**
+     * 支付渠道
+     */
+    private String paymentChannel;
 	/**
 	 * 时段
 	 */

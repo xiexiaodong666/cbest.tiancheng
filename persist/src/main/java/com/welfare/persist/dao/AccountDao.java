@@ -62,4 +62,10 @@ public class AccountDao extends ServiceImpl<AccountMapper, Account> {
         }
         return list;
     }
+
+    public Account queryByAccountCode(Long accountCode){
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Account.ACCOUNT_CODE,accountCode);
+        return getOne(queryWrapper);
+    }
 }

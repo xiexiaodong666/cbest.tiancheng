@@ -23,9 +23,9 @@ public class PaymentBarcode implements Serializable {
     private String barcode;
     @ApiModelProperty("扫描日期")
     private Date scanDate;
-    public static PaymentBarcode of(Long accountCode,Long secretKey){
+    public static PaymentBarcode of(Long accountCode, Long secretKey, String paymentChannel){
         PaymentBarcode paymentBarcode = new PaymentBarcode();
-        paymentBarcode.setBarcode(BarcodeUtil.generateBarcode(accountCode,secretKey));
+        paymentBarcode.setBarcode(BarcodeUtil.generateBarcode(accountCode,secretKey, paymentChannel));
         paymentBarcode.setScanDate(Calendar.getInstance().getTime());
         return paymentBarcode;
     }

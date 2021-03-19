@@ -105,3 +105,5 @@ xxl:
 notification:
   url: http://test-welfare-internal.kube.cbestcd.com
   #targetPath: https://test-welfare-app.sjgo365.com/tc/redirect?target=center
+wo-life:
+  url: http://113.204.98.245:8900

@@ -2,6 +2,7 @@ package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.Data;
 
@@ -57,4 +58,28 @@ public class AccountPageReq implements Serializable {
    */
   @ApiModelProperty("手机号码")
   private String phone;
+
+  /**
+   * 最小账号余额
+   */
+  @ApiModelProperty("最小账号余额")
+  private BigDecimal accountBalanceMin;
+
+  /**
+   * 最大账号余额
+   */
+  @ApiModelProperty("最大账号余额")
+  private BigDecimal accountBalanceMax;
+
+  /**
+   * 最小剩余授权额度
+   */
+  @ApiModelProperty("剩余授权额度")
+  private BigDecimal surplusQuotaMin;
+
+  /**
+   * 最大剩余授权额度
+   */
+  @ApiModelProperty("剩余授权额度")
+  private BigDecimal surplusQuotaMax;
 }

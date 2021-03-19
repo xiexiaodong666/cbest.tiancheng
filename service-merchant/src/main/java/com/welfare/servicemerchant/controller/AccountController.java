@@ -83,12 +83,36 @@ public class AccountController implements IController {
 
   @GetMapping("/page")
   @ApiOperation("分页查询账户")
-  public R<Page<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
+  public R<AccountPage<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
       AccountPageReq accountPageReq) {
+
+    AccountPage<AccountDTO> accountDTOAccountPage = new AccountPage<>();
+
+    if(accountPageReq.getAccountBalanceMin() != null && accountPageReq.getAccountBalanceMax() != null) {
+      if(accountPageReq.getAccountBalanceMin().compareTo(accountPageReq.getAccountBalanceMax()) > 0) {
+        return success(accountDTOAccountPage);
+      }
+    }
+
+    if(accountPageReq.getSurplusQuotaMin() != null && accountPageReq.getSurplusQuotaMax() != null) {
+      if(accountPageReq.getSurplusQuotaMin().compareTo(accountPageReq.getSurplusQuotaMax()) > 0) {
+        return success(accountDTOAccountPage);
+      }
+    }
+
     Page<AccountPageDTO> page = new Page(currentPage, pageSize);
+
     Page<AccountDTO> accountPage = accountService.getPageDTO(page, accountPageReq);
-    return success(accountPage);
+    accountDTOAccountPage.setRecords(accountPage.getRecords());
+    accountDTOAccountPage.setTotal(accountPage.getTotal());
+    accountDTOAccountPage.setSize(accountPage.getSize());
+    accountDTOAccountPage.setCurrent(accountPage.getCurrent());
+    if(CollectionUtils.isNotEmpty(accountDTOAccountPage.getRecords())) {
+      accountDTOAccountPage.setExt(accountService.getPageExtDTO(accountPageReq));
+    }
+
+    return success(accountDTOAccountPage);
   }
 
   @GetMapping("/{id}")

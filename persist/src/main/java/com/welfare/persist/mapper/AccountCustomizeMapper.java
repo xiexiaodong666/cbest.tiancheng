@@ -37,7 +37,26 @@ public interface AccountCustomizeMapper extends BaseMapper<Account> {
       @Param("accountTypeCodes")List<String> accountTypeCodes,
       @Param("binding") Integer binding,
       @Param("cardId")String cardId,
-      @Param("phone")String phone);
+      @Param("phone")String phone,
+      @Param("accountBalanceMin")BigDecimal accountBalanceMin,
+      @Param("accountBalanceMax")BigDecimal accountBalanceMax,
+      @Param("surplusQuotaMin")BigDecimal surplusQuotaMin,
+      @Param("surplusQuotaMax")BigDecimal surplusQuotaMax);
+
+  AccountPageExtDTO queryPageExtDTO(
+      @Param("merCode") String merCode,
+      @Param("accountName")String accountName,
+      @Param("departmentPathList")List<String>  departmentPathList,
+      @Param("accountStatus")Integer accountStatus,
+      @Param("accountTypeCodes")List<String> accountTypeCodes,
+      @Param("binding") Integer binding,
+      @Param("cardId")String cardId,
+      @Param("phone")String phone,
+      @Param("accountBalanceMin")BigDecimal accountBalanceMin,
+      @Param("accountBalanceMax")BigDecimal accountBalanceMax,
+      @Param("surplusQuotaMin")BigDecimal surplusQuotaMin,
+      @Param("surplusQuotaMax")BigDecimal surplusQuotaMax
+  );
 
   List<AccountPageDTO> queryPageDTO(@Param("merCode") String merCode,
       @Param("accountName")String accountName,

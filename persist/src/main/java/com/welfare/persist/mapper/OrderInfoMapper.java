@@ -3,6 +3,11 @@ package com.welfare.persist.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.OrderInfoDTO;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderBasicExtResponse;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailRequest;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailResponse;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalRequest;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalResponse;
 import com.welfare.persist.dto.query.OrderPageQuery;
 import com.welfare.persist.entity.OrderInfo;
 import com.welfare.persist.entity.OrderSummary;
@@ -28,4 +33,21 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
     List<OrderInfoDTO> searchOrder(@Param("orderPageQuery") OrderPageQuery orderPageQuery);
 
     OrderSummary searchOrderSum(@Param("orderPageQuery") OrderPageQuery orderPageQuery);
+
+    Page<CommodityOfflineOrderTotalResponse> getCommodityOfflineOrderTotal(Page page,
+        @Param("request") CommodityOfflineOrderTotalRequest request);
+
+    CommodityOfflineOrderBasicExtResponse getCommodityOfflineOrderTotalExt(
+        @Param("request") CommodityOfflineOrderTotalRequest request);
+
+    Page<CommodityOfflineOrderDetailResponse> getCommodityOfflineOrderDetail(Page page,
+        @Param("request") CommodityOfflineOrderDetailRequest request);
+
+    CommodityOfflineOrderBasicExtResponse getCommodityOfflineOrderDetailExt(
+        @Param("request") CommodityOfflineOrderDetailRequest request);
+
+    List<CommodityOfflineOrderTotalResponse> exportCommodityOfflineOrderTotal(@Param("request") CommodityOfflineOrderTotalRequest request);
+
+
+    List<CommodityOfflineOrderDetailResponse> exportCommodityOfflineOrderDetail(@Param("request") CommodityOfflineOrderDetailRequest request);
 }

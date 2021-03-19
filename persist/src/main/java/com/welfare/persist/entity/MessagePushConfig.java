@@ -4,8 +4,10 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,8 +20,8 @@ import lombok.experimental.Accessors;
 /**
  * (message_push_config)实体类
  *
- * @author kancy
- * @since 2021-03-19 11:01:29
+ * @author Yuxiang Li
+ * @since 2021-03-19 11:47:21
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
@@ -33,70 +35,75 @@ public class MessagePushConfig extends Model<MessagePushConfig> implements Seria
     /**
      * id
      */
-    @ApiModelProperty("id")  @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
      * 配置编码
      */
-    @ApiModelProperty("配置编码")  
+    @ApiModelProperty("配置编码")   
     private String configCode;
     /**
      * 配置名称
      */
-    @ApiModelProperty("配置名称")  
+    @ApiModelProperty("配置名称")   
     private String configName;
     /**
      * 商户名称
      */
-    @ApiModelProperty("商户名称")  
+    @ApiModelProperty("商户名称")   
     private String merCode;
     /**
      * 消息发送类型
      */
-    @ApiModelProperty("消息发送类型")  
+    @ApiModelProperty("消息发送类型")   
     private String targetType;
     /**
      * 模板类型
      */
-    @ApiModelProperty("模板类型")  
+    @ApiModelProperty("模板类型")   
     private String templateType;
     /**
      * 模板内容
      */
-    @ApiModelProperty("模板内容")  
+    @ApiModelProperty("模板内容")   
     private String templateContent;
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志")  
-    private Integer deleted;
+    @ApiModelProperty("删除标志") @TableLogic   
+    @TableField(fill = FieldFill.INSERT)
+	private Boolean deleted;
     /**
      * 创建人
      */
-    @ApiModelProperty("创建人")  
-    private String createUser;
+    @ApiModelProperty("创建人")   
+    @TableField(fill = FieldFill.INSERT)
+	private String createUser;
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")  
-    private Date createTime;
+    @ApiModelProperty("创建时间")   
+    @TableField(fill = FieldFill.INSERT)
+	private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty("更新人")  
-    private String updateUser;
+    @ApiModelProperty("更新人")   
+    @TableField(fill = FieldFill.UPDATE)
+	private String updateUser;
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")  
-    @TableField(update = "now()")
+    @ApiModelProperty("更新时间")   
+    @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
     /**
      * 版本
      */
-    @ApiModelProperty("版本") @Version 
-    private Integer version;
+    @ApiModelProperty("版本")  @Version 
+    @TableField(fill = FieldFill.INSERT)
+	private Integer version;
 
 //以下为列明常量
 

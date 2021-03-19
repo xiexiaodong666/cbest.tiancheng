@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 /**
  * @Author: duanhy
@@ -22,8 +23,8 @@ public class MessagPushConfigContactDTO {
   @ApiModelProperty("用户姓名")
   private String contactPerson;
 
-  @ApiModelProperty("推送时间(多个以;隔开 例：13:00;21:00 )")
-  private String pushTime;
+  @ApiModelProperty("格式：23:00")
+  private List<String> pushTimes;
 
   @ApiModelProperty("配置所属商户")
   private String merCode;

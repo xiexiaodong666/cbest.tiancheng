@@ -5,7 +5,7 @@ CREATE TABLE `message_push_config` (
                                        `mer_code` varchar(20) NOT NULL COMMENT '商户名称',
                                        `target_type` varchar(20) NOT NULL COMMENT '消息发送类型',
                                        `template_type` varchar(20) NOT NULL COMMENT '模板类型',
-                                       `template_content` varchar(500) NOT NULL COMMENT '模板内容',
+                                       `template_content` varchar(512) NOT NULL COMMENT '模板内容',
                                        `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
                                        `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
                                        `create_time` datetime DEFAULT NULL COMMENT '创建时间',

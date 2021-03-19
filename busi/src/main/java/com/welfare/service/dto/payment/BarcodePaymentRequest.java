@@ -66,7 +66,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
         }else if(barcode.startsWith(WelfareConstant.PaymentChannel.ALIPAY.barcodePrefix())){
             this.setPaymentChannel(WelfareConstant.PaymentChannel.ALIPAY.code());
         }else{
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "条码不符合规则", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "条码不符合规则", null);
         }
         return paymentChannel;
     }

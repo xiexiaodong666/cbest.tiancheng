@@ -35,7 +35,7 @@ public class ExceptionController implements IController {
         logger.error("业务异常： 请求路径：{}， 业务参数：{}, 异常：", reqURL, params, e);
 
         if(e instanceof BizException){
-            return fail(((BizException) e).getCode());
+            return fail(((BizException) e).getCodeEnum(),e.getMessage());
         }else{
             return fail(SystemCode.FAILURE,e.getMessage());
         }

@@ -1,10 +1,12 @@
 package com.welfare.common.exception;
 
+import net.dreamlu.mica.core.result.IResultCode;
+
 /**
  *
  * @author liyx1
  */
-public enum ExceptionCode {
+public enum ExceptionCode implements IResultCode {
     /**
      * 成功
      */
@@ -41,9 +43,11 @@ public enum ExceptionCode {
         this.msg = msg;
     }
 
-    public Integer getCode(){
+    @Override
+    public int getCode(){
         return this.code;
     }
+    @Override
     public String getMsg(){
         return this.msg;
     }

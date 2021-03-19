@@ -149,25 +149,21 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
 
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         PageInfo<MonthSettleDetailResp> monthSettleDetailDTOPageInfo = PageHelper.startPage(monthSettleDetailPageReq.getCurrent(), monthSettleDetailPageReq.getSize())
                 .doSelectPageInfo(() -> {
                     settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery).stream().map(monthSettleDetailDTO -> {
                                 MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();
                                 BeanUtils.copyProperties(monthSettleDetailDTO, monthSettleDetailResp);
+                                if (paymentChannelMap.containsKey(monthSettleDetailDTO.getPaymentChannel())) {
+                                    monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+                                }
                                 return monthSettleDetailResp;
                     }).collect(Collectors.toList());
                 });
 
         BasePageVo<MonthSettleDetailResp> monthSettleDetailRespPage = new BasePageVo<>(monthSettleDetailPageReq.getCurrent(),
                 monthSettleDetailPageReq.getSize(),monthSettleDetailDTOPageInfo.getTotal(), monthSettleDetailDTOPageInfo.getList());
-        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
-        if (paymentChannelMap != null && CollectionUtils.isNotEmpty(monthSettleDetailRespPage.getRecords())) {
-            monthSettleDetailRespPage.getRecords().forEach(monthSettleDetailResp -> {
-                if (paymentChannelMap.containsKey(monthSettleDetailResp.getPaymentChannel())) {
-                    monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailResp.getPaymentChannel()).getName());
-                }
-            });
-        }
         return monthSettleDetailRespPage;
     }
 

@@ -162,11 +162,15 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         BeanUtils.copyProperties(welfareSettleDetailPageReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
 
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         PageInfo<WelfareSettleDetailResp> welfareSettleDetailRespPageInfo = PageHelper.startPage(welfareSettleDetailPageReq.getCurrent(), welfareSettleDetailPageReq.getSize())
                 .doSelectPageInfo(() -> {
                     settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
                         WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
                         BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);
+                        if (paymentChannelMap.containsKey(welfareSettleDetailDTO.getPaymentChannel())) {
+                            welfareSettleDetailResp.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                        }
                         return welfareSettleDetailResp;
                     }).collect(Collectors.toList());
                 });
@@ -175,14 +179,6 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
         BasePageVo<WelfareSettleDetailResp> welfareSettleDetailRespBasePageVo = new BasePageVo<>(welfareSettleDetailPageReq.getCurrent(), welfareSettleDetailPageReq.getSize(),
                 welfareSettleDetailRespPageInfo.getTotal(), welfareSettleDetailRespPageInfo.getList(), extInfo);
-        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
-        if (paymentChannelMap != null && CollectionUtils.isNotEmpty(welfareSettleDetailRespBasePageVo.getRecords())) {
-            welfareSettleDetailRespBasePageVo.getRecords().forEach(monthSettleDetailResp -> {
-                if (paymentChannelMap.containsKey(monthSettleDetailResp.getPaymentChannel())) {
-                    monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailResp.getPaymentChannel()).getName());
-                }
-            });
-        }
         return welfareSettleDetailRespBasePageVo;
     }
 

@@ -35,7 +35,7 @@
         <result property="merDeductionType" column="mer_deduction_type"/>
         <result property="merDeductionTypeName" column="mer_deduction_type_name"/>
         <result property="consumeTypeName" column="consume_type_name"/>
-        <result property="paymentChannel" column="payment_channel"/>
+        <result property="paymentChannel" column="paymentChannel"/>
         <result property="merDeductionAmount" column="mer_deduction_amount"/>
         <result property="merDeductionCreditAmount" column="mer_credit_deduction_amount"/>
     </resultMap>

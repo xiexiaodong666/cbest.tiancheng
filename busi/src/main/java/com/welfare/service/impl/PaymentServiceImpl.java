@@ -20,7 +20,6 @@ import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.payment.*;
-import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
@@ -301,9 +300,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void onInsufficientBalance(PaymentRequest paymentRequest, Account account) {
         if(paymentRequest.getOffline()){
-            //离线模式需要锁定其离线交易
-            account.setOfflineLock(WelfareConstant.AccountOfflineFlag.DISABLE.code());
-            asyncService.updateAccount(account);
+            asyncService.onInsufficientBalanceOffline(account, paymentRequest);
         }
         throw new BizException(ExceptionCode.INSUFFICIENT_BALANCE);
     }

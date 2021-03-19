@@ -1,8 +1,10 @@
 package com.welfare.service.async;
 
 import com.alibaba.fastjson.JSON;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
+import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.remote.NotificationFeign;
 import com.welfare.service.remote.entity.NotificationReq;
 import com.welfare.service.remote.entity.NotificationResp;
@@ -45,7 +47,10 @@ public class AsyncService {
     }
 
     @Async("e-welfare-taskExecutor")
-    public void updateAccount(Account account){
+    public void onInsufficientBalanceOffline(Account account, PaymentRequest paymentRequest){
+        //离线模式需要锁定其离线交易
+        account.setOfflineLock(WelfareConstant.AccountOfflineFlag.DISABLE.code());
         accountDao.updateById(account);
+        //todo 发送锁定短信
     }
 }

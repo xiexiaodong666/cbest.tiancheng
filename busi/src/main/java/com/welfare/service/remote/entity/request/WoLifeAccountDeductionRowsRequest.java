@@ -7,6 +7,9 @@ import javax.validation.constraints.NotNull;
 import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
 
+import static com.welfare.common.constants.WelfareConstant.DEFAULT_SALE_UNID;
+import static com.welfare.common.constants.WelfareConstant.DEFAULT_SALE_UNNAME;
+
 /**
  * @author gaorui
  * @version 1.0.0
@@ -42,9 +45,9 @@ public class WoLifeAccountDeductionRowsRequest {
   public static WoLifeAccountDeductionRowsRequest of(PaymentRequest paymentRequest){
     WoLifeAccountDeductionRowsRequest woLifeAccountDeductionRowsRequest = new WoLifeAccountDeductionRowsRequest();
     woLifeAccountDeductionRowsRequest.setCount(1);
-    woLifeAccountDeductionRowsRequest.setName("重百线下消费商品");
+    woLifeAccountDeductionRowsRequest.setName(DEFAULT_SALE_UNNAME);
     woLifeAccountDeductionRowsRequest.setPrice(paymentRequest.getAmount());
-    woLifeAccountDeductionRowsRequest.setSaleUnId("cbest-offline-default");
+    woLifeAccountDeductionRowsRequest.setSaleUnId(DEFAULT_SALE_UNID);
     return woLifeAccountDeductionRowsRequest;
   }
 }

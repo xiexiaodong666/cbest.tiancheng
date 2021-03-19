@@ -5,6 +5,8 @@ import javax.validation.constraints.NotBlank;
 import com.welfare.service.dto.RefundRequest;
 import lombok.Data;
 
+import static com.welfare.common.constants.WelfareConstant.DEFAULT_SALE_UNID;
+
 /**
  * @author gaorui
  * @version 1.0.0
@@ -21,7 +23,7 @@ public class WoLifeRefundWriteOffRowsRequest {
 
   public static WoLifeRefundWriteOffRowsRequest of(RefundRequest refundRequest){
     WoLifeRefundWriteOffRowsRequest woLifeRefundWriteOffRowsRequest = new WoLifeRefundWriteOffRowsRequest();
-    woLifeRefundWriteOffRowsRequest.setSaleUnId("");
+    woLifeRefundWriteOffRowsRequest.setSaleUnId(DEFAULT_SALE_UNID);
     return woLifeRefundWriteOffRowsRequest;
   }
 }

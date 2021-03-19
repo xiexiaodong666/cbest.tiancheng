@@ -20,11 +20,9 @@ public class MessagPushConfigContactDTO {
   private String contact;
 
   @ApiModelProperty("用户姓名")
-  @NotEmpty(message = "用户姓名不能为空")
   private String contactPerson;
 
-  @ApiModelProperty("推送时间")
-  @NotEmpty(message = "至少保留一个推送时间")
+  @ApiModelProperty("推送时间(多个以;隔开 例：13:00;21:00 )")
   private String pushTime;
 
   @ApiModelProperty("配置所属商户")

@@ -4,6 +4,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -18,7 +19,7 @@ public class MonthSettleDetailDTO{
 
     private String transNo;
 
-    private String orderNO;
+    private String orderNo;
 
     private Date transTime;
 
@@ -68,4 +69,10 @@ public class MonthSettleDetailDTO{
     private String merDeductionTypeName;
 
     private String consumeTypeName;
+
+    private String paymentChannel;
+
+    private BigDecimal merDeductionAmount;
+
+    private BigDecimal merDeductionCreditAmount;
 }

@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.service.sync.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.welfare.common.exception.BizException;
@@ -43,7 +44,7 @@ public class MerchantStoreRelationHandler {
     RoleConsumptionReq roleConsumptionReq = evt.getRoleConsumptionReq();
     log.info("消费门店同步请求数据:{}", roleConsumptionReq);
     RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateRoleConsumption(roleConsumptionReq);
-    log.info("消费门店同步返回数据:{}", resp);
+    log.info("消费门店同步返回数据:{} ,请求:{}", JSON.toJSONString(resp), JSON.toJSONString(roleConsumptionReq));
 
     if (!("0000").equals(resp.getCode())) {
       throw new BizException("同步消费门店数据到商城中心失败msg【" + resp.getMsg() + "】");

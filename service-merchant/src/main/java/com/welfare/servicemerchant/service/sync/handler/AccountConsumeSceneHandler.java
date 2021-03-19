@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.service.sync.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
@@ -82,6 +83,8 @@ public class AccountConsumeSceneHandler {
         gson.toJson(userRoleBindingReqDTO));
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateUserRoleBinding(userRoleBindingReqDTO);
+    log.info("同步员工类型数据，resp【{}】req【{}】", JSON.toJSONString(roleConsumptionResp), JSON.toJSONString(userRoleBindingReqDTO));
+
     if (!("0000").equals(roleConsumptionResp.getCode())) {
       throw new BizException("同步员工类型数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
     }

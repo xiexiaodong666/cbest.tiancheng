@@ -62,6 +62,7 @@
             </if>
             and t1.trans_type in('consume','refund')
             and t1.mer_account_type in ('surplus_quota','surplus_quota_overpay')
+            and t1.payment_channel in ('welfare', 'wo_life')
         </where>
         group by t1.id
         order by t1.id
@@ -175,7 +176,7 @@
         when esd.trans_type='refund' then IFNULL(esd.trans_amount*-1,0)
         else 0 end)as totalConsumerAmount
         from employee_settle_detail esd left join account a on esd.account_code = a.account_code
-        left join department d on a.store_code = d.department_code
+        left join department d on a.department = d.department_code
         where esd.mer_code = #{query.merCode}
         <include refid="getEmployeeSettleConsumeWhere"/>
         group by esd.account_code
@@ -185,7 +186,7 @@
         select
         <include refid="employeeSettleSum"></include>
         from employee_settle_detail esd left join account a on esd.account_code = a.account_code
-        left join department d on a.store_code = d.department_code
+        left join department d on a.department = d.department_code
         where esd.mer_code = #{query.merCode}
         <include refid="getEmployeeSettleConsumeWhere"/>
 
@@ -195,7 +196,7 @@
         select
         <include refid="employeeSettleSum"></include>
         from employee_settle_detail esd left join account a on esd.account_code = a.account_code
-        left join department d on a.store_code = d.department_code
+        left join department d on a.department = d.department_code
         where 1=1
         <include refid="employeeSettleDetailQuery"></include>
     </select>
@@ -207,7 +208,7 @@
                esd.mer_account_type_name merAccountType,
                esd.account_name accountName,
                a.phone phone,
-               a.store_code departmentCode,
+               a.department departmentCode,
                d.department_name departmentName,
                esd.store_code storeCode,
                esd.store_name storeName,
@@ -224,7 +225,7 @@
                     when esd.settle_flag = 'settled' then '已结算' end as settleFlag
         from employee_settle_detail esd
         left join account a on esd.account_code = a.account_code
-        left join department d on a.store_code=d.department_code
+        left join department d on a.department=d.department_code
         where 1=1
         <include refid="employeeSettleDetailQuery"/>
         <if test="query.limit!=null and query.minId!=null">
@@ -254,7 +255,7 @@
         max(esd.trans_time) as maxTransTime
         from employee_settle_detail esd
         left join account a on esd.account_code = a.account_code
-        left join department d on a.store_code = d.department_code
+        left join department d on a.department = d.department_code
         <where>
             esd.settle_flag='unsettled'
             <if test="query.accountName!=null and query.accountName!=''">
@@ -305,7 +306,7 @@
         esd.*
         from employee_settle_detail esd
         left join account a on esd.account_code = a.account_code
-        left join department d on a.store_code = d.department_code
+        left join department d on a.department = d.department_code
         <where>
             esd.settle_flag='unsettled'
             <if test="query.merCode!=null and query.merCode!=''">

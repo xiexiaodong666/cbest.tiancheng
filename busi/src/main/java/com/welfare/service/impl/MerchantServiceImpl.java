@@ -290,4 +290,9 @@ public class MerchantServiceImpl implements MerchantService {
         }
         return false;
     }
+
+    @Override
+    public List<Merchant> supplierByMer(String merCode) {
+        return merchantDao.getBaseMapper().supplierByMer(merCode);
+    }
 }

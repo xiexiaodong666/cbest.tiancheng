@@ -15,7 +15,7 @@
         <result property="phone" column="phone"/>
         <result property="accountName" column="account_name"/>
         <result property="rechargeAmount" column="recharge_amount"/>
-        <result property="departmentCode" column="store_code"/>
+        <result property="departmentCode" column="department"/>
         <result property="departmentName" column="department_name"/>
     </resultMap>
 
@@ -50,11 +50,11 @@
          ad.account_code,
          ac.phone,
          ad.recharge_amount,
-         ac.store_code,
+         ac.department,
          de.department_name
         from account ac LEFT JOIN account_deposit_apply_detail ad
         on ac.account_code = ad.account_code
-        LEFT JOIN department de ON de.department_code = ac.store_code
+        LEFT JOIN department de ON de.department_code = ac.department
         where ad.apply_code = #{applyCode} and ac.deleted = 0 and ad.deleted = 0
     </select>
 

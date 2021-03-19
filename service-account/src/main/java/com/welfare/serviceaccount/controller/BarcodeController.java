@@ -42,8 +42,9 @@ public class BarcodeController implements IController {
     private final SupplierStoreDao supplierStoreDao;
     @GetMapping
     @ApiOperation("用户获取支付条码")
-    public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode){
-        PaymentBarcode barcode = barcodeService.getBarcode(accountCode);
+    public R<PaymentBarcode> getPaymentBarcode(@RequestParam @ApiParam("账户编号") Long accountCode,
+                                               @RequestParam @ApiParam("支付渠道") String paymentChannel){
+        PaymentBarcode barcode = barcodeService.getBarcode(accountCode, paymentChannel);
         return success(barcode);
     }
 

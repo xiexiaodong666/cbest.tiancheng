@@ -1,6 +1,7 @@
 package com.welfare.service.dto.payment;
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -14,6 +15,8 @@ import lombok.Data;
 @Data
 public class OnlinePaymentRequest extends PaymentRequest {
 
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 
     @Override
     public Long calculateAccountCode(){

@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dto.AccountConsumeSceneDO;
 import com.welfare.persist.dto.AccountIncrementDTO;
+import com.welfare.persist.dto.AccountOverviewDTO;
 import com.welfare.persist.dto.AccountPageDTO;
+import com.welfare.persist.dto.AccountPaymentChannelDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.CardInfo;
@@ -77,6 +79,11 @@ public interface AccountService {
   List<Long> getAccountCodeList(List<Long> accountCodes);
 
   AccountSimpleDTO queryAccountInfo(Long accountCode);
+
+  AccountOverviewDTO queryAccountOverview(Long accountCode, String paymentChannel);
+
+  List<AccountPaymentChannelDTO> queryPaymentChannelList(Long accountCode);
+
   void batchUpdateChangeEventId(List<Map<String,Object>> list);
   List<Account> queryByAccountTypeCode(String accountTypeCode);
   List<Account> queryByAccountTypeCode(List<String> accountTypeCode);

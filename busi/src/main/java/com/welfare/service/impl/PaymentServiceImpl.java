@@ -133,7 +133,7 @@ public class PaymentServiceImpl implements PaymentService {
                 String paymentChannel = paymentRequest.getPaymentChannel();
                 List<PaymentOperation> paymentOperations;
                 List<MerchantBillDetail> merchantBillDetails = null;
-                if(paymentChannel.equals(WelfareConstant.PaymentChannel.WO_LIFE.code())){
+                if(WelfareConstant.PaymentChannel.WO_LIFE.code().equals(paymentChannel)){
                     paymentOperations = woLifePaymentService.pay(paymentRequest, account, accountAmountDOList, merchantCredit, supplierStore);
                 }else{
                     paymentOperations = decreaseAccount(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit);

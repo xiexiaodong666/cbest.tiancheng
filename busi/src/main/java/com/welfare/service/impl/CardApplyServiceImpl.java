@@ -189,7 +189,7 @@ public class CardApplyServiceImpl implements CardApplyService {
       queryWrapperCardInfo.ne(CardInfo.CARD_STATUS, WelfareConstant.CardStatus.NEW.code());
       List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapperCardInfo);
       if (CollectionUtils.isNotEmpty(cardInfoList)) {
-        throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "卡片已被写入或者绑定, 不能删除", null);
+        throw new BizException(ExceptionCode.CARD_WRITTEN_OR_BIND, "卡片已被写入或者绑定, 不能删除", null);
       } else {
         queryWrapperCardInfo.clear();
         queryWrapperCardInfo.eq(CardInfo.APPLY_CODE, cardApply.getApplyCode());

@@ -28,8 +28,10 @@ public enum ExceptionCode implements IResultCode {
 
 
     //------条码相关异常------
-    BARCODE_EXPIRE(5003001,"条码过期");
+    BARCODE_EXPIRE(5003001,"条码过期"),
 
+    //______卡片相关异常------
+    CARD_WRITTEN_OR_BIND(5004001,"卡片已被写入或者绑定, 不能删除");
 
 
 

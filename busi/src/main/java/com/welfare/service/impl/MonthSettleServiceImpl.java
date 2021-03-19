@@ -73,6 +73,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     private SettleDetailDao settleDetailDao;
     @Autowired
     private SupplierStoreDao supplierStoreDao;
+    @Autowired
     private PaymentChannelDao paymentChannelDao;
 
 

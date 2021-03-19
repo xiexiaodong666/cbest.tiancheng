@@ -16,12 +16,14 @@ import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MonthSettleDao;
+import com.welfare.persist.dao.PaymentChannelDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.entity.PaymentChannel;
 import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MonthSettleMapper;
@@ -32,6 +34,7 @@ import com.welfare.service.remote.MerchantCreditFeign;
 import com.welfare.service.remote.entity.MerchantCreditResp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +73,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     private SettleDetailDao settleDetailDao;
     @Autowired
     private SupplierStoreDao supplierStoreDao;
+    private PaymentChannelDao paymentChannelDao;
 
 
     @Override
@@ -155,7 +159,14 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         BasePageVo<MonthSettleDetailResp> monthSettleDetailRespPage = new BasePageVo<>(monthSettleDetailPageReq.getCurrent(),
                 monthSettleDetailPageReq.getSize(),monthSettleDetailDTOPageInfo.getTotal(), monthSettleDetailDTOPageInfo.getList());
-
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
+        if (paymentChannelMap != null && CollectionUtils.isNotEmpty(monthSettleDetailRespPage.getRecords())) {
+            monthSettleDetailRespPage.getRecords().forEach(monthSettleDetailResp -> {
+                if (paymentChannelMap.containsKey(monthSettleDetailResp.getPaymentChannel())) {
+                    monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailResp.getPaymentChannel()).getName());
+                }
+            });
+        }
         return monthSettleDetailRespPage;
     }
 

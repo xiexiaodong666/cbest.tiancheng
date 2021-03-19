@@ -12,10 +12,7 @@ import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.AccountUtil;
-import com.welfare.persist.dao.MerchantDao;
-import com.welfare.persist.dao.MerchantStoreRelationDao;
-import com.welfare.persist.dao.SettleDetailDao;
-import com.welfare.persist.dao.SupplierStoreDao;
+import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.ProprietaryConsumePageQuery;
@@ -92,6 +89,9 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Autowired
     private MerchantDao merchantDao;
+
+    @Autowired
+    private PaymentChannelDao paymentChannelDao;
 
     @Override
     public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
@@ -175,7 +175,14 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
         BasePageVo<WelfareSettleDetailResp> welfareSettleDetailRespBasePageVo = new BasePageVo<>(welfareSettleDetailPageReq.getCurrent(), welfareSettleDetailPageReq.getSize(),
                 welfareSettleDetailRespPageInfo.getTotal(), welfareSettleDetailRespPageInfo.getList(), extInfo);
-
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
+        if (paymentChannelMap != null && CollectionUtils.isNotEmpty(welfareSettleDetailRespBasePageVo.getRecords())) {
+            welfareSettleDetailRespBasePageVo.getRecords().forEach(monthSettleDetailResp -> {
+                if (paymentChannelMap.containsKey(monthSettleDetailResp.getPaymentChannel())) {
+                    monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailResp.getPaymentChannel()).getName());
+                }
+            });
+        }
         return welfareSettleDetailRespBasePageVo;
     }
 

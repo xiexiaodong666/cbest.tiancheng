@@ -33,4 +33,4 @@ CREATE TABLE `message_push_config_contact` (
                                                PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-alter table account add column offline int(2) DEFAULT 1 comment '离线是否可用';
+alter table account add column offline_lock int(2) DEFAULT 1 comment '离线是否可用';

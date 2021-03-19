@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.util.List;
 
 /**
  * @Author: duanhy
@@ -23,7 +24,7 @@ public class MessagConfigContactAddReq {
   @NotEmpty(message = "用户姓名不能为空")
   private String contactPerson;
 
-  @ApiModelProperty(value = "推送时间(多个以;隔开 例：13:00;21:00 )", required = true)
+  @ApiModelProperty(value = "格式：23:00",required = true)
   @NotEmpty(message = "最少保留一个推送时间")
-  private String pushTime;
+  private List<String> pushTimes;
 }

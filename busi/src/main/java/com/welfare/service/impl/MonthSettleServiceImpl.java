@@ -157,6 +157,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
                                 BeanUtils.copyProperties(monthSettleDetailDTO, monthSettleDetailResp);
                                 if (paymentChannelMap.containsKey(monthSettleDetailDTO.getPaymentChannel())) {
                                     monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+                                    monthSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
                                 }
                                 return monthSettleDetailResp;
                     }).collect(Collectors.toList());

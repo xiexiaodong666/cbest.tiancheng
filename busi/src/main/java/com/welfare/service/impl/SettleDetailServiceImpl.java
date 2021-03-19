@@ -170,6 +170,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
                         BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);
                         if (paymentChannelMap.containsKey(welfareSettleDetailDTO.getPaymentChannel())) {
                             welfareSettleDetailResp.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                            welfareSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
                         }
                         return welfareSettleDetailResp;
                     }).collect(Collectors.toList());

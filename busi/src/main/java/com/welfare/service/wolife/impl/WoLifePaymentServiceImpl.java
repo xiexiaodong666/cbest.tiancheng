@@ -158,6 +158,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
             accountBillDetailDao.saveOrUpdateBatch(Arrays.asList(refundBillDetail, thePaidBilDetail));
             accountDeductionDetailDao.saveOrUpdateBatch(Arrays.asList(refundDeductionDetail, thePaidDeductionDetail));
+            refundRequest.setRefundStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
         } finally {
             DistributedLockUtil.unlock(accountLock);
         }

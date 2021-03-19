@@ -10,6 +10,8 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.AccountUtil;
+import com.welfare.persist.dao.*;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
@@ -89,6 +91,9 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     @Autowired
     private MerchantDao merchantDao;
 
+    @Autowired
+    private PaymentChannelDao paymentChannelDao;
+
     @Override
     public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
         return settleDetailMapper.getWelfareSettleAllMerchant(welfareSettleQuery);
@@ -158,11 +163,16 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         BeanUtils.copyProperties(welfareSettleDetailPageReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
 
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         PageInfo<WelfareSettleDetailResp> welfareSettleDetailRespPageInfo = PageHelper.startPage(welfareSettleDetailPageReq.getCurrent(), welfareSettleDetailPageReq.getSize())
                 .doSelectPageInfo(() -> {
                     settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
                         WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
                         BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);
+                        if (paymentChannelMap.containsKey(welfareSettleDetailDTO.getPaymentChannel())) {
+                            welfareSettleDetailResp.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                            welfareSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                        }
                         return welfareSettleDetailResp;
                     }).collect(Collectors.toList());
                 });
@@ -171,7 +181,6 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
         BasePageVo<WelfareSettleDetailResp> welfareSettleDetailRespBasePageVo = new BasePageVo<>(welfareSettleDetailPageReq.getCurrent(), welfareSettleDetailPageReq.getSize(),
                 welfareSettleDetailRespPageInfo.getTotal(), welfareSettleDetailRespPageInfo.getList(), extInfo);
-
         return welfareSettleDetailRespBasePageVo;
     }
 

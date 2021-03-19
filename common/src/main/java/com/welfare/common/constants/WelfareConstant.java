@@ -12,6 +12,10 @@ public class WelfareConstant {
 
     }
 
+    public static final String DEFAULT_SALE_UNID = "cbest-offline-default";
+    public static final String DEFAULT_SALE_UNNAME = "重百线下消费商品";
+
+
     /**
      * 离线是否启用
      */

@@ -70,7 +70,7 @@
         t1.order_channel as orderChannel,
         oi.order_id as order_id,
         'unsettled' as settleFlag,
-        t1.payment_channel as dataType,
+        'welfare' as dataType,
         'system' as create_user,
         t1.payment_channel as paymentChannel
         from account_deduction_detail t1

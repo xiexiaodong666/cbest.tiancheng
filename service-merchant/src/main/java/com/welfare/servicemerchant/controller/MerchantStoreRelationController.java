@@ -226,8 +226,7 @@ public class MerchantStoreRelationController implements IController {
       String[] storeCodeArray = storeCodes.split(",");
       String[] storeAliaArray = storeAlias.split(",");
 
-      if (Strings.isNotEmpty(storeCodes) && Strings.isNotEmpty(storeAlias)
-          && storeCodeArray.length == storeAliaArray.length) {
+      if (Strings.isNotEmpty(storeCodes) && Strings.isNotEmpty(storeAlias)) {
         List<AdminMerchantStore> merchantStores = new ArrayList<>();
 
         for (int i = 0; i < storeCodeArray.length; i++) {

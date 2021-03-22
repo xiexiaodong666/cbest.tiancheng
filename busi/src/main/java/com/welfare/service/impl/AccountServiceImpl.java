@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -822,7 +823,11 @@ public class AccountServiceImpl implements AccountService {
             Wrappers.<PaymentChannel>lambdaQuery()
                 .eq(PaymentChannel::getMerchantCode, account.getMerCode())
                 .eq(PaymentChannel::getDeleted, 0)
+                .groupBy(PaymentChannel::getCode)
                 .orderByAsc(PaymentChannel::getShowOrder));
+        if(CollectionUtil.isEmpty(channelList)) {
+            channelList = paymentChannelDao.listByDefaultGroupByCode();
+        }
 
         List<AccountPaymentChannelDTO> paymentChannelList = channelList.stream()
             .map(paymentChannel -> {

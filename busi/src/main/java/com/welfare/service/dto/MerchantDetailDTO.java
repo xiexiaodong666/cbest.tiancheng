@@ -94,4 +94,7 @@ public class MerchantDetailDTO {
 
   @ApiModelProperty("员工卡消费明细门店显示")
   private String billDetailShowStoreName;
+
+  @ApiModelProperty("员工卡消费明细门店显示(字典转义)")
+  private String billDetailShowStoreNameName;
 }

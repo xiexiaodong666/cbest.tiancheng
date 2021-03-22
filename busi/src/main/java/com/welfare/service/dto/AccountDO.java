@@ -1,6 +1,8 @@
 package com.welfare.service.dto;
 
 import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.Department;
+import com.welfare.persist.entity.Merchant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,12 +25,27 @@ public class AccountDO {
     private String accountTypeCode;
     @ApiModelProperty("账户类型名称")
     private String accountTypeName;
+    @ApiModelProperty("电话号码")
+    private String phone;
+    @ApiModelProperty("商户编码")
+    private String merCode;
+    @ApiModelProperty("商户名称")
+    private String merName;
+    @ApiModelProperty("部门编码")
+    private String departmentCode;
+    @ApiModelProperty("部门名称")
+    private String departmentName;
 
-    public static AccountDO of(Account account){
+    public static AccountDO of(Account account, Department department, Merchant merchant){
         AccountDO accountDO = new AccountDO();
         accountDO.setAccountCode(account.getAccountCode());
         accountDO.setAccountName(account.getAccountName());
         accountDO.setAccountTypeCode(account.getAccountTypeCode());
+        accountDO.setPhone(account.getPhone());
+        accountDO.setDepartmentName(department.getDepartmentName());
+        accountDO.setDepartmentCode(department.getDepartmentCode());
+        accountDO.setMerCode(merchant.getMerCode());
+        accountDO.setMerName(merchant.getMerName());
         return accountDO;
     }
 }

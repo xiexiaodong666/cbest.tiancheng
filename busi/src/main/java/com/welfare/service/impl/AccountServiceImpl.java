@@ -139,6 +139,8 @@ public class AccountServiceImpl implements AccountService {
                 e -> e));
 
     private final WoLifeFeignService woLifeFeignService;
+    private final DepartmentDao departmentDao;
+    private final MerchantDao merchantDao;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -1032,7 +1034,11 @@ public class AccountServiceImpl implements AccountService {
                 .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
         }
         Assert.notNull(accountCode, "根据条件没有解析出账号");
-        return AccountDO.of(this.getByAccountCode(accountCode));
+        Account account = this.getByAccountCode(accountCode);
+        Assert.notNull(account,"找不到账号:"+accountCode);
+        Department department = departmentDao.queryByCode(account.getDepartment());
+        Merchant merchant = merchantDao.queryByCode(account.getMerCode());
+        return AccountDO.of(account, department, merchant);
     }
 
     @Override

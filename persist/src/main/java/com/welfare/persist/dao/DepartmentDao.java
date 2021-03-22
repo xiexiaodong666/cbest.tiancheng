@@ -37,4 +37,10 @@ public class DepartmentDao extends ServiceImpl<DepartmentMapper, Department> {
     }
     return map;
   }
+
+  public Department queryByCode(String departmentCode) {
+    QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(Department.DEPARTMENT_CODE,departmentCode);
+    return getOne(queryWrapper);
+  }
 }

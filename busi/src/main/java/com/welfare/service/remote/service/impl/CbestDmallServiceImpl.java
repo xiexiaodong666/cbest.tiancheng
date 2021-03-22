@@ -6,6 +6,7 @@ import com.welfare.common.exception.BizException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.SupplierStore;
+import com.welfare.service.dto.messagepushconfig.WarningSettingSaveReq;
 import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
 import com.welfare.service.dto.offline.OfflineOrderDTO;
 import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
@@ -147,6 +148,11 @@ public class CbestDmallServiceImpl implements CbestDmallService {
       throw new BizException(resp.getMsg());
     }
     return resp.getData();
+  }
+
+  @Override
+  public DmallResponse<Object> saveWarningSetting(WarningSettingSaveReq req) {
+    return null;
   }
 
   private <T> Page<T> toPage(PagingResult<T> pagingResult, PagingCondition pagingCondition) {

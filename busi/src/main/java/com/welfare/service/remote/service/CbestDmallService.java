@@ -1,6 +1,7 @@
 package com.welfare.service.remote.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.messagepushconfig.WarningSettingSaveReq;
 import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
 import com.welfare.service.dto.offline.OfflineOrderDTO;
 import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
@@ -79,4 +80,11 @@ public interface CbestDmallService {
    * @return
    */
   OfflineOrderAccountSummaryDTO summaryAccountOfflineTrade(String merchantCode);
+
+  /**
+   * 保存短信通知设置
+   * @param req
+   * @return
+   */
+  DmallResponse<Object> saveWarningSetting(WarningSettingSaveReq req);
 }

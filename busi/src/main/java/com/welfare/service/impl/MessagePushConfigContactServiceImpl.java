@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.google.common.collect.Lists;
+import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
@@ -13,12 +14,17 @@ import com.welfare.service.dto.MessagePushConfigDao;
 import com.welfare.service.dto.messagepushconfig.MessagConfigContactAddReq;
 import com.welfare.service.dto.messagepushconfig.MessagConfigContactEditReq;
 import com.welfare.service.dto.messagepushconfig.MessagPushConfigContactDTO;
+import com.welfare.service.sync.event.AccountEvt;
+import com.welfare.service.sync.event.MessagePushConfigEvt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -37,9 +43,11 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
 
     private final MessagePushConfigContactDao messagePushConfigContactDao;
     private final MessagePushConfigDao messagePushConfigDao;
+    private final ApplicationContext applicationContext;
 
     @Override
-    public boolean add(MessagConfigContactAddReq req) {
+    @Transactional(rollbackFor = Exception.class)
+    public String add(MessagConfigContactAddReq req) {
         // 查询主表信息
         String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
         MessagePushConfig config = messagePushConfigDao.getByMerCode(merCode);
@@ -59,11 +67,17 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
         contact.setContactPerson(req.getContactPerson());
         contact.setContact(req.getContact());
         contact.setConfigCode(config.getConfigCode());
-        return messagePushConfigContactDao.save(contact);
+        boolean flag = messagePushConfigContactDao.save(contact);
+        // 推送给智慧食堂
+        if (flag) {
+            applicationContext.publishEvent(MessagePushConfigEvt.builder().contact(contact).build());
+        }
+        return contact.getId() + "";
     }
 
     @Override
-    public boolean edit(MessagConfigContactEditReq req) {
+    @Transactional(rollbackFor = Exception.class)
+    public String edit(MessagConfigContactEditReq req) {
         String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
         MessagePushConfig config = messagePushConfigDao.getByMerCode(merCode);
         BizAssert.notNull(config, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户短信配置不存在");
@@ -76,14 +90,26 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
         contact.setContact(req.getContact());
         contact.setContactPerson(req.getContactPerson());
         contact.setPushTime(String.join(";", req.getPushTimes()));
-        return messagePushConfigContactDao.updateById(contact);
+        boolean flag = messagePushConfigContactDao.updateById(contact);
+        // 推送给智慧食堂
+        if (flag) {
+            applicationContext.publishEvent(MessagePushConfigEvt.builder().contact(contact).build());
+        }
+        return contact.getId() + "";
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
         MessagePushConfigContact contact = messagePushConfigContactDao.getById(id);
         BizAssert.notNull(contact, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("配置不已存在[%s]", id));
-        return messagePushConfigContactDao.removeById(id);
+        boolean flag = messagePushConfigContactDao.removeById(id);
+        // 推送给智慧食堂
+        if (flag) {
+            contact.setDeleted(Boolean.TRUE);
+            applicationContext.publishEvent(MessagePushConfigEvt.builder().contact(contact).build());
+        }
+        return flag;
     }
 
     @Override

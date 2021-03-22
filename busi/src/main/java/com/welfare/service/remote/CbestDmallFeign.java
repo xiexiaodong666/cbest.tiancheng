@@ -1,6 +1,7 @@
 package com.welfare.service.remote;
 
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
+import com.welfare.service.dto.messagepushconfig.WarningSettingSaveReq;
 import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
 import com.welfare.service.dto.offline.OfflineOrderDTO;
 import com.welfare.service.dto.offline.OfflineOrderExportReq;
@@ -107,4 +108,12 @@ public interface CbestDmallFeign {
    */
   @PostMapping("/orangeapi/manage/offline-trade/account/summary")
   DmallResponse<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(@RequestParam("merchantCode") String merchantCode);
+
+  /**
+   * 保存短信通知设置
+   * @param req
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/warning-setting/save")
+  DmallResponse<Object> saveWarningSetting(@RequestBody WarningSettingSaveReq req);
 }

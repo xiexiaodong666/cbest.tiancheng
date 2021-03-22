@@ -43,7 +43,7 @@ public class MessagePushConfigController {
   @GetMapping("/contact/list")
   @ApiOperation("获取配置列表")
   @MerchantUser
-  public R<List<MessagPushConfigContactDTO>> contactList(@ApiParam(name = "手机号") String contact) {
+  public R<List<MessagPushConfigContactDTO>> contactList(String contact) {
     return R.success(configContactService.listByContact(contact));
   }
 
@@ -58,17 +58,17 @@ public class MessagePushConfigController {
   @PostMapping("/contact/export")
   @ApiOperation("导出配置列表(返回文件下载地址)")
   @MerchantUser
-  public R<String> exportContact(@ApiParam(name = "手机号") String contact) throws IOException {
+  public R<String> exportContact(String contact) throws IOException {
     List<MessagPushConfigContactDTO> dtos = configContactService.listByContact(contact);
     Merchant merchant = merchantService.getMerchantByMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
-    String path = fileUploadService.uploadExcelFile(MessagPushConfigExcelDTO.of(dtos, merchant), MessagPushConfigContactDTO.class, "短信配置");
+    String path = fileUploadService.uploadExcelFile(MessagPushConfigExcelDTO.of(dtos, merchant), MessagPushConfigExcelDTO.class, "短信配置");
     return R.success(fileUploadService.getFileServerUrl(path));
   }
 
   @PostMapping("/contact/del")
   @ApiOperation("删除配置")
   @MerchantUser
-  public R<Boolean> contactDel(@ApiParam(required = true) String id) {
+  public R<Boolean> contactDel(String id) {
     BizAssert.notBlank(id, ExceptionCode.ILLEGALITY_ARGURMENTS, "id不能为空");
     return R.success(configContactService.delete(id));
   }
@@ -76,14 +76,14 @@ public class MessagePushConfigController {
   @PostMapping("/contact/edit")
   @ApiOperation("编辑配置")
   @MerchantUser
-  public R<Boolean> contactEdit(@Validated @RequestBody MessagConfigContactEditReq req) {
+  public R<String> contactEdit(@Validated @RequestBody MessagConfigContactEditReq req) {
     return R.success(configContactService.edit(req));
   }
 
   @PostMapping("/contact/add")
   @ApiOperation("新增配置")
   @MerchantUser
-  public R<Boolean> contactAdd(@Validated @RequestBody MessagConfigContactAddReq req) {
+  public R<String> contactAdd(@Validated @RequestBody MessagConfigContactAddReq req) {
     return R.success(configContactService.add(req));
   }
 }

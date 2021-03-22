@@ -21,14 +21,14 @@ public interface MessagePushConfigContactService {
    * @param req
    * @return
    */
-  boolean add(MessagConfigContactAddReq req);
+  String add(MessagConfigContactAddReq req);
 
   /**
    * 编辑短信配置
    * @param req
    * @return
    */
-  boolean edit(MessagConfigContactEditReq req);
+  String edit(MessagConfigContactEditReq req);
 
   /**
    * 删除短信配置

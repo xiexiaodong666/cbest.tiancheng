@@ -3,6 +3,7 @@ package com.welfare.service.remote.fallback;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.service.dto.messagepushconfig.WarningSettingSaveReq;
 import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
 import com.welfare.service.dto.offline.OfflineOrderDTO;
 import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
@@ -85,6 +86,13 @@ public class CbestDmallFeignFallback implements FallbackFactory<CbestDmallFeign>
       public DmallResponse<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(String merchantCode) {
         log.error("汇总查询员工的离线订单失败, 请求:{}", merchantCode, throwable);
         throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+      }
+
+      @Override
+      public DmallResponse<Object> saveWarningSetting(WarningSettingSaveReq req) {
+        log.error("保存短信通知设置失败失败", throwable);
+        DmallResponse response = new DmallResponse("500", throwable.getMessage(), null);
+        return response;
       }
     };
   }

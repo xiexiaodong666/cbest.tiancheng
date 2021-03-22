@@ -37,7 +37,9 @@ public class MessagePushConfigContactDao extends ServiceImpl<MessagePushConfigCo
     if (StringUtils.isNoneBlank(merCode)) {
       QueryWrapper<MessagePushConfigContact> queryWrapper = new QueryWrapper<>();
       queryWrapper.eq(MessagePushConfigContact.MER_CODE, merCode);
-      queryWrapper.eq(MessagePushConfigContact.CONTACT, contact);
+      if (StringUtils.isNoneBlank(contact)) {
+        queryWrapper.eq(MessagePushConfigContact.CONTACT, contact);
+      }
       return list(queryWrapper);
     }
     return list;

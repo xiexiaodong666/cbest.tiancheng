@@ -8,6 +8,7 @@ import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.remote.NotificationFeign;
 import com.welfare.service.remote.entity.NotificationReq;
 import com.welfare.service.remote.entity.NotificationResp;
+import com.welfare.service.remote.entity.SendMessageReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 
 /**
  * Description:
@@ -56,6 +58,13 @@ public class AsyncService {
         //离线模式需要锁定其离线交易
         account.setOfflineLock(WelfareConstant.AccountOfflineFlag.DISABLE.code());
         accountDao.updateById(account);
-        //todo 发送锁定短信
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateStr = simpleDateFormat.format(paymentRequest.getPaymentDate());
+        String msg = String.format("甜橙生活:%s,您因余额不足导致消费订单被挂起无法扣款，请尽快充值个人余额，以免影响正常交易。",dateStr);
+        SendMessageReq sendMessageReq = SendMessageReq.of(account.getPhone(),msg);
+        NotificationResp notificationResp = notificationFeign.doSendSms(sendMessageReq);
+        if(!SUCCEED.equals(notificationResp.getCode())){
+            log.error("调用通知系统出错,msg:{},failureData{}",notificationResp.getMsg(),JSON.toJSONString(notificationResp.getFailureData()));
+        }
     }
 }

@@ -46,6 +46,11 @@ public class AsyncService {
         }
     }
 
+    /**
+     * 离线模式余额不足的时候触发
+     * 1. 锁定用户
+     * 2. 发短信通知用户
+     */
     @Async("e-welfare-taskExecutor")
     public void onInsufficientBalanceOffline(Account account, PaymentRequest paymentRequest){
         //离线模式需要锁定其离线交易

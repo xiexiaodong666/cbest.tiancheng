@@ -491,4 +491,53 @@ public class WelfareConstant {
             return this.desc;
         }
     }
+
+    /**
+     * 消息发送类型
+     */
+    public enum MessagePushTargetType {
+
+        SMS("sms", "短信"),
+        EMAIL("email", "邮件");
+
+        private final String code;
+        private final String desc;
+
+        MessagePushTargetType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+    }
+
+    /**
+     * 消息发送模板类型
+     */
+    public enum MessagePushTemplateType {
+
+        STRING_REPLACER("string_replacer", "字符串替换");
+
+        private final String code;
+        private final String desc;
+
+        MessagePushTemplateType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+    }
 }

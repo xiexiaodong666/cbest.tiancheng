@@ -1,5 +1,10 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.entity.Account;
+import com.welfare.service.async.AsyncService;
+import com.welfare.service.dto.payment.BarcodePaymentRequest;
+import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.remote.WoLifeFeignClient;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
@@ -9,10 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 /**
  * @author gaorui
@@ -29,6 +33,11 @@ public class WoLifeTest implements IController {
 
   @Autowired(required = false)
   WoLifeFeignClient woLifeFeignClient;
+
+  @Autowired(required = false)
+  private AsyncService asyncService;
+  @Autowired(required = false)
+  private AccountDao accountDao;
 
   /**
    * 账户余额查询
@@ -59,6 +68,13 @@ public class WoLifeTest implements IController {
       @RequestParam(name = "phone") String phone, @RequestParam(name = "data") String data) {
 
     return woLifeFeignClient.refundWriteOff(phone, data);
+  }
+  @GetMapping("/sendSms")
+  void sendSms(){
+    Account account = accountDao.queryByAccountCode(6666L);
+    PaymentRequest paymentRequest = new BarcodePaymentRequest();
+    paymentRequest.setPaymentDate(new Date());
+    asyncService.onInsufficientBalanceOffline(account,paymentRequest);
   }
 
 

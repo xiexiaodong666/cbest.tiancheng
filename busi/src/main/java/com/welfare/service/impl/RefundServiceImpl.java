@@ -392,6 +392,7 @@ public class RefundServiceImpl implements RefundService {
         refundDetail.setTransAmount(refundDeductionDetail.getTransAmount());
         refundDetail.setAccountCode(refundDeductionDetail.getAccountCode());
         refundDetail.setOrderChannel(refundDeductionDetail.getOrderChannel());
+        refundDetail.setPaymentChannel(refundDeductionDetail.getPaymentChannel());
         BigDecimal accountBalance = accountAmountTypes.stream()
                 .filter(accountAmountType -> !(SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())
                         || SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode())))

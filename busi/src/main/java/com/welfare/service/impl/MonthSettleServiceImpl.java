@@ -181,10 +181,14 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         monthSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
-
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleDetailDTOS.stream().map(monthSettleDetailDTO -> {
             MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();
             BeanUtils.copyProperties(monthSettleDetailDTO, monthSettleDetailResp);
+            if (paymentChannelMap.containsKey(monthSettleDetailDTO.getPaymentChannel())) {
+                monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+                monthSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+            }
             return monthSettleDetailResp;
         }).collect(Collectors.toList());
 

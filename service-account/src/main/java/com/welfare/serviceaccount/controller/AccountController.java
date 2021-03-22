@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.welfare.common.annotation.AccountUser;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.AccountUserHolder;
@@ -13,11 +14,14 @@ import com.welfare.service.dto.AccountDO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
+import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,8 +82,9 @@ public class AccountController implements IController {
     @ApiOperation("查询账户信息")
     @GetMapping("/simple")
     public R<AccountDO> queryAccountInfo(@RequestParam @ApiParam(value = "查询条件",required = true) String queryInfo,
-        @RequestParam @ApiParam("条件类型（barcode:条码,card:磁条信息）") String queryInfoType) {
-        AccountDO accountDO = accountService.queryByQueryInfo(queryInfo, queryInfoType);
+                                         @RequestParam @ApiParam("条件类型（barcode:条码,card:磁条信息）") String queryInfoType,
+                                         @RequestParam(required = false)  @ApiParam("时间yyyy-MM-dd HH:mm:ss") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date transDate) {
+        AccountDO accountDO = accountService.queryByQueryInfo(queryInfo, queryInfoType, transDate);
         return success(accountDO);
     }
 

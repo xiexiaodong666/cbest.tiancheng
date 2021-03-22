@@ -110,7 +110,7 @@ public interface AccountService {
    * @param queryType
    * @return
    */
-  AccountDO queryByQueryInfo(String queryInfo,String queryType);
+  AccountDO queryByQueryInfo(String queryInfo,String queryType,Date transDate);
 
   /**
    * 按组织机构分组统计各层人员数量

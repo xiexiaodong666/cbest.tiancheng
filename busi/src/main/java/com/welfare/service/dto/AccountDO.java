@@ -15,7 +15,6 @@ import lombok.Data;
  * @date 2/4/2021
  */
 @Data
-@ApiModel("账户信息")
 public class AccountDO {
     @ApiModelProperty("账户编码")
     private Long accountCode;
@@ -35,6 +34,8 @@ public class AccountDO {
     private String departmentCode;
     @ApiModelProperty("部门名称")
     private String departmentName;
+    @ApiModelProperty("离线锁定标识")
+    private Integer offlineLock;
 
     public static AccountDO of(Account account, Department department, Merchant merchant){
         AccountDO accountDO = new AccountDO();
@@ -46,6 +47,7 @@ public class AccountDO {
         accountDO.setDepartmentCode(department.getDepartmentCode());
         accountDO.setMerCode(merchant.getMerCode());
         accountDO.setMerName(merchant.getMerName());
+        accountDO.setOfflineLock(account.getOfflineLock());
         return accountDO;
     }
 }

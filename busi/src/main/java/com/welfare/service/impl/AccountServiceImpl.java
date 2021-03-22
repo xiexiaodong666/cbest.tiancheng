@@ -1019,7 +1019,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDO queryByQueryInfo(String queryInfo, String queryType) {
+    public AccountDO queryByQueryInfo(String queryInfo, String queryType,Date transDate) {
         Long accountCode = null;
         if (WelfareConstant.ConsumeQueryType.CARD.code().equals(queryType)) {
             CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
@@ -1031,7 +1031,7 @@ public class AccountServiceImpl implements AccountService {
         } else if (WelfareConstant.ConsumeQueryType.BARCODE.code().equals(queryType)) {
             BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
             accountCode = barcodeService
-                .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
+                .parseAccountFromBarcode(queryInfo, transDate, true);
         }
         Assert.notNull(accountCode, "根据条件没有解析出账号");
         Account account = this.getByAccountCode(accountCode);

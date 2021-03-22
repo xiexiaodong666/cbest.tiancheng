@@ -297,7 +297,13 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     @Override
     public List<MonthSettleDetailMerchantSummaryDTO> monthSettleDetailMerchantSummary(Long id, MonthSettleDetailReq monthSettleDetailReq) {
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
-        return settleDetailMapper.sumSettleDetailGroupByMerAccountType(monthSettleDetailQuery);
+        List<MonthSettleDetailMerchantSummaryDTO> monthSettleDetailMerchantSummaryDTOS = settleDetailMapper.sumSettleDetailGroupByMerAccountType(monthSettleDetailQuery);
+        if(!CollectionUtils.isEmpty(monthSettleDetailMerchantSummaryDTOS)){
+            //沃支付的流水，没有福利类型，不用汇总返回
+            monthSettleDetailMerchantSummaryDTOS = monthSettleDetailMerchantSummaryDTOS.stream()
+                    .filter(dto -> StringUtils.isNotEmpty(dto.getMerAccountType())).collect(Collectors.toList());
+        }
+        return monthSettleDetailMerchantSummaryDTOS;
     }
 
     /**

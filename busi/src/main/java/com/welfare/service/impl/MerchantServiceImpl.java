@@ -66,7 +66,7 @@ public class MerchantServiceImpl implements MerchantService {
     private final MerchantAccountTypeDao merchantAccountTypeDao;
     @Autowired
     MerchantAccountTypeService merchantAccountTypeService;
-
+    private final MessagePushConfigService messagePushConfigService;
 
     @Override
     public List<Merchant> list(MerchantReq req) {

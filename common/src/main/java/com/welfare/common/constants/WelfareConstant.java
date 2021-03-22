@@ -223,7 +223,8 @@ public class WelfareConstant {
         MER_CODE("mer_code","商户编号"),
         ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请"),
         RESET_ACCOUNT_SURPLUS_QUOTA("reset_account_surplus_quota","员工账号授信额度变更"),
-        EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号");
+        EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号"),
+        MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码");
 
         private final String code;
         private final String desc;

@@ -58,6 +58,7 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
         contact.setPushTime(String.join(";", req.getPushTimes()));
         contact.setContactPerson(req.getContactPerson());
         contact.setContact(req.getContact());
+        contact.setConfigCode(config.getConfigCode());
         return messagePushConfigContactDao.save(contact);
     }
 

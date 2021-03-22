@@ -14,8 +14,13 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author: duanhy
@@ -30,7 +35,7 @@ import org.springframework.web.bind.annotation.*;
 public class OfflineOrderController {
 
   private final CbestDmallService cbestDmallService;
-
+  private final FileUploadServiceUtil fileUploadServiceUtil;
   /**
    * 分页查询离线订单
    * @param req
@@ -56,14 +61,20 @@ public class OfflineOrderController {
   @PostMapping("/export")
   @MerchantUser
   @ApiOperation("导出离线订单(返回下载地址)")
-  R<String> offlineOrderExport(@RequestBody OfflineOrderExportReq req){
+  R<String> offlineOrderExport(@RequestBody OfflineOrderExportReq req) throws IOException {
     PagingCondition pagingCondition = new PagingCondition();
     pagingCondition.setPageNo(1);
     pagingCondition.setPageSize(2000);
     OfflineTradeReq offlineTradeReq = new OfflineTradeReq();
     BeanUtils.copyProperties(req, offlineTradeReq);
     offlineTradeReq.setPaging(pagingCondition);
-    return null;
+    Page<OfflineOrderDTO> dtoPage = cbestDmallService.listOfflineTrade(offlineTradeReq);
+    List<OfflineOrderDTO> list = new ArrayList<>();
+    if (dtoPage != null && CollectionUtils.isNotEmpty(dtoPage.getRecords())) {
+      list = dtoPage.getRecords();
+    }
+    String path = fileUploadServiceUtil.uploadExcelFile(list, OfflineOrderDTO.class, "离线订单");
+    return R.success(fileUploadServiceUtil.getFileServerUrl(path));
   }
 
   /**

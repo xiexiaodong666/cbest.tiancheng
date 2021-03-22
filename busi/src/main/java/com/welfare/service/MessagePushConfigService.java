@@ -1,6 +1,8 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.MessagePushConfig;
+
 /**
  * 服务接口
  *

@@ -231,7 +231,7 @@ public class MerchantStoreRelationController implements IController {
 
         for (int i = 0; i < storeCodeArray.length; i++) {
           AdminMerchantStore adminMerchantStore = new AdminMerchantStore();
-          adminMerchantStore.setStoreAlias(storeAlias.length() > i ? storeAliaArray[i] : null);
+          adminMerchantStore.setStoreAlias(storeAliaArray.length > i ? storeAliaArray[i] : null);
           adminMerchantStore.setStoreCode(storeCodeArray[i]);
           merchantStores.add(adminMerchantStore);
         }

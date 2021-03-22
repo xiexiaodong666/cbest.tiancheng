@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version 1.0.0
  * @date 2021/1/11 9:56 AM
  */
-@FeignClient(value = "wo-life", url = "${wo-life.url:http://113.204.98.245:8900}", fallbackFactory = WoLifeFeignClientFallback.class, configuration = FeignConfiguration.class)
+@FeignClient(value = "wo-life", url = "${wo-life.url:http://113.204.98.245:8900/testlivingroom}", fallbackFactory = WoLifeFeignClientFallback.class, configuration = FeignConfiguration.class)
 @ConditionalOnHavingProperty("wo-life.url")
 public interface WoLifeFeignClient {
 
   /**
    * 账户余额查询
    */
-  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getUserMoney.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+  @RequestMapping(value = "/_saas/_app/lifehouse.app/service/jsonService.db/getUserMoney.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
   WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(
       @RequestParam(name = "phone") String phone
   );
@@ -33,14 +33,14 @@ public interface WoLifeFeignClient {
   /**
    * 账户扣款
    */
-  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitOrderForTC.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+  @RequestMapping(value = "/_saas/_app/lifehouse.app/service/jsonService.db/getSubmitOrderForTC.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
   WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
       @RequestParam(name = "phone") String phone, @RequestParam(name = "data") String data);
 
   /**
    * 退款销账
    */
-  @RequestMapping(value = "/testlivingroom/_saas/_app/lifehouse.app/service/jsonService.db/refundForTC.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+  @RequestMapping(value = "/_saas/_app/lifehouse.app/service/jsonService.db/refundForTC.jssp", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
   WoLifeBasicResponse refundWriteOff(
       @RequestParam(name = "phone") String phone,
       @RequestParam(name = "data") String data);

@@ -2,7 +2,6 @@ package com.welfare.service.dto.offline;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,10 +12,10 @@ import java.util.List;
 /**
  * @Author: duanhy
  * @Version: 0.0.1
- * @Date: 2021/3/19 2:38 下午
+ * @Date: 2021/3/22 2:45 下午
  */
 @Data
-public class OfflineOrderReq extends PageReq {
+public class OfflineOrderExportReq {
 
   @ApiModelProperty("状态，0.挂起 1.已扣款 2.不扣款")
   private Integer status;

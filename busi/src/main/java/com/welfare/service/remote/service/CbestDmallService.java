@@ -79,4 +79,11 @@ public interface CbestDmallService {
    * @return
    */
   OfflineOrderAccountSummaryDTO summaryAccountOfflineTrade(String merchantCode);
+
+  /**
+   * 导出查询离线订单
+   * @param req
+   * @return
+   */
+  DmallResponse<Object> exportOfflineTrade(OfflineTradeReq req);
 }

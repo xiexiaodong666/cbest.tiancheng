@@ -70,6 +70,12 @@ public class CbestDmallFeignFallback implements FallbackFactory<CbestDmallFeign>
       }
 
       @Override
+      public DmallResponse<Object> exportOfflineTrade(OfflineTradeReq req) {
+        log.error("导出查询离线订单失败, 请求:{}", JSON.toJSONString(req), throwable);
+        throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+      }
+
+      @Override
       public DmallResponse<OfflineOrderHangupSummaryDTO> summaryHangupOfflineTrade(String merchantCode) {
         log.error("查询当前挂起的离线订单的汇总数据失败, 请求:{}", merchantCode, throwable);
         throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);

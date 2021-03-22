@@ -3,6 +3,7 @@ package com.welfare.service.remote;
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
 import com.welfare.service.dto.offline.OfflineOrderDTO;
+import com.welfare.service.dto.offline.OfflineOrderExportReq;
 import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
 import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.pos.*;
@@ -82,6 +83,14 @@ public interface CbestDmallFeign {
    */
   @PostMapping("/orangeapi/manage/offline-trade/list")
   DmallResponse<PagingResult<OfflineOrderDTO>> listOfflineTrade(@RequestBody OfflineTradeReq req);
+
+  /**
+   * 导出查询离线订单
+   * @param req
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/download")
+  DmallResponse<Object> exportOfflineTrade(@RequestBody OfflineTradeReq req);
 
   /**
    * 查询当前挂起的离线订单的汇总数据

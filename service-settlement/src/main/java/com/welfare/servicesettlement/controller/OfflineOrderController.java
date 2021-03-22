@@ -7,6 +7,7 @@ import com.welfare.service.dto.offline.OfflineOrderDTO;
 import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
 import com.welfare.service.dto.offline.OfflineOrderReq;
 import com.welfare.service.remote.service.CbestDmallService;
+import com.welfare.servicesettlement.util.FileUploadServiceUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class OfflineOrderController {
 
   private final CbestDmallService cbestDmallService;
+  private final FileUploadServiceUtil fileUploadServiceUtil;
 
   /**
    * 分页查询离线订单
@@ -37,7 +39,7 @@ public class OfflineOrderController {
   @MerchantUser
   @ApiOperation("分页查询离线订单")
   R<Page<OfflineOrderDTO>> offlineOrderList(@RequestBody OfflineOrderReq req){
-    return null;
+    return R.success();
   }
 
   /**

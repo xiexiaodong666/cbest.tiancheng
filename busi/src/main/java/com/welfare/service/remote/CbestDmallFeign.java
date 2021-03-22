@@ -1,12 +1,16 @@
 package com.welfare.service.remote;
 
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
+import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
+import com.welfare.service.dto.offline.OfflineOrderDTO;
+import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
 import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.pos.*;
 import com.welfare.service.remote.fallback.CbestDmallFeignFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.NotNull;
 import java.util.Map;
@@ -70,4 +74,28 @@ public interface CbestDmallFeign {
    */
   @PostMapping("/orangeapi/manage/terminal/price-template/modify")
   DmallResponse<PosTerminalPriceTemplateResp> modifyTerminalPriceTemplate(@RequestBody TerminalPriceTemplateUpdateReq req);
+
+  /**
+   * 分页查询离线订单
+   * @param req
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/list")
+  DmallResponse<PagingResult<OfflineOrderDTO>> listOfflineTrade(@RequestBody OfflineTradeReq req);
+
+  /**
+   * 查询当前挂起的离线订单的汇总数据
+   * @param merchantCode
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/hangup/summary")
+  DmallResponse<OfflineOrderHangupSummaryDTO> summaryHangupOfflineTrade(@RequestParam("merchantCode") String merchantCode);
+
+  /**
+   * 汇总查询员工的离线订单
+   * @param merchantCode
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/account/summary")
+  DmallResponse<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(@RequestParam("merchantCode") String merchantCode);
 }

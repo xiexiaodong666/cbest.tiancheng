@@ -6,6 +6,9 @@ import com.welfare.common.exception.BizException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.SupplierStore;
+import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
+import com.welfare.service.dto.offline.OfflineOrderDTO;
+import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
 import com.welfare.service.remote.CbestDmallFeign;
 import com.welfare.service.remote.entity.pos.*;
 import com.welfare.service.remote.service.CbestDmallService;
@@ -114,6 +117,36 @@ public class CbestDmallServiceImpl implements CbestDmallService {
       throw new BizException(response.getMsg());
     }
     return response.getData();
+  }
+
+  @Override
+  public Page<OfflineOrderDTO> listOfflineTrade(OfflineTradeReq req) {
+    DmallResponse<PagingResult<OfflineOrderDTO>> resp = cbestDmallFeign.listOfflineTrade(req);
+    if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
+      log.error("分页查询离线订单失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(resp));
+      throw new BizException(resp.getMsg());
+    }
+    return toPage(resp.getData(), req.getPaging());
+  }
+
+  @Override
+  public OfflineOrderHangupSummaryDTO summaryHangupOfflineTrade(String merchantCode) {
+    DmallResponse<OfflineOrderHangupSummaryDTO> resp = cbestDmallFeign.summaryHangupOfflineTrade(merchantCode);
+    if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
+      log.error("查询当前挂起的离线订单的汇总数据失败 请求:{} 响应:{}", merchantCode, JSON.toJSONString(resp));
+      throw new BizException(resp.getMsg());
+    }
+    return resp.getData();
+  }
+
+  @Override
+  public OfflineOrderAccountSummaryDTO summaryAccountOfflineTrade(String merchantCode) {
+    DmallResponse<OfflineOrderAccountSummaryDTO> resp = cbestDmallFeign.summaryAccountOfflineTrade(merchantCode);
+    if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
+      log.error("汇总查询员工的离线订单失败 请求:{} 响应:{}", merchantCode, JSON.toJSONString(resp));
+      throw new BizException(resp.getMsg());
+    }
+    return resp.getData();
   }
 
   private <T> Page<T> toPage(PagingResult<T> pagingResult, PagingCondition pagingCondition) {

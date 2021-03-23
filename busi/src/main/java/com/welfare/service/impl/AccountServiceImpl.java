@@ -232,7 +232,7 @@ public class AccountServiceImpl implements AccountService {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         boolean result = accountDao.removeById(id);
-
+        subAccountDao.deleteAccountCodeAndType(syncAccount.getAccountCode(), WelfareConstant.PaymentChannel.WELFARE.code());
         accountChangeEvtRecoed(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode());
         syncAccount.setDeleted(true);
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE)
@@ -436,10 +436,10 @@ public class AccountServiceImpl implements AccountService {
         // 添加
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
-
+        boolean flag = subAccountDao.save(account.getAccountCode(), WelfareConstant.PaymentChannel.WELFARE.code());
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
             .accountList(Arrays.asList(account)).build());
-        return result;
+        return result && flag;
     }
 
     private Account assemableAccount(AccountReq accountReq) {

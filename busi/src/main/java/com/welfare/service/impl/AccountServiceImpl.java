@@ -504,7 +504,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean batchSave(List<Account> accountList) {
-        return accountDao.saveBatch(accountList);
+        return accountDao.saveBatch(accountList)
+                && subAccountDao.saveBatch(AccountUtils.assemableSubAccount(accountList));
     }
 
     @Override

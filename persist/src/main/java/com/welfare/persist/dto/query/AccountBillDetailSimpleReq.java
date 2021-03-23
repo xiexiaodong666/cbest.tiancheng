@@ -14,4 +14,7 @@ public class AccountBillDetailSimpleReq {
 
     @ApiModelProperty("结束时间")
     private String endTransTime;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

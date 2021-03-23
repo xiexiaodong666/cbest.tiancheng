@@ -16,12 +16,14 @@ import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MonthSettleDao;
+import com.welfare.persist.dao.PaymentChannelDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MonthSettleDetailQuery;
 import com.welfare.persist.dto.query.MonthSettleQuery;
 import com.welfare.persist.entity.MonthSettle;
+import com.welfare.persist.entity.PaymentChannel;
 import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MonthSettleMapper;
@@ -32,6 +34,7 @@ import com.welfare.service.remote.MerchantCreditFeign;
 import com.welfare.service.remote.entity.MerchantCreditResp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +73,8 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     private SettleDetailDao settleDetailDao;
     @Autowired
     private SupplierStoreDao supplierStoreDao;
+    @Autowired
+    private PaymentChannelDao paymentChannelDao;
 
 
     @Override
@@ -144,18 +149,22 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
 
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         PageInfo<MonthSettleDetailResp> monthSettleDetailDTOPageInfo = PageHelper.startPage(monthSettleDetailPageReq.getCurrent(), monthSettleDetailPageReq.getSize())
                 .doSelectPageInfo(() -> {
                     settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery).stream().map(monthSettleDetailDTO -> {
                                 MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();
                                 BeanUtils.copyProperties(monthSettleDetailDTO, monthSettleDetailResp);
+                                if (paymentChannelMap.containsKey(monthSettleDetailDTO.getPaymentChannel())) {
+                                    monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+                                    monthSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+                                }
                                 return monthSettleDetailResp;
                     }).collect(Collectors.toList());
                 });
 
         BasePageVo<MonthSettleDetailResp> monthSettleDetailRespPage = new BasePageVo<>(monthSettleDetailPageReq.getCurrent(),
                 monthSettleDetailPageReq.getSize(),monthSettleDetailDTOPageInfo.getTotal(), monthSettleDetailDTOPageInfo.getList());
-
         return monthSettleDetailRespPage;
     }
 
@@ -172,10 +181,14 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         monthSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
-
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleDetailDTOS.stream().map(monthSettleDetailDTO -> {
             MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();
             BeanUtils.copyProperties(monthSettleDetailDTO, monthSettleDetailResp);
+            if (paymentChannelMap.containsKey(monthSettleDetailDTO.getPaymentChannel())) {
+                monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+                monthSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+            }
             return monthSettleDetailResp;
         }).collect(Collectors.toList());
 
@@ -288,7 +301,13 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     @Override
     public List<MonthSettleDetailMerchantSummaryDTO> monthSettleDetailMerchantSummary(Long id, MonthSettleDetailReq monthSettleDetailReq) {
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
-        return settleDetailMapper.sumSettleDetailGroupByMerAccountType(monthSettleDetailQuery);
+        List<MonthSettleDetailMerchantSummaryDTO> monthSettleDetailMerchantSummaryDTOS = settleDetailMapper.sumSettleDetailGroupByMerAccountType(monthSettleDetailQuery);
+        if(!CollectionUtils.isEmpty(monthSettleDetailMerchantSummaryDTOS)){
+            //沃支付的流水，没有福利类型，不用汇总返回
+            monthSettleDetailMerchantSummaryDTOS = monthSettleDetailMerchantSummaryDTOS.stream()
+                    .filter(dto -> StringUtils.isNotEmpty(dto.getMerAccountType())).collect(Collectors.toList());
+        }
+        return monthSettleDetailMerchantSummaryDTOS;
     }
 
     /**

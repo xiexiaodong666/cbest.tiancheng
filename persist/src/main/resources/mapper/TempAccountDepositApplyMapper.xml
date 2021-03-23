@@ -15,7 +15,7 @@
         <result property="accountCode" column="account_code"/>
         <result property="accountName" column="account_name"/>
         <result property="rechargeAmount" column="recharge_amount"/>
-        <result property="departmentCode" column="store_code"/>
+        <result property="departmentCode" column="department"/>
         <result property="departmentName" column="department_name"/>
     </resultMap>
 
@@ -31,11 +31,11 @@
          t.account_code,
          t.phone,
          t.recharge_amount,
-         a.store_code,
+         a.department,
          de.department_name
         from temp_account_deposit_apply t
             LEFT JOIN account a ON t.account_code = a.account_code
-            LEFT JOIN department de ON de.department_code = a.store_code
+            LEFT JOIN department de ON de.department_code = a.department
         where file_id = #{fileId} and a.deleted = 0 and a.mer_code = #{merCode}
     </select>
 

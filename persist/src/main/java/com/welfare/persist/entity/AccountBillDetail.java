@@ -94,6 +94,10 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     private BigDecimal surplusQuotaOverpay;
     @ApiModelProperty("订单渠道（o2o,online,shop_shopping）")
     private String orderChannel;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
+
     @ApiModelProperty("支付方式,二维码、卡、线上")
     private String paymentType;
     @ApiModelProperty("支付方式信息，二维码条码或者卡磁条号")
@@ -213,5 +217,5 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     public static final String PAYMENT_TYPE = "payment_type";
     public static final String PAYMENT_TYPE_INFO = "payment_type_info";
     public static final String SURPLUS_QUOTA_OVERPAY = "surplus_quota_overpay";
-
+    public static final String PAYMENT_CHANNEL = "payment_channel";
 }

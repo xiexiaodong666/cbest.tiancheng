@@ -94,4 +94,10 @@ public class MerchantController implements IController {
     public R<Boolean> hasRebateByMerCode(){
         return success(merchantService.queryIsRabteByMerCOde(MerchantUserHolder.getMerchantUser().getMerchantCode()));
     }
+
+    @GetMapping("/supplierByMer")
+    @ApiOperation("查询商户配置的供应商（不分页）")
+    public R<List<MerchantInfo>> supplierByMer(String merCode) {
+        return R.success(merchantConverter.toD(merchantService.supplierByMer(merCode)));
+    }
 }

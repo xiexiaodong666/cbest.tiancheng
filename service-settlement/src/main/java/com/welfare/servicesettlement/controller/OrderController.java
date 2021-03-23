@@ -3,6 +3,7 @@ package com.welfare.servicesettlement.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.constants.WelfareConstant.PaymentChannel;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.OrderInfoDTO;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +82,9 @@ public class OrderController implements IController {
         if (Objects.nonNull(orderPage) && orderPage.getRecords().size() > 0){
             List<OrderRespDto> respDtoList = new ArrayList<>();
             orderPage.getRecords().forEach(item->{
+                if(Strings.isNotEmpty(item.getPaymentChannel())) {
+                    item.setPaymentChannel(PaymentChannel.findByCode(item.getPaymentChannel()).desc());
+                }
                 OrderRespDto respDto = new OrderRespDto();
                 beanCopy(item , respDto);
                 respDtoList.add(respDto);
@@ -129,6 +134,9 @@ public class OrderController implements IController {
 
         if (Objects.nonNull(orderInfoPage)){
             orderInfoPage.forEach(item->{
+                if(Strings.isNotEmpty(item.getPaymentChannel())) {
+                    item.setPaymentChannel(PaymentChannel.findByCode(item.getPaymentChannel()).desc());
+                }
                 OrderRespDto respDto = new OrderRespDto();
                 beanCopy(item , respDto);
                 respDtoList.add(respDto);

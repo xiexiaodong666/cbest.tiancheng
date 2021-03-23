@@ -1,5 +1,8 @@
 package com.welfare.common.exception;
 
+import org.apache.skywalking.apm.toolkit.trace.IgnoredException;
+
+@IgnoredException
 public class BusiException extends RuntimeException{
 
     private ExceptionCode code;

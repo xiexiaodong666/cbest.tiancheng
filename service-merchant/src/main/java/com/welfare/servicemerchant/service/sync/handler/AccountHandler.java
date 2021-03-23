@@ -90,7 +90,7 @@ public class AccountHandler {
       merchantMap.put(merchant.getMerCode(), merchant);
     });
     // 查询员工机构名称
-    Set<String> departmentCodeSet = accountList.stream().map(Account::getStoreCode).collect(Collectors.toSet());
+    Set<String> departmentCodeSet = accountList.stream().map(Account::getDepartment).collect(Collectors.toSet());
     Map<String, Department> departmentMap = departmentDao.mapByDepartmentCodes(departmentCodeSet);
     // 查询员工类型名称
     Set<String> accountTypeCodeSet = accountList.stream().map(Account::getAccountTypeCode).collect(Collectors.toSet());
@@ -108,7 +108,7 @@ public class AccountHandler {
         gson.toJson(employerReqDTO));
     RoleConsumptionResp roleConsumptionResp = shoppingFeignClient
         .addOrUpdateEmployer(employerReqDTO);
-    log.info("同步员工账户，resp【{}】", JSON.toJSONString(roleConsumptionResp));
+    log.info("同步员工账户，resp【{}】req【{}】", JSON.toJSONString(roleConsumptionResp), JSON.toJSONString(employerReqDTO));
 
     if (!("0000").equals(roleConsumptionResp.getCode())) {
       throw new BusiException("同步员工账户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");

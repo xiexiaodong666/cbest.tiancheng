@@ -71,6 +71,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
     Account account = new Account();
     account.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
     BeanUtils.copyProperties(accountUploadDTO, account);
+    account.setDepartment(accountUploadDTO.getStoreCode());
     Boolean validate = validationAccount(account);
     if (validate.booleanValue() == true) {
       Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
@@ -80,6 +81,7 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       account.setSurplusQuotaOverpay(BigDecimal.ZERO);
       account.setMaxQuota(BigDecimal.ZERO);
       account.setCredit(false);
+      account.setDepartment(accountUploadDTO.getStoreCode());
       accountUploadList.add(account);
     }
   }
@@ -113,9 +115,9 @@ public class AccountUploadListener extends AnalysisEventListener<AccountUploadDT
       return false;
     }
     Department department = departmentService
-        .getByDepartmentCodeAndMerCode(account.getStoreCode(), merCode);
+        .getByDepartmentCodeAndMerCode(account.getDepartment(), merCode);
     if (null == department) {
-      uploadInfo.append("不存在的员工部门:").append(account.getStoreCode()).append(";");
+      uploadInfo.append("不存在的员工部门:").append(account.getDepartment()).append(";");
       return false;
     }
 

@@ -129,9 +129,9 @@ public class BarcodeServiceImpl implements BarcodeService {
     }
 
     @Override
-    public PaymentBarcode getBarcode(Long accountCode) {
+    public PaymentBarcode getBarcode(Long accountCode, String paymentChannel) {
         BarcodeSalt barcodeSalt =  queryPeriodSaltValue(Calendar.getInstance().getTime());
-        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue());
+        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue(), paymentChannel);
         redisTemplate.opsForValue().set(
                 BARCODE_PREFIX + paymentBarcode.getBarcode(),
                 paymentBarcode,barcodeExpireSecs,

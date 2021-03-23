@@ -7,7 +7,7 @@
   </sql>
 
   <sql id="baseColumn">
-    a.id,a.account_name,a.account_code,a.account_type_code,a.mer_code,a.store_code,a.account_status,a.staff_status,
+    a.id,a.account_name,a.account_code,a.account_type_code,a.mer_code,a.department,a.account_status,a.staff_status,
         a.binding,a.create_user,a.create_time,a.update_user,a.update_time,a.account_balance,a.version,a.phone,a.max_quota,
         a.surplus_quota,a.change_event_id,a.remark,a.deleted
   </sql>
@@ -18,7 +18,7 @@
     <result property="accountCode" column="account_code"/>
     <result property="accountTypeCode" column="account_type_code"/>
     <result property="merCode" column="mer_code"/>
-    <result property="storeCode" column="store_code"/>
+    <result property="department" column="department"/>
     <result property="accountStatus" column="account_status"/>
     <result property="staffStatus" column="staff_status"/>
     <result property="binding" column="binding"/>
@@ -129,7 +129,7 @@
     FROM
     account a
     left JOIN merchant m on a.mer_code = m.mer_code
-    LEFT JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN department d ON a.department = d.department_code
     LEFT JOIN account_type at ON at.type_code = a.account_type_code and a.mer_code = at.mer_code
     LEFT JOIN card_info ci ON ci.account_code = a.account_code
     where a.deleted = 0
@@ -375,7 +375,7 @@
     f.url as imgUrl
     FROM
     account a
-    LEFT JOIN department d ON a.store_code = d.department_code
+    LEFT JOIN department d ON a.department = d.department_code
     LEFT JOIN merchant m ON a.mer_code = m.mer_code
     LEFT JOIN account_type AT ON AT.type_code = a.account_type_code and a.mer_code = at.mer_code
     LEFT JOIN file_universal_storage f  ON f.id =  a.file_universal_storage_id
@@ -416,7 +416,7 @@
            f.url as imgUrl
 
     FROM account a
-           LEFT JOIN department d ON a.store_code = d.department_code
+           LEFT JOIN department d ON a.department = d.department_code
            LEFT JOIN merchant m ON a.mer_code = m.mer_code
            LEFT JOIN account_type AT
     ON AT.type_code = a.account_type_code and a.mer_code = at.mer_code
@@ -457,7 +457,7 @@
       count( if((a.id IS NOT NULL and a.deleted = 0),TRUE,NULL) ) AS accountTotal
     FROM
       department de
-      LEFT JOIN account a ON de.department_code = a.store_code
+      LEFT JOIN account a ON de.department_code = a.department
     <where>
       <if test="merCode!=null and merCode!=''">
         de.mer_code = #{merCode}

@@ -51,4 +51,6 @@ public class OrderReqDto implements Serializable {
     private Integer timeInterval;
     @ApiModelProperty(value = "账户类别" , required = false)
     private String accountType;
+    @ApiModelProperty(value = "支付渠道" , required = false)
+    private String paymentChannel;
 }

@@ -41,4 +41,7 @@ public class AccountBillDetailSimpleDTO {
 
     @ApiModelProperty("交易流水号")
     private String transNo;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

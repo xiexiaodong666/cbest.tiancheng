@@ -1,5 +1,6 @@
 package com.welfare.service.dto.payment;
 
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.StoreConsumeTypeDao;
@@ -87,5 +88,13 @@ public abstract class PaymentRequest {
 
     public String getCardNo() {
         return null;
+    }
+
+    public void setPaymentChannel(String paymentChannel){
+
+    }
+
+    public String getPaymentChannel(){
+        return WelfareConstant.PaymentChannel.WELFARE.code();
     }
 }

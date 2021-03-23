@@ -162,6 +162,9 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     @ApiModelProperty("订单渠道")
     private String orderChannel;
 
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
+
     /**
      * 数据支付类型 welfare-员工卡支付 third-其它三方支付
      */
@@ -331,5 +334,8 @@ public class SettleDetail extends Model<SettleDetail> implements Serializable {
     * 版本
     */
     public static final String VERSION = "version";
+
+    public static final String PAYMENT_CHANNEL = "payment_channel";
+
 
 }

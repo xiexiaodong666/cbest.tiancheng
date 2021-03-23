@@ -65,10 +65,10 @@ public class MessagePushConfigController {
     return R.success(fileUploadService.getFileServerUrl(path));
   }
 
-  @PostMapping("/contact/del")
+  @PostMapping("/contact/del/{id}")
   @ApiOperation("删除配置")
   @MerchantUser
-  public R<Boolean> contactDel(String id) {
+  public R<Boolean> contactDel(@PathVariable("id") String id) {
     BizAssert.notBlank(id, ExceptionCode.ILLEGALITY_ARGURMENTS, "id不能为空");
     return R.success(configContactService.delete(id));
   }

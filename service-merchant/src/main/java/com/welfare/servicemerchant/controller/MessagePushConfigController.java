@@ -47,7 +47,7 @@ public class MessagePushConfigController {
     return R.success(configContactService.listByContact(contact));
   }
 
-  @PostMapping("/contact/one")
+  @GetMapping("/contact/one")
   @ApiOperation("查询单个配置")
   @MerchantUser
   public R<MessagPushConfigContactDTO> oneContact(String id) {

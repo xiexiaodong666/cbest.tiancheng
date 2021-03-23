@@ -122,9 +122,14 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         List<WelfareSettleDetailResp> welfareSettleDetailRespList = settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
             WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
             BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);
+            if (paymentChannelMap.containsKey(welfareSettleDetailDTO.getPaymentChannel())) {
+                welfareSettleDetailResp.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                welfareSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+            }
             return welfareSettleDetailResp;
         }).collect(Collectors.toList());
 

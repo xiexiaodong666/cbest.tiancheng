@@ -65,3 +65,7 @@ INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order
 UPDATE account_bill_detail set payment_channel = 'welfare', update_time = NOW() ,version = version + 1;
 UPDATE account_deduction_detail set payment_channel = 'welfare' ,update_time = NOW() ,version = version + 1;
 UPDATE settle_detail set payment_channel = 'welfare' ,update_time = NOW(), version = version + 1;
+
+INSERT INTO `sub_account`(`id`, `account_code`, `sub_account_type`, `balance`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
+select floor( 10000000 + rand() * (99999999 - 10000000)),a.account_code,'welfare',0,'system',now(),NULL,NULL,0,0 from account a where a.deleted = 0;
+

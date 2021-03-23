@@ -16,6 +16,9 @@ create table payment_channel_config(
                                        UNIQUE key uk_mer_store_consume_type_payment_channel (mer_code,store_code,consume_type,payment_channel_code) using BTREE
 );
 
+alter table sub_account add column password_free_signature varchar(100) comment '免密支付签名' after balance;
+
+
 
 # DML
 update third_party_payment_request t set t.payment_request_type = 'wo_life';

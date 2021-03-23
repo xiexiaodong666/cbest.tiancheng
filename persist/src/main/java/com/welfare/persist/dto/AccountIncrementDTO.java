@@ -40,8 +40,8 @@ public class AccountIncrementDTO implements Serializable {
   @ApiModelProperty("员工账号配置的消费场景是否在该门店支持到店消费")
   private Boolean canUse;
   /**
-   * 员工离线是否(可用:true, 不可用:false)
+   * 员工离线模式是否可用(可用:true, 不可用:false)
    */
-  @ApiModelProperty("员工离线模式是否可用")
+  @ApiModelProperty("员工离线模式是否可用(可用:true, 不可用:false)")
   private Boolean offlineCanUse;
 }

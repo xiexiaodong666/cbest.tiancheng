@@ -324,8 +324,8 @@
                TRUE
              ELSE FALSE
              END                            AS canUse,
-           CASE WHEN (a.offline_lock = NULL or a.offline_lock = 0) THEN TRUE
-                ELSE FALSE END AS offlineCanUse
+           CASE WHEN (a.offline_lock = NULL or a.offline_lock = 0) THEN FALSE
+                ELSE TRUE END AS offlineCanUse
     FROM account a
            LEFT JOIN account_type AT
     ON AT.type_code = a.account_type_code and a.mer_code = at.mer_code

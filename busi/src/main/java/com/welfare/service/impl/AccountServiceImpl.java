@@ -783,7 +783,7 @@ public class AccountServiceImpl implements AccountService {
             StrUtil.isEmpty(paymentChannel) ? WelfareConstant.PaymentChannel.WELFARE
                 : PAYMENT_CHANNEL_MAP.get(paymentChannel);
         List<AccountBalanceDTO> balanceList = new ArrayList<>();
-
+        String queryErrorMsg = null;
         switch (paymentChannelEnum) {
             case WELFARE:
                 balanceList = Lists.newArrayList(Welfare.values())
@@ -798,6 +798,7 @@ public class AccountServiceImpl implements AccountService {
                 if (!woLifeBasicResponse.isSuccess()) {
                     log.error("账户余额查询返回失败, phone: {}, response: {}", phone,
                         JSON.toJSONString(woLifeBasicResponse));
+                    queryErrorMsg = StrUtil.format("查询失败，{}", woLifeBasicResponse.getResponseMessage());
                 }
                 WoLifeGetUserMoneyResponse woLifeGetUserMoneyResponse = woLifeBasicResponse
                     .getResponse();
@@ -836,6 +837,7 @@ public class AccountServiceImpl implements AccountService {
         accountOverviewDTO.setPaymentChannelDesc(paymentChannelEnum.desc());
         accountOverviewDTO.setBalanceList(balanceList);
         accountOverviewDTO.setPaymentChannelList(paymentChannelList);
+        accountOverviewDTO.setQueryErrorMsg(queryErrorMsg);
         return accountOverviewDTO;
     }
 

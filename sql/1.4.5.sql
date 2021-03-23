@@ -69,3 +69,6 @@ UPDATE settle_detail set payment_channel = 'welfare' ,update_time = NOW(), versi
 INSERT INTO `sub_account`(`id`, `account_code`, `sub_account_type`, `balance`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
 select a.id - 1000000000000000000,a.account_code,'welfare',0,'system',now(),NULL,NULL,0,0 from account a where a.deleted = 0;
 
+ALTER TABLE account CHANGE store_code department VARCHAR(20);
+
+

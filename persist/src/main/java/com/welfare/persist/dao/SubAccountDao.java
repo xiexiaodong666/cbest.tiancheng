@@ -21,16 +21,6 @@ import java.util.Objects;
 @Repository
 public class SubAccountDao extends ServiceImpl<SubAccountMapper, SubAccount> {
 
-  public boolean save(Long accountCode, String subAccountType) {
-    if (getByAccountCodeAndType(accountCode, subAccountType) != null) {
-      return true;
-    }
-    SubAccount subAccount = new SubAccount();
-    subAccount.setAccountCode(accountCode);
-    subAccount.setSubAccountType(subAccountType);
-    return save(subAccount);
-  }
-
   public SubAccount getByAccountCodeAndType(Long accountCode, String subAccountType) {
     if (accountCode != null && StringUtils.isNoneBlank(subAccountType)) {
       QueryWrapper<SubAccount> queryWrapper = new QueryWrapper<>();
@@ -41,11 +31,10 @@ public class SubAccountDao extends ServiceImpl<SubAccountMapper, SubAccount> {
     return null;
   }
 
-  public boolean deleteAccountCodeAndType(Long accountCode, String subAccountType) {
-    if (accountCode != null && StringUtils.isNoneBlank(subAccountType)) {
+  public boolean deleteAccountCode(Long accountCode) {
+    if (accountCode != null) {
       QueryWrapper<SubAccount> queryWrapper = new QueryWrapper<>();
       queryWrapper.eq(SubAccount.ACCOUNT_CODE, accountCode);
-      queryWrapper.eq(SubAccount.SUB_ACCOUNT_TYPE, subAccountType);
       return remove(queryWrapper);
     }
     return false;

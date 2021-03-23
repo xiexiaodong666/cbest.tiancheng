@@ -4,6 +4,7 @@ import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.*;
+import com.welfare.service.dto.PaymentChannelDTO;
 import com.welfare.service.remote.entity.EmployerDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
@@ -119,14 +120,16 @@ public class AccountUtils {
     return list;
   }
 
-  public static List<SubAccount> assemableSubAccount(List<Account> accountList) {
+  public static List<SubAccount> assemableSubAccount(List<Account> accountList, List<PaymentChannelDTO> paymentChannels) {
     List<SubAccount> list = new ArrayList<>();
-    if (!CollectionUtils.isEmpty(accountList)) {
+    if (!CollectionUtils.isEmpty(accountList) && !CollectionUtils.isEmpty(paymentChannels)) {
       accountList.forEach(account -> {
-        SubAccount subAccount = new SubAccount();
-        subAccount.setSubAccountType(WelfareConstant.PaymentChannel.WELFARE.code());
-        subAccount.setAccountCode(account.getAccountCode());
-        list.add(subAccount);
+        paymentChannels.forEach(paymentChannel -> {
+          SubAccount subAccount = new SubAccount();
+          subAccount.setSubAccountType(paymentChannel.getPaymentChannelCode());
+          subAccount.setAccountCode(account.getAccountCode());
+          list.add(subAccount);
+        });
       });
     }
     return list;

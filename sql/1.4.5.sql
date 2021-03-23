@@ -60,12 +60,15 @@ alter table account_bill_detail add column payment_channel varchar(20) comment '
 alter table settle_detail add column payment_channel varchar(20) comment '支付渠道' after order_channel;
 
 
-INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (floor( 10000000 + rand() * (99999999 - 10000000)), 'welfare', '甜橙卡', 'default', 1, 0, 'anonymous', '2021-03-18 14:59:29', NULL, NULL, 0);
+INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (666666, 'welfare', '甜橙卡', 'default', 1, 0, 'anonymous', '2021-03-18 14:59:29', NULL, NULL, 0);
 
 UPDATE account_bill_detail set payment_channel = 'welfare', update_time = NOW() ,version = version + 1;
 UPDATE account_deduction_detail set payment_channel = 'welfare' ,update_time = NOW() ,version = version + 1;
 UPDATE settle_detail set payment_channel = 'welfare' ,update_time = NOW(), version = version + 1;
 
 INSERT INTO `sub_account`(`id`, `account_code`, `sub_account_type`, `balance`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
-select floor( 10000000 + rand() * (99999999 - 10000000)),a.account_code,'welfare',0,'system',now(),NULL,NULL,0,0 from account a where a.deleted = 0;
+select a.id - 1000000000000000000,a.account_code,'welfare',0,'system',now(),NULL,NULL,0,0 from account a where a.deleted = 0;
+
+ALTER TABLE account CHANGE store_code department VARCHAR(20);
+
 

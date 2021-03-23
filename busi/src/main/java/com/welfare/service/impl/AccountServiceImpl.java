@@ -130,8 +130,9 @@ public class AccountServiceImpl implements AccountService {
     private final AccountChangeEventRecordDao accountChangeEventRecordDao;
 
     private final SubAccountDao subAccountDao;
+    @Autowired
+    private PaymentChannelService paymentChannelService;
     private final PaymentChannelDao paymentChannelDao;
-
     private final static Map<String, WelfareConstant.PaymentChannel> PAYMENT_CHANNEL_MAP = Stream
         .of(WelfareConstant.PaymentChannel.values()).collect(Collectors
             .toMap(WelfareConstant.PaymentChannel::code,
@@ -232,7 +233,7 @@ public class AccountServiceImpl implements AccountService {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         boolean result = accountDao.removeById(id);
-        subAccountDao.deleteAccountCodeAndType(syncAccount.getAccountCode(), WelfareConstant.PaymentChannel.WELFARE.code());
+        subAccountDao.deleteAccountCode(syncAccount.getAccountCode());
         accountChangeEvtRecoed(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode());
         syncAccount.setDeleted(true);
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE)
@@ -436,10 +437,27 @@ public class AccountServiceImpl implements AccountService {
         // 添加
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
-        boolean flag = subAccountDao.save(account.getAccountCode(), WelfareConstant.PaymentChannel.WELFARE.code());
+        PaymentChannelReq req =new PaymentChannelReq();
+        req.setFiltered(true);
+        req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+        List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
+        boolean result2 = subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
             .accountList(Arrays.asList(account)).build());
-        return result && flag;
+        return result && result2;
+    }
+
+    private List<SubAccount> assemableSubAccount(List<PaymentChannelDTO> paymentChannels, Account account) {
+        List<SubAccount> subAccounts = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(paymentChannels)) {
+            paymentChannels.forEach(paymentChannel -> {
+                SubAccount subAccount = new SubAccount();
+                subAccount.setSubAccountType(paymentChannel.getPaymentChannelCode());
+                subAccount.setAccountCode(account.getAccountCode());
+                subAccounts.add(subAccount);
+            });
+        }
+        return subAccounts;
     }
 
     private Account assemableAccount(AccountReq accountReq) {
@@ -504,8 +522,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean batchSave(List<Account> accountList) {
+        PaymentChannelReq req = new PaymentChannelReq();
+        req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+        req.setFiltered(true);
+        List<PaymentChannelDTO> paymentChannelDTOS = paymentChannelService.list(req);
         return accountDao.saveBatch(accountList)
-                && subAccountDao.saveBatch(AccountUtils.assemableSubAccount(accountList));
+                && subAccountDao.saveBatch(AccountUtils.assemableSubAccount(accountList, paymentChannelDTOS));
     }
 
     @Override

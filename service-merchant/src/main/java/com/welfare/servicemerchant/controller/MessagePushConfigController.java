@@ -55,7 +55,7 @@ public class MessagePushConfigController {
     return R.success(configContactService.findOneById(id));
   }
 
-  @PostMapping("/contact/export")
+  @GetMapping("/contact/export")
   @ApiOperation("导出配置列表(返回文件下载地址)")
   @MerchantUser
   public R<String> exportContact(String contact) throws IOException {

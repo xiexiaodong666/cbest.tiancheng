@@ -108,7 +108,6 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             type.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
             accountTypeList.add(type);
         }
-        accountAmountTypeService.batchSave(accountTypeList, merchantAccountType.getMerCode());
         return merchantAccountTypeDao.saveBatch(accountTypeList);
     }
 
@@ -152,7 +151,6 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
                 merchantAccountTypeDao.updateAllColumnById(type);
             }
         }
-        accountAmountTypeService.batchSave(addList, merchantAccountType.getMerCode());
         merchantAccountTypeDao.saveBatch(addList);
         //无法判断更新是否成功，因为这里有三种更新方式， 没报错默认更新成功
         return Boolean.TRUE;

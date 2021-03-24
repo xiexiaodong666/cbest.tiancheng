@@ -72,12 +72,4 @@ public interface AccountAmountTypeService {
      * @return
      */
     BigDecimal sumBalanceExceptSurplusQuota(Long accountCode);
-
-  void batchSave(List<MerchantAccountType> merchantAccountTypes, String merCode);
-
-  /**
-   * 给员工插入所属商户的所有福利类型（排除自助充值、授信额度、溢缴款)
-   * @param account
-   */
-  void saveByAccount(Account account);
 }

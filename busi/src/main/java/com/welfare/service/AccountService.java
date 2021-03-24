@@ -124,11 +124,4 @@ public interface AccountService {
    * @param creditLimitReq
    */
   void batchRestoreCreditLimit(AccountRestoreCreditLimitReq creditLimitReq);
-
-  /**
-   * 查询商户下所有的员工
-   * @param merCode
-   * @return
-   */
-  List<Account> getByMerCode(String merCode);
 }

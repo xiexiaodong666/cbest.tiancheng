@@ -430,14 +430,6 @@ public class AccountServiceImpl implements AccountService {
             accountAmountTypeMapper.insert(accountAmountType2);
             account.setSurplusQuota(account.getMaxQuota());
         }
-        Merchant merchant = merchantService.getMerchantByMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
-        if ("1".equals(merchant.getSelfRecharge())) {
-            AccountAmountType accountAmountType = new AccountAmountType();
-            accountAmountType.setAccountCode(account.getAccountCode());
-            accountAmountType.setMerAccountTypeCode(MerAccountTypeCode.SELF.code());
-            accountAmountType.setAccountBalance(BigDecimal.ZERO);
-            accountAmountTypeMapper.insert(accountAmountType);
-        }
         FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
         fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
         fileUniversalStorage.setUrl(accountReq.getImgUrl());
@@ -453,7 +445,6 @@ public class AccountServiceImpl implements AccountService {
         req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
         List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
         boolean result2 = subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
-        accountAmountTypeService.saveByAccount(account);
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
             .accountList(Arrays.asList(account)).build());
         return result && result2;
@@ -1244,13 +1235,6 @@ public class AccountServiceImpl implements AccountService {
                 DistributedLockUtil.unlock(multiLock);
             }
         }
-    }
-
-    @Override
-    public List<Account> getByMerCode(String merCode) {
-        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(Account.MER_CODE, merCode);
-        return accountDao.list(queryWrapper);
     }
 
     private OrderTransRelation assemblyOrderTransRelation(BigDecimal updateQuota,

@@ -71,4 +71,7 @@ public class WelfareSettleDetailPageReq  extends PageReq {
 
     @ApiModelProperty("商户支出方式")
     private String merDeductionType;
+
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

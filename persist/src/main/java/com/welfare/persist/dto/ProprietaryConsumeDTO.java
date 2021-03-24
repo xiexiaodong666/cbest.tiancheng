@@ -27,7 +27,7 @@ public class ProprietaryConsumeDTO {
 
   @ExcelProperty(value = "订单号")
   @ApiModelProperty(value = "订单号")
-  private String orderNO;
+  private String orderNo;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -89,7 +89,7 @@ public class MerchantHandler  {
         req.setList(list);
         log.info("同步商户到商城中台，req【{}】", JSON.toJSONString(req));
         RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateMerchant(req);
-        log.info("同步商户到商城中台，resp【{}】", JSON.toJSONString(resp));
+        log.info("同步商户到商城中台，resp【{}】req【{}】", JSON.toJSONString(resp), JSON.toJSONString(req));
         if (!("0000").equals(resp.getCode())) {
             throw new BusiException("同步商户数据到商城中心失败msg【"+resp.getMsg()+"】");
         }

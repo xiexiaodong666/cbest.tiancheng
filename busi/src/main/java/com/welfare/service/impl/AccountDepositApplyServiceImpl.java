@@ -439,12 +439,12 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
           if (CollectionUtils.isNotEmpty(details)) {
             AccountDepositApplyDetail detail = details.get(0);
             Account account = accountService.getByAccountCode(detail.getAccountCode());
-            Department department = departmentService.getByDepartmentCode(account.getStoreCode());
+            Department department = departmentService.getByDepartmentCode(account.getDepartment());
             AccountDepositApplyItem item = new AccountDepositApplyItem();
             item.setAccountCode(detail.getAccountCode());
             item.setAccountName(account.getAccountName());
             item.setRechargeAmount(detail.getRechargeAmount());
-            item.setDepartmentCode(account.getStoreCode());
+            item.setDepartmentCode(account.getDepartment());
             item.setDepartmentName(department.getDepartmentName());
             item.setPhone(account.getPhone());
             detailInfo.setItems(Lists.newArrayList(item));

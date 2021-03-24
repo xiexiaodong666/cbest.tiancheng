@@ -58,4 +58,6 @@ public class OrderRespDto implements Serializable {
     private String accountType;
     @ApiModelProperty("账号类别名称")
     private String accountTypeName;
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 }

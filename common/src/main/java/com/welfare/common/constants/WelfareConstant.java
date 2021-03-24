@@ -11,6 +11,51 @@ public class WelfareConstant {
     private WelfareConstant() {
 
     }
+
+    public static final String DEFAULT_SALE_UNID = "cbest-offline-default";
+    public static final String DEFAULT_SALE_UNNAME = "重百线下消费商品";
+
+
+    public enum PaymentChannel {
+        /**
+         * 沃生活馆
+         */
+        WO_LIFE("wo_life", "沃生活馆支付","70"),
+        WECHAT("wechat", "微信","71"),
+        ALIPAY("alipay", "支付宝","72"),
+        WELFARE("welfare", "甜橙卡","69");
+
+        private final String code;
+        private final String desc;
+        private final String barcodePrefix;
+
+        PaymentChannel(String code, String desc,String barcodePrefix) {
+            this.code = code;
+            this.desc = desc;
+            this.barcodePrefix = barcodePrefix;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+
+        public String barcodePrefix(){return this.barcodePrefix;}
+
+        public static PaymentChannel findByCode(String code) {
+            for (PaymentChannel type : PaymentChannel.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的PaymentChannel类型");
+        }
+    }
+
+
     public enum DictType {
         /**
          * 门店消费类型

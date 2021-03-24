@@ -29,6 +29,7 @@ public class AccountConsumeSceneStoreRelationDao extends
         return getOne(queryWrapper);
     }
 
+
     public List<AccountConsumeSceneStoreRelation> queryBySceneIdsAndStoreNo(List<Long> sceneIds, String storeNo){
         QueryWrapper<AccountConsumeSceneStoreRelation> queryWrapper = new QueryWrapper<>();
         queryWrapper.in(AccountConsumeSceneStoreRelation.ACCOUNT_CONSUME_SCENE_ID,sceneIds)

@@ -80,4 +80,9 @@ public class OrderPageQuery {
 
     private String organizationCode;
 
+    /**
+     * 支付渠道
+     */
+    private String paymentChannel;
+
 }

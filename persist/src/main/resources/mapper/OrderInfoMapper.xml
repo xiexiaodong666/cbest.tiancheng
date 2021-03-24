@@ -457,7 +457,7 @@
         select  mm.mer_name as accountMerName, tt.orderId ,
         tt.accountMerCode,tt.merchantName,tt.accountCode,
         tt.accountName,tt.merchantCode,tt.storeCode,tt.storeName,
-        tt.orderTime,tt.cardId,trans_type, phone,
+        tt.orderTime,tt.cardId,trans_type, phone,tt.paymentChannel,
         case time_interval
         when 1 then "早餐"
         when 2 then "午餐"
@@ -489,9 +489,10 @@
         d.department_code,
         d.department_name ,
         aty.type_code,
-        aty.type_name
+        aty.type_name,
+        ab.payment_channel as paymentChannel
         FROM
-        (select account_code,sum(trans_amount) as trans_amount , trans_no ,
+        (select account_code,sum(trans_amount) as trans_amount , trans_no ,payment_channel,
         max(trans_time) as trans_time ,store_code,trans_type,max(card_id) as card_id
         from account_bill_detail
         where trans_type in ('consume','refund')
@@ -501,7 +502,7 @@
         LEFT JOIN supplier_store s on ab.store_code = s.store_code
         LEFT JOIN merchant m on s.mer_code = m.mer_code
         LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
-        LEFT JOIN department d on d.department_code = t.store_code
+        LEFT JOIN department d on d.department_code = t.department
         LEFT JOIN account_type aty on aty.type_code = t.account_type_code
         <where>
             <if test="orderPageQuery.accountName != null">
@@ -516,6 +517,9 @@
             </if>
             <if test="orderPageQuery.orderId != null">
                 and oi.order_id = #{orderPageQuery.orderId}
+            </if>
+            <if test="orderPageQuery.paymentChannel != null">
+                and ab.payment_channel = #{orderPageQuery.paymentChannel}
             </if>
             <if test="orderPageQuery.lowPrice != null">
                 and ab.trans_amount &gt;= #{orderPageQuery.lowPrice}
@@ -583,7 +587,7 @@
                 aty.type_code,
                 aty.type_name
             FROM
-            (select account_code,sum(trans_amount) as trans_amount ,
+            (select account_code,sum(trans_amount) as trans_amount ,payment_channel,
         trans_no , max(trans_time) as trans_time ,store_code,trans_type
         from account_bill_detail
         where trans_type in ('consume','refund')
@@ -593,7 +597,7 @@
             LEFT JOIN supplier_store s on ab.store_code = s.store_code
             LEFT JOIN merchant m on s.mer_code = m.mer_code
             LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
-            LEFT JOIN department d on d.department_code = t.store_code
+            LEFT JOIN department d on d.department_code = t.department
             LEFT JOIN account_type aty on aty.type_code = t.account_type_code
             <where>
                 <if test="orderPageQuery.accountName != null">
@@ -623,6 +627,9 @@
                 </if>
                 <if test="orderPageQuery.supplierMerCode != null">
                     and m.mer_code = #{orderPageQuery.supplierMerCode}
+                </if>
+                <if test="orderPageQuery.paymentChannel != null">
+                    and ab.payment_channel = #{orderPageQuery.paymentChannel}
                 </if>
             </where>
             ) tt LEFT JOIN merchant mm

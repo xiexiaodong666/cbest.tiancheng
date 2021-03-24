@@ -27,7 +27,7 @@ import java.util.Map;
 @ConditionalOnHavingProperty("cbest.dmall.url")
 public interface CbestDmallFeign {
 
-  String SUCCESS_CODE = "0000";
+  Integer SUCCESS_CODE = 200;
 
   /**
    * 分页查询价格模板

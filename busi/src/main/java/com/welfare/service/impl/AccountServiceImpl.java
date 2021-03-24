@@ -75,6 +75,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -429,7 +430,14 @@ public class AccountServiceImpl implements AccountService {
             accountAmountTypeMapper.insert(accountAmountType2);
             account.setSurplusQuota(account.getMaxQuota());
         }
-
+        Merchant merchant = merchantService.getMerchantByMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+        if ("1".equals(merchant.getSelfRecharge())) {
+            AccountAmountType accountAmountType = new AccountAmountType();
+            accountAmountType.setAccountCode(account.getAccountCode());
+            accountAmountType.setMerAccountTypeCode(MerAccountTypeCode.SELF.code());
+            accountAmountType.setAccountBalance(BigDecimal.ZERO);
+            accountAmountTypeMapper.insert(accountAmountType);
+        }
         FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
         fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
         fileUniversalStorage.setUrl(accountReq.getImgUrl());

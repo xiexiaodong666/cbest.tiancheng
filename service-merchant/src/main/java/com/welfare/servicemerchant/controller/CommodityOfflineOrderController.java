@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +40,7 @@ public class CommodityOfflineOrderController {
 
   private final FileUploadService fileUploadService;
 
-  @GetMapping("/total")
+  @PostMapping("/total")
   @ApiOperation("分页查询商品销售线下订单汇总")
   @MerchantUser
   public R<CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse>>
@@ -67,7 +68,7 @@ public class CommodityOfflineOrderController {
     return R.success(result);
   }
 
-  @GetMapping("/total/list")
+  @PostMapping("/total/list")
   @ApiOperation("查询商品销售线下订单所有数据")
   @MerchantUser
   public R<CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse>> totalExport(@RequestBody CommodityOfflineOrderTotalRequest request) {
@@ -84,7 +85,7 @@ public class CommodityOfflineOrderController {
     return R.success(result);
   }
 
-  @GetMapping("/detail")
+  @PostMapping("/detail")
   @ApiOperation("分页查询商品销售线下订单明细数据")
   @MerchantUser
   public R<CommodityOfflineOrderBasicResponse<CommodityOfflineOrderDetailResponse>> detail(
@@ -114,7 +115,7 @@ public class CommodityOfflineOrderController {
     return R.success(result);
   }
 
-  @GetMapping("/detail/list")
+  @PostMapping("/detail/list")
   @ApiOperation("查询商品销售线下订单明细所有数据")
   @MerchantUser
   public R<CommodityOfflineOrderBasicResponse<CommodityOfflineOrderDetailResponse>> detailExport(@RequestBody CommodityOfflineOrderDetailRequest request) {

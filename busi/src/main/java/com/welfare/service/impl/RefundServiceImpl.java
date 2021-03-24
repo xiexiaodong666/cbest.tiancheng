@@ -273,7 +273,7 @@ public class RefundServiceImpl implements RefundService {
             operateMerchantCredit(account, refundDeductionDetail);
             RefundOperation refundOperation = RefundOperation.of(refundBillDetail, refundDeductionDetail);
             refundOperations.add(refundOperation);
-            int refundCompare = refundedAmount.compareTo(remainingRefundAmount);
+            int refundCompare = refundedAmount.compareTo(refundRequest.getAmount());
             if (refundCompare == 0) {
                 break;
             }

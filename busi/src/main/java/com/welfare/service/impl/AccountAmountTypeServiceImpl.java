@@ -52,7 +52,8 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     @Autowired
     private AccountService accountService;
     private final OrderTransRelationService orderTransRelationService;
-    private final AccountChangeEventRecordService accountChangeEventRecordService;
+    @Autowired
+    private AccountChangeEventRecordService accountChangeEventRecordService;
     private final AccountChangeEventRecordDao accountChangeEventRecordDao;
     private final AccountBillDetailDao accountBillDetailDao;
     private final OrderTransRelationDao orderTransRelationDao;

@@ -198,10 +198,10 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, account.getAccountCode());
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(queryWrapper);
-        Assert.isTrue(!CollectionUtils.isEmpty(accountAmountTypes), "该用户没有账户余额信息");
         List<MerchantAccountType> types = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
-        Assert.isTrue(!CollectionUtils.isEmpty(types), "该商户没有配置accountType");
-
+        if(CollectionUtils.isEmpty(accountAmountTypes) || CollectionUtils.isEmpty(types)){
+            return Collections.emptyList();
+        }
         Map<String, MerchantAccountType> map = types.stream()
                 .collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
         return accountAmountTypes.stream()

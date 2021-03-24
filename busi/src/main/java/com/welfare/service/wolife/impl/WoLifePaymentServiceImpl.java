@@ -107,7 +107,7 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         } catch (Exception e){
             thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED,null,e.getMessage());
             log.error("沃生活馆系统调用异常:",e);
-            throw new RuntimeException("[沃生活馆]:系统调用异常。",e);
+            throw e;
         }
 
         return Collections.singletonList(paymentOperation);
@@ -149,12 +149,12 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             }catch (Exception e){
                 log.error("沃生活馆退款系统调用异常:",e);
                 thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED,null,e.getMessage());
-                throw new RuntimeException("[沃生活馆]:退款系统调用异常。");
+                throw e;
             }
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail,refundRequest);
             AccountBillDetail refundBillDetail = toRefundBillDetail(thePaidBilDetail,refundRequest);
             SupplierStore supplierStore = supplierStoreDao.getOneByCode(refundBillDetail.getStoreCode());
-            if(Objects.equals(account.getMerCode(),supplierStore.getMerCode())){
+            if(!Objects.equals(account.getMerCode(),supplierStore.getMerCode())){
                 //非自营才有退回商户操作,和扣款时保持一致
                 operateMerchant(refundRequest, account);
             }

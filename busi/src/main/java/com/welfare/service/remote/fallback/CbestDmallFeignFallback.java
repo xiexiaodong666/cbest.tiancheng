@@ -91,7 +91,7 @@ public class CbestDmallFeignFallback implements FallbackFactory<CbestDmallFeign>
       @Override
       public DmallResponse<Object> saveWarningSetting(WarningSettingSaveReq req) {
         log.error("保存短信通知设置失败失败", throwable);
-        DmallResponse response = new DmallResponse("500", throwable.getMessage(), null);
+        DmallResponse response = new DmallResponse(500, throwable.getMessage(), null);
         return response;
       }
     };

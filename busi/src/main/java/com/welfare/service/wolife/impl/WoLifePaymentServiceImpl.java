@@ -77,22 +77,6 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         paymentRequest.setPhone(account.getPhone());
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
-        ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestService.generateHandling(paymentRequest);
-
-        try {
-            WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse =
-                    woLifeFeignService.accountDeduction(paymentRequest.getPhone(), WoLifeAccountDeductionDataRequest.of(paymentRequest));
-            if (basicResponse.isSuccess()) {
-                thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.SUCCEED,basicResponse,null);
-            }else{
-                thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED, basicResponse, null);
-                throw new BusiException("[沃生活馆]支付异常:"+basicResponse.getResponseMessage());
-            }
-        } catch (Exception e){
-            thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED,null,e.getMessage());
-            log.error("沃生活馆系统调用异常:",e);
-            throw new RuntimeException("[沃生活馆]:系统调用异常。",e);
-        }
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();
         AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, paymentAmount, accountAmountTypes);
@@ -110,6 +94,21 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         paymentOperation.setOperateAmount(paymentAmount);
         paymentOperation.setMerchantAccountType(null);
 
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestService.generateHandling(paymentRequest);
+        try {
+            WoLifeBasicResponse<WoLifeAccountDeductionResponse> basicResponse =
+                    woLifeFeignService.accountDeduction(paymentRequest.getPhone(), WoLifeAccountDeductionDataRequest.of(paymentRequest));
+            if (basicResponse.isSuccess()) {
+                thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.SUCCEED,basicResponse,null);
+            }else{
+                thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED, basicResponse, null);
+                throw new BusiException("[沃生活馆]支付异常:"+basicResponse.getResponseMessage());
+            }
+        } catch (Exception e){
+            thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED,null,e.getMessage());
+            log.error("沃生活馆系统调用异常:",e);
+            throw new RuntimeException("[沃生活馆]:系统调用异常。",e);
+        }
 
         return Collections.singletonList(paymentOperation);
     }

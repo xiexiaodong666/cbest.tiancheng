@@ -10,8 +10,10 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
+import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
+import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.SequenceService;
@@ -20,6 +22,7 @@ import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +49,8 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     private MerchantService merchantService;
     private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
     private final SequenceService sequenceService;
+    @Autowired
+    private AccountAmountTypeService accountAmountTypeService;
     private final static Long startId = 10000L;
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
@@ -103,6 +108,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             type.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
             accountTypeList.add(type);
         }
+        accountAmountTypeService.batchSave(accountTypeList, merchantAccountType.getMerCode());
         return merchantAccountTypeDao.saveBatch(accountTypeList);
     }
 
@@ -146,6 +152,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
                 merchantAccountTypeDao.updateAllColumnById(type);
             }
         }
+        accountAmountTypeService.batchSave(addList, merchantAccountType.getMerCode());
         merchantAccountTypeDao.saveBatch(addList);
         //无法判断更新是否成功，因为这里有三种更新方式， 没报错默认更新成功
         return Boolean.TRUE;

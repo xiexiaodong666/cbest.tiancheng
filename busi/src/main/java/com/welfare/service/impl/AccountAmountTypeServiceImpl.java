@@ -18,6 +18,7 @@ import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -267,4 +268,53 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         orderTransRelation.setType(transType.code());
         return orderTransRelation;
     }
+
+
+    @Override
+    public void batchSave(List<MerchantAccountType> merchantAccountTypes, String merCode) {
+        if (!CollectionUtils.isEmpty(merchantAccountTypes) && StringUtils.isNoneBlank(merCode)) {
+            List<Account> accounts = accountService.getByMerCode(merCode);
+            if (!CollectionUtils.isEmpty(accounts)) {
+                List<AccountAmountType> accountAmountTypes = new ArrayList<>();
+                accounts.forEach(account -> {
+                    merchantAccountTypes.forEach(merchantAccountType -> {
+                        AccountAmountType accountAmountType = new AccountAmountType();
+                        accountAmountType.setAccountCode(account.getAccountCode());
+                        accountAmountType.setMerAccountTypeCode(merchantAccountType.getMerAccountTypeCode());
+                        accountAmountType.setAccountBalance(BigDecimal.ZERO);
+                        accountAmountTypes.add(accountAmountType);
+                    });
+                });
+                if (!CollectionUtils.isEmpty(accountAmountTypes)) {
+                    accountAmountTypeDao.saveBatch(accountAmountTypes);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void saveByAccount(Account account) {
+        if (Objects.nonNull(account)) {
+            List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
+            if (!CollectionUtils.isEmpty(merchantAccountTypes)) {
+                merchantAccountTypes = merchantAccountTypes.stream().filter(merchantAccountType ->
+                        !Lists.newArrayList(WelfareConstant.MerAccountTypeCode.SELF.code(),
+                                WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code(),
+                                WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
+                                .contains(merchantAccountType.getMerAccountTypeCode())).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(merchantAccountTypes)) {
+                    List<AccountAmountType> accountAmountTypes = new ArrayList<>();
+                    merchantAccountTypes.forEach(merchantAccountType -> {
+                        AccountAmountType accountAmountType = new AccountAmountType();
+                        accountAmountType.setAccountCode(account.getAccountCode());
+                        accountAmountType.setMerAccountTypeCode(merchantAccountType.getMerAccountTypeCode());
+                        accountAmountType.setAccountBalance(BigDecimal.ZERO);
+                        accountAmountTypes.add(accountAmountType);
+                    });
+                    accountAmountTypeDao.saveBatch(accountAmountTypes);
+                }
+            }
+        }
+    }
+
 }

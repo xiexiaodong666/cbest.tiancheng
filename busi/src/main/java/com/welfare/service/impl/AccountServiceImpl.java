@@ -140,6 +140,9 @@ public class AccountServiceImpl implements AccountService {
 
     private final WoLifeFeignService woLifeFeignService;
 
+    @Autowired
+    private AccountAmountTypeService accountAmountTypeService;
+
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
         IPage<AccountPageDTO> iPage = accountCustomizeMapper
@@ -442,6 +445,7 @@ public class AccountServiceImpl implements AccountService {
         req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
         List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
         boolean result2 = subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
+        accountAmountTypeService.saveByAccount(account);
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
             .accountList(Arrays.asList(account)).build());
         return result && result2;
@@ -1232,6 +1236,13 @@ public class AccountServiceImpl implements AccountService {
                 DistributedLockUtil.unlock(multiLock);
             }
         }
+    }
+
+    @Override
+    public List<Account> getByMerCode(String merCode) {
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Account.MER_CODE, merCode);
+        return accountDao.list(queryWrapper);
     }
 
     private OrderTransRelation assemblyOrderTransRelation(BigDecimal updateQuota,

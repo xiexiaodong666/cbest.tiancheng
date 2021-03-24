@@ -63,9 +63,9 @@ public class CommodityOfflineOrderTotalRequest {
   private String goodsName;
 
   /**
-   * 商户编码
+   * 供应商编码
    */
-  @ApiModelProperty("商户编码")
+  @ApiModelProperty("供应商编码")
   private String merCode;
 
   /**

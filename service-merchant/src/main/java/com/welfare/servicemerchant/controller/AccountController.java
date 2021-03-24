@@ -101,7 +101,7 @@ public class AccountController implements IController {
       }
     }
 
-    Page<AccountPageDTO> page = new Page(currentPage, pageSize);
+    Page<AccountPageDTO> page = new Page<>(currentPage, pageSize);
 
     Page<AccountDTO> accountPage = accountService.getPageDTO(page, accountPageReq);
     accountDTOAccountPage.setRecords(accountPage.getRecords());

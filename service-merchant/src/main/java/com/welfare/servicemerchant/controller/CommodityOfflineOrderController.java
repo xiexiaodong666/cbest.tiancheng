@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderBasicExtResponse;
 import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderBasicResponse;
 import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailRequest;
@@ -47,10 +48,9 @@ public class CommodityOfflineOrderController {
     Page page = new Page();
     page.setCurrent(request.getCurrent());
     page.setSize(request.getSize());
-
+    request.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     Page<CommodityOfflineOrderTotalResponse> responsePage = orderService
         .getCommodityOfflineOrderTotal(page, request);
-
     CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse> result = new CommodityOfflineOrderBasicResponse<>();
 
     result.setCurrent(responsePage.getCurrent());
@@ -72,6 +72,7 @@ public class CommodityOfflineOrderController {
   @MerchantUser
   public R<CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse>> totalExport(@RequestBody CommodityOfflineOrderTotalRequest request) {
     CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse> result = new CommodityOfflineOrderBasicResponse<>();
+    request.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     List<CommodityOfflineOrderTotalResponse> responseList = orderService
         .exportCommodityOfflineOrderTotal(request);
     result.setRecords(responseList);
@@ -92,6 +93,7 @@ public class CommodityOfflineOrderController {
     Page page = new Page();
     page.setCurrent(request.getCurrent());
     page.setSize(request.getSize());
+    request.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
 
     Page<CommodityOfflineOrderDetailResponse> responsePage = orderService
         .getCommodityOfflineOrderDetail(page, request);
@@ -117,6 +119,7 @@ public class CommodityOfflineOrderController {
   @MerchantUser
   public R<CommodityOfflineOrderBasicResponse<CommodityOfflineOrderDetailResponse>> detailExport(@RequestBody CommodityOfflineOrderDetailRequest request) {
     CommodityOfflineOrderBasicResponse<CommodityOfflineOrderDetailResponse> result = new CommodityOfflineOrderBasicResponse<>();
+    request.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     List<CommodityOfflineOrderDetailResponse> responseList = orderService
         .exportCommodityOfflineOrderDetail(request);
     result.setRecords(responseList);

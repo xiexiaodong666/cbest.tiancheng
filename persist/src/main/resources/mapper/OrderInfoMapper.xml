@@ -14,12 +14,13 @@
         FROM
         (
         SELECT
-        trans_no,
+        ab.trans_no,
         ab.account_code,
         sum( trans_amount ) AS transAmountTotal,
         ab.trans_type
         FROM
         account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
         LEFT JOIN supplier_store s ON ab.store_code = s.store_code
         LEFT JOIN merchant m ON s.mer_code = m.mer_code
         LEFT JOIN account ac ON ac.account_code = ab.account_code
@@ -58,9 +59,19 @@
             </if>
         </where>
         GROUP BY
-        trans_no
+        ab.trans_no
         ) a
         <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
             <if test="request.goodsName != null">
                 and CONCAT( a.transAmountTotal, '元商品' ) like concat('%',#{request.goodsName},'%')
             </if>
@@ -68,6 +79,8 @@
 
         GROUP BY
         a.transAmountTotal,a.trans_type
+
+        order by saleCount desc, sales desc
     </select>
 
 
@@ -83,12 +96,13 @@
         FROM
         (
         SELECT
-        trans_no,
+        ab.trans_no,
         ab.account_code,
         sum( trans_amount ) AS transAmountTotal,
         ab.trans_type
         FROM
         account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
         LEFT JOIN supplier_store s ON ab.store_code = s.store_code
         LEFT JOIN merchant m ON s.mer_code = m.mer_code
         LEFT JOIN account ac ON ac.account_code = ab.account_code
@@ -128,15 +142,27 @@
             </if>
         </where>
         GROUP BY
-        trans_no
+        ab.trans_no
         ) a
         <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
             <if test="request.goodsName != null">
                 and CONCAT( a.transAmountTotal, '元商品' ) like concat('%',#{request.goodsName},'%')
             </if>
         </where>
         GROUP BY
         a.transAmountTotal,a.trans_type
+
+        order by saleCount desc, sales desc
     </select>
 
 
@@ -157,12 +183,13 @@
         FROM
         (
         SELECT
-        trans_no,
+        ab.trans_no,
         ab.account_code,
         sum( trans_amount ) AS transAmountTotal,
         ab.trans_type
         FROM
         account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
         LEFT JOIN supplier_store s ON ab.store_code = s.store_code
         LEFT JOIN merchant m ON s.mer_code = m.mer_code
         LEFT JOIN account ac ON ac.account_code = ab.account_code
@@ -202,9 +229,20 @@
             </if>
         </where>
         GROUP BY
-        trans_no
+        ab.trans_no
         ) a
         <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
+
             <if test="request.goodsName != null">
                 and CONCAT( a.transAmountTotal, '元商品' ) like concat('%',#{request.goodsName},'%')
             </if>
@@ -236,7 +274,8 @@
         ab.trans_time,
         oi.order_id,
         ac.phone,
-        d.department_name
+        d.department_name,
+        ab.trans_no
         FROM
         account_bill_detail ab
         LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
@@ -283,10 +322,21 @@
         ab.trans_no,ab.trans_type
         ) a
         <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
             <if test="request.goodsId">
                 and a.transAmountTotal = #{request.goodsId}
             </if>
         </where>
+
     </select>
 
     <select id="exportCommodityOfflineOrderDetail" parameterType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailRequest"
@@ -310,7 +360,8 @@
         ab.trans_time,
         oi.order_id,
         ac.phone,
-        d.department_name
+        d.department_name,
+        ab.trans_no
         FROM
         account_bill_detail ab
         LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
@@ -357,10 +408,21 @@
         ab.trans_no,ab.trans_type
         ) a
         <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
             <if test="request.goodsId">
                 and a.transAmountTotal = #{request.goodsId}
             </if>
         </where>
+
     </select>
 
     <select id="getCommodityOfflineOrderDetailExt" parameterType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailRequest"
@@ -390,7 +452,8 @@
         oi.order_id,
         ac.phone,
         d.department_name,
-        ab.account_code
+        ab.account_code,
+        ab.trans_no
 
         FROM
         account_bill_detail ab
@@ -438,6 +501,16 @@
         ab.trans_no,ab.trans_type
         ) a
         <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
             <if test="request.goodsId">
                 and a.transAmountTotal = #{request.goodsId}
             </if>

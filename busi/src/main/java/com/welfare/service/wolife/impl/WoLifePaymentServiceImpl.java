@@ -5,6 +5,7 @@ import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.PaymentTypeEnum;
+import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDao;
@@ -85,12 +86,12 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
                 thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.SUCCEED,basicResponse,null);
             }else{
                 thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED, basicResponse, null);
-                throw new RuntimeException("[沃生活馆]支付异常:"+basicResponse.getResponseMessage());
+                throw new BusiException("[沃生活馆]支付异常:"+basicResponse.getResponseMessage());
             }
         } catch (Exception e){
             thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED,null,e.getMessage());
             log.error("沃生活馆系统调用异常:",e);
-            throw new RuntimeException("[沃生活馆]:系统调用异常。");
+            throw new RuntimeException("[沃生活馆]:系统调用异常。",e);
         }
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();

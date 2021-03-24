@@ -36,7 +36,12 @@ public class ExceptionController implements IController {
 
         if(e instanceof BizException){
             return fail(((BizException) e).getCodeEnum(),e.getMessage());
-        }else{
+        } else if(e instanceof DmallException){
+            R result = new R();
+            result.setCode(((DmallException) e).getCode());
+            result.setMsg(e.getMessage());
+            return result;
+        } else{
             return fail(SystemCode.FAILURE,e.getMessage());
         }
 

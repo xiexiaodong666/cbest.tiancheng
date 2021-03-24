@@ -51,6 +51,7 @@ public class OfflineOrderController {
     OfflineTradeReq offlineTradeReq = new OfflineTradeReq();
     BeanUtils.copyProperties(req, offlineTradeReq);
     offlineTradeReq.setPaging(pagingCondition);
+    offlineTradeReq.setMerchantCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     return R.success(cbestDmallService.listOfflineTrade(offlineTradeReq));
   }
 
@@ -68,6 +69,7 @@ public class OfflineOrderController {
     OfflineTradeReq offlineTradeReq = new OfflineTradeReq();
     BeanUtils.copyProperties(req, offlineTradeReq);
     offlineTradeReq.setPaging(pagingCondition);
+    offlineTradeReq.setMerchantCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
     Page<OfflineOrderDTO> dtoPage = cbestDmallService.listOfflineTrade(offlineTradeReq);
     List<OfflineOrderDTO> list = new ArrayList<>();
     if (dtoPage != null && CollectionUtils.isNotEmpty(dtoPage.getRecords())) {

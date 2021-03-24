@@ -95,19 +95,19 @@ public interface CbestDmallFeign {
 
   /**
    * 查询当前挂起的离线订单的汇总数据
-   * @param merchantCode
+   * @param merCode
    * @return
    */
   @PostMapping("/orangeapi/manage/offline-trade/hangup/summary")
-  DmallResponse<OfflineOrderHangupSummaryDTO> summaryHangupOfflineTrade(@RequestParam("merchantCode") String merchantCode);
+  DmallResponse<OfflineOrderHangupSummaryDTO> summaryHangupOfflineTrade(Map<String, String> merCode);
 
   /**
    * 汇总查询员工的离线订单
-   * @param merchantCode
+   * @param merCode
    * @return
    */
   @PostMapping("/orangeapi/manage/offline-trade/account/summary")
-  DmallResponse<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(@RequestParam("merchantCode") String merchantCode);
+  DmallResponse<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(Map<String, String> merCode);
 
   /**
    * 保存短信通知设置

@@ -3,6 +3,7 @@ package com.welfare.service.remote.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.DmallException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.entity.SupplierStore;
@@ -53,7 +54,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PagingResult<PriceTemplateBrief>> resp = cbestDmallFeign.listPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("分页查询价格模板失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(resp));
-      throw new BizException(resp.getMsg());
+      throw new DmallException(Integer.parseInt(resp.getCode()),resp.getMsg(), null);
     }
     return toPage(resp.getData(), req.getPaging());
   }
@@ -65,7 +66,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PosPriceTemplate> response = cbestDmallFeign.queryPriceTemplate(parma);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(response.getCode())) {
       log.error("查询价格模板失败 请求:{} 响应:{}", id, JSON.toJSONString(response));
-      throw new BizException(response.getMsg());
+      throw new DmallException(Integer.parseInt(response.getCode()),response.getMsg(), null);
     }
     return response.getData();
   }
@@ -75,7 +76,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PosPriceTemplate> response = cbestDmallFeign.createPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(response.getCode())) {
       log.error("创建价格模板失败失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(response));
-      throw new BizException(response.getMsg());
+      throw new DmallException(Integer.parseInt(response.getCode()),response.getMsg(), null);
     }
     return response.getData();
   }
@@ -85,7 +86,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PosPriceTemplate> response = cbestDmallFeign.modifyPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(response.getCode())) {
       log.error("修改价格模板失败失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(response));
-      throw new BizException(response.getMsg());
+      throw new DmallException(Integer.parseInt(response.getCode()),response.getMsg(), null);
     }
     return response.getData();
   }
@@ -105,7 +106,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PagingResult<PosTerminalPriceTemplateResp>> resp = cbestDmallFeign.listTerminalPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("分页查询收银机价格模板失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(resp));
-      throw new BizException(resp.getMsg());
+      throw new DmallException(Integer.parseInt(resp.getCode()),resp.getMsg(), null);
     }
     return toPage(resp.getData(), req.getPaging());
   }
@@ -115,7 +116,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PosTerminalPriceTemplateResp> response = cbestDmallFeign.modifyTerminalPriceTemplate(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(response.getCode())) {
       log.error("修改收银机价格模板失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(response));
-      throw new BizException(response.getMsg());
+      throw new DmallException(Integer.parseInt(response.getCode()),response.getMsg(), null);
     }
     return response.getData();
   }
@@ -125,27 +126,31 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     DmallResponse<PagingResult<OfflineOrderDTO>> resp = cbestDmallFeign.listOfflineTrade(req);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("分页查询离线订单失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(resp));
-      throw new BizException(resp.getMsg());
+      throw new DmallException(Integer.parseInt(resp.getCode()),resp.getMsg(), null);
     }
     return toPage(resp.getData(), req.getPaging());
   }
 
   @Override
   public OfflineOrderHangupSummaryDTO summaryHangupOfflineTrade(String merchantCode) {
-    DmallResponse<OfflineOrderHangupSummaryDTO> resp = cbestDmallFeign.summaryHangupOfflineTrade(merchantCode);
+    Map<String, String> map = new HashMap<>();
+    map.put("merchantCode", merchantCode);
+    DmallResponse<OfflineOrderHangupSummaryDTO> resp = cbestDmallFeign.summaryHangupOfflineTrade(map);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("查询当前挂起的离线订单的汇总数据失败 请求:{} 响应:{}", merchantCode, JSON.toJSONString(resp));
-      throw new BizException(resp.getMsg());
+      throw new DmallException(Integer.parseInt(resp.getCode()),resp.getMsg(), null);
     }
     return resp.getData();
   }
 
   @Override
   public OfflineOrderAccountSummaryDTO summaryAccountOfflineTrade(String merchantCode) {
-    DmallResponse<OfflineOrderAccountSummaryDTO> resp = cbestDmallFeign.summaryAccountOfflineTrade(merchantCode);
+    Map<String, String> map = new HashMap<>();
+    map.put("merchantCode", merchantCode);
+    DmallResponse<OfflineOrderAccountSummaryDTO> resp = cbestDmallFeign.summaryAccountOfflineTrade(map);
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("汇总查询员工的离线订单失败 请求:{} 响应:{}", merchantCode, JSON.toJSONString(resp));
-      throw new BizException(resp.getMsg());
+      throw new DmallException(Integer.parseInt(resp.getCode()),resp.getMsg(), null);
     }
     return resp.getData();
   }

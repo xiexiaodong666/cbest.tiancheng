@@ -43,4 +43,6 @@ public class OfflineTradeReq {
   @ApiModelProperty("分页条件")
   @NotNull(message = "分页条件不能为空")
   private PagingCondition paging;
+
+  private String merchantCode;
 }

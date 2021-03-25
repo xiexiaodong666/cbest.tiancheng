@@ -20,6 +20,7 @@ import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.payment.*;
+import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
@@ -273,6 +274,7 @@ public class PaymentServiceImpl implements PaymentService {
         if(!enough){
             onInsufficientBalance(paymentRequest, account);
         }
+        Assert.notEmpty(accountAmountDOList,"用户没有可用的福利类型");
         BigDecimal allTypeBalance = accountAmountDOList.stream()
                 .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

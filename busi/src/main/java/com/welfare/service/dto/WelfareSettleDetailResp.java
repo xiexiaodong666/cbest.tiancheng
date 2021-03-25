@@ -116,11 +116,14 @@ public class WelfareSettleDetailResp {
     private String merDeductionTypeName;
 
     @ApiModelProperty("商户余额支出")
+    @ExcelProperty(value = "商户余额支出")
     private BigDecimal merDeductionAmount;
 
     @ApiModelProperty("商户授信支出")
+    @ExcelProperty(value = "商户授信支出")
     private BigDecimal merDeductionCreditAmount;
 
     @ApiModelProperty("支付渠道")
+    @ExcelProperty(value = "支付渠道")
     private String paymentChannel;
 }

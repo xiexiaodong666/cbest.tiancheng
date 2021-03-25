@@ -76,6 +76,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -131,8 +132,9 @@ public class AccountServiceImpl implements AccountService {
     private final AccountChangeEventRecordDao accountChangeEventRecordDao;
 
     private final SubAccountDao subAccountDao;
+    @Autowired
+    private PaymentChannelService paymentChannelService;
     private final PaymentChannelDao paymentChannelDao;
-
     private final static Map<String, WelfareConstant.PaymentChannel> PAYMENT_CHANNEL_MAP = Stream
         .of(WelfareConstant.PaymentChannel.values()).collect(Collectors
             .toMap(WelfareConstant.PaymentChannel::code,
@@ -141,6 +143,9 @@ public class AccountServiceImpl implements AccountService {
     private final WoLifeFeignService woLifeFeignService;
     private final DepartmentDao departmentDao;
     private final MerchantDao merchantDao;
+
+    @Autowired
+    private AccountAmountTypeService accountAmountTypeService;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -235,7 +240,7 @@ public class AccountServiceImpl implements AccountService {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         boolean result = accountDao.removeById(id);
-
+        subAccountDao.deleteAccountCode(syncAccount.getAccountCode());
         accountChangeEvtRecoed(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode());
         syncAccount.setDeleted(true);
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE)
@@ -428,7 +433,6 @@ public class AccountServiceImpl implements AccountService {
             accountAmountTypeMapper.insert(accountAmountType2);
             account.setSurplusQuota(account.getMaxQuota());
         }
-
         FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
         fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
         fileUniversalStorage.setUrl(accountReq.getImgUrl());
@@ -439,10 +443,27 @@ public class AccountServiceImpl implements AccountService {
         // 添加
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
-
+        PaymentChannelReq req =new PaymentChannelReq();
+        req.setFiltered(true);
+        req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+        List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
+        boolean result2 = subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
             .accountList(Arrays.asList(account)).build());
-        return result;
+        return result && result2;
+    }
+
+    private List<SubAccount> assemableSubAccount(List<PaymentChannelDTO> paymentChannels, Account account) {
+        List<SubAccount> subAccounts = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(paymentChannels)) {
+            paymentChannels.forEach(paymentChannel -> {
+                SubAccount subAccount = new SubAccount();
+                subAccount.setSubAccountType(paymentChannel.getPaymentChannelCode());
+                subAccount.setAccountCode(account.getAccountCode());
+                subAccounts.add(subAccount);
+            });
+        }
+        return subAccounts;
     }
 
     private Account assemableAccount(AccountReq accountReq) {
@@ -507,7 +528,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean batchSave(List<Account> accountList) {
-        return accountDao.saveBatch(accountList);
+        PaymentChannelReq req = new PaymentChannelReq();
+        req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+        req.setFiltered(true);
+        List<PaymentChannelDTO> paymentChannelDTOS = paymentChannelService.list(req);
+        return accountDao.saveBatch(accountList)
+                && subAccountDao.saveBatch(AccountUtils.assemableSubAccount(accountList, paymentChannelDTOS));
     }
 
     @Override
@@ -763,7 +789,7 @@ public class AccountServiceImpl implements AccountService {
             StrUtil.isEmpty(paymentChannel) ? WelfareConstant.PaymentChannel.WELFARE
                 : PAYMENT_CHANNEL_MAP.get(paymentChannel);
         List<AccountBalanceDTO> balanceList = new ArrayList<>();
-
+        String queryErrorMsg = null;
         switch (paymentChannelEnum) {
             case WELFARE:
                 balanceList = Lists.newArrayList(Welfare.values())
@@ -778,6 +804,7 @@ public class AccountServiceImpl implements AccountService {
                 if (!woLifeBasicResponse.isSuccess()) {
                     log.error("账户余额查询返回失败, phone: {}, response: {}", phone,
                         JSON.toJSONString(woLifeBasicResponse));
+                    queryErrorMsg = StrUtil.format("查询失败，{}", woLifeBasicResponse.getResponseMessage());
                 }
                 WoLifeGetUserMoneyResponse woLifeGetUserMoneyResponse = woLifeBasicResponse
                     .getResponse();
@@ -816,6 +843,7 @@ public class AccountServiceImpl implements AccountService {
         accountOverviewDTO.setPaymentChannelDesc(paymentChannelEnum.desc());
         accountOverviewDTO.setBalanceList(balanceList);
         accountOverviewDTO.setPaymentChannelList(paymentChannelList);
+        accountOverviewDTO.setQueryErrorMsg(queryErrorMsg);
         return accountOverviewDTO;
     }
 

@@ -123,9 +123,14 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         List<WelfareSettleDetailResp> welfareSettleDetailRespList = settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
             WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
             BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);
+            if (paymentChannelMap.containsKey(welfareSettleDetailDTO.getPaymentChannel())) {
+                welfareSettleDetailResp.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                welfareSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+            }
             return welfareSettleDetailResp;
         }).collect(Collectors.toList());
 
@@ -431,26 +436,19 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         proprietaryConsumePageQuery.setStoreType("self");
         List<WelfareTypeTotalAmountResp> typeTotalAmounts = new ArrayList<>();
         // 查询商户下所有的余额类型
-        List<MerchantAccountType> accountTypeList = accountTypeService.queryAllByMerCode(merCode);
-        if (CollectionUtils.isNotEmpty(accountTypeList)) {
-            List<String> typeCodes = accountTypeList.stream().map(MerchantAccountType::getMerAccountTypeCode).collect(Collectors.toList());
-            // 根据余额类型分组统计金额
-            List<WelfareTypeTotalAmountDTO> amountDTOS = settleDetailMapper.statisticalAmountGroupByWelfareTypeCode(proprietaryConsumePageQuery);
-            Map<String,WelfareTypeTotalAmountDTO> amountDTOMap = new HashMap<>();
-            BigDecimal totalAmount = BigDecimal.ZERO;
-            if (CollectionUtils.isNotEmpty(amountDTOS)) {
-                amountDTOMap = amountDTOS.stream().collect(Collectors.toMap(WelfareTypeTotalAmountDTO::getType, a -> a,(k1,k2)->k1));
-                totalAmount = amountDTOS.stream().map(WelfareTypeTotalAmountDTO::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            }
-            Map<String, WelfareTypeTotalAmountDTO> finalAmountDTOMap = amountDTOMap;
-            accountTypeList.forEach(merchantAccountType -> {
+        // 根据余额类型分组统计金额
+        List<WelfareTypeTotalAmountDTO> amountDTOS = settleDetailMapper.statisticalAmountGroupByWelfareTypeCode(proprietaryConsumePageQuery);
+        Map<String,WelfareTypeTotalAmountDTO> amountDTOMap = new HashMap<>();
+        BigDecimal totalAmount;
+        if (amountDTOS != null && amountDTOS.size() > 0) {
+            amountDTOS = amountDTOS.stream().filter(dto -> StringUtils.isNoneBlank(dto.getType())).collect(Collectors.toList());
+            amountDTOMap = amountDTOS.stream().collect(Collectors.toMap(WelfareTypeTotalAmountDTO::getType, a -> a,(k1,k2)->k1));
+            totalAmount = amountDTOS.stream().map(WelfareTypeTotalAmountDTO::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            amountDTOMap.forEach((s, welfareTypeTotalAmountDTO) -> {
                 WelfareTypeTotalAmountResp amountResp = new WelfareTypeTotalAmountResp();
-                amountResp.setType(merchantAccountType.getMerAccountTypeCode());
-                amountResp.setTypeName(merchantAccountType.getMerAccountTypeName());
-                amountResp.setAmount(BigDecimal.ZERO);
-                if (finalAmountDTOMap.containsKey(merchantAccountType.getMerAccountTypeCode())) {
-                    amountResp.setAmount(finalAmountDTOMap.get(merchantAccountType.getMerAccountTypeCode()).getAmount());
-                }
+                amountResp.setType(welfareTypeTotalAmountDTO.getType());
+                amountResp.setTypeName(welfareTypeTotalAmountDTO.getTypeName());
+                amountResp.setAmount(welfareTypeTotalAmountDTO.getAmount());
                 typeTotalAmounts.add(amountResp);
             });
             // 计算总金额

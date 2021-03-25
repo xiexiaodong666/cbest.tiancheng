@@ -178,10 +178,14 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         monthSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
         List<MonthSettleDetailDTO> monthSettleDetailDTOS = settleDetailMapper.selectMonthSettleDetail(monthSettleDetailQuery);
-
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         List<MonthSettleDetailResp> monthSettleDetailResps = monthSettleDetailDTOS.stream().map(monthSettleDetailDTO -> {
             MonthSettleDetailResp monthSettleDetailResp = new MonthSettleDetailResp();
             BeanUtils.copyProperties(monthSettleDetailDTO, monthSettleDetailResp);
+            if (paymentChannelMap.containsKey(monthSettleDetailDTO.getPaymentChannel())) {
+                monthSettleDetailResp.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+                monthSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(monthSettleDetailDTO.getPaymentChannel()).getName());
+            }
             return monthSettleDetailResp;
         }).collect(Collectors.toList());
 
@@ -294,7 +298,13 @@ public class MonthSettleServiceImpl implements MonthSettleService {
     @Override
     public List<MonthSettleDetailMerchantSummaryDTO> monthSettleDetailMerchantSummary(Long id, MonthSettleDetailReq monthSettleDetailReq) {
         MonthSettleDetailQuery monthSettleDetailQuery = getMonthSettleDetailQuery(id, monthSettleDetailReq);
-        return settleDetailMapper.sumSettleDetailGroupByMerAccountType(monthSettleDetailQuery);
+        List<MonthSettleDetailMerchantSummaryDTO> monthSettleDetailMerchantSummaryDTOS = settleDetailMapper.sumSettleDetailGroupByMerAccountType(monthSettleDetailQuery);
+        if(!CollectionUtils.isEmpty(monthSettleDetailMerchantSummaryDTOS)){
+            //沃支付的流水，没有福利类型，不用汇总返回
+            monthSettleDetailMerchantSummaryDTOS = monthSettleDetailMerchantSummaryDTOS.stream()
+                    .filter(dto -> StringUtils.isNotEmpty(dto.getMerAccountType())).collect(Collectors.toList());
+        }
+        return monthSettleDetailMerchantSummaryDTOS;
     }
 
     /**

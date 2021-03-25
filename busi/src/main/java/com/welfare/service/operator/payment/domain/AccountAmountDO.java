@@ -10,6 +10,7 @@ import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.Data;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -87,7 +88,6 @@ public class AccountAmountDO {
         }else if (paymentRequest instanceof WholesalePaymentRequest){
             accountBillDetail.setPaymentType(PaymentTypeEnum.WHOLESALE.getCode());
         }
-
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
         BigDecimal accountSurplusQuota = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
         BigDecimal accountSurplusOverpay = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);

@@ -76,6 +76,8 @@ public class RefundServiceImpl implements RefundService {
             welfareRefund(refundRequest, refundDeductionDetailInDb, accountDeductionDetails, accountCode);
         }else if(WelfareConstant.PaymentChannel.WO_LIFE.code().equals(first.getPaymentChannel())){
             woLifePaymentService.refund(refundRequest,accountDeductionDetails, accountCode);
+        }else{
+            throw new RuntimeException("不支持此种支付渠道:"+first.getPaymentChannel());
         }
 
     }
@@ -88,6 +90,7 @@ public class RefundServiceImpl implements RefundService {
             refundRequest.setAccountMerCode(account.getMerCode());
             log.error("accountInfo:{}",account);
             List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
+            Assert.notEmpty(accountAmountDOList,"员工没有配置福利类型");
             //按照deductionOrder逆序
             accountAmountDOList.sort(Comparator.comparing(x -> -1 * x.getMerchantAccountType().getDeductionOrder()));
             List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
@@ -270,7 +273,7 @@ public class RefundServiceImpl implements RefundService {
             operateMerchantCredit(account, refundDeductionDetail);
             RefundOperation refundOperation = RefundOperation.of(refundBillDetail, refundDeductionDetail);
             refundOperations.add(refundOperation);
-            int refundCompare = refundedAmount.compareTo(remainingRefundAmount);
+            int refundCompare = refundedAmount.compareTo(refundRequest.getAmount());
             if (refundCompare == 0) {
                 break;
             }

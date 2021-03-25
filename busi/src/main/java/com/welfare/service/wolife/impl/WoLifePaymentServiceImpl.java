@@ -187,9 +187,10 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         refundDeductionDetail.setTransNo(refundRequest.getTransNo());
         refundDeductionDetail.setRelatedTransNo(refundRequest.getOriginalTransNo());
         refundDeductionDetail.setTransType(WelfareConstant.TransType.REFUND.code());
+        refundDeductionDetail.setTransTime(refundRequest.getRefundDate());
+        refundDeductionDetail.setReversedAmount(BigDecimal.ZERO);
         refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);
-
         thePayDeductionDetail.setReversedAmount(thePayDeductionDetail.getTransAmount());
         return refundDeductionDetail;
     }
@@ -199,6 +200,8 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
         BeanUtils.copyProperties(thePayBillDetail, refundBillDetail);
         refundBillDetail.setTransNo(refundRequest.getTransNo());
         refundBillDetail.setTransType(WelfareConstant.TransType.REFUND.code());
+        refundBillDetail.setTransTime(refundRequest.getRefundDate());
+
         refundBillDetail.setId(null);
         refundBillDetail.setVersion(0);
         return refundBillDetail;

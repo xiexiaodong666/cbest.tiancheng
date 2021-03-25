@@ -97,7 +97,7 @@ public class OfflineOrderController {
   @GetMapping("/account/summary")
   @MerchantUser
   @ApiOperation("查询当前挂起的离线订单的汇总数据")
-  R<OfflineOrderAccountSummaryDTO> offlineOrderAccountSummary(){
+  R<List<OfflineOrderAccountSummaryDTO>> offlineOrderAccountSummary(){
     return R.success(cbestDmallService.summaryAccountOfflineTrade(MerchantUserHolder.getMerchantUser().getMerchantCode()));
   }
 }

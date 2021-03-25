@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 
 /**
  * @Author: duanhy
@@ -79,7 +81,7 @@ public interface CbestDmallService {
    * @param merchantCode
    * @return
    */
-  OfflineOrderAccountSummaryDTO summaryAccountOfflineTrade(String merchantCode);
+  List<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(String merchantCode);
 
   /**
    * 保存短信通知设置

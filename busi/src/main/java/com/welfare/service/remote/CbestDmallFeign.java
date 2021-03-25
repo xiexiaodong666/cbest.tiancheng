@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,7 +108,7 @@ public interface CbestDmallFeign {
    * @return
    */
   @PostMapping("/orangeapi/manage/offline-trade/account/summary")
-  DmallResponse<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(Map<String, String> merCode);
+  DmallResponse<List<OfflineOrderAccountSummaryDTO>> summaryAccountOfflineTrade(Map<String, String> merCode);
 
   /**
    * 保存短信通知设置

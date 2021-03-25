@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -83,7 +84,7 @@ public class CbestDmallFeignFallback implements FallbackFactory<CbestDmallFeign>
       }
 
       @Override
-      public DmallResponse<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(Map<String, String> merchantCode) {
+      public DmallResponse<List<OfflineOrderAccountSummaryDTO>> summaryAccountOfflineTrade(Map<String, String> merchantCode) {
         log.error("汇总查询员工的离线订单失败, 请求:{}", JSON.toJSONString(merchantCode), throwable);
         throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
       }

@@ -144,10 +144,11 @@ public class CbestDmallServiceImpl implements CbestDmallService {
   }
 
   @Override
-  public OfflineOrderAccountSummaryDTO summaryAccountOfflineTrade(String merchantCode) {
+  public List<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(String merchantCode) {
     Map<String, String> map = new HashMap<>();
     map.put("merchantCode", merchantCode);
-    DmallResponse<OfflineOrderAccountSummaryDTO> resp = cbestDmallFeign.summaryAccountOfflineTrade(map);
+    DmallResponse<List<OfflineOrderAccountSummaryDTO>> resp = cbestDmallFeign.summaryAccountOfflineTrade(map);
+    System.out.println(JSON.toJSONString(resp));
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("汇总查询员工的离线订单失败 请求:{} 响应:{}", merchantCode, JSON.toJSONString(resp));
       throw new DmallException(resp.getCode(),resp.getMsg(), null);

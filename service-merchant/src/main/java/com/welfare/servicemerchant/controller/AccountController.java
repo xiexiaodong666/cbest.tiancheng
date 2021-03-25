@@ -81,10 +81,9 @@ public class AccountController implements IController {
     return success(accountService.queryIncrementDTO(accountIncrementReq));
   }
 
-  @GetMapping("/page")
-  @ApiOperation("分页查询账户")
-  public R<AccountPage<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
-      @RequestParam @ApiParam("单页大小") Integer pageSize,
+  @PostMapping("/page/merchant")
+  @ApiOperation("商户端分页查询账户")
+  public R<AccountPage<AccountDTO>> merchantPageQuery(@RequestBody
       AccountPageReq accountPageReq) {
 
     AccountPage<AccountDTO> accountDTOAccountPage = new AccountPage<>();
@@ -101,7 +100,7 @@ public class AccountController implements IController {
       }
     }
 
-    Page<AccountPageDTO> page = new Page<>(currentPage, pageSize);
+    Page<AccountPageDTO> page = new Page<>(accountPageReq.getCurrentPage(), accountPageReq.getPageSize());
 
     Page<AccountDTO> accountPage = accountService.getPageDTO(page, accountPageReq);
     accountDTOAccountPage.setRecords(accountPage.getRecords());
@@ -113,6 +112,16 @@ public class AccountController implements IController {
     }
 
     return success(accountDTOAccountPage);
+  }
+
+  @GetMapping("/page")
+  @ApiOperation("分页查询账户")
+  public R<Page<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
+      @RequestParam @ApiParam("单页大小") Integer pageSize,
+      AccountPageReq accountPageReq) {
+    Page<AccountPageDTO> page = new Page<>(currentPage, pageSize);
+    Page<AccountDTO> accountPage = accountService.getPageDTO(page, accountPageReq);
+    return success(accountPage);
   }
 
   @GetMapping("/{id}")

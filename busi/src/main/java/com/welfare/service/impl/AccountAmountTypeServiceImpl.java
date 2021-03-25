@@ -18,6 +18,7 @@ import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,8 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     @Autowired
     private AccountService accountService;
     private final OrderTransRelationService orderTransRelationService;
-    private final AccountChangeEventRecordService accountChangeEventRecordService;
+    @Autowired
+    private AccountChangeEventRecordService accountChangeEventRecordService;
     private final AccountChangeEventRecordDao accountChangeEventRecordDao;
     private final AccountBillDetailDao accountBillDetailDao;
     private final OrderTransRelationDao orderTransRelationDao;
@@ -198,10 +200,10 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, account.getAccountCode());
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(queryWrapper);
-        Assert.isTrue(!CollectionUtils.isEmpty(accountAmountTypes), "该用户没有账户余额信息");
         List<MerchantAccountType> types = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
-        Assert.isTrue(!CollectionUtils.isEmpty(types), "该商户没有配置accountType");
-
+        if(CollectionUtils.isEmpty(accountAmountTypes) || CollectionUtils.isEmpty(types)){
+            return Collections.emptyList();
+        }
         Map<String, MerchantAccountType> map = types.stream()
                 .collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
         return accountAmountTypes.stream()

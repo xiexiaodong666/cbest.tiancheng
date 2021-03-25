@@ -32,4 +32,7 @@ public class AccountOverviewDTO {
 
     @ApiModelProperty("账号支付渠道")
     private List<AccountPaymentChannelDTO> paymentChannelList;
+
+    @ApiModelProperty("查询失败错误信息")
+    private String queryErrorMsg;
 }

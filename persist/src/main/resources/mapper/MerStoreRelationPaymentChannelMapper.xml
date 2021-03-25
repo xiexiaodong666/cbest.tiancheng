@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.MerStoreRelationPaymentChannelMapper">
+    <sql id="tableName">
+        mer_store_relation_payment_channel
+    </sql>
+
+    <sql id="baseColumn">
+        id,mer_code,store_code,consum_type,payment_channel,create_user,create_time,update_user,update_time,deleted,version
+    </sql>
+
+</mapper>

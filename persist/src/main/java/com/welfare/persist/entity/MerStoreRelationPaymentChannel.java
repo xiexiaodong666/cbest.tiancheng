@@ -12,51 +12,52 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 子账户信息(sub_account)实体类
+ * (mer_store_relation_payment_channel)实体类
  *
  * @author Yuxiang Li
- * @since 2021-03-10 15:43:18
+ * @since 2021-03-25 15:54:37
  * @description 由 Mybatisplus Code Generator 创建
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("sub_account")
-@ApiModel("子账户信息")
-public class SubAccount extends Model<SubAccount> implements Serializable {
+@TableName("mer_store_relation_payment_channel")
+@ApiModel("")
+public class MerStoreRelationPaymentChannel extends Model<MerStoreRelationPaymentChannel> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * pk
      */
-    @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty("pk")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
 	private Long id;
     /**
-     * 员工账号
+     * 商户编码
      */
-    @ApiModelProperty("员工账号")   
-    private Long accountCode;
+    @ApiModelProperty("商户编码")   
+    private String merCode;
     /**
-     * 子账户类型
+     * 门店编码
      */
-    @ApiModelProperty("子账户类型")   
-    private String subAccountType;
+    @ApiModelProperty("门店编码")   
+    private String storeCode;
     /**
-     * 余额
+     * 消费场景
      */
-    @ApiModelProperty("余额")   
-    private BigDecimal balance;
-
-    @ApiModelProperty("免密支付签名")
-    private String passwordFreeSignature;
+    @ApiModelProperty("消费场景")   
+    private String consumType;
+    /**
+     * 支付渠道
+     */
+    @ApiModelProperty("支付渠道")   
+    private String paymentChannel;
     /**
      * 创建人
      */
@@ -97,21 +98,25 @@ public class SubAccount extends Model<SubAccount> implements Serializable {
 //以下为列明常量
 
     /**
-    * 
+    * pk
     */
     public static final String ID = "id";
     /**
-    * 员工账号
+    * 商户编码
     */
-    public static final String ACCOUNT_CODE = "account_code";
+    public static final String MER_CODE = "mer_code";
     /**
-    * 子账户类型
+    * 门店编码
     */
-    public static final String SUB_ACCOUNT_TYPE = "sub_account_type";
+    public static final String STORE_CODE = "store_code";
     /**
-    * 余额
+    * 消费场景
     */
-    public static final String BALANCE = "balance";
+    public static final String CONSUM_TYPE = "consum_type";
+    /**
+    * 支付渠道
+    */
+    public static final String PAYMENT_CHANNEL = "payment_channel";
     /**
     * 创建人
     */
@@ -136,7 +141,5 @@ public class SubAccount extends Model<SubAccount> implements Serializable {
     * 版本
     */
     public static final String VERSION = "version";
-
-    public static final String PASSWORD_FREE_SIGNATURE = "password_free_signature";
 
 }

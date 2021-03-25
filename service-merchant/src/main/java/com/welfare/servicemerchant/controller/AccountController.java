@@ -205,6 +205,14 @@ public class AccountController implements IController {
     return success(fileUploadService.getFileServerUrl(path));
   }
 
+  @ApiOperation("商户员工账号导出")
+  @PostMapping(value = "/exportAccount/merchant")
+  public R<String> exportMerchantAccount(AccountPageReq accountPageReq) throws IOException {
+    List<AccountDTO> accountDTOList = accountService.export(accountPageReq);
+    String path = fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号");
+    return success(fileUploadService.getFileServerUrl(path));
+  }
+
   @ApiOperation("批量新增员工账号")
   @PostMapping(value = "/uploadAccount")
   @MerchantUser

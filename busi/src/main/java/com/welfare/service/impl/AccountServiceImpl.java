@@ -195,7 +195,11 @@ public class AccountServiceImpl implements AccountService {
                 accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
                 accountPageReq.getAccountTypeCodes(), accountPageReq.getBinding(),
                 accountPageReq.getCardId(),
-                accountPageReq.getPhone());
+                accountPageReq.getPhone(),
+                          accountPageReq.getAccountBalanceMin(),
+                          accountPageReq.getAccountBalanceMax(),
+                          accountPageReq.getSurplusQuotaMin(),
+                          accountPageReq.getSurplusQuotaMax());
         return accountConverter.toAccountDTOList(list);
     }
 

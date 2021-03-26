@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SubAccountController implements IController {
     private final SubAccountService subAccountService;
 
-    @PostMapping("password-free-signature")
+    @PostMapping("/password-free-signature")
     @ApiOperation("维护免密支付签名")
     public R<SubAccountDTO> passwordFreeSignature(@RequestBody SubAccountDTO subAccountDTO){
         subAccountService.passwordFreeSignature(

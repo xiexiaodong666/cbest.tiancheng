@@ -16,7 +16,7 @@ public class CommodityOfflineOrderTotalResponse {
    * 商品id
    */
   @ApiModelProperty("商品id")
-  private BigDecimal goodsId;
+  private String goodsId;
 
   /**
    * 商品名称

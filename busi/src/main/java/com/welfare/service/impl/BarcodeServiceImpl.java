@@ -66,16 +66,9 @@ public class BarcodeServiceImpl implements BarcodeService {
 
     private void generateSaltIfNeeded(List<BarcodeSalt> barcodeSalts) {
         if(barcodeSalts.size() < MAX_PERIOD_GENERATE){
-            //全局只能有一个线程在执行生成逻辑
-            RLock lock = redissonClient.getFairLock(RedisKeyConstant.GENERATE_BARCODE_SALT_LOCK);
-            lock.lock();
-            try{
-                //让事务生效,直接this调用没有aop织入事务
-                BarcodeService bean = SpringBeanUtils.getBean(BarcodeService.class);
-                bean.batchGenerateSalt();
-            }finally {
-                lock.unlock();
-            }
+            //让事务生效,直接this调用没有aop织入事务
+            BarcodeService bean = SpringBeanUtils.getBean(BarcodeService.class);
+            bean.batchGenerateSalt();
         }
     }
 
@@ -101,18 +94,26 @@ public class BarcodeServiceImpl implements BarcodeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchGenerateSalt(){
-        BarcodeSalt maxPeriodBarcodeSalt = getTheLatestSaltInDb();
-        Date maxPeriod = BarcodeUtil.parsePeriodToDate(maxPeriodBarcodeSalt.getValidPeriod());
-        long days = (maxPeriod.getTime() - Calendar.getInstance().getTime().getTime()) / MILL_SEC_A_DAY;
-        if(days < MAX_PERIOD_GENERATE){
-            //循环生成缺失的period
-            for (int i = 0; i < MAX_PERIOD_GENERATE - days; i++) {
-                Date theDayAfterMax = DateUtils.addDays(maxPeriod, i);
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-                String targetPeriodStr = dateFormat.format(theDayAfterMax);
-                generateSalt(Long.valueOf(targetPeriodStr));
+        //全局只能有一个线程在执行生成逻辑
+        RLock lock = redissonClient.getFairLock(RedisKeyConstant.GENERATE_BARCODE_SALT_LOCK);
+        lock.lock();
+        try{
+            BarcodeSalt maxPeriodBarcodeSalt = getTheLatestSaltInDb();
+            Date maxPeriod = BarcodeUtil.parsePeriodToDate(maxPeriodBarcodeSalt.getValidPeriod());
+            long days = (maxPeriod.getTime() - Calendar.getInstance().getTime().getTime()) / MILL_SEC_A_DAY;
+            if(days < MAX_PERIOD_GENERATE){
+                //循环生成缺失的period
+                for (int i = 0; i < MAX_PERIOD_GENERATE - days; i++) {
+                    Date theDayAfterMax = DateUtils.addDays(maxPeriod, i);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                    String targetPeriodStr = dateFormat.format(theDayAfterMax);
+                    generateSalt(Long.valueOf(targetPeriodStr));
+                }
             }
+        }finally {
+            lock.unlock();
         }
+
     }
 
     @Override

@@ -16,11 +16,21 @@ import java.util.List;
 @Data
 public class PaymentChannelDTO {
 
+
+  @ApiModelProperty("id")
+  private String id;
+
   @ApiModelProperty("支付渠道编码")
   private String paymentChannelCode;
 
   @ApiModelProperty("支付渠道名称")
   private String paymentChannelName;
+
+  @ApiModelProperty("排序：从 1 开始升序排列")
+  private Integer showOrder;
+
+  @ApiModelProperty("商户编码")
+  private String merchantCode;
 
   public static List<PaymentChannelDTO> of(List<PaymentChannel> paymentChannels) {
     List<PaymentChannelDTO> list = new ArrayList<>();
@@ -29,6 +39,9 @@ public class PaymentChannelDTO {
         PaymentChannelDTO dto = new PaymentChannelDTO();
         dto.setPaymentChannelCode(paymentChannel.getCode());
         dto.setPaymentChannelName(paymentChannel.getName());
+        dto.setShowOrder(paymentChannel.getShowOrder());
+        dto.setMerchantCode(paymentChannel.getMerchantCode());
+        dto.setId(paymentChannel.getId() + "");
         list.add(dto);
       });
     }

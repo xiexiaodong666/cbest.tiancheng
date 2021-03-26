@@ -1,5 +1,9 @@
 package com.welfare.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.paymentChannel.*;
+import java.util.List;
+
 /**
  * 服务接口
  *
@@ -9,4 +13,9 @@ package com.welfare.service;
  */
 public interface PaymentChannelConfigService {
 
+  Page<PayChannelConfigSimpleDTO> simplePage(PayChannelConfigSimpleReq req);
+
+  PayChannelConfigDTO detail(PayChannelConfigReq condition);
+
+  Boolean edit(PayChannelConfigEditReq req);
 }

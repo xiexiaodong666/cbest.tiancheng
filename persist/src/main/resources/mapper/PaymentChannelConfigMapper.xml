@@ -9,4 +9,82 @@
         id,mer_code,store_code,consume_type,payment_channel_code,payment_channel_name,create_user,create_time,update_user,update_time,account_balance,deleted,version
     </sql>
 
+    <select id="simplePage" resultType="com.welfare.persist.dto.PayChannelConfigSimple" >
+        SELECT
+            m.id as merchantId,
+            m.mer_name as merchantName,
+            m.mer_code as merchantCode,
+            a.paymentChannels as paymentChannels,
+            count(msr.store_code) as consumeStoreCount
+        from
+            merchant m LEFT JOIN
+            (
+                SELECT
+                    p.merchant_code as merchantCode,
+                    GROUP_CONCAT( p.`name` ORDER BY p.show_order ASC SEPARATOR ' / ' )  as paymentChannels
+                FROM
+                    payment_channel p
+                WHERE
+                  p.deleted = 0
+                GROUP BY
+                    p.merchant_code
+            ) as a
+            on a.merchantCode = m.mer_code
+        LEFT JOIN merchant_store_relation msr  ON m.mer_code = msr.mer_code  AND msr.deleted = 0
+        <where>
+            m.deleted = 0
+            <if test="merName != null and merName != ''">
+                and m.mer_name like concat('%', #{merName}, '%')
+            </if>
+        </where>
+        GROUP BY m.mer_code
+    </select>
+
+    <select id="list" parameterType="com.welfare.persist.dto.query.PayChannelConfigQuery" resultType="com.welfare.persist.dto.PaymentChannelConfigDetailDTO">
+        SELECT
+        msr.mer_code AS merchantCode,
+        t.mer_name AS merchantName,
+        msr.store_code AS storeCode,
+        ss.store_name AS storeName,
+        msr.consum_type AS merConsumType,
+        pcc.consume_type AS consumeType,
+        pcc.id AS paymentChannelConfigId,
+        pcc.`payment_channel_code` AS paymentChannelCode,
+        pcc.`payment_channel_name` AS paymentChannelName
+        FROM
+        merchant_store_relation msr
+        LEFT JOIN merchant t ON msr.mer_code = t.mer_code
+        LEFT JOIN supplier_store ss ON ss.store_code = msr.store_code
+        LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        LEFT JOIN payment_channel_config pcc ON pcc.deleted = 0
+        AND msr.mer_code = pcc.mer_code
+        AND msr.store_code = pcc.store_code
+        <where>
+            msr.deleted = 0
+            <if test="query.merchantCode != null and query.merchantCode != ''">
+                AND msr.mer_code = #{query.merchantCode}
+            </if>
+            <if test="query.supplierCode != null and query.supplierCode != ''">
+                AND supplier.mer_code = #{query.supplierCode}
+            </if>
+            <if test="query.storeName != null and query.storeName != ''">
+                AND ss.store_name like concat('%', #{query.storeName}, '%')
+            </if>
+            <if test="query.consumeTypes != null and query.consumeTypes.size()>0">
+                and pcc.consume_type in
+                <foreach item="item" index="index" collection="query.consumeTypes" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.paymentChannelCode != null and query.paymentChannelCode.size()>0">
+                and pcc.payment_channel_code in
+                <foreach item="item" index="index" collection="query.paymentChannelCode" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
 </mapper>

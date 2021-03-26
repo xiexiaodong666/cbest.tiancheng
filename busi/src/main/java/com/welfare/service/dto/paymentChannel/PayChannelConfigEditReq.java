@@ -8,10 +8,10 @@ import java.util.List;
 /**
  * @Author: duanhy
  * @Version: 0.0.1
- * @Date: 2021/3/25 4:13 下午
+ * @Date: 2021/3/25 4:38 下午
  */
 @Data
-public class PaymentChannelMerchantResp {
+public class PayChannelConfigEditReq {
 
   @ApiModelProperty("商户编码")
   private String merchantCode;
@@ -19,6 +19,6 @@ public class PaymentChannelMerchantResp {
   @ApiModelProperty("商户名称")
   private String merchantName;
 
-  @ApiModelProperty("支付渠道")
-  private List<PaymentChannelDTO> paymentChannels;
+  @ApiModelProperty("编辑的数据")
+  private List<PayChannelConfigRowDTO> rows;
 }

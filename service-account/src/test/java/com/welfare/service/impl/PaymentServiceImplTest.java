@@ -2,8 +2,10 @@ package com.welfare.service.impl;
 
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.entity.*;
+import com.welfare.service.MerchantCreditService;
 import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
@@ -11,6 +13,10 @@ import com.welfare.service.payment.WelfarePaymentOperator;
 import com.welfare.serviceaccount.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
@@ -26,7 +32,7 @@ import java.util.stream.Collectors;
  * @email yuxiang.li@sjgo365.com
  * @date 2/1/2021
  */
-public class PaymentServiceImplTest extends BaseTest {
+public class PaymentServiceImplTest extends BaseTest{
     PaymentRequest paymentRequest;
     Account account;
     List<AccountAmountDO> accountAmountDOs;
@@ -43,6 +49,7 @@ public class PaymentServiceImplTest extends BaseTest {
         account.setAccountCode(123L);
         account.setAccountBalance(BigDecimal.valueOf(5));
         account.setSurplusQuota(BigDecimal.valueOf(10));
+        account.setSurplusQuotaOverpay(BigDecimal.ZERO);
         account.setAccountTypeCode("testType");
         account.setMerCode("merCode001");
         accountAmountDOs = new ArrayList<>();
@@ -65,7 +72,7 @@ public class PaymentServiceImplTest extends BaseTest {
         accountAmountType2.setAccountCode(account.getAccountCode());
         accountAmountType2.setMerAccountTypeCode("third");
         MerchantAccountType merchantAccountType2 = new MerchantAccountType();
-        merchantAccountType2.setMerAccountTypeCode("third");
+        merchantAccountType2.setMerAccountTypeCode("surplus_overpay");
         merchantAccountType2.setDeductionOrder(3);
         accountAmountDOs.add(AccountAmountDO.of(accountAmountType,merchantAccountType,account));
         accountAmountDOs.add(AccountAmountDO.of(accountAmountType1,merchantAccountType1,account));

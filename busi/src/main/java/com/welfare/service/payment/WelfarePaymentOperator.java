@@ -32,7 +32,7 @@ public class WelfarePaymentOperator implements IPaymentOperator{
     public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
         BigDecimal usableAmount = account.getAccountBalance()
                 .add(account.getSurplusQuota())
-                .add(account.getSurplusQuotaOverpay());
+                .add(account.getSurplusQuotaOverpay()==null?BigDecimal.ZERO:account.getSurplusQuotaOverpay());
         BigDecimal amount = paymentRequest.getAmount();
         boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
         Assert.isTrue(enough, "用户账户总余额不足");

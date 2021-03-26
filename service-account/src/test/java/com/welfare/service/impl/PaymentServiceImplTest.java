@@ -7,6 +7,7 @@ import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
+import com.welfare.service.payment.WelfarePaymentOperator;
 import com.welfare.serviceaccount.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,8 +84,8 @@ public class PaymentServiceImplTest extends BaseTest {
 
     @Test
     public void testDecreaseAccount() {
-        PaymentServiceImpl paymentService = SpringBeanUtils.getBean(PaymentServiceImpl.class);
-        List<PaymentOperation> operations =  paymentService.decreaseAccount(paymentRequest,account,accountAmountDOs,supplierStore,merchantCredit);
+        WelfarePaymentOperator paymentService = SpringBeanUtils.getBean(WelfarePaymentOperator.class);
+        List<PaymentOperation> operations =  paymentService.pay(paymentRequest,account,accountAmountDOs,supplierStore,merchantCredit);
         List<List<MerchantAccountOperation>> merchantOperations = operations.stream()
                 .map(PaymentOperation::getMerchantAccountOperations).collect(Collectors.toList());
         List<AccountAmountType> accountAmountTypes = operations.stream()

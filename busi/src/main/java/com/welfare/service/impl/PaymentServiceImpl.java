@@ -8,7 +8,6 @@ import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
-import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
@@ -19,13 +18,14 @@ import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.async.AsyncNotificationService;
-import com.welfare.service.dto.payment.*;
-import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
-import com.welfare.service.operator.merchant.CurrentBalanceOperator;
+import com.welfare.service.dto.payment.BarcodePaymentRequest;
+import com.welfare.service.dto.payment.CardPaymentRequest;
+import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
-import com.welfare.service.wolife.WoLifePaymentService;
+import com.welfare.service.payment.IPaymentOperator;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +38,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
-import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SELF;
 
 /**
  * Description:
@@ -64,7 +66,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountDao accountDao;
-    private final CurrentBalanceOperator currentBalanceOperator;
     private final MerchantBillDetailDao merchantBillDetailDao;
     private final AccountConsumeSceneDao accountConsumeSceneDao;
     private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
@@ -72,8 +73,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantCreditDao merchantCreditDao;
     private final AsyncNotificationService asyncNotificationService;
-    private final WoLifePaymentService woLifePaymentService;
-    private final ThirdPartyPaymentRequestService thirdPartyPaymentRequestService;
     PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
@@ -126,25 +125,28 @@ public class PaymentServiceImpl implements PaymentService {
                 List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture.get();
                 String paymentScene = paymentSceneFuture.get();
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
+                //支付前的校验
                 chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
+
                 List<AccountAmountDO> accountAmountDOList = accountAmountDOFuture.get();
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
 
                 String paymentChannel = paymentRequest.getPaymentChannel();
-                List<PaymentOperation> paymentOperations;
                 List<MerchantBillDetail> merchantBillDetails = null;
-                if(WelfareConstant.PaymentChannel.WO_LIFE.code().equals(paymentChannel)){
-                    paymentOperations = woLifePaymentService.pay(paymentRequest, account, accountAmountDOList, merchantCredit, supplierStore);
-                }else{
-                    paymentOperations = decreaseAccount(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit);
-                }
+                PaymentChannelOperatorEnum paymentChannelOperatorEnum = PaymentChannelOperatorEnum.findByPaymentChannelStr(paymentChannel);
+                IPaymentOperator paymentOperator = SpringBeanUtils.getBean(paymentChannelOperatorEnum.paymentOperator());
+
+                List<PaymentOperation> paymentOperations = paymentOperator.pay(
+                        paymentRequest,
+                        account,
+                        accountAmountDOList,
+                        supplierStore,
+                        merchantCredit
+                );
                 merchantBillDetails = paymentOperations.stream()
                         .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
                         .map(MerchantAccountOperation::getMerchantBillDetail)
                         .collect(Collectors.toList());
-
-
-
                 //执行更新数据库
                 List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                         .collect(Collectors.toList());
@@ -261,40 +263,6 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRequest;
     }
 
-    public List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
-                                                  Account account, List<AccountAmountDO> accountAmountDOList,
-                                                  SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        BigDecimal usableAmount = account.getAccountBalance()
-                .add(account.getSurplusQuota())
-                .add(account.getSurplusQuotaOverpay());
-        BigDecimal amount = paymentRequest.getAmount();
-        boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-        Assert.isTrue(enough, "用户账户总余额不足");
-        Assert.notEmpty(accountAmountDOList,"用户没有可用的福利类型");
-        BigDecimal allTypeBalance = accountAmountDOList.stream()
-                .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        //判断子账户之和
-        boolean accountTypesEnough = allTypeBalance.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-        Assert.isTrue(accountTypesEnough, "用户子账户余额总和不足,请确认员工账户总账和子账是否对应");
-        accountAmountDOList.sort(Comparator.comparing(x -> x.getMerchantAccountType().getDeductionOrder()));
-        List<PaymentOperation> paymentOperations = new ArrayList<>(4);
-        List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
-                .collect(Collectors.toList());
-        for (AccountAmountDO accountAmountDO : accountAmountDOList) {
-            if (BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance()) == 0) {
-                //当前的accountType没钱，则继续下一个账户
-                continue;
-            }
-            PaymentOperation currentOperation = decrease(accountAmountDO, amount, paymentRequest, accountAmountTypes, supplierStore, merchantCredit);
-            amount = amount.subtract(currentOperation.getOperateAmount());
-            paymentOperations.add(currentOperation);
-            if (currentOperation.isEnough()) {
-                break;
-            }
-        }
-        return paymentOperations;
-    }
 
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
         List<AccountBillDetail> billDetails = paymentOperations.stream()
@@ -323,52 +291,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 
-    private PaymentOperation decrease(AccountAmountDO accountAmountDO,
-                                      BigDecimal toOperateAmount,
-                                      PaymentRequest paymentRequest,
-                                      List<AccountAmountType> accountAmountTypes, SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        AccountAmountType accountAmountType = accountAmountDO.getAccountAmountType();
-        MerchantAccountType merchantAccountType = accountAmountDO.getMerchantAccountType();
-        BigDecimal accountBalance = accountAmountType.getAccountBalance();
-        BigDecimal subtract = accountBalance.subtract(toOperateAmount);
 
-        BigDecimal operatedAmount;
-        /**
-         * 扣减个人账户
-         */
-        boolean isCurrentEnough = subtract.compareTo(BigDecimal.ZERO) >= 0;
-        if (isCurrentEnough) {
-            operatedAmount = toOperateAmount;
-            accountAmountType.setAccountBalance(subtract);
-        } else {
-            operatedAmount = accountBalance;
-            accountAmountType.setAccountBalance(BigDecimal.ZERO);
-        }
-        PaymentOperation paymentOperation = new PaymentOperation();
-        paymentOperation.setOperateAmount(operatedAmount);
-        paymentOperation.setAccountAmountType(accountAmountType);
-        paymentOperation.setMerchantAccountType(merchantAccountType);
-        paymentOperation.setTransNo(paymentRequest.getTransNo());
-        AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, operatedAmount, accountAmountTypes);
-        paymentOperation.setAccountBillDetail(accountBillDetail);
-        paymentOperation.setEnough(isCurrentEnough);
-        /**
-         * 扣减商户账户
-         */
-        AccountDeductionDetail accountDeductionDetail = AccountAmountDO.decreaseMerchant(
-                paymentRequest,
-                accountAmountType,
-                operatedAmount,
-                paymentOperation,
-                accountAmountDO.getAccount(),
-                supplierStore,
-                merchantCredit,
-                currentBalanceOperator
-        );
-        paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
-        return paymentOperation;
-
-    }
 
 
 }

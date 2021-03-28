@@ -87,15 +87,4 @@
         </where>
     </select>
 
-    <update id="delByMerCodeAndStoreCode"  parameterType="list">
-        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
-            update <include refid="tableName"/>
-            set deleted = 0
-            where
-            mer_code = #{item.mer_code}
-            and store_code = #{item.storeCode}
-
-        </foreach>
-    </update>
-
 </mapper>

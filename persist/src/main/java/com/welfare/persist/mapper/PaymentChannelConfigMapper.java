@@ -26,5 +26,4 @@ public interface PaymentChannelConfigMapper extends BaseMapper<PaymentChannelCon
 
   List<PaymentChannelConfigDetailDTO> list(@Param("query") PayChannelConfigQuery query);
 
-  int delByMerCodeAndStoreCode(List<PayChannelConfigDelReq> list);
 }

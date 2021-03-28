@@ -15,7 +15,24 @@ public interface PaymentChannelConfigService {
 
   Page<PayChannelConfigSimpleDTO> simplePage(PayChannelConfigSimpleReq req);
 
-  PayChannelConfigDTO detail(PayChannelConfigReq condition);
+  PayChannelConfigDetailDTO detail(PayChannelConfigReq condition);
 
   Boolean edit(PayChannelConfigEditReq req);
+
+  /**
+   * 评论删除支付渠道
+   * @param delDtos
+   * @return 删除条数
+   */
+  int batchDel(List<PayChannelConfigDelDTO> delDtos);
+
+  /**
+   * 通过门店编码和消费方式删除
+   * @param storeCode
+   * @param consumeType
+   * @return
+   */
+  int delByStoreCodeAndConsumeType(String storeCode, String consumeType);
+
+  boolean batchSave(List<PayChannelConfigDTO> payChannelConfigDTOS);
 }

@@ -1,11 +1,12 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.PaymentChannelConfigDao;
 import com.welfare.persist.dto.PayChannelConfigSimple;
-import com.welfare.persist.dto.PayChannelMerchantDTO;
 import com.welfare.persist.dto.PaymentChannelConfigDetailDTO;
 import com.welfare.persist.dto.query.PayChannelConfigQuery;
 import com.welfare.persist.entity.Merchant;
@@ -64,21 +65,21 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
     }
 
     @Override
-    public PayChannelConfigDTO detail(PayChannelConfigReq condition) {
+    public PayChannelConfigDetailDTO detail(PayChannelConfigReq condition) {
         Merchant merchant = merchantDao.queryByCode(condition.getMerchantCode());
         Assert.notNull(merchant, "商户不存在");
         PaymentChannelReq channelReq = new PaymentChannelReq();
         channelReq.setFiltered(false);
         channelReq.setMerCode(merchant.getMerCode());
         List<com.welfare.service.dto.PaymentChannelDTO> allPaymentChannel = paymentChannelService.list(channelReq);
-        PayChannelConfigDTO dto = new PayChannelConfigDTO();
+        PayChannelConfigDetailDTO dto = new PayChannelConfigDetailDTO();
         dto.setMerchantCode(merchant.getMerCode());
         dto.setMerchantName(merchant.getMerName());
         // 查询所有的消费场景
         DictReq dictReq = new DictReq();
         dictReq.setDictType(WelfareConstant.DictType.STORE_CONSUM_TYPE.code());
         List<DictDTO> allConsumeTypes = dictService.getByType(dictReq);
-        dto.setHeader(PayChannelConfigDTO.ConsumeType.of(allConsumeTypes));
+        dto.setHeader(PayChannelConfigDetailDTO.ConsumeType.of(allConsumeTypes));
         PayChannelConfigQuery query = new PayChannelConfigQuery();
         BeanUtils.copyProperties(condition, query);
         List<PaymentChannelConfigDetailDTO> configs = paymentChannelConfigDao.getBaseMapper().list(query);
@@ -170,6 +171,56 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
             flag3 = paymentChannelConfigDao.removeByIds(removeList);
         }
         return flag && flag3;
+    }
+
+    @Override
+    public int batchDel(List<PayChannelConfigDelDTO> delDtos) {
+        if (CollectionUtils.isNotEmpty(delDtos)) {
+            QueryWrapper<PaymentChannelConfig> queryWrapper = new QueryWrapper<>();
+            delDtos.forEach(delDTO -> {
+                queryWrapper.or(wrapper -> {
+                    if (StringUtils.hasText(delDTO.getMerCode())) {
+                        wrapper.eq(PaymentChannelConfig.MER_CODE, delDTO.getMerCode());
+                    }
+                    if (StringUtils.hasText(delDTO.getStoreCode())) {
+                        wrapper.eq(PaymentChannelConfig.STORE_CODE, delDTO.getStoreCode());
+                    }
+                    if (StringUtils.hasText(delDTO.getConsumeType())) {
+                        wrapper.eq(PaymentChannelConfig.CONSUME_TYPE, delDTO.getConsumeType());
+                    }
+                    if (StringUtils.hasText(delDTO.getPaymentChannel())) {
+                        wrapper.eq(PaymentChannelConfig.PAYMENT_CHANNEL_CODE, delDTO.getPaymentChannel());
+                    }
+                });
+            });
+            return paymentChannelConfigDao.getBaseMapper().delete(queryWrapper);
+        }
+        return 0;
+    }
+
+    @Override
+    public int delByStoreCodeAndConsumeType(String storeCode, String consumeType) {
+        if (StringUtils.isEmpty(storeCode) || StringUtils.isEmpty(consumeType)) {
+            throw new BusiException("门店编码或消费方式不能为空");
+        }
+        QueryWrapper<PaymentChannelConfig> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(PaymentChannelConfig.STORE_CODE, storeCode)
+                .eq(PaymentChannelConfig.CONSUME_TYPE, consumeType);
+        return paymentChannelConfigDao.getBaseMapper().delete(queryWrapper);
+    }
+
+    @Override
+    public boolean batchSave(List<PayChannelConfigDTO> payChannelConfigDTOS) {
+        if (CollectionUtils.isNotEmpty(payChannelConfigDTOS)) {
+            List<PaymentChannelConfig> channelConfigs = new ArrayList<>();
+            payChannelConfigDTOS.forEach(payChannelConfigDTO -> {
+                PaymentChannelConfig channelConfig = new PaymentChannelConfig();
+                BeanUtils.copyProperties(payChannelConfigDTO, channelConfig);
+                channelConfigs.add(channelConfig);
+            });
+            return paymentChannelConfigDao.saveBatch(channelConfigs);
+        }
+        return true;
     }
 
     private List<PayChannelConfigRowDTO.PaymentChannel> getCompletionOtherPaymentChannel(List<com.welfare.service.dto.PaymentChannelDTO> all,

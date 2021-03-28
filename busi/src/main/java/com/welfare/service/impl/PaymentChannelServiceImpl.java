@@ -5,9 +5,12 @@ import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.PaymentChannelDao;
 import com.welfare.persist.dto.PayChannelMerchantDTO;
+import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.PaymentChannel;
+import com.welfare.service.PaymentChannelConfigService;
 import com.welfare.service.PaymentChannelService;
 import com.welfare.service.dto.PaymentChannelReq;
+import com.welfare.service.dto.paymentChannel.PayChannelConfigDelDTO;
 import com.welfare.service.dto.paymentChannel.PaymentChannelMerchantDTO;
 import com.welfare.service.dto.paymentChannel.PaymentChannelDTO;
 import com.welfare.service.dto.paymentChannel.PaymentChannelSortReq;
@@ -18,14 +21,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +41,8 @@ import java.util.stream.Collectors;
 @Service
 public class PaymentChannelServiceImpl implements PaymentChannelService {
     private final PaymentChannelDao paymentChannelDao;
+    @Autowired
+    private PaymentChannelConfigService paymentChannelConfigService;
 
     @Override
     public List<com.welfare.service.dto.PaymentChannelDTO> list(PaymentChannelReq req) {
@@ -79,7 +82,23 @@ public class PaymentChannelServiceImpl implements PaymentChannelService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean delByMerCode(String merCode) {
+        PaymentChannelReq req = new PaymentChannelReq();
+        req.setFiltered(false);
+        req.setMerCode(merCode);
+        List<PaymentChannel> oldList = paymentChannelDao.listByMerCodeGroupByCode(req.getMerCode());
+        List<PaymentChannel> defaultList = paymentChannelDao.listByDefaultGroupByCode();
+        if (CollectionUtils.isNotEmpty(oldList) && CollectionUtils.isNotEmpty(defaultList)) {
+            Map<String, PaymentChannel> defaultMap = defaultList.stream().collect(Collectors
+                    .toMap(PaymentChannel::getCode, a -> a, (k1, k2) -> k1));
+            List<PaymentChannel> specialList;
+            specialList = oldList.stream().filter(item -> !defaultMap.containsKey(item.getCode())).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(specialList)) {
+                // 删除商户特殊支付渠道配置
+                paymentChannelConfigService.batchDel(PayChannelConfigDelDTO.of(merCode, specialList));
+            }
+        }
         return paymentChannelDao.delByMerCode(merCode);
     }
 

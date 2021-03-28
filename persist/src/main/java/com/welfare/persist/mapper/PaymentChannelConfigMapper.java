@@ -3,6 +3,7 @@ package com.welfare.persist.mapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.PayChannelConfigSimple;
 import com.welfare.persist.dto.PaymentChannelConfigDetailDTO;
+import com.welfare.persist.dto.query.PayChannelConfigDelReq;
 import com.welfare.persist.dto.query.PayChannelConfigQuery;
 import com.welfare.persist.entity.PaymentChannelConfig;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -25,4 +26,5 @@ public interface PaymentChannelConfigMapper extends BaseMapper<PaymentChannelCon
 
   List<PaymentChannelConfigDetailDTO> list(@Param("query") PayChannelConfigQuery query);
 
+  int delByMerCodeAndStoreCode(List<PayChannelConfigDelReq> list);
 }

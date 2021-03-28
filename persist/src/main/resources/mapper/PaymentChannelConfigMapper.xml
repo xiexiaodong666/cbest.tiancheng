@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,mer_code,store_code,consume_type,payment_channel_code,payment_channel_name,create_user,create_time,update_user,update_time,account_balance,deleted,version
+        id,mer_code,store_code,consume_type,payment_channel_code,payment_channel_name,create_user,create_time,update_user,update_time,deleted,version
     </sql>
 
     <select id="simplePage" resultType="com.welfare.persist.dto.PayChannelConfigSimple" >
@@ -86,5 +86,16 @@
             </if>
         </where>
     </select>
+
+    <update id="delByMerCodeAndStoreCode"  parameterType="list">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update <include refid="tableName"/>
+            set deleted = 0
+            where
+            mer_code = #{item.mer_code}
+            and store_code = #{item.storeCode}
+
+        </foreach>
+    </update>
 
 </mapper>

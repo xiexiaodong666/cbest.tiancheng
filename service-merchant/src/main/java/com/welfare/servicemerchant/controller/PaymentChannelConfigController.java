@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * @Author: duanhy
  * @Version: 0.0.1
@@ -40,7 +38,7 @@ public class PaymentChannelConfigController {
 
   @PostMapping("/list")
   @ApiOperation("查询商户所选消费方式的支付渠道的配置")
-  public R<PayChannelConfigDTO> detail(@Validated @RequestBody PayChannelConfigReq req) {
+  public R<PayChannelConfigDetailDTO> detail(@Validated @RequestBody PayChannelConfigReq req) {
     return R.success(channelConfigService.detail(req));
   }
 

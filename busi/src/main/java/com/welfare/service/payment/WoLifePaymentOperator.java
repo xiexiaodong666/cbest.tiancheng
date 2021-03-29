@@ -15,6 +15,7 @@ import com.welfare.service.MerchantCreditService;
 import com.welfare.service.ThirdPartyPaymentRequestService;
 import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.RemainingLimitOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
@@ -51,37 +52,13 @@ import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPE
 @Slf4j
 public class WoLifePaymentOperator implements IPaymentOperator, IRefundOperator{
     private final WoLifeFeignService woLifeFeignService;
-    private final MerchantCreditService merchantCreditService;
-    private final AccountDao accountDao;
-    private final AccountBillDetailDao accountBillDetailDao;
-    private final AccountDeductionDetailDao accountDeductionDetailDao;
-    private final ThirdPartyPaymentRequestDao thirdPartyPaymentRequestDao;
-    private final SupplierStoreDao supplierStoreDao;
     private final RemainingLimitOperator remainingLimitOperator;
     private final ThirdPartyPaymentRequestService thirdPartyPaymentRequestService;
 
     @Override
     @DistributedLock(lockPrefix = "wo-life-pay", lockKey = "#paymentRequest.transNo")
     public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        paymentRequest.setPhone(account.getPhone());
-        List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
-                .collect(Collectors.toList());
-        PaymentOperation paymentOperation = new PaymentOperation();
-        BigDecimal paymentAmount = paymentRequest.getAmount();
-        AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, paymentAmount, accountAmountTypes);
-        paymentOperation.setAccountBillDetail(accountBillDetail);
-        paymentOperation.setTransNo(paymentRequest.getTransNo());
-        AccountDeductionDetail accountDeductionDetail = AccountAmountDO.generateAccountDeductionDetail(paymentRequest,
-                null,
-                paymentAmount,
-                paymentOperation,
-                account,
-                supplierStore,
-                merchantCredit,
-                remainingLimitOperator);
-        paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
-        paymentOperation.setOperateAmount(paymentAmount);
-        paymentOperation.setMerchantAccountType(null);
+        PaymentOperation paymentOperation = doPay(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit, remainingLimitOperator);
 
         ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestService.generateHandling(paymentRequest);
         try {
@@ -105,28 +82,14 @@ public class WoLifePaymentOperator implements IPaymentOperator, IRefundOperator{
 
 
 
-
-
-
     @Override
     public void refund(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionInDbs, List<AccountDeductionDetail> paidDeductionDetails, Long accountCode) {
         String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + accountCode;
         RLock accountLock = DistributedLockUtil.lockFairly(lockKey);
         try {
+            doRefund(refundRequest, paidDeductionDetails, accountCode);
+
             ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestService.generateRefundHandling(refundRequest);
-            //沃生活馆支付只会有一条记录
-            AccountDeductionDetail thePaidDeductionDetail = paidDeductionDetails.get(0);
-            AccountBillDetail thePaidBilDetail = accountBillDetailDao.getOneByTransNoAndTransType(
-                    refundRequest.getOriginalTransNo(),
-                    WelfareConstant.TransType.CONSUME.code()
-            );
-            BigDecimal paidAmount = paidDeductionDetails.stream()
-                    .map(AccountDeductionDetail::getTransAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            Assert.isTrue(paidAmount.subtract(refundRequest.getAmount())
-                    .compareTo(BigDecimal.ZERO) == 0, "沃支付的退款必须全额退款");
-            Account account = accountDao.queryByAccountCode(accountCode);
-            refundRequest.setPhone(account.getPhone());
             try{
                 WoLifeBasicResponse woLifeBasicResponse = woLifeFeignService.refundWriteOff(refundRequest.getPhone(), WoLifeRefundWriteOffDataRequest.of(refundRequest));
                 if(woLifeBasicResponse.isSuccess()){
@@ -140,59 +103,8 @@ public class WoLifePaymentOperator implements IPaymentOperator, IRefundOperator{
                 thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.FAILED,null,e.getMessage());
                 throw e;
             }
-            AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail,refundRequest);
-            AccountBillDetail refundBillDetail = toRefundBillDetail(thePaidBilDetail,refundRequest);
-            SupplierStore supplierStore = supplierStoreDao.getOneByCode(refundBillDetail.getStoreCode());
-            if(!Objects.equals(account.getMerCode(),supplierStore.getMerCode())){
-                //非自营才有退回商户操作,和扣款时保持一致
-                operateMerchant(refundRequest, account);
-            }
-
-            accountBillDetailDao.saveOrUpdateBatch(Arrays.asList(refundBillDetail, thePaidBilDetail));
-            accountDeductionDetailDao.saveOrUpdateBatch(Arrays.asList(refundDeductionDetail, thePaidDeductionDetail));
-            refundRequest.setRefundStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
         } finally {
             DistributedLockUtil.unlock(accountLock);
         }
-    }
-
-    private void operateMerchant(RefundRequest refundRequest, Account account) {
-        RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
-        try {
-            merchantCreditService.increaseAccountType(
-                    account.getMerCode(),
-                    WelfareConstant.MerCreditType.REMAINING_LIMIT,
-                    refundRequest.getAmount(),
-                    refundRequest.getTransNo(),
-                    WelfareConstant.TransType.REFUND.code());
-        } finally {
-            DistributedLockUtil.unlock(merAccountLock);
-        }
-    }
-
-    private AccountDeductionDetail toRefundDeductionDetail(AccountDeductionDetail thePayDeductionDetail, RefundRequest refundRequest) {
-        AccountDeductionDetail refundDeductionDetail = new AccountDeductionDetail();
-        BeanUtils.copyProperties(thePayDeductionDetail, refundDeductionDetail);
-        refundDeductionDetail.setTransNo(refundRequest.getTransNo());
-        refundDeductionDetail.setRelatedTransNo(refundRequest.getOriginalTransNo());
-        refundDeductionDetail.setTransType(WelfareConstant.TransType.REFUND.code());
-        refundDeductionDetail.setTransTime(refundRequest.getRefundDate());
-        refundDeductionDetail.setReversedAmount(BigDecimal.ZERO);
-        refundDeductionDetail.setId(null);
-        refundDeductionDetail.setVersion(0);
-        thePayDeductionDetail.setReversedAmount(thePayDeductionDetail.getTransAmount());
-        return refundDeductionDetail;
-    }
-
-    private AccountBillDetail toRefundBillDetail(AccountBillDetail thePayBillDetail, RefundRequest refundRequest) {
-        AccountBillDetail refundBillDetail = new AccountBillDetail();
-        BeanUtils.copyProperties(thePayBillDetail, refundBillDetail);
-        refundBillDetail.setTransNo(refundRequest.getTransNo());
-        refundBillDetail.setTransType(WelfareConstant.TransType.REFUND.code());
-        refundBillDetail.setTransTime(refundRequest.getRefundDate());
-
-        refundBillDetail.setId(null);
-        refundBillDetail.setVersion(0);
-        return refundBillDetail;
     }
 }

@@ -131,7 +131,7 @@ public class AccountAmountDO {
         //扣减商户金额
 
         Assert.notNull(supplierStore, "根据门店号没有找到门店");
-        if (!Objects.equals(supplierStore.getMerCode(), account.getMerCode())) {
+        if (!Objects.equals(supplierStore.getMerCode(), account.getMerCode()) && Objects.nonNull(merAccountTypeOperator)) {
             decreaseMerchant(paymentRequest, operatedAmount, paymentOperation, merchantCredit, merAccountTypeOperator, accountDeductionDetail);
         } else {
             paymentOperation.setMerchantAccountOperations(Collections.emptyList());

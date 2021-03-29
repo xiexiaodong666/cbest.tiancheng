@@ -1,6 +1,8 @@
 package com.welfare.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.ImmutableMap;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.AccountStatus;
@@ -18,6 +20,7 @@ import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.async.AsyncNotificationService;
+import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
@@ -73,6 +76,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantCreditDao merchantCreditDao;
     private final AsyncNotificationService asyncNotificationService;
+    private final PaymentChannelConfigDao paymentChannelConfigDao;
+    private final SubAccountDao subAccountDao;
     PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
@@ -294,5 +299,83 @@ public class PaymentServiceImpl implements PaymentService {
 
 
 
+    @Override
+    public ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentSceneCheck(
+        BarcodePaymentRequest paymentRequest) {
+        try {
+            Long accountCode = paymentRequest.calculateAccountCode();
+            Assert.notNull(accountCode, "账号不能为空。");
+            Account account = accountService.getByAccountCode(accountCode);
+            Assert.notNull(account, "未找到账号：" + accountCode);
+            ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) SpringBeanUtils
+                .getBean("e-welfare-paymentQueryAsync");
+            Future<SupplierStore> supplierStoreFuture = threadPoolTaskExecutor.submit(
+                () -> supplierStoreService
+                    .getSupplierStoreByStoreCode(paymentRequest.getStoreNo()));
+            Future<MerchantStoreRelation> merchantStoreRelationFuture = threadPoolTaskExecutor
+                .submit(() ->
+                    merchantStoreRelationDao
+                        .getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(),
+                            account.getMerCode()));
+            Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = threadPoolTaskExecutor
+                .submit(() -> {
+                    List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
+                        .getAccountTypeAndMerCode(account.getAccountTypeCode(),
+                            account.getMerCode());
+                    Assert
+                        .isTrue(!CollectionUtils.isEmpty(accountConsumeScenes), "未找到该账户的可用交易场景配置");
+                    List<Long> sceneIds = accountConsumeScenes.stream()
+                        .map(AccountConsumeScene::getId).collect(Collectors.toList());
+                    return accountConsumeSceneStoreRelationDao
+                        .queryBySceneIdsAndStoreNo(sceneIds, paymentRequest.getStoreNo());
+                });
+            Future<String> paymentSceneFuture = threadPoolTaskExecutor
+                .submit(paymentRequest::calculatePaymentScene);
+            String merCode = account.getMerCode();
+            String storeNo = paymentRequest.getStoreNo();
+            String paymentScene = paymentSceneFuture.get();
+            String paymentChannel = paymentRequest.getPaymentChannel();
+            Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() -> {
+                List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigDao
+                    .getBaseMapper().selectList(
+                        Wrappers.<PaymentChannelConfig>lambdaQuery()
+                            .eq(PaymentChannelConfig::getMerCode, merCode)
+                            .eq(PaymentChannelConfig::getStoreCode, storeNo)
+                            .eq(PaymentChannelConfig::getConsumeType, paymentScene)
+                            .eq(PaymentChannelConfig::getPaymentChannelCode, paymentChannel));
+                return paymentChannelConfigList;
+            });
+            Future<SubAccount> subAccountFuture = threadPoolTaskExecutor.submit(() -> {
+                SubAccount subAccount = subAccountDao.getBaseMapper().selectOne(
+                    Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
+                        .eq(SubAccount::getSubAccountType, paymentChannel));
+                return subAccount;
+            });
+
+            SupplierStore supplierStore = supplierStoreFuture.get();
+            List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture
+                .get();
+
+            MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
+            //检查门店消费场景
+            chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene,
+                sceneStoreRelations);
+            //检查支付渠道消费场景
+            List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigListFuture
+                .get();
+            if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
+                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
+            }
+            SubAccount subAccount = subAccountFuture.get();
+            ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = new ThirdPartyBarcodePaymentDTO();
+            if(subAccount != null) {
+                thirdPartyBarcodePaymentDTO.setPasswordFreeSignature(subAccount.getPasswordFreeSignature());
+            }
+            return thirdPartyBarcodePaymentDTO;
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(StrUtil.format("查询检查第三方支付码异步执行异常, paymentRequest: {}", JSON.toJSON(paymentRequest)), e);
+            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", e);
+        }
+    }
 
 }

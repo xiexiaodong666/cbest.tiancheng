@@ -3,6 +3,7 @@ package com.welfare.serviceaccount.controller;
 import com.welfare.service.PaymentService;
 import com.welfare.service.RefundService;
 import com.welfare.service.dto.RefundRequest;
+import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -84,6 +85,14 @@ public class PaymentController implements IController {
     public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
         RefundRequest refundRequest = refundService.queryResult(transNo);
         return success(refundRequest);
+    }
+
+    @PostMapping("/thirdPartyBarcodePaymentSceneCheck")
+    @ApiOperation("第三方条码支付场景检验")
+    public R<ThirdPartyBarcodePaymentDTO> thirdPartyBarcodePaymentSceneCheck(@RequestBody BarcodePaymentRequest paymentRequest) {
+        ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = paymentService
+            .thirdPartyBarcodePaymentSceneCheck(paymentRequest);
+        return success(thirdPartyBarcodePaymentDTO);
     }
 
 }

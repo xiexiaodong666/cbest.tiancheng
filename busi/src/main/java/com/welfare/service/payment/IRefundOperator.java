@@ -20,8 +20,10 @@ public interface IRefundOperator {
      * @param paidDeductionDetails
      * @param accountCode
      */
-    void refund(RefundRequest refundRequest,
+    default void refund(RefundRequest refundRequest,
                 List<AccountDeductionDetail> refundDeductionInDbs,
                 List<AccountDeductionDetail> paidDeductionDetails,
-                Long accountCode);
+                Long accountCode){
+        throw new RuntimeException("method not supported");
+    }
 }

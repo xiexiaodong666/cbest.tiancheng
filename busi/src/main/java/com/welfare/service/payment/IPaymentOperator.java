@@ -26,9 +26,11 @@ public interface IPaymentOperator {
      * @param merchantCredit
      * @return
      */
-    List<PaymentOperation> pay(PaymentRequest paymentRequest,
+    default List<PaymentOperation> pay(PaymentRequest paymentRequest,
                                Account account,
                                List<AccountAmountDO> accountAmountDOList,
                                SupplierStore supplierStore,
-                               MerchantCredit merchantCredit);
+                               MerchantCredit merchantCredit){
+        throw new RuntimeException("method not supported");
+    }
 }

@@ -71,7 +71,7 @@ public class WoLifePaymentOperator implements IPaymentOperator, IRefundOperator{
         AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, paymentAmount, accountAmountTypes);
         paymentOperation.setAccountBillDetail(accountBillDetail);
         paymentOperation.setTransNo(paymentRequest.getTransNo());
-        AccountDeductionDetail accountDeductionDetail = AccountAmountDO.decreaseMerchant(paymentRequest,
+        AccountDeductionDetail accountDeductionDetail = AccountAmountDO.generateAccountDeductionDetail(paymentRequest,
                 null,
                 paymentAmount,
                 paymentOperation,

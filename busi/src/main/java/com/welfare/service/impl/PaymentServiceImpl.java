@@ -95,6 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAccountMerCode(account.getMerCode());
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             try {
+
                 //整体异步查询
                 Future<SupplierStore> supplierStoreFuture = threadPoolTaskExecutor.submit(() -> supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo()));
                 Future<String> paymentSceneFuture = threadPoolTaskExecutor.submit(paymentRequest::calculatePaymentScene);
@@ -125,11 +126,11 @@ public class PaymentServiceImpl implements PaymentService {
                 List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture.get();
                 String paymentScene = paymentSceneFuture.get();
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
-                //支付前的校验
-                chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
-
                 List<AccountAmountDO> accountAmountDOList = accountAmountDOFuture.get();
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
+
+                //支付前的校验
+                chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
 
                 String paymentChannel = paymentRequest.getPaymentChannel();
                 List<MerchantBillDetail> merchantBillDetails = null;

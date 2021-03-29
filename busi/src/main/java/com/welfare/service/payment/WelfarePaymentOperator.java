@@ -95,7 +95,7 @@ public class WelfarePaymentOperator implements IPaymentOperator{
         /**
          * 扣减商户账户
          */
-        AccountDeductionDetail accountDeductionDetail = AccountAmountDO.decreaseMerchant(
+        AccountDeductionDetail accountDeductionDetail = AccountAmountDO.generateAccountDeductionDetail(
                 paymentRequest,
                 accountAmountType,
                 operatedAmount,

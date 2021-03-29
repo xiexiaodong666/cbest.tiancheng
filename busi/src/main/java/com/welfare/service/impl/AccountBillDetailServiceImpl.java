@@ -56,20 +56,10 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
                 e -> e));
 
     @Override
-    public void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType,
-        Account account) {
-        AccountBillDetail accountBillDetail = new AccountBillDetail();
-        Long accountCode = deposit.getAccountCode();
-        BigDecimal amount = deposit.getAmount();
-        accountBillDetail.setAccountCode(accountCode);
-        accountBillDetail.setAccountBalance(account.getAccountBalance());
-        accountBillDetail.setChannel(deposit.getChannel());
-        accountBillDetail.setTransNo(deposit.getTransNo());
-        accountBillDetail.setTransAmount(amount);
-        accountBillDetail.setTransTime(Calendar.getInstance().getTime());
-        accountBillDetail.setSurplusQuota(account.getSurplusQuota());
-        accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
-        accountBillDetail.setTransType(TransType.DEPOSIT_INCR.code());
+    public void saveNewAccountBillDetail(Deposit deposit,
+                                         AccountAmountType accountAmountType,
+                                         Account account) {
+        AccountBillDetail accountBillDetail = Deposit.assemblyAccountBillDetail(deposit, accountAmountType, account);
         accountBillDetailDao.save(accountBillDetail);
     }
 

@@ -159,7 +159,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     records.add(accountChangeEventRecord);
                     AccountDeductionDetail deductionDetail = assemblyAccountDeductionDetail(deposit, account, accountAmountType);
                     deductionDetails.add(deductionDetail);
-                    details.add(assemblyAccountBillDetail(deposit, accountAmountType, account));
+                    details.add(Deposit.assemblyAccountBillDetail(deposit, accountAmountType, account));
                     relations.add(assemblyNewTransRelation(
                             deposit.getApplyCode(),
                             deposit.getTransNo(),
@@ -186,15 +186,6 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         }
     }
 
-
-    @Override
-    public AccountAmountType querySurplusQuota(Long accountCode) {
-        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, accountCode)
-                .eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code());
-        return accountAmountTypeDao.getOne(queryWrapper);
-    }
-
     @Override
     public List<AccountAmountDO> queryAccountAmountDO(Account account) {
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
@@ -210,19 +201,6 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 .map(accountAmountType ->
                         AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode()),account))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public BigDecimal sumBalanceExceptSurplusQuota(Long accountCode) {
-        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(AccountAmountType.ACCOUNT_CODE,accountCode)
-                .ne(AccountAmountType.MER_ACCOUNT_TYPE_CODE, WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA)
-                .select(AccountAmountType.MER_ACCOUNT_TYPE_CODE,AccountAmountType.ACCOUNT_BALANCE);
-        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(queryWrapper);
-        BigDecimal balanceSum = accountAmountTypes.stream()
-                .map(AccountAmountType::getAccountBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return balanceSum;
     }
 
     private AccountDeductionDetail assemblyAccountDeductionDetail(Deposit deposit, Account account,
@@ -243,23 +221,6 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         accountDeductionDetail.setCardId(deposit.getCardNo());
         accountDeductionDetail.setChanel(deposit.getChannel());
         return accountDeductionDetail;
-    }
-
-    private AccountBillDetail assemblyAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType,
-                                                        Account account) {
-        AccountBillDetail accountBillDetail = new AccountBillDetail();
-        Long accountCode = deposit.getAccountCode();
-        BigDecimal amount = deposit.getAmount();
-        accountBillDetail.setAccountCode(accountCode);
-        accountBillDetail.setAccountBalance(account.getAccountBalance());
-        accountBillDetail.setChannel(deposit.getChannel());
-        accountBillDetail.setTransNo(deposit.getTransNo());
-        accountBillDetail.setTransAmount(amount);
-        accountBillDetail.setTransTime(Calendar.getInstance().getTime());
-        accountBillDetail.setSurplusQuota(account.getSurplusQuota());
-        accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
-        accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
-        return accountBillDetail;
     }
 
     private OrderTransRelation assemblyNewTransRelation(String orderId, String transNo, WelfareConstant.TransType transType) {

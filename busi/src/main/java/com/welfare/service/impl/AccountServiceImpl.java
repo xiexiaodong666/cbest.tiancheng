@@ -40,8 +40,11 @@ import com.welfare.service.enums.AccountBalanceType.WoLife;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.remote.ShoppingFeignClient;
+import com.welfare.service.remote.entity.AlipayUserAgreementSignReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementSignResp;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
+import com.welfare.service.remote.service.CbestPayService;
 import com.welfare.service.remote.service.WoLifeFeignService;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
@@ -132,6 +135,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
+
+    private final CbestPayService cbestPayService;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -846,11 +851,24 @@ public class AccountServiceImpl implements AccountService {
             channelList = paymentChannelDao.listByDefaultGroupByCode();
         }
 
+        List<String> paymentChannelCodeList = channelList.stream().map(PaymentChannel::getCode)
+            .collect(Collectors.toList());
+
+        List<SubAccount> subAccountList = subAccountDao.getBaseMapper().selectList(
+            Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
+                .in(SubAccount::getSubAccountType, paymentChannelCodeList));
+
+        Map<String, String> subAccountMap = subAccountList.stream().collect(
+            Collectors.toMap(SubAccount::getSubAccountType, SubAccount::getPasswordFreeSignature));
+
         List<AccountPaymentChannelDTO> paymentChannelList = channelList.stream()
             .map(paymentChannel -> {
+                String code = paymentChannel.getCode();
                 AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
                 accountPaymentChannelDTO.setPaymentChannel(paymentChannel.getCode());
                 accountPaymentChannelDTO.setPaymentChannelDesc(paymentChannel.getName());
+                String passwordFreeSignature = subAccountMap.get(code);
+                accountPaymentChannelDTO.setPasswordFree(passwordFreeSignature != null);
                 return accountPaymentChannelDTO;
             }).collect(Collectors.toList());
         return paymentChannelList;
@@ -1309,5 +1327,29 @@ public class AccountServiceImpl implements AccountService {
                 }
             });
         }
+    }
+
+    @Override
+    public AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel) {
+        WelfareConstant.PaymentChannel paymentChannelEnum =
+            StrUtil.isEmpty(paymentChannel) ? WelfareConstant.PaymentChannel.WELFARE
+                : PAYMENT_CHANNEL_MAP.get(paymentChannel);
+        String signUrl;
+        switch (paymentChannelEnum) {
+            case ALIPAY:
+                Account account = getByAccountCode(accountCode);
+                AlipayUserAgreementSignReq req = new AlipayUserAgreementSignReq();
+                req.setExternalLogonId(String.valueOf(accountCode));
+                AlipayUserAgreementSignResp alipayUserAgreementSignResp = cbestPayService
+                    .alipayUserAgreementSign(account.getMerCode(), req);
+                signUrl = alipayUserAgreementSignResp.getSignUrl();
+                break;
+            default:
+                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
+        }
+
+        AccountPasswordFreeSignDTO accountPasswordFreeSignDTO = new AccountPasswordFreeSignDTO();
+        accountPasswordFreeSignDTO.setSignUrl(signUrl);
+        return accountPasswordFreeSignDTO;
     }
 }

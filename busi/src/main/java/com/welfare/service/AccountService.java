@@ -119,4 +119,12 @@ public interface AccountService {
    * @param creditLimitReq
    */
   void batchRestoreCreditLimit(AccountRestoreCreditLimitReq creditLimitReq);
+
+  /**
+   * 免密签约
+   * @param accountCode
+   * @param paymentChannel
+   * @return
+   */
+  AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel);
 }

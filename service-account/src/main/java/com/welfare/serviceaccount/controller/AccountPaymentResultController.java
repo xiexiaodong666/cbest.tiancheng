@@ -6,6 +6,9 @@ import com.welfare.service.AccountPaymentResultService;
 import com.welfare.service.dto.BarcodePaymentNotifyReq;
 import com.welfare.service.dto.BarcodePaymentResultDTO;
 import com.welfare.service.dto.BarcodePaymentResultReq;
+import com.welfare.service.dto.CreateThirdPartyPaymentDTO;
+import com.welfare.service.dto.CreateThirdPartyPaymentReq;
+import com.welfare.service.remote.entity.CbestPayBaseResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,29 @@ public class AccountPaymentResultController implements IController {
     public R<BarcodePaymentResultDTO> barcodePaymentResult(BarcodePaymentResultReq req) {
         req.setAccountCode(AccountUserHolder.getAccountUser().getAccountCode());
         return success(accountPaymentResultService.queryBarcodePaymentResult(req));
+    }
+
+    @ApiOperation("第三方支付结果通知")
+    @PostMapping("/thirdPartyPaymentResultNotify")
+    public R thirdPartyPaymentResultNotify(@RequestBody CbestPayBaseResp resp) {
+        accountPaymentResultService.thirdPartyPaymentResultNotify(resp);
+        return success();
+    }
+
+    @ApiOperation("第三方交易创建通知")
+    @PostMapping("/createThirdPartyPaymentNotify")
+    public R createThirdPartyPaymentNotify(@RequestBody CbestPayBaseResp resp) {
+        accountPaymentResultService.createThirdPartyPaymentNotify(resp);
+        return success();
+    }
+
+    @ApiOperation("第三方交易创建")
+    @GetMapping("/createThirdPartyPayment")
+    @AccountUser
+    public R<CreateThirdPartyPaymentDTO> createThirdPartyPayment(CreateThirdPartyPaymentReq req) {
+        CreateThirdPartyPaymentDTO createThirdPartyPaymentDTO = accountPaymentResultService
+            .createThirdPartyPayment(req);
+        return success(createThirdPartyPaymentDTO);
     }
 
 }

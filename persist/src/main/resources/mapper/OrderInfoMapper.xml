@@ -296,7 +296,7 @@
                 and ac.phone = #{request.phone}
             </if>
             <if test="request.orderId != null">
-                and ac.order_id = #{request.orderId}
+                and oi.order_id = #{request.orderId}
             </if>
 
 
@@ -393,7 +393,7 @@
                 and ac.phone = #{request.phone}
             </if>
             <if test="request.orderId != null">
-                and ac.order_id = #{request.orderId}
+                and oi.order_id = #{request.orderId}
             </if>
 
             <if test="request.merCode != null">
@@ -489,6 +489,16 @@
             ab.order_channel = 'SHOP_CONSUMPTION'
             and
             ab.trans_type = 'consume'
+            <if test="request.accountName != null">
+                and ac.account_name like concat('%',#{request.accountName},'%')
+            </if>
+            <if test="request.phone != null">
+                and ac.phone = #{request.phone}
+            </if>
+            <if test="request.orderId != null">
+                and oi.order_id = #{request.orderId}
+            </if>
+
             <if test="request.merCode != null">
                 and ac.mer_code = #{request.merCode}
             </if>

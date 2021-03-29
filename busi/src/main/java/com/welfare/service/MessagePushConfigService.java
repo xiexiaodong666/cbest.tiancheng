@@ -12,4 +12,11 @@ import com.welfare.persist.entity.MessagePushConfig;
  */
 public interface MessagePushConfigService {
 
+  /**
+   * 初始化模板
+   * @param merCode
+   * @return
+   */
+  boolean init(String merCode);
+
 }

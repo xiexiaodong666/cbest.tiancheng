@@ -98,7 +98,8 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         Merchant merchant = merchantService
             .getMerchantByMerCode(account.getMerCode());
         String billDetailShowStoreName = merchant.getBillDetailShowStoreName();
-        boolean showStoreName = "1".equals(billDetailShowStoreName);
+        boolean showStoreName =
+            billDetailShowStoreName == null || "1".equals(billDetailShowStoreName);
         accountBillDetailSimpleDTOList = accountBillDetailSimpleDTOList.stream()
             .map(accountBillDetailSimpleDTO -> {
                 String channel = accountBillDetailSimpleDTO.getChannel();
@@ -112,7 +113,7 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
                         accountBillDetailSimpleDTO.setTransTypeName(channelEnum.desc());
                     }
                 }
-                if(!showStoreName) {
+                if (!showStoreName) {
                     accountBillDetailSimpleDTO.setStoreCode("");
                     accountBillDetailSimpleDTO.setStoreName("");
                 }

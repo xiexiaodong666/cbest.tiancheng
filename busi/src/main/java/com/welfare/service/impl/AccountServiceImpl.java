@@ -75,6 +75,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -139,6 +140,9 @@ public class AccountServiceImpl implements AccountService {
                 e -> e));
 
     private final WoLifeFeignService woLifeFeignService;
+
+    @Autowired
+    private AccountAmountTypeService accountAmountTypeService;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -450,7 +454,6 @@ public class AccountServiceImpl implements AccountService {
             accountAmountTypeMapper.insert(accountAmountType2);
             account.setSurplusQuota(account.getMaxQuota());
         }
-
         FileUniversalStorage fileUniversalStorage = new FileUniversalStorage();
         fileUniversalStorage.setType(FileUniversalStorageEnum.ACCOUNT_IMG.getCode());
         fileUniversalStorage.setUrl(accountReq.getImgUrl());

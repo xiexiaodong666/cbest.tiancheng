@@ -12,6 +12,6 @@ public class MqConstant {
         public static final String ONLINE_ORDER = "test-topic-for-e-welfare";
     }
     public static class ConsumerGroup{
-        public static final String ONLINE_ORDER_CONSUMER_GROUP = "test-topic-for-e-welfare";
+        public static final String ONLINE_ORDER_CONSUMER_GROUP = "e-welfare-settlement";
     }
 }

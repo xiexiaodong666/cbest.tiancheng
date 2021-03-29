@@ -93,4 +93,4 @@ ftp:
   default-path: /bills
 
 rocketmq:
-  name-server: http://172.30.37.35:9876
+  name-server: a.broker.rocketmq.cbest.gam:9876;b.broker.rocketmq.cbest.gam:9876

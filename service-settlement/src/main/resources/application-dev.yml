@@ -96,4 +96,4 @@ ftp:
   default-path: /test
 
 rocketmq:
-  name-server: http://172.30.37.35:9876
+  name-server: 172.30.37.35:9876;172.30.37.35:9876

@@ -94,3 +94,6 @@ ftp:
   user: pay_tiancheng
   password: 4m+Hatccc
   default-path: /test
+
+rocketmq:
+  name-server: http://172.30.37.35:9876

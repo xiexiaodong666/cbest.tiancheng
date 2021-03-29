@@ -290,11 +290,16 @@
             and
             ab.trans_type = 'consume'
             <if test="request.accountName != null">
-                and ac.accountName like concat('%',#{request.accountName},'%')
+                and ac.account_name like concat('%',#{request.accountName},'%')
             </if>
             <if test="request.phone != null">
-                and ac.phone #{request.phone}
+                and ac.phone = #{request.phone}
             </if>
+            <if test="request.orderId != null">
+                and ac.order_id = #{request.orderId}
+            </if>
+
+
             <if test="request.merCode != null">
                 and ac.mer_code = #{request.merCode}
             </if>
@@ -382,11 +387,15 @@
             and
             ab.trans_type = 'consume'
             <if test="request.accountName != null">
-                and ac.accountName like concat('%',#{request.accountName},'%')
+                and ac.account_name like concat('%',#{request.accountName},'%')
             </if>
             <if test="request.phone != null">
-                and ac.phone #{request.phone}
+                and ac.phone = #{request.phone}
             </if>
+            <if test="request.orderId != null">
+                and ac.order_id = #{request.orderId}
+            </if>
+
             <if test="request.merCode != null">
                 and ac.mer_code = #{request.merCode}
             </if>

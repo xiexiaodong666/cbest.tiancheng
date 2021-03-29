@@ -1,6 +1,7 @@
 package com.welfare.persist.dto.commodityOfflineOrder;
 
 import io.swagger.annotations.ApiModelProperty;
+import java.math.BigDecimal;
 import lombok.Data;
 
 /**
@@ -21,7 +22,7 @@ public class CommodityOfflineOrderBasicExtResponse {
      * 总销售额
      */
     @ApiModelProperty("总销售额")
-    private Integer salesTotal;
+    private BigDecimal salesTotal;
 
     /**
      * 总消费人次

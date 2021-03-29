@@ -8,7 +8,6 @@ import com.google.common.eventbus.Subscribe;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BusiException;
-import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.StoreConsumeTypeDTO;
@@ -18,14 +17,15 @@ import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
 import com.welfare.service.remote.entity.StoreShoppingReq.ListBean.ConsumeSettingsBean;
 import com.welfare.service.sync.event.SupplierStoreEvt;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *

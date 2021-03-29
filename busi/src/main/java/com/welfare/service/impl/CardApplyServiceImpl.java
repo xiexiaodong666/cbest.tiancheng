@@ -8,7 +8,6 @@ import com.welfare.common.enums.SequenceTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.GenerateCodeUtil;
-import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.CardApplyDao;
 import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.CardApplyDTO;

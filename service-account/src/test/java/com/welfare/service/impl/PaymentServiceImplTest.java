@@ -2,10 +2,8 @@ package com.welfare.service.impl;
 
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.entity.*;
-import com.welfare.service.MerchantCreditService;
 import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
-import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
@@ -13,10 +11,6 @@ import com.welfare.service.payment.WelfarePaymentOperator;
 import com.welfare.serviceaccount.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.util.Assert;
 
 import java.math.BigDecimal;

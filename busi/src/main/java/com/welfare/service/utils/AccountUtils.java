@@ -1,7 +1,6 @@
 package com.welfare.service.utils;
 
 import com.welfare.common.constants.AccountChangeType;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dto.AccountSyncDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.service.dto.PaymentChannelDTO;

@@ -18,7 +18,6 @@ import com.welfare.common.enums.AccountRechargePaymentStatusEnum;
 import com.welfare.common.enums.AccountRechargeStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.AccountUserHolder;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountDepositRecord;
 import com.welfare.persist.mapper.AccountDepositRecordMapper;

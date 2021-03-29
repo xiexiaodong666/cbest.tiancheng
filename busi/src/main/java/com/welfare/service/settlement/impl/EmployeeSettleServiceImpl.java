@@ -12,7 +12,7 @@ import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.EmployeeSettleDao;
 import com.welfare.persist.dao.EmployeeSettleDetailDao;
-import com.welfare.persist.dto.*;
+import com.welfare.persist.dto.EmployeeSettleBillDTO;
 import com.welfare.persist.dto.query.EmployeeSettleBillQuery;
 import com.welfare.persist.dto.query.EmployeeSettleBuildQuery;
 import com.welfare.persist.entity.EmployeeSettle;
@@ -41,7 +41,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.welfare.common.constants.RedisKeyConstant.*;
+import static com.welfare.common.constants.RedisKeyConstant.BUILD_EMPLOYEE_SETTLE;
+import static com.welfare.common.constants.RedisKeyConstant.FINISH_EMPLOYEE_SETTLE;
 
 /**
  * 商户员工结算账单服务接口实现

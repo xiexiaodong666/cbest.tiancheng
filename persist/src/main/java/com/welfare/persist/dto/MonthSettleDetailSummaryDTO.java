@@ -1,7 +1,6 @@
 package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
 import java.io.Serializable;

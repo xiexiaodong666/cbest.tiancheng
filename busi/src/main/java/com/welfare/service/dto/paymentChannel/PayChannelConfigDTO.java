@@ -2,7 +2,6 @@ package com.welfare.service.dto.paymentChannel;
 
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.sync.event.MerStoreConsumeTypeChangeEvt;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.util.Assert;
 

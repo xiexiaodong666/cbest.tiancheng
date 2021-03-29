@@ -1,7 +1,5 @@
 package com.welfare.persist.dto;
 
-import com.alibaba.excel.annotation.ExcelProperty;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;

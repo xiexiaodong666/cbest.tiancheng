@@ -11,7 +11,6 @@ import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.SettleDetail;
 import com.welfare.service.dto.*;
 import com.welfare.service.dto.proprietary.ProprietaryConsumePageReq;
-import com.welfare.service.utils.PageReq;
 
 import java.util.List;
 import java.util.Map;

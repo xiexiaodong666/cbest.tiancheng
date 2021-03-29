@@ -1,6 +1,7 @@
 package com.welfare.persist.dto.query;
 
 import lombok.Data;
+
 import java.util.List;
 
 /**

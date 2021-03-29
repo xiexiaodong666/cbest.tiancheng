@@ -21,7 +21,10 @@ import com.welfare.persist.dto.query.AccountConsumePageQuery;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
-import com.welfare.service.*;
+import com.welfare.service.AccountChangeEventRecordService;
+import com.welfare.service.AccountConsumeSceneService;
+import com.welfare.service.AccountTypeService;
+import com.welfare.service.MerchantService;
 import com.welfare.service.dto.*;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.lang.invoke.MethodHandleInfo;
 import java.util.*;
 import java.util.stream.Collectors;
 

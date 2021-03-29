@@ -1,9 +1,10 @@
 package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * @author gaorui

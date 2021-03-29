@@ -12,8 +12,6 @@ import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.AccountService;
 import com.welfare.service.CardInfoService;
 import com.welfare.service.dto.AccountBindCardDTO;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -21,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yaoxiao

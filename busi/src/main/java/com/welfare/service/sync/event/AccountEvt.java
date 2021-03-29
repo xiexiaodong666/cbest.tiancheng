@@ -4,14 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.entity.Account;
-import java.util.List;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.killbill.bus.api.BusEvent;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author yaoxiao

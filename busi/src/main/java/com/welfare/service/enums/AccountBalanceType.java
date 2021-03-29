@@ -2,6 +2,7 @@ package com.welfare.service.enums;
 
 import com.welfare.persist.entity.Account;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
+
 import java.util.function.Function;
 
 public interface AccountBalanceType<T> {

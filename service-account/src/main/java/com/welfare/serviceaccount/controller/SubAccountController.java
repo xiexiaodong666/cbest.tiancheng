@@ -1,6 +1,5 @@
 package com.welfare.serviceaccount.controller;
 
-import com.welfare.persist.entity.SubAccount;
 import com.welfare.service.SubAccountService;
 import com.welfare.serviceaccount.controller.dto.SubAccountDTO;
 import io.swagger.annotations.Api;

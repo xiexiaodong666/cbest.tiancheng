@@ -1,6 +1,5 @@
 package com.welfare.common.util;
 
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.PaymentChannel;
 import jodd.util.MathUtil;
 import jodd.util.StringUtil;

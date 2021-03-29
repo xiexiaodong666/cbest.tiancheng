@@ -1,17 +1,15 @@
 package com.welfare.persist.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
-import lombok.extern.slf4j.Slf4j;
 import com.welfare.persist.entity.EmployeeSettle;
 import com.welfare.persist.mapper.EmployeeSettleMapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 商户员工结算账单(employee_settle)数据DAO

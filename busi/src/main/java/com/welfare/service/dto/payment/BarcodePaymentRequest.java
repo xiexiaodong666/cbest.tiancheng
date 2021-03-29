@@ -4,7 +4,6 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.SpringBeanUtils;
-import com.welfare.common.util.StringUtil;
 import com.welfare.service.BarcodeService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.util.ConsumeTypesUtils;
-import com.welfare.persist.dto.AdminMerchantStore;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

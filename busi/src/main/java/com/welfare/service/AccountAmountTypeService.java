@@ -3,11 +3,9 @@ package com.welfare.service;
 import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**

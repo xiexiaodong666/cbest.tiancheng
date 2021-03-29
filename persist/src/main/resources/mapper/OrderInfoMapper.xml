@@ -289,6 +289,12 @@
             ab.order_channel = 'SHOP_CONSUMPTION'
             and
             ab.trans_type = 'consume'
+            <if test="request.accountName != null">
+                and ac.accountName like concat('%',#{request.accountName},'%')
+            </if>
+            <if test="request.phone != null">
+                and ac.phone #{request.phone}
+            </if>
             <if test="request.merCode != null">
                 and ac.mer_code = #{request.merCode}
             </if>
@@ -375,6 +381,12 @@
             ab.order_channel = 'SHOP_CONSUMPTION'
             and
             ab.trans_type = 'consume'
+            <if test="request.accountName != null">
+                and ac.accountName like concat('%',#{request.accountName},'%')
+            </if>
+            <if test="request.phone != null">
+                and ac.phone #{request.phone}
+            </if>
             <if test="request.merCode != null">
                 and ac.mer_code = #{request.merCode}
             </if>

@@ -21,7 +21,7 @@ public class CommodityOfflineOrderDetailRequest extends CommodityOfflineOrderTot
    * 下单人
    */
   @ApiModelProperty("下单人")
-  private Long accountName;
+  private String accountName;
 
   /**
    * 手机号

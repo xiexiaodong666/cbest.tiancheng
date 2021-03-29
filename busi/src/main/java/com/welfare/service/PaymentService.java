@@ -1,5 +1,7 @@
 package com.welfare.service;
 
+import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
+import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 
 /**
@@ -25,4 +27,12 @@ public interface PaymentService {
      * @return
      */
     <T extends PaymentRequest> T queryResult(String transNo,Class<T> clazz);
+
+    /**
+     * 第三方支付码（微信或支付宝）场景校验，并且返回免密支付签名
+     * @param paymentRequest
+     * @return
+     */
+    ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentSceneCheck(
+        BarcodePaymentRequest paymentRequest);
 }

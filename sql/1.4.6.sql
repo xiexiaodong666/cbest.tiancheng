@@ -21,3 +21,19 @@ alter table sub_account add column password_free_signature varchar(100) comment 
 # DML
 update third_party_payment_request t set t.payment_request_type = 'wo_life';
 
+# 初始化甜橙卡支付渠道
+INSERT INTO `payment_channel_config`(`id`, `mer_code`, `store_code`, `consume_type`, `payment_channel_code`, `payment_channel_name`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
+SELECT msr.id - 1000000000000000000,msr.mer_code,msr.store_code,'O2O','welfare', '甜橙卡', 'anonymous', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.O2O' = true and deleted = 0;
+
+INSERT INTO `payment_channel_config`(`id`, `mer_code`, `store_code`, `consume_type`, `payment_channel_code`, `payment_channel_name`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
+SELECT msr.id - 100000000000000000,msr.mer_code,msr.store_code,'ONLINE_MALL','welfare', '甜橙卡', 'anonymous', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.ONLINE_MALL' = true and deleted = 0;
+
+INSERT INTO `payment_channel_config`(`id`, `mer_code`, `store_code`, `consume_type`, `payment_channel_code`, `payment_channel_name`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
+SELECT msr.id - 10000000000000000,msr.mer_code,msr.store_code,'SHOP_CONSUMPTION','welfare', '甜橙卡', 'anonymous', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.SHOP_CONSUMPTION' = true and deleted = 0;
+
+INSERT INTO `payment_channel_config`(`id`, `mer_code`, `store_code`, `consume_type`, `payment_channel_code`, `payment_channel_name`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
+SELECT msr.id - 1000000000000000,msr.mer_code,msr.store_code,'WHOLESALE','welfare', '甜橙卡', 'anonymous', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.WHOLESALE' = true and deleted = 0;
+
+
+
+

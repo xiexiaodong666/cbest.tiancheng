@@ -13,10 +13,25 @@ import java.util.List;
  */
 public interface PaymentChannelConfigService {
 
+  /**
+   * 商户支付渠道简要信息
+   * @param req
+   * @return
+   */
   Page<PayChannelConfigSimpleDTO> simplePage(PayChannelConfigSimpleReq req);
 
+  /**
+   * 商户支付渠道详情
+   * @param condition
+   * @return
+   */
   PayChannelConfigDetailDTO detail(PayChannelConfigReq condition);
 
+  /**
+   * 编辑商户支付渠道配置
+   * @param req
+   * @return
+   */
   Boolean edit(PayChannelConfigEditReq req);
 
   /**
@@ -27,12 +42,9 @@ public interface PaymentChannelConfigService {
   int batchDel(List<PayChannelConfigDelDTO> delDtos);
 
   /**
-   * 通过门店编码和消费方式删除
-   * @param storeCode
-   * @param consumeType
+   * 批量新增商户支付渠道
+   * @param payChannelConfigDTOS
    * @return
    */
-  int delByStoreCodeAndConsumeType(String storeCode, String consumeType);
-
   boolean batchSave(List<PayChannelConfigDTO> payChannelConfigDTOS);
 }

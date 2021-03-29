@@ -3,7 +3,6 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.PaymentChannelConfigDao;
 import com.welfare.persist.dto.PayChannelConfigSimple;
@@ -112,11 +111,7 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
                             paymentChannel.setPaymentChannelCode(paymentChannelConfig.getPaymentChannelCode());
                             paymentChannel.setPaymentChannelName(paymentChannelConfig.getPaymentChannelName());
                             paymentChannel.setSelected(true);
-                            if (paymentChannelConfig.getPaymentChannelCode().equals(WelfareConstant.PaymentChannel.WELFARE.code())) {
-                                paymentChannel.setEnable(false);
-                            } else {
-                                paymentChannel.setEnable(true);
-                            }
+                            paymentChannel.setEnable(!paymentChannelConfig.getPaymentChannelCode().equals(WelfareConstant.PaymentChannel.WELFARE.code()));
                             paymentChannels.add(paymentChannel);
                         });
                         // 补全其余支付渠道
@@ -196,17 +191,6 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
             return paymentChannelConfigDao.getBaseMapper().delete(queryWrapper);
         }
         return 0;
-    }
-
-    @Override
-    public int delByStoreCodeAndConsumeType(String storeCode, String consumeType) {
-        if (StringUtils.isEmpty(storeCode) || StringUtils.isEmpty(consumeType)) {
-            throw new BusiException("门店编码或消费方式不能为空");
-        }
-        QueryWrapper<PaymentChannelConfig> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(PaymentChannelConfig.STORE_CODE, storeCode)
-                .eq(PaymentChannelConfig.CONSUME_TYPE, consumeType);
-        return paymentChannelConfigDao.getBaseMapper().delete(queryWrapper);
     }
 
     @Override

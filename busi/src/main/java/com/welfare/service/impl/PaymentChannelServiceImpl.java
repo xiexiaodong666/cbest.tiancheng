@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.PaymentChannelDao;
 import com.welfare.persist.dto.PayChannelMerchantDTO;
-import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.PaymentChannel;
 import com.welfare.service.PaymentChannelConfigService;
 import com.welfare.service.PaymentChannelService;

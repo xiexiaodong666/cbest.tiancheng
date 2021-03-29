@@ -5,6 +5,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.AccountUserHolder;
 import com.welfare.persist.dto.AccountConsumeSceneDO;
 import com.welfare.persist.dto.AccountOverviewDTO;
+import com.welfare.persist.dto.AccountPasswordFreeSignDTO;
 import com.welfare.persist.dto.AccountPaymentChannelDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.AccountService;
@@ -88,5 +89,13 @@ public class AccountController implements IController {
     public R<List<AccountPaymentChannelDTO>> paymentChannelList() {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.queryPaymentChannelList(accountCode));
+    }
+
+    @ApiOperation("免密支付签约")
+    @GetMapping("/passwordFreeSign")
+    @AccountUser
+    public R<AccountPasswordFreeSignDTO> passwordFreeSign(String paymentChannel) {
+        Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
+        return success(accountService.passwordFreeSign(accountCode, paymentChannel));
     }
 }

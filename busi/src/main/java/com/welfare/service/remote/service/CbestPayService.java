@@ -47,4 +47,25 @@ public interface CbestPayService {
      * @return
      */
     CbestPayBaseBizResp tradeRefundQuery(String market, TradeRefundQueryReq req);
+
+    /**
+     * 支付宝代扣签约
+     * @param req
+     * @return
+     */
+    AlipayUserAgreementSignResp alipayUserAgreementSign(String market, AlipayUserAgreementSignReq req);
+
+    /**
+     * 支付宝代扣签约查询
+     * @param req
+     * @return
+     */
+    AlipayUserAgreementQueryResp alipayUserAgreementQuery(String market, AlipayUserAgreementQueryReq req);
+
+    /**
+     * 支付宝代扣解约
+     * @param req
+     * @return
+     */
+    AlipayUserAgreementUnsignResp alipayUserAgreementUnsign(String market, AlipayUserAgreementUnsignReq req);
 }

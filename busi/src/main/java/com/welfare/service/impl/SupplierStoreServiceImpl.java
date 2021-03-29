@@ -58,6 +58,7 @@ import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
+import com.welfare.service.sync.event.SupplierConsumeTypeChangeEvt;
 import com.welfare.service.sync.event.SupplierStoreEvt;
 import com.welfare.service.utils.TreeUtil;
 import java.io.IOException;
@@ -69,7 +70,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -578,6 +578,15 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       supplierStore.setConsumType(
           JSON.toJSONString(ConsumeTypesUtils.transfer(supplierStore.getConsumType())));
       flag2 = this.syncConsumeType(entity.getStoreCode(), supplierStore.getConsumType());
+    }
+    // 抛出门店消费场景删除事件
+    List<ConsumeTypeEnum> delConsumeTypes = ConsumeTypesUtils.getRedundantConsumeType(entity.getConsumType(), supplierStore.getConsumType());
+    if (CollectionUtils.isNotEmpty(delConsumeTypes)) {
+      applicationContext.publishEvent(SupplierConsumeTypeChangeEvt.builder()
+              .actionType(ShoppingActionTypeEnum.DELETE)
+              .storeCode(entity.getStoreCode())
+              .delConsumeTypes(delConsumeTypes)
+              .build());
     }
     SupplierStore update = this.buildUpdate(entity,supplierStore);
     update.setStoreParent(update.getMerCode());

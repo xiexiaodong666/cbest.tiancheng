@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.welfare.persist.entity.PaymentChannel">
+<mapper namespace="com.welfare.persist.mapper.PaymentChannelMapper">
     <sql id="tableName">
         payment_channel
     </sql>
@@ -9,4 +9,24 @@
         id,code,name,merchant_code,deleted,create_user,create_time,update_user,update_time,version,show_order
     </sql>
 
+
+    <select id="merchantPayChannelList" resultType="com.welfare.persist.dto.PayChannelMerchantDTO" >
+        SELECT
+        m.mer_name as merchant_name,
+        a.merchant_code as merchantCode,
+        a.payment_channels as paymentChannels
+        from
+        (
+        SELECT
+        merchant_code,
+        GROUP_CONCAT( `name` ORDER BY show_order ASC SEPARATOR ' / ' ) as payment_channels
+        FROM
+        payment_channel
+        WHERE
+        deleted = 0
+        AND merchant_code != 'default' GROUP BY merchant_code
+        ) a
+        LEFT JOIN
+        merchant m on m.mer_code = a.merchant_code and m.deleted = 0
+    </select>
 </mapper>

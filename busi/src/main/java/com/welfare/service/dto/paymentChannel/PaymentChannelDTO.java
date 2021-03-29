@@ -9,7 +9,7 @@ import lombok.Data;
  * @Date: 2021/3/25 4:12 下午
  */
 @Data
-public class PaymentChannelResp {
+public class PaymentChannelDTO {
 
   @ApiModelProperty("主键id")
   private String id;
@@ -21,7 +21,7 @@ public class PaymentChannelResp {
   private String name;
 
   @ApiModelProperty("排序：从 1 开始升序排列")
-  private Integer sorted;
+  private Integer showOrder;
 
   @ApiModelProperty("商户编码")
   private String merchantCode;

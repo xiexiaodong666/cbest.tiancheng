@@ -29,6 +29,7 @@ import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
 import com.welfare.service.remote.entity.RoleConsumptionListReq;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
+import com.welfare.service.sync.event.MerStoreConsumeTypeChangeEvt;
 import com.welfare.service.sync.event.MerchantStoreRelationEvt;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -175,7 +176,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     MerchantStoreRelationEvt evt = new MerchantStoreRelationEvt();
     evt.setRoleConsumptionReq(roleConsumptionReq);
     applicationContext.publishEvent(evt);
-
+    // 创建商户消费门店新增事件
+    applicationContext.publishEvent(MerStoreConsumeTypeChangeEvt.of(relationAddReq));
     return save;
   }
 
@@ -222,6 +224,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     roleConsumptionListReq.setMerchantCode(merchantStoreRelation.getMerCode());
     roleConsumptionListReq.setEnabled(Boolean.TRUE);
 
+    List<MerStoreConsumeTypeChangeEvt.StoreConsumeType> addStoreConsumeTypes = new ArrayList<>();
     for (AdminMerchantStore merchantStore :
         adminMerchantStoreList) {
       // update
@@ -229,6 +232,10 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         adminMerchantStoreUpdateList.add(merchantStore);
       } // add
       else {
+        addStoreConsumeTypes.add(MerStoreConsumeTypeChangeEvt.StoreConsumeType.builder()
+                .storeCode(merchantStore.getStoreCode())
+                .consumeType(ConsumeTypesUtils.getByConsumeTypeJson(merchantStore.getConsumType()))
+                .build());
         MerchantStoreRelation merchantStoreRelationNew = new MerchantStoreRelation();
         merchantStoreRelationNew.setMerCode(merchantStoreRelation.getMerCode());
         merchantStoreRelationNew.setStoreCode(merchantStore.getStoreCode());
@@ -273,17 +280,20 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   List<MerchantStoreRelation> removeMerchantStoreRelationList = new ArrayList<>();
 
     List<StoreConsumeRelationDTO> storeConsumeRelationDTOS = new ArrayList<>();
+    List<MerStoreConsumeTypeChangeEvt.StoreConsumeType> delStoreConsumeTypes = new ArrayList<>();
     for(
-  MerchantStoreRelation m :
-  merchantStoreRelations)
-
-  {
+    MerchantStoreRelation m :
+    merchantStoreRelations) {
     Optional<AdminMerchantStore> adminMerchantStoreOptional = adminMerchantStoreUpdateList
         .stream()
         .filter(a -> a.getMerchantStoreId().equals(String.valueOf(m.getId()))).findFirst();
     // update
     if (adminMerchantStoreOptional.isPresent()) {
       AdminMerchantStore adminMerchantStore = adminMerchantStoreOptional.get();
+      List<ConsumeTypeEnum> delConsumeTypes = ConsumeTypesUtils.getRedundantConsumeType(m.getConsumType(), adminMerchantStore.getConsumType());
+      if (CollectionUtils.isNotEmpty(delConsumeTypes)) {
+        delStoreConsumeTypes.add(MerStoreConsumeTypeChangeEvt.StoreConsumeType.builder().storeCode(m.getStoreCode()).consumeType(delConsumeTypes).build());
+      }
 
       StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
       storeConsumeRelationDTO.setStoreCode(adminMerchantStore.getStoreCode());
@@ -324,41 +334,48 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       storeCodeList.add(m.getStoreCode());
       deleteIds.add(m.getId());
       removeMerchantStoreRelationList.add(m);
+      delStoreConsumeTypes.add(MerStoreConsumeTypeChangeEvt.StoreConsumeType.builder().storeCode(m.getStoreCode()).build());
     }
   }
 
     // 同步员工消费方法
     accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(
-        merchantStoreRelation.getMerCode(), storeConsumeRelationDTOS);
+            merchantStoreRelation.getMerCode(), storeConsumeRelationDTOS);
 
-
-    if(CollectionUtils.isNotEmpty(removeMerchantStoreRelationList))
-
-  {
+    if(CollectionUtils.isNotEmpty(removeMerchantStoreRelationList)) {
     merchantStoreRelations.removeAll(removeMerchantStoreRelationList);
   }
 
-  boolean remove = true;
-  boolean updateBatch = true;
-  boolean saveBath = true;
-    if(CollectionUtils.isNotEmpty(deleteIds))
-
-  {
-    accountConsumeSceneStoreRelationService.deleteConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
-    remove = merchantStoreRelationDao.removeByIds(deleteIds);
-  }
-    if(CollectionUtils.isNotEmpty(merchantStoreRelations))
-
-  {
-    updateBatch = merchantStoreRelationDao.updateBatchById(merchantStoreRelations);
-  }
-    if(CollectionUtils.isNotEmpty(merchantStoreRelationNewList))
-
-  {
-    saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
-  }
-
-  MerchantStoreRelationEvt evt = new MerchantStoreRelationEvt();
+    boolean remove = true;
+    boolean updateBatch = true;
+    boolean saveBath = true;
+    if(CollectionUtils.isNotEmpty(deleteIds)) {
+      accountConsumeSceneStoreRelationService.deleteConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
+      remove = merchantStoreRelationDao.removeByIds(deleteIds);
+    }
+    if(CollectionUtils.isNotEmpty(merchantStoreRelations)) {
+      updateBatch = merchantStoreRelationDao.updateBatchById(merchantStoreRelations);
+    }
+    if(CollectionUtils.isNotEmpty(merchantStoreRelationNewList)) {
+      saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
+      // 创建商户门店消费新增事件
+      applicationContext.publishEvent(MerStoreConsumeTypeChangeEvt.builder()
+              .actionType(ShoppingActionTypeEnum.ADD)
+              .merCode(merchantStoreRelation.getMerCode())
+              .changeStoreConsumes(addStoreConsumeTypes)
+              .build()
+      );
+    }
+    if (CollectionUtils.isNotEmpty(delStoreConsumeTypes)) {
+      // 创建商户门店消费删除事件
+      applicationContext.publishEvent(MerStoreConsumeTypeChangeEvt.builder()
+              .actionType(ShoppingActionTypeEnum.DELETE)
+              .merCode(merchantStoreRelation.getMerCode())
+              .changeStoreConsumes(delStoreConsumeTypes)
+              .build()
+      );
+    }
+    MerchantStoreRelationEvt evt = new MerchantStoreRelationEvt();
     evt.setRoleConsumptionReq(roleConsumptionReq);
     applicationContext.publishEvent(evt);
 
@@ -397,6 +414,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     List<Long> removeIds = new ArrayList<>();
     List<String> storeCodeList = new ArrayList<>();
+    List<String> removeStoreSet = new ArrayList<>();
 
     if (CollectionUtils.isNotEmpty(merchantStoreRelations)) {
       for (MerchantStoreRelation storeRelation :
@@ -407,6 +425,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
           storeCodeList.add(storeRelation.getStoreCode());
           removeIds.add(storeRelation.getId());
           storeRelation.setSyncStatus(0);
+          removeStoreSet.add(storeRelation.getStoreCode());
         }
 
         if (status != null) {
@@ -446,7 +465,14 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     MerchantStoreRelationEvt evt = new MerchantStoreRelationEvt();
     evt.setRoleConsumptionReq(roleConsumptionReq);
     applicationContext.publishEvent(evt);
-
+    // 创建商户门店消费方式删除事件
+    if (delete != null && CollectionUtils.isNotEmpty(removeStoreSet)) {
+      applicationContext.publishEvent(MerStoreConsumeTypeChangeEvt.builder()
+              .actionType(ShoppingActionTypeEnum.DELETE)
+              .merCode(merchantStoreRelation.getMerCode())
+              .changeStoreConsumes(MerStoreConsumeTypeChangeEvt.StoreConsumeType.of(removeStoreSet))
+              .build());
+    }
     return remove && saveOrUpdateBatch;
   }
 

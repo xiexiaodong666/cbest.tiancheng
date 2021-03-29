@@ -3,15 +3,13 @@ package com.welfare.service.dto.paymentChannel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * @Author: duanhy
  * @Version: 0.0.1
- * @Date: 2021/3/25 4:13 下午
+ * @Date: 2021/3/25 5:44 下午
  */
 @Data
-public class PaymentChannelMerchantResp {
+public class PaymentChannelMerchantDTO {
 
   @ApiModelProperty("商户编码")
   private String merchantCode;
@@ -19,6 +17,6 @@ public class PaymentChannelMerchantResp {
   @ApiModelProperty("商户名称")
   private String merchantName;
 
-  @ApiModelProperty("支付渠道")
-  private List<PaymentChannelDTO> paymentChannels;
+  @ApiModelProperty("支付渠道：xx/xxx/xxxx")
+  private String paymentChannels;
 }

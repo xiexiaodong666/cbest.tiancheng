@@ -88,11 +88,7 @@ public class PaymentChannelConfig extends Model<PaymentChannelConfig> implements
     @ApiModelProperty("更新时间")   
     @TableField(fill = FieldFill.UPDATE)
 	private Date updateTime;
-    /**
-     * 账户余额
-     */
-    @ApiModelProperty("账户余额")   
-    private BigDecimal accountBalance;
+
     /**
      * 删除标志
      */
@@ -148,10 +144,6 @@ public class PaymentChannelConfig extends Model<PaymentChannelConfig> implements
     * 更新时间
     */
     public static final String UPDATE_TIME = "update_time";
-    /**
-    * 账户余额
-    */
-    public static final String ACCOUNT_BALANCE = "account_balance";
     /**
     * 删除标志
     */

@@ -15,9 +15,16 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PaymentChannelSortReq {
 
+  @ApiModelProperty("主键id 不传就是新增")
+  private String id;
+
   @ApiModelProperty("支付渠道编码")
   @NotEmpty(message = "支付渠道编码不能为空")
   private String code;
+
+  @ApiModelProperty("支付渠道名称")
+  @NotEmpty(message = "支付渠道名称不能为空")
+  private String name;
 
   @ApiModelProperty("商户编码")
   @NotEmpty(message = "商户编码不能为空")
@@ -26,5 +33,5 @@ public class PaymentChannelSortReq {
   @ApiModelProperty(value = "排序，从 1 开始升序", required = true)
   @NotNull(message = "排序权重不能为空")
   @Min(value = 1, message = "排序权重不能小于1")
-  private Integer sorted;
+  private Integer showOrder;
 }

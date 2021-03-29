@@ -1,14 +1,12 @@
 package com.welfare.persist.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import com.baomidou.mybatisplus.annotation.Version;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.util.Date;
 import lombok.Data;
@@ -54,7 +52,7 @@ public class PaymentChannel extends Model<PaymentChannel> implements Serializabl
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除")  
+    @ApiModelProperty("删除标志  1-删除、0-未删除")
     private Integer deleted;
     /**
      * 创建人
@@ -132,5 +130,5 @@ public class PaymentChannel extends Model<PaymentChannel> implements Serializabl
     /**
      * 展示顺序
      */
-    public static final String SHOW_ORDER = "showOrder";
+    public static final String SHOW_ORDER = "show_order";
 }

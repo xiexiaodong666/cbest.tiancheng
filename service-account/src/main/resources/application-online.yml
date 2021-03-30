@@ -38,7 +38,7 @@ e-welfare:
   distributed-lock:
     enabled: true
   barcode:
-    expire: 180
+    expire: 600
 mybatis-plus:
   global-config:
     db-config:

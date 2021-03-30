@@ -55,6 +55,7 @@ public class PaymentNotificationContent implements Serializable {
         barcodePaymentRequest.setMachineNo(terminal);
         barcodePaymentRequest.setStoreNo(market);
         barcodePaymentRequest.setOffline(false);
+        barcodePaymentRequest.setNotification(true);
         barcodePaymentRequest.setTransNo(gatewayTradeNo);
         return barcodePaymentRequest;
     }

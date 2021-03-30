@@ -44,8 +44,8 @@ public class BarcodeServiceImpl implements BarcodeService {
     private static final Long MAX_PERIOD_GENERATE = 30L;
     private static final int MILL_SEC_A_DAY = (86400 * 1000);
     private static final String BARCODE_PREFIX = "e-welfare-barcode";
-    @Value("${e-welfare.barcode.expire:180}")
-    private Long barcodeExpireSecs;
+    @Value("${e-welfare.barcode.expire:600}")
+    private Long barcodeExpireInRedisSecs;
 
     private final BarcodeSaltDao barcodeSaltDao;
     private final RedissonClient redissonClient;
@@ -135,11 +135,12 @@ public class BarcodeServiceImpl implements BarcodeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PaymentBarcode getBarcode(Long accountCode, String paymentChannel) {
-        BarcodeSalt barcodeSalt =  queryPeriodSaltValue(Calendar.getInstance().getTime());
-        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue(), paymentChannel);
+        Date generatedDate = Calendar.getInstance().getTime();
+        BarcodeSalt barcodeSalt =  queryPeriodSaltValue(generatedDate);
+        PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue(), paymentChannel, generatedDate);
         redisTemplate.opsForValue().set(
                 BARCODE_PREFIX + paymentBarcode.getBarcode(),
-                paymentBarcode,barcodeExpireSecs,
+                paymentBarcode, barcodeExpireInRedisSecs,
                 TimeUnit.SECONDS
         );
         return paymentBarcode;
@@ -148,10 +149,14 @@ public class BarcodeServiceImpl implements BarcodeService {
     @Override
     public Long parseAccountFromBarcode(String barcode, Date scanDate, boolean isOffline) {
         Assert.isTrue(barcode!=null && barcode.length() == 21,"条码必须为21位");
+        PaymentBarcode paymentBarcode = redisTemplate.opsForValue().get(BARCODE_PREFIX + barcode);
         if(!isOffline){
-            PaymentBarcode paymentBarcode = redisTemplate.opsForValue().get(BARCODE_PREFIX + barcode);
             Assert.notNull(paymentBarcode,"条码过期或不存在");
         }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd");
+        String theDayOfScan = dateFormat.format(scanDate);
+        String theDayOfNow = dateFormat.format(Calendar.getInstance().getTime());
+        Assert.isTrue(Objects.equals(theDayOfNow,theDayOfScan),"条码跨天，请重新拉取条码并支付");
         BarcodeSalt barcodeSalt = queryPeriodSaltValue(scanDate);
         return BarcodeUtil.calculateAccount(barcode, barcodeSalt.getSaltValue());
     }

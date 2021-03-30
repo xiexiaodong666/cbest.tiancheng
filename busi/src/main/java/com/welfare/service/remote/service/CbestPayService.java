@@ -53,21 +53,21 @@ public interface CbestPayService {
      * @param req
      * @return
      */
-    AlipayUserAgreementSignResp alipayUserAgreementSign(String market, AlipayUserAgreementSignReq req);
+    AlipayUserAgreementSignResp alipayUserAgreementSign(AlipayUserAgreementSignReq req);
 
     /**
      * 支付宝代扣签约查询
      * @param req
      * @return
      */
-    AlipayUserAgreementQueryResp alipayUserAgreementQuery(String market, AlipayUserAgreementQueryReq req);
+    AlipayUserAgreementQueryResp alipayUserAgreementQuery(AlipayUserAgreementQueryReq req);
 
     /**
      * 支付宝代扣解约
      * @param req
      * @return
      */
-    AlipayUserAgreementUnsignResp alipayUserAgreementUnsign(String market, AlipayUserAgreementUnsignReq req);
+    AlipayUserAgreementUnsignResp alipayUserAgreementUnsign(AlipayUserAgreementUnsignReq req);
 
     /**
      * 代扣签约(页面跳转方式）
@@ -75,5 +75,5 @@ public interface CbestPayService {
      * @param req
      * @return
      */
-    AlipayUserAgreementPageSignResp alipayUserAgreementPageSign(String market, AlipayUserAgreementPageSignReq req);
+    AlipayUserAgreementPageSignResp alipayUserAgreementPageSign(AlipayUserAgreementPageSignReq req);
 }

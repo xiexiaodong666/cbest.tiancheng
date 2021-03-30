@@ -1343,7 +1343,7 @@ public class AccountServiceImpl implements AccountService {
                 AlipayUserAgreementPageSignReq req = new AlipayUserAgreementPageSignReq();
                 req.setExternalLogonId(String.valueOf(accountCode));
                 AlipayUserAgreementPageSignResp alipayUserAgreementPageSignResp = cbestPayService
-                    .alipayUserAgreementPageSign(account.getMerCode(), req);
+                    .alipayUserAgreementPageSign(req);
                 signPage = alipayUserAgreementPageSignResp.getSignPage();
                 break;
             default:
@@ -1365,7 +1365,7 @@ public class AccountServiceImpl implements AccountService {
                 AlipayUserAgreementSignReq req = new AlipayUserAgreementSignReq();
                 req.setExternalLogonId(String.valueOf(accountCode));
                 AlipayUserAgreementSignResp alipayUserAgreementSignResp = cbestPayService
-                    .alipayUserAgreementSign(account.getMerCode(), req);
+                    .alipayUserAgreementSign(req);
                 String signParams = alipayUserAgreementSignResp.getSignParams();
                 String signUrl = alipayUserAgreementSignResp.getSignUrl();
                 accountPasswordFreeSignDTO.setSignUrl(signUrl);
@@ -1391,7 +1391,7 @@ public class AccountServiceImpl implements AccountService {
                             WelfareConstant.PaymentChannel.ALIPAY.code()));
                 req.setAgreementNo(subAccount.getPasswordFreeSignature());
                 AlipayUserAgreementUnsignResp alipayUserAgreementUnsignResp = cbestPayService
-                    .alipayUserAgreementUnsign(account.getMerCode(), req);
+                    .alipayUserAgreementUnsign(req);
                 String signParams = alipayUserAgreementUnsignResp.getSignParams();
                 String signUrl = alipayUserAgreementUnsignResp.getSignUrl();
                 accountPasswordFreeSignDTO.setSignUrl(signUrl);

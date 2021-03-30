@@ -100,6 +100,7 @@ public class CbestPayServiceImpl implements CbestPayService {
     private String generateSign(CbestPayBaseReq req) {
         Map<String, Object> map = BeanUtil.beanToMap(req, true, true);
         String params = map.entrySet().stream()
+            .filter(item -> item.getValue() != null)
             .sorted(Entry.comparingByKey())
             .map(item -> item.getKey() + "=" + item.getValue())
             .collect(Collectors.joining("&"))
@@ -109,9 +110,9 @@ public class CbestPayServiceImpl implements CbestPayService {
     }
 
     @Override
-    public AlipayUserAgreementSignResp alipayUserAgreementSign(String market,
+    public AlipayUserAgreementSignResp alipayUserAgreementSign(
         AlipayUserAgreementSignReq req) {
-        CbestPayBaseBizResp resp = request("sjgoalipay.user.agreement.sign", market, req);
+        CbestPayBaseBizResp resp = request("alipay.user.agreement.sign", null, req);
         String bizStatus = resp.getBizStatus();
         if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
             log.error(
@@ -125,9 +126,9 @@ public class CbestPayServiceImpl implements CbestPayService {
     }
 
     @Override
-    public AlipayUserAgreementQueryResp alipayUserAgreementQuery(String market,
+    public AlipayUserAgreementQueryResp alipayUserAgreementQuery(
         AlipayUserAgreementQueryReq req) {
-        CbestPayBaseBizResp resp = request("sjgoalipay.user.agreement.query", market, req);
+        CbestPayBaseBizResp resp = request("alipay.user.agreement.query", null, req);
         String bizStatus = resp.getBizStatus();
         if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
             log.error(
@@ -141,9 +142,9 @@ public class CbestPayServiceImpl implements CbestPayService {
     }
 
     @Override
-    public AlipayUserAgreementUnsignResp alipayUserAgreementUnsign(String market,
+    public AlipayUserAgreementUnsignResp alipayUserAgreementUnsign(
         AlipayUserAgreementUnsignReq req) {
-        CbestPayBaseBizResp resp = request("sjgoalipay.user.agreement.unsign", market, req);
+        CbestPayBaseBizResp resp = request("alipay.user.agreement.unsign", null, req);
         String bizStatus = resp.getBizStatus();
         if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
             log.error(
@@ -157,9 +158,9 @@ public class CbestPayServiceImpl implements CbestPayService {
     }
 
     @Override
-    public AlipayUserAgreementPageSignResp alipayUserAgreementPageSign(String market,
+    public AlipayUserAgreementPageSignResp alipayUserAgreementPageSign(
         AlipayUserAgreementPageSignReq req) {
-        CbestPayBaseBizResp resp = request("sjgoalipay.user.agreement.page.sign", market, req);
+        CbestPayBaseBizResp resp = request("alipay.user.agreement.page.sign", null, req);
         String bizStatus = resp.getBizStatus();
         if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
             log.error(

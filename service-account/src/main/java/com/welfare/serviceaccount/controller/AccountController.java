@@ -5,6 +5,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.AccountUserHolder;
 import com.welfare.persist.dto.AccountConsumeSceneDO;
 import com.welfare.persist.dto.AccountOverviewDTO;
+import com.welfare.persist.dto.AccountPasswordFreePageSignDTO;
 import com.welfare.persist.dto.AccountPasswordFreeSignDTO;
 import com.welfare.persist.dto.AccountPaymentChannelDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
@@ -91,11 +92,27 @@ public class AccountController implements IController {
         return success(accountService.queryPaymentChannelList(accountCode));
     }
 
-    @ApiOperation("免密支付签约")
+    @ApiOperation("免密支付签约(页面跳转方式）")
+    @GetMapping("/passwordFreePageSign")
+    @AccountUser
+    public R<AccountPasswordFreePageSignDTO> passwordFreePageSign(String paymentChannel) {
+        Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
+        return success(accountService.passwordFreePageSign(accountCode, paymentChannel));
+    }
+
+    @ApiOperation("免密签约(APP、小程序或JSAPI）")
     @GetMapping("/passwordFreeSign")
     @AccountUser
     public R<AccountPasswordFreeSignDTO> passwordFreeSign(String paymentChannel) {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.passwordFreeSign(accountCode, paymentChannel));
+    }
+
+    @ApiOperation("免密解约(APP、小程序或JSAPI）")
+    @GetMapping("/passwordFreeUnsign")
+    @AccountUser
+    public R<AccountPasswordFreeSignDTO> passwordFreeUnsign(String paymentChannel) {
+        Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
+        return success(accountService.passwordFreeUnsign(accountCode, paymentChannel));
     }
 }

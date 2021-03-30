@@ -8,6 +8,7 @@ import com.welfare.service.dto.BarcodePaymentResultDTO;
 import com.welfare.service.dto.BarcodePaymentResultReq;
 import com.welfare.service.dto.CreateThirdPartyPaymentDTO;
 import com.welfare.service.dto.CreateThirdPartyPaymentReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementQueryResp;
 import com.welfare.service.remote.entity.CbestPayBaseResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,6 +66,13 @@ public class AccountPaymentResultController implements IController {
         CreateThirdPartyPaymentDTO createThirdPartyPaymentDTO = accountPaymentResultService
             .createThirdPartyPayment(req);
         return success(createThirdPartyPaymentDTO);
+    }
+
+    @ApiOperation("第三方签约或解约结果通知")
+    @PostMapping("/thirdPartySignResultNotify")
+    public R thirdPartySignResultNotify(@RequestBody AlipayUserAgreementQueryResp resp) {
+        accountPaymentResultService.thirdPartySignResultNotify(resp);
+        return success();
     }
 
 }

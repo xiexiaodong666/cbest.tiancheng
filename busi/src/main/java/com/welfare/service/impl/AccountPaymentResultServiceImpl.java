@@ -3,7 +3,12 @@ package com.welfare.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.welfare.common.constants.WelfareConstant.PaymentChannel;
 import com.welfare.common.util.SpringBeanUtils;
+import com.welfare.persist.dao.SubAccountDao;
+import com.welfare.persist.entity.SubAccount;
 import com.welfare.service.AccountPaymentResultService;
 import com.welfare.service.BarcodeService;
 import com.welfare.service.dto.BarcodePaymentNotifyReq;
@@ -13,18 +18,18 @@ import com.welfare.service.dto.CreateThirdPartyPaymentDTO;
 import com.welfare.service.dto.CreateThirdPartyPaymentNotifyReq;
 import com.welfare.service.dto.CreateThirdPartyPaymentReq;
 import com.welfare.service.dto.ThirdPartyPaymentResultNotifyReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementQueryResp;
 import com.welfare.service.remote.entity.CbestPayBaseResp;
 import com.welfare.service.remote.entity.CbestPayRespStatusConstant;
+import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -32,6 +37,9 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
 
     @Resource
     private RedissonClient redissonClient;
+
+    @Resource
+    private SubAccountDao subAccountDao;
 
     public static final String KEY_PREFIX = "e-welfare_account_payment_result:{}:{}";
 
@@ -91,7 +99,8 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             BeanUtils.copyProperties(thirdPartyPaymentResultNotifyReq, req);
             req.setTotalAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalAmount()));
             req.setActualAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getActualAmount()));
-            req.setTotalDiscountAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalDiscountAmount()));
+            req.setTotalDiscountAmount(
+                fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalDiscountAmount()));
             String barcode = thirdPartyPaymentResultNotifyReq.getBarcode();
             BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
             Long accountCode = barcodeService
@@ -123,7 +132,34 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             return null;
         }
         CreateThirdPartyPaymentDTO createThirdPartyPaymentDTO = new CreateThirdPartyPaymentDTO();
-        createThirdPartyPaymentDTO.setOrderString(createThirdPartyPaymentNotifyReq.getOrderString());
+        createThirdPartyPaymentDTO
+            .setOrderString(createThirdPartyPaymentNotifyReq.getOrderString());
         return createThirdPartyPaymentDTO;
+    }
+
+    @Override
+    public void thirdPartySignResultNotify(AlipayUserAgreementQueryResp resp) {
+        String status = resp.getStatus();
+        String externalLogonId = resp.getExternalLogonId();
+        Long accountCode = Long.valueOf(externalLogonId);
+        String subAccountType = PaymentChannel.ALIPAY.code();
+        if ("NORMAL".equals(status)) {
+
+            String passwordFreeSignature = resp.getAgreementNo();
+
+            SubAccount subAccount = subAccountDao
+                .getByAccountCodeAndType(accountCode, subAccountType);
+            subAccount.setPasswordFreeSignature(passwordFreeSignature);
+            boolean updated = subAccountDao.updateById(subAccount);
+
+        }
+        if ("STOP".equals(status)) {
+            LambdaUpdateWrapper<SubAccount> updateWrapper = Wrappers.<SubAccount>lambdaUpdate()
+                .set(SubAccount::getPasswordFreeSignature, null)
+                .eq(SubAccount::getAccountCode, accountCode)
+                .eq(SubAccount::getSubAccountType, subAccountType);
+            boolean updated = subAccountDao.update(updateWrapper);
+
+        }
     }
 }

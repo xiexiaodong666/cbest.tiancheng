@@ -5,6 +5,7 @@ import com.welfare.service.dto.BarcodePaymentResultDTO;
 import com.welfare.service.dto.BarcodePaymentResultReq;
 import com.welfare.service.dto.CreateThirdPartyPaymentDTO;
 import com.welfare.service.dto.CreateThirdPartyPaymentReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementQueryResp;
 import com.welfare.service.remote.entity.CbestPayBaseResp;
 
 public interface AccountPaymentResultService {
@@ -30,4 +31,10 @@ public interface AccountPaymentResultService {
      * @param req
      */
     CreateThirdPartyPaymentDTO createThirdPartyPayment(CreateThirdPartyPaymentReq req);
+
+    /**
+     * 签约或解约结果通知
+     * @param resp
+     */
+    void thirdPartySignResultNotify(AlipayUserAgreementQueryResp resp);
 }

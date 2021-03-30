@@ -155,4 +155,20 @@ public class CbestPayServiceImpl implements CbestPayService {
             .parseObject(resp.getBizContent(), AlipayUserAgreementUnsignResp.class);
         return alipayUserAgreementUnsignResp;
     }
+
+    @Override
+    public AlipayUserAgreementPageSignResp alipayUserAgreementPageSign(String market,
+        AlipayUserAgreementPageSignReq req) {
+        CbestPayBaseBizResp resp = request("sjgoalipay.user.agreement.page.sign", market, req);
+        String bizStatus = resp.getBizStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
+            log.error(
+                StrUtil.format("调用重百付代扣签约(页面跳转方式）接口失败-req: {}, resp: {}", JSON.toJSONString(req),
+                    JSON.toJSONString(resp)));
+            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+        }
+        AlipayUserAgreementPageSignResp alipayUserAgreementPageSignResp = JSON
+            .parseObject(resp.getBizContent(), AlipayUserAgreementPageSignResp.class);
+        return alipayUserAgreementPageSignResp;
+    }
 }

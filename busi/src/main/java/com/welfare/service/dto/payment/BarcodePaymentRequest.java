@@ -8,6 +8,7 @@ import com.welfare.service.BarcodeService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @email yuxiang.li@sjgo365.com
  * @date 1/11/2021
  */
+@EqualsAndHashCode(callSuper = true)
 @ApiModel("扫码支付请求")
 @Data
 public class BarcodePaymentRequest extends PaymentRequest {
@@ -52,7 +54,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
         }else{
             redisTemplate.opsForValue().set("BARCODE:"+barcode,barcode,Long.parseLong(expireSecs), TimeUnit.SECONDS);
         }
-        Long accountCode = barcodeService.parseAccountFromBarcode(barcode, scanDate,getOffline());
+        Long accountCode = barcodeService.parseAccountFromBarcode(barcode, scanDate,getOffline(), isNotification());
         this.setAccountCode(accountCode);
         return accountCode;
     }

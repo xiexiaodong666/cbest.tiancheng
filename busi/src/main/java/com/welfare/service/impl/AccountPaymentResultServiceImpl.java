@@ -104,7 +104,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             String barcode = thirdPartyPaymentResultNotifyReq.getBarcode();
             BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
             Long accountCode = barcodeService
-                .parseAccountFromBarcode(barcode, Calendar.getInstance().getTime(), true);
+                .parseAccountFromBarcode(barcode, Calendar.getInstance().getTime(), true, false);
             RBucket<BarcodePaymentNotifyReq> bucket = redissonClient.<BarcodePaymentNotifyReq>getBucket(
                 StrUtil.format(KEY_PREFIX, accountCode, barcode));
             bucket.set(req, 1, TimeUnit.MINUTES);

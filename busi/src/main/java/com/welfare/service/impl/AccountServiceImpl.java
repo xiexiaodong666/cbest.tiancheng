@@ -1021,7 +1021,7 @@ public class AccountServiceImpl implements AccountService {
             case BARCODE:
                 BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
                 accountCode = barcodeService
-                    .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
+                    .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true, false);
                 break;
             default:
                 break;
@@ -1067,7 +1067,7 @@ public class AccountServiceImpl implements AccountService {
         } else if (WelfareConstant.ConsumeQueryType.BARCODE.code().equals(queryType)) {
             BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
             accountCode = barcodeService
-                .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
+                .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true, false);
         }
         Assert.notNull(accountCode, "根据条件没有解析出账号");
         return AccountDO.of(this.getByAccountCode(accountCode));

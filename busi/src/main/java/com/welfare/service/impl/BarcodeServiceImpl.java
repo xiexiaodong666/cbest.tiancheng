@@ -161,11 +161,13 @@ public class BarcodeServiceImpl implements BarcodeService {
     }
 
     @Override
-    public Long parseAccountFromBarcode(String barcode, Date scanDate, boolean isOffline) {
+    public Long parseAccountFromBarcode(String barcode, Date scanDate, boolean isOffline, boolean isNotification) {
         Assert.isTrue(barcode!=null && barcode.length() == 21,"条码必须为21位");
-        PaymentBarcode paymentBarcode = redisTemplate.opsForValue().get(BARCODE_PREFIX + barcode);
-        if(!isOffline){
+        if(!isOffline && !isNotification){
+            PaymentBarcode paymentBarcode = redisTemplate.opsForValue().get(BARCODE_PREFIX + barcode);
             Assert.notNull(paymentBarcode,"条码过期或不存在");
+        } else {
+
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd");
         String theDayOfScan = dateFormat.format(scanDate);

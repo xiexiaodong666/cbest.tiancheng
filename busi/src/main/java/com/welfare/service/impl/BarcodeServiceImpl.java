@@ -77,18 +77,16 @@ public class BarcodeServiceImpl implements BarcodeService {
         QueryWrapper<BarcodeSalt> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(BarcodeSalt.VALID_PERIOD_NUMERIC,targetValidPeriod);
         BarcodeSalt barcodeSalt = barcodeSaltDao.getOne(queryWrapper);
-        if(!Objects.isNull(barcodeSalt)){
-            return barcodeSalt;
-        }else{
+        if (Objects.isNull(barcodeSalt)) {
             barcodeSalt = new BarcodeSalt();
             Long saltValue = BarcodeUtil.nextRandSalt();
             barcodeSalt.setSaltValue(saltValue);
             barcodeSalt.setValidPeriod(targetValidPeriod.toString());
             barcodeSalt.setValidPeriodNumeric(targetValidPeriod);
             boolean isSaved = barcodeSaltDao.save(barcodeSalt);
-            Assert.isTrue(isSaved,"保存失败");
-            return barcodeSalt;
+            Assert.isTrue(isSaved, "保存失败");
         }
+        return barcodeSalt;
     }
 
     @Override

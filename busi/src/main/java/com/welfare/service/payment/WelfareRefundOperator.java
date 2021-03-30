@@ -69,7 +69,7 @@ public class WelfareRefundOperator implements IRefundOperator{
                     .collect(Collectors.toList());
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             try {
-                doRefund(refundRequest, accountDeductionDetails, refundDeductionDetailInDb, account, accountAmountTypes);
+                doRefund(refundRequest, accountDeductionDetails, account, accountAmountTypes);
             } finally {
                 DistributedLockUtil.unlock(merAccountLock);
             }
@@ -82,11 +82,8 @@ public class WelfareRefundOperator implements IRefundOperator{
 
     private void doRefund(RefundRequest refundRequest,
                           List<AccountDeductionDetail> paidDeductionDetails,
-                          List<AccountDeductionDetail> refundDeductionDetail,
                           Account account,
                           List<AccountAmountType> accountAmountTypes) {
-        Map<String, AccountAmountType> accountAmountTypeMap = accountAmountTypes.stream()
-                .collect(Collectors.toMap(AccountAmountType::getMerAccountTypeCode, type -> type));
         BigDecimal paidAmount = paidDeductionDetails.stream()
                 .map(AccountDeductionDetail::getTransAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -156,6 +153,7 @@ public class WelfareRefundOperator implements IRefundOperator{
                     RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail);
                     refundOperations.add(refundOperation);
                 }
+                Assert.notNull(surplusOverpayType,"该用户不存在溢缴款账户,请检查配置");
                 AccountDeductionDetail surplusOverpayRefundDeductionDetail = toRefundDeductionDetail(surPlusQuotaDeductionDetail, refundRequest, surplusQuotaOverpayAmount, surplusOverpayType);
                 AccountBillDetail overpayRefundBillDetail = toRefundBillDetail(surplusOverpayRefundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
                 surplusOverpayType.setAccountBalance(surplusOverpayType.getAccountBalance().add(surplusQuotaOverpayAmount));
@@ -179,15 +177,15 @@ public class WelfareRefundOperator implements IRefundOperator{
 
     /**
      * 除了个人授信的退款逻辑
-     * @param accountAmountTypes
-     * @param refundRequest
-     * @param account
-     * @param refundOperations
-     * @param remainingRefundAmount
-     * @param groupedPaidDetail
-     * @param refundedAmount
-     * @param tmpAccountBillDetail
-     * @param isSurplusHandled
+     * @param accountAmountTypes 福利类型列表
+     * @param refundRequest 退款请求
+     * @param account 账户
+     * @param refundOperations 退款操作列表
+     * @param remainingRefundAmount 剩余需要退款的金额
+     * @param groupedPaidDetail 分组后的付款明细
+     * @param refundedAmount 已经退款的金额
+     * @param tmpAccountBillDetail 第一条付款明细
+     * @param isSurplusHandled 是否已经处理了授信退款
      */
     private void handlePartlyRefundCommon(List<AccountAmountType> accountAmountTypes,
                                           RefundRequest refundRequest,
@@ -234,28 +232,6 @@ public class WelfareRefundOperator implements IRefundOperator{
         }
     }
 
-    @Deprecated
-    /**
-     * deprecated，部分退款已经覆盖全额退款的逻辑。且全额退款不适用于溢缴款的逻辑。
-     */
-    private List<RefundOperation> fullyRefund(RefundRequest refundRequest, List<AccountDeductionDetail> accountDeductionDetails, Account account, List<AccountAmountType> accountAmountTypes, Map<String, AccountAmountType> accountAmountTypeMap) {
-        List<RefundOperation> refundOperations;
-        AccountBillDetail tmpAccountBillDetail = accountBillDetailDao.getOneByTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
-        Assert.notNull(tmpAccountBillDetail,"未找到正向支付明细");
-        refundOperations = accountDeductionDetails.stream()
-                .map(paymentDeductionDetail -> toRefundDeductionDetail(
-                        paymentDeductionDetail,
-                        refundRequest,
-                        paymentDeductionDetail.getTransAmount(), accountAmountTypeMap.get(paymentDeductionDetail.getMerAccountType()))
-                ).map(refundDeductionDetail -> {
-                    AccountAmountType accountAmountType = accountAmountTypeMap.get(refundDeductionDetail.getMerAccountType());
-                    accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(refundDeductionDetail.getTransAmount()));
-                    AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
-                    operateMerchantCredit(account, refundDeductionDetail);
-                    return RefundOperation.of(refundBillDetail, refundDeductionDetail);
-                }).collect(Collectors.toList());
-        return refundOperations;
-    }
 
     private void operateMerchantCredit(Account account, AccountDeductionDetail refundDeductionDetail) {
         String storeCode = refundDeductionDetail.getStoreCode();
@@ -291,12 +267,7 @@ public class WelfareRefundOperator implements IRefundOperator{
         List<AccountDeductionDetail> refundDeductionDetails = refundOperations.stream()
                 .map(RefundOperation::getRefundDeductionDetail)
                 .collect(Collectors.toList());
-        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
-        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
-        BigDecimal accountCreditOverpayBalance = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
-        account.setAccountBalance(accountBalance);
-        account.setSurplusQuota(accountCreditBalance);
-        account.setSurplusQuotaOverpay(accountCreditOverpayBalance);
+        AccountAmountDO.updateAccountAfterOperated(account,accountAmountTypes);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(refundBillDetails);
         accountAmountTypeDao.updateBatchById(accountAmountTypes);
@@ -342,7 +313,7 @@ public class WelfareRefundOperator implements IRefundOperator{
      * @param refundRequest 退款请求
      * @param refundAmountForThis    这条退款金额多少
      * @param accountAmountType 操作的福利类型
-     * @return
+     * @return 退款的明细
      */
     private AccountDeductionDetail toRefundDeductionDetail(AccountDeductionDetail accountDeductionDetail,
                                                            RefundRequest refundRequest, BigDecimal refundAmountForThis, AccountAmountType accountAmountType) {

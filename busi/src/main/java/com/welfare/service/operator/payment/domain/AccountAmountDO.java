@@ -158,4 +158,13 @@ public class AccountAmountDO {
         accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount().abs());
         accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount().abs());
     }
+
+    public static void updateAccountAfterOperated(Account account, List<AccountAmountType> accountAmountTypes) {
+        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
+        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
+        BigDecimal accountCreditOverpay = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
+        account.setAccountBalance(accountBalance);
+        account.setSurplusQuota(accountCreditBalance);
+        account.setSurplusQuotaOverpay(accountCreditOverpay);
+    }
 }

@@ -13,7 +13,6 @@ import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.perf.PerfMonitor;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.*;
@@ -40,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -78,18 +78,15 @@ public class PaymentServiceImpl implements PaymentService {
     private final AsyncNotificationService asyncNotificationService;
     private final PaymentChannelConfigDao paymentChannelConfigDao;
     private final SubAccountDao subAccountDao;
-    PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
-
+    @Resource(name = "e-welfare-paymentQueryAsync")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
-    public <T extends PaymentRequest>T paymentRequest(T paymentRequest) {
-        paymentRequestPerfMonitor.start();
-        ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) SpringBeanUtils.getBean("e-welfare-paymentQueryAsync");
-        Future<PaymentRequest> queryResultFuture = threadPoolTaskExecutor.submit(() -> queryResult(paymentRequest.getTransNo(),paymentRequest.getClass()));
-
+    public <T extends PaymentRequest>T paymentRequest(final T paymentRequest) {
+        Future<? extends PaymentRequest> queryResultFuture = threadPoolTaskExecutor.submit(() -> queryResult(paymentRequest.getTransNo(),paymentRequest.getClass()));
         Long accountCode = paymentRequest.calculateAccountCode();
         Assert.notNull(accountCode, "账号不能为空。");
         String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + accountCode;
@@ -100,45 +97,37 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setAccountMerCode(account.getMerCode());
             RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
             try {
-
                 //整体异步查询
                 Future<SupplierStore> supplierStoreFuture = threadPoolTaskExecutor.submit(() -> supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo()));
                 Future<String> paymentSceneFuture = threadPoolTaskExecutor.submit(paymentRequest::calculatePaymentScene);
-                Future<List<AccountAmountDO>> accountAmountDOFuture =
+                Future<List<AccountAmountDO>> accountAmountDoFuture =
                         threadPoolTaskExecutor.submit(() -> accountAmountTypeService.queryAccountAmountDO(account));
                 Future<MerchantStoreRelation> merchantStoreRelationFuture = threadPoolTaskExecutor.submit(() ->
                         merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(), account.getMerCode()));
                 Future<MerchantCredit> merchantCreditFuture =
                         threadPoolTaskExecutor.submit(() -> merchantCreditService.getByMerCode(account.getMerCode()));
-                Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = threadPoolTaskExecutor.submit(() -> {
-                    List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
-                            .getAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
-                    Assert.isTrue(!CollectionUtils.isEmpty(accountConsumeScenes), "未找到该账户的可用交易场景配置");
-                    List<Long> sceneIds = accountConsumeScenes.stream().map(AccountConsumeScene::getId).collect(Collectors.toList());
-                    return accountConsumeSceneStoreRelationDao
-                            .queryBySceneIdsAndStoreNo(sceneIds, paymentRequest.getStoreNo());
-                });
+                Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();
                 if (WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
                         || WelfareConstant.AsyncStatus.REVERSED.code().equals(requestHandled.getPaymentStatus())) {
                     log.warn("重复的支付请求，直接返回已经处理完成的request{}", JSON.toJSONString(requestHandled));
                     BeanUtils.copyProperties(requestHandled, paymentRequest);
-                    return (T)requestHandled;
+                    @SuppressWarnings("unchecked")
+                    T paymentRequestHandled = (T) requestHandled;
+                    return paymentRequestHandled;
                 }
-
                 SupplierStore supplierStore = supplierStoreFuture.get();
                 List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture.get();
                 String paymentScene = paymentSceneFuture.get();
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
-                List<AccountAmountDO> accountAmountDOList = accountAmountDOFuture.get();
+                List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
-
                 //支付前的校验
                 chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
 
                 String paymentChannel = paymentRequest.getPaymentChannel();
-                List<MerchantBillDetail> merchantBillDetails = null;
+                List<MerchantBillDetail> merchantBillDetails;
                 PaymentChannelOperatorEnum paymentChannelOperatorEnum = PaymentChannelOperatorEnum.findByPaymentChannelStr(paymentChannel);
                 IPaymentOperator paymentOperator = SpringBeanUtils.getBean(paymentChannelOperatorEnum.paymentOperator());
 
@@ -159,17 +148,10 @@ public class PaymentServiceImpl implements PaymentService {
                 //在循环里面已经对merchantCredit进行了更新
                 merchantCreditDao.updateById(merchantCredit);
                 saveDetails(paymentOperations, account, accountAmountTypes);
-
                 if (!CollectionUtils.isEmpty(merchantBillDetails)) {
                     merchantBillDetailDao.saveBatch(merchantBillDetails);
                 }
-
-                paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-                paymentRequest.setAccountName(account.getAccountName());
-                paymentRequest.setAccountBalance(account.getAccountBalance());
-                paymentRequest.setAccountCredit(account.getSurplusQuota().add(account.getSurplusQuotaOverpay()));
-                paymentRequest.setPhone(account.getPhone());
-
+                fillPaymentRequest(paymentRequest, account);
                 if (ConsumeTypeEnum.SHOP_SHOPPING.getCode().equals(paymentRequest.getPaymentScene())) {
                     asyncNotificationService.paymentNotify(paymentRequest.getPhone(), paymentRequest.getAmount());
                 }
@@ -182,22 +164,46 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(accountLock);
-            paymentRequestPerfMonitor.stop();
         }
 
+    }
+
+    private <T extends PaymentRequest> Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationFuture(T paymentRequest, Account account) {
+        return threadPoolTaskExecutor.submit(() -> {
+            List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
+                    .getAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
+            Assert.isTrue(!CollectionUtils.isEmpty(accountConsumeScenes), "未找到该账户的可用交易场景配置");
+            List<Long> sceneIds = accountConsumeScenes.stream().map(AccountConsumeScene::getId).collect(Collectors.toList());
+            return accountConsumeSceneStoreRelationDao
+                    .queryBySceneIdsAndStoreNo(sceneIds, paymentRequest.getStoreNo());
+        });
+    }
+
+    /**
+     * 填充paymentRequest
+     * @param <T> 付款请求类型
+     * @param paymentRequest 付款请求
+     * @param account 账户
+     */
+    private <T extends PaymentRequest> void fillPaymentRequest(T paymentRequest, Account account) {
+        paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+        paymentRequest.setAccountName(account.getAccountName());
+        paymentRequest.setAccountBalance(account.getAccountBalance());
+        paymentRequest.setAccountCredit(account.getSurplusQuota().add(account.getSurplusQuotaOverpay()));
+        paymentRequest.setPhone(account.getPhone());
     }
 
 
     /**
      * 判断消费场景是否符合配置
      *
-     * @param paymentRequest
-     * @param account
-     * @param supplierStore
-     * @param paymentScene
-     * @param sceneStoreRelations
+     * @param paymentRequest 付款请求
+     * @param account 账户
+     * @param supplierStore 门店
+     * @param paymentScene 支付场景
+     * @param sceneStoreRelations 消费场景与门店关联列表
      */
-    private String chargeBeforePay(PaymentRequest paymentRequest, Account account, SupplierStore supplierStore, MerchantStoreRelation merStoreRelation, String paymentScene, List<AccountConsumeSceneStoreRelation> sceneStoreRelations) {
+    private void chargeBeforePay(PaymentRequest paymentRequest, Account account, SupplierStore supplierStore, MerchantStoreRelation merStoreRelation, String paymentScene, List<AccountConsumeSceneStoreRelation> sceneStoreRelations) {
         Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()), "账户未启用");
         Assert.notNull(merStoreRelation, "用户所在组织（公司）不支持在该门店消费或配置已禁用");
         Assert.isTrue(EnableEnum.ENABLE.getCode().equals(merStoreRelation.getStatus()), "用户所在组织（公司）不支持在该门店消费或配置已禁用");
@@ -218,7 +224,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (!sceneConsumeTypes.contains(paymentScene)) {
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
         }
-        return paymentScene;
     }
 
     @Override
@@ -307,8 +312,6 @@ public class PaymentServiceImpl implements PaymentService {
             Assert.notNull(accountCode, "账号不能为空。");
             Account account = accountService.getByAccountCode(accountCode);
             Assert.notNull(account, "未找到账号：" + accountCode);
-            ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) SpringBeanUtils
-                .getBean("e-welfare-paymentQueryAsync");
             Future<SupplierStore> supplierStoreFuture = threadPoolTaskExecutor.submit(
                 () -> supplierStoreService
                     .getSupplierStoreByStoreCode(paymentRequest.getStoreNo()));
@@ -317,40 +320,23 @@ public class PaymentServiceImpl implements PaymentService {
                     merchantStoreRelationDao
                         .getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(),
                             account.getMerCode()));
-            Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = threadPoolTaskExecutor
-                .submit(() -> {
-                    List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
-                        .getAccountTypeAndMerCode(account.getAccountTypeCode(),
-                            account.getMerCode());
-                    Assert
-                        .isTrue(!CollectionUtils.isEmpty(accountConsumeScenes), "未找到该账户的可用交易场景配置");
-                    List<Long> sceneIds = accountConsumeScenes.stream()
-                        .map(AccountConsumeScene::getId).collect(Collectors.toList());
-                    return accountConsumeSceneStoreRelationDao
-                        .queryBySceneIdsAndStoreNo(sceneIds, paymentRequest.getStoreNo());
-                });
+            Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
             Future<String> paymentSceneFuture = threadPoolTaskExecutor
                 .submit(paymentRequest::calculatePaymentScene);
             String merCode = account.getMerCode();
             String storeNo = paymentRequest.getStoreNo();
             String paymentScene = paymentSceneFuture.get();
             String paymentChannel = paymentRequest.getPaymentChannel();
-            Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() -> {
-                List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigDao
-                    .getBaseMapper().selectList(
-                        Wrappers.<PaymentChannelConfig>lambdaQuery()
-                            .eq(PaymentChannelConfig::getMerCode, merCode)
-                            .eq(PaymentChannelConfig::getStoreCode, storeNo)
-                            .eq(PaymentChannelConfig::getConsumeType, paymentScene)
-                            .eq(PaymentChannelConfig::getPaymentChannelCode, paymentChannel));
-                return paymentChannelConfigList;
-            });
-            Future<SubAccount> subAccountFuture = threadPoolTaskExecutor.submit(() -> {
-                SubAccount subAccount = subAccountDao.getBaseMapper().selectOne(
-                    Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
-                        .eq(SubAccount::getSubAccountType, paymentChannel));
-                return subAccount;
-            });
+            Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() -> paymentChannelConfigDao
+                .getBaseMapper().selectList(
+                    Wrappers.<PaymentChannelConfig>lambdaQuery()
+                        .eq(PaymentChannelConfig::getMerCode, merCode)
+                        .eq(PaymentChannelConfig::getStoreCode, storeNo)
+                        .eq(PaymentChannelConfig::getConsumeType, paymentScene)
+                        .eq(PaymentChannelConfig::getPaymentChannelCode, paymentChannel)));
+            Future<SubAccount> subAccountFuture = threadPoolTaskExecutor.submit(() -> subAccountDao.getBaseMapper().selectOne(
+                Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
+                    .eq(SubAccount::getSubAccountType, paymentChannel)));
 
             SupplierStore supplierStore = supplierStoreFuture.get();
             List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture

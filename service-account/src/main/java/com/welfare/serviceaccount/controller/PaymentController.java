@@ -5,6 +5,8 @@ import com.welfare.service.RefundService;
 import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.*;
+import com.welfare.serviceaccount.controller.dto.PaymentNotification;
+import com.welfare.serviceaccount.controller.dto.PaymentNotificationContent;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -93,6 +95,15 @@ public class PaymentController implements IController {
         ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = paymentService
             .thirdPartyBarcodePaymentSceneCheck(paymentRequest);
         return success(thirdPartyBarcodePaymentDTO);
+    }
+
+    @PostMapping("/password-free/notification")
+    @ApiOperation("免密支付成功通知接口")
+    public R<PaymentRequest> paymentNotification(@RequestBody PaymentNotification paymentNotification){
+        PaymentNotificationContent paymentNotificationContent = paymentNotification.parseContent();
+        PaymentRequest paymentRequest = paymentNotificationContent.toPaymentRequest();
+        paymentService.paymentRequest(paymentRequest);
+        return success(paymentRequest);
     }
 
 }

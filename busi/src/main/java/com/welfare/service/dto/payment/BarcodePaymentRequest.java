@@ -39,7 +39,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
         if(!Objects.isNull(super.getAccountCode())){
             return super.getAccountCode();
         }
-        calculatePaymentChannelByBarcode();
+        this.paymentChannel = calculatePaymentChannelByBarcode(this.barcode);
         BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
         RedisTemplate<String,String> redisTemplate = SpringBeanUtils.getBean(StringRedisTemplate.class);
         String expireSecs = SpringBeanUtils.getApplicationContext()
@@ -56,19 +56,18 @@ public class BarcodePaymentRequest extends PaymentRequest {
         return accountCode;
     }
 
-    private String calculatePaymentChannelByBarcode() {
+    public static String calculatePaymentChannelByBarcode(final String barcode) {
         if(barcode.startsWith(WelfareConstant.PaymentChannel.WELFARE.barcodePrefix())){
-            this.setPaymentChannel(WelfareConstant.PaymentChannel.WELFARE.code());
+            return WelfareConstant.PaymentChannel.WELFARE.code();
         }else if(barcode.startsWith(WelfareConstant.PaymentChannel.WO_LIFE.barcodePrefix())){
-            this.setPaymentChannel(WelfareConstant.PaymentChannel.WO_LIFE.code());
+            return WelfareConstant.PaymentChannel.WO_LIFE.code();
         }else if(barcode.startsWith(WelfareConstant.PaymentChannel.WECHAT.barcodePrefix())){
-            this.setPaymentChannel(WelfareConstant.PaymentChannel.WECHAT.code());
+            return WelfareConstant.PaymentChannel.WECHAT.code();
         }else if(barcode.startsWith(WelfareConstant.PaymentChannel.ALIPAY.barcodePrefix())){
-            this.setPaymentChannel(WelfareConstant.PaymentChannel.ALIPAY.code());
+            return WelfareConstant.PaymentChannel.ALIPAY.code();
         }else{
             throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "条码不符合规则", null);
         }
-        return paymentChannel;
     }
 
 

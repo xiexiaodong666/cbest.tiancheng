@@ -67,6 +67,7 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
         contact.setContactPerson(req.getContactPerson());
         contact.setContact(req.getContact());
         contact.setConfigCode(config.getConfigCode());
+        contact.setCreateUser(MerchantUserHolder.getMerchantUser().getUserCode());
         boolean flag = messagePushConfigContactDao.save(contact);
         // 推送给智慧食堂
         if (flag) {
@@ -90,6 +91,7 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
         contact.setContact(req.getContact());
         contact.setContactPerson(req.getContactPerson());
         contact.setPushTime(String.join(";", req.getPushTimes()));
+        contact.setUpdateUser(MerchantUserHolder.getMerchantUser().getUserCode());
         boolean flag = messagePushConfigContactDao.updateById(contact);
         // 推送给智慧食堂
         if (flag) {
@@ -107,6 +109,7 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
         // 推送给智慧食堂
         if (flag) {
             contact.setDeleted(Boolean.TRUE);
+            contact.setUpdateUser(MerchantUserHolder.getMerchantUser().getUserCode());
             applicationContext.publishEvent(MessagePushConfigEvt.builder().contact(contact).build());
         }
         return flag;

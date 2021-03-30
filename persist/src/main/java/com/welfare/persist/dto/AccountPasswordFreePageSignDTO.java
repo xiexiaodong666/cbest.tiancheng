@@ -5,9 +5,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("免密签约")
+@ApiModel("免密支付签约(页面跳转方式）")
 public class AccountPasswordFreePageSignDTO {
 
-    @ApiModelProperty(name = "签约页面")
+    @ApiModelProperty("签约页面")
     private String signPage;
 }

@@ -121,10 +121,26 @@ public interface AccountService {
   void batchRestoreCreditLimit(AccountRestoreCreditLimitReq creditLimitReq);
 
   /**
-   * 免密签约
+   * 免密签约(页面跳转方式）
+   * @param accountCode
+   * @param paymentChannel
+   * @return
+   */
+  AccountPasswordFreePageSignDTO passwordFreePageSign(Long accountCode, String paymentChannel);
+
+  /**
+   * 免密签约(APP、小程序或JSAPI）
    * @param accountCode
    * @param paymentChannel
    * @return
    */
   AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel);
+
+  /**
+   * 免密解约(APP、小程序或JSAPI）
+   * @param accountCode
+   * @param paymentChannel
+   * @return
+   */
+  AccountPasswordFreeSignDTO passwordFreeUnsign(Long accountCode, String paymentChannel);
 }

@@ -44,6 +44,8 @@ import com.welfare.service.remote.entity.AlipayUserAgreementPageSignReq;
 import com.welfare.service.remote.entity.AlipayUserAgreementPageSignResp;
 import com.welfare.service.remote.entity.AlipayUserAgreementSignReq;
 import com.welfare.service.remote.entity.AlipayUserAgreementSignResp;
+import com.welfare.service.remote.entity.AlipayUserAgreementUnsignReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementUnsignResp;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
 import com.welfare.service.remote.service.CbestPayService;
@@ -1332,10 +1334,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel) {
-        WelfareConstant.PaymentChannel paymentChannelEnum =
-            StrUtil.isEmpty(paymentChannel) ? WelfareConstant.PaymentChannel.WELFARE
-                : PAYMENT_CHANNEL_MAP.get(paymentChannel);
+    public AccountPasswordFreePageSignDTO passwordFreePageSign(Long accountCode, String paymentChannel) {
+        WelfareConstant.PaymentChannel paymentChannelEnum = PAYMENT_CHANNEL_MAP.get(paymentChannel);
         String signPage;
         switch (paymentChannelEnum) {
             case ALIPAY:
@@ -1350,8 +1350,56 @@ public class AccountServiceImpl implements AccountService {
                 throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
         }
 
+        AccountPasswordFreePageSignDTO accountPasswordFreePageSignDTO = new AccountPasswordFreePageSignDTO();
+        accountPasswordFreePageSignDTO.setSignPage(signPage);
+        return accountPasswordFreePageSignDTO;
+    }
+
+    @Override
+    public AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel) {
+        WelfareConstant.PaymentChannel paymentChannelEnum = PAYMENT_CHANNEL_MAP.get(paymentChannel);
         AccountPasswordFreeSignDTO accountPasswordFreeSignDTO = new AccountPasswordFreeSignDTO();
-        accountPasswordFreeSignDTO.setSignPage(signPage);
+        switch (paymentChannelEnum) {
+            case ALIPAY:
+                Account account = getByAccountCode(accountCode);
+                AlipayUserAgreementSignReq req = new AlipayUserAgreementSignReq();
+                req.setExternalLogonId(String.valueOf(accountCode));
+                AlipayUserAgreementSignResp alipayUserAgreementSignResp = cbestPayService
+                    .alipayUserAgreementSign(account.getMerCode(), req);
+                String signParams = alipayUserAgreementSignResp.getSignParams();
+                String signUrl = alipayUserAgreementSignResp.getSignUrl();
+                accountPasswordFreeSignDTO.setSignUrl(signUrl);
+                accountPasswordFreeSignDTO.setSignParams(signParams);
+                break;
+            default:
+                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
+        }
+        return accountPasswordFreeSignDTO;
+    }
+
+    @Override
+    public AccountPasswordFreeSignDTO passwordFreeUnsign(Long accountCode, String paymentChannel) {
+        WelfareConstant.PaymentChannel paymentChannelEnum = PAYMENT_CHANNEL_MAP.get(paymentChannel);
+        AccountPasswordFreeSignDTO accountPasswordFreeSignDTO = new AccountPasswordFreeSignDTO();
+        switch (paymentChannelEnum) {
+            case ALIPAY:
+                Account account = getByAccountCode(accountCode);
+                AlipayUserAgreementUnsignReq req = new AlipayUserAgreementUnsignReq();
+                SubAccount subAccount = subAccountDao.getBaseMapper().selectOne(
+                    Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
+                        .eq(SubAccount::getSubAccountType,
+                            WelfareConstant.PaymentChannel.ALIPAY.code()));
+                req.setAgreementNo(subAccount.getPasswordFreeSignature());
+                AlipayUserAgreementUnsignResp alipayUserAgreementUnsignResp = cbestPayService
+                    .alipayUserAgreementUnsign(account.getMerCode(), req);
+                String signParams = alipayUserAgreementUnsignResp.getSignParams();
+                String signUrl = alipayUserAgreementUnsignResp.getSignUrl();
+                accountPasswordFreeSignDTO.setSignUrl(signUrl);
+                accountPasswordFreeSignDTO.setSignParams(signParams);
+                break;
+            default:
+                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密解约", null);
+        }
         return accountPasswordFreeSignDTO;
     }
 }

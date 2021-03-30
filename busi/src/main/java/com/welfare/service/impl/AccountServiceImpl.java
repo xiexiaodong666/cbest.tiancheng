@@ -40,6 +40,8 @@ import com.welfare.service.enums.AccountBalanceType.WoLife;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.remote.ShoppingFeignClient;
+import com.welfare.service.remote.entity.AlipayUserAgreementPageSignReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementPageSignResp;
 import com.welfare.service.remote.entity.AlipayUserAgreementSignReq;
 import com.welfare.service.remote.entity.AlipayUserAgreementSignResp;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
@@ -1334,22 +1336,22 @@ public class AccountServiceImpl implements AccountService {
         WelfareConstant.PaymentChannel paymentChannelEnum =
             StrUtil.isEmpty(paymentChannel) ? WelfareConstant.PaymentChannel.WELFARE
                 : PAYMENT_CHANNEL_MAP.get(paymentChannel);
-        String signUrl;
+        String signPage;
         switch (paymentChannelEnum) {
             case ALIPAY:
                 Account account = getByAccountCode(accountCode);
-                AlipayUserAgreementSignReq req = new AlipayUserAgreementSignReq();
+                AlipayUserAgreementPageSignReq req = new AlipayUserAgreementPageSignReq();
                 req.setExternalLogonId(String.valueOf(accountCode));
-                AlipayUserAgreementSignResp alipayUserAgreementSignResp = cbestPayService
-                    .alipayUserAgreementSign(account.getMerCode(), req);
-                signUrl = alipayUserAgreementSignResp.getSignUrl();
+                AlipayUserAgreementPageSignResp alipayUserAgreementPageSignResp = cbestPayService
+                    .alipayUserAgreementPageSign(account.getMerCode(), req);
+                signPage = alipayUserAgreementPageSignResp.getSignPage();
                 break;
             default:
                 throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
         }
 
         AccountPasswordFreeSignDTO accountPasswordFreeSignDTO = new AccountPasswordFreeSignDTO();
-        accountPasswordFreeSignDTO.setSignUrl(signUrl);
+        accountPasswordFreeSignDTO.setSignPage(signPage);
         return accountPasswordFreeSignDTO;
     }
 }

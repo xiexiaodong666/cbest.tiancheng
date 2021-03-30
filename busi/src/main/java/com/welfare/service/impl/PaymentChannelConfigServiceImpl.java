@@ -50,6 +50,8 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
     private DictService dictService;
     @Override
     public Page<PayChannelConfigSimpleDTO> simplePage(PayChannelConfigSimpleReq req) {
+        List<PaymentChannelDTO> defaultList = paymentChannelService.defaultList();
+        String defaultStr = defaultList.stream().map(PaymentChannelDTO::getName).collect(Collectors.joining(" / "));
         Page<PayChannelConfigSimple> page = new Page<>(req.getCurrent(), req.getSize());
         paymentChannelConfigDao.getBaseMapper().simplePage(page, req.getMerchantName());
         List<PayChannelConfigSimpleDTO> list = new ArrayList<>();
@@ -57,6 +59,9 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
             page.getRecords().forEach(payChannelConfigSimple -> {
                 PayChannelConfigSimpleDTO dto = new PayChannelConfigSimpleDTO();
                 BeanUtils.copyProperties(payChannelConfigSimple, dto);
+                if (StringUtils.isEmpty(dto.getPaymentChannels())) {
+                    dto.setPaymentChannels(defaultStr);
+                }
                 list.add(dto);
             });
         }

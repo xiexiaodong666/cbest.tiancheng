@@ -68,4 +68,12 @@ public interface CbestPayService {
      * @return
      */
     AlipayUserAgreementUnsignResp alipayUserAgreementUnsign(String market, AlipayUserAgreementUnsignReq req);
+
+    /**
+     * 代扣签约(页面跳转方式）
+     * @param market
+     * @param req
+     * @return
+     */
+    AlipayUserAgreementPageSignResp alipayUserAgreementPageSign(String market, AlipayUserAgreementPageSignReq req);
 }

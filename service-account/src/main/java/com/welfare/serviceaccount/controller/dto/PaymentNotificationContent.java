@@ -8,6 +8,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ public class PaymentNotificationContent implements Serializable {
         barcodePaymentRequest.setBarcode(barcode);
         barcodePaymentRequest.setPaymentChannel(paymentChannel);
         barcodePaymentRequest.setRequestId(UUID.randomUUID().toString());
-        barcodePaymentRequest.setScanDate(scanDate);
+        barcodePaymentRequest.setScanDate(Calendar.getInstance().getTime());
         //重百付调用时候金额为分，甜橙处理逻辑是按照元处理
         barcodePaymentRequest.setAmount(totalAmount.divide(BigDecimal.valueOf(100L),2, RoundingMode.HALF_UP));
         barcodePaymentRequest.setMachineNo(terminal);

@@ -44,7 +44,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
         RedisTemplate<String,String> redisTemplate = SpringBeanUtils.getBean(StringRedisTemplate.class);
         String expireSecs = SpringBeanUtils.getApplicationContext()
                 .getEnvironment()
-                .getProperty("e-welfare.barcode.expire", "600");
+                .getProperty("e-welfare.barcode.expire-for-pay", "240");
         String barcodeInRedis = redisTemplate.opsForValue().get("BARCODE:" + barcode);
         if(!StringUtils.isEmpty(barcodeInRedis) && !isNotification()){
             //在不是“支付成功通知”的情况下，需要校验支付码是否已经被使用过了

@@ -43,10 +43,18 @@ public class BarcodeServiceImpl implements BarcodeService {
      */
     private static final Long MAX_PERIOD_GENERATE = 30L;
     private static final int MILL_SEC_A_DAY = (86400 * 1000);
-    private static final String BARCODE_PREFIX = "e-welfare-barcode";
-    @Value("${e-welfare.barcode.expire:600}")
-    private Long barcodeExpireInRedisSecs;
-
+    private static final String BARCODE_PREFIX = "e-welfare-barcode-for-pay";
+    private static final String BARCODE_NOTIFICATION_PREFIX = "e-welfare-barcode-for-notification";
+    /**
+     *  条码用于支付成功通知过期时间
+     */
+    @Value("${e-welfare.barcode.expire-for-notification:3600}")
+    private Long barcodeExpireForNotification;
+    /**
+     *  条码用于支付过期时间
+     */
+    @Value("${e-welfare.barcode.expire-for-pay:240}")
+    private long barcodeExpireForPay;
     private final BarcodeSaltDao barcodeSaltDao;
     private final RedissonClient redissonClient;
     /**
@@ -138,9 +146,15 @@ public class BarcodeServiceImpl implements BarcodeService {
         Date generatedDate = Calendar.getInstance().getTime();
         BarcodeSalt barcodeSalt =  queryPeriodSaltValue(generatedDate);
         PaymentBarcode paymentBarcode = PaymentBarcode.of(accountCode, barcodeSalt.getSaltValue(), paymentChannel, generatedDate);
+        //两次操作redis，没有事务一致性需求，如果某次操作失败，则用户重新刷新条码
         redisTemplate.opsForValue().set(
                 BARCODE_PREFIX + paymentBarcode.getBarcode(),
-                paymentBarcode, barcodeExpireInRedisSecs,
+                paymentBarcode, barcodeExpireForPay,
+                TimeUnit.SECONDS
+        );
+        redisTemplate.opsForValue().set(
+                BARCODE_NOTIFICATION_PREFIX + paymentBarcode.getBarcode(),
+                paymentBarcode, barcodeExpireForNotification,
                 TimeUnit.SECONDS
         );
         return paymentBarcode;

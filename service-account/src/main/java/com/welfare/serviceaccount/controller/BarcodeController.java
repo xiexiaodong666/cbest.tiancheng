@@ -67,11 +67,4 @@ public class BarcodeController implements IController {
                         .collect(Collectors.toList())
         );
     }
-
-    @GetMapping("/batch-generate-salt")
-    @ApiOperation("每天批量生成缺失的period")
-    public R<Void> batchGenerateSalt(){
-        barcodeService.batchGenerateSalt();
-        return success();
-    }
 }

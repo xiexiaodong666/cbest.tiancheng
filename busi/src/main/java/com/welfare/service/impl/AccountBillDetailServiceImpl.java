@@ -45,7 +45,8 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
 
     private final AccountDao accountDao;
 
-    private final MerchantService merchantService;
+    @Autowired
+    private MerchantService merchantService;
 
     /**
      * 循环依赖问题，所以未采用构造器注入

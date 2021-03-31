@@ -6,6 +6,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.Channel;
 import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.persist.dao.AccountBillDetailDao;
+import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dto.AccountBillDetailSimpleDTO;
 import com.welfare.persist.dto.query.AccountBillDetailSimpleReq;
 import com.welfare.persist.entity.Account;
@@ -42,7 +43,7 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
 
     private final AccountBillDetailDao accountBillDetailDao;
 
-    private final AccountService accountService;
+    private final AccountDao accountDao;
 
     private final MerchantService merchantService;
 
@@ -93,8 +94,8 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
         AccountBillDetailSimpleReq accountBillDetailSimpleReq) {
         List<AccountBillDetailSimpleDTO> accountBillDetailSimpleDTOList = accountBillDetailDao
             .getBaseMapper().selectAccountBillDetailSimpleList(accountBillDetailSimpleReq);
-        Account account = accountService
-            .getByAccountCode(accountBillDetailSimpleReq.getAccountCode());
+        Account account = accountDao
+            .queryByAccountCode(accountBillDetailSimpleReq.getAccountCode());
         Merchant merchant = merchantService
             .getMerchantByMerCode(account.getMerCode());
         String billDetailShowStoreName = merchant.getBillDetailShowStoreName();

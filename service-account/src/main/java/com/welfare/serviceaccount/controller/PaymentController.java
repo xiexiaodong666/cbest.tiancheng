@@ -1,10 +1,12 @@
 package com.welfare.serviceaccount.controller;
 
+import com.welfare.service.AccountPaymentResultService;
 import com.welfare.service.PaymentService;
 import com.welfare.service.RefundService;
 import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.*;
+import com.welfare.service.remote.entity.CbestPayBaseResp;
 import com.welfare.serviceaccount.controller.dto.PaymentNotification;
 import com.welfare.serviceaccount.controller.dto.PaymentNotificationContent;
 import io.swagger.annotations.Api;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController implements IController {
     private final PaymentService paymentService;
     private final RefundService refundService;
+    private final AccountPaymentResultService accountPaymentResultService;
 
     @PostMapping("/online")
     @ApiOperation("线上支付")
@@ -100,6 +104,10 @@ public class PaymentController implements IController {
     @PostMapping("/password-free/notification")
     @ApiOperation("免密支付成功通知接口")
     public R<PaymentRequest> paymentNotification(@RequestBody PaymentNotification paymentNotification){
+        //缓存支付通知结果，员工卡H5端会轮训查询支付结果
+        CbestPayBaseResp cbestPayBaseResp = new CbestPayBaseResp();
+        BeanUtils.copyProperties(paymentNotification, cbestPayBaseResp);
+        accountPaymentResultService.thirdPartyPaymentResultNotify(cbestPayBaseResp);
         PaymentNotificationContent paymentNotificationContent = paymentNotification.parseContent();
         PaymentRequest paymentRequest = paymentNotificationContent.toPaymentRequest();
         paymentService.paymentRequest(paymentRequest);

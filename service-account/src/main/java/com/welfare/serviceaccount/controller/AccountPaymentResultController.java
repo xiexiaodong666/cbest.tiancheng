@@ -45,13 +45,6 @@ public class AccountPaymentResultController implements IController {
         return success(accountPaymentResultService.queryBarcodePaymentResult(req));
     }
 
-    @ApiOperation("第三方支付结果通知")
-    @PostMapping("/thirdPartyPaymentResultNotify")
-    public R thirdPartyPaymentResultNotify(@RequestBody CbestPayBaseResp resp) {
-        accountPaymentResultService.thirdPartyPaymentResultNotify(resp);
-        return success();
-    }
-
     @ApiOperation("第三方交易创建通知")
     @PostMapping("/createThirdPartyPaymentNotify")
     public R createThirdPartyPaymentNotify(@RequestBody CbestPayBaseResp resp) {

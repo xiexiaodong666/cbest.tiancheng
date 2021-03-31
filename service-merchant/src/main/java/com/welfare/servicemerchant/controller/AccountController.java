@@ -75,12 +75,45 @@ public class AccountController implements IController {
     return success(accountService.queryIncrementDTO(accountIncrementReq));
   }
 
+  @PostMapping("/page/merchant")
+  @ApiOperation("商户端分页查询账户")
+  public R<AccountPage<AccountDTO>> merchantPageQuery(@RequestBody
+      AccountPageReq accountPageReq) {
+
+    AccountPage<AccountDTO> accountDTOAccountPage = new AccountPage<>();
+
+    if(accountPageReq.getAccountBalanceMin() != null && accountPageReq.getAccountBalanceMax() != null) {
+      if(accountPageReq.getAccountBalanceMin().compareTo(accountPageReq.getAccountBalanceMax()) > 0) {
+        return success(accountDTOAccountPage);
+      }
+    }
+
+    if(accountPageReq.getSurplusQuotaMin() != null && accountPageReq.getSurplusQuotaMax() != null) {
+      if(accountPageReq.getSurplusQuotaMin().compareTo(accountPageReq.getSurplusQuotaMax()) > 0) {
+        return success(accountDTOAccountPage);
+      }
+    }
+
+    Page<AccountPageDTO> page = new Page<>(accountPageReq.getCurrentPage(), accountPageReq.getPageSize());
+
+    Page<AccountDTO> accountPage = accountService.getPageDTO(page, accountPageReq);
+    accountDTOAccountPage.setRecords(accountPage.getRecords());
+    accountDTOAccountPage.setTotal(accountPage.getTotal());
+    accountDTOAccountPage.setSize(accountPage.getSize());
+    accountDTOAccountPage.setCurrent(accountPage.getCurrent());
+    if(CollectionUtils.isNotEmpty(accountDTOAccountPage.getRecords())) {
+      accountDTOAccountPage.setExt(accountService.getPageExtDTO(accountPageReq));
+    }
+
+    return success(accountDTOAccountPage);
+  }
+
   @GetMapping("/page")
   @ApiOperation("分页查询账户")
   public R<Page<AccountDTO>> pageQuery(@RequestParam @ApiParam("当前页") Integer currentPage,
       @RequestParam @ApiParam("单页大小") Integer pageSize,
       AccountPageReq accountPageReq) {
-    Page<AccountPageDTO> page = new Page(currentPage, pageSize);
+    Page<AccountPageDTO> page = new Page<>(currentPage, pageSize);
     Page<AccountDTO> accountPage = accountService.getPageDTO(page, accountPageReq);
     return success(accountPage);
   }
@@ -161,6 +194,14 @@ public class AccountController implements IController {
   @ApiOperation("员工账号导出")
   @GetMapping(value = "/exportAccount")
   public R<String> exportAccount(AccountPageReq accountPageReq) throws IOException {
+    List<AccountDTO> accountDTOList = accountService.export(accountPageReq);
+    String path = fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号");
+    return success(fileUploadService.getFileServerUrl(path));
+  }
+
+  @ApiOperation("商户员工账号导出")
+  @PostMapping(value = "/exportAccount/merchant")
+  public R<String> exportMerchantAccount(@RequestBody AccountPageReq accountPageReq) throws IOException {
     List<AccountDTO> accountDTOList = accountService.export(accountPageReq);
     String path = fileUploadService.uploadExcelFile(accountDTOList, AccountDTO.class, "员工账号");
     return success(fileUploadService.getFileServerUrl(path));

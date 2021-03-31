@@ -309,7 +309,7 @@ public class AccountDepositRecordServiceImpl extends
                     } else if (CbestPayRespStatusConstant
                         .FAIL.equals(tradeCancelBizStatus)) {
                         accountDepositRecord.setPayStatus(
-                            AccountRechargePaymentStatusEnum.REFUND_SUCCESS.getCode());
+                            AccountRechargePaymentStatusEnum.REFUND_FAILURE.getCode());
                         log.error(StrUtil.format("支付交易流水号[{}]调用支付冲正接口失败", payTradeNo));
                         updateById(accountDepositRecord);
                     } else {

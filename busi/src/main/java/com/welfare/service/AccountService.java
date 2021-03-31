@@ -26,6 +26,8 @@ public interface AccountService {
   Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
       AccountPageReq accountPageReq);
 
+  AccountPageExtDTO getPageExtDTO(AccountPageReq accountPageReq);
+
   List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq);
 
   Account findByPhone(String phone,String merCode);

@@ -238,6 +238,7 @@ public class MerchantServiceImpl implements MerchantService {
         entity.setMerCooperationMode(merchant.getMerCooperationMode());
         entity.setUpdateUser(merchant.getUpdateUser());
         entity.setRemark(merchant.getRemark());
+        entity.setBillDetailShowStoreName(merchant.getBillDetailShowStoreName());
         return entity;
     }
 

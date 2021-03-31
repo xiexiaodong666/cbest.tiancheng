@@ -5,10 +5,15 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.PaymentChannel;
+import com.welfare.common.constants.WelfareConstant.TransType;
+import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.SubAccountDao;
+import com.welfare.persist.dto.ThirdPartyPaymentRequestDao;
 import com.welfare.persist.entity.SubAccount;
+import com.welfare.persist.entity.ThirdPartyPaymentRequest;
 import com.welfare.service.AccountPaymentResultService;
 import com.welfare.service.BarcodeService;
 import com.welfare.service.dto.BarcodePaymentNotifyReq;
@@ -40,6 +45,9 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
 
     @Resource
     private SubAccountDao subAccountDao;
+
+    @Resource
+    private ThirdPartyPaymentRequestDao thirdPartyPaymentRequestDao;
 
     public static final String KEY_PREFIX = "e-welfare_account_payment_result:{}:{}";
 
@@ -91,36 +99,99 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
 
     @Override
     public void thirdPartyPaymentResultNotify(CbestPayBaseResp resp) {
-        if (CbestPayRespStatusConstant.SUCCESS.equals(resp.getStatus())) {
-            String bizContent = resp.getBizContent();
-            ThirdPartyPaymentResultNotifyReq thirdPartyPaymentResultNotifyReq = JSON
-                .parseObject(bizContent, ThirdPartyPaymentResultNotifyReq.class);
-            BarcodePaymentNotifyReq req = new BarcodePaymentNotifyReq();
-            BeanUtils.copyProperties(thirdPartyPaymentResultNotifyReq, req);
-            req.setTotalAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalAmount()));
-            req.setActualAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getActualAmount()));
-            req.setTotalDiscountAmount(
-                fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalDiscountAmount()));
-            String barcode = thirdPartyPaymentResultNotifyReq.getBarcode();
-            BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
-            Long accountCode = barcodeService
-                .parseAccountFromBarcode(barcode, Calendar.getInstance().getTime(), true, false);
-            RBucket<BarcodePaymentNotifyReq> bucket = redissonClient.<BarcodePaymentNotifyReq>getBucket(
-                StrUtil.format(KEY_PREFIX, accountCode, barcode));
-            bucket.set(req, 1, TimeUnit.MINUTES);
+        String status = resp.getStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(status)) {
+            log.error("第三方支付结果通知返回非成功状态， resp: {}", JSON.toJSONString(resp));
         }
+        String bizStatus = resp.getBizStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
+            log.error("第三方支付结果通知业务状态返回非成功状态， resp: {}", JSON.toJSONString(resp));
+            return;
+        }
+        String bizContent = resp.getBizContent();
+        ThirdPartyPaymentResultNotifyReq thirdPartyPaymentResultNotifyReq = JSON
+            .parseObject(bizContent, ThirdPartyPaymentResultNotifyReq.class);
+        BarcodePaymentNotifyReq req = new BarcodePaymentNotifyReq();
+        BeanUtils.copyProperties(thirdPartyPaymentResultNotifyReq, req);
+        req.setTotalAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalAmount()));
+        req.setActualAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getActualAmount()));
+        req.setTotalDiscountAmount(
+            fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalDiscountAmount()));
+        String barcode = thirdPartyPaymentResultNotifyReq.getBarcode();
+        Long accountCode = calculateAccountCode(barcode);
+        //缓存第三方支付结果通知
+        RBucket<BarcodePaymentNotifyReq> bucket = redissonClient.<BarcodePaymentNotifyReq>getBucket(
+            StrUtil.format(KEY_PREFIX, accountCode, barcode));
+        bucket.set(req, 1, TimeUnit.MINUTES);
+
+        //更新第三方交易状态为成功
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestDao
+            .getBaseMapper().selectOne(
+                Wrappers.<ThirdPartyPaymentRequest>lambdaQuery()
+                    .eq(ThirdPartyPaymentRequest::getTransNo,
+                        thirdPartyPaymentResultNotifyReq.getTradeNo())
+                    .eq(ThirdPartyPaymentRequest::getAccountCode, accountCode)
+                    .eq(ThirdPartyPaymentRequest::getTransType,
+                        TransType.CONSUME.code()));
+        thirdPartyPaymentRequest.setResponse(JSON.toJSONString(req));
+        thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+        thirdPartyPaymentRequestDao.updateById(thirdPartyPaymentRequest);
+    }
+
+    private Long calculateAccountCode(String barcode) {
+        BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
+        Long accountCode = barcodeService
+            .parseAccountFromBarcode(barcode, Calendar.getInstance().getTime(), true, false);
+        return accountCode;
     }
 
     @Override
     public void createThirdPartyPaymentNotify(CbestPayBaseResp resp) {
-        if (CbestPayRespStatusConstant.SUCCESS.equals(resp.getStatus())) {
-            String bizContent = resp.getBizContent();
-            CreateThirdPartyPaymentNotifyReq req = JSON
-                .parseObject(bizContent, CreateThirdPartyPaymentNotifyReq.class);
-            RBucket<CreateThirdPartyPaymentNotifyReq> bucket = redissonClient.<CreateThirdPartyPaymentNotifyReq>getBucket(
-                StrUtil.format(CREATE_THIRD_PARTY_PAYMENT_KEY_PREFIX, req.getBarcode()));
-            bucket.set(req, 1, TimeUnit.MINUTES);
+        String status = resp.getStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(status)) {
+            log.error("第三方交易创建通知返回非成功状态， resp: {}", JSON.toJSONString(resp));
         }
+        String bizStatus = resp.getBizStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
+            log.error("第三方交易创建通知业务状态返回非成功状态， resp: {}", JSON.toJSONString(resp));
+            return;
+        }
+        String bizContent = resp.getBizContent();
+        CreateThirdPartyPaymentNotifyReq req = JSON
+            .parseObject(bizContent, CreateThirdPartyPaymentNotifyReq.class);
+        //缓存第三方交易创建通知
+        RBucket<CreateThirdPartyPaymentNotifyReq> bucket = redissonClient.<CreateThirdPartyPaymentNotifyReq>getBucket(
+            StrUtil.format(CREATE_THIRD_PARTY_PAYMENT_KEY_PREFIX, req.getBarcode()));
+        bucket.set(req, 1, TimeUnit.MINUTES);
+
+        //保存第三方交易为支付中
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = buildThirdPartyPaymentRequest(req);
+        thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
+    }
+
+    private ThirdPartyPaymentRequest buildThirdPartyPaymentRequest(
+        CreateThirdPartyPaymentNotifyReq req) {
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
+        thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(req));
+        thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.HANDLING.code());
+        thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
+        String barcode = req.getBarcode();
+        Long accountCode = calculateAccountCode(barcode);
+        thirdPartyPaymentRequest.setAccountCode(accountCode);
+        thirdPartyPaymentRequest.setTransType(WelfareConstant.TransType.CONSUME.code());
+        thirdPartyPaymentRequest.setPaymentTypeInfo(barcode);
+        thirdPartyPaymentRequest.setTransNo(req.getTradeNo());
+        String amount = req.getAmount();
+        thirdPartyPaymentRequest
+            .setTransAmount(amount == null ? null : new BigDecimal(fenToYuan(amount)));
+        if (barcode.startsWith(WelfareConstant.PaymentChannel.WECHAT.barcodePrefix())) {
+            thirdPartyPaymentRequest
+                .setPaymentChannel(WelfareConstant.PaymentChannel.WECHAT.code());
+        } else if (barcode.startsWith(WelfareConstant.PaymentChannel.ALIPAY.barcodePrefix())) {
+            thirdPartyPaymentRequest
+                .setPaymentChannel(WelfareConstant.PaymentChannel.ALIPAY.code());
+        }
+        return thirdPartyPaymentRequest;
     }
 
     @Override
@@ -144,9 +215,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
         Long accountCode = Long.valueOf(externalLogonId);
         String subAccountType = PaymentChannel.ALIPAY.code();
         if ("NORMAL".equals(status)) {
-
             String passwordFreeSignature = resp.getAgreementNo();
-
             SubAccount subAccount = subAccountDao
                 .getByAccountCodeAndType(accountCode, subAccountType);
             subAccount.setPasswordFreeSignature(passwordFreeSignature);

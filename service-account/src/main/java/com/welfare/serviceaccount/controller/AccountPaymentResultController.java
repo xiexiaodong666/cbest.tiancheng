@@ -10,6 +10,7 @@ import com.welfare.service.dto.CreateThirdPartyPaymentDTO;
 import com.welfare.service.dto.CreateThirdPartyPaymentReq;
 import com.welfare.service.remote.entity.AlipayUserAgreementQueryResp;
 import com.welfare.service.remote.entity.CbestPayBaseResp;
+import com.welfare.service.remote.entity.CbestPayRespStatusConstant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +48,9 @@ public class AccountPaymentResultController implements IController {
 
     @ApiOperation("第三方交易创建通知")
     @PostMapping("/createThirdPartyPaymentNotify")
-    public R createThirdPartyPaymentNotify(@RequestBody CbestPayBaseResp resp) {
+    public String createThirdPartyPaymentNotify(@RequestBody CbestPayBaseResp resp) {
         accountPaymentResultService.createThirdPartyPaymentNotify(resp);
-        return success();
+        return CbestPayRespStatusConstant.SUCCESS;
     }
 
     @ApiOperation("第三方交易创建")
@@ -63,9 +64,9 @@ public class AccountPaymentResultController implements IController {
 
     @ApiOperation("第三方签约或解约结果通知")
     @PostMapping("/thirdPartySignResultNotify")
-    public R thirdPartySignResultNotify(@RequestBody AlipayUserAgreementQueryResp resp) {
+    public String thirdPartySignResultNotify(@RequestBody AlipayUserAgreementQueryResp resp) {
         accountPaymentResultService.thirdPartySignResultNotify(resp);
-        return success();
+        return CbestPayRespStatusConstant.SUCCESS;
     }
 
 }

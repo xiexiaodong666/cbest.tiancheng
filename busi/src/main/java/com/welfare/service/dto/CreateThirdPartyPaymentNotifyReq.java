@@ -16,6 +16,8 @@ public class CreateThirdPartyPaymentNotifyReq {
 
     private String market;
 
+    private String amount;
+
     @JSONField(name = "order_string")
     private String orderString;
 }

@@ -1,6 +1,9 @@
 package com.welfare.service.payment;
 
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.*;
+import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WelfarePaymentOperator implements IPaymentOperator{
     private final CurrentBalanceOperator currentBalanceOperator;
+    private final AsyncService asyncService;
     @Override
     public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
         BigDecimal usableAmount = account.getAccountBalance()
@@ -35,7 +39,9 @@ public class WelfarePaymentOperator implements IPaymentOperator{
                 .add(account.getSurplusQuotaOverpay()==null?BigDecimal.ZERO:account.getSurplusQuotaOverpay());
         BigDecimal amount = paymentRequest.getAmount();
         boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-        Assert.isTrue(enough, "用户账户总余额不足");
+        if(!enough){
+            onInsufficientBalance(paymentRequest,account);
+        }
         Assert.notEmpty(accountAmountDOList,"用户没有可用的福利类型");
         BigDecimal allTypeBalance = accountAmountDOList.stream()
                 .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
@@ -108,6 +114,13 @@ public class WelfarePaymentOperator implements IPaymentOperator{
         paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
         return paymentOperation;
 
+    }
+
+    private void onInsufficientBalance(PaymentRequest paymentRequest, Account account) {
+        if(paymentRequest.getOffline()){
+            asyncService.onInsufficientBalanceOffline(account, paymentRequest);
+        }
+        throw new BizException(ExceptionCode.INSUFFICIENT_BALANCE);
     }
 
 

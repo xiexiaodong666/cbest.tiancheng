@@ -1366,7 +1366,7 @@ public class AccountServiceImpl implements AccountService {
                 signPage = alipayUserAgreementPageSignResp.getSignPage();
                 break;
             default:
-                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
         }
 
         AccountPasswordFreePageSignDTO accountPasswordFreePageSignDTO = new AccountPasswordFreePageSignDTO();
@@ -1391,7 +1391,7 @@ public class AccountServiceImpl implements AccountService {
                 accountPasswordFreeSignDTO.setSignParams(signParams);
                 break;
             default:
-                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
         }
         return accountPasswordFreeSignDTO;
     }
@@ -1417,7 +1417,7 @@ public class AccountServiceImpl implements AccountService {
                 accountPasswordFreeSignDTO.setSignParams(signParams);
                 break;
             default:
-                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密解约", null);
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密解约", null);
         }
         return accountPasswordFreeSignDTO;
     }

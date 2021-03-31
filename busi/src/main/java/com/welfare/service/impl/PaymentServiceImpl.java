@@ -277,13 +277,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 
-    private void onInsufficientBalance(PaymentRequest paymentRequest, Account account) {
-        if(paymentRequest.getOffline()){
-            asyncService.onInsufficientBalanceOffline(account, paymentRequest);
-        }
-        throw new BizException(ExceptionCode.INSUFFICIENT_BALANCE);
-    }
-
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
         List<AccountBillDetail> billDetails = paymentOperations.stream()
                 .map(PaymentOperation::getAccountBillDetail)

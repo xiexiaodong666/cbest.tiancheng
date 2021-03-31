@@ -14,19 +14,18 @@ import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -101,7 +100,7 @@ public class AccountController implements IController {
     accountDTOAccountPage.setTotal(accountPage.getTotal());
     accountDTOAccountPage.setSize(accountPage.getSize());
     accountDTOAccountPage.setCurrent(accountPage.getCurrent());
-    if(CollectionUtils.isNotEmpty(accountDTOAccountPage.getRecords())) {
+    if(!CollectionUtils.isEmpty(accountDTOAccountPage.getRecords())) {
       accountDTOAccountPage.setExt(accountService.getPageExtDTO(accountPageReq));
     }
 

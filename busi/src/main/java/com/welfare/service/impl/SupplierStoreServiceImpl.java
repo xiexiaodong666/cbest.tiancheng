@@ -300,7 +300,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
     }
 //    if (EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(supplierStore.getCashierNo()))) {
-//      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "虚拟收银机号已存在", null);
+//      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "虚拟收银机号已存在", null);
 //    }
 
     supplierStore.setConsumType(
@@ -604,7 +604,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
     /*if (consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
             && consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "O2O和线上商城不能同时选择", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "O2O和线上商城不能同时选择", null);
     }*/
   }
 

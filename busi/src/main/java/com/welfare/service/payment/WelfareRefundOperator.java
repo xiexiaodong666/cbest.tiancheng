@@ -2,7 +2,7 @@ package com.welfare.service.payment;
 
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.AccountAmountTypeDao;
@@ -91,7 +91,7 @@ public class WelfareRefundOperator implements IRefundOperator{
         int compareTo = paidAmount.compareTo(totalToRefundAmount);
         List<RefundOperation> refundOperations;
         if (compareTo < 0) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款金额大于付款金额:" + totalToRefundAmount + ":" + paidAmount, null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款金额大于付款金额:" + totalToRefundAmount + ":" + paidAmount, null);
         } else {
             refundOperations = partlyRefund(paidDeductionDetails, accountAmountTypes, refundRequest, account);
         }
@@ -228,7 +228,7 @@ public class WelfareRefundOperator implements IRefundOperator{
             }
         }
         if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常，退款金额计算错误", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常，退款金额计算错误", null);
         }
     }
 

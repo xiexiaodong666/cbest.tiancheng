@@ -118,7 +118,7 @@ public class CbestPayServiceImpl implements CbestPayService {
             log.error(
                 StrUtil.format("调用重百付支付宝代扣签约接口失败-req: {}, resp: {}", JSON.toJSONString(req),
                     JSON.toJSONString(resp)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
         }
         AlipayUserAgreementSignResp alipayUserAgreementSignResp = JSON
             .parseObject(resp.getBizContent(), AlipayUserAgreementSignResp.class);
@@ -134,7 +134,7 @@ public class CbestPayServiceImpl implements CbestPayService {
             log.error(
                 StrUtil.format("调用重百付支付宝代扣签约查询接口失败-req: {}, resp: {}", JSON.toJSONString(req),
                     JSON.toJSONString(resp)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
         }
         AlipayUserAgreementQueryResp alipayUserAgreementQueryResp = JSON
             .parseObject(resp.getBizContent(), AlipayUserAgreementQueryResp.class);
@@ -150,7 +150,7 @@ public class CbestPayServiceImpl implements CbestPayService {
             log.error(
                 StrUtil.format("调用重百付支付宝代扣解约接口失败-req: {}, resp: {}", JSON.toJSONString(req),
                     JSON.toJSONString(resp)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
         }
         AlipayUserAgreementUnsignResp alipayUserAgreementUnsignResp = JSON
             .parseObject(resp.getBizContent(), AlipayUserAgreementUnsignResp.class);
@@ -166,7 +166,7 @@ public class CbestPayServiceImpl implements CbestPayService {
             log.error(
                 StrUtil.format("调用重百付代扣签约(页面跳转方式）接口失败-req: {}, resp: {}", JSON.toJSONString(req),
                     JSON.toJSONString(resp)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
         }
         AlipayUserAgreementPageSignResp alipayUserAgreementPageSignResp = JSON
             .parseObject(resp.getBizContent(), AlipayUserAgreementPageSignResp.class);

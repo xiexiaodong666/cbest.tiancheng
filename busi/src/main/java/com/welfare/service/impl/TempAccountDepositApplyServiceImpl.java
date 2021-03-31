@@ -109,7 +109,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
 //        Page<TempAccountDepositApplyDTO> page = pageByFileIdByExistAccount(1 , 1, fileId);
 //        if (page == null || CollectionUtils.isEmpty(page.getRecords())) {
 //          delByFileId(fileId);
-//          throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工！", null);
+//          throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工！", null);
 //        }
         return fileId;
       } else {

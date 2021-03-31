@@ -41,15 +41,13 @@ public class AccountDaoAspect {
         Account accountInDb = accountDao.getById(accountToUpdate.getId());
         BigDecimal balanceToUpdate = accountToUpdate.getAccountBalance();
         BigDecimal balanceInDb = accountInDb.getAccountBalance();
-        if(null != balanceToUpdate && balanceInDb.compareTo(balanceToUpdate)!=0){
-            AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
-            accountChangeEventRecord.setAccountCode(accountToUpdate.getAccountCode());
-            accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
-            accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
-            AccountChangeEventRecordService accountChangeEventRecordService = SpringBeanUtils.getBean(
+        AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
+        accountChangeEventRecord.setAccountCode(accountToUpdate.getAccountCode());
+        accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
+        accountChangeEventRecord.setChangeValue(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeValue());
+        AccountChangeEventRecordService accountChangeEventRecordService = SpringBeanUtils.getBean(
                 AccountChangeEventRecordService.class);
-            accountChangeEventRecordService.save(accountChangeEventRecord);
-            accountToUpdate.setChangeEventId(accountChangeEventRecord.getId());
-        }
+        accountChangeEventRecordService.save(accountChangeEventRecord);
+        accountToUpdate.setChangeEventId(accountChangeEventRecord.getId());
     }
 }

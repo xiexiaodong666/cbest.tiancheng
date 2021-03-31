@@ -3,7 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.enums.ConsumeTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dto.SupplierStoreWithMerchantDTO;
 import com.welfare.persist.dto.query.StorePageReq;
@@ -75,7 +75,7 @@ public class SupplierStoreController implements IController {
   public R add(@RequestBody @Valid SupplierStoreAddDTO supplierStore) {
     if (supplierStore.getConsumType().contains(ConsumeTypeEnum.O2O.getCode())
         && EmptyChecker.isEmpty(supplierStore.getAddressList())) {
-      throw new BusiException("O2O门店，收货地址必填");
+      throw new BizException("O2O门店，收货地址必填");
     }
     if (CollectionUtils.isNotEmpty(supplierStore.getStoreConsumeTypeList())
         && supplierStore.getStoreConsumeTypeList().size() > 1) {
@@ -83,7 +83,7 @@ public class SupplierStoreController implements IController {
           sc -> sc.getCashierNo()).collect(Collectors
                                                .toSet());
       if (set.size() != supplierStore.getStoreConsumeTypeList().size()) {
-        throw new BusiException("同一门店下虚拟收银机号不能相同");
+        throw new BizException("同一门店下虚拟收银机号不能相同");
       }
     }
     return R.status(supplierStoreService.add(supplierStore), "新增失败");
@@ -117,7 +117,7 @@ public class SupplierStoreController implements IController {
   public R update(@RequestBody @Valid SupplierStoreUpdateDTO supplierStore) {
     if (supplierStore.getConsumType().contains(ConsumeTypeEnum.O2O.getCode())
         && EmptyChecker.isEmpty(supplierStore.getAddressList())) {
-      throw new BusiException("O2O门店，收货地址必填");
+      throw new BizException("O2O门店，收货地址必填");
     }
 
     if (CollectionUtils.isNotEmpty(supplierStore.getStoreConsumeTypeList())
@@ -126,7 +126,7 @@ public class SupplierStoreController implements IController {
           sc -> sc.getCashierNo()).collect(Collectors
                                                .toSet());
       if (set.size() != supplierStore.getStoreConsumeTypeList().size()) {
-        throw new BusiException("同一门店下虚拟收银机号不能相同");
+        throw new BizException("同一门店下虚拟收银机号不能相同");
       }
     }
 

@@ -1,7 +1,7 @@
 package com.welfare.common.aspect;
 
 import com.welfare.common.annotation.RepeatRequestVerification;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.mica.core.utils.JsonUtil;
@@ -26,7 +26,7 @@ public class RepeatRequestVerificationAspect {
     if(stringRedisTemplate.opsForValue().setIfAbsent(lockPrefix +key ,"true",1, TimeUnit.SECONDS)){
       return joinPoint.proceed();
     }else{
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"请勿重复提交",null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"请勿重复提交",null);
     }
   }
 

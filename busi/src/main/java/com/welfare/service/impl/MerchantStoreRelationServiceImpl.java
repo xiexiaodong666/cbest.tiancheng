@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.GenerateCodeUtil;
@@ -106,7 +106,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   public boolean add(MerchantStoreRelationAddReq relationAddReq) {
     // 防止门店，消费门店  消费方法不一致
     if (!validateConsumeType(relationAddReq.getAdminMerchantStoreList())) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
     }
     QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(MerchantStoreRelation.MER_CODE, relationAddReq.getMerCode());
@@ -114,7 +114,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     List<MerchantStoreRelation> validateMerchantStoreRelationList = merchantStoreRelationDao.list(
         queryWrapper);
     if (CollectionUtils.isNotEmpty(validateMerchantStoreRelationList)) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该商户已配置了门店", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该商户已配置了门店", null);
     }
 
     RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
@@ -187,7 +187,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     // 防止门店，消费门店  消费方法不一致
     if (!validateConsumeType(relationUpdateReq.getAdminMerchantStoreList())) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
     }
 
     QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
@@ -264,7 +264,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
           log.error("[add] json convert error", e.getMessage());
         }
         if (consumeTypeMap == null) {
-          throw new BusiException("消费方法格式错误");
+          throw new BizException("消费方法格式错误");
         }
 
         roleConsumptionBindingsReq.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
@@ -320,7 +320,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         log.error("[add] json convert error", e.getMessage());
       }
       if (consumeTypeMap == null) {
-        throw new BusiException("消费方法格式错误");
+        throw new BizException("消费方法格式错误");
       }
       roleConsumptionBindingsReq.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
       roleConsumptionBindingsReq.setStoreCode(adminMerchantStore.getStoreCode());

@@ -3,7 +3,7 @@ package com.welfare.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.constants.WelfareSettleConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DateUtil;
 import com.welfare.persist.dao.MerchantBillDetailDao;
@@ -109,7 +109,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
                 }
             }catch (Exception e){
                 log.error("循环拉取账户细交易数据异常:{}", e);
-                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "循环拉取账户细交易数据异常", null);
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "循环拉取账户细交易数据异常", null);
             }finally {
                 lock.unlock();
             }

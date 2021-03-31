@@ -8,7 +8,7 @@ import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.domain.UserInfo;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.MerchantUserHolder;
@@ -255,7 +255,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
         MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq, "api");
         if(merchantCreditResp.getCode()!=1){
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "恢复商户授信额度失败", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "恢复商户授信额度失败", null);
         }
         return i;
     }
@@ -317,7 +317,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettle monthSettle = monthSettleMapper.selectById(id);
 
         if(monthSettle == null){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"参数异常，未获取到账单信息", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"参数异常，未获取到账单信息", null);
         }
 
         MonthSettleDetailQuery monthSettleDetailQuery = new MonthSettleDetailQuery();

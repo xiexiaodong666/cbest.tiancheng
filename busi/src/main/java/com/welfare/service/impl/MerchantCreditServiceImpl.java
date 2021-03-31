@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.MerchantBillDetailDao;
 import com.welfare.persist.dao.MerchantCreditDao;
@@ -212,10 +212,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     public void restoreRemainingLimit(RestoreRemainingLimitReq req) {
         Merchant merchant = merchantService.queryByCode(req.getMerCode());
         if (Objects.isNull(merchant)) {
-            throw new BusiException("商户不存在");
+            throw new BizException("商户不存在");
         }
         if (req.getAmount() == null) {
-            throw new BusiException("额度为空");
+            throw new BizException("额度为空");
         }
         List<MerchantBillDetail> details = merchantBillDetailService.findByTransNoAndTransType(
                 req.getTransNo(),MerCreditType.REMAINING_LIMIT.code());
@@ -235,7 +235,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             }
             MerchantCredit merchantCredit = creditService.getByMerCode(req.getMerCode());
             if (merchantCredit.getRemainingLimit().add(req.getAmount()).compareTo(merchantCredit.getCreditLimit()) > 0) {
-                throw new BusiException(String.format("结算金额[%s]超过商户最大信用额度[%s],剩余额度[%s]",
+                throw new BizException(String.format("结算金额[%s]超过商户最大信用额度[%s],剩余额度[%s]",
                         req.getAmount(), merchantCredit.getCreditLimit(), merchantCredit.getRemainingLimit()));
             }
             // 恢复商户的信用额度

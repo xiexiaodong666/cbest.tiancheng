@@ -11,14 +11,14 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
-import com.welfare.service.async.AsyncNotificationService;
+import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
@@ -75,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final SupplierStoreService supplierStoreService;
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantCreditDao merchantCreditDao;
-    private final AsyncNotificationService asyncNotificationService;
+    private final AsyncService asyncService;
     private final PaymentChannelConfigDao paymentChannelConfigDao;
     private final SubAccountDao subAccountDao;
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
@@ -147,13 +147,15 @@ public class PaymentServiceImpl implements PaymentService {
                         .collect(Collectors.toList());
                 //在循环里面已经对merchantCredit进行了更新
                 merchantCreditDao.updateById(merchantCredit);
+                //支付成功要将账户的离线模式启用
+                account.setOfflineLock(WelfareConstant.AccountOfflineFlag.ENABLE.code());
                 saveDetails(paymentOperations, account, accountAmountTypes);
                 if (!CollectionUtils.isEmpty(merchantBillDetails)) {
                     merchantBillDetailDao.saveBatch(merchantBillDetails);
                 }
                 fillPaymentRequest(paymentRequest, account);
                 if (ConsumeTypeEnum.SHOP_SHOPPING.getCode().equals(paymentRequest.getPaymentScene())) {
-                    asyncNotificationService.paymentNotify(paymentRequest.getPhone(), paymentRequest.getAmount());
+                    asyncService.paymentNotify(paymentRequest.getPhone(), paymentRequest.getAmount());
                 }
             } finally {
                 DistributedLockUtil.unlock(merAccountLock);
@@ -161,7 +163,7 @@ public class PaymentServiceImpl implements PaymentService {
             return paymentRequest;
         } catch (InterruptedException | ExecutionException e) {
             log.error("异步执行查询异常", e);
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(accountLock);
         }
@@ -222,7 +224,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .distinct()
                 .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
         }
     }
 
@@ -274,6 +276,13 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRequest;
     }
 
+
+    private void onInsufficientBalance(PaymentRequest paymentRequest, Account account) {
+        if(paymentRequest.getOffline()){
+            asyncService.onInsufficientBalanceOffline(account, paymentRequest);
+        }
+        throw new BizException(ExceptionCode.INSUFFICIENT_BALANCE);
+    }
 
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
         List<AccountBillDetail> billDetails = paymentOperations.stream()
@@ -342,7 +351,7 @@ public class PaymentServiceImpl implements PaymentService {
             List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigListFuture
                 .get();
             if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
             }
             SubAccount subAccount = subAccountFuture.get();
             ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = new ThirdPartyBarcodePaymentDTO();
@@ -352,7 +361,7 @@ public class PaymentServiceImpl implements PaymentService {
             return thirdPartyBarcodePaymentDTO;
         } catch (InterruptedException | ExecutionException e) {
             log.error(StrUtil.format("查询检查第三方支付码异步执行异常, paymentRequest: {}", JSON.toJSON(paymentRequest)), e);
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", e);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", e);
         }
     }
 

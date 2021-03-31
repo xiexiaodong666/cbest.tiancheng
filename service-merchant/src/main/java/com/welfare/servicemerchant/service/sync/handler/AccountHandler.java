@@ -7,7 +7,7 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.dto.AccountSyncDTO;
@@ -111,7 +111,7 @@ public class AccountHandler {
     log.info("同步员工账户，resp【{}】req【{}】", JSON.toJSONString(roleConsumptionResp), JSON.toJSONString(employerReqDTO));
 
     if (!("0000").equals(roleConsumptionResp.getCode())) {
-      throw new BusiException("同步员工账户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
+      throw new BizException("同步员工账户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
     }
 
   }

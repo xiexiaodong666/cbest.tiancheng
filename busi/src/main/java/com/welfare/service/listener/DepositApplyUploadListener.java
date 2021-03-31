@@ -3,7 +3,7 @@ package com.welfare.service.listener;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.fastjson.JSON;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.TempAccountDepositApply;
@@ -60,24 +60,24 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
   public void invoke(AccountDepositRequest request, AnalysisContext context) {
     log.info("员工账号存储申请：解析到一条数据:{}, requestId:{}, fileId;{}", JSON.toJSONString(request), requestId, fileId);
     if (StringUtils.isBlank(request.getPhone())) {
-      throw new BusiException("账号不能为空");
+      throw new BizException("账号不能为空");
     }
 //    if (!AccountUtil.validPhone(request.getPhone())) {
 //      throw new BusiException(String.format("[%s]手机号不合法！", request.getPhone()));
 //    }
     if (request.getRechargeAmount() == null || request.getRechargeAmount().compareTo(BigDecimal.ZERO) < 0) {
-      throw new BusiException(String.format("[%s]金额不能小于0！", request.getPhone()));
+      throw new BizException(String.format("[%s]金额不能小于0！", request.getPhone()));
     }
     if (request.getRechargeAmount().compareTo(MAX_AMOUNT) > 0) {
-      throw new BusiException(String.format("[%s]金额超过限制[%s]！", request.getPhone(), MAX_AMOUNT));
+      throw new BizException(String.format("[%s]金额超过限制[%s]！", request.getPhone(), MAX_AMOUNT));
     }
     if (phoneSet.contains(request.getPhone().trim())) {
-      throw new BusiException(String.format("[%s]账号(手机号)不能重复！", request.getPhone()));
+      throw new BizException(String.format("[%s]账号(手机号)不能重复！", request.getPhone()));
     }
     request.setPhone(request.getPhone().trim());
     phoneSet.add(request.getPhone().trim());
     if (phoneSet.size() > MAX_COUNT) {
-      throw new BusiException("超过单次充值上限[1000]");
+      throw new BizException("超过单次充值上限[1000]");
     }
     requestList.add(request);
   }
@@ -102,13 +102,13 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
   private Map<String, Account> validateAccountIsExist() {
     Map<String, Account> accountMap = accountDao.mapByMerCodeAndPhones(merCode, phoneSet);
     if (org.springframework.util.CollectionUtils.isEmpty(accountMap)) {
-      throw new BusiException("商户下没有当前导入的员工");
+      throw new BizException("商户下没有当前导入的员工");
     }
     Set<String> phones = accountMap.keySet();
     if (accountMap.size() != phoneSet.size() || !phoneSet.containsAll(phones)) {
       requestList.forEach(request -> {
         if (!phones.contains(request.getPhone())) {
-          throw new BusiException(String.format("商户下没有[%s]员工！", request.getPhone()));
+          throw new BizException(String.format("商户下没有[%s]员工！", request.getPhone()));
         }
       });
     }
@@ -119,7 +119,7 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
      requestList.forEach(request -> {
        Account account = accountMap.get(request.getPhone());
        if (Objects.isNull(account)) {
-         throw new BusiException(String.format("商户下没有[%s]员工！", request.getPhone()));
+         throw new BizException(String.format("商户下没有[%s]员工！", request.getPhone()));
        }
        TempAccountDepositApply apply = getTempAccountDepositApply(request, account);
        applyList.add(apply);
@@ -131,7 +131,7 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
    */
   private void saveData() {
     if (CollectionUtils.isEmpty(applyList)) {
-      throw new BusiException("请至少上传一个员工");
+      throw new BizException("请至少上传一个员工");
     }
     log.info("员工账号存储申请：{}条数据，开始存储数据库！requestId:{}, fileId:{}", applyList.size(), requestId, fileId);
     depositApplyService.saveAll(applyList);

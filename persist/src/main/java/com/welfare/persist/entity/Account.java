@@ -65,6 +65,9 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("账号状态(1正常2禁用)")   
     private Integer accountStatus;
+
+    @ApiModelProperty("离线启用标识 1启用，0-禁用")
+    private Integer offlineLock;
     /**
      * 员工状态
      */
@@ -253,5 +256,7 @@ public class Account extends Model<Account> implements Serializable {
     * 文件存储关联id
     */
     public static final String FILE_UNIVERSAL_STORAGE_ID = "file_universal_storage_id";
+
+    public static final String OFFLINE_LOCK = "offline_lock";
 
 }

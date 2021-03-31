@@ -1,7 +1,8 @@
 package com.welfare.service.remote.fallback;
 
 
-import com.welfare.common.exception.BusiException;
+import com.alibaba.fastjson.JSON;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.service.remote.WoLifeFeignClient;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
@@ -27,20 +28,20 @@ public class WoLifeFeignClientFallback implements FallbackFactory<WoLifeFeignCli
       @Override
       public WoLifeBasicResponse<WoLifeGetUserMoneyResponse> getUserMoney(String phone) {
         log.error("沃生活馆账户余额查询失败, 请求:{}", phone, throwable);
-        throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
+        throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
       }
 
       @Override
       public WoLifeBasicResponse<WoLifeAccountDeductionResponse> accountDeduction(
           String phone, String data) {
         log.error("沃生活馆账户扣款失败, 请求:{},{}", phone, data, throwable);
-        throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
+        throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
       }
 
       @Override
       public WoLifeBasicResponse refundWriteOff( String phone, String data) {
         log.error("沃生活馆退款销账失败, 请求:{},{}", phone, data, throwable);
-        throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
+        throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "沃生活馆系统异常", null);
       }
 
   /*    @Override

@@ -1,7 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.DictDao;
@@ -106,7 +106,7 @@ public class DictServiceImpl implements DictService {
                         .type(type)
                         .build());
             } catch (NoSuchMethodException e) {
-                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
             }
         }
         for (T t : list) {
@@ -133,9 +133,9 @@ public class DictServiceImpl implements DictService {
                         fieldMethod.getSMethod().invoke(c.cast(t), dictName);
                     }
                 } catch (IllegalAccessException e) {
-                    throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
+                    throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
                 } catch (InvocationTargetException e) {
-                    throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
+                    throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
                 }
             }
 

@@ -3,7 +3,7 @@ package com.welfare.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
@@ -81,7 +81,7 @@ public class RefundServiceImpl implements RefundService {
             BigDecimal paidAmount = paidDetails.stream()
                     .map(AccountDeductionDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             if (refundedAmount.add(refundRequest.getAmount()).compareTo(paidAmount) > 0) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款总额不能大于已付款金额", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款总额不能大于已付款金额", null);
             }
             if (transNoInDbs.contains(refundRequest.getTransNo())) {
                 RefundRequest refundRequestInDb = queryResult(refundRequest.getTransNo());

@@ -6,7 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareSettleConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.DateUtil;
 import com.welfare.persist.dao.EmployeeSettleDetailDao;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
@@ -73,7 +73,7 @@ public class EmployeeSettleDetailServiceImpl implements EmployeeSettleDetailServ
                 dateStr = DateUtil.date2Str(DateUtil.getDayMin(date, -1), DateUtil.DEFAULT_DATE_FORMAT);
             }
             log.error("同步{}的员工授信流水数据失败", dateStr, e);
-            throw new BusiException(String.format("同步%s的员工授信流水数据失败", dateStr));
+            throw new BizException(String.format("同步%s的员工授信流水数据失败", dateStr));
         }
     }
 

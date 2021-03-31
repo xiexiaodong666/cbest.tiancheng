@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.*;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.EmptyChecker;
@@ -224,7 +224,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public SupplierStoreDetailDTO detail(Long id) {
     SupplierStoreDetailDTO store = supplierStoreDetailConverter.toD(supplierStoreDao.getById(id));
     if (EmptyChecker.isEmpty(store)) {
-      throw new BusiException("门店不存在");
+      throw new BizException("门店不存在");
     }
     try {
       Map<String, Boolean> consumeTypeMap = mapper.readValue(
@@ -284,19 +284,19 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     checkConsumType(supplierStore.getConsumType());
     if(EmptyChecker.notEmpty(supplierStore.getAddressList())
             &&supplierStore.getAddressList().size()>10){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
     }
     Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
     if (EmptyChecker.isEmpty(merchant)) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
     }
     if (!Arrays.asList(merchant.getMerIdentity().split(",")).contains(
         MerIdentityEnum.supplier.getCode())) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "非供应商商户", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "非供应商商户", null);
 
     }
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店编码已存在", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店编码已存在", null);
 
     }
 //    if (EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(supplierStore.getCashierNo()))) {
@@ -333,7 +333,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     //同步商城中台
     //同步重百付
     if (!flag || !saveStoreConsumeType) {
-      throw new BusiException("新增门店失败");
+      throw new BizException("新增门店失败");
     }
     SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(save);
     detailDTO.setId(save.getId());
@@ -351,7 +351,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     if(EmptyChecker.notEmpty(reqList)){
       for(SupplierStoreActivateReq req:reqList){
         if(!activate(req)){
-          throw new BusiException("更新激活状态失败【"+req.getId()+"】,【"+req.getStatus()+"】");
+          throw new BizException("更新激活状态失败【"+req.getId()+"】,【"+req.getStatus()+"】");
         }
       }
     }else{
@@ -361,7 +361,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         req.setId(ss.getId());
         req.setStatus(SupplierStoreStatusEnum.ACTIVATED.getCode());
         if(!activate(req)){
-          throw new BusiException("更新激活状态失败【"+req.getId()+"】,【"+req.getStatus()+"】");
+          throw new BizException("更新激活状态失败【"+req.getId()+"】,【"+req.getStatus()+"】");
         }
       }
     }
@@ -371,14 +371,14 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public boolean activate(SupplierStoreActivateReq storeActivateReq) {
     SupplierStore supplierStore = supplierStoreDao.getById(storeActivateReq.getId());
     if (EmptyChecker.isEmpty(supplierStore)) {
-      throw new BusiException("门店不存在");
+      throw new BizException("门店不存在");
     }
     supplierStore.setId(storeActivateReq.getId());
     supplierStore.setStatus(storeActivateReq.getStatus());
     boolean flag = supplierStoreDao.updateById(supplierStore);
     //同步商城中台
     if (!flag) {
-      throw new BusiException("修改门店激活状态失败");
+      throw new BizException("修改门店激活状态失败");
     }
     //更新需要全量数据传过去，这里需要再查一次门店的 地址数据
     SupplierStoreSyncDTO sync = supplierStoreSyncConverter.toD(supplierStore);
@@ -407,6 +407,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     return flag;
   }
 
+  @Override
   @Transactional(rollbackFor = Exception.class)
   public boolean batchAdd(List<SupplierStoreAddDTO> list) {
     List<SupplierStore> saves = supplierStoreAddConverter.toE((list));
@@ -416,7 +417,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       store.setStoreParent(store.getMerCode());
       }
     if (!supplierStoreDao.saveBatch(saves)) {
-      throw new BusiException("导入门店--批量插入失败");
+      throw new BizException("导入门店--批量插入失败");
     }
     //存放门店code和地址的对应关系，用于批量新增门店后，存入对应地址
     Map<String, List<MerchantAddressDTO>> map = new HashMap<>();
@@ -460,11 +461,11 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
 
     if (!merchantAddressService.batchSave(addressDTOList, SupplierStore.class.getSimpleName())) {
-      throw new BusiException("导入门店--批量插入地址失败");
+      throw new BizException("导入门店--批量插入地址失败");
     }
     if(CollectionUtils.isNotEmpty(storeConsumeTypeList)) {
       if (!storeConsumeTypeDao.saveBatch(storeConsumeTypeList)) {
-        throw new BusiException("导入门店--批量插入关联门店消费方法收银机号失败");
+        throw new BizException("导入门店--批量插入关联门店消费方法收银机号失败");
       }
     }
 
@@ -480,6 +481,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     return Boolean.TRUE;
   }
 
+  @Override
   public List<SupplierStore> list(QueryWrapper<SupplierStore> queryWrapper) {
     return supplierStoreDao.list(queryWrapper);
   }
@@ -495,12 +497,12 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       EasyExcel.read(multipartFile.getInputStream(), SupplierStoreImportDTO.class, listener).sheet()
           .doRead();
     } catch (IOException e) {
-      throw new BusiException("excel解析失败");
+      throw new BizException("excel解析失败");
     }
     String result = listener.getUploadInfo().toString();
     listener.getUploadInfo().delete(0, listener.getUploadInfo().length());
     if (!SupplierStoreListener.success.equals(result)) {
-      throw new BusiException(result);
+      throw new BizException(result);
     }
     return result;
   }
@@ -510,7 +512,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   public boolean delete(Long id) {
     SupplierStore supplierStore = supplierStoreDao.getById(id);
     if (EmptyChecker.isEmpty(supplierStore)) {
-      throw new BusiException("门店不存在");
+      throw new BizException("门店不存在");
     }
     Boolean flag = supplierStoreDao.removeById(id);
     merchantAddressService.delete(
@@ -519,7 +521,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
     //同步商城中台
     if (!flag) {
-      throw new BusiException("删除门店失败");
+      throw new BizException("删除门店失败");
     }
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     syncList.add(supplierStoreSyncConverter.toD(supplierStore));
@@ -534,11 +536,11 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     checkConsumType(supplierStore.getConsumType());
     if(EmptyChecker.notEmpty(supplierStore.getAddressList())
             &&supplierStore.getAddressList().size()>10){
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
     }
     SupplierStore entity = supplierStoreDao.getById(supplierStore.getId());
     if (EmptyChecker.isEmpty(entity)) {
-      throw new BusiException("id不存在");
+      throw new BizException("id不存在");
     }
     boolean flag2 = true;
     //同步消费门店消费配置
@@ -583,7 +585,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
 
     //同步商城中台
     if (!(flag && flag2 && flag3 && saveStoreConsumeType)) {
-      throw new BusiException("更新门店失败");
+      throw new BizException("更新门店失败");
     }
     List<SupplierStoreSyncDTO> syncList = new ArrayList<>();
     SupplierStoreSyncDTO detailDTO = supplierStoreSyncConverter.toD(update);
@@ -598,7 +600,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   private void checkConsumType(String consumType) {
     List<String> consumTypes = Arrays.asList(consumType.split(","));
     if (!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未输入正确的消费类型", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未输入正确的消费类型", null);
     }
     /*if (consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
             && consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())) {
@@ -641,7 +643,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     }
 
     if (map == null) {
-      throw new BusiException("消费方法格式错误");
+      throw new BizException("消费方法格式错误");
     }
 
     boolean isSelectO2O = map.get(ConsumeTypeEnum.O2O.getCode());
@@ -663,7 +665,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       }
 
       if (consumeTypeMap == null) {
-        throw new BusiException("消费方法格式错误");
+        throw new BizException("消费方法格式错误");
       }
 
       if (!isSelectO2O) {
@@ -730,7 +732,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
         storeRelation.setConsumType(mapper.writeValueAsString(consumeTypeMap));
       } catch (JsonProcessingException e) {
         log.error("[syncConsumeType] writeValueAsString error", consumeTypeMap);
-        throw new BusiException("消费方法格式错误");
+        throw new BizException("消费方法格式错误");
       }
 
     }
@@ -790,7 +792,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
           log.error("[syncConsumeType] json convert error", merchantStoreRelation.getConsumType());
         }
         if (consumeTypeMap == null) {
-          throw new BusiException("消费方法格式错误");
+          throw new BizException("消费方法格式错误");
         }
         roleConsumptionBindingsReq.setConsumeTypes(ConsumeTypesUtils.transfer(consumeTypeMap));
         roleConsumptionBindingsReq.setStoreCode(merchantStoreRelation.getStoreCode());

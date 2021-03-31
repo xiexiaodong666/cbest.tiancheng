@@ -3,7 +3,7 @@ package com.welfare.servicemerchant.service.sync.handler;
 import com.alibaba.fastjson.JSON;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionReq;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
@@ -48,7 +48,7 @@ public class MerchantStoreRelationHandler {
     log.info("消费门店同步返回数据:{} ,请求:{}", JSON.toJSONString(resp), JSON.toJSONString(roleConsumptionReq));
 
     if (!("0000").equals(resp.getCode())) {
-      throw new BusiException("同步消费门店数据到商城中心失败msg【" + resp.getMsg() + "】");
+      throw new BizException("同步消费门店数据到商城中心失败msg【" + resp.getMsg() + "】");
 
     }
   }

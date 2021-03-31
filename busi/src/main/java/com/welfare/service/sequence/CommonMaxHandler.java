@@ -1,6 +1,6 @@
 package com.welfare.service.sequence;
 
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.persist.entity.Sequence;
 
 /**
@@ -16,7 +16,7 @@ public class CommonMaxHandler implements MaxSequenceExceedHandler{
     @Override
     public Sequence handle(Sequence sequence) {
         if(sequence.getSequenceNo() >sequence.getMaxSequence()){
-            throw new BusiException("自增序列达到最大值");
+            throw new BizException("自增序列达到最大值");
         }
         return sequence;
     }

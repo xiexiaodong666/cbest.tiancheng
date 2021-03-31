@@ -35,6 +35,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -174,6 +175,11 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         merchantCreditService.init(merchant.getMerCode());
         boolean flag3=merchantAccountTypeService.init(merCode);
+        boolean flag4=true;
+        List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));
+        if (merIdentitys.contains(MerIdentityEnum.customer.getCode())) {
+            flag4 = messagePushConfigService.init(merCode);
+        }
         //同步商城中台
         if(!(flag&&flag2&flag3)){
             throw new BizException("新增商户失败");
@@ -184,7 +190,7 @@ public class MerchantServiceImpl implements MerchantService {
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).timestamp(new Date()).build());
-        return flag&&flag2&flag3;
+        return flag&&flag2&flag3&&flag4;
     }
 
     @Override
@@ -197,8 +203,13 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant update=buildEntity(merchant);
         boolean flag= 1==merchantDao.updateAllColumnById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
+        boolean flag3=true;
+        List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));
+        if (merIdentitys.contains(MerIdentityEnum.customer.getCode())) {
+            flag3 = messagePushConfigService.init(update.getMerCode());
+        }
         //同步商城中台
-        if(!(flag&&flag2)){
+        if(!(flag&&flag2&&flag3)){
             throw new BizException("更新商户失败");
         }
         List<MerchantSyncDTO> syncList=new ArrayList<>();
@@ -206,7 +217,7 @@ public class MerchantServiceImpl implements MerchantService {
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).timestamp(new Date()).build());
-        return flag&&flag2;
+        return flag&&flag2&&flag3;
     }
     private Merchant buildEntity(MerchantUpdateDTO merchant){
         Merchant entity=merchantDao.getById(merchant.getId());

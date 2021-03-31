@@ -1,6 +1,7 @@
 package com.welfare.service.remote;
 
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
+import com.welfare.common.constants.FrameworkConstant;
 import com.welfare.service.dto.messagepushconfig.WarningSettingSaveReq;
 import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
 import com.welfare.service.dto.offline.OfflineOrderDTO;
@@ -12,6 +13,7 @@ import com.welfare.service.remote.fallback.CbestDmallFeignFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.NotNull;
@@ -116,5 +118,8 @@ public interface CbestDmallFeign {
    * @return
    */
   @PostMapping("/orangeapi/manage/offline-trade/warning-setting/save")
-  DmallResponse<Object> saveWarningSetting(@RequestBody WarningSettingSaveReq req);
+  DmallResponse<Object> saveWarningSetting(@RequestBody WarningSettingSaveReq req,
+                                           @RequestHeader(name = FrameworkConstant.USER_ID) String userId,
+                                           @RequestHeader(name = FrameworkConstant.USER_NAME) String userName,
+                                           @RequestHeader(name = FrameworkConstant.TIMETAMP) String timestamp);
 }

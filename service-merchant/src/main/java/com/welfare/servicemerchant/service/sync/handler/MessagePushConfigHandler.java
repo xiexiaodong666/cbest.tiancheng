@@ -14,6 +14,7 @@ import com.welfare.service.remote.CbestDmallFeign;
 import com.welfare.service.remote.entity.pos.DmallResponse;
 import com.welfare.service.sync.event.MessagePushConfigEvt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -62,7 +63,9 @@ public class MessagePushConfigHandler {
     }
     WarningSettingSaveReq req = WarningSettingSaveReq.of(contact, templateContent);
     log.info("离线消息配置同步请求数据 请求:{}", JSON.toJSONString(req));
-    DmallResponse<Object> resp = cbestDmallFeign.saveWarningSetting(req);
+    String userId = StringUtils.isNoneBlank(contact.getUpdateUser()) ? contact.getUpdateUser() :
+            (StringUtils.isNoneBlank(contact.getCreateUser()) ? contact.getCreateUser() : "system");
+    DmallResponse<Object> resp = cbestDmallFeign.saveWarningSetting(req, userId, userId, String.valueOf(System.currentTimeMillis()));
     log.info("离线消息配置同步请求数据完成 响应:{} ,请求:{}", JSON.toJSONString(resp), JSON.toJSONString(req));
     if (!(CbestDmallFeign.SUCCESS_CODE).equals(resp.getCode())) {
       throw new BizException(String.format("离线消息配置同步请求数据失败 请求:%s msg:%s", JSON.toJSONString(req), resp.getMsg()));

@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.entity.MessagePushConfig;
@@ -22,6 +23,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessagePushConfigServiceImpl implements MessagePushConfigService {
 
-    private final static String MESSAGE_CONTENT_TEMPLATE = "甜橙生活：今日挂起订单3笔，交易额178元，累计挂起订单12笔，交易额782元，请登录甜橙生活查看并处理，以免影响正常交易。";
+    private final MessagePushConfigDao messagePushConfigDao;
 
+    private final static String MESSAGE_CONTENT_TEMPLATE = "今日挂起订单#todayOrderCount#笔，交易额#todayOrderAmount#元，累计挂起订单#totalOrderCount#笔，交易额#totalOrderAmount#元，请登录甜橙生活查看并处理，以免影响正常交易";
+
+    @Override
+    public boolean init(String merCode) {
+        QueryWrapper<MessagePushConfig> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(MessagePushConfig.MER_CODE, merCode);
+        if (messagePushConfigDao.getOne(queryWrapper) != null) {
+            return true;
+        }
+        MessagePushConfig config = new MessagePushConfig();
+        config.setMerCode(merCode);
+        config.setConfigName("默认模板");
+        config.setTemplateType(WelfareConstant.MessagePushTemplateType.STRING_REPLACER.code());
+        config.setTargetType(WelfareConstant.MessagePushTargetType.SMS.code());
+        config.setTemplateContent(MESSAGE_CONTENT_TEMPLATE);
+        config.setConfigCode("TEMPLATE_" + merCode);
+        return messagePushConfigDao.save(config);
+    }
 }

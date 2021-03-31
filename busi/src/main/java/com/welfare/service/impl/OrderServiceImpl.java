@@ -8,6 +8,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.OrderInfoDTO;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderBasicExtResponse;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailRequest;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailResponse;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalRequest;
+import com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalResponse;
 import com.welfare.persist.dto.query.OrderPageQuery;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountMapper;
@@ -596,6 +601,44 @@ public class OrderServiceImpl implements OrderService {
         int count = orderMapper.saveOrUpdate(orderInfoList);
         return count;
 
+    }
+
+    @Override
+    public Page<CommodityOfflineOrderTotalResponse> getCommodityOfflineOrderTotal(Page page,
+        CommodityOfflineOrderTotalRequest request) {
+
+        return orderMapper.getCommodityOfflineOrderTotal(page, request);
+    }
+
+    @Override
+    public List<CommodityOfflineOrderTotalResponse> exportCommodityOfflineOrderTotal(
+        CommodityOfflineOrderTotalRequest request) {
+        return orderMapper.exportCommodityOfflineOrderTotal(request);
+    }
+
+    @Override
+    public List<CommodityOfflineOrderDetailResponse> exportCommodityOfflineOrderDetail(
+        CommodityOfflineOrderDetailRequest request) {
+        return orderMapper.exportCommodityOfflineOrderDetail(request);
+    }
+
+    @Override
+    public CommodityOfflineOrderBasicExtResponse getCommodityOfflineOrderTotalExt(
+        CommodityOfflineOrderTotalRequest request) {
+
+        return orderMapper.getCommodityOfflineOrderTotalExt(request);
+    }
+
+    @Override
+    public Page<CommodityOfflineOrderDetailResponse> getCommodityOfflineOrderDetail(Page page,
+        CommodityOfflineOrderDetailRequest request) {
+        return orderMapper.getCommodityOfflineOrderDetail(page, request);
+    }
+
+    @Override
+    public CommodityOfflineOrderBasicExtResponse getCommodityOfflineOrderDetailExt(
+        CommodityOfflineOrderDetailRequest request) {
+        return orderMapper.getCommodityOfflineOrderDetailExt(request);
     }
 
     /**

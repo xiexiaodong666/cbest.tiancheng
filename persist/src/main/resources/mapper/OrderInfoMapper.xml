@@ -343,7 +343,7 @@
             abd.order_channel = 'SHOP_CONSUMPTION'
             AND abd.trans_type = 'refund'  and  return_trans_no is not null
             )
-            <if test="request.goodsId">
+            <if test="request.goodsId != null">
                 and a.transAmountTotal = #{request.goodsId}
             </if>
         </where>
@@ -439,7 +439,7 @@
             abd.order_channel = 'SHOP_CONSUMPTION'
             AND abd.trans_type = 'refund'  and  return_trans_no is not null
             )
-            <if test="request.goodsId">
+            <if test="request.goodsId != null">
                 and a.transAmountTotal = #{request.goodsId}
             </if>
         </where>
@@ -542,7 +542,7 @@
             abd.order_channel = 'SHOP_CONSUMPTION'
             AND abd.trans_type = 'refund'  and  return_trans_no is not null
             )
-            <if test="request.goodsId">
+            <if test="request.goodsId != null">
                 and a.transAmountTotal = #{request.goodsId}
             </if>
         </where>

@@ -451,7 +451,7 @@
         SELECT
         sum( t.transAmountTotal ) AS salesTotal,
         sum( t.saleCount ) AS saleTotalCount,
-        sum(t.account_code ) AS saleTotalPeopleCount from (
+        COUNT (t.accountCode ) AS saleTotalPeopleCount from (
         SELECT
         '已完成' as orderStatus,
         1 as saleCount,
@@ -462,7 +462,7 @@
         a.transAmountTotal,
         a.phone,
         a.department_name,
-        a.account_code
+        a.account_code as accountCode
 
         FROM
         (

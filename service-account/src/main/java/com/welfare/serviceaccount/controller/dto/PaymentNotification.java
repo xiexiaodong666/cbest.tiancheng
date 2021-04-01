@@ -34,11 +34,20 @@ public class PaymentNotification implements Serializable {
     @JsonProperty("biz_content")
     private String bizContent;
 
+    private static final String SUCCESS = "SUCCESS";
+    private static final String FAILED = "FAILED";
+
     /**
      * 将content转为PaymentNotificationContent对象
      * @return
      */
     public PaymentNotificationContent parseContent(){
         return JSON.parseObject(bizContent,PaymentNotificationContent.class);
+    }
+
+    public static PaymentNotification success(){
+        PaymentNotification paymentNotification = new PaymentNotification();
+        paymentNotification.setStatus(SUCCESS);
+        return paymentNotification;
     }
 }

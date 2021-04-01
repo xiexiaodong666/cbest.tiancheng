@@ -103,7 +103,7 @@ public class PaymentController implements IController {
 
     @PostMapping("/password-free/notification")
     @ApiOperation("免密支付成功通知接口")
-    public R<PaymentRequest> paymentNotification(@RequestBody PaymentNotification paymentNotification){
+    public PaymentNotification paymentNotification(@RequestBody PaymentNotification paymentNotification){
         //缓存支付通知结果，员工卡H5端会轮训查询支付结果
         CbestPayBaseResp cbestPayBaseResp = new CbestPayBaseResp();
         BeanUtils.copyProperties(paymentNotification, cbestPayBaseResp);
@@ -111,7 +111,7 @@ public class PaymentController implements IController {
         PaymentNotificationContent paymentNotificationContent = paymentNotification.parseContent();
         PaymentRequest paymentRequest = paymentNotificationContent.toPaymentRequest();
         paymentService.paymentRequest(paymentRequest);
-        return success(paymentRequest);
+        return PaymentNotification.success();
     }
 
 }

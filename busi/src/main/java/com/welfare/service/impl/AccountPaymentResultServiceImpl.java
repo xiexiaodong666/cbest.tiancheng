@@ -210,6 +210,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
 
     @Override
     public void thirdPartySignResultNotify(AlipayUserAgreementQueryResp resp) {
+        log.info("签约或解约结果通知, resp: {}", JSON.toJSONString(resp));
         String status = resp.getStatus();
         String externalLogonId = resp.getExternalLogonId();
         Long accountCode = Long.valueOf(externalLogonId);

@@ -348,6 +348,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
             SubAccount subAccount = subAccountFuture.get();
             ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = new ThirdPartyBarcodePaymentDTO();
+            thirdPartyBarcodePaymentDTO.setAccountCode(accountCode);
             if(subAccount != null) {
                 thirdPartyBarcodePaymentDTO.setPasswordFreeSignature(subAccount.getPasswordFreeSignature());
             }

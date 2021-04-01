@@ -18,7 +18,6 @@ import java.io.Serializable;
  * @date 3/30/2021
  */
 @Data
-@ApiModel("免密支付通知对象")
 public class PaymentNotification implements Serializable {
     @ApiModelProperty("通知状态")
     private String status;
@@ -48,6 +47,13 @@ public class PaymentNotification implements Serializable {
     public static PaymentNotification success(){
         PaymentNotification paymentNotification = new PaymentNotification();
         paymentNotification.setStatus(SUCCESS);
+        return paymentNotification;
+    }
+
+    public static PaymentNotification failed(Exception e){
+        PaymentNotification paymentNotification = new PaymentNotification();
+        paymentNotification.setStatus(FAILED);
+        paymentNotification.setBizMsg(e.getMessage());
         return paymentNotification;
     }
 }

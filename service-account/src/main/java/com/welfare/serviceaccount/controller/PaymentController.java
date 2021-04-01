@@ -104,14 +104,20 @@ public class PaymentController implements IController {
     @PostMapping("/password-free/notification")
     @ApiOperation("免密支付成功通知接口")
     public PaymentNotification paymentNotification(@RequestBody PaymentNotification paymentNotification){
-        //缓存支付通知结果，员工卡H5端会轮训查询支付结果
-        CbestPayBaseResp cbestPayBaseResp = new CbestPayBaseResp();
-        BeanUtils.copyProperties(paymentNotification, cbestPayBaseResp);
-        accountPaymentResultService.thirdPartyPaymentResultNotify(cbestPayBaseResp);
-        PaymentNotificationContent paymentNotificationContent = paymentNotification.parseContent();
-        PaymentRequest paymentRequest = paymentNotificationContent.toPaymentRequest();
-        paymentService.paymentRequest(paymentRequest);
-        return PaymentNotification.success();
+        try{
+            //缓存支付通知结果，员工卡H5端会轮训查询支付结果
+            CbestPayBaseResp cbestPayBaseResp = new CbestPayBaseResp();
+            BeanUtils.copyProperties(paymentNotification, cbestPayBaseResp);
+            accountPaymentResultService.thirdPartyPaymentResultNotify(cbestPayBaseResp);
+            PaymentNotificationContent paymentNotificationContent = paymentNotification.parseContent();
+            PaymentRequest paymentRequest = paymentNotificationContent.toPaymentRequest();
+            paymentService.paymentRequest(paymentRequest);
+            return PaymentNotification.success();
+        }catch (Exception e){
+            log.error("免密支付通知异常:",e);
+            return PaymentNotification.failed(e);
+        }
+
     }
 
 }

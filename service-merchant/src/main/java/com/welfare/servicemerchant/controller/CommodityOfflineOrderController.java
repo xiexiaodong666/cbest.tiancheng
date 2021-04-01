@@ -59,6 +59,11 @@ public class CommodityOfflineOrderController {
 
     // 过滤百超电数据
     SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(request.getStoreCode());
+    if(supplierStore == null) {
+      CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse> result = new CommodityOfflineOrderBasicResponse<>();
+
+      return R.success(result);
+    }
     if(merCodeList.contains(supplierStore.getMerCode())) {
       CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse> result = new CommodityOfflineOrderBasicResponse<>();
 
@@ -94,6 +99,12 @@ public class CommodityOfflineOrderController {
 
     // 过滤百超电数据
     SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(request.getStoreCode());
+    if(supplierStore == null) {
+      CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse> result = new CommodityOfflineOrderBasicResponse<>();
+
+      return R.success(result);
+    }
+
     if(merCodeList.contains(supplierStore.getMerCode())) {
       CommodityOfflineOrderBasicResponse<CommodityOfflineOrderTotalResponse> result = new CommodityOfflineOrderBasicResponse<>();
 
@@ -122,6 +133,12 @@ public class CommodityOfflineOrderController {
 
     // 过滤百超电数据
     SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(request.getStoreCode());
+    if(supplierStore == null) {
+      CommodityOfflineOrderBasicResponse<CommodityOfflineOrderDetailResponse> result = new CommodityOfflineOrderBasicResponse<>();
+
+      return R.success(result);
+    }
+
     if(merCodeList.contains(supplierStore.getMerCode())) {
       CommodityOfflineOrderBasicResponse<CommodityOfflineOrderDetailResponse> result = new CommodityOfflineOrderBasicResponse<>();
 
@@ -159,6 +176,11 @@ public class CommodityOfflineOrderController {
 
     // 过滤百超电数据
     SupplierStore supplierStore = supplierStoreService.getSupplierStoreByStoreCode(request.getStoreCode());
+    if(supplierStore == null) {
+      CommodityOfflineOrderBasicResponse<CommodityOfflineOrderDetailResponse> result = new CommodityOfflineOrderBasicResponse<>();
+
+      return R.success(result);
+    }
     if(merCodeList.contains(supplierStore.getMerCode())) {
       CommodityOfflineOrderBasicResponse<CommodityOfflineOrderDetailResponse> result = new CommodityOfflineOrderBasicResponse<>();
 

@@ -2,6 +2,559 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.welfare.persist.mapper.OrderInfoMapper">
 
+    <select id="getCommodityOfflineOrderTotal"
+      parameterType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalRequest"
+      resultType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalResponse">
+        SELECT
+        a.transAmountTotal AS goodsId,
+        CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
+        SUM( a.transAmountTotal ) AS sales,
+        COUNT( trans_no ) AS saleCount,
+        COUNT( DISTINCT a.account_code ) AS salePeopleCount
+        FROM
+        (
+        SELECT
+        ab.trans_no,
+        ab.account_code,
+        sum( trans_amount ) AS transAmountTotal,
+        ab.trans_type
+        FROM
+        account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
+        LEFT JOIN supplier_store s ON ab.store_code = s.store_code
+        LEFT JOIN merchant m ON s.mer_code = m.mer_code
+        LEFT JOIN account ac ON ac.account_code = ab.account_code
+        LEFT JOIN department d ON ac.department = d.department_code
+        LEFT JOIN account_type at ON at.type_code = ac.account_type_code and ac.mer_code = at.mer_code
+        <where>
+            ab.order_channel = 'SHOP_CONSUMPTION'
+            and
+            ab.trans_type = 'consume'
+            <if test="request.merCode != null">
+                and ac.mer_code = #{request.merCode}
+            </if>
+            <if test="request.filterDateStart != null">
+                and ab.trans_time &gt;= #{request.filterDateStart}
+            </if>
+            <if test="request.filterDateEnd != null">
+                and ab.trans_time &lt;= #{request.filterDateEnd}
+            </if>
+
+            <if test="request.storeCode != null">
+                AND ab.store_code = #{request.storeCode}
+            </if>
+            <if test="request.departmentPathList != null and request.departmentPathList.size() > 0">
+                and
+                <foreach collection="request.departmentPathList" item="item" index="index" open="("
+                  close=")"
+                  separator="or">
+                    d.department_path like '${item}%'
+                </foreach>
+            </if>
+            <if test="request.accountTypeCodes != null and request.accountTypeCodes.size()>0">
+                and at.type_code in
+                <foreach collection="request.accountTypeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        ab.trans_no
+        ) a
+        <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
+            <if test="request.goodsName != null">
+                and CONCAT( a.transAmountTotal, '元商品' ) like concat('%',#{request.goodsName},'%')
+            </if>
+        </where>
+
+        GROUP BY
+        a.transAmountTotal,a.trans_type
+
+        order by saleCount desc, sales desc
+    </select>
+
+
+    <select id="exportCommodityOfflineOrderTotal"
+      parameterType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalRequest"
+      resultType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalResponse">
+        SELECT
+        a.transAmountTotal AS goodsId,
+        CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
+        SUM( a.transAmountTotal ) AS sales,
+        COUNT( trans_no ) AS saleCount,
+        COUNT( DISTINCT a.account_code ) AS salePeopleCount
+        FROM
+        (
+        SELECT
+        ab.trans_no,
+        ab.account_code,
+        sum( trans_amount ) AS transAmountTotal,
+        ab.trans_type
+        FROM
+        account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
+        LEFT JOIN supplier_store s ON ab.store_code = s.store_code
+        LEFT JOIN merchant m ON s.mer_code = m.mer_code
+        LEFT JOIN account ac ON ac.account_code = ab.account_code
+        LEFT JOIN department d ON ac.department = d.department_code
+        LEFT JOIN account_type at ON at.type_code = ac.account_type_code and ac.mer_code = at.mer_code
+        <where>
+            ab.order_channel = 'SHOP_CONSUMPTION'
+            and
+            ab.trans_type = 'consume'
+            <if test="request.merCode != null">
+                and ac.mer_code = #{request.merCode}
+            </if>
+
+            <if test="request.filterDateStart != null">
+                and ab.trans_time &gt;= #{request.filterDateStart}
+            </if>
+            <if test="request.filterDateEnd != null">
+                and ab.trans_time &lt;= #{request.filterDateEnd}
+            </if>
+
+            <if test="request.storeCode != null">
+                AND ab.store_code = #{request.storeCode}
+            </if>
+            <if test="request.departmentPathList != null and request.departmentPathList.size() > 0">
+                and
+                <foreach collection="request.departmentPathList" item="item" index="index" open="("
+                  close=")"
+                  separator="or">
+                    d.department_path like '${item}%'
+                </foreach>
+            </if>
+            <if test="request.accountTypeCodes != null and request.accountTypeCodes.size()>0">
+                and at.type_code in
+                <foreach collection="request.accountTypeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        ab.trans_no
+        ) a
+        <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
+            <if test="request.goodsName != null">
+                and CONCAT( a.transAmountTotal, '元商品' ) like concat('%',#{request.goodsName},'%')
+            </if>
+        </where>
+        GROUP BY
+        a.transAmountTotal,a.trans_type
+
+        order by saleCount desc, sales desc
+    </select>
+
+
+
+    <select id="getCommodityOfflineOrderTotalExt"
+      parameterType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderTotalRequest"
+      resultType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderBasicExtResponse">
+        select sum(sales) as salesTotal ,
+        sum(saleCount) as saleTotalCount,
+        sum(salePeopleCount) as  saleTotalPeopleCount
+        from(
+        SELECT
+        a.transAmountTotal AS goodsId,
+        CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
+        SUM( a.transAmountTotal ) AS sales,
+        COUNT( trans_no ) AS saleCount,
+        COUNT( DISTINCT a.account_code ) AS salePeopleCount
+        FROM
+        (
+        SELECT
+        ab.trans_no,
+        ab.account_code,
+        sum( trans_amount ) AS transAmountTotal,
+        ab.trans_type
+        FROM
+        account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
+        LEFT JOIN supplier_store s ON ab.store_code = s.store_code
+        LEFT JOIN merchant m ON s.mer_code = m.mer_code
+        LEFT JOIN account ac ON ac.account_code = ab.account_code
+        LEFT JOIN department d ON ac.department = d.department_code
+        LEFT JOIN account_type at ON at.type_code = ac.account_type_code and ac.mer_code = at.mer_code
+        <where>
+            ab.order_channel = 'SHOP_CONSUMPTION'
+            and
+            ab.trans_type = 'consume'
+            <if test="request.merCode != null">
+                and ac.mer_code = #{request.merCode}
+            </if>
+
+            <if test="request.filterDateStart != null">
+                and ab.trans_time &gt;= #{request.filterDateStart}
+            </if>
+            <if test="request.filterDateEnd != null">
+                and ab.trans_time &lt;= #{request.filterDateEnd}
+            </if>
+
+            <if test="request.storeCode != null">
+                AND ab.store_code = #{request.storeCode}
+            </if>
+            <if test="request.departmentPathList != null and request.departmentPathList.size() > 0">
+                and
+                <foreach collection="request.departmentPathList" item="item" index="index" open="("
+                  close=")"
+                  separator="or">
+                    d.department_path like '${item}%'
+                </foreach>
+            </if>
+            <if test="request.accountTypeCodes != null and request.accountTypeCodes.size()>0">
+                and at.type_code in
+                <foreach collection="request.accountTypeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        ab.trans_no
+        ) a
+        <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
+
+            <if test="request.goodsName != null">
+                and CONCAT( a.transAmountTotal, '元商品' ) like concat('%',#{request.goodsName},'%')
+            </if>
+        </where>
+        GROUP BY
+        a.transAmountTotal,a.trans_type) t
+    </select>
+
+
+
+    <select id="getCommodityOfflineOrderDetail" parameterType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailRequest"
+      resultType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailResponse">
+
+        SELECT
+        '已完成' as orderStatus,
+        1 as saleCount,
+        a.order_id as orderId,
+        CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
+        a.account_Name as accountName,
+        a.transAmountTotal as sales,
+        a.phone,
+        a.department_name as departmentName,
+        a.trans_time as consumeTime
+        FROM
+        (
+        SELECT
+        sum( trans_amount ) AS transAmountTotal,
+        ac.account_Name,
+        ab.trans_time,
+        oi.order_id,
+        ac.phone,
+        d.department_name,
+        ab.trans_no
+        FROM
+        account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
+        LEFT JOIN supplier_store s ON ab.store_code = s.store_code
+        LEFT JOIN merchant m ON s.mer_code = m.mer_code
+        LEFT JOIN account ac ON ac.account_code = ab.account_code
+        LEFT JOIN department d ON ac.department = d.department_code
+        LEFT JOIN account_type AT ON AT.type_code = ac.account_type_code
+        AND ac.mer_code = AT.mer_code
+        <where>
+            ab.order_channel = 'SHOP_CONSUMPTION'
+            and
+            ab.trans_type = 'consume'
+            <if test="request.accountName != null">
+                and ac.account_name like concat('%',#{request.accountName},'%')
+            </if>
+            <if test="request.phone != null">
+                and ac.phone = #{request.phone}
+            </if>
+            <if test="request.orderId != null">
+                and oi.order_id = #{request.orderId}
+            </if>
+
+
+            <if test="request.merCode != null">
+                and ac.mer_code = #{request.merCode}
+            </if>
+
+            <if test="request.filterDateStart != null">
+                and ab.trans_time &gt;= #{request.filterDateStart}
+            </if>
+            <if test="request.filterDateEnd != null">
+                and ab.trans_time &lt;= #{request.filterDateEnd}
+            </if>
+
+            <if test="request.storeCode != null">
+                AND ab.store_code = #{request.storeCode}
+            </if>
+            <if test="request.departmentPathList != null and request.departmentPathList.size() > 0">
+                and
+                <foreach collection="request.departmentPathList" item="item" index="index" open="("
+                  close=")"
+                  separator="or">
+                    d.department_path like '${item}%'
+                </foreach>
+            </if>
+            <if test="request.accountTypeCodes != null and request.accountTypeCodes.size()>0">
+                and at.type_code in
+                <foreach collection="request.accountTypeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        ab.trans_no,ab.trans_type
+        ) a
+        <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
+            <if test="request.goodsId != null">
+                and a.transAmountTotal = #{request.goodsId}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="exportCommodityOfflineOrderDetail" parameterType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailRequest"
+      resultType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailResponse">
+
+        SELECT
+        '已完成' as orderStatus,
+        1 as saleCount,
+        a.order_id as orderId,
+        CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
+        a.account_Name as accountName,
+        a.transAmountTotal as sales,
+        a.phone,
+        a.department_name as departmentName,
+        a.trans_time as consumeTime
+        FROM
+        (
+        SELECT
+        sum( trans_amount ) AS transAmountTotal,
+        ac.account_Name,
+        ab.trans_time,
+        oi.order_id,
+        ac.phone,
+        d.department_name,
+        ab.trans_no
+        FROM
+        account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
+        LEFT JOIN supplier_store s ON ab.store_code = s.store_code
+        LEFT JOIN merchant m ON s.mer_code = m.mer_code
+        LEFT JOIN account ac ON ac.account_code = ab.account_code
+        LEFT JOIN department d ON ac.department = d.department_code
+        LEFT JOIN account_type AT ON AT.type_code = ac.account_type_code
+        AND ac.mer_code = AT.mer_code
+        <where>
+            ab.order_channel = 'SHOP_CONSUMPTION'
+            and
+            ab.trans_type = 'consume'
+            <if test="request.accountName != null">
+                and ac.account_name like concat('%',#{request.accountName},'%')
+            </if>
+            <if test="request.phone != null">
+                and ac.phone = #{request.phone}
+            </if>
+            <if test="request.orderId != null">
+                and oi.order_id = #{request.orderId}
+            </if>
+
+            <if test="request.merCode != null">
+                and ac.mer_code = #{request.merCode}
+            </if>
+
+            <if test="request.filterDateStart != null">
+                and ab.trans_time &gt;= #{request.filterDateStart}
+            </if>
+            <if test="request.filterDateEnd != null">
+                and ab.trans_time &lt;= #{request.filterDateEnd}
+            </if>
+
+            <if test="request.storeCode != null">
+                AND ab.store_code = #{request.storeCode}
+            </if>
+            <if test="request.departmentPathList != null and request.departmentPathList.size() > 0">
+                and
+                <foreach collection="request.departmentPathList" item="item" index="index" open="("
+                  close=")"
+                  separator="or">
+                    d.department_path like '${item}%'
+                </foreach>
+            </if>
+            <if test="request.accountTypeCodes != null and request.accountTypeCodes.size()>0">
+                and at.type_code in
+                <foreach collection="request.accountTypeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        ab.trans_no,ab.trans_type
+        ) a
+        <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
+            <if test="request.goodsId != null">
+                and a.transAmountTotal = #{request.goodsId}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getCommodityOfflineOrderDetailExt" parameterType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderDetailRequest"
+      resultType="com.welfare.persist.dto.commodityOfflineOrder.CommodityOfflineOrderBasicExtResponse">
+        SELECT
+        sum( t.transAmountTotal ) AS salesTotal,
+        sum( t.saleCount ) AS saleTotalCount,
+        count( DISTINCT t.account_code ) AS saleTotalPeopleCount from (
+        SELECT
+        '已完成' as orderStatus,
+        1 as saleCount,
+        a.order_id,
+        a.trans_time,
+        CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
+        a.account_Name,
+        a.transAmountTotal,
+        a.phone,
+        a.department_name,
+        a.account_code
+
+        FROM
+        (
+        SELECT
+        sum( trans_amount ) AS transAmountTotal,
+        ac.account_Name,
+        ab.trans_time,
+        oi.order_id,
+        ac.phone,
+        d.department_name,
+        ab.account_code,
+        ab.trans_no
+
+        FROM
+        account_bill_detail ab
+        LEFT JOIN order_info oi ON oi.trans_no = ab.trans_no
+        LEFT JOIN supplier_store s ON ab.store_code = s.store_code
+        LEFT JOIN merchant m ON s.mer_code = m.mer_code
+        LEFT JOIN account ac ON ac.account_code = ab.account_code
+        LEFT JOIN department d ON ac.department = d.department_code
+        LEFT JOIN account_type AT ON AT.type_code = ac.account_type_code
+        AND ac.mer_code = AT.mer_code
+        <where>
+            ab.order_channel = 'SHOP_CONSUMPTION'
+            and
+            ab.trans_type = 'consume'
+            <if test="request.accountName != null">
+                and ac.account_name like concat('%',#{request.accountName},'%')
+            </if>
+            <if test="request.phone != null">
+                and ac.phone = #{request.phone}
+            </if>
+            <if test="request.orderId != null">
+                and oi.order_id = #{request.orderId}
+            </if>
+
+            <if test="request.merCode != null">
+                and ac.mer_code = #{request.merCode}
+            </if>
+
+            <if test="request.filterDateStart != null">
+                and ab.trans_time &gt;= #{request.filterDateStart}
+            </if>
+            <if test="request.filterDateEnd != null">
+                and ab.trans_time &lt;= #{request.filterDateEnd}
+            </if>
+
+            <if test="request.storeCode != null">
+                AND ab.store_code = #{request.storeCode}
+            </if>
+            <if test="request.departmentPathList != null and request.departmentPathList.size() > 0">
+                and
+                <foreach collection="request.departmentPathList" item="item" index="index" open="("
+                  close=")"
+                  separator="or">
+                    d.department_path like '${item}%'
+                </foreach>
+            </if>
+            <if test="request.accountTypeCodes != null and request.accountTypeCodes.size()>0">
+                and at.type_code in
+                <foreach collection="request.accountTypeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        ab.trans_no,ab.trans_type
+        ) a
+        <where>
+            a.trans_no NOT IN (
+            SELECT
+            oi1.return_trans_no
+            FROM
+            account_bill_detail abd
+            LEFT JOIN order_info oi1 ON oi1.trans_no = abd.trans_no
+            WHERE
+            abd.order_channel = 'SHOP_CONSUMPTION'
+            AND abd.trans_type = 'refund'  and  return_trans_no is not null
+            )
+            <if test="request.goodsId != null">
+                and a.transAmountTotal = #{request.goodsId}
+            </if>
+        </where>
+        )t
+    </select>
+
+
+
+
+
+
+
 
 
     <select id="searchOrder" parameterType="com.welfare.persist.dto.query.OrderPageQuery" resultType="com.welfare.persist.dto.OrderInfoDTO">

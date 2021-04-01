@@ -7,6 +7,7 @@ import com.welfare.persist.dto.AccountConsumeSceneDO;
 import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountOverviewDTO;
 import com.welfare.persist.dto.AccountPageDTO;
+import com.welfare.persist.dto.AccountPageExtDTO;
 import com.welfare.persist.dto.AccountPaymentChannelDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.persist.entity.Account;
@@ -30,6 +31,8 @@ public interface AccountService {
 
   Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page,
       AccountPageReq accountPageReq);
+
+  AccountPageExtDTO getPageExtDTO(AccountPageReq accountPageReq);
 
   List<AccountIncrementDTO> queryIncrementDTO(AccountIncrementReq accountIncrementReq);
 

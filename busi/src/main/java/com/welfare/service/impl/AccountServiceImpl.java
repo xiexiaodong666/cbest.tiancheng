@@ -147,12 +147,32 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
         IPage<AccountPageDTO> iPage = accountCustomizeMapper
-            .queryPageDTO(page, accountPageReq.getMerCode(), accountPageReq.getAccountName(),
-                accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
-                accountPageReq.getAccountTypeCodes(), accountPageReq.getBinding(),
-                accountPageReq.getCardId(),
-                accountPageReq.getPhone());
+                .queryPageDTO(page, accountPageReq.getMerCode(), accountPageReq.getAccountName(),
+                        accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
+                        accountPageReq.getAccountTypeCodes(), accountPageReq.getBinding(),
+                        accountPageReq.getCardId(),
+                        accountPageReq.getPhone(),
+                        accountPageReq.getAccountBalanceMin(),
+                        accountPageReq.getAccountBalanceMax(),
+                        accountPageReq.getSurplusQuotaMin(),
+                        accountPageReq.getSurplusQuotaMax());
+
         return accountConverter.toPage(iPage);
+    }
+
+    @Override
+    public AccountPageExtDTO getPageExtDTO(AccountPageReq accountPageReq) {
+        AccountPageExtDTO accountPageExtDTO = accountCustomizeMapper
+            .queryPageExtDTO(accountPageReq.getMerCode(), accountPageReq.getAccountName(),
+                             accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
+                             accountPageReq.getAccountTypeCodes(), accountPageReq.getBinding(),
+                             accountPageReq.getCardId(),
+                             accountPageReq.getPhone(),
+                             accountPageReq.getAccountBalanceMin(),
+                             accountPageReq.getAccountBalanceMax(),
+                             accountPageReq.getSurplusQuotaMin(),
+                             accountPageReq.getSurplusQuotaMax());
+        return accountPageExtDTO;
     }
 
     @Override
@@ -179,7 +199,11 @@ public class AccountServiceImpl implements AccountService {
                 accountPageReq.getDepartmentPathList(), accountPageReq.getAccountStatus(),
                 accountPageReq.getAccountTypeCodes(), accountPageReq.getBinding(),
                 accountPageReq.getCardId(),
-                accountPageReq.getPhone());
+                accountPageReq.getPhone(),
+                          accountPageReq.getAccountBalanceMin(),
+                          accountPageReq.getAccountBalanceMax(),
+                          accountPageReq.getSurplusQuotaMin(),
+                          accountPageReq.getSurplusQuotaMax());
         return accountConverter.toAccountDTOList(list);
     }
 
@@ -239,7 +263,7 @@ public class AccountServiceImpl implements AccountService {
         boolean result = accountDao.removeById(id);
         subAccountDao.deleteAccountCode(syncAccount.getAccountCode());
         accountChangeEvtRecoed(AccountChangeType.ACCOUNT_DELETE, syncAccount.getAccountCode());
-        syncAccount.setDeleted(true);
+        syncAccount.setDeleted(System.currentTimeMillis());
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.DELETE)
             .accountList(Arrays.asList(syncAccount)).build());
         return result;

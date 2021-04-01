@@ -93,7 +93,7 @@ hystrix:
 xxl:
   job:
     admin:
-      addresses: http://172.30.37.36:8180/
+      addresses: http://172.30.37.35:8180/
     executor:
       appname: e-welfare-settlement
       ip:

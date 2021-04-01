@@ -165,8 +165,118 @@
     <if test=" phone !='' and phone != null ">
       and a.phone = #{phone}
     </if>
+
+    <if test=" accountBalanceMin != null ">
+      and a.account_balance <![CDATA[>=]]> #{accountBalanceMin}
+    </if>
+    <if test=" accountBalanceMax != null ">
+      and a.account_balance <![CDATA[<=]]> #{accountBalanceMax}
+    </if>
+
+    <if test=" surplusQuotaMin != null ">
+      and a.surplus_quota <![CDATA[>=]]> #{surplusQuotaMin}
+    </if>
+    <if test=" surplusQuotaMax != null ">
+      and a.surplus_quota <![CDATA[<=]]> #{surplusQuotaMax}
+    </if>
+
     GROUP BY a.account_code
     order by a.create_time desc
+  </select>
+
+  <select id="queryPageExtDTO" resultType="com.welfare.persist.dto.AccountPageExtDTO">
+    select COUNT(DISTINCT t.accountCode) as totalAccount , SUM(t.accountBalance) as totalAccountBalance, sum(t.surplusQuota)  as totalSurplusQuota from (
+    SELECT
+    a.id,
+    m.mer_name as merName,
+    m.mer_code as merCode,
+    a.account_name AS accountName,
+    a.account_code AS accountCode,
+    a.account_status AS accountStatus,
+    case a.account_status
+    when 1 then '正常'
+    when 2 then '禁用'
+    end as accountStatusString,
+    d.department_code AS departmentCode,
+    d.department_name AS departmentName,
+    at.type_name AS accountTypeName,
+    a.max_quota AS maxQuota,
+    a.surplus_quota AS surplusQuota,
+    GROUP_CONCAT(ci.card_id) AS cardId,
+    GROUP_CONCAT(
+    CONCAT(
+    ci.card_id,
+    "(",
+    CASE ci.enabled
+    WHEN 0 THEN
+    '禁用)'
+    ELSE
+    "正常)"
+    END
+    )
+    ) AS cardIdString,
+    a.account_balance AS accountBalance,
+    a.binding,
+    case a.binding
+    when 0 then '未绑定'
+    when 1 then '绑定'
+    end as bindingString,
+    a.phone
+    FROM
+    account a
+    left JOIN merchant m on a.mer_code = m.mer_code
+    LEFT JOIN department d ON a.department = d.department_code
+    LEFT JOIN account_type at ON at.type_code = a.account_type_code and a.mer_code = at.mer_code
+    LEFT JOIN card_info ci ON ci.account_code = a.account_code
+    where a.deleted = 0
+    <if test=" merCode !='' and merCode != null ">
+      and a.mer_code = #{merCode} and at.mer_code = #{merCode}
+    </if>
+    <if test=" accountName !='' and accountName != null  ">
+      and a.account_name like '%${accountName}%'
+    </if>
+    <if test="departmentPathList != null and departmentPathList.size() > 0">
+      and
+      <foreach collection="departmentPathList" item="item" index="index" open="(" close=")"
+        separator="or">
+        d.department_path like '${item}%'
+      </foreach>
+    </if>
+    <if test="accountStatus != null ">
+      and a.account_status = #{accountStatus}
+    </if>
+    <if test="binding != null ">
+      and a.binding = #{binding}
+    </if>
+    <if test=" accountTypeCodes != null and accountTypeCodes.size()>0">
+      and at.type_code in
+      <foreach collection="accountTypeCodes" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+    </if>
+    <if test=" cardId !='' and cardId != null ">
+      and a. account_code in ( select a1.account_code from account a1 left join card_info ci1 on
+      ci1.account_code = a1.account_code where ci1.card_id = #{cardId})
+    </if>
+    <if test=" phone !='' and phone != null ">
+      and a.phone = #{phone}
+    </if>
+
+    <if test=" accountBalanceMin != null ">
+      and a.account_balance <![CDATA[>=]]> #{accountBalanceMin}
+    </if>
+    <if test=" accountBalanceMax != null ">
+      and a.account_balance <![CDATA[<=]]> #{accountBalanceMax}
+    </if>
+
+    <if test=" surplusQuotaMin != null ">
+      and a.surplus_quota <![CDATA[>=]]> #{surplusQuotaMin}
+    </if>
+    <if test=" surplusQuotaMax != null ">
+      and a.surplus_quota <![CDATA[<=]]> #{surplusQuotaMax}
+    </if>
+    GROUP BY a.account_code
+    order by a.create_time desc ) t
   </select>
 
 

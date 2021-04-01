@@ -40,6 +40,7 @@ logging:
   #file: ${config.file:classpath:config/config.properties}
 
 cbest:
+  merCode: M134,M202
   oss:
     config:
       bucket: sjgo-img-test
@@ -84,7 +85,3 @@ feign:
       #service-test:
        # connect-timeout: 10000
         #read-timeout: 20000
-
-#百超电商户代码
-cbest:
-  merCode: M134,M202

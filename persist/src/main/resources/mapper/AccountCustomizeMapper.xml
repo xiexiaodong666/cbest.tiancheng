@@ -425,11 +425,11 @@
 
              WHEN (
                  a.deleted = 0
-                 AND AT.deleted = 0
-                 AND acs.deleted = 0
                  AND a.account_status = 1
-                 AND acs.`status` = 1
-                 AND locate(relation.scene_consum_type, #{consumeType}) > 0
+                 AND AT.deleted = 0
+                 AND locate( '0',GROUP_CONCAT( acs.deleted ) ) > 0
+                 AND locate( '1', GROUP_CONCAT( acs.`status` ) ) > 0
+                 AND locate( 'SHOP_CONSUMPTION' ,GROUP_CONCAT( if(relation.deleted=0,relation.scene_consum_type,'') )) > 0
                ) THEN
                TRUE
              ELSE FALSE

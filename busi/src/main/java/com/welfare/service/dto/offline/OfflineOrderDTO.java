@@ -34,7 +34,7 @@ public class OfflineOrderDTO {
   @ApiModelProperty("手机号")
   private String phone;
 
-  @ExcelProperty(value = "交易时间", index = 5)
+  @ExcelProperty(value = "消费金额", index = 5)
   @ApiModelProperty("消费金额，单位")
   private Integer amount;
 

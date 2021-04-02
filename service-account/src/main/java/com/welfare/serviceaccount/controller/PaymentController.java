@@ -9,9 +9,7 @@ import com.welfare.service.dto.payment.*;
 import com.welfare.service.remote.entity.CbestPayBaseResp;
 import com.welfare.serviceaccount.controller.dto.PaymentNotification;
 import com.welfare.serviceaccount.controller.dto.PaymentNotificationContent;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -103,7 +101,8 @@ public class PaymentController implements IController {
 
     @PostMapping("/password-free/notification")
     @ApiOperation("免密支付成功通知接口")
-    public PaymentNotification paymentNotification(@RequestBody PaymentNotification paymentNotification){
+    @ApiModelProperty("SUCCESS or FAILED")
+    public String paymentNotification(@RequestBody PaymentNotification paymentNotification){
         try{
             //缓存支付通知结果，员工卡H5端会轮训查询支付结果
             CbestPayBaseResp cbestPayBaseResp = new CbestPayBaseResp();
@@ -112,10 +111,10 @@ public class PaymentController implements IController {
             PaymentNotificationContent paymentNotificationContent = paymentNotification.parseContent();
             PaymentRequest paymentRequest = paymentNotificationContent.toPaymentRequest();
             paymentService.paymentRequest(paymentRequest);
-            return PaymentNotification.success();
+            return PaymentNotification.SUCCESS;
         }catch (Exception e){
             log.error("免密支付通知异常:",e);
-            return PaymentNotification.failed(e);
+            return PaymentNotification.FAILED;
         }
 
     }

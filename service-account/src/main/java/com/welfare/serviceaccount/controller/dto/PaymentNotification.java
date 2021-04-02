@@ -33,8 +33,8 @@ public class PaymentNotification implements Serializable {
     @JsonProperty("biz_content")
     private String bizContent;
 
-    private static final String SUCCESS = "SUCCESS";
-    private static final String FAILED = "FAILED";
+    public static final String SUCCESS = "SUCCESS";
+    public static final String FAILED = "FAILED";
 
     /**
      * 将content转为PaymentNotificationContent对象

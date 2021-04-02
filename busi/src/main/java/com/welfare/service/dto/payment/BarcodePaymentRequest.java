@@ -46,7 +46,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
                 .getEnvironment()
                 .getProperty("e-welfare.barcode.expire", "210");
         String barcodeInRedis = redisTemplate.opsForValue().get("BARCODE:" + barcode);
-        if(!StringUtils.isEmpty(barcodeInRedis)){
+        if(!StringUtils.isEmpty(barcodeInRedis) && !getOffline()){
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该支付码已被使用",null);
         }else{
             redisTemplate.opsForValue().set("BARCODE:"+barcode,barcode,Long.parseLong(expireSecs), TimeUnit.SECONDS);

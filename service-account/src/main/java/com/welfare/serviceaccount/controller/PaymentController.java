@@ -100,8 +100,7 @@ public class PaymentController implements IController {
     }
 
     @PostMapping("/password-free/notification")
-    @ApiOperation("免密支付成功通知接口")
-    @ApiModelProperty("SUCCESS or FAILED")
+    @ApiOperation(value = "免密支付成功通知接口",response = String.class,notes = "返回SUCCESS或者FAILED")
     public String paymentNotification(@RequestBody PaymentNotification paymentNotification){
         try{
             //缓存支付通知结果，员工卡H5端会轮训查询支付结果

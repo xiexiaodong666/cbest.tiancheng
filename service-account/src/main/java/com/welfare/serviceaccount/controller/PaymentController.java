@@ -9,6 +9,7 @@ import com.welfare.service.dto.payment.*;
 import com.welfare.service.remote.entity.CbestPayBaseResp;
 import com.welfare.serviceaccount.controller.dto.PaymentNotification;
 import com.welfare.serviceaccount.controller.dto.PaymentNotificationContent;
+import com.welfare.serviceaccount.controller.dto.RefundNotificationContent;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +100,7 @@ public class PaymentController implements IController {
         return success(thirdPartyBarcodePaymentDTO);
     }
 
-    @PostMapping("/password-free/notification")
+    @PostMapping("/password-free/notification/payment")
     @ApiOperation(value = "免密支付成功通知接口",response = String.class,notes = "返回SUCCESS或者FAILED")
     public String paymentNotification(@RequestBody PaymentNotification paymentNotification){
         try{
@@ -107,7 +108,7 @@ public class PaymentController implements IController {
             CbestPayBaseResp cbestPayBaseResp = new CbestPayBaseResp();
             BeanUtils.copyProperties(paymentNotification, cbestPayBaseResp);
             accountPaymentResultService.thirdPartyPaymentResultNotify(cbestPayBaseResp);
-            PaymentNotificationContent paymentNotificationContent = paymentNotification.parseContent();
+            PaymentNotificationContent paymentNotificationContent = paymentNotification.parsePaymentNotificationContent();
             PaymentRequest paymentRequest = paymentNotificationContent.toPaymentRequest();
             paymentService.paymentRequest(paymentRequest);
             return PaymentNotification.SUCCESS;
@@ -116,6 +117,20 @@ public class PaymentController implements IController {
             return PaymentNotification.FAILED;
         }
 
+    }
+
+    @PostMapping("/password-free/notification/refund")
+    @ApiOperation(value = "免密支付退款成功通知接口",response = String.class,notes = "返回SUCCESS或者FAILED")
+    public String refundNotification(@RequestBody PaymentNotification paymentNotification){
+        try{
+            RefundNotificationContent refundNotificationContent = paymentNotification.parseRefundNotificationContent();
+            RefundRequest refundRequest = refundNotificationContent.toRefundRequest();
+            refundService.handleRefundRequest(refundRequest);
+            return PaymentNotification.SUCCESS;
+        }catch (Exception e){
+            log.error("免密支付退款通知异常:",e);
+            return PaymentNotification.FAILED;
+        }
     }
 
 }

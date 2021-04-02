@@ -40,8 +40,16 @@ public class PaymentNotification implements Serializable {
      * 将content转为PaymentNotificationContent对象
      * @return
      */
-    public PaymentNotificationContent parseContent(){
+    public PaymentNotificationContent parsePaymentNotificationContent(){
         return JSON.parseObject(bizContent,PaymentNotificationContent.class);
+    }
+
+    /**
+     * 将content转为PaymentNotificationContent对象
+     * @return
+     */
+    public RefundNotificationContent parseRefundNotificationContent(){
+        return JSON.parseObject(bizContent,RefundNotificationContent.class);
     }
 
     public static PaymentNotification success(){

@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import io.swagger.annotations.ApiModelProperty;
@@ -24,18 +25,14 @@ public class PaymentNotificationContent implements Serializable {
     @ApiModelProperty("交易单号")
     private String tradeNo;
     @ApiModelProperty("网关交易单号")
+    @JsonProperty("gateway_trade_no")
     private String gatewayTradeNo;
-    @ApiModelProperty("买家id")
-    private String buyerId;
     @ApiModelProperty("终端号（收银机）")
     private String terminal;
     @ApiModelProperty("总金额")
-    private BigDecimal totalAmount;
-    @ApiModelProperty("实际金额")
-    private BigDecimal actualAmount;
-    @ApiModelProperty("总优惠金额")
-    private BigDecimal totalDiscountAmount;
-    @ApiModelProperty("5011-支付宝-1|5012-支付宝优惠-1|5013-支付宝优惠2-1")
+    private BigDecimal amount;
+    @ApiModelProperty("5065-甜橙生活-5")
+    @JsonProperty("pay_detail")
     private String payDetail;
     @ApiModelProperty("门店号")
     private String market;
@@ -43,15 +40,20 @@ public class PaymentNotificationContent implements Serializable {
     private String barcode;
     private Date scanDate;
 
+    @ApiModelProperty("账户编码")
+    @JsonProperty("account_code")
+    private String accountCode;
+
     public PaymentRequest toPaymentRequest(){
         BarcodePaymentRequest barcodePaymentRequest = new BarcodePaymentRequest();
         String paymentChannel = BarcodePaymentRequest.calculatePaymentChannelByBarcode(barcode);
+        barcodePaymentRequest.setAccountCode(Long.valueOf(accountCode));
         barcodePaymentRequest.setBarcode(barcode);
         barcodePaymentRequest.setPaymentChannel(paymentChannel);
         barcodePaymentRequest.setRequestId(UUID.randomUUID().toString());
         barcodePaymentRequest.setScanDate(Calendar.getInstance().getTime());
         //重百付调用时候金额为分，甜橙处理逻辑是按照元处理
-        barcodePaymentRequest.setAmount(totalAmount.divide(BigDecimal.valueOf(100L),2, RoundingMode.HALF_UP));
+        barcodePaymentRequest.setAmount(amount.divide(BigDecimal.valueOf(100L),2, RoundingMode.HALF_UP));
         barcodePaymentRequest.setMachineNo(terminal);
         barcodePaymentRequest.setStoreNo(market);
         barcodePaymentRequest.setOffline(false);

@@ -83,7 +83,7 @@ public class OfflineOrderController {
       dto2.setAmount(changeF2Y(offlineOrderDTO.getAmount()));
       offlineOrderDTO2s.add(dto2);
     });
-    String path = fileUploadServiceUtil.uploadExcelFile(offlineOrderDTO2s, OfflineOrderDTO.class, "离线订单");
+    String path = fileUploadServiceUtil.uploadExcelFile(offlineOrderDTO2s, OfflineOrderDTO.OfflineOrderDTO2.class, "离线订单");
     return R.success(fileUploadServiceUtil.getFileServerUrl(path));
   }
 

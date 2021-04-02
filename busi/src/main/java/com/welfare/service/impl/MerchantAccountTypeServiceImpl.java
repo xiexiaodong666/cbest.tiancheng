@@ -47,8 +47,6 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     private MerchantService merchantService;
     private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
     private final SequenceService sequenceService;
-    @Autowired
-    private AccountAmountTypeService accountAmountTypeService;
     private final static Long startId = 10000L;
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {

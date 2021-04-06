@@ -2,7 +2,6 @@ package com.welfare.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.Channel;
 import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.persist.dao.AccountBillDetailDao;
@@ -15,7 +14,6 @@ import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountBillDetailService;
-import com.welfare.service.AccountService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.dto.Deposit;
 import java.math.BigDecimal;
@@ -45,7 +43,8 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
 
     private final AccountDao accountDao;
 
-    private final MerchantService merchantService;
+    @Autowired
+    private MerchantService merchantService;
 
     /**
      * 循环依赖问题，所以未采用构造器注入

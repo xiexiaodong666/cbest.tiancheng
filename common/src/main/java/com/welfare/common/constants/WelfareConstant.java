@@ -42,6 +42,14 @@ public class WelfareConstant {
             return this.desc;
         }
 
+        public static AccountOfflineFlag findByCode(Integer code) {
+            for (AccountOfflineFlag type : AccountOfflineFlag.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的AccountOfflineFlag类型");
+        }
 
     }
 

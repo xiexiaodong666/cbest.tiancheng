@@ -1,11 +1,15 @@
 package com.welfare.service.remote.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.DmallException;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.SupplierStoreDao;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.dto.messagepushconfig.WarningSettingSaveReq;
 import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
@@ -20,10 +24,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +39,7 @@ public class CbestDmallServiceImpl implements CbestDmallService {
   @Autowired(required = false)
   private CbestDmallFeign cbestDmallFeign;
   private final SupplierStoreDao supplierStoreDao;
-
+  private final AccountDao accountDao;
   @Override
   public Page<PriceTemplateBrief> listPriceTemplate(PosPriceTemplateReq req) {
     if (CollectionUtils.isEmpty(req.getStoreCodes())) {
@@ -127,6 +128,20 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("分页查询离线订单失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(resp));
       throw new DmallException(resp.getCode(),resp.getMsg(), null);
+    }
+    if (CollectionUtils.isNotEmpty(resp.getData().getList())) {
+      List<OfflineOrderDTO> offlineOrderDTOS = resp.getData().getList();
+      List<String> phones = offlineOrderDTOS.stream().map(OfflineOrderDTO::getPhone).collect(Collectors.toList());
+      QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+      queryWrapper.eq(Account.MER_CODE, req.getMerchantCode()).in(Account.PHONE, phones);
+      Map<String, Account> accountMap = accountDao.list(queryWrapper).stream().collect(Collectors.toMap(Account::getPhone, account -> account));
+      offlineOrderDTOS.forEach(offlineOrderDTO -> {
+        if (accountMap.containsKey(offlineOrderDTO.getPhone())) {
+          offlineOrderDTO.setStatusName(
+                  WelfareConstant.AccountOfflineFlag.findByCode(
+                          accountMap.get(offlineOrderDTO.getPhone()).getOfflineLock()).desc());
+        }
+      });
     }
     return toPage(resp.getData(), req.getPaging());
   }

@@ -129,20 +129,6 @@ public class CbestDmallServiceImpl implements CbestDmallService {
       log.error("分页查询离线订单失败 请求:{} 响应:{}", JSON.toJSONString(req), JSON.toJSONString(resp));
       throw new DmallException(resp.getCode(),resp.getMsg(), null);
     }
-    if (CollectionUtils.isNotEmpty(resp.getData().getList())) {
-      List<OfflineOrderDTO> offlineOrderDTOS = resp.getData().getList();
-      List<String> phones = offlineOrderDTOS.stream().map(OfflineOrderDTO::getPhone).collect(Collectors.toList());
-      QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-      queryWrapper.eq(Account.MER_CODE, req.getMerchantCode()).in(Account.PHONE, phones);
-      Map<String, Account> accountMap = accountDao.list(queryWrapper).stream().collect(Collectors.toMap(Account::getPhone, account -> account));
-      offlineOrderDTOS.forEach(offlineOrderDTO -> {
-        if (accountMap.containsKey(offlineOrderDTO.getPhone())) {
-          offlineOrderDTO.setStatusName(
-                  WelfareConstant.AccountOfflineFlag.findByCode(
-                          accountMap.get(offlineOrderDTO.getPhone()).getOfflineLock()).desc());
-        }
-      });
-    }
     return toPage(resp.getData(), req.getPaging());
   }
 
@@ -163,10 +149,23 @@ public class CbestDmallServiceImpl implements CbestDmallService {
     Map<String, String> map = new HashMap<>();
     map.put("merchantCode", merchantCode);
     DmallResponse<List<OfflineOrderAccountSummaryDTO>> resp = cbestDmallFeign.summaryAccountOfflineTrade(map);
-    System.out.println(JSON.toJSONString(resp));
     if (!CbestDmallFeign.SUCCESS_CODE.equals(resp.getCode())) {
       log.error("汇总查询员工的离线订单失败 请求:{} 响应:{}", merchantCode, JSON.toJSONString(resp));
       throw new DmallException(resp.getCode(),resp.getMsg(), null);
+    }
+    if (CollectionUtils.isNotEmpty(resp.getData())) {
+      List<OfflineOrderAccountSummaryDTO> offlineOrderDTOS = resp.getData();
+      List<String> phones = offlineOrderDTOS.stream().map(OfflineOrderAccountSummaryDTO::getPhone).collect(Collectors.toList());
+      QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+      queryWrapper.eq(Account.MER_CODE, merchantCode).in(Account.PHONE, phones);
+      Map<String, Account> accountMap = accountDao.list(queryWrapper).stream().collect(Collectors.toMap(Account::getPhone, account -> account));
+      offlineOrderDTOS.forEach(offlineOrderDTO -> {
+        if (accountMap.containsKey(offlineOrderDTO.getPhone())) {
+          offlineOrderDTO.setStatusName(
+                  WelfareConstant.AccountOfflineFlag.findByCode(
+                          accountMap.get(offlineOrderDTO.getPhone()).getOfflineLock()).desc());
+        }
+      });
     }
     return resp.getData();
   }

@@ -39,6 +39,10 @@ logging:
     path: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest
   level:
     root: info
+    com:
+      welfare:
+        service:
+          remote: debug
 encrypt:
   file: ${config.file:classpath:config/config.properties}
 e-welfare:

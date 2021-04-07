@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +76,14 @@ public class OfflineOrderController {
     if (dtoPage != null && CollectionUtils.isNotEmpty(dtoPage.getRecords())) {
       list = dtoPage.getRecords();
     }
-    String path = fileUploadServiceUtil.uploadExcelFile(list, OfflineOrderDTO.class, "离线订单");
+    List<OfflineOrderDTO.OfflineOrderDTO2> offlineOrderDTO2s = new ArrayList<>();
+    list.forEach(offlineOrderDTO -> {
+      OfflineOrderDTO.OfflineOrderDTO2 dto2 = new OfflineOrderDTO.OfflineOrderDTO2();
+      BeanUtils.copyProperties(offlineOrderDTO, dto2, "amount");
+      dto2.setAmount(changeF2Y(offlineOrderDTO.getAmount()));
+      offlineOrderDTO2s.add(dto2);
+    });
+    String path = fileUploadServiceUtil.uploadExcelFile(offlineOrderDTO2s, OfflineOrderDTO.OfflineOrderDTO2.class, "离线订单");
     return R.success(fileUploadServiceUtil.getFileServerUrl(path));
   }
 
@@ -99,5 +107,15 @@ public class OfflineOrderController {
   @ApiOperation("查询当前挂起的离线订单的汇总数据")
   R<List<OfflineOrderAccountSummaryDTO>> offlineOrderAccountSummary(){
     return R.success(cbestDmallService.summaryAccountOfflineTrade(MerchantUserHolder.getMerchantUser().getMerchantCode()));
+  }
+  /**
+   * 分转元，转换为bigDecimal在toString
+   * @return
+   */
+  private BigDecimal changeF2Y(Integer price) {
+    if (price == null) {
+      return BigDecimal.ZERO;
+    }
+    return BigDecimal.valueOf(Long.valueOf(price)).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
   }
 }

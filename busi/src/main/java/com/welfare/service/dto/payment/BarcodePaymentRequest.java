@@ -48,7 +48,7 @@ public class BarcodePaymentRequest extends PaymentRequest {
                 .getEnvironment()
                 .getProperty("e-welfare.barcode.expire-for-pay", "240");
         String barcodeInRedis = redisTemplate.opsForValue().get("BARCODE:" + barcode);
-        if(!StringUtils.isEmpty(barcodeInRedis) && !isNotification()){
+        if(!StringUtils.isEmpty(barcodeInRedis) && !isNotification() && !getOffline()){
             //在不是“支付成功通知”的情况下，需要校验支付码是否已经被使用过了
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该支付码已被使用",null);
         }else{

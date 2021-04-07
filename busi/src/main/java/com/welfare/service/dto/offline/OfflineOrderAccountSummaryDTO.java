@@ -25,4 +25,7 @@ public class OfflineOrderAccountSummaryDTO {
 
   @ApiModelProperty("挂起订单金额，单位“分”")
   private Long orderAmount;
+
+  @ApiModelProperty("离线交易状态")
+  private String statusName;
 }

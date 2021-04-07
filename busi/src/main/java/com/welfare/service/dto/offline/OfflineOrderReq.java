@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 public class OfflineOrderReq extends PageReq {
 
-  @ApiModelProperty("状态，0.挂起 1.已扣款 2.不扣款")
+  @ApiModelProperty("状态，0.挂起 1.已扣款 2.未知")
   private Integer status;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

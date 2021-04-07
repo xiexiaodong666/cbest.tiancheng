@@ -54,7 +54,7 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
                 .getProperty(
                         "e-welfare.ignore-source-header-urls",
                         List.class,
-                        Arrays.asList("/password-free/notification/payment","/password-free/notification/refund","test")
+                        Arrays.asList("/payment/password-free/notification/payment","/payment/password-free/notification/refund","test")
                 );
         String requestURI = request.getRequestURI();
         if(StringUtils.isEmpty(source) && !pathIgnoreSources.contains(requestURI)){

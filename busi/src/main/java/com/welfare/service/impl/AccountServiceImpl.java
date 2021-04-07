@@ -900,9 +900,12 @@ public class AccountServiceImpl implements AccountService {
         List<SubAccount> subAccountList = subAccountDao.getBaseMapper().selectList(
             Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
                 .in(SubAccount::getSubAccountType, paymentChannelCodeList));
-
-        Map<String, String> subAccountMap = subAccountList.stream().collect(
-            Collectors.toMap(SubAccount::getSubAccountType, SubAccount::getPasswordFreeSignature));
+        final Map<String, String> subAccountMap = new HashMap<>();
+        if(CollectionUtil.isNotEmpty(subAccountList)) {
+            for (SubAccount subAccount : subAccountList) {
+                subAccountMap.put(subAccount.getSubAccountType(), subAccount.getPasswordFreeSignature());
+            }
+        }
 
         List<AccountPaymentChannelDTO> paymentChannelList = channelList.stream()
             .map(paymentChannel -> {

@@ -23,6 +23,8 @@ public class ThirdPartyPaymentRequestDao extends ServiceImpl<ThirdPartyPaymentRe
         QueryWrapper<ThirdPartyPaymentRequest> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(ThirdPartyPaymentRequest.TRANS_NO,transNo);
         queryWrapper.eq(ThirdPartyPaymentRequest.TRANS_TYPE, TransType.CONSUME.code());
+        queryWrapper.last("limit 1");
+
         return getOne(queryWrapper);
     }
 

@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 账户信息服务控制器
@@ -99,9 +101,26 @@ public class AccountController implements IController {
         return success(accountService.queryPaymentChannelList(accountCode));
     }
 
-    @ApiOperation("免密支付签约(页面跳转方式）")
-    @GetMapping("/passwordFreePageSign")
+    @ApiOperation("查询员工是否开通支付宝免密支付")
+    @GetMapping("/alipayPasswordFree")
     @AccountUser
+    public R<AccountPaymentChannelDTO> passwordFree() {
+        Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
+        List<AccountPaymentChannelDTO> accountPaymentChannelDTOS = accountService.queryPaymentChannelList(accountCode);
+        return success(getAlipayPasswordFree(accountPaymentChannelDTOS));
+    }
+
+    private AccountPaymentChannelDTO getAlipayPasswordFree(List<AccountPaymentChannelDTO> accountPaymentChannelDTOS){
+        if (CollectionUtils.isNotEmpty(accountPaymentChannelDTOS)){
+            for (AccountPaymentChannelDTO accountPaymentChannelDTO: accountPaymentChannelDTOS) {
+                if (WelfareConstant.PaymentChannel.ALIPAY.code().equals(accountPaymentChannelDTO.getPaymentChannel())){
+                    return accountPaymentChannelDTO;
+                }
+            }
+        }
+        return null;
+    }
+
     public R<AccountPasswordFreePageSignDTO> passwordFreePageSign(String paymentChannel) {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.passwordFreePageSign(accountCode, paymentChannel));

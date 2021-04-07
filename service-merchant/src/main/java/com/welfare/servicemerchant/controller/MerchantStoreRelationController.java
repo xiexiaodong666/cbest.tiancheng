@@ -13,6 +13,7 @@ import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.service.MerchantService;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.servicemerchant.dto.AdminMerchantStoreRelationDTO;
+import com.welfare.servicemerchant.dto.SupplierStoreInfo;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -250,6 +251,14 @@ public class MerchantStoreRelationController implements IController {
   @MerchantUser
   public R<List<MerSupplierStoreResp>> queryMerSupplierStoreDTList(){
     List<MerSupplierStoreResp> supplierStoreResps = merchantStoreRelationService.queryMerSupplierStoreRelation(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(supplierStoreResps);
+  }
+
+  @GetMapping("/merSupplierNoSelfStore/list")
+  @ApiOperation("查询商户下所有的供应商消费门店配置")
+  @MerchantUser
+  public R<List<MerSupplierStore2DTO>> merSupplierNoSelfStore(){
+    List<MerSupplierStore2DTO> supplierStoreResps = merchantStoreRelationService.queryNoSelfMerSupplierStoreRelation(MerchantUserHolder.getMerchantUser().getMerchantCode());
     return success(supplierStoreResps);
   }
 }

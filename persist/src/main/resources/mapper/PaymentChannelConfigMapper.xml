@@ -61,6 +61,7 @@
         AND msr.store_code = pcc.store_code
         <where>
             msr.deleted = 0
+            and ss.mer_code != msr.mer_code
             <if test="query.merchantCode != null and query.merchantCode != ''">
                 AND msr.mer_code = #{query.merchantCode}
             </if>

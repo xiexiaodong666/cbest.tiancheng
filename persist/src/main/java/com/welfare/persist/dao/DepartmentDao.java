@@ -43,4 +43,18 @@ public class DepartmentDao extends ServiceImpl<DepartmentMapper, Department> {
     queryWrapper.eq(Department.DEPARTMENT_CODE,departmentCode);
     return getOne(queryWrapper);
   }
+
+  public Map<String, Department> mapByMerCodeAndDepartmentCodes(String merCode, Set<String> departmentCodes) {
+    Map<String, Department> map = new HashMap<>();
+    if (CollectionUtils.isNotEmpty(departmentCodes)) {
+      QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
+      queryWrapper.in(Department.DEPARTMENT_CODE, departmentCodes);
+      queryWrapper.eq(Department.MER_CODE, merCode);
+      List<Department> list = list(queryWrapper);
+      if (CollectionUtils.isNotEmpty(list)) {
+        map = list.stream().collect(Collectors.toMap(Department::getDepartmentCode, a -> a,(k1, k2)->k1));
+      }
+    }
+    return map;
+  }
 }

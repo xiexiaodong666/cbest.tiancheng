@@ -58,6 +58,7 @@ import com.welfare.service.remote.service.WoLifeFeignService;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -151,7 +152,7 @@ public class AccountServiceImpl implements AccountService {
     private final WoLifeFeignService woLifeFeignService;
     private final DepartmentDao departmentDao;
     private final MerchantDao merchantDao;
-
+    private final AccountTypeDao accountTypeDao;
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
 
@@ -221,10 +222,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String uploadAccount(MultipartFile multipartFile) {
+    public String uploadAccount(MultipartFile multipartFile) throws IOException {
         try {
             AccountUploadListener listener = new AccountUploadListener(accountTypeService, this,
-                merchantService, departmentService, sequenceService);
+                merchantService, departmentService, sequenceService, accountTypeDao, departmentDao, accountDao);
             EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
                 .doRead();
             String result = listener.getUploadInfo().toString();
@@ -232,8 +233,8 @@ public class AccountServiceImpl implements AccountService {
             return result;
         } catch (Exception e) {
             log.info("批量新增员工解析 Excel exception:{}", e.getMessage());
+            throw e;
         }
-        return "解析失败";
     }
 
     @Override

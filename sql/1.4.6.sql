@@ -16,7 +16,7 @@ CREATE TABLE `payment_channel_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 alter table sub_account add column password_free_signature varchar(100) comment '免密支付签名' after balance;
-
+alter table order_info modify card_id varchar(32) comment '卡id';
 
 # DML
 update third_party_payment_request t set t.payment_request_type = 'wo_life';

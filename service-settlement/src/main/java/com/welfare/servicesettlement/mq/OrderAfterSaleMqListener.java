@@ -1,6 +1,5 @@
 package com.welfare.servicesettlement.mq;
 
-import com.welfare.servicesettlement.dto.mall.OrderMQInfo;
 import com.welfare.servicesettlement.dto.mall.PlatformAftersaleDetailInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -301,7 +301,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void onInsufficientBalance(PaymentRequest paymentRequest, Account account) {
-        if(paymentRequest.getOffline()){
+        if(paymentRequest.getOffline() && WelfareConstant.AccountOfflineFlag.ENABLE.code().equals(account.getOfflineLock())){
             asyncService.onInsufficientBalanceOffline(account, paymentRequest);
         }
         throw new BizException(ExceptionCode.INSUFFICIENT_BALANCE);

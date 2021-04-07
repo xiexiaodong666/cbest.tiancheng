@@ -13,7 +13,6 @@ import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.service.MerchantService;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.servicemerchant.dto.AdminMerchantStoreRelationDTO;
-import com.welfare.servicemerchant.dto.SupplierStoreInfo;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,7 +52,6 @@ public class MerchantStoreRelationController implements IController {
   private final MerchantStoreRelationService merchantStoreRelationService;
   private final MerchantService merchantService;
   private final FileUploadService fileUploadService;
-
 
   @GetMapping("/api/list")
   @ApiOperation("api分页查询消费门店配置列表")
@@ -255,10 +253,10 @@ public class MerchantStoreRelationController implements IController {
   }
 
   @GetMapping("/merSupplierNoSelfStore/list")
-  @ApiOperation("查询商户下所有的供应商消费门店配置")
+  @ApiOperation("查询商户下未结算明细所有非自营门店")
   @MerchantUser
-  public R<List<MerSupplierStore2DTO>> merSupplierNoSelfStore(){
-    List<MerSupplierStore2DTO> supplierStoreResps = merchantStoreRelationService.queryNoSelfMerSupplierStoreRelation(MerchantUserHolder.getMerchantUser().getMerchantCode());
-    return success(supplierStoreResps);
+  public R<List<StoreCodeName2DTO>> merSupplierNoSelfStore(){
+    List<StoreCodeName2DTO> list = merchantStoreRelationService.allStoresInUnSettleDetail(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(list);
   }
 }

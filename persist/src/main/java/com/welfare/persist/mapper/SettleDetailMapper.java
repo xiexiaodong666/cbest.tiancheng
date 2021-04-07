@@ -102,4 +102,7 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
 
 
     List<MonthSettleDetailMerchantSummaryDTO> sumSettleDetailGroupByMerAccountType(MonthSettleDetailQuery monthSettleDetailQuery);
+
+    List<StoreCodeName2DTO> allStoresInUnSettleDetail(@Param("merCode") String merCode);
+
 }

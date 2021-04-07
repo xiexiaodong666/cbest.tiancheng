@@ -424,6 +424,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         return resps;
     }
 
+
     @Override
     public List<WelfareTypeTotalAmountResp> statisticalAmountGroupByWelfareTypeCode(ProprietaryConsumePageReq welfareSettleDetailPageReq) {
         String merCode = welfareSettleDetailPageReq.getMerCode();

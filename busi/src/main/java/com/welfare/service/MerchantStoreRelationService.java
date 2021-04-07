@@ -3,13 +3,11 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.MerSupplierStore2DTO;
-import com.welfare.persist.dto.MerSupplierStoreDTO;
-import com.welfare.persist.dto.MerSupplierStoreResp;
-import com.welfare.persist.dto.MerchantStoreRelationDTO;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import com.welfare.service.dto.StoreCodeNameDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -53,9 +51,9 @@ public interface MerchantStoreRelationService {
 
 
   /**
-   * 通过商户编码查询商户配置的非自营消费门店信息
+   * 查询商户未结算明细所有门店
    * @param merCode
    * @return
    */
-  List<MerSupplierStore2DTO>  queryNoSelfMerSupplierStoreRelation(@Param("merCode")String merCode);
+  List<StoreCodeName2DTO> allStoresInUnSettleDetail(String merCode);
 }

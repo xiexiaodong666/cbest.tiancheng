@@ -65,6 +65,8 @@ public class AsyncService {
         NotificationResp notificationResp = notificationFeign.doSendSms(sendMessageReq);
         if(!SUCCEED.equals(notificationResp.getCode())){
             log.error("调用通知系统出错,msg:{},failureData{}",notificationResp.getMsg(),JSON.toJSONString(notificationResp.getFailureData()));
+        } else {
+            log.info("调用通知系统完成,msg:{},",notificationResp.getMsg());
         }
     }
 }

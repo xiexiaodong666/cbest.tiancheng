@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,7 +51,11 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
         }
         List pathIgnoreSources = SpringBeanUtils.getApplicationContext()
                 .getEnvironment()
-                .getProperty("e-welfare.ignore-source-header-urls", List.class, Collections.emptyList());
+                .getProperty(
+                        "e-welfare.ignore-source-header-urls",
+                        List.class,
+                        Arrays.asList("/password-free/notification/payment","/password-free/notification/refund","test")
+                );
         String requestURI = request.getRequestURI();
         if(StringUtils.isEmpty(source) && !pathIgnoreSources.contains(requestURI)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Source required for http header");

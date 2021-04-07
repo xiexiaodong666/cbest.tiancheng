@@ -1,6 +1,7 @@
 package com.welfare.persist.dto;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.common.enums.PaymentTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.persist.entity.ThirdPartyPaymentRequest;
@@ -21,6 +22,7 @@ public class ThirdPartyPaymentRequestDao extends ServiceImpl<ThirdPartyPaymentRe
     public ThirdPartyPaymentRequest queryByTransNo(String transNo){
         QueryWrapper<ThirdPartyPaymentRequest> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(ThirdPartyPaymentRequest.TRANS_NO,transNo);
+        queryWrapper.eq(ThirdPartyPaymentRequest.TRANS_TYPE, TransType.CONSUME.code());
         return getOne(queryWrapper);
     }
 

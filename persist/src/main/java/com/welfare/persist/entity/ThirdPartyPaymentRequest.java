@@ -124,6 +124,12 @@ public class ThirdPartyPaymentRequest extends Model<ThirdPartyPaymentRequest> im
     * 交易流水号
     */
     public static final String TRANS_NO = "trans_no";
+
+    /**
+     * 交易类型
+     */
+    public static final String TRANS_TYPE = "trans_type";
+
     /**
     * 交易金额
     */

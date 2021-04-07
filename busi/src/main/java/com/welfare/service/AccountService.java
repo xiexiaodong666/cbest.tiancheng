@@ -9,6 +9,7 @@ import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +35,7 @@ public interface AccountService {
 
   List<AccountDTO> export(AccountPageReq accountPageReq);
 
-  String uploadAccount(MultipartFile multipartFile);
+  String uploadAccount(MultipartFile multipartFile)throws IOException;
 
   String accountBatchBindCard(MultipartFile multipartFile);
 

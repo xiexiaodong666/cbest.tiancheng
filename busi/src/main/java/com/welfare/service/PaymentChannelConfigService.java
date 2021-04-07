@@ -36,7 +36,7 @@ public interface PaymentChannelConfigService {
   Boolean edit(PayChannelConfigEditReq req);
 
   /**
-   * 评论删除支付渠道
+   * 批量删除支付渠道
    * @param delDtos
    * @return 删除条数
    */

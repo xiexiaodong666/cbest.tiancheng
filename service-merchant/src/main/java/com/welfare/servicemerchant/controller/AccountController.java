@@ -212,7 +212,7 @@ public class AccountController implements IController {
       @RequestPart(name = "file") @ApiParam(name = "file", required = true) MultipartFile multipartFile) {
     try {
       return success(accountService.uploadAccount(multipartFile));
-    } catch (BizException be) {
+    } catch (Exception be) {
       return R.fail(be.getMessage());
     }
   }

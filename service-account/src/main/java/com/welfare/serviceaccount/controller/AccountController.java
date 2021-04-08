@@ -118,7 +118,11 @@ public class AccountController implements IController {
                 }
             }
         }
-        return null;
+        AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
+        accountPaymentChannelDTO.setPaymentChannel(WelfareConstant.PaymentChannel.ALIPAY.code());
+        accountPaymentChannelDTO.setPaymentChannelDesc(WelfareConstant.PaymentChannel.ALIPAY.desc());
+        accountPaymentChannelDTO.setPasswordFree(false);
+        return accountPaymentChannelDTO;
     }
 
     public R<AccountPasswordFreePageSignDTO> passwordFreePageSign(String paymentChannel) {

@@ -116,7 +116,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             .parseObject(bizContent, ThirdPartyPaymentResultNotifyReq.class);
         BarcodePaymentNotifyReq req = new BarcodePaymentNotifyReq();
         BeanUtils.copyProperties(thirdPartyPaymentResultNotifyReq, req);
-        req.setTotalAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getAmount()));
+        req.setAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getAmount()));
         req.setActualAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getActualAmount()));
         req.setTotalDiscountAmount(
             fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalDiscountAmount()));
@@ -144,7 +144,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
             thirdPartyPaymentRequest.setPaymentTypeInfo(req.getBarcode());
             thirdPartyPaymentRequest.setTransType(TransType.CONSUME.code());
-            thirdPartyPaymentRequest.setTransAmount(new BigDecimal(req.getActualAmount()));
+            thirdPartyPaymentRequest.setTransAmount(new BigDecimal(req.getAmount()));
             thirdPartyPaymentRequest.setTransNo(req.getGatewayTradeNo());
             thirdPartyPaymentRequest.setAccountCode(Long.valueOf(req.getAccountCode()));
             thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);

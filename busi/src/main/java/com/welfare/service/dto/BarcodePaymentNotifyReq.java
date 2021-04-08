@@ -77,4 +77,7 @@ public class BarcodePaymentNotifyReq implements Serializable {
     @JSONField(name = "pay_detail")
     @JsonProperty("pay_detail")
     private String payDetail;
+
+    @ApiModelProperty("金额")
+    private String amount;
 }

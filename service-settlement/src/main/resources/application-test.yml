@@ -103,3 +103,6 @@ ftp:
 
 rocketmq:
   name-server: http://172.30.37.35:9876
+  topic:
+    order-online: MSGCENTRAL_APP_WELFARE_ORDER_CHANGED_TEST
+    order-online-after-sale: MSGCENTRAL_APP_WELFARE_ORDER_AFTERSALE_CHANGED_TEST

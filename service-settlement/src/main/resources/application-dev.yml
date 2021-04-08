@@ -102,5 +102,5 @@ ftp:
 rocketmq:
   name-server: 172.30.37.35:9876;172.30.37.35:9876
   topic:
-    order-online: e-welfare-online-order
-    order-online-after-sale: e-welfare-online-order-aftersale
+    order-online: MSGCENTRAL_APP_WELFARE_ORDER_CHANGED_TEST
+    order-online-after-sale: MSGCENTRAL_APP_WELFARE_ORDER_AFTERSALE_CHANGED_TEST

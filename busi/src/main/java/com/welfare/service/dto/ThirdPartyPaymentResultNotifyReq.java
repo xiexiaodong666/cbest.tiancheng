@@ -21,7 +21,7 @@ public class ThirdPartyPaymentResultNotifyReq {
 
     @JSONField(name = "total_amount")
     private String totalAmount;
-    @JSONField(name = "total_amount")
+    @JSONField(name = "amount")
     private String amount;
     @JSONField(name = "actual_amount")
     private String actualAmount;

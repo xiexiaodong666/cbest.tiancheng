@@ -131,7 +131,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
                 .getBaseMapper().selectOne(
                         Wrappers.<ThirdPartyPaymentRequest>lambdaQuery()
                                 .eq(ThirdPartyPaymentRequest::getTransNo,
-                                        thirdPartyPaymentResultNotifyReq.getTradeNo())
+                                        thirdPartyPaymentResultNotifyReq.getGatewayTradeNo())
                                 .eq(ThirdPartyPaymentRequest::getAccountCode, accountCode)
                                 .eq(ThirdPartyPaymentRequest::getTransType,
                                         TransType.CONSUME.code()));
@@ -142,7 +142,10 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
             thirdPartyPaymentRequest.setPaymentChannel(PaymentChannel.ALIPAY.code());
             thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
-            thirdPartyPaymentRequest.setTransNo(req.getTradeNo());
+            thirdPartyPaymentRequest.setPaymentTypeInfo(req.getBarcode());
+            thirdPartyPaymentRequest.setTransType(TransType.CONSUME.code());
+            thirdPartyPaymentRequest.setTransAmount(new BigDecimal(req.getActualAmount()));
+            thirdPartyPaymentRequest.setTransNo(req.getGatewayTradeNo());
             thirdPartyPaymentRequest.setAccountCode(Long.valueOf(req.getAccountCode()));
             thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
         }else{

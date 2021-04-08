@@ -118,7 +118,7 @@ public class WelfarePaymentOperator implements IPaymentOperator{
     }
 
     private void onInsufficientBalance(PaymentRequest paymentRequest, Account account) {
-        //离线模式，且账户不为锁定状态才需要发送短信
+        //离线模式，且账户不为锁定状态才需要发送短信(上游系统会尝试多次扣款，这个判断是避免重复给用户发送短信)
         if(paymentRequest.getOffline() && !WelfareConstant.AccountOfflineFlag.DISABLE.code().equals(account.getOfflineLock())){
             asyncService.onInsufficientBalanceOffline(account, paymentRequest);
         }

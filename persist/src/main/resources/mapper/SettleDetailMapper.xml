@@ -534,8 +534,12 @@
             else 0
         end as settleAmount,
         t1.payment_channel as paymentChannel,
-        t1.mer_deduction_amount as merDeductionAmount,
-        t1.mer_credit_deduction_amount as merDeductionCreditAmount
+        case when t1.trans_type='consume' then t1.mer_deduction_amount
+        when t1.trans_type='refund' then t1.mer_deduction_amount*-1
+        end as merDeductionAmount,
+        case when t1.trans_type='consume' then t1.mer_credit_deduction_amount
+        when t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
+        end as merDeductionCreditAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
 

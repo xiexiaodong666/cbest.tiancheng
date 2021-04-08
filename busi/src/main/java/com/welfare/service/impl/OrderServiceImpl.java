@@ -733,7 +733,7 @@ public class OrderServiceImpl implements OrderService {
                         detailsGroupByMer.forEach((merCode, settleDetails) -> {
                             MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merCode);
                             List<MerchantBillDetail> merchantBillDetails =
-                                    settleDetailService.calculateAndSetRebate(merchantCredit, settleDetails);
+                                    settleDetailService.rebateAndOrderNoCalculate(merchantCredit, settleDetails);
                             List<String> rebateTransNos = merchantBillDetails.stream().map(MerchantBillDetail::getTransNo).collect(Collectors.toList());
                             if(!CollectionUtils.isEmpty(merchantBillDetails)){
                                 //返利需要幂等，先删除相关记录，再重新保存。

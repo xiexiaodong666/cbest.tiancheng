@@ -33,6 +33,7 @@ import com.welfare.service.dto.proprietary.ProprietaryConsumePageReq;
 import com.welfare.service.operator.merchant.RebateLimitOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.utils.PageUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +59,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Autowired
@@ -92,6 +94,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Autowired
     private PaymentChannelDao paymentChannelDao;
+    private final OrderInfoDao orderInfoDao;
 
     @Override
     public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
@@ -295,11 +298,14 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         //修改数据
     }
 
-    private SettleDetail calculateAndSetRebate(SettleDetail settleDetail) {
+    private SettleDetail rebateAndOrderNoCalculate(SettleDetail settleDetail) {
         String storeCode = settleDetail.getStoreCode();
         String merCode = settleDetail.getMerCode();
         MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(storeCode, merCode);
-
+        OrderInfo orderInfo = orderInfoDao.getOneByTransNo(settleDetail.getTransNo());
+        if(Objects.nonNull(orderInfo)){
+            settleDetail.setOrderId(orderInfo.getOrderId());
+        }
         // jian.zhou 2021-01-24
         // 处理未配置的商户和门店的情况
         if (relation == null){
@@ -344,10 +350,10 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     }
 
     @Override
-    public List<MerchantBillDetail> calculateAndSetRebate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails) {
+    public List<MerchantBillDetail> rebateAndOrderNoCalculate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails) {
         return settleDetails.stream().sorted(Comparator.comparing(SettleDetail::getTransTime))
                 .map(detail -> {
-                    SettleDetail settleDetail = calculateAndSetRebate(detail);
+                    SettleDetail settleDetail = rebateAndOrderNoCalculate(detail);
                     if (Objects.isNull(detail.getRebateAmount()) || detail.getRebateAmount().equals(BigDecimal.ZERO)) {
                         //计算返利后，需要返利为0
                         return null;

@@ -95,7 +95,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
                 MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merCode);
                 if (!settleDetails.isEmpty()) {
                     params.put("minId", settleDetails.get(settleDetails.size() - 1).getId() + 1);
-                    List<MerchantBillDetail> merchantBillDetails = settleDetailService.calculateAndSetRebate(merchantCredit,settleDetails);
+                    List<MerchantBillDetail> merchantBillDetails = settleDetailService.rebateAndOrderNoCalculate(merchantCredit,settleDetails);
                     List<String> rebateTransNos = merchantBillDetails.stream().map(MerchantBillDetail::getTransNo).collect(Collectors.toList());
                     if(!CollectionUtils.isEmpty(merchantBillDetails)){
                         //返利需要幂等，先删除相关记录，再重新保存。

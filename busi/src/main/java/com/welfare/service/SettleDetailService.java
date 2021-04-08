@@ -79,7 +79,7 @@ public interface SettleDetailService {
      * @param settleDetails
      * @return
      */
-    List<MerchantBillDetail> calculateAndSetRebate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails);
+    List<MerchantBillDetail> rebateAndOrderNoCalculate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails);
 
     /**
      * 分页查询商户自营消费明细

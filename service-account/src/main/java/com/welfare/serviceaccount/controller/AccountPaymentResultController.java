@@ -64,7 +64,7 @@ public class AccountPaymentResultController implements IController {
 
     @ApiOperation("第三方签约或解约结果通知")
     @PostMapping("/thirdPartySignResultNotify")
-    public String thirdPartySignResultNotify(@RequestBody AlipayUserAgreementQueryResp resp) {
+    public String thirdPartySignResultNotify(@RequestBody CbestPayBaseResp resp) {
         accountPaymentResultService.thirdPartySignResultNotify(resp);
         return CbestPayRespStatusConstant.SUCCESS;
     }

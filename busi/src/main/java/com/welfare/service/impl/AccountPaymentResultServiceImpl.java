@@ -234,21 +234,34 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
     }
 
     @Override
-    public void thirdPartySignResultNotify(AlipayUserAgreementQueryResp resp) {
+    public void thirdPartySignResultNotify(CbestPayBaseResp resp) {
         log.info("签约或解约结果通知, resp: {}", JSON.toJSONString(resp));
         String status = resp.getStatus();
-        String externalLogonId = resp.getExternalLogonId();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(status)) {
+            log.error("签约或解约结果通知返回非成功状态， resp: {}", JSON.toJSONString(resp));
+        }
+        String bizStatus = resp.getBizStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
+            log.error("签约或解约结果通知业务状态返回非成功状态， resp: {}", JSON.toJSONString(resp));
+            return;
+        }
+        String bizContent = resp.getBizContent();
+        AlipayUserAgreementQueryResp alipayUserAgreementQueryResp = JSON
+            .parseObject(bizContent, AlipayUserAgreementQueryResp.class);
+        String signStatus = alipayUserAgreementQueryResp.getStatus();
+
+        String externalLogonId = alipayUserAgreementQueryResp.getExternalLogonId();
         Long accountCode = Long.valueOf(externalLogonId);
         String subAccountType = PaymentChannel.ALIPAY.code();
-        if ("NORMAL".equals(status)) {
-            String passwordFreeSignature = resp.getAgreementNo();
+        if ("NORMAL".equals(signStatus)) {
+            String passwordFreeSignature = alipayUserAgreementQueryResp.getAgreementNo();
             SubAccount subAccount = subAccountDao
                 .getByAccountCodeAndType(accountCode, subAccountType);
             subAccount.setPasswordFreeSignature(passwordFreeSignature);
             boolean updated = subAccountDao.updateById(subAccount);
 
         }
-        if ("STOP".equals(status)) {
+        if ("STOP".equals(signStatus)) {
             LambdaUpdateWrapper<SubAccount> updateWrapper = Wrappers.<SubAccount>lambdaUpdate()
                 .set(SubAccount::getPasswordFreeSignature, null)
                 .eq(SubAccount::getAccountCode, accountCode)

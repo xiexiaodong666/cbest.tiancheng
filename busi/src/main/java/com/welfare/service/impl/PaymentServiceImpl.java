@@ -10,6 +10,7 @@ import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
+import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
@@ -50,6 +51,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SELF;
 
 /**
  * Description:

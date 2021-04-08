@@ -17,7 +17,7 @@ import com.welfare.service.remote.entity.StoreBinding;
 import com.welfare.service.remote.entity.UserRoleBinding;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,7 +72,10 @@ public class AccountConsumeSceneHandler {
     UserRoleBindingReqDTO userRoleBindingReqDTO = new UserRoleBindingReqDTO();
     userRoleBindingReqDTO.setRequestId(UUID.randomUUID().toString());
     userRoleBindingReqDTO.setTimestamp(new Date());
-    List<UserRoleBinding> userRoleBindingList = assemableUserRoleBindings(actionTypeEnum,accountConsumeSceneEvt);
+    List<UserRoleBinding> userRoleBindingList = new ArrayList<>();
+    if (CollectionUtils.isNotEmpty(accountConsumeSceneEvt.getRelationList())) {
+      userRoleBindingList = assemableUserRoleBindings(actionTypeEnum,accountConsumeSceneEvt);
+    }
     //这边没有删除 删除和修改传同样的type bindings 为空
     userRoleBindingReqDTO.setActionType(
         actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.DELETE.getCode()) || actionTypeEnum.getCode().equals(ShoppingActionTypeEnum.ACCOUNT_CONSUME_SCENE_BATCH_DELETE.getCode())

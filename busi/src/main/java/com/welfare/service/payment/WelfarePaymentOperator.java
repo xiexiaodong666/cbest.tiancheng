@@ -1,5 +1,6 @@
 package com.welfare.service.payment;
 
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.*;
@@ -117,7 +118,8 @@ public class WelfarePaymentOperator implements IPaymentOperator{
     }
 
     private void onInsufficientBalance(PaymentRequest paymentRequest, Account account) {
-        if(paymentRequest.getOffline()){
+        //离线模式，且账户不为锁定状态才需要发送短信
+        if(paymentRequest.getOffline() && !WelfareConstant.AccountOfflineFlag.DISABLE.code().equals(account.getOfflineLock())){
             asyncService.onInsufficientBalanceOffline(account, paymentRequest);
         }
         throw new BizException(ExceptionCode.INSUFFICIENT_BALANCE);

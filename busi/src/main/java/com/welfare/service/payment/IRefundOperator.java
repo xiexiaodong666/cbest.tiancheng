@@ -16,6 +16,7 @@ import com.welfare.service.dto.RefundRequest;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -51,6 +52,7 @@ public interface IRefundOperator {
      * @param accountCode
      */
     default void doRefund(RefundRequest refundRequest, List<AccountDeductionDetail> paidDeductionDetails, Long accountCode) {
+
         //沃生活，微信，支付宝只会有一条
         AccountDeductionDetail thePaidDeductionDetail = paidDeductionDetails.get(0);
         AccountBillDetail thePaidBilDetail = getAccountBillDetailDao().getOneByTransNoAndTransType(
@@ -61,7 +63,14 @@ public interface IRefundOperator {
                 .map(AccountDeductionDetail::getTransAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         Assert.isTrue(paidAmount.subtract(refundRequest.getAmount())
-                .compareTo(BigDecimal.ZERO) == 0, "沃支付的退款必须全额退款");
+                .compareTo(BigDecimal.ZERO) == 0, "当前场景退款必须全额退款");
+
+        List<AccountDeductionDetail> accountDeductionDetails = getAccountDeductionDetailDao()
+                .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
+        if(!CollectionUtils.isEmpty(accountDeductionDetails)){
+            //已经退款过就不处理
+            return;
+        }
         Account account = getAccountDao().queryByAccountCode(accountCode);
         refundRequest.setPhone(account.getPhone());
         AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail, refundRequest);

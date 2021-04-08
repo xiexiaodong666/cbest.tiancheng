@@ -36,5 +36,5 @@ public interface AccountPaymentResultService {
      * 签约或解约结果通知
      * @param resp
      */
-    void thirdPartySignResultNotify(AlipayUserAgreementQueryResp resp);
+    void thirdPartySignResultNotify(CbestPayBaseResp resp);
 }

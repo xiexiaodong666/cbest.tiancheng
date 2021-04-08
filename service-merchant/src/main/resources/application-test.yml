@@ -41,6 +41,7 @@ logging:
   #file: ${config.file:classpath:config/config.properties}
 
 cbest:
+  merCode:
   oss:
     config:
       bucket: sjgo-img-test

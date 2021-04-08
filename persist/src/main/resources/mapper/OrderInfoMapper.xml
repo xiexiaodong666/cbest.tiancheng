@@ -10,7 +10,7 @@
         CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
         SUM( a.transAmountTotal ) AS sales,
         COUNT( trans_no ) AS saleCount,
-        COUNT( DISTINCT a.account_code ) AS salePeopleCount
+        COUNT( a.account_code ) AS salePeopleCount
         FROM
         (
         SELECT
@@ -92,7 +92,7 @@
         CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
         SUM( a.transAmountTotal ) AS sales,
         COUNT( trans_no ) AS saleCount,
-        COUNT( DISTINCT a.account_code ) AS salePeopleCount
+        COUNT( a.account_code ) AS salePeopleCount
         FROM
         (
         SELECT
@@ -179,7 +179,7 @@
         CONCAT( a.transAmountTotal, '元商品' ) AS goodsName,
         SUM( a.transAmountTotal ) AS sales,
         COUNT( trans_no ) AS saleCount,
-        COUNT( DISTINCT a.account_code ) AS salePeopleCount
+        COUNT( a.account_code ) AS salePeopleCount
         FROM
         (
         SELECT
@@ -343,7 +343,7 @@
             abd.order_channel = 'SHOP_CONSUMPTION'
             AND abd.trans_type = 'refund'  and  return_trans_no is not null
             )
-            <if test="request.goodsId">
+            <if test="request.goodsId != null">
                 and a.transAmountTotal = #{request.goodsId}
             </if>
         </where>
@@ -439,7 +439,7 @@
             abd.order_channel = 'SHOP_CONSUMPTION'
             AND abd.trans_type = 'refund'  and  return_trans_no is not null
             )
-            <if test="request.goodsId">
+            <if test="request.goodsId != null">
                 and a.transAmountTotal = #{request.goodsId}
             </if>
         </where>
@@ -451,7 +451,7 @@
         SELECT
         sum( t.transAmountTotal ) AS salesTotal,
         sum( t.saleCount ) AS saleTotalCount,
-        count( DISTINCT t.account_code ) AS saleTotalPeopleCount from (
+        sum( t.saleCount ) AS saleTotalPeopleCount from (
         SELECT
         '已完成' as orderStatus,
         1 as saleCount,
@@ -542,7 +542,7 @@
             abd.order_channel = 'SHOP_CONSUMPTION'
             AND abd.trans_type = 'refund'  and  return_trans_no is not null
             )
-            <if test="request.goodsId">
+            <if test="request.goodsId != null">
                 and a.transAmountTotal = #{request.goodsId}
             </if>
         </where>

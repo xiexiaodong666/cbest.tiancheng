@@ -782,4 +782,13 @@ public class DateUtil {
     public static Date getNow() {
         return new Date();
     }
+
+    public static Long getCurrentTimeStamp(){
+        String stampStr = String.valueOf(System.currentTimeMillis());
+        if (stampStr.length() >= 3) {
+            return Long.valueOf(stampStr.substring(0, stampStr.length() - 3));
+        } else {
+            return Long.valueOf(stampStr);
+        }
+    }
 }

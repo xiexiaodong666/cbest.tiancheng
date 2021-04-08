@@ -40,6 +40,7 @@ logging:
   #file: ${config.file:classpath:config/config.properties}
 
 cbest:
+  merCode: 886623,M104,M105
   oss:
     config:
       bucket: sjgo-img

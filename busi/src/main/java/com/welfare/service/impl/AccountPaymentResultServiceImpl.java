@@ -9,6 +9,8 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.PaymentChannel;
 import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.common.enums.PaymentTypeEnum;
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.SubAccountDao;
 import com.welfare.persist.dto.ThirdPartyPaymentRequestDao;
@@ -28,6 +30,7 @@ import com.welfare.service.remote.entity.CbestPayBaseResp;
 import com.welfare.service.remote.entity.CbestPayRespStatusConstant;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -124,15 +127,40 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             StrUtil.format(KEY_PREFIX, accountCode, barcode));
         bucket.set(req, 1, TimeUnit.MINUTES);
 
-        ThirdPartyPaymentRequest thirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
-        thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(req));
-        thirdPartyPaymentRequest.setPaymentRequestType("alipay-password-free");
-        thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-        thirdPartyPaymentRequest.setPaymentChannel(PaymentChannel.ALIPAY.code());
-        thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
-        thirdPartyPaymentRequest.setTransNo(req.getTradeNo());
-        thirdPartyPaymentRequest.setAccountCode(Long.valueOf(req.getAccountCode()));
-        thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestDao
+                .getBaseMapper().selectOne(
+                        Wrappers.<ThirdPartyPaymentRequest>lambdaQuery()
+                                .eq(ThirdPartyPaymentRequest::getTransNo,
+                                        thirdPartyPaymentResultNotifyReq.getTradeNo())
+                                .eq(ThirdPartyPaymentRequest::getAccountCode, accountCode)
+                                .eq(ThirdPartyPaymentRequest::getTransType,
+                                        TransType.CONSUME.code()));
+        if(Objects.isNull(thirdPartyPaymentRequest)){
+            thirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
+            thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(req));
+            thirdPartyPaymentRequest.setPaymentRequestType("alipay-password-free");
+            thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            thirdPartyPaymentRequest.setPaymentChannel(PaymentChannel.ALIPAY.code());
+            thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
+            thirdPartyPaymentRequest.setTransNo(req.getTradeNo());
+            thirdPartyPaymentRequest.setAccountCode(Long.valueOf(req.getAccountCode()));
+            thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
+        }else{
+            thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(req));
+            if(req.getBarcode().startsWith(PaymentChannel.WECHAT.barcodePrefix())){
+                thirdPartyPaymentRequest.setPaymentRequestType(PaymentChannel.WECHAT.code());
+                thirdPartyPaymentRequest.setPaymentChannel(PaymentChannel.WECHAT.code());
+            }else if(req.getBarcode().startsWith(PaymentChannel.ALIPAY.barcodePrefix())){
+                thirdPartyPaymentRequest.setPaymentRequestType(PaymentChannel.ALIPAY.code());
+                thirdPartyPaymentRequest.setPaymentChannel(PaymentChannel.ALIPAY.code());
+            }else{
+                log.warn("支付通知收到不支持的条码:{}",req.getBarcode());
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"不支持的条码"+req.getBarcode());
+            }
+            thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+            thirdPartyPaymentRequestDao.updateById(thirdPartyPaymentRequest);
+        }
+
     }
 
     private Long calculateAccountCode(String barcode) {

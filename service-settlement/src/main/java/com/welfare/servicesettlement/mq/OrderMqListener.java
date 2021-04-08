@@ -42,6 +42,7 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final AccountDao accountDao;
     private final MerchantDao merchantDao;
+
     @Override
     public void onMessage(OrderMqInfo orderDTO) {
         log.info("rocketmq msg received:{}", JSON.toJSONString(orderDTO));

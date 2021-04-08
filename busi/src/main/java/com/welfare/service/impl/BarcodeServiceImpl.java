@@ -166,13 +166,11 @@ public class BarcodeServiceImpl implements BarcodeService {
         if(!isOffline && !isNotification){
             PaymentBarcode paymentBarcode = redisTemplate.opsForValue().get(BARCODE_PREFIX + barcode);
             Assert.notNull(paymentBarcode,"条码过期或不存在");
-        } else {
-
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd");
+            String theDayOfScan = dateFormat.format(scanDate);
+            String theDayOfNow = dateFormat.format(Calendar.getInstance().getTime());
+            Assert.isTrue(Objects.equals(theDayOfNow,theDayOfScan),"条码跨天，请重新拉取条码并支付");
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd");
-        String theDayOfScan = dateFormat.format(scanDate);
-        String theDayOfNow = dateFormat.format(Calendar.getInstance().getTime());
-        Assert.isTrue(Objects.equals(theDayOfNow,theDayOfScan),"条码跨天，请重新拉取条码并支付");
         BarcodeSalt barcodeSalt = queryPeriodSaltValue(scanDate);
         return BarcodeUtil.calculateAccount(barcode, barcodeSalt.getSaltValue());
     }

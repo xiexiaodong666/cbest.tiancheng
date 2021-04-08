@@ -34,4 +34,5 @@ public class ThirdPartyPaymentResultNotifyReq {
     private String market;
 
     private String barcode;
+    private String accountCode;
 }

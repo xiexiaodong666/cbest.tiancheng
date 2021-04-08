@@ -1,6 +1,13 @@
 package com.welfare.servicesettlement.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.dao.AccountDeductionDetailDao;
+import com.welfare.persist.dao.MerchantDao;
+import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.persist.entity.OrderInfo;
 import com.welfare.service.OrderService;
 import com.welfare.servicesettlement.dto.mall.OrderMqInfo;
@@ -9,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 /**
@@ -27,10 +36,17 @@ import org.springframework.stereotype.Component;
 )
 public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
     private final OrderService orderService;
+    private final AccountDeductionDetailDao accountDeductionDetailDao;
+    private final AccountDao accountDao;
+    private final MerchantDao merchantDao;
     @Override
     public void onMessage(OrderMqInfo orderDTO) {
         log.info("rocketmq msg received:{}", JSON.toJSONString(orderDTO));
-        //OrderInfo orderInfo = orderDTO.parseToOrderInfo();
-        //log.info("ready to save orderInfo:{}",JSON.toJSONString(orderInfo));
+        List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao
+                .queryByTransNoAndTransType(orderDTO.getTradeNo(), WelfareConstant.TransType.CONSUME.code());
+        BizAssert.notEmpty(accountDeductionDetails, ExceptionCode.DATA_NOT_EXIST,"不存在流水号:"+orderDTO.getTradeNo());
+
+        OrderInfo orderInfo = orderDTO.parseToOrderInfo();
+        log.info("ready to save orderInfo:{}",JSON.toJSONString(orderInfo));
     }
 }

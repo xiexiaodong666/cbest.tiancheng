@@ -124,18 +124,15 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             StrUtil.format(KEY_PREFIX, accountCode, barcode));
         bucket.set(req, 1, TimeUnit.MINUTES);
 
-        //更新第三方交易状态为成功
-        ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestDao
-            .getBaseMapper().selectOne(
-                Wrappers.<ThirdPartyPaymentRequest>lambdaQuery()
-                    .eq(ThirdPartyPaymentRequest::getTransNo,
-                        thirdPartyPaymentResultNotifyReq.getTradeNo())
-                    .eq(ThirdPartyPaymentRequest::getAccountCode, accountCode)
-                    .eq(ThirdPartyPaymentRequest::getTransType,
-                        TransType.CONSUME.code()));
-        thirdPartyPaymentRequest.setResponse(JSON.toJSONString(req));
+        ThirdPartyPaymentRequest thirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
+        thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(req));
+        thirdPartyPaymentRequest.setPaymentRequestType("alipay-password-free");
         thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-        thirdPartyPaymentRequestDao.updateById(thirdPartyPaymentRequest);
+        thirdPartyPaymentRequest.setPaymentChannel(PaymentChannel.ALIPAY.code());
+        thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
+        thirdPartyPaymentRequest.setTransNo(req.getTradeNo());
+        thirdPartyPaymentRequest.setAccountCode(Long.valueOf(req.getAccountCode()));
+        thirdPartyPaymentRequestDao.save(thirdPartyPaymentRequest);
     }
 
     private Long calculateAccountCode(String barcode) {

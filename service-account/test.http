@@ -1,4 +1,4 @@
-POST http://172.30.37.131:10015/payment/password-free/notification/payment
+POST http://172.30.37.188:10015/payment/password-free/notification/payment
 Content-Type: application/json
 
-{"status":"SUCCESS","msg":"SUCCESS","biz_status":"SUCCESS","biz_msg":"SUCCESS","biz_content":"{\"market\":\"1001\",\"terminal\":\"1234\",\"barcode\":\"713418362922002545732\",\"amount\":\"1\",\"account_code\":\"1000010562\",\"gateway_trade_no\":\"202104100190302454670692352\",\"pay_detail\":\"5065-甜橙生活-1\"}"}
+{"status":"SUCCESS","msg":"SUCCESS","biz_status":"SUCCESS","biz_msg":"SUCCESS","biz_content":"{\"market\":\"1001\",\"terminal\":\"1111\",\"barcode\":\"711512259616652554633\",\"amount\":\"1\",\"account_code\":\"1000010562\",\"gateway_trade_no\":\"202104100190642365928050688\",\"pay_detail\":\"5065-甜橙生活-1\"}"}

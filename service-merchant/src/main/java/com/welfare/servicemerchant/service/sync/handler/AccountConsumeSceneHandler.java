@@ -18,13 +18,7 @@ import com.welfare.service.remote.entity.UserRoleBinding;
 import com.welfare.service.remote.entity.UserRoleBindingReqDTO;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

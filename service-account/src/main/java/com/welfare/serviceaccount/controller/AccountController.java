@@ -125,6 +125,9 @@ public class AccountController implements IController {
         return accountPaymentChannelDTO;
     }
 
+    @ApiOperation("免密支付签约(页面跳转方式）")
+    @GetMapping("/passwordFreePageSign")
+    @AccountUser
     public R<AccountPasswordFreePageSignDTO> passwordFreePageSign(String paymentChannel) {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.passwordFreePageSign(accountCode, paymentChannel));

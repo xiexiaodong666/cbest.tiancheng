@@ -7,7 +7,10 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.dao.MerchantDao;
+import com.welfare.persist.dao.OrderInfoDao;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountDeductionDetail;
+import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.OrderInfo;
 import com.welfare.service.OrderService;
 import com.welfare.servicesettlement.dto.mall.OrderMqInfo;
@@ -35,7 +38,7 @@ import java.util.List;
         consumerGroup = MqConstant.ConsumerGroup.ONLINE_ORDER_CONSUMER_GROUP
 )
 public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
-    private final OrderService orderService;
+    private final OrderInfoDao orderInfoDao;
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final AccountDao accountDao;
     private final MerchantDao merchantDao;
@@ -46,7 +49,11 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
                 .queryByTransNoAndTransType(orderDTO.getTradeNo(), WelfareConstant.TransType.CONSUME.code());
         BizAssert.notEmpty(accountDeductionDetails, ExceptionCode.DATA_NOT_EXIST,"不存在流水号:"+orderDTO.getTradeNo());
 
-        OrderInfo orderInfo = orderDTO.parseToOrderInfo();
+        AccountDeductionDetail firstDetail = accountDeductionDetails.get(0);
+        Account account = accountDao.queryByAccountCode(firstDetail.getAccountCode());
+        Merchant merchant = merchantDao.queryByCode(account.getMerCode());
+        OrderInfo orderInfo = OrderMqInfo.parseToOrderInfo(orderDTO,firstDetail,account,merchant);
+        orderInfoDao.save(orderInfo);
         log.info("ready to save orderInfo:{}",JSON.toJSONString(orderInfo));
     }
 }

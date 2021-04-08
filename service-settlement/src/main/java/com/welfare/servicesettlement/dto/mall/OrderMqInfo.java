@@ -1,7 +1,6 @@
 package com.welfare.servicesettlement.dto.mall;
 
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.persist.entity.Merchant;
@@ -38,6 +37,7 @@ public class OrderMqInfo implements Serializable {
     private Long orgOrderNo;
     private String orgThirdNo;
     private Long storeId;
+    private String storeCode;
     private String storeName;
     private Integer payType;
     private Date payTime;
@@ -127,16 +127,16 @@ public class OrderMqInfo implements Serializable {
     @ApiModelProperty("重百付交易单号")
     private String tradeNo;
 
-    public OrderInfo parseToOrderInfo(OrderMqInfo orderMqInfo, AccountDeductionDetail accountDeductionDetail, Account account, Merchant merchant){
+    public static OrderInfo  parseToOrderInfo(OrderMqInfo orderMqInfo, AccountDeductionDetail accountDeductionDetail, Account account, Merchant merchant){
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setOrderId(orderMqInfo.getOrgOrderNo().toString());
         orderInfo.setAccountCode(accountDeductionDetail.getAccountCode());
         orderInfo.setOrderTime(orderMqInfo.getOrderTime());
         orderInfo.setOrderAmount(orderMqInfo.getOrderAmount());
-        orderInfo.setAccountName("todo");
+        orderInfo.setAccountName(account.getAccountName());
         orderInfo.setCardId(accountDeductionDetail.getCardId());
-        //orderInfo.setStoreCode(this.storeId);
-        orderInfo.setTransNo(this.tradeNo);
+        orderInfo.setStoreCode(orderMqInfo.getStoreCode());
+        orderInfo.setTransNo(orderMqInfo.getTradeNo());
         orderInfo.setAccountName(account.getAccountName());
         orderInfo.setMerchantCode(account.getMerCode());
         orderInfo.setMerchantName(merchant.getMerName());

@@ -110,4 +110,17 @@
     where
       msr.deleted != 1 and msr.consum_type like"%true%" and msr.mer_code=#{merCode}
   </select>
+
+  <select id="queryNoSelfMerSupplierStoreRelation" resultType="com.welfare.persist.dto.MerSupplierStore2DTO">
+    SELECT
+      msr.store_code as storeCode,
+      msr.store_alias as storeName
+    FROM
+      merchant_store_relation msr
+        LEFT JOIN merchant m ON m.mer_code = msr.mer_code
+        LEFT JOIN supplier_store ss ON ss.store_code = msr.store_code
+        LEFT JOIN merchant sup ON ss.mer_code = sup.mer_code
+    where
+      msr.deleted != 1 and msr.consum_type like"%true%" and msr.mer_code=#{merCode} and ss.mer_code != msr.mer_code
+  </select>
 </mapper>

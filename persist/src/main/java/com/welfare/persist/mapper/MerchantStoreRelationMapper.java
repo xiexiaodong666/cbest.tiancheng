@@ -2,6 +2,7 @@ package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.MerSupplierStore2DTO;
 import com.welfare.persist.dto.MerSupplierStoreDTO;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.entity.MerchantStoreRelation;
@@ -40,4 +41,11 @@ public interface MerchantStoreRelationMapper extends BaseMapper<MerchantStoreRel
    * @return
    */
   List<MerSupplierStoreDTO> queryMerSupplierStoreRelation(@Param("merCode")String merCode);
+
+  /**
+   * 通过商户编码查询商户配置的非自营消费门店信息
+   * @param merCode
+   * @return
+   */
+  List<MerSupplierStore2DTO> queryNoSelfMerSupplierStoreRelation(@Param("merCode")String merCode);
 }

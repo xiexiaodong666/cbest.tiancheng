@@ -534,8 +534,12 @@
             else 0
         end as settleAmount,
         t1.payment_channel as paymentChannel,
-        t1.mer_deduction_amount as merDeductionAmount,
-        t1.mer_credit_deduction_amount as merDeductionCreditAmount
+        case when t1.trans_type='consume' then t1.mer_deduction_amount
+        when t1.trans_type='refund' then t1.mer_deduction_amount*-1
+        end as merDeductionAmount,
+        case when t1.trans_type='consume' then t1.mer_credit_deduction_amount
+        when t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
+        end as merDeductionCreditAmount
         <include refid="queryListTable"></include>
         <include refid="queryListCondition"></include>
 
@@ -800,4 +804,17 @@
         </where>
     </sql>
 
+    <select id="allStoresInUnSettleDetail" resultType="com.welfare.persist.dto.StoreCodeName2DTO" >
+        select
+        t1.store_code as storeCode,
+        t1.store_name as storeName
+        from settle_detail t1
+        left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
+        where
+        t3.mer_code != t1.mer_code
+        <if test="merCode!=null and merCode!=''">
+            and t1.mer_code = #{merCode}
+        </if>
+        group by t1.store_code, t1.store_name
+    </select>
 </mapper>

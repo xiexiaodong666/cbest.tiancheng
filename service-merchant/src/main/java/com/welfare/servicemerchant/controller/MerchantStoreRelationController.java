@@ -53,7 +53,6 @@ public class MerchantStoreRelationController implements IController {
   private final MerchantService merchantService;
   private final FileUploadService fileUploadService;
 
-
   @GetMapping("/api/list")
   @ApiOperation("api分页查询消费门店配置列表")
   @ApiUser
@@ -251,5 +250,13 @@ public class MerchantStoreRelationController implements IController {
   public R<List<MerSupplierStoreResp>> queryMerSupplierStoreDTList(){
     List<MerSupplierStoreResp> supplierStoreResps = merchantStoreRelationService.queryMerSupplierStoreRelation(MerchantUserHolder.getMerchantUser().getMerchantCode());
     return success(supplierStoreResps);
+  }
+
+  @GetMapping("/merSupplierNoSelfStore/list")
+  @ApiOperation("查询商户下未结算明细所有非自营门店")
+  @MerchantUser
+  public R<List<StoreCodeName2DTO>> merSupplierNoSelfStore(){
+    List<StoreCodeName2DTO> list = merchantStoreRelationService.allStoresInUnSettleDetail(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(list);
   }
 }

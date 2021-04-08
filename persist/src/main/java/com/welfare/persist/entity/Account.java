@@ -110,9 +110,9 @@ public class Account extends Model<Account> implements Serializable {
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic   
+    @ApiModelProperty("删除标志") @TableLogic(delval = "unix_timestamp()")
     @TableField(fill = FieldFill.INSERT)
-	private Boolean deleted;
+	private Long deleted;
     /**
      * 版本
      */

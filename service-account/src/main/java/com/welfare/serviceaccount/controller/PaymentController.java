@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.welfare.service.AccountPaymentResultService;
 import com.welfare.service.PaymentService;
 import com.welfare.service.RefundService;
@@ -104,6 +105,7 @@ public class PaymentController implements IController {
     @ApiOperation(value = "免密支付成功通知接口",response = String.class,notes = "返回SUCCESS或者FAILED")
     public String paymentNotification(@RequestBody PaymentNotification paymentNotification){
         try{
+            log.info("request start:/password-free/notification/payment,body:{}", JSON.toJSONString(paymentNotification));
             //缓存支付通知结果，员工卡H5端会轮训查询支付结果
             CbestPayBaseResp cbestPayBaseResp = new CbestPayBaseResp();
             BeanUtils.copyProperties(paymentNotification, cbestPayBaseResp);
@@ -123,6 +125,7 @@ public class PaymentController implements IController {
     @ApiOperation(value = "免密支付退款成功通知接口",response = String.class,notes = "返回SUCCESS或者FAILED")
     public String refundNotification(@RequestBody PaymentNotification paymentNotification){
         try{
+            log.info("request start:/password-free/notification/refund,body:{}", JSON.toJSONString(paymentNotification));
             RefundNotificationContent refundNotificationContent = paymentNotification.parseRefundNotificationContent();
             RefundRequest refundRequest = refundNotificationContent.toRefundRequest();
             refundService.handleRefundRequest(refundRequest);

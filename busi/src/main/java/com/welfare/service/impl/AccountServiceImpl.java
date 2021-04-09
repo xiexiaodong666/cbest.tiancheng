@@ -479,7 +479,7 @@ public class AccountServiceImpl implements AccountService {
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
         PaymentChannelReq req =new PaymentChannelReq();
-        req.setFiltered(true);
+        req.setFiltered(false);
         req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
         List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
         boolean result2 = subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
@@ -565,7 +565,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean batchSave(List<Account> accountList) {
         PaymentChannelReq req = new PaymentChannelReq();
         req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
-        req.setFiltered(true);
+        req.setFiltered(false);
         List<PaymentChannelDTO> paymentChannelDTOS = paymentChannelService.list(req);
         return accountDao.saveBatch(accountList)
                 && subAccountDao.saveBatch(AccountUtils.assemableSubAccount(accountList, paymentChannelDTOS));

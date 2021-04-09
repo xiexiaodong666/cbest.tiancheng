@@ -38,6 +38,7 @@
             </if>
         </where>
         GROUP BY m.mer_code
+        order by m.create_time desc
     </select>
 
     <select id="list" parameterType="com.welfare.persist.dto.query.PayChannelConfigQuery" resultType="com.welfare.persist.dto.PaymentChannelConfigDetailDTO">

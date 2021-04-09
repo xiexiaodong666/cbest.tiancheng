@@ -295,6 +295,11 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
         delStoreConsumeTypes.add(MerStoreConsumeTypeChangeEvt.StoreConsumeType.builder().storeCode(m.getStoreCode()).consumeType(delConsumeTypes).build());
       }
 
+      List<ConsumeTypeEnum> addConsumeTypes = ConsumeTypesUtils.getRedundantConsumeType(adminMerchantStore.getConsumType(), m.getConsumType());
+      if (CollectionUtils.isNotEmpty(addConsumeTypes)) {
+        addStoreConsumeTypes.add(MerStoreConsumeTypeChangeEvt.StoreConsumeType.builder().storeCode(m.getStoreCode()).consumeType(addConsumeTypes).build());
+      }
+
       StoreConsumeRelationDTO storeConsumeRelationDTO = new StoreConsumeRelationDTO();
       storeConsumeRelationDTO.setStoreCode(adminMerchantStore.getStoreCode());
       storeConsumeRelationDTO.setConsumeType(adminMerchantStore.getConsumType());

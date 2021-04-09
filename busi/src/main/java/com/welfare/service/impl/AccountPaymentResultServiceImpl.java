@@ -182,7 +182,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
         String bizStatus = resp.getBizStatus();
         if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
             log.error("第三方交易创建通知业务状态返回非成功状态， resp: {}", JSON.toJSONString(resp));
-            return;
+            //return;
         }
         String bizContent = resp.getBizContent();
         CreateThirdPartyPaymentNotifyReq req = JSON
@@ -264,7 +264,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             boolean updated = subAccountDao.updateById(subAccount);
 
         }
-        if ("STOP".equals(signStatus)) {
+        if ("UNSIGN".equals(signStatus)) {
             LambdaUpdateWrapper<SubAccount> updateWrapper = Wrappers.<SubAccount>lambdaUpdate()
                 .set(SubAccount::getPasswordFreeSignature, null)
                 .eq(SubAccount::getAccountCode, accountCode)

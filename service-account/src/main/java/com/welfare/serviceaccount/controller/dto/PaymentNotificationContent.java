@@ -51,7 +51,9 @@ public class PaymentNotificationContent implements Serializable {
         barcodePaymentRequest.setBarcode(barcode);
         barcodePaymentRequest.setPaymentChannel(paymentChannel);
         barcodePaymentRequest.setRequestId(UUID.randomUUID().toString());
-        barcodePaymentRequest.setScanDate(Calendar.getInstance().getTime());
+        Date time = Calendar.getInstance().getTime();
+        barcodePaymentRequest.setScanDate(time);
+        barcodePaymentRequest.setPaymentDate(time);
         //重百付调用时候金额为分，甜橙处理逻辑是按照元处理
         barcodePaymentRequest.setAmount(amount.divide(BigDecimal.valueOf(100L),2, RoundingMode.HALF_UP));
         barcodePaymentRequest.setMachineNo(terminal);

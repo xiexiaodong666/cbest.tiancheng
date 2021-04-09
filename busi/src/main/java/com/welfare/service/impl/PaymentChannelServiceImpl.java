@@ -9,10 +9,7 @@ import com.welfare.persist.entity.PaymentChannel;
 import com.welfare.service.PaymentChannelConfigService;
 import com.welfare.service.PaymentChannelService;
 import com.welfare.service.dto.PaymentChannelReq;
-import com.welfare.service.dto.paymentChannel.PayChannelConfigDelDTO;
-import com.welfare.service.dto.paymentChannel.PaymentChannelDTO;
-import com.welfare.service.dto.paymentChannel.PaymentChannelMerchantDTO;
-import com.welfare.service.dto.paymentChannel.PaymentChannelSortReq;
+import com.welfare.service.dto.paymentChannel.*;
 import com.welfare.service.utils.PageReq;
 import com.welfare.service.utils.PageUtils;
 import lombok.RequiredArgsConstructor;
@@ -141,9 +138,9 @@ public class PaymentChannelServiceImpl implements PaymentChannelService {
     }
 
     @Override
-    public Page<PaymentChannelMerchantDTO> merchantPayChannelList(PageReq pageReq) {
+    public Page<PaymentChannelMerchantDTO> merchantPayChannelList(PaymentChannelPageReq pageReq) {
         Page<PayChannelMerchantDTO> page = new Page<>(pageReq.getCurrent(), pageReq.getSize());
-        page = paymentChannelDao.getBaseMapper().merchantPayChannelList(page);
+        page = paymentChannelDao.getBaseMapper().merchantPayChannelList(pageReq.getMerName(),page);
         List<PaymentChannelMerchantDTO> list = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(page.getRecords())) {
             page.getRecords().forEach(payChannelMerchantDTO -> {

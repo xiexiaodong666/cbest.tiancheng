@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.PayChannelMerchantDTO;
 import com.welfare.persist.entity.PaymentChannel;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 
 /**
@@ -18,6 +19,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface PaymentChannelMapper extends BaseMapper<PaymentChannel> {
 
 
-  Page<PayChannelMerchantDTO> merchantPayChannelList(Page<PayChannelMerchantDTO> page);
+  Page<PayChannelMerchantDTO> merchantPayChannelList(@Param("merName")String merName, Page<PayChannelMerchantDTO> page);
 
 }

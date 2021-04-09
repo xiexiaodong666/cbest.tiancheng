@@ -5,6 +5,7 @@ import com.welfare.service.PaymentChannelService;
 import com.welfare.service.dto.PaymentChannelReq;
 import com.welfare.service.dto.paymentChannel.PaymentChannelDTO;
 import com.welfare.service.dto.paymentChannel.PaymentChannelMerchantDTO;
+import com.welfare.service.dto.paymentChannel.PaymentChannelPageReq;
 import com.welfare.service.dto.paymentChannel.PaymentChannelSortReq;
 import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.Api;
@@ -55,7 +56,7 @@ public class PaymentChannelController {
 
   @PostMapping("/merchant/page")
   @ApiOperation("查询已配置独立支付渠道或已排序的商户")
-  public R<Page<PaymentChannelMerchantDTO>> merchantSpecialList(@RequestBody PageReq req) {
+  public R<Page<PaymentChannelMerchantDTO>> merchantSpecialList(@RequestBody PaymentChannelPageReq req) {
     return R.success(paymentChannelService.merchantPayChannelList(req));
   }
 

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.service.dto.PaymentChannelReq;
 import com.welfare.service.dto.paymentChannel.PaymentChannelDTO;
 import com.welfare.service.dto.paymentChannel.PaymentChannelMerchantDTO;
+import com.welfare.service.dto.paymentChannel.PaymentChannelPageReq;
 import com.welfare.service.dto.paymentChannel.PaymentChannelSortReq;
 import com.welfare.service.utils.PageReq;
 
@@ -57,7 +58,7 @@ public interface PaymentChannelService {
    * @param pageReq
    * @return
    */
-  Page<PaymentChannelMerchantDTO> merchantPayChannelList(PageReq pageReq);
+  Page<PaymentChannelMerchantDTO> merchantPayChannelList(PaymentChannelPageReq pageReq);
 
   /**
    * 排序

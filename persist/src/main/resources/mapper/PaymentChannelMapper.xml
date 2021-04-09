@@ -28,6 +28,7 @@
         ) a
         LEFT JOIN
         merchant m on m.mer_code = a.merchant_code and m.deleted = 0
+        where m.mer_name like concat('%',#{merName},'%')
         order by m.create_time desc
     </select>
 </mapper>

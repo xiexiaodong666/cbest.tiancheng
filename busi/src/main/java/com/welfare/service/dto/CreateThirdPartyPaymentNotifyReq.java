@@ -3,8 +3,10 @@ package com.welfare.service.dto;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class CreateThirdPartyPaymentNotifyReq {
+public class CreateThirdPartyPaymentNotifyReq implements Serializable {
 
     private String barcode;
 

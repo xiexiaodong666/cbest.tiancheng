@@ -53,7 +53,7 @@ public class AccountPaymentResultController implements IController {
         return CbestPayRespStatusConstant.SUCCESS;
     }
 
-    @ApiOperation("第三方交易创建")
+    @ApiOperation("前端轮询第三方支付结果")
     @GetMapping("/createThirdPartyPayment")
     @AccountUser
     public R<CreateThirdPartyPaymentDTO> createThirdPartyPayment(CreateThirdPartyPaymentReq req) {

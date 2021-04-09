@@ -1,13 +1,14 @@
-CREATE TABLE `sub_account_group` (
+# ---- DDL
+CREATE TABLE `account_amount_type_group` (
                                      `id` bigint(20) NOT NULL COMMENT '主键',
-                                     `group_code` varchar(20) NOT NULL COMMENT '家庭编码',
+                                     `group_code` varchar(20) NOT NULL COMMENT '账户组编码',
                                      `mer_account_type_code` varchar(20) NOT NULL COMMENT '福利类型',
                                      `balance` decimal(15,2) DEFAULT '0.00' COMMENT '余额',
                                      `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
                                      `create_time` datetime DEFAULT NULL COMMENT '创建时间',
                                      `update_user` varchar(20) DEFAULT NULL COMMENT '更新人',
                                      `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-                                     `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
+                                     `deleted` bigint(20) DEFAULT NULL COMMENT '删除标志',
                                      `version` int(11) DEFAULT NULL COMMENT '版本',
                                      PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='账户组';
@@ -41,10 +42,11 @@ CREATE TABLE `mer_account_type_consume_scene_config` (
                                                          PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='福利类型消费门店场景配置';
 
-alter table account_bill_detail add column group_id big(20) comment '家庭id' after payment_channel;
-alter table account_deduction_detail add column group_id big(20) comment '家庭id' after payment_channel;
+alter table account_bill_detail add column account_amount_type_group_id bigint(20) comment '福利类型组id' after payment_channel;
+alter table account_deduction_detail add column account_amount_type_group_id bigint(20) comment '福利类型组id' after payment_channel;
 
-alter table account_amount_type add column has_join_group tinyint(1) comment '是否加入家庭' after account_balance;
-alter table account_amount_type add column group_id big(20) comment '家庭id' after account_balance;
+alter table account_amount_type add column join_group tinyint(1) comment '是否加入组' after account_balance;
+alter table account_amount_type add column account_amount_type_group_id bigint(20) comment '家庭id' after account_balance;
 
 
+# DML ---

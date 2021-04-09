@@ -33,6 +33,7 @@
         LEFT JOIN merchant_store_relation msr  ON m.mer_code = msr.mer_code  AND msr.deleted = 0
         <where>
             m.deleted = 0
+            and m.mer_identity like concat('%', 'PARTER', '%')
             <if test="merName != null and merName != ''">
                 and m.mer_name like concat('%', #{merName}, '%')
             </if>

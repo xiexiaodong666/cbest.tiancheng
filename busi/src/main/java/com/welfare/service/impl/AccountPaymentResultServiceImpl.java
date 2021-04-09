@@ -264,7 +264,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
             boolean updated = subAccountDao.updateById(subAccount);
 
         }
-        if ("STOP".equals(signStatus)) {
+        if ("UNSIGN".equals(signStatus)) {
             LambdaUpdateWrapper<SubAccount> updateWrapper = Wrappers.<SubAccount>lambdaUpdate()
                 .set(SubAccount::getPasswordFreeSignature, null)
                 .eq(SubAccount::getAccountCode, accountCode)

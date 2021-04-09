@@ -118,11 +118,7 @@ public class AccountController implements IController {
                 }
             }
         }
-        AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
-        accountPaymentChannelDTO.setPaymentChannel(WelfareConstant.PaymentChannel.ALIPAY.code());
-        accountPaymentChannelDTO.setPaymentChannelDesc(WelfareConstant.PaymentChannel.ALIPAY.desc());
-        accountPaymentChannelDTO.setPasswordFree(false);
-        return accountPaymentChannelDTO;
+        return null;
     }
 
     @ApiOperation("免密支付签约(页面跳转方式）")

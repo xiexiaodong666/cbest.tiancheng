@@ -70,4 +70,10 @@ public class WelfareSettleDetailReq{
 
     @ApiModelProperty("支付渠道")
     private String paymentChannel;
+
+    @ApiModelProperty(value = "手机号")
+    private String phone;
+
+    @ApiModelProperty(value = "部门编码列表")
+    private List<String> departmentCodes;
 }

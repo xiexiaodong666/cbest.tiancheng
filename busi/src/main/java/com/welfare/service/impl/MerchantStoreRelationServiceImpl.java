@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BizException;
@@ -12,18 +13,18 @@ import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
+import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
-import com.welfare.persist.dto.AdminMerchantStore;
-import com.welfare.persist.dto.MerSupplierStoreDTO;
-import com.welfare.persist.dto.MerSupplierStoreResp;
-import com.welfare.persist.dto.MerchantStoreRelationDTO;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.MerchantStoreRelationService;
+import com.welfare.service.dto.StoreCodeNameDTO;
 import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
@@ -60,6 +61,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   private final SupplierStoreDao supplierStoreDao;
 
   private final ObjectMapper mapper;
+  private final SettleDetailDao settleDetailDao;
   @Autowired
   private AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final ApplicationContext applicationContext;
@@ -560,5 +562,14 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     }
 
     return validate;
+  }
+
+  @Override
+  public List<StoreCodeName2DTO> allStoresInUnSettleDetail(String merCode) {
+    List<StoreCodeName2DTO> settleDetails = settleDetailDao.getBaseMapper().allStoresInUnSettleDetail(merCode);
+    if (CollectionUtils.isNotEmpty(settleDetails)) {
+      settleDetails = settleDetails.stream().filter(Objects::nonNull).collect(Collectors.toList());
+    }
+    return settleDetails;
   }
 }

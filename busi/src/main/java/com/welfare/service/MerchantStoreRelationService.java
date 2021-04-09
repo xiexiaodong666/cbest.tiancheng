@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.MerSupplierStoreResp;
 import com.welfare.persist.dto.MerchantStoreRelationDTO;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
 import com.welfare.persist.entity.MerchantStoreRelation;
+import com.welfare.service.dto.StoreCodeNameDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -48,4 +50,12 @@ public interface MerchantStoreRelationService {
    * @return
    */
   List<MerSupplierStoreResp>  queryMerSupplierStoreRelation(@Param("merCode")String merCode);
+
+
+  /**
+   * 查询商户未结算明细所有门店
+   * @param merCode
+   * @return
+   */
+  List<StoreCodeName2DTO> allStoresInUnSettleDetail(String merCode);
 }

@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;

@@ -363,6 +363,8 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     }
     if(CollectionUtils.isNotEmpty(merchantStoreRelationNewList)) {
       saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
+    }
+    if(CollectionUtils.isNotEmpty(addStoreConsumeTypes)) {
       // 创建商户门店消费新增事件
       applicationContext.publishEvent(MerStoreConsumeTypeChangeEvt.builder()
               .actionType(ShoppingActionTypeEnum.ADD)
@@ -371,6 +373,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
               .build()
       );
     }
+
     if (CollectionUtils.isNotEmpty(delStoreConsumeTypes)) {
       // 创建商户门店消费删除事件
       applicationContext.publishEvent(MerStoreConsumeTypeChangeEvt.builder()

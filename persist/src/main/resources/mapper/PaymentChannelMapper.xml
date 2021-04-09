@@ -29,8 +29,9 @@
         LEFT JOIN
         merchant m on m.mer_code = a.merchant_code and m.deleted = 0
         <where>
+             m.mer_identity like concat('%', 'PARTER', '%')
             <if test="merName != null and merName != ''">
-                m.mer_name like concat('%',#{merName},'%')
+               and m.mer_name like concat('%',#{merName},'%')
             </if>
         </where>
         order by m.create_time desc

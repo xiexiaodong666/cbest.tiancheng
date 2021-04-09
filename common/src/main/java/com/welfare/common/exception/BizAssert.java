@@ -58,7 +58,7 @@ public class BizAssert {
 
     public static void notEmpty(Collection<?> collection, ExceptionCode exceptionCode, String msg){
         if(CollectionUtils.isEmpty(collection)){
-            throw new BizException(exceptionCode);
+            throw new BizException(exceptionCode,msg);
         }
     }
 

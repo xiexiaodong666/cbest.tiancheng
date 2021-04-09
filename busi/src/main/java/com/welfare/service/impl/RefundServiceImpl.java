@@ -82,14 +82,14 @@ public class RefundServiceImpl implements RefundService {
                     .queryByTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
             BigDecimal paidAmount = paidDetails.stream()
                     .map(AccountDeductionDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            if (refundedAmount.add(refundRequest.getAmount()).compareTo(paidAmount) > 0) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款总额不能大于已付款金额", null);
-            }
             if (transNoInDbs.contains(refundRequest.getTransNo())) {
                 RefundRequest refundRequestInDb = queryResult(refundRequest.getTransNo());
                 log.warn("交易已经处理过，直接返回处理结果:{}", JSON.toJSONString(refundRequestInDb));
                 BeanUtils.copyProperties(refundRequestInDb, refundRequest);
                 return true;
+            }
+            if (refundedAmount.add(refundRequest.getAmount()).compareTo(paidAmount) > 0) {
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款总额不能大于已付款金额", null);
             }
 
         }

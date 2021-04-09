@@ -16,11 +16,13 @@ import com.welfare.service.OrderService;
 import com.welfare.servicesettlement.dto.mall.OrderMqInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -46,9 +48,14 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
     @Override
     public void onMessage(OrderMqInfo orderDTO) {
         log.info("rocketmq msg received:{}", JSON.toJSONString(orderDTO));
+        String tradeNo = orderDTO.getTradeNo();
+        if(Strings.isEmpty(tradeNo)){
+            //没有交易单号，则没有支付过，不保存
+            return;
+        }
         List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao
-                .queryByTransNoAndTransType(orderDTO.getTradeNo(), WelfareConstant.TransType.CONSUME.code());
-        BizAssert.notEmpty(accountDeductionDetails, ExceptionCode.DATA_NOT_EXIST,"不存在流水号:"+orderDTO.getTradeNo());
+                .queryByTransNoAndTransType(tradeNo, WelfareConstant.TransType.CONSUME.code());
+        BizAssert.notEmpty(accountDeductionDetails, ExceptionCode.DATA_NOT_EXIST,"不存在流水号:"+ tradeNo);
 
         AccountDeductionDetail firstDetail = accountDeductionDetails.get(0);
         Account account = accountDao.queryByAccountCode(firstDetail.getAccountCode());

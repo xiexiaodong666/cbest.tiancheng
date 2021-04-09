@@ -1,14 +1,14 @@
 package com.welfare.service.dto.payment;
 
+import com.welfare.common.exception.BizException;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.SpringBeanUtils;
-import com.welfare.common.util.StringUtil;
 import com.welfare.service.BarcodeService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @email yuxiang.li@sjgo365.com
  * @date 1/11/2021
  */
+@EqualsAndHashCode(callSuper = true)
 @ApiModel("扫码支付请求")
 @Data
 public class BarcodePaymentRequest extends PaymentRequest {
@@ -40,36 +41,36 @@ public class BarcodePaymentRequest extends PaymentRequest {
         if(!Objects.isNull(super.getAccountCode())){
             return super.getAccountCode();
         }
-        calculatePaymentChannelByBarcode();
+        this.paymentChannel = calculatePaymentChannelByBarcode(this.barcode);
         BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
         RedisTemplate<String,String> redisTemplate = SpringBeanUtils.getBean(StringRedisTemplate.class);
         String expireSecs = SpringBeanUtils.getApplicationContext()
                 .getEnvironment()
-                .getProperty("e-welfare.barcode.expire", "210");
+                .getProperty("e-welfare.barcode.expire-for-pay", "240");
         String barcodeInRedis = redisTemplate.opsForValue().get("BARCODE:" + barcode);
-        if(!StringUtils.isEmpty(barcodeInRedis)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该支付码已被使用",null);
+        if(!StringUtils.isEmpty(barcodeInRedis) && !isNotification() && !getOffline()){
+            //在不是“支付成功通知”的情况下，需要校验支付码是否已经被使用过了
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"该支付码已被使用",null);
         }else{
             redisTemplate.opsForValue().set("BARCODE:"+barcode,barcode,Long.parseLong(expireSecs), TimeUnit.SECONDS);
         }
-        Long accountCode = barcodeService.parseAccountFromBarcode(barcode, scanDate,getOffline());
+        Long accountCode = barcodeService.parseAccountFromBarcode(barcode, scanDate,getOffline(), isNotification());
         this.setAccountCode(accountCode);
         return accountCode;
     }
 
-    private String calculatePaymentChannelByBarcode() {
+    public static String calculatePaymentChannelByBarcode(final String barcode) {
         if(barcode.startsWith(WelfareConstant.PaymentChannel.WELFARE.barcodePrefix())){
-            this.setPaymentChannel(WelfareConstant.PaymentChannel.WELFARE.code());
+            return WelfareConstant.PaymentChannel.WELFARE.code();
         }else if(barcode.startsWith(WelfareConstant.PaymentChannel.WO_LIFE.barcodePrefix())){
-            this.setPaymentChannel(WelfareConstant.PaymentChannel.WO_LIFE.code());
+            return WelfareConstant.PaymentChannel.WO_LIFE.code();
         }else if(barcode.startsWith(WelfareConstant.PaymentChannel.WECHAT.barcodePrefix())){
-            this.setPaymentChannel(WelfareConstant.PaymentChannel.WECHAT.code());
+            return WelfareConstant.PaymentChannel.WECHAT.code();
         }else if(barcode.startsWith(WelfareConstant.PaymentChannel.ALIPAY.barcodePrefix())){
-            this.setPaymentChannel(WelfareConstant.PaymentChannel.ALIPAY.code());
+            return WelfareConstant.PaymentChannel.ALIPAY.code();
         }else{
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "条码不符合规则", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "条码不符合规则", null);
         }
-        return paymentChannel;
     }
 
 

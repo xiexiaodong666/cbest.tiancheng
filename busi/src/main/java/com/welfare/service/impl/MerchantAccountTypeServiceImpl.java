@@ -5,12 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.MoveDirectionEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
-import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.AccountAmountTypeService;
@@ -22,7 +21,6 @@ import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +47,6 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     private MerchantService merchantService;
     private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
     private final SequenceService sequenceService;
-    @Autowired
-    private AccountAmountTypeService accountAmountTypeService;
     private final static Long startId = 10000L;
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
@@ -64,7 +60,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     public MerchantAccountTypeDetailDTO detail(Long id) {
         MerchantAccountTypeDetailDTO detailDTO=merchantAccountTypeDetailConverter.toD(merchantAccountTypeDao.getById(id));
         if(EmptyChecker.isEmpty(detailDTO)){
-            throw new BusiException("福利类型不存在");
+            throw new BizException("福利类型不存在");
         }
         detailDTO.setMerName(merchantService.getMerchantByMerCode(detailDTO.getMerCode()).getMerName());
         List<MerchantAccountType> list=this.queryShowedByMerCode(detailDTO.getMerCode());
@@ -91,7 +87,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     @Transactional(rollbackFor = Exception.class)
     public boolean add(MerchantAccountTypeAddDTO merchantAccountType) {
         if(EmptyChecker.isEmpty(merchantAccountType.getTypeList())){
-            throw new BusiException("福利类型扣款顺序不能为空");
+            throw new BizException("福利类型扣款顺序不能为空");
         }
         List<MerchantAccountType> accountTypeList=new ArrayList<>();
         Date date=new Date();
@@ -115,7 +111,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     @Transactional(rollbackFor = Exception.class)
     public boolean update(MerchantAccountTypeUpdateDTO merchantAccountType) {
         if(EmptyChecker.isEmpty(merchantAccountType.getTypeList())){
-            throw new BusiException("福利类型扣款顺序不能为空");
+            throw new BizException("福利类型扣款顺序不能为空");
         }
         MerchantAccountTypeReq req=new MerchantAccountTypeReq();
         req.setMerCode(merchantAccountType.getMerCode());

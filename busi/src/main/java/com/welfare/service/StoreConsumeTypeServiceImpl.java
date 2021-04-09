@@ -3,11 +3,12 @@ package com.welfare.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.welfare.persist.dao.StoreConsumeTypeDao;
 import com.welfare.persist.entity.StoreConsumeType;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author gaorui

@@ -1,6 +1,5 @@
 package com.welfare.persist.dao;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.common.constants.WelfareSettleConstant;

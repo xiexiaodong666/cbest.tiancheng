@@ -1,10 +1,10 @@
 package com.welfare.persist.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.PaymentChannel;
 import com.welfare.persist.mapper.PaymentChannelMapper;
 import lombok.extern.slf4j.Slf4j;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
@@ -25,15 +25,13 @@ import java.util.stream.Collectors;
 @Repository
 public class PaymentChannelDao extends ServiceImpl<PaymentChannelMapper, PaymentChannel> {
 
-  private static final String DEFAULT_MERCHANT_NAME = "default";
+  public static final String DEFAULT_MERCHANT_NAME = "default";
 
   public List<PaymentChannel> listByMerCodeGroupByCode(String merCode) {
     QueryWrapper<PaymentChannel> queryWrapper = new QueryWrapper<>();
-    if (StringUtils.isNoneBlank(merCode)) {
-      queryWrapper.eq(PaymentChannel.MERCHANT_CODE, merCode);
-    }
+    queryWrapper.eq(PaymentChannel.MERCHANT_CODE, merCode);
     queryWrapper.eq(PaymentChannel.DELETED, "0");
-    queryWrapper.groupBy(PaymentChannel.CODE);
+    queryWrapper.orderByAsc(PaymentChannel.SHOW_ORDER);
     return list(queryWrapper);
   }
 
@@ -41,7 +39,7 @@ public class PaymentChannelDao extends ServiceImpl<PaymentChannelMapper, Payment
     QueryWrapper<PaymentChannel> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(PaymentChannel.MERCHANT_CODE, DEFAULT_MERCHANT_NAME);
     queryWrapper.eq(PaymentChannel.DELETED, "0");
-    queryWrapper.groupBy(PaymentChannel.CODE);
+    queryWrapper.orderByAsc(PaymentChannel.SHOW_ORDER);
     return list(queryWrapper);
   }
 
@@ -55,5 +53,14 @@ public class PaymentChannelDao extends ServiceImpl<PaymentChannelMapper, Payment
       map = list.stream().collect(Collectors.toMap(PaymentChannel::getCode, a -> a,(k1, k2)->k1));
     }
     return map;
+  }
+
+  public Boolean delByMerCode(String merCode) {
+    if (StringUtils.isNoneBlank(merCode)) {
+      QueryWrapper<PaymentChannel> queryWrapper = new QueryWrapper<>();
+      queryWrapper.eq(PaymentChannel.MERCHANT_CODE, merCode);
+      return remove(queryWrapper);
+    }
+    return true;
   }
 }

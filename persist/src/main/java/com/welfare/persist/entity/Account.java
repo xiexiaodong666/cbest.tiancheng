@@ -1,22 +1,18 @@
 package com.welfare.persist.entity;
 
-import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.math.BigDecimal;
-import java.util.Date;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 账户信息(account)实体类
@@ -69,6 +65,9 @@ public class Account extends Model<Account> implements Serializable {
      */
     @ApiModelProperty("账号状态(1正常2禁用)")   
     private Integer accountStatus;
+
+    @ApiModelProperty("离线启用标识 1启用，0-禁用")
+    private Integer offlineLock;
     /**
      * 员工状态
      */
@@ -257,5 +256,7 @@ public class Account extends Model<Account> implements Serializable {
     * 文件存储关联id
     */
     public static final String FILE_UNIVERSAL_STORAGE_ID = "file_universal_storage_id";
+
+    public static final String OFFLINE_LOCK = "offline_lock";
 
 }

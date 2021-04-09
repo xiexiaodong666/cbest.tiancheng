@@ -1,11 +1,11 @@
 package com.welfare.service.remote.entity.request;
 
-import java.math.BigDecimal;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 import static com.welfare.common.constants.WelfareConstant.DEFAULT_SALE_UNID;
 import static com.welfare.common.constants.WelfareConstant.DEFAULT_SALE_UNNAME;

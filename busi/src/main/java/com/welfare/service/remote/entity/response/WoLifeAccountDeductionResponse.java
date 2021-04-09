@@ -1,7 +1,8 @@
 package com.welfare.service.remote.entity.response;
 
-import java.math.BigDecimal;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * @author gaorui

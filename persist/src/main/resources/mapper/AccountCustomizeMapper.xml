@@ -425,15 +425,17 @@
 
              WHEN (
                  a.deleted = 0
-                 AND AT.deleted = 0
-                 AND acs.deleted = 0
                  AND a.account_status = 1
-                 AND acs.`status` = 1
-                 AND locate(relation.scene_consum_type, #{consumeType}) > 0
+                 AND AT.deleted = 0
+                 AND locate( '0',GROUP_CONCAT( acs.deleted ) ) > 0
+                 AND locate( '1', GROUP_CONCAT( acs.`status` ) ) > 0
+                 AND locate( 'SHOP_CONSUMPTION' ,GROUP_CONCAT( if(relation.deleted=0,relation.scene_consum_type,'') )) > 0
                ) THEN
                TRUE
              ELSE FALSE
-             END                            AS canUse
+             END                            AS canUse,
+           CASE WHEN (a.offline_lock = NULL or a.offline_lock = 0) THEN FALSE
+                ELSE TRUE END AS offlineCanUse
     FROM account a
            LEFT JOIN account_type AT
     ON AT.type_code = a.account_type_code and a.mer_code = at.mer_code

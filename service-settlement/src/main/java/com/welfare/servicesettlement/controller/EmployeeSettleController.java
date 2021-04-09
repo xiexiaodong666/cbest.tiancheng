@@ -5,23 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.domain.MerchantUserInfo;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
 import com.welfare.persist.dto.EmployeeSettleSumDTO;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
-import com.welfare.service.dto.EmployeeSettleBillPageReq;
-import com.welfare.service.dto.EmployeeSettleBillResp;
-import com.welfare.service.dto.EmployeeSettleBuildReq;
-import com.welfare.service.dto.EmployeeSettleConsumePageReq;
-import com.welfare.service.dto.EmployeeSettleDetailPageReq;
-import com.welfare.service.dto.EmployeeSettleDetailReq;
-import com.welfare.service.dto.EmployeeSettleDetailResp;
-import com.welfare.service.dto.EmployeeSettleFinishReq;
-import com.welfare.service.dto.EmployeeSettleSumReq;
-import com.welfare.service.dto.StoreCodeNameDTO;
+import com.welfare.service.dto.*;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
 import com.welfare.service.settlement.EmployeeSettleService;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
@@ -32,18 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -90,7 +73,7 @@ public class EmployeeSettleController {
      if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
          employeeSettleConsumePageReq.setMerCode(merchantUser.getMerchantCode());
      }else {
-         throw new BusiException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+         throw new BizException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
      }
      return success(employeeSettleDetailService.pageQuery(employeeSettleConsumePageReq));
   }
@@ -103,7 +86,7 @@ public class EmployeeSettleController {
      if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
          employeeSettleConsumeQuery.setMerCode(merchantUser.getMerchantCode());
      }else {
-         throw new BusiException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+         throw new BizException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
      }
      return success(employeeSettleDetailService.summary(employeeSettleConsumeQuery));
 
@@ -146,7 +129,7 @@ public class EmployeeSettleController {
       path = fileUploadService.uploadExcelFile(
               employeeSettleDetailRespList, EmployeeSettleDetailResp.class, "未结算账单明细");
     } catch (IOException e) {
-      throw new BusiException(null, "文件导出异常", null);
+      throw new BizException(null, "文件导出异常", null);
     }
     return success(fileUploadService.getFileServerUrl(path));
   }
@@ -160,7 +143,7 @@ public class EmployeeSettleController {
     if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
       billPageReq.setMerCode(merchantUser.getMerchantCode());
     }else {
-      throw new BusiException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+      throw new BizException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
     }
     Page<EmployeeSettleBillResp> page = employeeSettleService.pageQueryBill(billPageReq);
     return success(page);
@@ -195,7 +178,7 @@ public class EmployeeSettleController {
       path = fileUploadService.uploadExcelFile(
           employeeSettleDetailRespList, EmployeeSettleDetailResp.class, "账单明细");
     } catch (IOException e) {
-      throw new BusiException(null, "文件导出异常", null);
+      throw new BizException(null, "文件导出异常", null);
     }
     return success(fileUploadService.getFileServerUrl(path));
   }
@@ -214,7 +197,7 @@ public class EmployeeSettleController {
       try {
         date = DateUtil.str2Date(dateStr, DateUtil.DEFAULT_DATE_FORMAT);
       } catch (Exception e) {
-        throw new BusiException("时间转换失败");
+        throw new BizException("时间转换失败");
       }
     }
     employeeSettleDetailService.pullAccountDetailByDate(date);
@@ -225,7 +208,7 @@ public class EmployeeSettleController {
     @ApiOperation("查询员工授信消费所有门店name和code")
     public R<List<StoreCodeNameDTO>> allStoresInMonthSettle(@RequestParam(value = "settleNo", required = false)String settleNo, @RequestParam(value = "accountCode", required = false)String accountCode){
     if (StringUtils.isBlank(settleNo)&&StringUtils.isBlank(accountCode)){
-        throw new BusiException(ILLEGALITY_ARGURMENTS, "缺少参数", null);
+        throw new BizException(ILLEGALITY_ARGURMENTS, "缺少参数", null);
     }
     List<StoreCodeNameDTO> supplierStores =  employeeSettleDetailService.allStoresInMonthSettle(settleNo, accountCode);
     return success(supplierStores);

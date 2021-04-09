@@ -1,7 +1,16 @@
 package com.welfare.service.remote.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.service.dto.messagepushconfig.WarningSettingSaveReq;
+import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
+import com.welfare.service.dto.offline.OfflineOrderDTO;
+import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
 import com.welfare.service.remote.entity.pos.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 
 /**
@@ -52,4 +61,32 @@ public interface CbestDmallService {
    * @return
    */
   PosTerminalPriceTemplateResp modifyTerminalPriceTemplate(TerminalPriceTemplateUpdateReq req);
+
+  /**
+   * 分页查询离线订单
+   * @param req
+   * @return
+   */
+  Page<OfflineOrderDTO> listOfflineTrade(OfflineTradeReq req);
+
+  /**
+   * 查询当前挂起的离线订单的汇总数据
+   * @param merchantCode
+   * @return
+   */
+  OfflineOrderHangupSummaryDTO summaryHangupOfflineTrade(String merchantCode);
+
+  /**
+   * 汇总查询员工的离线订单
+   * @param merchantCode
+   * @return
+   */
+  List<OfflineOrderAccountSummaryDTO> summaryAccountOfflineTrade(String merchantCode);
+
+  /**
+   * 保存短信通知设置
+   * @param req
+   * @return
+   */
+  DmallResponse<Object> saveWarningSetting(WarningSettingSaveReq req);
 }

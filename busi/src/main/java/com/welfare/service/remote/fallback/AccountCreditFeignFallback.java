@@ -1,7 +1,7 @@
 package com.welfare.service.remote.fallback;
 
 import com.alibaba.fastjson.JSON;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.service.remote.AccountCreditFeign;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class AccountCreditFeignFallback implements FallbackFactory<AccountCredit
   public AccountCreditFeign create(Throwable throwable) {
     return (request, source) -> {
       log.error("查询价格模板失败, 请求:{}", JSON.toJSONString(request), throwable);
-      throw new BusiException("系统异常");
+      throw new BizException("系统异常");
     };
   }
 }

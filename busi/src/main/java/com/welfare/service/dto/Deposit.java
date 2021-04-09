@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,5 +80,22 @@ public class Deposit {
         accountAmountType.setAccountCode(accountCode);
         accountAmountType.setMerAccountTypeCode(merAccountTypeCode);
         return accountAmountType;
+    }
+
+    public static AccountBillDetail assemblyAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType,
+                                                        Account account) {
+        AccountBillDetail accountBillDetail = new AccountBillDetail();
+        Long accountCode = deposit.getAccountCode();
+        BigDecimal amount = deposit.getAmount();
+        accountBillDetail.setAccountCode(accountCode);
+        accountBillDetail.setAccountBalance(account.getAccountBalance());
+        accountBillDetail.setChannel(deposit.getChannel());
+        accountBillDetail.setTransNo(deposit.getTransNo());
+        accountBillDetail.setTransAmount(amount);
+        accountBillDetail.setTransTime(Calendar.getInstance().getTime());
+        accountBillDetail.setSurplusQuota(account.getSurplusQuota());
+        accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
+        accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
+        return accountBillDetail;
     }
 }

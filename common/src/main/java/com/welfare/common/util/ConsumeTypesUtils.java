@@ -1,7 +1,7 @@
 package com.welfare.common.util;
 
+import com.alibaba.fastjson.JSON;
 import com.welfare.common.enums.ConsumeTypeEnum;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
@@ -67,5 +67,54 @@ public class ConsumeTypesUtils {
       }
     }
     return map;
+  }
+
+  public static List<ConsumeTypeEnum> getRedundantConsumeType(String oldConsumeType, String newConsumeType) {
+    Map<String, Boolean> oldConsumeTypeMap = new HashMap<>();
+    Map<String, Boolean> newConsumeTypeMap = new HashMap<>();
+    if (StringUtils.isNotBlank(oldConsumeType)) {
+      oldConsumeTypeMap = JSON.parseObject(oldConsumeType, Map.class);
+    }
+    if (StringUtils.isNotBlank(newConsumeType)) {
+      newConsumeTypeMap = JSON.parseObject(newConsumeType, Map.class);
+    }
+    if (newConsumeTypeMap == null || newConsumeTypeMap.size() == 0 || oldConsumeTypeMap == null || oldConsumeTypeMap.size() == 0) {
+      return getTrueByMap(oldConsumeTypeMap);
+    } else {
+      List<ConsumeTypeEnum> consumeTypeList = new ArrayList<>();
+      for (Map.Entry<String, Boolean> oldType: oldConsumeTypeMap.entrySet()) {
+        if (oldType.getValue() && (!newConsumeTypeMap.containsKey(oldType.getKey()) || !newConsumeTypeMap.get(oldType.getKey()) )) {
+          consumeTypeList.add(ConsumeTypeEnum.getByType(oldType.getKey()));
+        }
+      }
+      return consumeTypeList;
+    }
+  }
+
+  private static List<ConsumeTypeEnum> getTrueByMap(Map<String, Boolean> consumeTypeMap){
+    List<ConsumeTypeEnum> consumeTypeEnums = new ArrayList<>();
+    if (consumeTypeMap != null && consumeTypeMap.size() > 0) {
+      consumeTypeMap.forEach((s, aBoolean) -> {
+        if(aBoolean) {
+          consumeTypeEnums.add(ConsumeTypeEnum.getByType(s));
+        }
+      });
+    }
+    return consumeTypeEnums;
+  }
+
+  public static List<ConsumeTypeEnum> getByConsumeTypeJson(String consumeTypeJson){
+    List<ConsumeTypeEnum> consumeTypeEnums = new ArrayList<>();
+    if (StringUtils.isNotBlank(consumeTypeJson)) {
+      Map<String, Boolean> consumeTypeMap = JSON.parseObject(consumeTypeJson, Map.class);
+      if (consumeTypeMap != null && consumeTypeMap.size() > 0) {
+        consumeTypeMap.forEach((s, aBoolean) -> {
+          if(aBoolean) {
+            consumeTypeEnums.add(ConsumeTypeEnum.getByType(s));
+          }
+        });
+      }
+    }
+    return consumeTypeEnums;
   }
 }

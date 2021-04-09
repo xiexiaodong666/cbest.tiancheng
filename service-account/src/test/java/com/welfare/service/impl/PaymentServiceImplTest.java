@@ -7,6 +7,7 @@ import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
+import com.welfare.service.payment.WelfarePaymentOperator;
 import com.welfare.serviceaccount.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  * @email yuxiang.li@sjgo365.com
  * @date 2/1/2021
  */
-public class PaymentServiceImplTest extends BaseTest {
+public class PaymentServiceImplTest extends BaseTest{
     PaymentRequest paymentRequest;
     Account account;
     List<AccountAmountDO> accountAmountDOs;
@@ -42,6 +43,7 @@ public class PaymentServiceImplTest extends BaseTest {
         account.setAccountCode(123L);
         account.setAccountBalance(BigDecimal.valueOf(5));
         account.setSurplusQuota(BigDecimal.valueOf(10));
+        account.setSurplusQuotaOverpay(BigDecimal.ZERO);
         account.setAccountTypeCode("testType");
         account.setMerCode("merCode001");
         accountAmountDOs = new ArrayList<>();
@@ -64,7 +66,7 @@ public class PaymentServiceImplTest extends BaseTest {
         accountAmountType2.setAccountCode(account.getAccountCode());
         accountAmountType2.setMerAccountTypeCode("third");
         MerchantAccountType merchantAccountType2 = new MerchantAccountType();
-        merchantAccountType2.setMerAccountTypeCode("third");
+        merchantAccountType2.setMerAccountTypeCode("surplus_overpay");
         merchantAccountType2.setDeductionOrder(3);
         accountAmountDOs.add(AccountAmountDO.of(accountAmountType,merchantAccountType,account));
         accountAmountDOs.add(AccountAmountDO.of(accountAmountType1,merchantAccountType1,account));
@@ -83,8 +85,8 @@ public class PaymentServiceImplTest extends BaseTest {
 
     @Test
     public void testDecreaseAccount() {
-        PaymentServiceImpl paymentService = SpringBeanUtils.getBean(PaymentServiceImpl.class);
-        List<PaymentOperation> operations =  paymentService.decreaseAccount(paymentRequest,account,accountAmountDOs,supplierStore,merchantCredit);
+        WelfarePaymentOperator paymentService = SpringBeanUtils.getBean(WelfarePaymentOperator.class);
+        List<PaymentOperation> operations =  paymentService.pay(paymentRequest,account,accountAmountDOs,supplierStore,merchantCredit);
         List<List<MerchantAccountOperation>> merchantOperations = operations.stream()
                 .map(PaymentOperation::getMerchantAccountOperations).collect(Collectors.toList());
         List<AccountAmountType> accountAmountTypes = operations.stream()

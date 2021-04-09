@@ -1,6 +1,5 @@
 package com.welfare.service.remote.service;
 
-import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionDataRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffDataRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;

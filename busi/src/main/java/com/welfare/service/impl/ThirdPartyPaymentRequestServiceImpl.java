@@ -9,10 +9,7 @@ import com.welfare.service.ThirdPartyPaymentRequestService;
 import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
-import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
-import com.welfare.service.remote.service.WoLifeFeignService;
-import com.welfare.service.wolife.WoLifePaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -32,7 +29,6 @@ import java.util.Objects;
 @Service
 public class ThirdPartyPaymentRequestServiceImpl implements ThirdPartyPaymentRequestService {
     private final ThirdPartyPaymentRequestDao thirdPartyPaymentRequestDao;
-    private final WoLifeFeignService woLifeFeignService;
     @Override
     @Deprecated
     public boolean chargeWhetherHandled(PaymentRequest paymentRequest) {

@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.config.CbestPayConfig;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.service.remote.CbestPayFeign;
 import com.welfare.service.remote.entity.*;
@@ -72,7 +72,7 @@ public class CbestPayServiceImpl implements CbestPayService {
             log.error(StrUtil
                 .format("调用重百付{}接口异常-req: {}, resp: {}", method, JSON.toJSONString(req),
                     JSON.toJSONString(resp)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
         }
         log.info(StrUtil.format("调用重百付{}接口-req: {}, resp: {}", method, JSON.toJSONString(req),
             JSON.toJSONString(resp)));
@@ -100,6 +100,7 @@ public class CbestPayServiceImpl implements CbestPayService {
     private String generateSign(CbestPayBaseReq req) {
         Map<String, Object> map = BeanUtil.beanToMap(req, true, true);
         String params = map.entrySet().stream()
+            .filter(item -> item.getValue() != null)
             .sorted(Entry.comparingByKey())
             .map(item -> item.getKey() + "=" + item.getValue())
             .collect(Collectors.joining("&"))
@@ -108,4 +109,67 @@ public class CbestPayServiceImpl implements CbestPayService {
         return sign;
     }
 
+    @Override
+    public AlipayUserAgreementSignResp alipayUserAgreementSign(
+        AlipayUserAgreementSignReq req) {
+        CbestPayBaseBizResp resp = request("alipay.user.agreement.sign", null, req);
+        String bizStatus = resp.getBizStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
+            log.error(
+                StrUtil.format("调用重百付支付宝代扣签约接口失败-req: {}, resp: {}", JSON.toJSONString(req),
+                    JSON.toJSONString(resp)));
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+        }
+        AlipayUserAgreementSignResp alipayUserAgreementSignResp = JSON
+            .parseObject(resp.getBizContent(), AlipayUserAgreementSignResp.class);
+        return alipayUserAgreementSignResp;
+    }
+
+    @Override
+    public AlipayUserAgreementQueryResp alipayUserAgreementQuery(
+        AlipayUserAgreementQueryReq req) {
+        CbestPayBaseBizResp resp = request("alipay.user.agreement.query", null, req);
+        String bizStatus = resp.getBizStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
+            log.error(
+                StrUtil.format("调用重百付支付宝代扣签约查询接口失败-req: {}, resp: {}", JSON.toJSONString(req),
+                    JSON.toJSONString(resp)));
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+        }
+        AlipayUserAgreementQueryResp alipayUserAgreementQueryResp = JSON
+            .parseObject(resp.getBizContent(), AlipayUserAgreementQueryResp.class);
+        return alipayUserAgreementQueryResp;
+    }
+
+    @Override
+    public AlipayUserAgreementUnsignResp alipayUserAgreementUnsign(
+        AlipayUserAgreementUnsignReq req) {
+        CbestPayBaseBizResp resp = request("alipay.user.agreement.unsign", null, req);
+        String bizStatus = resp.getBizStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
+            log.error(
+                StrUtil.format("调用重百付支付宝代扣解约接口失败-req: {}, resp: {}", JSON.toJSONString(req),
+                    JSON.toJSONString(resp)));
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+        }
+        AlipayUserAgreementUnsignResp alipayUserAgreementUnsignResp = JSON
+            .parseObject(resp.getBizContent(), AlipayUserAgreementUnsignResp.class);
+        return alipayUserAgreementUnsignResp;
+    }
+
+    @Override
+    public AlipayUserAgreementPageSignResp alipayUserAgreementPageSign(
+        AlipayUserAgreementPageSignReq req) {
+        CbestPayBaseBizResp resp = request("alipay.user.agreement.page.sign", null, req);
+        String bizStatus = resp.getBizStatus();
+        if (!CbestPayRespStatusConstant.SUCCESS.equals(bizStatus)) {
+            log.error(
+                StrUtil.format("调用重百付代扣签约(页面跳转方式）接口失败-req: {}, resp: {}", JSON.toJSONString(req),
+                    JSON.toJSONString(resp)));
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+        }
+        AlipayUserAgreementPageSignResp alipayUserAgreementPageSignResp = JSON
+            .parseObject(resp.getBizContent(), AlipayUserAgreementPageSignResp.class);
+        return alipayUserAgreementPageSignResp;
+    }
 }

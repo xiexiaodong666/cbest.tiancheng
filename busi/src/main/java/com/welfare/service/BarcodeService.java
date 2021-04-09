@@ -60,7 +60,8 @@ public interface BarcodeService {
      * @param barcode
      * @param scanDate
      * @param isOffline
+     * @param isNotification
      * @return
      */
-    Long parseAccountFromBarcode(String barcode, Date scanDate, boolean isOffline);
+    Long parseAccountFromBarcode(String barcode, Date scanDate, boolean isOffline, boolean isNotification);
 }

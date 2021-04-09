@@ -4,6 +4,8 @@ package com.welfare.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.*;
+import com.welfare.persist.dto.MerSupplierStoreResp;
+import com.welfare.persist.dto.MerchantStoreRelationDTO;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
 import com.welfare.persist.entity.MerchantStoreRelation;

@@ -3,18 +3,13 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.persist.dto.AccountConsumeSceneDO;
-import com.welfare.persist.dto.AccountIncrementDTO;
-import com.welfare.persist.dto.AccountOverviewDTO;
-import com.welfare.persist.dto.AccountPageDTO;
-import com.welfare.persist.dto.AccountPageExtDTO;
-import com.welfare.persist.dto.AccountPaymentChannelDTO;
-import com.welfare.persist.dto.AccountSimpleDTO;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +35,7 @@ public interface AccountService {
 
   List<AccountDTO> export(AccountPageReq accountPageReq);
 
-  String uploadAccount(MultipartFile multipartFile);
+  String uploadAccount(MultipartFile multipartFile)throws IOException;
 
   String accountBatchBindCard(MultipartFile multipartFile);
 
@@ -113,7 +108,7 @@ public interface AccountService {
    * @param queryType
    * @return
    */
-  AccountDO queryByQueryInfo(String queryInfo,String queryType);
+  AccountDO queryByQueryInfo(String queryInfo,String queryType,Date transDate);
 
   /**
    * 按组织机构分组统计各层人员数量
@@ -127,4 +122,28 @@ public interface AccountService {
    * @param creditLimitReq
    */
   void batchRestoreCreditLimit(AccountRestoreCreditLimitReq creditLimitReq);
+
+  /**
+   * 免密签约(页面跳转方式）
+   * @param accountCode
+   * @param paymentChannel
+   * @return
+   */
+  AccountPasswordFreePageSignDTO passwordFreePageSign(Long accountCode, String paymentChannel);
+
+  /**
+   * 免密签约(APP、小程序或JSAPI）
+   * @param accountCode
+   * @param paymentChannel
+   * @return
+   */
+  AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel);
+
+  /**
+   * 免密解约(APP、小程序或JSAPI）
+   * @param accountCode
+   * @param paymentChannel
+   * @return
+   */
+  AccountPasswordFreeSignDTO passwordFreeUnsign(Long accountCode, String paymentChannel);
 }

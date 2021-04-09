@@ -39,6 +39,10 @@ logging:
     path: /home/finance/Logs/e-welfare-settlement.e-cbest.lotest
   level:
     root: info
+    com:
+      welfare:
+        service:
+          remote: debug
 encrypt:
   file: ${config.file:classpath:config/config.properties}
 e-welfare:
@@ -96,3 +100,9 @@ ftp:
   user: pay_tiancheng
   password: 4m+Hatccc
   default-path: /test
+
+rocketmq:
+  name-server: http://172.30.37.35:9876
+  topic:
+    order-online: MSGCENTRAL_APP_WELFARE_ORDER_STATUS_CHANGE_TEST
+    order-online-after-sale: MSGCENTRAL_APP_WELFARE_ORDER_AFTERSALE_CHANGED_TEST

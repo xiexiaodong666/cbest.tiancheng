@@ -4,13 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.gson.Gson;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
-import com.welfare.persist.entity.AccountConsumeScene;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
@@ -21,9 +18,6 @@ import com.welfare.service.dto.ConsumeTypeJson;
 import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 import com.welfare.service.utils.AccountUtils;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -33,8 +27,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author yaoxiao

@@ -1,12 +1,12 @@
 package com.welfare.service.remote.entity.request;
 
-import java.util.Collections;
-import java.util.List;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import com.welfare.service.dto.RefundRequest;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author gaorui

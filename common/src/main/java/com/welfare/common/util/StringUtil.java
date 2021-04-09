@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
  * @date 1/7/2021
  */
 public class StringUtil {
+
+    private final static Pattern DATE_STRING_PATTERN = Pattern.compile("^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$");
     private StringUtil(){
 
     }
@@ -44,5 +46,13 @@ public class StringUtil {
             char uppercase = (char)(now+1);
             return String.valueOf(uppercase);
         }
+    }
+
+    public static boolean validationHHmm(String str) {
+        if (str == null) {
+            return false;
+        }
+        Matcher isNum = DATE_STRING_PATTERN.matcher(str);
+        return isNum.matches();
     }
 }

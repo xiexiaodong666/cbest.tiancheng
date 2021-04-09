@@ -1,10 +1,8 @@
 package com.welfare.service.remote.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.remote.WoLifeFeignClient;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionDataRequest;
-import com.welfare.service.remote.entity.request.WoLifeGetAccountDeductionRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffDataRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;

@@ -104,7 +104,7 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
      * 卡号
      */
     @ApiModelProperty("卡号")   
-    private Integer cardId;
+    private String cardId;
     /**
      * 订单金额
      */

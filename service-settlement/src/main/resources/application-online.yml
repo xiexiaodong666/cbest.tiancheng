@@ -95,5 +95,5 @@ ftp:
 rocketmq:
   name-server: a.broker.rocketmq.cbest.gam:9876;b.broker.rocketmq.cbest.gam:9876
   topic:
-    order-online: MSGCENTRAL_APP_WELFARE_ORDER_CHANGED
+    order-online: MSGCENTRAL_APP_WELFARE_ORDER_STATUS_CHANGE
     order-online-after-sale: MSGCENTRAL_APP_WELFARE_ORDER_AFTERSALE_CHANGED

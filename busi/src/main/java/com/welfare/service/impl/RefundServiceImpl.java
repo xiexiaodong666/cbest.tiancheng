@@ -47,11 +47,7 @@ public class RefundServiceImpl implements RefundService {
         List<AccountDeductionDetail> paymentDeductionDetailInDb = accountDeductionDetailDao
                 .queryByTransNoAndTransType(refundRequest.getTransNo(), WelfareConstant.TransType.CONSUME.code());
         Assert.isTrue(CollectionUtils.isEmpty(paymentDeductionDetailInDb),"退款交易单号不能和付款的交易单号一样。");
-        List<AccountDeductionDetail> refundDeductionDetailsInDb = accountDeductionDetailDao
-                .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
-        if (hasRefunded(refundRequest, refundDeductionDetailsInDb)) {
-            return;
-        }
+
         List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao.queryByTransNoAndTransType(
                 originalTransNo,
                 WelfareConstant.TransType.CONSUME.code()
@@ -62,6 +58,12 @@ public class RefundServiceImpl implements RefundService {
         //找到支付渠道对应的退款operator,执行退款
         PaymentChannelOperatorEnum paymentChannelOperatorEnum = PaymentChannelOperatorEnum.findByPaymentChannelStr(first.getPaymentChannel());
         IRefundOperator refundOperator = SpringBeanUtils.getBean(paymentChannelOperatorEnum.refundOperator());
+
+        List<AccountDeductionDetail> refundDeductionDetailsInDb = accountDeductionDetailDao
+                .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
+        if (hasRefunded(refundRequest, refundDeductionDetailsInDb)) {
+            return;
+        }
         refundOperator.refund(refundRequest,refundDeductionDetailsInDb,accountDeductionDetails,accountCode);
     }
 

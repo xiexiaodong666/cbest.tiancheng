@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -52,6 +53,7 @@ public class RefundNotificationContent implements Serializable {
         refundRequest.setRefundDate(Calendar.getInstance().getTime());
         refundRequest.setOriginalTransNo(gatewayTradeNo);
         refundRequest.setTransNo(outRefundNo);
+        refundRequest.setAmount(amount.divide(BigDecimal.valueOf(100),2, RoundingMode.HALF_UP));
         return refundRequest;
     }
 }

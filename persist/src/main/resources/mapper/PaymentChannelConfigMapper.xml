@@ -15,7 +15,7 @@
             m.mer_name as merchantName,
             m.mer_code as merchantCode,
             a.paymentChannels as paymentChannels,
-            count(if(msr.store_code != NULL, 1, NULL)) as consumeStoreCount
+            count(msr.store_code) as consumeStoreCount
         from
             merchant m LEFT JOIN
             (

@@ -117,7 +117,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
         BarcodePaymentNotifyReq req = new BarcodePaymentNotifyReq();
         BeanUtils.copyProperties(thirdPartyPaymentResultNotifyReq, req);
         req.setAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getAmount()));
-        req.setActualAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getActualAmount()));
+        req.setActualAmount(fenToYuan(thirdPartyPaymentResultNotifyReq.getAmount()));
         req.setTotalDiscountAmount(
             fenToYuan(thirdPartyPaymentResultNotifyReq.getTotalDiscountAmount()));
         String barcode = thirdPartyPaymentResultNotifyReq.getBarcode();

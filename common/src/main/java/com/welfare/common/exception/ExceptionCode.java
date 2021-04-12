@@ -20,7 +20,7 @@ public enum ExceptionCode implements IResultCode {
     ILLEGALITY_ARGURMENTS(5001001,"参数校验异常"),
     DATA_BASE_ERROR(5001002,"数据库异常"),
 
-    //----------业务异常-----------
+    //----------业务异常------------------------------------------------------------------------------------------------
 
     //---------资金相关异常----
     MERCHANT_RECHARGE_LIMIT_EXCEED(5002001,"商户余额不足"),
@@ -37,7 +37,9 @@ public enum ExceptionCode implements IResultCode {
     BUSI_ERROR_NO_PERMISSION(5005001,"未登录"),
 
     //______数据相关异常------
-    DATA_NOT_EXIST(50060001,"数据不存在");
+    DATA_NOT_EXIST(50060001,"数据不存在"),
+    //______配置相关异常------
+    NO_AVAILABLE_AMOUNT_TYPE(50070001,"当前场景没有可用的福利类型");
 
 
     private int code;

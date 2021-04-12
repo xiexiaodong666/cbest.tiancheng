@@ -10,8 +10,8 @@ import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
-import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
+import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
@@ -42,16 +42,12 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
-import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SELF;
 
 /**
  * Description:
@@ -80,6 +76,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final AsyncService asyncService;
     private final PaymentChannelConfigDao paymentChannelConfigDao;
     private final SubAccountDao subAccountDao;
+    private final MerAccountTypeConsumeSceneConfigDao merAccountTypeConsumeSceneConfigDao;
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
     @Resource(name = "e-welfare-paymentQueryAsync")
@@ -108,6 +105,9 @@ public class PaymentServiceImpl implements PaymentService {
                         merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(), account.getMerCode()));
                 Future<MerchantCredit> merchantCreditFuture =
                         threadPoolTaskExecutor.submit(() -> merchantCreditService.getByMerCode(account.getMerCode()));
+                Future<List<MerAccountTypeConsumeSceneConfig>> merAccountTypeConsumeSceneConfigFuture =
+                        threadPoolTaskExecutor.submit(() -> merAccountTypeConsumeSceneConfigDao
+                                .query(account.getMerCode(),paymentRequest.getStoreNo(),paymentRequest.getPaymentScene()));
                 Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();
@@ -124,6 +124,8 @@ public class PaymentServiceImpl implements PaymentService {
                 String paymentScene = paymentSceneFuture.get();
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
                 List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
+                List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs = merAccountTypeConsumeSceneConfigFuture.get();
+                accountAmountDOList = filterAvailable(accountAmountDOList, merAccountTypeConsumeSceneConfigs);
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
                 //支付前的校验
                 chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
@@ -170,6 +172,19 @@ public class PaymentServiceImpl implements PaymentService {
             DistributedLockUtil.unlock(accountLock);
         }
 
+    }
+
+    private List<AccountAmountDO> filterAvailable(List<AccountAmountDO> accountAmountDOList, List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs) {
+        List<String> configs = merAccountTypeConsumeSceneConfigs.stream()
+                .map(MerAccountTypeConsumeSceneConfig::getMerAccountTypeCode)
+                .collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(configs)){
+            return Collections.emptyList();
+        }
+        accountAmountDOList = accountAmountDOList.stream()
+                .filter(amountDO -> configs.contains(amountDO.getAccountAmountType().getMerAccountTypeCode()))
+                .collect(Collectors.toList());
+        return accountAmountDOList;
     }
 
     private <T extends PaymentRequest> Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationFuture(T paymentRequest, Account account) {

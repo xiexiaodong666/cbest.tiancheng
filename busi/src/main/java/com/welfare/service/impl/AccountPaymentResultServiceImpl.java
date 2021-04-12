@@ -133,8 +133,9 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
                                 .eq(ThirdPartyPaymentRequest::getTransNo,
                                         thirdPartyPaymentResultNotifyReq.getGatewayTradeNo())
                                 .eq(ThirdPartyPaymentRequest::getAccountCode, accountCode)
-                                .eq(ThirdPartyPaymentRequest::getTransType,
-                                        TransType.CONSUME.code()));
+                                .eq(ThirdPartyPaymentRequest::getTransType, TransType.CONSUME.code())
+                                .last("limit 1")
+                );
         if(Objects.isNull(thirdPartyPaymentRequest)){
             thirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
             thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(req));

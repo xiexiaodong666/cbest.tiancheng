@@ -135,7 +135,7 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
 
     private List<PayChannelConfigRowDTO.PaymentChannel> sort(List<com.welfare.service.dto.PaymentChannelDTO> allPaymentChannels,
                                                              List<PayChannelConfigRowDTO.PaymentChannel> selectedPaymentChannels){
-        List<PayChannelConfigRowDTO.PaymentChannel> paymentChannels = new LinkedList<>();
+        List<PayChannelConfigRowDTO.PaymentChannel> paymentChannels = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(selectedPaymentChannels)) {
             Map<String, PayChannelConfigRowDTO.PaymentChannel> channelConfigMap = selectedPaymentChannels.stream().collect(Collectors.toMap(PayChannelConfigRowDTO.PaymentChannel::getPaymentChannelCode, type -> type));
             allPaymentChannels.forEach(dto -> {

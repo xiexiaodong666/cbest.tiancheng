@@ -15,7 +15,7 @@
             m.mer_name as merchantName,
             m.mer_code as merchantCode,
             a.paymentChannels as paymentChannels,
-            count(msr.store_code) as consumeStoreCount
+            count(if(msr.store_code != NULL, 1, NULL)) as consumeStoreCount
         from
             merchant m LEFT JOIN
             (
@@ -31,9 +31,11 @@
             ) as a
             on a.merchantCode = m.mer_code
         LEFT JOIN merchant_store_relation msr  ON m.mer_code = msr.mer_code  AND msr.deleted = 0
+        LEFT JOIN supplier_store ss  ON msr.store_code = ss.store_code  AND ss.deleted = 0
         <where>
             m.deleted = 0
             and m.mer_identity like concat('%', 'PARTER', '%')
+            and ss.mer_code != msr.mer_code
             <if test="merName != null and merName != ''">
                 and m.mer_name like concat('%', #{merName}, '%')
             </if>

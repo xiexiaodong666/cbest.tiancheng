@@ -20,6 +20,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +47,7 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
     private final MerchantDao merchantDao;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void onMessage(OrderMqInfo orderDTO) {
         log.info("rocketmq msg received:{}", JSON.toJSONString(orderDTO));
         String tradeNo = orderDTO.getTradeNo();

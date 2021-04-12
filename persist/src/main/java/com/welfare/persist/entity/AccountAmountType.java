@@ -50,6 +50,13 @@ public class AccountAmountType extends Model<AccountAmountType> implements Seria
      */
     @ApiModelProperty("余额")   
     private BigDecimal accountBalance;
+
+    @ApiModelProperty("是否加入组")
+    private Boolean joinedGroup;
+
+    @ApiModelProperty("分组id")
+    private Long accountAmountTypeGroupId;
+
     /**
      * 删除标志  1-删除、0-未删除
      */
@@ -129,5 +136,10 @@ public class AccountAmountType extends Model<AccountAmountType> implements Seria
     * 版本
     */
     public static final String VERSION = "version";
+
+    public static final String JOINED_GROUP = "joined_group";
+
+    public static final String ACCOUNT_AMOUNT_TYPE_GROUP_ID = "account_amount_type_group_id";
+
 
 }

@@ -1,5 +1,8 @@
 package com.welfare.common.constants;
 
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
+
 /**
  * Description:
  *
@@ -531,6 +534,9 @@ public class WelfareConstant {
      */
     public enum MessagePushTemplateType {
 
+        /**
+         *
+         */
         STRING_REPLACER("string_replacer", "字符串替换");
 
         private final String code;
@@ -549,4 +555,41 @@ public class WelfareConstant {
             return this.desc;
         }
     }
+
+    /**
+     * 支付业务类型
+     */
+    public enum PaymentBizType{
+        /**
+         *
+         */
+        DEFAULT("default","默认"),
+        HOSPITAL_POINTS("hospital_points","卫计委积分"),
+        WHOLESALE("wholesale","批发");
+        private final String code;
+        private final String desc;
+
+        PaymentBizType(String code, String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+
+        public static PaymentBizType fromCode(String code){
+            PaymentBizType[] values = PaymentBizType.values();
+            for (PaymentBizType bizType : values) {
+                if(bizType.code.equals(code)){
+                    return bizType;
+                }
+            }
+            return DEFAULT;
+        }
+    }
+
 }

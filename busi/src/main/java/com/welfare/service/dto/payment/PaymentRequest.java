@@ -99,4 +99,8 @@ public abstract class PaymentRequest {
     public String getPaymentChannel(){
         return WelfareConstant.PaymentChannel.WELFARE.code();
     }
+
+    public WelfareConstant.PaymentBizType bizType(){
+        return WelfareConstant.PaymentBizType.DEFAULT;
+    }
 }

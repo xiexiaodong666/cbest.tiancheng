@@ -54,7 +54,6 @@ public class PaymentChannelConfigController {
 
   @PostMapping("/getByCondition")
   @ApiOperation("通过商户编码、门店编码、消费场景查询")
-  @MerchantUser
   public R<List<PaymentChannelConfig>> get(@Validated @RequestBody PaymentChannelConfigReq req) {
     return R.success(channelConfigService.getByMerCodeAndStoreAndConsume(req));
   }

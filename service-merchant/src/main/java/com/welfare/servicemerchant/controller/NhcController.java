@@ -31,10 +31,17 @@ public class NhcController {
     return null;
   }
 
-  @GetMapping("/user/info/{userCode}")
+  @PostMapping("/user/info")
   @ApiOperation("查询用户信息")
   @MerchantUser
-  public R<NhcUserInfoDTO> getUserInfo(@PathVariable("userCode") String userCode) {
+  public R<NhcUserInfoDTO> getUserInfo(@RequestBody NhcQueryUserReq queryUserReq) {
+    return null;
+  }
+
+  @PostMapping("/user/mallPoint/recharge")
+  @ApiOperation("用户积分充值")
+  @MerchantUser
+  public R<Boolean> rechargeMallPoint(@Validated @RequestBody NhcUserPointRechargeReq pointRechargeReq) {
     return null;
   }
 

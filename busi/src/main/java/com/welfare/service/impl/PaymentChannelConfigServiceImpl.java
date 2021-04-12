@@ -141,9 +141,10 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
             allPaymentChannels.forEach(dto -> {
                 if (channelConfigMap.containsKey(dto.getPaymentChannelCode())) {
                     if (dto.getPaymentChannelCode().equals(WelfareConstant.PaymentChannel.WELFARE.code())) {
-                        paymentChannels.add(channelConfigMap.get(dto.getPaymentChannelCode()));
-                    } else {
                         paymentChannels.add(0, channelConfigMap.get(dto.getPaymentChannelCode()));
+                    } else {
+                        paymentChannels.add(channelConfigMap.get(dto.getPaymentChannelCode()));
+
                     }
                 }
             });

@@ -490,7 +490,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   @Transactional(rollbackFor = Exception.class)
   public String upload(MultipartFile multipartFile) {
     DictReq req = new DictReq();
-    req.setDictType(WelfareConstant.DictType.STORE_CONSUM_TYPE.code());
+    req.setDictType(WelfareConstant.DictType.STORE_CONSUME_TYPE.code());
     SupplierStoreListener listener = new SupplierStoreListener(
         merchantService, this);
     try {

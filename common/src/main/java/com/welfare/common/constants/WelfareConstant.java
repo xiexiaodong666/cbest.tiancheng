@@ -1,8 +1,5 @@
 package com.welfare.common.constants;
 
-import com.welfare.common.exception.BizException;
-import com.welfare.common.exception.ExceptionCode;
-
 /**
  * Description:
  *
@@ -101,7 +98,7 @@ public class WelfareConstant {
         /**
          * 门店消费类型
          */
-        STORE_CONSUM_TYPE("SupplierStore.consumType", "消费类型");
+        STORE_CONSUME_TYPE("SupplierStore.consumType", "消费类型");
 
         private final String code;
         private final String desc;
@@ -509,6 +506,9 @@ public class WelfareConstant {
      */
     public enum MessagePushTargetType {
 
+        /**
+         *
+         */
         SMS("sms", "短信"),
         EMAIL("email", "邮件");
 

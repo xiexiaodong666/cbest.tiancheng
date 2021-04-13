@@ -241,7 +241,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .distinct()
                 .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
+            log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式", null);
         }
     }
 
@@ -361,7 +362,8 @@ public class PaymentServiceImpl implements PaymentService {
             List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigListFuture
                 .get();
             if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
+                log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式");
             }
             SubAccount subAccount = subAccountFuture.get();
             ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = new ThirdPartyBarcodePaymentDTO();

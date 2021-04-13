@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.WholesaleReceivableSettleMapper">
+    <sql id="tableName">
+        wholesale_receivable_settle
+    </sql>
+
+    <sql id="baseColumn">
+        id,settle_no,settle_month,mer_code,trans_amount,settle_amount,settle_self_amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,uppdate_user,update_time,deleted,settle_statistics_info
+    </sql>
+
+</mapper>

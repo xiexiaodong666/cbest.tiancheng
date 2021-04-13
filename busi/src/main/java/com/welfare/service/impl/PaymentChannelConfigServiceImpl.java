@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
@@ -9,6 +10,7 @@ import com.welfare.persist.dto.PayChannelConfigSimple;
 import com.welfare.persist.dto.PaymentChannelConfigDetailDTO;
 import com.welfare.persist.dto.query.PayChannelConfigQuery;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.entity.PaymentChannelConfig;
 import com.welfare.service.DictService;
 import com.welfare.service.PaymentChannelConfigService;
@@ -109,7 +111,6 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
                         consumeAndChannel.setConsumeType(consumeType);
                         consumeAndChannels.add(consumeAndChannel);
                         List<PayChannelConfigRowDTO.PaymentChannel> paymentChannels = new ArrayList<>();
-                        consumeAndChannel.setPaymentChannels(paymentChannels);
                         dtos2.forEach(paymentChannelConfig -> {
                             PayChannelConfigRowDTO.PaymentChannel paymentChannel = new PayChannelConfigRowDTO.PaymentChannel();
                             paymentChannel.setId(paymentChannelConfig.getPaymentChannelConfigId());
@@ -123,11 +124,32 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
                         if (CollectionUtils.isEmpty(condition.getPaymentChannelCode())) {
                             paymentChannels.addAll(getCompletionOtherPaymentChannel(allPaymentChannel, paymentChannels));
                         }
+                        // 排序
+                        consumeAndChannel.setPaymentChannels(sort(allPaymentChannel, paymentChannels));
                     });
                 }
             });
         }
         return dto;
+    }
+
+    private List<PayChannelConfigRowDTO.PaymentChannel> sort(List<com.welfare.service.dto.PaymentChannelDTO> allPaymentChannels,
+                                                             List<PayChannelConfigRowDTO.PaymentChannel> selectedPaymentChannels){
+        List<PayChannelConfigRowDTO.PaymentChannel> paymentChannels = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(selectedPaymentChannels)) {
+            Map<String, PayChannelConfigRowDTO.PaymentChannel> channelConfigMap = selectedPaymentChannels.stream().collect(Collectors.toMap(PayChannelConfigRowDTO.PaymentChannel::getPaymentChannelCode, type -> type));
+            allPaymentChannels.forEach(dto -> {
+                if (channelConfigMap.containsKey(dto.getPaymentChannelCode())) {
+                    if (dto.getPaymentChannelCode().equals(WelfareConstant.PaymentChannel.WELFARE.code())) {
+                        paymentChannels.add(0, channelConfigMap.get(dto.getPaymentChannelCode()));
+                    } else {
+                        paymentChannels.add(channelConfigMap.get(dto.getPaymentChannelCode()));
+
+                    }
+                }
+            });
+        }
+        return paymentChannels;
     }
 
     @Override
@@ -210,6 +232,29 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
             return paymentChannelConfigDao.saveBatch(channelConfigs);
         }
         return true;
+    }
+
+    @Override
+    public List<PaymentChannelConfig> getByMerCodeAndStoreAndConsume(PaymentChannelConfigReq req) {
+        PaymentChannelReq channelReq = new PaymentChannelReq();
+        channelReq.setFiltered(false);
+        channelReq.setMerCode(req.getMerCode());
+        List<com.welfare.service.dto.PaymentChannelDTO> paymentChannels = paymentChannelService.list(channelReq);
+        QueryWrapper<PaymentChannelConfig> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(PaymentChannelConfig.MER_CODE, req.getMerCode());
+        queryWrapper.eq(PaymentChannelConfig.STORE_CODE, req.getStoreCode());
+        queryWrapper.eq(PaymentChannelConfig.CONSUME_TYPE, req.getConsumeType());
+        List<PaymentChannelConfig> result = new ArrayList<>();
+        List<PaymentChannelConfig> channelConfigs = paymentChannelConfigDao.list(queryWrapper);
+        if (CollectionUtils.isNotEmpty(channelConfigs)) {
+            Map<String, List<PaymentChannelConfig>> channelConfigMap = channelConfigs.stream().collect(Collectors.groupingBy(PaymentChannelConfig::getPaymentChannelCode));
+            paymentChannels.forEach(dto -> {
+                if (channelConfigMap.containsKey(dto.getPaymentChannelCode())) {
+                    result.add(channelConfigMap.get(dto.getPaymentChannelCode()).get(0));
+                }
+            });
+        }
+        return result;
     }
 
     private List<PayChannelConfigRowDTO.PaymentChannel> getCompletionOtherPaymentChannel(List<com.welfare.service.dto.PaymentChannelDTO> all,

@@ -3,6 +3,8 @@ package com.welfare.service.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class BarcodePaymentResultDTO {
 
@@ -47,4 +49,7 @@ public class BarcodePaymentResultDTO {
 
     @ApiModelProperty("支付明细")
     private String payDetail;
+
+    @ApiModelProperty("消费金额")
+    private BigDecimal amount;
 }

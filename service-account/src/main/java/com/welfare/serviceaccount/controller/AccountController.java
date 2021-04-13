@@ -132,9 +132,9 @@ public class AccountController implements IController {
     @ApiOperation("免密签约(APP、小程序或JSAPI）")
     @GetMapping("/passwordFreeSign")
     @AccountUser
-    public R<AccountPasswordFreeSignDTO> passwordFreeSign(String paymentChannel) {
+    public R<AccountPasswordFreeSignDTO> passwordFreeSign(String paymentChannel, String redirectUrl) {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
-        return success(accountService.passwordFreeSign(accountCode, paymentChannel));
+        return success(accountService.passwordFreeSign(accountCode, paymentChannel, redirectUrl));
     }
 
     @ApiOperation("免密解约(APP、小程序或JSAPI）")

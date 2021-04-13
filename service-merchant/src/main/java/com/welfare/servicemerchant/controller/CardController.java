@@ -202,7 +202,7 @@ public class CardController implements IController {
         return success(cardInfoService.createAndBind(cardInfo));
     }
 
-    @DeleteMapping("/card-binding/{cardNo}")
+    @DeleteMapping("/card-unbinding/{cardNo}")
     @ApiOperation("解绑卡")
     public R<CardInfo> unbind(@PathVariable String cardNo){
         CardInfo cardInfo = cardInfoService.unbind(cardNo);

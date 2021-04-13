@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount.controller.dto;
 
+import com.welfare.persist.entity.SubAccount;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,4 +28,11 @@ public class SubAccountDTO implements Serializable {
     @NotNull(message = "passwordFreeSignature can not be null")
     private String passwordFreeSignature;
 
+    public static SubAccountDTO of(SubAccount subAccount){
+        SubAccountDTO subAccountDTO = new SubAccountDTO();
+        subAccountDTO.setAccountCode(subAccountDTO.getAccountCode());
+        subAccountDTO.setPaymentChannel(subAccountDTO.getPaymentChannel());
+        subAccountDTO.setPasswordFreeSignature(subAccount.getPasswordFreeSignature());
+        return subAccountDTO;
+    }
 }

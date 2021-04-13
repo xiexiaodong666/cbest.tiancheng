@@ -43,4 +43,5 @@ public interface CardInfoMapper extends BaseMapper<CardInfo> {
       @Param("startTime") Date startTime, @Param("endTime") Date endTime,
       @Param("bindStartTime") Date bindStartTime, @Param("bindEndTime") Date bindEndTime);
 
+  Integer alwaysUpdateSomeColumnById(CardInfo entity);
 }

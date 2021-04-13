@@ -36,7 +36,7 @@ public interface NhcService {
    * @param userPageReq
    * @return
    */
-  Page<NhcAccountBillDetailDTO> userBillPage(NhcUserPageReq userPageReq);
+  Page<NhcAccountBillDetailDTO> getUserBillPage(NhcUserPageReq userPageReq);
 
   /**
    * 离开家庭
@@ -64,12 +64,12 @@ public interface NhcService {
    * @param nhcUserPageReq
    * @return
    */
-  Page<NhcAccountBillDetailDTO> accountBillPage( NhcUserPageReq nhcUserPageReq);
+  Page<NhcAccountBillDetailDTO> getAccountBillPage(NhcUserPageReq nhcUserPageReq);
 
   /**
    * 查询家庭信息
    * @param userCode
    * @return
    */
-  NhcFamilyMemberDTO familyInfo(String userCode);
+  NhcFamilyMemberDTO getFamilyInfo(String userCode);
 }

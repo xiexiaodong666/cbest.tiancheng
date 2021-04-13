@@ -24,6 +24,7 @@ public class NhcUserReq {
   private String familyUserCode;
 
   @ApiModelProperty(value = "商户CODE", required = true)
+  @NotEmpty(message = "商户CODE为空")
   private String merCode;
 
   @ApiModelProperty(value = "用户手机号码")

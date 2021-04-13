@@ -12,7 +12,7 @@ import lombok.Data;
 public class NhcQueryUserReq {
 
   @ApiModelProperty("用户编码")
-  private String userCode;
+  private String accountCode;
 
   @ApiModelProperty("手机号")
   private String phone;

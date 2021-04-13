@@ -45,17 +45,17 @@ public class NhcController {
     return null;
   }
 
-  @PostMapping("/user/bill/{userCode}")
+  @PostMapping("/user/bill")
   @ApiOperation("查询用户账户记录")
   @MerchantUser
   public R<Page<NhcAccountBillDetailDTO>> userBillPage(@Validated @RequestBody NhcUserPageReq userPageReq) {
     return null;
   }
 
-  @PostMapping("/user/family/leave/{userCode}")
+  @PostMapping("/user/family/leave/{accountCode}")
   @ApiOperation("从家庭中删除用户")
   @MerchantUser
-  public R<Boolean> leaveFamily(@PathVariable("userCode") String userCode) {
+  public R<Boolean> leaveFamily(@PathVariable("accountCode") String accountCode) {
     return null;
   }
 
@@ -73,17 +73,17 @@ public class NhcController {
     return null;
   }
 
-  @PostMapping("/account/bill/{accountCode}")
+  @PostMapping("/account/bill")
   @ApiOperation("查询员工账户记录")
   @MerchantUser
   public R<Page<NhcAccountBillDetailDTO>> accountBillPage(@Validated @RequestBody NhcUserPageReq nhcUserPageReq) {
     return null;
   }
 
-  @PostMapping("/user/family/info/{userCode}")
+  @PostMapping("/user/family/info/{accountCode}")
   @ApiOperation("查询家庭信息")
   @MerchantUser
-  public R<NhcFamilyMemberDTO> familyInfo(@PathVariable("userCode") String userCode) {
+  public R<NhcFamilyMemberDTO> familyInfo(@PathVariable("accountCode") String accountCode) {
     return null;
   }
 }

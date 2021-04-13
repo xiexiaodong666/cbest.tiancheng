@@ -18,7 +18,7 @@ public class NhcUserReq {
   private String userName;
 
   @ApiModelProperty("用户编码（修改要传)")
-  private String userCode;
+  private String accountCode;
 
   @ApiModelProperty("要加入家庭的用户编码")
   private String familyUserCode;

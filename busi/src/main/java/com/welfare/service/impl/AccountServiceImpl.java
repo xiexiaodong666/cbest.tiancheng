@@ -1403,7 +1403,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel) {
+    public AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel, String redirectUrl) {
         WelfareConstant.PaymentChannel paymentChannelEnum = PAYMENT_CHANNEL_MAP.get(paymentChannel);
         AccountPasswordFreeSignDTO accountPasswordFreeSignDTO = new AccountPasswordFreeSignDTO();
         switch (paymentChannelEnum) {
@@ -1411,6 +1411,9 @@ public class AccountServiceImpl implements AccountService {
                 Account account = getByAccountCode(accountCode);
                 AlipayUserAgreementSignReq req = new AlipayUserAgreementSignReq();
                 req.setExternalLogonId(String.valueOf(accountCode));
+                if (!StringUtils.isEmpty(redirectUrl)) {
+                    req.setMerchantProcessUrl(redirectUrl);
+                }
                 AlipayUserAgreementSignResp alipayUserAgreementSignResp = cbestPayService
                     .alipayUserAgreementSign(req);
                 String signParams = alipayUserAgreementSignResp.getSignParams();

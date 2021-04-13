@@ -137,7 +137,7 @@ public interface AccountService {
    * @param paymentChannel
    * @return
    */
-  AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel);
+  AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel, String redirectUrl);
 
   /**
    * 免密解约(APP、小程序或JSAPI）

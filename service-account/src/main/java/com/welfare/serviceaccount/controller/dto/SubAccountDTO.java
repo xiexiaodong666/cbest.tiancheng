@@ -30,8 +30,8 @@ public class SubAccountDTO implements Serializable {
 
     public static SubAccountDTO of(SubAccount subAccount){
         SubAccountDTO subAccountDTO = new SubAccountDTO();
-        subAccountDTO.setAccountCode(subAccountDTO.getAccountCode());
-        subAccountDTO.setPaymentChannel(subAccountDTO.getPaymentChannel());
+        subAccountDTO.setAccountCode(subAccount.getAccountCode());
+        subAccountDTO.setPaymentChannel(subAccount.getSubAccountType());
         subAccountDTO.setPasswordFreeSignature(subAccount.getPasswordFreeSignature());
         return subAccountDTO;
     }

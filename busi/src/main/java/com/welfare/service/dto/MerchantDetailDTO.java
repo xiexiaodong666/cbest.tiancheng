@@ -97,4 +97,10 @@ public class MerchantDetailDTO {
 
   @ApiModelProperty("员工卡消费明细门店显示(字典转义)")
   private String billDetailShowStoreNameName;
+
+  @ApiModelProperty("批发限制授信额度")
+  private BigDecimal wholesaleCreditLimit;
+
+  @ApiModelProperty("批发授信额度")
+  private BigDecimal wholesaleCredit;
 }

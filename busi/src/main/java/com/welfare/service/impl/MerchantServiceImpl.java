@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.MerIdentityEnum;
@@ -12,6 +13,7 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dao.MerchantDao;
+import com.welfare.persist.dao.MerchantExtendDao;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.dto.query.MerchantPageReq;
@@ -68,6 +70,9 @@ public class MerchantServiceImpl implements MerchantService {
     @Autowired
     MerchantAccountTypeService merchantAccountTypeService;
     private final MessagePushConfigService messagePushConfigService;
+
+    @Autowired
+    private MerchantExtendDao merchantExtendDao;
 
     @Override
     public List<Merchant> list(MerchantReq req) {
@@ -138,6 +143,8 @@ public class MerchantServiceImpl implements MerchantService {
             merchantDetailDTO.setRebateLimit(merchantCredit.getRebateLimit());
             merchantDetailDTO.setCreditLimit(merchantCredit.getCreditLimit());
             merchantDetailDTO.setRemainingLimit(merchantCredit.getRemainingLimit());
+            merchantDetailDTO.setWholesaleCredit(merchantCredit.getWholesaleCredit());
+            merchantDetailDTO.setWholesaleCreditLimit(merchantCredit.getWholesaleCreditLimit());
         }
         dictService.trans(MerchantDetailDTO.class, Merchant.class.getSimpleName(), true, merchantDetailDTO);
         return merchantDetailDTO;
@@ -174,6 +181,21 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         merchantCreditService.init(merchant.getMerCode());
+        // 写入extend
+
+        MerchantExtend merchantExtend = merchantExtendDao.getBaseMapper().selectOne(Wrappers.<MerchantExtend>lambdaQuery().eq(MerchantExtend::getMerCode, merchant.getMerCode()));
+        if(merchantExtend == null) {
+            merchantExtend = new MerchantExtend();
+            merchantExtend.setMerCode(merchant.getMerCode());
+            merchantExtend.setSupplierWholesaleSettleMethod(merchant.getSupplierWholesaleSettleMethod());
+
+            merchantExtendDao.getBaseMapper().insert(merchantExtend);
+        } else {
+            merchantExtend.setSupplierWholesaleSettleMethod(merchant.getSupplierWholesaleSettleMethod());
+            merchantExtendDao.getBaseMapper().updateById(merchantExtend);
+        }
+
+
         boolean flag3=merchantAccountTypeService.init(merCode);
         boolean flag4=true;
         List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));

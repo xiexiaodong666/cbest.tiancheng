@@ -59,4 +59,7 @@ public class MerchantAddDTO {
 
   @ApiModelProperty("员工卡消费明细门店显示")
   private String billDetailShowStoreName;
+
+  @ApiModelProperty("结算方式")
+  private String supplierWholesaleSettleMethod;
 }

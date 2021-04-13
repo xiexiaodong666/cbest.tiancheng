@@ -9,6 +9,35 @@ package com.welfare.common.constants;
 public class WelfareSettleConstant {
 
     /**
+     * 批发结算方式
+     */
+    public enum WholesaleSettleMethodEnum {
+        /**
+         * 联营
+         */
+        JOINT_VENTURE("joint_venture", "联营"),
+        /**
+         *  经销
+         */
+        DISTRIBUTION("distribution", "经销");
+
+        private String code;
+        private String desc;
+
+        WholesaleSettleMethodEnum(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+    /**
      * 账单状态枚举
      */
     public enum SettleRecStatusEnum {

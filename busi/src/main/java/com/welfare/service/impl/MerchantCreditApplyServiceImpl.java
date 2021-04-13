@@ -250,6 +250,8 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             merchantCreditService.decreaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.DEPOSIT_DECR.code());
         } else if (merCreditType == WelfareConstant.MerCreditType.CREDIT_LIMIT) {
             merchantCreditService.setAccountType(merCode,merCreditType,amount,transNo);
+        } else if (merCreditType == WelfareConstant.MerCreditType.WHOLESALE_CREDIT_LIMIT) {
+
         } else {
             merchantCreditService.increaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.DEPOSIT_INCR.code());
         }

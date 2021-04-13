@@ -18,4 +18,12 @@ public interface SubAccountService {
      * @return
      */
     SubAccount passwordFreeSignature(Long accountCode,String paymentChannel,String passwordFreeSignature);
+
+    /**
+     * 查询subAccount
+     * @param accountCode 账户号
+     * @param paymentChannel 支付渠道
+     * @return 对应子账户
+     */
+    SubAccount query(Long accountCode, String paymentChannel);
 }

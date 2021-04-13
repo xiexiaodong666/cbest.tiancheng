@@ -38,15 +38,15 @@ public class BizAssert {
         }
     }
 
-    public static void notNull(Object obj,ExceptionCode exceptionCode,String exceptionMsg){
-        if(Objects.isNull(obj)){
-            throw new BizException(exceptionCode,exceptionMsg, null);
-        }
-    }
-
     public static void notNull(Object obj,ExceptionCode exceptionCode){
         if(Objects.isNull(obj)){
             throw new BizException(exceptionCode,exceptionCode.getMsg(), null);
+        }
+    }
+
+    public static void notNull(Object obj,ExceptionCode exceptionCode,String exceptionMsg){
+        if(Objects.isNull(obj)){
+            throw new BizException(exceptionCode,exceptionMsg, null);
         }
     }
 

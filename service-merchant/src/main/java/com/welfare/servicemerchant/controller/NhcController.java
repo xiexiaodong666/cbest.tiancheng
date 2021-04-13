@@ -12,6 +12,8 @@ import net.dreamlu.mica.core.result.R;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * @Author: duanhy
@@ -87,6 +89,13 @@ public class NhcController {
   @ApiOperation("查询家庭信息")
   @MerchantUser
   public R<NhcFamilyMemberDTO> familyInfo(@PathVariable("accountCode") String accountCode) {
+    return null;
+  }
+
+  @PostMapping("/user/mallPoint/list")
+  @ApiOperation("批量查询用户积分")
+  @MerchantUser
+  public R<List<NhcUserMallPointDTO>> getUserMallPointList(@RequestBody NhcBatchQueryUserReq batchQueryUserReq) {
     return null;
   }
 }

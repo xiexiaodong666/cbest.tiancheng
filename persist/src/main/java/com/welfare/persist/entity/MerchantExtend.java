@@ -44,10 +44,10 @@ public class MerchantExtend extends Model<MerchantExtend> implements Serializabl
     @ApiModelProperty("商户编码")   
     private String merCode;
     /**
-     * 是否是社区医院
+     * 行业标签
      */
-    @ApiModelProperty("是否是社区医院")   
-    private Boolean communityHospital;
+    @ApiModelProperty("行业标签")
+    private String industryTag;
     /**
      * 积分商城是否开启
      */
@@ -101,9 +101,9 @@ public class MerchantExtend extends Model<MerchantExtend> implements Serializabl
     */
     public static final String MER_CODE = "mer_code";
     /**
-    * 是否是社区医院
+    * 行业标签
     */
-    public static final String COMMUNITY_HOSPITAL = "community_hospital";
+    public static final String INDUSTRY_TAG = "industry_tag";
     /**
     * 积分商城是否开启
     */

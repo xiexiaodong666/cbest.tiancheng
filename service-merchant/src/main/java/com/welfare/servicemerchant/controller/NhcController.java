@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.service.NhcService;
 import com.welfare.service.dto.nhc.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/nhc")
 @Api(tags = "卫计委相关接口")
 public class NhcController {
+
+  private final NhcService nhcService;
 
   @PostMapping("/user/saveOrUpdate")
   @ApiOperation("新增或修改用户")

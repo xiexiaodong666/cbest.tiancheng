@@ -41,4 +41,10 @@ public class AccountTypeDao extends ServiceImpl<AccountTypeMapper, AccountType> 
         }
         return map;
     }
+
+    public List<AccountType> getByMerCode(String merCode){
+        QueryWrapper<AccountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountType.MER_CODE, merCode);
+        return list(queryWrapper);
+    }
 }

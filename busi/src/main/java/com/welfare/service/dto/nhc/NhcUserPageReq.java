@@ -16,5 +16,5 @@ public class NhcUserPageReq extends PageReq {
 
   @ApiModelProperty(value = "用户/员工编码", required = true)
   @NotEmpty(message = "编码不能为空")
-  private String code;
+  private String accountCode;
 }

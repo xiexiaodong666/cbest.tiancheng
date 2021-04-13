@@ -18,7 +18,7 @@ public class NhcUserReq {
   private String userName;
 
   @ApiModelProperty("用户编码（修改要传)")
-  private String userCode;
+  private String accountCode;
 
   @ApiModelProperty("要加入家庭的用户编码")
   private String familyUserCode;
@@ -26,7 +26,6 @@ public class NhcUserReq {
   @ApiModelProperty(value = "商户CODE", required = true)
   private String merCode;
 
-  @ApiModelProperty(value = "用户手机号码", required = true)
-  @NotEmpty(message = "用户手机号码为空")
+  @ApiModelProperty(value = "用户手机号码")
   private String phone;
 }

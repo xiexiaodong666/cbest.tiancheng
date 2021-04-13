@@ -19,7 +19,7 @@ public class NhcUserInfoDTO {
   private String userName;
 
   @ApiModelProperty("用户编码")
-  private String userCode;
+  private String accountCode;
 
   @ApiModelProperty(value = "商户CODE")
   private String merCode;

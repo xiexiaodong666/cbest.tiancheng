@@ -3,6 +3,9 @@ package com.welfare.persist.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.math.BigDecimal;
 
 /**
  * 用户交易流水明细表(account_deduction_detail)数据Mapper
@@ -14,4 +17,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AccountDeductionDetailMapper extends BaseMapper<AccountDeductionDetail> {
 
+    /**
+     * 求和商户下某种福利类型充值总额
+     * @param merCode
+     * @param merAccountTypeCode
+     * @return
+     */
+    BigDecimal sumDepositDetailAmount(@Param("merCode") String merCode, @Param("merAccountTypeCode") String merAccountTypeCode);
 }

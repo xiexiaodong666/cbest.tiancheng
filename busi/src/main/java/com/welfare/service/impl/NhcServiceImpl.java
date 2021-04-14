@@ -1,7 +1,9 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountBindStatus;
+import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.AccountStatus;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
@@ -9,16 +11,14 @@ import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
-import com.welfare.persist.dao.AccountDao;
-import com.welfare.persist.dao.AccountTypeDao;
-import com.welfare.persist.dao.DepartmentDao;
-import com.welfare.persist.dao.SubAccountDao;
+import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.dto.AccountReq;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.dto.nhc.*;
 import com.welfare.service.sync.event.AccountEvt;
+import com.welfare.service.utils.AccountUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -48,7 +48,7 @@ public class NhcServiceImpl implements NhcService {
     @Autowired
     private MerchantService merchantService;
     @Autowired
-    private MerchantAccountTypeService merchantAccountTypeService;
+    private AccountAmountTypeDao accountAmountTypeDao;
     @Autowired
     private AccountTypeDao accountTypeDao;
     @Autowired
@@ -59,6 +59,8 @@ public class NhcServiceImpl implements NhcService {
     private AccountAmountTypeGroupService accountAmountTypeGroupService;
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private AccountChangeEventRecordService accountChangeEventRecordService;
 
     @Override
     public String saveOrUpdateUser(NhcUserReq userReq) {
@@ -76,10 +78,10 @@ public class NhcServiceImpl implements NhcService {
             account.setPhone(userReq.getPhone());
         } else {
             // 新增
+            account = assemblyUser(NhcAccountReq.of(userReq), merchant);
             if (StringUtils.isNoneBlank(userReq.getFamilyUserCode())) {
                 joinGroup = true;
             }
-            account = assemblyUser(userReq, merchant);
         }
         BizAssert.isTrue(accountDao.saveOrUpdate(account));
         // 加入家庭
@@ -97,29 +99,49 @@ public class NhcServiceImpl implements NhcService {
         return String.valueOf(account.getAccountCode());
     }
 
-    private Account assemblyUser(NhcUserReq userReq, Merchant merchant) {
+    private Account assemblyUser(NhcAccountReq accountReq, Merchant merchant) {
         Account account = new Account();
         Long accountCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
         account.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
         account.setAccountCode(accountCode);
-        account.setAccountName(userReq.getUserName());
-        account.setMerCode(userReq.getMerCode());
-        account.setPhone(userReq.getPhone());
+        account.setAccountName(accountReq.getAccountName());
+        account.setMerCode(accountReq.getMerCode());
+        account.setPhone(accountReq.getPhone());
         account.setAccountStatus(AccountStatus.ENABLE.getCode());
         account.setOfflineLock(WelfareConstant.AccountOfflineFlag.ENABLE.code());
         account.setBinding(AccountBindStatus.NO_BIND.getCode());
-
-        List<AccountType> accountTypes = accountTypeDao.getByMerCode(userReq.getMerCode());
+        List<AccountType> accountTypes = accountTypeDao.getByMerCode(accountReq.getMerCode());
         BizAssert.notEmpty(accountTypes, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户没有员工类型");
         account.setAccountTypeCode(accountTypes.get(0).getTypeCode());
-        List<DepartmentTree> departmentTrees = departmentService.tree(userReq.getMerCode());
-        account.setDepartment(departmentTrees.get(0).getDepartmentCode());
+        if (StringUtils.isBlank(accountReq.getDepartmentCode())) {
+            List<DepartmentTree> departmentTrees = departmentService.tree(accountReq.getMerCode());
+            account.setDepartment(departmentTrees.get(0).getDepartmentCode());
+        } else {
+            account.setDepartment(accountReq.getDepartmentCode());
+        }
         // 创建甜橙卡子账户
         SubAccount subAccount = new SubAccount();
         subAccount.setSubAccountType(WelfareConstant.PaymentChannel.WELFARE.code());
         subAccount.setAccountCode(account.getAccountCode());
         BizAssert.isTrue(subAccountDao.save(subAccount));
         // 创建积分福利账户
+        AccountAmountType accountAmountType1 = new AccountAmountType();
+        accountAmountType1.setAccountCode(accountCode);
+        accountAmountType1.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
+        accountAmountType1.setJoinedGroup(false);
+        AccountAmountType accountAmountType2 = new AccountAmountType();
+        accountAmountType2.setAccountCode(accountCode);
+        accountAmountType2.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code());
+        AccountAmountType accountAmountType3 = new AccountAmountType();
+        accountAmountType3.setAccountCode(accountCode);
+        accountAmountType3.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
+        accountAmountTypeDao.saveBatch(Lists.newArrayList(accountAmountType1,accountAmountType2,accountAmountType3));
+
+        AccountChangeEventRecord accountChangeEventRecord = AccountUtils
+                .assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, account.getAccountCode(),
+                        account.getCreateUser());
+        accountChangeEventRecordService.save(accountChangeEventRecord);
+        account.setChangeEventId(accountChangeEventRecord.getId());
         return account;
     }
 

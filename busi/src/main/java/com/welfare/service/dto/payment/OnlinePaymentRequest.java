@@ -18,8 +18,6 @@ public class OnlinePaymentRequest extends PaymentRequest {
 
     @ApiModelProperty("支付渠道")
     private String paymentChannel;
-    @ApiModelProperty("业务类型  default:默认，hospital-points:卫计委积分支付,wholesale:批发支付")
-    private String bizType;
     @Override
     public Long calculateAccountCode(){
         return super.getAccountCode();
@@ -27,6 +25,6 @@ public class OnlinePaymentRequest extends PaymentRequest {
 
     @Override
     public WelfareConstant.PaymentBizType bizType(){
-        return WelfareConstant.PaymentBizType.fromCode(bizType);
+        return WelfareConstant.PaymentBizType.fromCode(getBizType());
     }
 }

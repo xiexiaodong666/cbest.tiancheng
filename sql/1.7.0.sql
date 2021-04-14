@@ -16,7 +16,7 @@ CREATE TABLE `account_amount_type_group` (
 CREATE TABLE `merchant_extend` (
                                    `id` bigint(20) NOT NULL COMMENT '主键',
                                    `mer_code` varchar(20) NOT NULL COMMENT '商户编码',
-                                   `community_hospital` tinyint(1) DEFAULT NULL COMMENT '是否是社区医院',
+                                   `industry_tag` varchar(255)  DEFAULT NULL COMMENT '行业标签',
                                    `point_mall` tinyint(1) DEFAULT NULL COMMENT '积分商城是否开启',
                                    `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
                                    `create_time` datetime DEFAULT NULL COMMENT '创建时间',
@@ -50,3 +50,5 @@ alter table account_amount_type add column account_amount_type_group_id bigint(2
 
 
 # DML ---
+
+INSERT INTO `sequence`(`id`, `sequence_type`, `prefix`, `sequence_no`, `min_sequence`, `max_sequence`, `handler_for_max`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`) VALUES (20, 'account_amount_type_group_code', NULL, 1000000000, 1000000000, 9999999999, 'com.welfare.service.sequence.CommonMaxHandler', 'anonymous', '2021-03-08 16:59:23', 'zxadmin', '2021-03-16 10:44:35', 0, 0);

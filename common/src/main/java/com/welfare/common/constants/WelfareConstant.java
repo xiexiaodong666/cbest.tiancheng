@@ -233,7 +233,8 @@ public class WelfareConstant {
         ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请"),
         RESET_ACCOUNT_SURPLUS_QUOTA("reset_account_surplus_quota","员工账号授信额度变更"),
         EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号"),
-        MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码");
+        MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码"),
+        ACCOUNT_AMOUNT_TYPE_GROUP_CODE("account_amount_type_group_code","员工福利账号组编码");
 
         private final String code;
         private final String desc;
@@ -260,7 +261,8 @@ public class WelfareConstant {
          */
         SELF("self","自主余额"),
         SURPLUS_QUOTA("surplus_quota","授信额度"),
-        SURPLUS_QUOTA_OVERPAY("surplus_quota_overpay","授信额度溢缴款");
+        SURPLUS_QUOTA_OVERPAY("surplus_quota_overpay","授信额度溢缴款"),
+        MALL_POINT("mall_point","商城积分");
 
         private final String code;
         private final String desc;
@@ -293,7 +295,9 @@ public class WelfareConstant {
         RESET_DECR("reset_decr","设置（减少)"),
         REBATE_DECR("rebate_decr","返点（减少)"),
         REBATE_INCR("rebate_incr","返点（新增)"),
-        DEPOSIT_BACK("deposit_back","回冲");
+        DEPOSIT_BACK("deposit_back","回冲"),
+        JOINED_GROUP("joined_group","加入福利类型账户组"),
+        LEAVE_GROUP("leave_group","离开福利类型账户组");
         private final String code;
         private final String desc;
 

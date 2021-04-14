@@ -1,8 +1,10 @@
 package com.welfare.persist.dto;
 
+import com.welfare.persist.entity.Account;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 
@@ -33,4 +35,5 @@ public class AccountSimpleDTO {
 
     @ApiModelProperty("是否授信")
     private Boolean credit;
+
 }

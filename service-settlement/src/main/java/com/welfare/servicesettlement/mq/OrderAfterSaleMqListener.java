@@ -1,6 +1,7 @@
 package com.welfare.servicesettlement.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.OrderInfoDao;
@@ -12,6 +13,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -33,6 +35,8 @@ public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrder
     private final OrderInfoDao orderInfoDao;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @DistributedLock(lockPrefix = "order-save",lockKey = "#aftersaleOrderMqInfo.orgOrderNo")
     public void onMessage(AftersaleOrderMqInfo aftersaleOrderMqInfo) {
         log.info("return order rocketmq msg received:{}", JSON.toJSONString(aftersaleOrderMqInfo));
         String tradeNo = aftersaleOrderMqInfo.getTradeNo();

@@ -1,6 +1,7 @@
 package com.welfare.servicesettlement.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
@@ -52,12 +53,18 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DistributedLock(lockPrefix = "order-save",lockKey = "#orderDTO.orgOrderNo")
     public void onMessage(OrderMqInfo orderDTO) {
         log.info("rocketmq msg received:{}", JSON.toJSONString(orderDTO));
         String tradeNo = orderDTO.getTradeNo();
         if(Strings.isEmpty(tradeNo) ||  IGNORE_PAY_TYPE.equals(orderDTO.getPayType())){
             log.info("此订单不需要保存");
             //没有交易单号，则没有支付过，不保存。老的员工卡也不保存
+            return;
+        }
+        OrderInfo orderInfoInDb = orderInfoDao.getOneByOrderNo(orderDTO.getOrgOrderNo().toString());
+        if(!Objects.isNull(orderInfoInDb)){
+            log.info("订单已经保存，不需要再次保存");
             return;
         }
         List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao

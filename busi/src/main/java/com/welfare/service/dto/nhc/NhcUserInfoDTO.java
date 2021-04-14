@@ -1,10 +1,18 @@
 package com.welfare.service.dto.nhc;
 
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.Merchant;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -32,4 +40,27 @@ public class NhcUserInfoDTO {
 
   @ApiModelProperty(value = "积分")
   private BigDecimal mallPoint;
+
+  public static NhcUserInfoDTO of(Account account, AccountAmountType accountAmountType, Merchant merchant) {
+    BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
+    BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "积分福利不存在");
+    BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+
+    NhcUserInfoDTO userInfoDTO = new NhcUserInfoDTO();
+    userInfoDTO.setUserName(account.getAccountName());
+    userInfoDTO.setAccountCode(String.valueOf(account.getAccountCode()));
+    userInfoDTO.setMerCode(account.getMerCode());
+    userInfoDTO.setMerName(merchant.getMerName());
+    userInfoDTO.setPhone(account.getPhone());
+    userInfoDTO.setMallPoint(accountAmountType != null ? accountAmountType.getAccountBalance() : BigDecimal.ZERO);
+    return userInfoDTO;
+  }
+
+  public static List<NhcUserInfoDTO> of(Map<Long, Account> accountMap, Map<Long, AccountAmountType> accountAmountTypes, Merchant merchant) {
+    List<NhcUserInfoDTO> list = new ArrayList<>();
+
+    return list;
+  }
+
+
 }

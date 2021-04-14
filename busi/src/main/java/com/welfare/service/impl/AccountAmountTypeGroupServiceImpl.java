@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.welfare.common.constants.CacheConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
@@ -12,6 +13,7 @@ import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.AccountAmountTypeGroup;
+import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.AccountAmountTypeGroupService;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountService;
@@ -21,6 +23,7 @@ import com.welfare.service.dto.account.AccountAmountTypeGroupDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -55,6 +58,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     @Autowired
     private AccountDeductionDetailDao accountDeductionDetailDao;
     private final AccountDao accountDao;
+    private final AccountAmountTypeMapper accountAmountTypeMapper;
 
     @Override
     public boolean removeByAccountCode(Long accountCode, String merAccountTypeCode) {
@@ -110,8 +114,9 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     }
 
     @Override
-    public Integer countGroups() {
-        return accountAmountTypeDao.countGroups();
+    @Cacheable(value = CacheConstant.TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT, key = "#merCode")
+    public Long countGroups(String merCode, String merAccountTypeCode) {
+        return accountAmountTypeMapper.countByMerCodeAndMerAccountType(merCode,merAccountTypeCode);
     }
 
     @Override

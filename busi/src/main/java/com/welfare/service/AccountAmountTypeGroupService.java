@@ -45,7 +45,9 @@ public interface AccountAmountTypeGroupService {
     /**
      * 计算家庭数
      * @return 家庭组数
+     * @param merCode 商户号
+     * @param merAccountTypeCode 福利类型编码
      */
-    Integer countGroups();
+    Long countGroups(String merCode,String merAccountTypeCode);
 
 }

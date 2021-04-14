@@ -68,9 +68,4 @@ public class AccountAmountTypeDao extends ServiceImpl<AccountAmountTypeMapper, A
                 .eq(AccountAmountType::getAccountAmountTypeGroupId, accountAmountGroupId)
         );
     }
-
-    @Cacheable(value = TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT,key = TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT)
-    public Integer countGroups() {
-        return count(Wrappers.<AccountAmountType>lambdaQuery().groupBy(AccountAmountType::getAccountAmountTypeGroupId));
-    }
 }

@@ -32,4 +32,12 @@
         and mer_account_type_code = #{merAccountTypeCode}
     </update>
 
+    <select id="countByMerCodeAndMerAccountType" resultType="long">
+        select count(*)
+        from account_amount_type t
+            inner join account a on a.account_code = t.account_code
+        where a.mer_code = #{merCode}
+          and t.mer_account_type_code = #{merAccountTypeCode}
+    </select>
+
 </mapper>

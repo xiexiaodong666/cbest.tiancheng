@@ -38,4 +38,13 @@ public interface AccountAmountTypeMapper extends BaseMapper<AccountAmountType> {
       @Param("merAccountTypeCode") String merAccountTypeCode,
       @Param("accountBalance") BigDecimal accountBalance,
       @Param("updateUser") String updateUser);
+
+  /**
+   * 根据商户编码和福利类型分组统计
+   * @param merCode 商户编码
+   * @param merAccountTypeCode 福利类型编码
+   * @return 分组数量
+   */
+  Long countByMerCodeAndMerAccountType(@Param("merCode") String merCode, @Param("merAccountTypeCode") String merAccountTypeCode);
+
 }

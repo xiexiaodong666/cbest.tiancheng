@@ -33,13 +33,21 @@ import java.util.Objects;
 )
 public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrderMqInfo> {
     private final OrderInfoDao orderInfoDao;
-
+    /**
+     * 此种类型的pay_type需要忽略（表示老的员工卡支付的）
+     */
+    private static final  Integer IGNORE_PAY_TYPE = 6;
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DistributedLock(lockPrefix = "order-save",lockKey = "#aftersaleOrderMqInfo.orgOrderNo")
     public void onMessage(AftersaleOrderMqInfo aftersaleOrderMqInfo) {
         log.info("return order rocketmq msg received:{}", JSON.toJSONString(aftersaleOrderMqInfo));
         String tradeNo = aftersaleOrderMqInfo.getTradeNo();
+        if(Strings.isEmpty(tradeNo) ||  IGNORE_PAY_TYPE.equals(aftersaleOrderMqInfo.getPayType())){
+            log.info("此逆向订单不需要保存");
+            //没有交易单号，则没有支付过，不保存。老的员工卡也不保存
+            return;
+        }
         String orderNo = aftersaleOrderMqInfo.getOrgOrderNo().toString();
         OrderInfo orderInfo = orderInfoDao.getOneByOrderNo(orderNo);
         BizAssert.notNull(orderInfo, ExceptionCode.DATA_NOT_EXIST,"正向订单不存在");

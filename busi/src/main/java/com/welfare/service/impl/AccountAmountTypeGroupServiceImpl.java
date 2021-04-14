@@ -53,6 +53,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     private AccountBillDetailDao accountBillDetailDao;
     @Autowired
     private AccountDeductionDetailDao accountDeductionDetailDao;
+    private final AccountDao accountDao;
 
     @Override
     public boolean removeByAccountCode(Long accountCode, String merAccountTypeCode) {
@@ -83,11 +84,6 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         accountBillDetailDao.save(accountBillDetail);
         accountDeductionDetailDao.save(accountDeductionDetail);
         return accountAmountTypeDao.updateById(accountAmountType);
-    }
-
-    @Override
-    public boolean addByAccountCodeAndMerAccountTypeCode(Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode) {
-        return false;
     }
 
     @Override

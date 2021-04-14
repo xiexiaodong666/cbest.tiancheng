@@ -45,14 +45,18 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final AccountDao accountDao;
     private final MerchantDao merchantDao;
+    /**
+     * 此种类型的pay_type需要忽略（表示老的员工卡支付的）
+     */
+    private static final  Integer IGNORE_PAY_TYPE = 6;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void onMessage(OrderMqInfo orderDTO) {
         log.info("rocketmq msg received:{}", JSON.toJSONString(orderDTO));
         String tradeNo = orderDTO.getTradeNo();
-        if(Strings.isEmpty(tradeNo)){
-            //没有交易单号，则没有支付过，不保存
+        if(Strings.isEmpty(tradeNo) ||  IGNORE_PAY_TYPE.equals(orderDTO.getPayType())){
+            //没有交易单号，则没有支付过，不保存。老的员工卡也不保存
             return;
         }
         List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao

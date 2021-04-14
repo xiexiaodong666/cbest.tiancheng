@@ -55,6 +55,8 @@ public abstract class PaymentRequest {
     private String phone;
     @ApiModelProperty("账户所在商家，返回参数")
     private String accountMerCode;
+    @ApiModelProperty("业务类型  default:默认，hospital-points:卫计委积分支付,wholesale:批发支付")
+    private String bizType;
     private String paymentScene;
     private boolean notification = false;
 

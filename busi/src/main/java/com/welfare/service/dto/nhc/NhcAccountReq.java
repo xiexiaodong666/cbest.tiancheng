@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * @Author: duanhy
@@ -34,4 +35,15 @@ public class NhcAccountReq {
   @ApiModelProperty(value = "账号状态(1正常2禁用)", required = true)
   @NotNull(message = "账号状态为空")
   private Integer status;
+
+  public static NhcAccountReq of(NhcUserReq userReq) {
+    NhcAccountReq nhcAccountReq = new NhcAccountReq();
+    if (Objects.nonNull(userReq)) {
+      nhcAccountReq.setAccountName(userReq.getUserName());
+      nhcAccountReq.setAccountCode(userReq.getAccountCode());
+      nhcAccountReq.setMerCode(userReq.getMerCode());
+      nhcAccountReq.setPhone(userReq.getPhone());
+    }
+    return nhcAccountReq;
+  }
 }

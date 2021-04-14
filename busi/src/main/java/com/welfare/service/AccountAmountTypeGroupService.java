@@ -1,6 +1,7 @@
 package com.welfare.service;
 
 
+import com.welfare.persist.entity.AccountAmountTypeGroup;
 import com.welfare.service.dto.nhc.NhcFamilyMemberDTO;
 
 /**
@@ -27,6 +28,12 @@ public interface AccountAmountTypeGroupService {
      */
     boolean addByAccountCodeAndMerAccountTypeCode(Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode);
 
+    /**
+     * 根据账户号查询组
+     * @param accountCode
+     * @return
+     */
+    AccountAmountTypeGroup queryByAccountCode(Long accountCode);
 
 
 }

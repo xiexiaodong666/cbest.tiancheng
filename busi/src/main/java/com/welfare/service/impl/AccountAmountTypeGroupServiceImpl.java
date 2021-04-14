@@ -8,11 +8,17 @@ import com.welfare.persist.dao.AccountAmountTypeGroupDao;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.entity.*;
+import com.welfare.persist.dao.AccountAmountTypeGroupDao;
+import com.welfare.persist.dao.AccountDao;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.AccountAmountTypeGroup;
 import com.welfare.service.AccountAmountTypeGroupService;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.dto.BatchSequence;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +27,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import java.util.Objects;
+
 /**
  * @Author: duanhy
  * @Version: 0.0.1
@@ -28,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroupService {
 
     @Autowired
@@ -44,6 +53,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     private AccountBillDetailDao accountBillDetailDao;
     @Autowired
     private AccountDeductionDetailDao accountDeductionDetailDao;
+    private final AccountDao accountDao;
 
     @Override
     public boolean removeByAccountCode(Long accountCode, String merAccountTypeCode) {
@@ -76,6 +86,18 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         return accountAmountTypeDao.updateById(accountAmountType);
     }
 
+    @Override
+    public AccountAmountTypeGroup queryByAccountCode(Long accountCode) {
+        AccountAmountType accountAmountType = accountAmountTypeDao.queryByAccountCodeAndAmountType(
+                accountCode,
+                WelfareConstant.MerAccountTypeCode.MALL_POINT.code()
+        );
+        if (Objects.nonNull(accountAmountType) && accountAmountType.getJoinedGroup()) {
+            return accountAmountTypeGroupDao.getById(accountAmountType.getAccountAmountTypeGroupId());
+        }else{
+            return null;
+        }
+    }
     @Override
     public boolean addByAccountCodeAndMerAccountTypeCode(Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode) {
         Account joinAccount = accountService.getByAccountCode(joinAccountCode);

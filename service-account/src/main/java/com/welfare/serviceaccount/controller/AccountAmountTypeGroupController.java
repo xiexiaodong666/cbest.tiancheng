@@ -24,6 +24,7 @@ public class AccountAmountTypeGroupController implements IController {
 
     @GetMapping("/by-account-code")
     public R<AccountAmountTypeGroupDO> queryByAccountCode(Long AccountCode){
+
         return success();
     }
 }

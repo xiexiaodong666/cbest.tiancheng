@@ -1,6 +1,7 @@
 package com.welfare.persist.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
@@ -50,5 +51,12 @@ public class AccountAmountTypeDao extends ServiceImpl<AccountAmountTypeMapper, A
             map = list.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, a -> a,(k1, k2)->k1));
         }
         return map;
+    }
+
+    public AccountAmountType queryByAccountCodeAndAmountType(Long accountCode, String merAccountType){
+        return getOne(Wrappers.<AccountAmountType>lambdaQuery()
+                .eq(AccountAmountType::getAccountCode, accountCode)
+                .eq(AccountAmountType::getMerAccountTypeCode, merAccountType)
+        );
     }
 }

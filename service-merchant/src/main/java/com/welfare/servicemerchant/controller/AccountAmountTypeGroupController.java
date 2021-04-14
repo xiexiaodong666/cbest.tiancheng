@@ -4,6 +4,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.service.AccountAmountTypeGroupService;
 import com.welfare.service.dto.account.AccountAmountTypeGroupDTO;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -30,14 +31,14 @@ public class AccountAmountTypeGroupController implements IController {
 
     @GetMapping("/dto")
     @ApiOperation("根据账号查询组信息")
-    public R<AccountAmountTypeGroupDTO> queryByAccountCode(@RequestParam Long accountCode){
+    public R<AccountAmountTypeGroupDTO> queryByAccountCode(@RequestParam @ApiParam("账户编码") Long accountCode){
         AccountAmountTypeGroupDTO accountAmountTypeGroupDTO = accountAmountTypeGroupService.queryDO(accountCode);
         return success(accountAmountTypeGroupDTO);
     }
 
     @GetMapping("/count")
     @ApiOperation("根据商户号统计分组数")
-    public R<Long> countGroups(@RequestParam String merCode){
+    public R<Long> countGroups(@RequestParam @ApiParam("商户编码") String merCode){
         Long count = accountAmountTypeGroupService.countGroups(merCode, WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
         return success(count);
     }

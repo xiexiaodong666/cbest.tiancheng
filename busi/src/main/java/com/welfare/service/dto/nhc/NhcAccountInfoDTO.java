@@ -1,5 +1,12 @@
 package com.welfare.service.dto.nhc;
 
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.Department;
+import com.welfare.persist.entity.Merchant;
+import com.welfare.service.dto.DepartmentTree;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -33,4 +40,21 @@ public class NhcAccountInfoDTO {
 
   @ApiModelProperty("账号状态(1正常2禁用)")
   private Integer status;
+
+
+  public static NhcAccountInfoDTO of(Account account, AccountAmountType accountAmountType, DepartmentTree department) {
+    BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
+    BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "积分福利不存在");
+    BizAssert.notNull(department, ExceptionCode.ILLEGALITY_ARGURMENTS, "组织不存在");
+
+    NhcAccountInfoDTO accountInfoDTO = new NhcAccountInfoDTO();
+    accountInfoDTO.setAccountName(account.getAccountName());
+    accountInfoDTO.setAccountCode(String.valueOf(account.getAccountCode()));
+    accountInfoDTO.setPhone(account.getPhone());
+    accountInfoDTO.setDepartmentCode(department.getDepartmentCode());
+    accountInfoDTO.setDepartmentName(department.getDepartmentName());
+    accountInfoDTO.setStatus(account.getAccountStatus());
+    accountInfoDTO.setProcurementBalance(accountAmountType.getAccountBalance());
+    return accountInfoDTO;
+  }
 }

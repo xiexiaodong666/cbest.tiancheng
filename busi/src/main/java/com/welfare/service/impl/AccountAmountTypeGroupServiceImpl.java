@@ -8,7 +8,6 @@ import com.welfare.persist.dao.AccountAmountTypeGroupDao;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.entity.*;
-import com.welfare.persist.dao.AccountAmountTypeGroupDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
@@ -18,6 +17,7 @@ import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountService;
 import com.welfare.service.SequenceService;
 import com.welfare.service.dto.BatchSequence;
+import com.welfare.service.dto.account.AccountAmountTypeGroupDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @Author: duanhy
@@ -98,6 +99,21 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
             return null;
         }
     }
+
+    @Override
+    public AccountAmountTypeGroupDTO queryDO(Long accountCode) {
+        AccountAmountTypeGroup accountAmountTypeGroup = queryByAccountCode(accountCode);
+        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByGroupId(accountAmountTypeGroup.getId());
+        List<Long> accountCodes = accountAmountTypes.stream().map(AccountAmountType::getAccountCode).collect(Collectors.toList());
+        List<Account> accounts = accountDao.listByAccountCodes(accountCodes);
+        return AccountAmountTypeGroupDTO.of(accountAmountTypeGroup,accounts);
+    }
+
+    @Override
+    public Integer countGroups() {
+        return accountAmountTypeDao.countGroups();
+    }
+
     @Override
     public boolean addByAccountCodeAndMerAccountTypeCode(Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode) {
         Account joinAccount = accountService.getByAccountCode(joinAccountCode);

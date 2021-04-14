@@ -2,7 +2,7 @@ package com.welfare.service;
 
 
 import com.welfare.persist.entity.AccountAmountTypeGroup;
-import com.welfare.service.dto.nhc.NhcFamilyMemberDTO;
+import com.welfare.service.dto.account.AccountAmountTypeGroupDTO;
 
 /**
  * @Author: duanhy
@@ -30,10 +30,22 @@ public interface AccountAmountTypeGroupService {
 
     /**
      * 根据账户号查询组
-     * @param accountCode
-     * @return
+     * @param accountCode 账户编码
+     * @return 分组实体
      */
     AccountAmountTypeGroup queryByAccountCode(Long accountCode);
 
+    /**
+     * 根据账户号
+     * @param accountCode 账户编码
+     * @return 分组DO
+     */
+    AccountAmountTypeGroupDTO queryDO(Long accountCode);
+
+    /**
+     * 计算家庭数
+     * @return 家庭组数
+     */
+    Integer countGroups();
 
 }

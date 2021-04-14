@@ -56,6 +56,7 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
         log.info("rocketmq msg received:{}", JSON.toJSONString(orderDTO));
         String tradeNo = orderDTO.getTradeNo();
         if(Strings.isEmpty(tradeNo) ||  IGNORE_PAY_TYPE.equals(orderDTO.getPayType())){
+            log.info("此订单不需要保存");
             //没有交易单号，则没有支付过，不保存。老的员工卡也不保存
             return;
         }

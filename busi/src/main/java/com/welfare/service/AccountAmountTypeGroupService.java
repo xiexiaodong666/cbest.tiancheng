@@ -17,7 +17,7 @@ public interface AccountAmountTypeGroupService {
      * @param merAccountTypeCode
      * @return
      */
-    boolean removeByAccountCode(Long accountCode, String merAccountTypeCode);
+    boolean removeByAccountCode(String merCode, Long accountCode, String merAccountTypeCode);
 
     /**
      * 加入组
@@ -26,7 +26,7 @@ public interface AccountAmountTypeGroupService {
      * @param merAccountTypeCode 福利类型
      * @return
      */
-    boolean addByAccountCodeAndMerAccountTypeCode(Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode);
+    boolean addByAccountCodeAndMerAccountTypeCode(String merCode, Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode);
 
     /**
      * 根据账户号查询组

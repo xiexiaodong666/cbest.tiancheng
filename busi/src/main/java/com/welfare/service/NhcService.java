@@ -46,27 +46,6 @@ public interface NhcService {
   Boolean leaveFamily(String userCode);
 
   /**
-   * 新增或修改员工
-   * @param nhcAccountReq
-   * @return
-   */
-  String saveOrUpdateAccount(NhcAccountReq nhcAccountReq);
-
-  /**
-   * 查询员工信息
-   * @param accountCode
-   * @return
-   */
-  NhcAccountInfoDTO getAccountInfo(String accountCode);
-
-  /**
-   * 查询员工账户记录
-   * @param nhcUserPageReq
-   * @return
-   */
-  Page<NhcAccountBillDetailDTO> getAccountBillPage(NhcUserPageReq nhcUserPageReq);
-
-  /**
    * 查询家庭信息
    * @param userCode
    * @return

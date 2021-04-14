@@ -28,6 +28,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,7 +67,10 @@ public class NhcServiceImpl implements NhcService {
     @Autowired
     private AccountAmountTypeGroupDao accountAmountTypeGroupDao;
 
+
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String saveOrUpdateUser(NhcUserReq userReq) {
         Account account;
         Merchant merchant = merchantService.getMerchantByMerCode(userReq.getMerCode());
@@ -91,6 +95,7 @@ public class NhcServiceImpl implements NhcService {
         // 加入家庭
         if (joinGroup) {
             boolean success = accountAmountTypeGroupService.addByAccountCodeAndMerAccountTypeCode(
+                    account.getMerCode(),
                     Long.parseLong(userReq.getAccountCode()),
                     Long.parseLong(userReq.getFamilyUserCode()),
                     WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
@@ -135,11 +140,8 @@ public class NhcServiceImpl implements NhcService {
         accountAmountType1.setJoinedGroup(false);
         AccountAmountType accountAmountType2 = new AccountAmountType();
         accountAmountType2.setAccountCode(accountCode);
-        accountAmountType2.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code());
-        AccountAmountType accountAmountType3 = new AccountAmountType();
-        accountAmountType3.setAccountCode(accountCode);
-        accountAmountType3.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code());
-        accountAmountTypeDao.saveBatch(Lists.newArrayList(accountAmountType1,accountAmountType2,accountAmountType3));
+        accountAmountType2.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE.code());
+        accountAmountTypeDao.saveBatch(Lists.newArrayList(accountAmountType1,accountAmountType2));
 
         AccountChangeEventRecord accountChangeEventRecord = AccountUtils
                 .assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, account.getAccountCode(),
@@ -183,52 +185,11 @@ public class NhcServiceImpl implements NhcService {
     }
 
     @Override
-    public String saveOrUpdateAccount(NhcAccountReq nhcAccountReq) {
-        Account account;
-        Merchant merchant = merchantService.getMerchantByMerCode(nhcAccountReq.getMerCode());
-        BizAssert.notNull(merchant,
-                ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
-        if (StringUtils.isNoneBlank(nhcAccountReq.getAccountCode())) {
-            // 修改
-            account = accountService.getByAccountCode(Long.parseLong(nhcAccountReq.getAccountCode()));
-            BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("员工不存在[%s]", nhcAccountReq.getAccountCode()));
-            BizAssert.isTrue(nhcAccountReq.getMerCode().equals(account.getMerCode()), ExceptionCode.ILLEGALITY_ARGURMENTS, "无权限操作！");
-            account.setAccountName(nhcAccountReq.getAccountName());
-            account.setPhone(nhcAccountReq.getPhone());
-        } else {
-            // 新增
-            account = assemblyUser(nhcAccountReq, merchant);
-        }
-        BizAssert.isTrue(accountDao.saveOrUpdate(account));
-        // 同步商户
-        applicationContext.publishEvent(AccountEvt.builder()
-                .typeEnum(StringUtils.isNoneBlank(nhcAccountReq.getAccountCode()) ? ShoppingActionTypeEnum.UPDATE : ShoppingActionTypeEnum.ADD)
-                .accountList(Collections.singletonList(account)).build());
-        return String.valueOf(account.getAccountCode());
-    }
-
-    @Override
-    public NhcAccountInfoDTO getAccountInfo(String accountCode) {
-        Account account = accountService.getByAccountCode(Long.parseLong(accountCode));
-        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
-        Merchant merchant = merchantService.getMerchantByMerCode(account.getMerCode());
-        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
-        AccountAmountType accountAmountType = accountAmountTypeDao.queryByAccountCodeAndAmountType(account.getAccountCode(),
-                WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code());
-        List<DepartmentTree> departmentTrees = departmentService.tree(account.getMerCode());
-        BizAssert.notEmpty(departmentTrees, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户组织不存在");
-        return NhcAccountInfoDTO.of(account, accountAmountType, departmentTrees.get(0));
-    }
-
-    @Override
-    public Page<NhcAccountBillDetailDTO> getAccountBillPage(NhcUserPageReq nhcUserPageReq) {
-        return null;
-    }
-
-    @Override
     public NhcFamilyMemberDTO getFamilyInfo(String userCode) {
         Account account = accountService.getByAccountCode(Long.parseLong(userCode));
         BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
+        Merchant merchant = merchantService.getMerchantByMerCode(account.getMerCode());
+        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
         AccountAmountType accountAmountType = accountAmountTypeDao.queryByAccountCodeAndAmountType(account.getAccountCode(),
                 WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
         BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "积分福利账户为空");
@@ -249,11 +210,10 @@ public class NhcServiceImpl implements NhcService {
             if (CollectionUtils.isNotEmpty(accountCodes)) {
                 QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
                 accountQueryWrapper.in(Account.ACCOUNT_CODE, accountCodes);
-                //Map<Long, Account> accountMap = accountDao.list(accountQueryWrapper).stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, account->account));
+                Map<Long, Account> accountMap = accountDao.list(accountQueryWrapper).stream().collect(Collectors.toMap(Account::getAccountCode, a->a));
+                dto.setMembers(NhcUserInfoDTO.of(accountMap, accountAmountTypeMap, merchant));
             }
-
         }
-
         return dto;
     }
 }

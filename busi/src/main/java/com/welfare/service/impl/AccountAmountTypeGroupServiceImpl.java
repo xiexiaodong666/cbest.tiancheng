@@ -1,6 +1,5 @@
 package com.welfare.service.impl;
 
-import com.welfare.common.constants.CacheConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
@@ -23,8 +22,10 @@ import com.welfare.service.dto.account.AccountAmountTypeGroupDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -32,6 +33,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.welfare.common.constants.CacheConstant.TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT;
 
 /**
  * @Author: duanhy
@@ -61,7 +64,9 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     private final AccountAmountTypeMapper accountAmountTypeMapper;
 
     @Override
-    public boolean removeByAccountCode(Long accountCode, String merAccountTypeCode) {
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT,key = "#merCode")
+    public boolean removeByAccountCode(String merCode, Long accountCode, String merAccountTypeCode) {
         Account account = accountService.getByAccountCode(accountCode);
         BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, merAccountTypeCode);
@@ -114,13 +119,15 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     }
 
     @Override
-    @Cacheable(value = CacheConstant.TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT, key = "#merCode")
+    @Cacheable(value = TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT, key = "#merCode")
     public Long countGroups(String merCode, String merAccountTypeCode) {
         return accountAmountTypeMapper.countByMerCodeAndMerAccountType(merCode,merAccountTypeCode);
     }
 
     @Override
-    public boolean addByAccountCodeAndMerAccountTypeCode(Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode) {
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT,key = "#merCode")
+    public boolean addByAccountCodeAndMerAccountTypeCode(String merCode, Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode) {
         Account joinAccount = accountService.getByAccountCode(joinAccountCode);
         BizAssert.notNull(joinAccount, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
         Account groupAccount = accountService.getByAccountCode(groupAccountCode);

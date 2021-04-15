@@ -1,0 +1,4 @@
+POST http://localhost:10015/payment/password-free/notification/refund
+Content-Type: application/json
+
+{"status":"SUCCESS","msg":"SUCCESS","biz_status":"SUCCESS","biz_msg":"SUCCESS","biz_content":"{\"market\":\"1001\",\"terminal\":\"1111\",\"barcode\":\"712404792842169711022\",\"amount\":\"1\",\"account_code\":\"1000010562\",\"gateway_trade_no\":\"202104100190727006198435840\",\"out_refund_no\":\"809A0011111210408144417PR1\",\"refund_detail\":\"5065-甜橙生活-1\"}"}

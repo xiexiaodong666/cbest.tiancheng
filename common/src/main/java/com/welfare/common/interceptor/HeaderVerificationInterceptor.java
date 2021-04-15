@@ -11,8 +11,11 @@ import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.domain.UserInfo;
 import com.welfare.common.util.AccountUserHolder;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.common.util.UserInfoHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -23,6 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Description:
@@ -43,7 +49,16 @@ public class HeaderVerificationInterceptor implements HandlerInterceptor {
             setMerchantUserToContext(handler, request);
             setAccountUserToContext(handler, request);
         }
-        if(StringUtils.isEmpty(source)){
+        List pathIgnoreSources = SpringBeanUtils.getApplicationContext()
+                .getEnvironment()
+                .getProperty(
+                        "e-welfare.ignore-source-header-urls",
+                        List.class,
+                        Arrays.asList("/payment/password-free/notification/payment","/payment/password-free/notification/refund","test"
+                        ,"/accountPaymentResult/createThirdPartyPaymentNotify","/accountPaymentResult/thirdPartySignResultNotify")
+                );
+        String requestURI = request.getRequestURI();
+        if(StringUtils.isEmpty(source) && !pathIgnoreSources.contains(requestURI)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Source required for http header");
         }
         //todo 需要优化Source校验逻辑

@@ -1,6 +1,5 @@
 package com.welfare.persist.dto.query;
 
-import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

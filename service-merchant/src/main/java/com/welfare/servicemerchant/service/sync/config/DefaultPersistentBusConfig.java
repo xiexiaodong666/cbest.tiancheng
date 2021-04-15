@@ -1,12 +1,13 @@
 package com.welfare.servicemerchant.service.sync.config;
 
-import java.util.Properties;
-import javax.sql.DataSource;
 import org.killbill.bus.DefaultPersistentBus;
 import org.killbill.bus.api.PersistentBus;
 import org.killbill.bus.api.PersistentBusConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * @author joewee

@@ -4,7 +4,6 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.entity.ThirdPartyPaymentRequest;
 import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
-import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 
 /**

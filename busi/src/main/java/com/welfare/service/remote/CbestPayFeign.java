@@ -4,7 +4,6 @@ import com.welfare.common.annotation.ConditionalOnHavingProperty;
 import com.welfare.service.remote.entity.CbestPayBaseReq;
 import com.welfare.service.remote.entity.CbestPayBaseResp;
 import com.welfare.service.remote.fallback.CbestPayFallback;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

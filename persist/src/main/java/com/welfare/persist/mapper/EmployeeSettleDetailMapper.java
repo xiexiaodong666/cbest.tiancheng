@@ -1,15 +1,11 @@
 package com.welfare.persist.mapper;
 
-import com.welfare.persist.dto.EmployeeSettleBuildDTO;
-import com.welfare.persist.dto.EmployeeSettleConsumeDTO;
-import com.welfare.persist.dto.EmployeeSettleDetailDTO;
-import com.welfare.persist.dto.EmployeeSettleStoreDTO;
-import com.welfare.persist.dto.EmployeeSettleSumDTO;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.EmployeeSettleBuildQuery;
 import com.welfare.persist.dto.query.EmployeeSettleConsumeQuery;
 import com.welfare.persist.dto.query.EmployeeSettleDetailQuery;
 import com.welfare.persist.entity.EmployeeSettleDetail;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

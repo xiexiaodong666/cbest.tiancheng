@@ -3,11 +3,9 @@ package com.welfare.service;
 import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -51,25 +49,10 @@ public interface AccountAmountTypeService {
      */
     void batchUpdateAccountAmountType(List<Deposit> deposits);
 
-    /**
-     * 查询指定account的授信额度
-     *
-     * @param accountCode
-     * @return
-     */
-    AccountAmountType querySurplusQuota(Long accountCode);
-
   /**
    * 根据账户号查询AccountAmount领域模型
    * @param account
    * @return
    */
     List<AccountAmountDO> queryAccountAmountDO(Account account);
-
-    /**
-     * 计算除了额度的余额
-     * @param accountCode
-     * @return
-     */
-    BigDecimal sumBalanceExceptSurplusQuota(Long accountCode);
 }

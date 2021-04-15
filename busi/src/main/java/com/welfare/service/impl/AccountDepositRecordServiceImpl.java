@@ -16,9 +16,8 @@ import com.welfare.common.constants.WelfareConstant.SequenceType;
 import com.welfare.common.enums.AccountPayTypeEnum;
 import com.welfare.common.enums.AccountRechargePaymentStatusEnum;
 import com.welfare.common.enums.AccountRechargeStatusEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.AccountUserHolder;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountDepositRecord;
 import com.welfare.persist.mapper.AccountDepositRecordMapper;
@@ -70,12 +69,12 @@ public class AccountDepositRecordServiceImpl extends
         String payType = req.getPayType();
         AccountPayTypeEnum accountPayTypeEnum = AccountPayTypeEnum.getByType(payType);
         if (accountPayTypeEnum == null) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "支付方式有误", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "支付方式有误", null);
         }
         Long accountCode = req.getAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
         if (account == null) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "获取用户信息失败", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "获取用户信息失败", null);
         }
 
         //组装参数，请求微信H5交易创建接口
@@ -96,7 +95,7 @@ public class AccountDepositRecordServiceImpl extends
             log.error(
                 StrUtil.format("调用重百付微信H5交易创建接口异常-req: {}, resp: {}", JSON.toJSONString(req),
                     JSON.toJSONString(resp)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
         }
         //保存支付信息
         AccountDepositRecord accountDepositRecord = new AccountDepositRecord();
@@ -119,7 +118,7 @@ public class AccountDepositRecordServiceImpl extends
         boolean saved = save(accountDepositRecord);
         if (!saved) {
             log.error(StrUtil.format("保存支付信息失败-入参：{}", JSON.toJSONString(req)));
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "保存支付信息失败", null);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "保存支付信息失败", null);
         }
         //返回支付流水号和支付链接
         AccountDepositDTO accountDepositDTO = new AccountDepositDTO();
@@ -282,7 +281,7 @@ public class AccountDepositRecordServiceImpl extends
                         AccountRechargeStatusEnum.RECHARGE_SUCCESS.getCode());
                 accountDepositRecord.setDepositTime(DateUtil.date());
                 updateById(accountDepositRecord);
-            } catch (BusiException e) {
+            } catch (BizException e) {
                 log.error("支付成功后充值业务异常", e);
                 if (DateUtil
                     .between(accountDepositRecord.getCreateTime(), new Date(),

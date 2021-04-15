@@ -1,7 +1,8 @@
 package com.welfare.service.remote.entity.request;
 
-import javax.validation.constraints.NotBlank;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * @author gaorui

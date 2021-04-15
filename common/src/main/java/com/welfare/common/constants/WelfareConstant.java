@@ -16,13 +16,51 @@ public class WelfareConstant {
     public static final String DEFAULT_SALE_UNNAME = "重百线下消费商品";
 
 
+    /**
+     * 离线是否启用
+     */
+    public enum AccountOfflineFlag{
+        /**
+         * 启用，禁用
+         */
+        ENABLE(1,"启用"),
+        DISABLE(0,"禁用");
+
+        private final Integer code;
+        private final String desc;
+
+        AccountOfflineFlag(Integer code,String desc){
+            this.code = code;
+            this.desc  =desc;
+        }
+
+        public Integer code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+
+        public static AccountOfflineFlag findByCode(Integer code) {
+            for (AccountOfflineFlag type : AccountOfflineFlag.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的AccountOfflineFlag类型");
+        }
+
+    }
+
+
     public enum PaymentChannel {
         /**
          * 沃生活馆
          */
         WO_LIFE("wo_life", "沃生活馆支付","70"),
-        WECHAT("wechat", "微信","71"),
-        ALIPAY("alipay", "支付宝","72"),
+        ALIPAY("alipay", "支付宝","71"),
+        WECHAT("wechat", "微信","72"),
         WELFARE("welfare", "甜橙卡","69");
 
         private final String code;
@@ -193,7 +231,8 @@ public class WelfareConstant {
         MER_CODE("mer_code","商户编号"),
         ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请"),
         RESET_ACCOUNT_SURPLUS_QUOTA("reset_account_surplus_quota","员工账号授信额度变更"),
-        EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号");
+        EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号"),
+        MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码");
 
         private final String code;
         private final String desc;
@@ -449,6 +488,55 @@ public class WelfareConstant {
         private final String desc;
 
         ConsumeQueryType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+    }
+
+    /**
+     * 消息发送类型
+     */
+    public enum MessagePushTargetType {
+
+        SMS("sms", "短信"),
+        EMAIL("email", "邮件");
+
+        private final String code;
+        private final String desc;
+
+        MessagePushTargetType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code() {
+            return this.code;
+        }
+
+        public String desc() {
+            return this.desc;
+        }
+    }
+
+    /**
+     * 消息发送模板类型
+     */
+    public enum MessagePushTemplateType {
+
+        STRING_REPLACER("string_replacer", "字符串替换");
+
+        private final String code;
+        private final String desc;
+
+        MessagePushTemplateType(String code, String desc) {
             this.code = code;
             this.desc = desc;
         }

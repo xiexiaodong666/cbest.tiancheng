@@ -4,7 +4,7 @@ import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.domain.MerchantUserInfo;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.service.SettleDetailService;
@@ -53,7 +53,7 @@ public class MerInfoController  implements IController {
     public R<SettleMerInfoResp> getAccountInfo(){
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         if(merchantUser == null){
-            throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
+            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
         }
         SettleMerInfoResp settleAccountInfoResp= settleDetailService.getMerAccountInfo(merchantUser.getMerchantCode());
         return R.success(settleAccountInfoResp);
@@ -66,7 +66,7 @@ public class MerInfoController  implements IController {
     public R<BasePageVo<SettleMerTransDetailResp>> getAccountTransPageDetail(SettleMerTransDetailPageReq settleMerTransDetailPageReq){
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         if(merchantUser == null){
-            throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
+            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
         }
         BasePageVo<SettleMerTransDetailResp> settleAccountTransDetailRespPage = settleDetailService.getMerAccountTransPageDetail(merchantUser.getMerchantCode(), settleMerTransDetailPageReq);
         return R.success(settleAccountTransDetailRespPage);
@@ -78,7 +78,7 @@ public class MerInfoController  implements IController {
     public R<String> getAccountTransDetail(SettleMerTransDetailReq settleMerTransDetailReq){
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         if(merchantUser == null){
-            throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
+            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
         }
         List<SettleMerTransDetailResp> settleAccountTransDetailRespPage = settleDetailService
                 .getMerAccountTransDetail(merchantUser.getMerchantCode(), settleMerTransDetailReq)
@@ -93,7 +93,7 @@ public class MerInfoController  implements IController {
             path = fileUploadService.uploadExcelFile(
                     settleAccountTransDetailRespPage, SettleMerTransDetailResp.class, "商户账户明细");
         } catch (IOException e) {
-            throw new BusiException(null, "文件导出异常", null);
+            throw new BizException(null, "文件导出异常", null);
         }
         return success(fileUploadService.getFileServerUrl(path));
     }

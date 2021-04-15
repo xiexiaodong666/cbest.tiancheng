@@ -8,15 +8,13 @@ import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.domain.UserInfo;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.UserInfoHolder;
-import com.welfare.persist.dto.MonthSettleDetailDTO;
 import com.welfare.persist.dto.MonthSettleDetailMerchantSummaryDTO;
 import com.welfare.persist.dto.MonthSettleDetailSummaryDTO;
 import com.welfare.persist.entity.MonthSettle;
-import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.MonthSettleService;
 import com.welfare.service.dto.*;
 import com.welfare.servicesettlement.task.SettlementBillBuildTask;
@@ -32,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -149,7 +146,7 @@ public class MonthSettleController implements IController {
             path = fileUploadService.uploadExcelFile(
                     monthSettleDetailResps, MonthSettleDetailResp.class, "结算账单明细");
         } catch (IOException e) {
-            throw new BusiException(null, "文件导出异常", null);
+            throw new BizException(null, "文件导出异常", null);
         }
         return success(fileUploadService.getFileServerUrl(path));
     }
@@ -162,7 +159,7 @@ public class MonthSettleController implements IController {
     public R monthSettleSend(@PathVariable("id")Long id){
         UserInfo userInfo = UserInfoHolder.getUserInfo();
         if(userInfo==null){
-            throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
+            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
         }
         Integer count = monthSettleService.monthSettleSend(id);
         return count == 1 ? R.success():R.fail("发送账单失败,请检查账单状态");
@@ -184,7 +181,7 @@ public class MonthSettleController implements IController {
     public R monthSettleFinish(@PathVariable("id")Long id){
         UserInfo userInfo = UserInfoHolder.getUserInfo();
         if(userInfo==null){
-            throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
+            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
         }
 
         Integer count = monthSettleService.monthSettleFinish(id);
@@ -224,7 +221,7 @@ public class MonthSettleController implements IController {
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
             if(!monthSettleById.getMerCode().equals(merchantUser.getMerchantCode())){
-                throw new BusiException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前商户无此数据权限",null);
+                throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前商户无此数据权限",null);
             }
         }
     }

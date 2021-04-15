@@ -26,4 +26,9 @@ public class MerchantDao extends ServiceImpl<MerchantMapper, Merchant> {
         queryWrapper.eq(Merchant.MER_CODE,merCode);
         return getOne(queryWrapper);
     }
+    public Merchant queryByName(String merName){
+        QueryWrapper<Merchant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Merchant.MER_NAME,merName);
+        return getOne(queryWrapper);
+    }
 }

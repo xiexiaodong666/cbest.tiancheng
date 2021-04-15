@@ -38,7 +38,9 @@ e-welfare:
   distributed-lock:
     enabled: true
   barcode:
-    expire: 180
+    expire-for-notification: 3600
+    expire-for-pay: 240
+  ignore-source-header-urls: /payment/password-free/notification/payment,/payment/password-free/notification/refund,/accountPaymentResult/createThirdPartyPaymentNotify,/accountPaymentResult/thirdPartySignResultNotify
 mybatis-plus:
   global-config:
     db-config:

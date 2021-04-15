@@ -3,7 +3,6 @@ package com.welfare.service.dto.pos;
 import com.welfare.service.utils.PageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

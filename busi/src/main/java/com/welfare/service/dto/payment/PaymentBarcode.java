@@ -21,12 +21,12 @@ import java.util.Date;
 public class PaymentBarcode implements Serializable {
     @ApiModelProperty("条码值")
     private String barcode;
-    @ApiModelProperty("扫描日期")
-    private Date scanDate;
-    public static PaymentBarcode of(Long accountCode, Long secretKey, String paymentChannel){
+    @ApiModelProperty("条码生成日期")
+    private Date generatedDate;
+    public static PaymentBarcode of(Long accountCode, Long secretKey, String paymentChannel, Date generatedDate){
         PaymentBarcode paymentBarcode = new PaymentBarcode();
         paymentBarcode.setBarcode(BarcodeUtil.generateBarcode(accountCode,secretKey, paymentChannel));
-        paymentBarcode.setScanDate(Calendar.getInstance().getTime());
+        paymentBarcode.setGeneratedDate(generatedDate);
         return paymentBarcode;
     }
 }

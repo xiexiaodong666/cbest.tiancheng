@@ -10,7 +10,6 @@ import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.Data;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -97,13 +96,13 @@ public class AccountAmountDO {
         return accountBillDetail;
     }
 
-    public static AccountDeductionDetail decreaseMerchant(PaymentRequest paymentRequest,
-                                                          AccountAmountType accountAmountType,
-                                                          BigDecimal operatedAmount,
-                                                          PaymentOperation paymentOperation,
-                                                          Account account, SupplierStore supplierStore,
-                                                          MerchantCredit merchantCredit,
-                                                          AbstractMerAccountTypeOperator merAccountTypeOperator) {
+    public static AccountDeductionDetail generateAccountDeductionDetail(PaymentRequest paymentRequest,
+                                                                        AccountAmountType accountAmountType,
+                                                                        BigDecimal operatedAmount,
+                                                                        PaymentOperation paymentOperation,
+                                                                        Account account, SupplierStore supplierStore,
+                                                                        MerchantCredit merchantCredit,
+                                                                        AbstractMerAccountTypeOperator merAccountTypeOperator) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(paymentRequest.calculateAccountCode());
         accountDeductionDetail.setOrderChannel(paymentRequest.getPaymentScene());
@@ -132,20 +131,8 @@ public class AccountAmountDO {
         //扣减商户金额
 
         Assert.notNull(supplierStore, "根据门店号没有找到门店");
-        if (!Objects.equals(supplierStore.getMerCode(), account.getMerCode())) {
-            MerchantCreditService merchantCreditService = SpringBeanUtils.getBean(MerchantCreditService.class);
-            List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.doOperateAccount(
-                    merchantCredit,
-                    operatedAmount,
-                    paymentRequest.getTransNo(),
-                    merAccountTypeOperator, WelfareConstant.TransType.CONSUME.code());
-            paymentOperation.setMerchantAccountOperations(merchantAccountOperations);
-            Map<String, MerchantBillDetail> merBillDetailMap = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
-                    .collect(Collectors.toMap(MerchantBillDetail::getBalanceType, merchantBillDetail -> merchantBillDetail));
-            MerchantBillDetail currentBalanceDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.CURRENT_BALANCE.code());
-            MerchantBillDetail remainingLimitDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.REMAINING_LIMIT.code());
-            accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount().abs());
-            accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount().abs());
+        if (!Objects.equals(supplierStore.getMerCode(), account.getMerCode()) && Objects.nonNull(merAccountTypeOperator)) {
+            decreaseMerchant(paymentRequest, operatedAmount, paymentOperation, merchantCredit, merAccountTypeOperator, accountDeductionDetail);
         } else {
             paymentOperation.setMerchantAccountOperations(Collections.emptyList());
             accountDeductionDetail.setMerDeductionAmount(BigDecimal.ZERO);
@@ -154,5 +141,30 @@ public class AccountAmountDO {
 
 
         return accountDeductionDetail;
+    }
+
+    private static void decreaseMerchant(PaymentRequest paymentRequest, BigDecimal operatedAmount, PaymentOperation paymentOperation, MerchantCredit merchantCredit, AbstractMerAccountTypeOperator merAccountTypeOperator, AccountDeductionDetail accountDeductionDetail) {
+        MerchantCreditService merchantCreditService = SpringBeanUtils.getBean(MerchantCreditService.class);
+        List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.doOperateAccount(
+                merchantCredit,
+                operatedAmount,
+                paymentRequest.getTransNo(),
+                merAccountTypeOperator, WelfareConstant.TransType.CONSUME.code());
+        paymentOperation.setMerchantAccountOperations(merchantAccountOperations);
+        Map<String, MerchantBillDetail> merBillDetailMap = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
+                .collect(Collectors.toMap(MerchantBillDetail::getBalanceType, merchantBillDetail -> merchantBillDetail));
+        MerchantBillDetail currentBalanceDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.CURRENT_BALANCE.code());
+        MerchantBillDetail remainingLimitDetail = merBillDetailMap.get(WelfareConstant.MerCreditType.REMAINING_LIMIT.code());
+        accountDeductionDetail.setMerDeductionAmount(currentBalanceDetail == null ? BigDecimal.ZERO : currentBalanceDetail.getTransAmount().abs());
+        accountDeductionDetail.setMerDeductionCreditAmount(remainingLimitDetail == null ? BigDecimal.ZERO : remainingLimitDetail.getTransAmount().abs());
+    }
+
+    public static void updateAccountAfterOperated(Account account, List<AccountAmountType> accountAmountTypes) {
+        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
+        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
+        BigDecimal accountCreditOverpay = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
+        account.setAccountBalance(accountBalance);
+        account.setSurplusQuota(accountCreditBalance);
+        account.setSurplusQuotaOverpay(accountCreditOverpay);
     }
 }

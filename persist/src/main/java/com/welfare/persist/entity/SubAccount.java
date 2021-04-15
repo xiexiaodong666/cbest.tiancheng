@@ -1,22 +1,18 @@
 package com.welfare.persist.entity;
 
-import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.math.BigDecimal;
-import java.util.Date;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 子账户信息(sub_account)实体类
@@ -54,6 +50,9 @@ public class SubAccount extends Model<SubAccount> implements Serializable {
      */
     @ApiModelProperty("余额")   
     private BigDecimal balance;
+
+    @ApiModelProperty("免密支付签名")
+    private String passwordFreeSignature;
     /**
      * 创建人
      */
@@ -133,5 +132,7 @@ public class SubAccount extends Model<SubAccount> implements Serializable {
     * 版本
     */
     public static final String VERSION = "version";
+
+    public static final String PASSWORD_FREE_SIGNATURE = "password_free_signature";
 
 }

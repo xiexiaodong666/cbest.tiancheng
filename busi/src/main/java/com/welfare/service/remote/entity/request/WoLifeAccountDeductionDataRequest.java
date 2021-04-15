@@ -1,14 +1,13 @@
 package com.welfare.service.remote.entity.request;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author gaorui

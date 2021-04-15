@@ -1,6 +1,6 @@
 package com.welfare.service.operator.merchant;
 
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
@@ -80,7 +80,7 @@ public abstract class AbstractMerAccountTypeOperator {
                                                              BigDecimal amountLeftToBeDecrease,
                                                              BigDecimal operatedAmount,
                                                              String transNo, String transType){
-        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "组织(公司)余额不足", null);
+        throw new BizException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "组织(公司)余额不足", null);
     }
     /**
      * 默认抛出超过余额限度异常,子类可以自定义其他操作
@@ -91,6 +91,6 @@ public abstract class AbstractMerAccountTypeOperator {
      * @return
      */
     protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo, String transType){
-        throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
+        throw new BizException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
     }
 }

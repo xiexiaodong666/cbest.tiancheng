@@ -6,13 +6,13 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.EmployeeSettleDao;
 import com.welfare.persist.dao.EmployeeSettleDetailDao;
-import com.welfare.persist.dto.*;
+import com.welfare.persist.dto.EmployeeSettleBillDTO;
 import com.welfare.persist.dto.query.EmployeeSettleBillQuery;
 import com.welfare.persist.dto.query.EmployeeSettleBuildQuery;
 import com.welfare.persist.entity.EmployeeSettle;
@@ -41,7 +41,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.welfare.common.constants.RedisKeyConstant.*;
+import static com.welfare.common.constants.RedisKeyConstant.BUILD_EMPLOYEE_SETTLE;
+import static com.welfare.common.constants.RedisKeyConstant.FINISH_EMPLOYEE_SETTLE;
 
 /**
  * 商户员工结算账单服务接口实现
@@ -100,7 +101,7 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
     @Transactional(rollbackFor = Exception.class)
     public List<String> buildEmployeeSettle(EmployeeSettleBuildReq settleBuildReq) {
         if (CollectionUtils.isEmpty(settleBuildReq.getSelectedAccountCodes())) {
-            throw new BusiException("至少勾选一个员工！");
+            throw new BizException("至少勾选一个员工！");
         }
         List<RLock> locks = new ArrayList<>();
         RLock multiLock;
@@ -116,27 +117,27 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             query.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
             List<EmployeeSettleDetail> settleDetails = employeeSettleDetailMapper.getBuildEmployeeSettleDetail(query);
             if (CollectionUtils.isEmpty(settleDetails)) {
-                throw new BusiException(String.format("员工在当前查询条件下没有结算数据！"));
+                throw new BizException(String.format("员工在当前查询条件下没有结算数据！"));
             }
             List<Long> accountCodes = settleDetails.stream().map(EmployeeSettleDetail::getAccountCode).collect(Collectors.toList());
             settleBuildReq.getSelectedAccountCodes().forEach(accountCode -> {
                 if (!accountCodes.contains(Long.parseLong(accountCode))) {
-                    throw new BusiException(String.format("员工[%s]在当前查询条件下没有结算数据！", accountCode));
+                    throw new BizException(String.format("员工[%s]在当前查询条件下没有结算数据！", accountCode));
                 }
             });
             List<EmployeeSettle> employeeSettles = assemblyEmployeeSettles(settleDetails, settleBuildReq);
             boolean flag1 = employeeSettleDao.saveBatch(employeeSettles);
             boolean flag2 = employeeSettleDetailDao.updateBatchById(settleDetails);
             if (!flag1 || !flag2) {
-                throw new BusiException("操作繁忙，请稍后再试！");
+                throw new BizException("操作繁忙，请稍后再试！");
             }
             return employeeSettles.stream().map(EmployeeSettle::getSettleNo).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("生成员工授信结算单失败,请求:{}", JSON.toJSONString(settleBuildReq), e);
-            if (e instanceof BusiException) {
+            if (e instanceof BizException) {
                 throw e;
             } else {
-                throw new BusiException("生成账单失败");
+                throw new BizException("生成账单失败");
             }
         } finally {
             DistributedLockUtil.unlock(multiLock);
@@ -148,7 +149,7 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
     public boolean finishEmployeeSettle(EmployeeSettleFinishReq employeeSettleFinishReq) {
         List<String> settleNos = employeeSettleFinishReq.getSettleNos();
         if (CollectionUtils.isEmpty(settleNos)) {
-            throw new BusiException("至少勾选一个员工！");
+            throw new BizException("至少勾选一个员工！");
         }
         List<RLock> locks = new ArrayList<>();
         RLock multiLock;
@@ -163,12 +164,12 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             List<String> getSettleNos = employeeSettles.stream().map(EmployeeSettle::getSettleNo).collect(Collectors.toList());
             settleNos.forEach(settleNo -> {
                 if (!getSettleNos.contains(settleNo)) {
-                    throw new BusiException(String.format("结算单[%s]不存在！", settleNo));
+                    throw new BizException(String.format("结算单[%s]不存在！", settleNo));
                 }
             });
             employeeSettles.forEach(employeeSettle -> {
                 if (WelfareSettleConstant.SettleStatusEnum.SETTLED.code().equals(employeeSettle.getSettleStatus())) {
-                    throw new BusiException(String.format("结算单[%s]不能重复结算！", employeeSettle.getSettleNo()));
+                    throw new BizException(String.format("结算单[%s]不能重复结算！", employeeSettle.getSettleNo()));
                 }
                 employeeSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
                 employeeSettle.setUppdateUser(MerchantUserHolder.getMerchantUser().getUserCode());
@@ -180,7 +181,7 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                     MerchantUserHolder.getMerchantUser().getUserCode(),
                     settleNos);
             if (!flag1 || !flag2) {
-                throw new BusiException("完成结算失败，请重新操作！");
+                throw new BizException("完成结算失败，请重新操作！");
             }
             // 恢复员工授信额度或溢缴款账户额度
             AccountRestoreCreditLimitReq req = new AccountRestoreCreditLimitReq();
@@ -193,12 +194,12 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
             req.setCreditLimitDtos(restoreCreditLimitDtos);
             WelfareResp resp = accountCreditFeign.remainingLimit(req, "settlement-api");
             if (resp == null || resp.getCode() != 1) {
-                throw new BusiException("完成结算失败，请重新操作！");
+                throw new BizException("完成结算失败，请重新操作！");
             }
             return true;
         } catch (Exception e) {
             log.error("完成员工授信结算单失败,请求:{}", JSON.toJSONString(employeeSettleFinishReq), e);
-            throw new BusiException("完成结算单失败");
+            throw new BizException("完成结算单失败");
         } finally {
             DistributedLockUtil.unlock(multiLock);
         }

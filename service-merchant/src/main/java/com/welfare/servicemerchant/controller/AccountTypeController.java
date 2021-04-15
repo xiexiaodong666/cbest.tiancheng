@@ -3,7 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.annotation.RepeatRequestVerification;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountTypeMapperDTO;
 import com.welfare.persist.dto.MerSupplierStoreDTO;
@@ -81,7 +81,7 @@ public class AccountTypeController implements IController {
   public R<AccountType> detail(@PathVariable String id){
     try {
       return success(accountTypeService.getAccountType(Long.parseLong(id)));
-    }catch (BusiException be){
+    }catch (BizException be){
       return R.fail(be.getMessage());
     }
 
@@ -96,7 +96,7 @@ public class AccountTypeController implements IController {
       AccountType accountType = accountTypeConverter.toEntity(accountTypeReq);
       accountType.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountTypeService.save(accountType));
-    }catch (BusiException be){
+    }catch (BizException be){
       return R.fail(be.getMessage());
     }
 
@@ -110,7 +110,7 @@ public class AccountTypeController implements IController {
       AccountType accountType = accountTypeConverter.toEntity(accountTypeReq);
       accountType.setUpdateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountTypeService.update(accountType));
-    }catch (BusiException be){
+    }catch (BizException be){
       return R.fail(be.getMessage());
     }
   }
@@ -120,7 +120,7 @@ public class AccountTypeController implements IController {
   public R<Boolean> delete(@RequestBody UpdateStatusReq updateStatusReq){
     try {
       return success(accountTypeService.delete(Long.parseLong(updateStatusReq.getId())));
-    }catch (BusiException be){
+    }catch (BizException be){
       return R.fail(be.getMessage());
     }
   }

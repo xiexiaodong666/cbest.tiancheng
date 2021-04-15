@@ -1,7 +1,7 @@
 package com.welfare.persist.mapper;
 
-import com.welfare.persist.entity.FileUniversalStorage;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.welfare.persist.entity.FileUniversalStorage;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

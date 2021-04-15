@@ -4,7 +4,7 @@ import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.RedisKeyConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountDao;
@@ -87,7 +87,7 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
   public String upload(MultipartFile multipartFile, String requestId) {
     String fileId = getFileIdByRequestId(requestId);
     if (StringUtils.isBlank(MerchantUserHolder.getMerchantUser().getMerchantCode())) {
-      throw new BusiException("商户编码不能为空");
+      throw new BizException("商户编码不能为空");
     }
     if (StringUtils.isNotBlank(fileId)) {
       return fileId;
@@ -109,14 +109,14 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
 //        Page<TempAccountDepositApplyDTO> page = pageByFileIdByExistAccount(1 , 1, fileId);
 //        if (page == null || CollectionUtils.isEmpty(page.getRecords())) {
 //          delByFileId(fileId);
-//          throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工！", null);
+//          throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工！", null);
 //        }
         return fileId;
       } else {
-        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
+        throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
       }
     } catch (Exception e) {
-      throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
     } finally {
       lock.unlock();
     }

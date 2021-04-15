@@ -2,7 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.ApiUser;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.query.MerchantCreditApplyQueryReq;
 import com.welfare.service.MerchantCreditApplyService;
@@ -68,10 +68,10 @@ public class MerchantCreditApplyController implements IController {
     @ApiUser
     public R<String> update(@Validated @RequestBody MerchantCreditApplyUpdateReq request){
         if (request.getBalance() == null || request.getBalance().compareTo(BigDecimal.ZERO) < 0) {
-            throw new BusiException("金额不能小于0");
+            throw new BizException("金额不能小于0");
         }
         if (request.getBalance() != null && request.getBalance().compareTo(MAX_AMOUNT) > 0) {
-            throw new BusiException(String.format("金额超过限制[%s]", MAX_AMOUNT));
+            throw new BizException(String.format("金额超过限制[%s]", MAX_AMOUNT));
         }
         return success(applyService.update(request, UserInfoHolder.getUserInfo()));
     }
@@ -100,10 +100,10 @@ public class MerchantCreditApplyController implements IController {
     @ApiUser
     public R<String> save(@Validated @RequestBody MerchantCreditApplyRequest request){
         if (request.getBalance() == null || request.getBalance().compareTo(BigDecimal.ZERO) < 0) {
-            throw new BusiException("金额不能小于0");
+            throw new BizException("金额不能小于0");
         }
         if (request.getBalance() != null && request.getBalance().compareTo(MAX_AMOUNT) > 0) {
-            throw new BusiException(String.format("金额超过限制[%s]", MAX_AMOUNT));
+            throw new BizException(String.format("金额超过限制[%s]", MAX_AMOUNT));
         }
         return success(applyService.save(request, UserInfoHolder.getUserInfo()));
     }

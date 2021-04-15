@@ -4,8 +4,6 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.welfare.common.util.DateUtil;
-import com.welfare.persist.entity.EmployeeSettleDetail;
-import com.welfare.service.PullAccountDetailRecordService;
 import com.welfare.service.settlement.EmployeeSettleDetailService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;

@@ -4,13 +4,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.annotation.RepeatRequestVerification;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountChangeEventRecordDao;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
 import com.welfare.persist.dto.query.AccountConsumePageQuery;
-import com.welfare.persist.entity.Account;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneService;
@@ -24,7 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.util.Arrays;
-import java.util.LinkedList;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
@@ -34,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -108,7 +108,7 @@ public class AccountConsumeSceneController implements IController {
     try {
       accountConsumeSceneAddReq.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountConsumeSceneService.save(accountConsumeSceneAddReq));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -120,7 +120,7 @@ public class AccountConsumeSceneController implements IController {
     try {
       accountConsumeSceneReq.setUpdateUser(MerchantUserHolder.getMerchantUser().getUsername());
       return success(accountConsumeSceneService.update(accountConsumeSceneReq));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -131,7 +131,7 @@ public class AccountConsumeSceneController implements IController {
     try {
       return success(accountConsumeSceneService.updateStatus(Long.parseLong(updateStatusReq.getId()),
           updateStatusReq.getConsumeSceneStatus()));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }
@@ -141,7 +141,7 @@ public class AccountConsumeSceneController implements IController {
   public R<Boolean> delete(@RequestBody UpdateStatusReq updateStatusReq) {
     try {
       return success(accountConsumeSceneService.delete(Long.parseLong(updateStatusReq.getId())));
-    }catch (BusiException be){
+    }catch (BizException be){
       return R.fail(be.getMessage());
     }
   }
@@ -166,7 +166,7 @@ public class AccountConsumeSceneController implements IController {
   public R<Boolean> edit(@RequestBody List<AccountConsumeSceneEditReq> consumeSceneEditReqs) {
     try {
       return success(accountConsumeSceneService.edit(consumeSceneEditReqs));
-    } catch (BusiException be) {
+    } catch (BizException be) {
       return R.fail(be.getMessage());
     }
   }

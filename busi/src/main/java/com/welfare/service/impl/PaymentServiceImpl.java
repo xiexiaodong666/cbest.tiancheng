@@ -1,6 +1,8 @@
 package com.welfare.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.ImmutableMap;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.AccountStatus;
@@ -10,22 +12,23 @@ import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.perf.PerfMonitor;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
-import com.welfare.service.async.AsyncNotificationService;
-import com.welfare.service.dto.payment.*;
-import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
-import com.welfare.service.operator.merchant.CurrentBalanceOperator;
+import com.welfare.service.async.AsyncService;
+import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
+import com.welfare.service.dto.payment.BarcodePaymentRequest;
+import com.welfare.service.dto.payment.CardPaymentRequest;
+import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
-import com.welfare.service.wolife.WoLifePaymentService;
+import com.welfare.service.payment.IPaymentOperator;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +40,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -64,28 +71,24 @@ public class PaymentServiceImpl implements PaymentService {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final AccountAmountTypeDao accountAmountTypeDao;
     private final AccountDao accountDao;
-    private final CurrentBalanceOperator currentBalanceOperator;
     private final MerchantBillDetailDao merchantBillDetailDao;
     private final AccountConsumeSceneDao accountConsumeSceneDao;
     private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
     private final SupplierStoreService supplierStoreService;
     private final MerchantStoreRelationDao merchantStoreRelationDao;
     private final MerchantCreditDao merchantCreditDao;
-    private final AsyncNotificationService asyncNotificationService;
-    private final WoLifePaymentService woLifePaymentService;
-    private final ThirdPartyPaymentRequestService thirdPartyPaymentRequestService;
-    PerfMonitor paymentRequestPerfMonitor = new PerfMonitor("paymentRequest");
+    private final AsyncService asyncService;
+    private final PaymentChannelConfigDao paymentChannelConfigDao;
+    private final SubAccountDao subAccountDao;
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
-
+    @Resource(name = "e-welfare-paymentQueryAsync")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
-    public <T extends PaymentRequest>T paymentRequest(T paymentRequest) {
-        paymentRequestPerfMonitor.start();
-        ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) SpringBeanUtils.getBean("e-welfare-paymentQueryAsync");
-        Future<PaymentRequest> queryResultFuture = threadPoolTaskExecutor.submit(() -> queryResult(paymentRequest.getTransNo(),paymentRequest.getClass()));
-
+    public <T extends PaymentRequest>T paymentRequest(final T paymentRequest) {
+        Future<? extends PaymentRequest> queryResultFuture = threadPoolTaskExecutor.submit(() -> queryResult(paymentRequest.getTransNo(),paymentRequest.getClass()));
         Long accountCode = paymentRequest.calculateAccountCode();
         Assert.notNull(accountCode, "账号不能为空。");
         String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + accountCode;
@@ -99,71 +102,62 @@ public class PaymentServiceImpl implements PaymentService {
                 //整体异步查询
                 Future<SupplierStore> supplierStoreFuture = threadPoolTaskExecutor.submit(() -> supplierStoreService.getSupplierStoreByStoreCode(paymentRequest.getStoreNo()));
                 Future<String> paymentSceneFuture = threadPoolTaskExecutor.submit(paymentRequest::calculatePaymentScene);
-                Future<List<AccountAmountDO>> accountAmountDOFuture =
+                Future<List<AccountAmountDO>> accountAmountDoFuture =
                         threadPoolTaskExecutor.submit(() -> accountAmountTypeService.queryAccountAmountDO(account));
                 Future<MerchantStoreRelation> merchantStoreRelationFuture = threadPoolTaskExecutor.submit(() ->
                         merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(), account.getMerCode()));
                 Future<MerchantCredit> merchantCreditFuture =
                         threadPoolTaskExecutor.submit(() -> merchantCreditService.getByMerCode(account.getMerCode()));
-                Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = threadPoolTaskExecutor.submit(() -> {
-                    List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
-                            .getAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
-                    Assert.isTrue(!CollectionUtils.isEmpty(accountConsumeScenes), "未找到该账户的可用交易场景配置");
-                    List<Long> sceneIds = accountConsumeScenes.stream().map(AccountConsumeScene::getId).collect(Collectors.toList());
-                    return accountConsumeSceneStoreRelationDao
-                            .queryBySceneIdsAndStoreNo(sceneIds, paymentRequest.getStoreNo());
-                });
+                Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();
                 if (WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
                         || WelfareConstant.AsyncStatus.REVERSED.code().equals(requestHandled.getPaymentStatus())) {
                     log.warn("重复的支付请求，直接返回已经处理完成的request{}", JSON.toJSONString(requestHandled));
                     BeanUtils.copyProperties(requestHandled, paymentRequest);
-                    return (T)requestHandled;
+                    @SuppressWarnings("unchecked")
+                    T paymentRequestHandled = (T) requestHandled;
+                    return paymentRequestHandled;
                 }
-
                 SupplierStore supplierStore = supplierStoreFuture.get();
                 List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture.get();
                 String paymentScene = paymentSceneFuture.get();
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
-                chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
-                List<AccountAmountDO> accountAmountDOList = accountAmountDOFuture.get();
+                List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
+                //支付前的校验
+                chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
 
                 String paymentChannel = paymentRequest.getPaymentChannel();
-                List<PaymentOperation> paymentOperations;
-                List<MerchantBillDetail> merchantBillDetails = null;
-                if(WelfareConstant.PaymentChannel.WO_LIFE.code().equals(paymentChannel)){
-                    paymentOperations = woLifePaymentService.pay(paymentRequest, account, accountAmountDOList, merchantCredit, supplierStore);
-                }else{
-                    paymentOperations = decreaseAccount(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit);
-                }
+                List<MerchantBillDetail> merchantBillDetails;
+                PaymentChannelOperatorEnum paymentChannelOperatorEnum = PaymentChannelOperatorEnum.findByPaymentChannelStr(paymentChannel);
+                IPaymentOperator paymentOperator = SpringBeanUtils.getBean(paymentChannelOperatorEnum.paymentOperator());
+
+                List<PaymentOperation> paymentOperations = paymentOperator.pay(
+                        paymentRequest,
+                        account,
+                        accountAmountDOList,
+                        supplierStore,
+                        merchantCredit
+                );
                 merchantBillDetails = paymentOperations.stream()
                         .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
                         .map(MerchantAccountOperation::getMerchantBillDetail)
                         .collect(Collectors.toList());
-
-
-
                 //执行更新数据库
                 List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                         .collect(Collectors.toList());
                 //在循环里面已经对merchantCredit进行了更新
                 merchantCreditDao.updateById(merchantCredit);
+                //支付成功要将账户的离线模式启用
+                account.setOfflineLock(WelfareConstant.AccountOfflineFlag.ENABLE.code());
                 saveDetails(paymentOperations, account, accountAmountTypes);
-
                 if (!CollectionUtils.isEmpty(merchantBillDetails)) {
                     merchantBillDetailDao.saveBatch(merchantBillDetails);
                 }
-
-                paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
-                paymentRequest.setAccountName(account.getAccountName());
-                paymentRequest.setAccountBalance(account.getAccountBalance());
-                paymentRequest.setAccountCredit(account.getSurplusQuota().add(account.getSurplusQuotaOverpay()));
-                paymentRequest.setPhone(account.getPhone());
-
+                fillPaymentRequest(paymentRequest, account);
                 if (ConsumeTypeEnum.SHOP_SHOPPING.getCode().equals(paymentRequest.getPaymentScene())) {
-                    asyncNotificationService.paymentNotify(paymentRequest.getPhone(), paymentRequest.getAmount());
+                    asyncService.paymentNotify(paymentRequest.getPhone(), paymentRequest.getAmount());
                 }
             } finally {
                 DistributedLockUtil.unlock(merAccountLock);
@@ -171,25 +165,49 @@ public class PaymentServiceImpl implements PaymentService {
             return paymentRequest;
         } catch (InterruptedException | ExecutionException e) {
             log.error("异步执行查询异常", e);
-            throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(accountLock);
-            paymentRequestPerfMonitor.stop();
         }
 
+    }
+
+    private <T extends PaymentRequest> Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationFuture(T paymentRequest, Account account) {
+        return threadPoolTaskExecutor.submit(() -> {
+            List<AccountConsumeScene> accountConsumeScenes = accountConsumeSceneDao
+                    .getAccountTypeAndMerCode(account.getAccountTypeCode(), account.getMerCode());
+            Assert.isTrue(!CollectionUtils.isEmpty(accountConsumeScenes), "未找到该账户的可用交易场景配置");
+            List<Long> sceneIds = accountConsumeScenes.stream().map(AccountConsumeScene::getId).collect(Collectors.toList());
+            return accountConsumeSceneStoreRelationDao
+                    .queryBySceneIdsAndStoreNo(sceneIds, paymentRequest.getStoreNo());
+        });
+    }
+
+    /**
+     * 填充paymentRequest
+     * @param <T> 付款请求类型
+     * @param paymentRequest 付款请求
+     * @param account 账户
+     */
+    private <T extends PaymentRequest> void fillPaymentRequest(T paymentRequest, Account account) {
+        paymentRequest.setPaymentStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
+        paymentRequest.setAccountName(account.getAccountName());
+        paymentRequest.setAccountBalance(account.getAccountBalance());
+        paymentRequest.setAccountCredit(account.getSurplusQuota().add(account.getSurplusQuotaOverpay()));
+        paymentRequest.setPhone(account.getPhone());
     }
 
 
     /**
      * 判断消费场景是否符合配置
      *
-     * @param paymentRequest
-     * @param account
-     * @param supplierStore
-     * @param paymentScene
-     * @param sceneStoreRelations
+     * @param paymentRequest 付款请求
+     * @param account 账户
+     * @param supplierStore 门店
+     * @param paymentScene 支付场景
+     * @param sceneStoreRelations 消费场景与门店关联列表
      */
-    private String chargeBeforePay(PaymentRequest paymentRequest, Account account, SupplierStore supplierStore, MerchantStoreRelation merStoreRelation, String paymentScene, List<AccountConsumeSceneStoreRelation> sceneStoreRelations) {
+    private void chargeBeforePay(PaymentRequest paymentRequest, Account account, SupplierStore supplierStore, MerchantStoreRelation merStoreRelation, String paymentScene, List<AccountConsumeSceneStoreRelation> sceneStoreRelations) {
         Assert.isTrue(AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()), "账户未启用");
         Assert.notNull(merStoreRelation, "用户所在组织（公司）不支持在该门店消费或配置已禁用");
         Assert.isTrue(EnableEnum.ENABLE.getCode().equals(merStoreRelation.getStatus()), "用户所在组织（公司）不支持在该门店消费或配置已禁用");
@@ -208,9 +226,9 @@ public class PaymentServiceImpl implements PaymentService {
                 .distinct()
                 .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc(), null);
+            log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式", null);
         }
-        return paymentScene;
     }
 
     @Override
@@ -261,40 +279,6 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRequest;
     }
 
-    public List<PaymentOperation> decreaseAccount(PaymentRequest paymentRequest,
-                                                  Account account, List<AccountAmountDO> accountAmountDOList,
-                                                  SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        BigDecimal usableAmount = account.getAccountBalance()
-                .add(account.getSurplusQuota())
-                .add(account.getSurplusQuotaOverpay());
-        BigDecimal amount = paymentRequest.getAmount();
-        boolean enough = usableAmount.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-        Assert.isTrue(enough, "用户账户总余额不足");
-        Assert.notEmpty(accountAmountDOList,"用户没有可用的福利类型");
-        BigDecimal allTypeBalance = accountAmountDOList.stream()
-                .map(accountAmountDO -> accountAmountDO.getAccountAmountType().getAccountBalance())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        //判断子账户之和
-        boolean accountTypesEnough = allTypeBalance.subtract(amount).compareTo(BigDecimal.ZERO) >= 0;
-        Assert.isTrue(accountTypesEnough, "用户子账户余额总和不足,请确认员工账户总账和子账是否对应");
-        accountAmountDOList.sort(Comparator.comparing(x -> x.getMerchantAccountType().getDeductionOrder()));
-        List<PaymentOperation> paymentOperations = new ArrayList<>(4);
-        List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
-                .collect(Collectors.toList());
-        for (AccountAmountDO accountAmountDO : accountAmountDOList) {
-            if (BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance()) == 0) {
-                //当前的accountType没钱，则继续下一个账户
-                continue;
-            }
-            PaymentOperation currentOperation = decrease(accountAmountDO, amount, paymentRequest, accountAmountTypes, supplierStore, merchantCredit);
-            amount = amount.subtract(currentOperation.getOperateAmount());
-            paymentOperations.add(currentOperation);
-            if (currentOperation.isEnough()) {
-                break;
-            }
-        }
-        return paymentOperations;
-    }
 
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
         List<AccountBillDetail> billDetails = paymentOperations.stream()
@@ -306,13 +290,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<AccountAmountType> accountTypes = paymentOperations.stream()
                 .map(PaymentOperation::getAccountAmountType).filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
-        BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
-        BigDecimal accountCreditBalance = AccountAmountDO.calculateAccountCredit(accountAmountTypes);
-        BigDecimal accountCreditOverpay = AccountAmountDO.calculateAccountCreditOverpay(accountAmountTypes);
-        account.setAccountBalance(accountBalance);
-        account.setSurplusQuota(accountCreditBalance);
-        account.setSurplusQuotaOverpay(accountCreditOverpay);
+        AccountAmountDO.updateAccountAfterOperated(account, accountAmountTypes);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
@@ -323,52 +301,70 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 
-    private PaymentOperation decrease(AccountAmountDO accountAmountDO,
-                                      BigDecimal toOperateAmount,
-                                      PaymentRequest paymentRequest,
-                                      List<AccountAmountType> accountAmountTypes, SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        AccountAmountType accountAmountType = accountAmountDO.getAccountAmountType();
-        MerchantAccountType merchantAccountType = accountAmountDO.getMerchantAccountType();
-        BigDecimal accountBalance = accountAmountType.getAccountBalance();
-        BigDecimal subtract = accountBalance.subtract(toOperateAmount);
+    @Override
+    public ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentSceneCheck(
+        BarcodePaymentRequest paymentRequest) {
+        try {
+            Long accountCode = paymentRequest.calculateAccountCode();
+            Assert.notNull(accountCode, "账号不能为空。");
+            Account account = accountService.getByAccountCode(accountCode);
+            Assert.notNull(account, "未找到账号：" + accountCode);
+            Future<SupplierStore> supplierStoreFuture = threadPoolTaskExecutor.submit(
+                () -> supplierStoreService
+                    .getSupplierStoreByStoreCode(paymentRequest.getStoreNo()));
+            Future<MerchantStoreRelation> merchantStoreRelationFuture = threadPoolTaskExecutor
+                .submit(() ->
+                    merchantStoreRelationDao
+                        .getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(),
+                            account.getMerCode()));
+            Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
+            Future<String> paymentSceneFuture = threadPoolTaskExecutor
+                .submit(paymentRequest::calculatePaymentScene);
+            String merCode = account.getMerCode();
+            String storeNo = paymentRequest.getStoreNo();
+            String paymentScene = paymentSceneFuture.get();
+            String paymentChannel = paymentRequest.getPaymentChannel();
+            Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() -> paymentChannelConfigDao
+                .getBaseMapper().selectList(
+                    Wrappers.<PaymentChannelConfig>lambdaQuery()
+                        .eq(PaymentChannelConfig::getMerCode, merCode)
+                        .eq(PaymentChannelConfig::getStoreCode, storeNo)
+                        .eq(PaymentChannelConfig::getConsumeType, paymentScene)
+                        .eq(PaymentChannelConfig::getPaymentChannelCode, paymentChannel)));
+            Future<SubAccount> subAccountFuture = threadPoolTaskExecutor.submit(() -> subAccountDao.getBaseMapper().selectOne(
+                Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
+                    .eq(SubAccount::getSubAccountType, paymentChannel)));
 
-        BigDecimal operatedAmount;
-        /**
-         * 扣减个人账户
-         */
-        boolean isCurrentEnough = subtract.compareTo(BigDecimal.ZERO) >= 0;
-        if (isCurrentEnough) {
-            operatedAmount = toOperateAmount;
-            accountAmountType.setAccountBalance(subtract);
-        } else {
-            operatedAmount = accountBalance;
-            accountAmountType.setAccountBalance(BigDecimal.ZERO);
+            SupplierStore supplierStore = supplierStoreFuture.get();
+            List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture
+                .get();
+
+            MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
+            //检查门店消费场景
+            chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene,
+                sceneStoreRelations);
+            //检查支付渠道消费场景
+            List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigListFuture
+                .get();
+            if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
+                log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式");
+            }
+            SubAccount subAccount = subAccountFuture.get();
+            ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = new ThirdPartyBarcodePaymentDTO();
+            thirdPartyBarcodePaymentDTO.setAccountCode(accountCode);
+            thirdPartyBarcodePaymentDTO.setAccountName(account.getAccountName());
+            thirdPartyBarcodePaymentDTO.setPhone(account.getPhone());
+            thirdPartyBarcodePaymentDTO.setSurplusQuota(account.getSurplusQuota());
+            thirdPartyBarcodePaymentDTO.setAccountBalance(account.getAccountBalance());
+            if(subAccount != null) {
+                thirdPartyBarcodePaymentDTO.setPasswordFreeSignature(subAccount.getPasswordFreeSignature());
+            }
+            return thirdPartyBarcodePaymentDTO;
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(StrUtil.format("查询检查第三方支付码异步执行异常, paymentRequest: {}", JSON.toJSON(paymentRequest)), e);
+            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", e);
         }
-        PaymentOperation paymentOperation = new PaymentOperation();
-        paymentOperation.setOperateAmount(operatedAmount);
-        paymentOperation.setAccountAmountType(accountAmountType);
-        paymentOperation.setMerchantAccountType(merchantAccountType);
-        paymentOperation.setTransNo(paymentRequest.getTransNo());
-        AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, operatedAmount, accountAmountTypes);
-        paymentOperation.setAccountBillDetail(accountBillDetail);
-        paymentOperation.setEnough(isCurrentEnough);
-        /**
-         * 扣减商户账户
-         */
-        AccountDeductionDetail accountDeductionDetail = AccountAmountDO.decreaseMerchant(
-                paymentRequest,
-                accountAmountType,
-                operatedAmount,
-                paymentOperation,
-                accountAmountDO.getAccount(),
-                supplierStore,
-                merchantCredit,
-                currentBalanceOperator
-        );
-        paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
-        return paymentOperation;
-
     }
-
 
 }

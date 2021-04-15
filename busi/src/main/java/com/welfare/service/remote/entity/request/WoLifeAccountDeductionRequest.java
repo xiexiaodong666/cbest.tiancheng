@@ -1,10 +1,9 @@
 package com.welfare.service.remote.entity.request;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author gaorui

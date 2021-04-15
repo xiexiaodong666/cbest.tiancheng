@@ -3,6 +3,8 @@ package com.welfare.service.remote.entity.request;
 import com.welfare.common.util.DateUtil;
 import com.welfare.service.dto.merchantconsume.WelfareMerChantConsumeDataApiRequest;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author gaorui
@@ -36,9 +38,15 @@ public class WelfareMerChantConsumeDataRequest {
   public static WelfareMerChantConsumeDataRequest of(WelfareMerChantConsumeDataApiRequest request) {
 
     WelfareMerChantConsumeDataRequest welfareMerChantConsumeDataRequest = new WelfareMerChantConsumeDataRequest();
+    if (CollectionUtils.isNotEmpty(request.getBusinessType())) {
+      welfareMerChantConsumeDataRequest.setBusinessType(
+          StringUtils.join(request.getBusinessType(), ","));
+    }
 
-    welfareMerChantConsumeDataRequest.setBusinessType(request.getBusinessType());
-    welfareMerChantConsumeDataRequest.setConsumeType(request.getConsumeType());
+    if (CollectionUtils.isNotEmpty(request.getConsumeType())) {
+      welfareMerChantConsumeDataRequest.setConsumeType(
+          StringUtils.join(request.getConsumeType(), ","));
+    }
     welfareMerChantConsumeDataRequest.setEndDate(
         DateUtil.date2Str(request.getEndDate(), DateUtil.DEFAULT_DATE_FORMAT));
     welfareMerChantConsumeDataRequest.setStartDate(

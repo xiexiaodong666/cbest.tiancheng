@@ -2,6 +2,7 @@ package com.welfare.service.dto.merchantconsume;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -16,12 +17,12 @@ public class WelfareMerChantConsumeDataApiRequest {
    * 业务类型
    */
   @ApiModelProperty("业务类型")
-  private String businessType;
+  private List<String> businessType;
   /**
    * 消费方式
    */
   @ApiModelProperty("消费方式")
-  private String consumeType;
+  private List<String> consumeType;
   /**
    * 消费时间筛选结束
    */

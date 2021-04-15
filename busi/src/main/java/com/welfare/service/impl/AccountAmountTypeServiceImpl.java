@@ -214,6 +214,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         accountDeductionDetail.setSelfDeductionAmount(BigDecimal.ZERO);
         accountDeductionDetail.setCardId(deposit.getCardNo());
         accountDeductionDetail.setChanel(deposit.getChannel());
+        accountDeductionDetail.setPaymentChannel(deposit.getPaymentChannel());
         return accountDeductionDetail;
     }
 

@@ -1,9 +1,12 @@
 package com.welfare.servicesettlement.dto.mall;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.persist.entity.OrderInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
@@ -69,4 +72,19 @@ public class AftersaleOrderMqInfo extends OrderMqInfo{
 
     @ApiModelProperty("交易单号")
     private String tradeNo;
+
+    public OrderInfo parseFromOriginalOrder(OrderInfo originalOrderInfo){
+        OrderInfo afterSaleOrderInfo = new OrderInfo();
+        BeanUtils.copyProperties(originalOrderInfo,afterSaleOrderInfo);
+        afterSaleOrderInfo.setOrderId(this.getOrgOrderNo().toString());
+        afterSaleOrderInfo.setOrderAmount(this.refundAmount);
+        afterSaleOrderInfo.setTransNo(this.tradeNo);
+        afterSaleOrderInfo.setReturnTransNo(originalOrderInfo.getTransNo());
+        afterSaleOrderInfo.setOrderTime(this.getOrderTime());
+        afterSaleOrderInfo.setTransType(WelfareConstant.TransType.REFUND.code());
+        afterSaleOrderInfo.setTransTypeName(WelfareConstant.TransType.REFUND.desc());
+        //需要insert，id置空
+        afterSaleOrderInfo.setId(null);
+        return afterSaleOrderInfo;
+    }
 }

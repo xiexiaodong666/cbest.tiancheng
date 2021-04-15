@@ -46,6 +46,7 @@ public class DepositServiceImpl implements DepositService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void personalDeposit(Deposit deposit) {
+        deposit.setPaymentChannel(WelfareConstant.PaymentChannel.WELFARE.code());
         accountAmountTypeService.updateAccountAmountType(deposit);
         deposit.setDepositStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
     }

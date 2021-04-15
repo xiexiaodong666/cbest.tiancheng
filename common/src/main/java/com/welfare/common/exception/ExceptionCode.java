@@ -25,7 +25,7 @@ public enum ExceptionCode implements IResultCode {
     //---------资金相关异常----
     MERCHANT_RECHARGE_LIMIT_EXCEED(5002001,"商户余额不足"),
     INSUFFICIENT_BALANCE(5002002,"用户余额不足"),
-
+    REFUND_MORE_THAN_PAID(5002003,"累计退款金额不能大于付款金额"),
 
     //------条码相关异常------
     BARCODE_EXPIRE(5003001,"条码过期"),

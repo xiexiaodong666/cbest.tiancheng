@@ -1,5 +1,10 @@
 package com.welfare.service.remote.entity.request;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.exception.BusiException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,6 +14,7 @@ import javax.validation.constraints.NotNull;
 
 import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * @author gaorui
@@ -17,7 +23,6 @@ import lombok.Data;
  */
 @Data
 public class WoLifeAccountDeductionDataRequest {
-
   /**
    * 订单id
    */
@@ -44,10 +49,27 @@ public class WoLifeAccountDeductionDataRequest {
 
   public static WoLifeAccountDeductionDataRequest of(PaymentRequest paymentRequest){
     WoLifeAccountDeductionDataRequest woLifeAccountDeductionDataRequest = new WoLifeAccountDeductionDataRequest();
+
     woLifeAccountDeductionDataRequest.setOid(paymentRequest.getTransNo());
-    woLifeAccountDeductionDataRequest.setTotalCount(1);
     woLifeAccountDeductionDataRequest.setTotalPrice(paymentRequest.getAmount());
-    woLifeAccountDeductionDataRequest.setRows(Collections.singletonList(WoLifeAccountDeductionRowsRequest.of(paymentRequest)));
+    String saleRows = paymentRequest.getSaleRows();
+
+    // 处理线上商城支付请求
+    if(Strings.isNotEmpty(saleRows) && ConsumeTypeEnum.ONLINE_MALL.getCode().equals(paymentRequest.getPaymentScene())) {
+      ObjectMapper objectMapper = new ObjectMapper();
+      try {
+        List<WoLifeAccountDeductionRowsRequest> rows = objectMapper.readValue(saleRows, new TypeReference<List<WoLifeAccountDeductionRowsRequest>>(){});
+        woLifeAccountDeductionDataRequest.setRows(rows);
+        woLifeAccountDeductionDataRequest.setTotalCount(rows.size());
+      } catch (JsonProcessingException e) {
+        throw new BusiException("[沃生活馆]支付异常:线上支付商品行参数转换错误" + saleRows);
+      }
+
+    } else {
+      woLifeAccountDeductionDataRequest.setRows(Collections.singletonList(WoLifeAccountDeductionRowsRequest.of(paymentRequest)));
+      woLifeAccountDeductionDataRequest.setTotalCount(1);
+    }
+
     return woLifeAccountDeductionDataRequest;
   }
 }

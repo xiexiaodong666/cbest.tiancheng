@@ -57,6 +57,15 @@ public abstract class PaymentRequest {
     private String accountMerCode;
     private String paymentScene;
 
+    @ApiModelProperty("沃生活馆线上支付请求商品行数据,json格式 ["
+        + "  {"
+        + "    \"name\": \"重百线上商品 (注释:商品名称)\","
+        + "    \"price\": 1 (注释:商品单价, 元),"
+        + "    \"count\": 1 (注释:购买数量),"
+        + "    \"saleUnId\": 123456789 (注释:商品id)"
+        + "  }"
+        + "]")
+    private String saleRows;
     public String calculatePaymentScene(){
         String consumeType = queryPaymentScene(machineNo,storeNo);
         //不是O2O或者ONLINE_SHOPPING,则为到店消费

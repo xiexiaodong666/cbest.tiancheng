@@ -1,10 +1,9 @@
 package com.welfare.service.wolife.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.enums.PaymentTypeEnum;
+import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.exception.BusiException;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.AccountBillDetailDao;
@@ -16,19 +15,12 @@ import com.welfare.persist.entity.*;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.ThirdPartyPaymentRequestService;
 import com.welfare.service.dto.RefundRequest;
-import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
-import com.welfare.service.operator.merchant.CreditLimitOperator;
 import com.welfare.service.operator.merchant.RemainingLimitOperator;
-import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
-import com.welfare.service.operator.payment.domain.RefundOperation;
-import com.welfare.service.remote.WoLifeFeignClient;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionDataRequest;
-import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRequest;
 import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffDataRequest;
-import com.welfare.service.remote.entity.request.WoLifeRefundWriteOffRequest;
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.service.WoLifeFeignService;
@@ -37,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -134,12 +125,15 @@ public class WoLifePaymentServiceImpl implements WoLifePaymentService {
             BigDecimal paidAmount = paidDeductionDetails.stream()
                     .map(AccountDeductionDetail::getTransAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            Assert.isTrue(paidAmount.subtract(refundRequest.getAmount())
-                    .compareTo(BigDecimal.ZERO) == 0, "沃支付的退款必须全额退款");
+            // 沃生活馆线上渠道订单支付部分退
+            if(!ConsumeTypeEnum.ONLINE_MALL.getCode().equals(thePaidDeductionDetail.getOrderChannel())) {
+                Assert.isTrue(paidAmount.subtract(refundRequest.getAmount())
+                                  .compareTo(BigDecimal.ZERO) == 0, "沃支付的退款必须全额退款");
+            }
             Account account = accountDao.queryByAccountCode(accountCode);
             refundRequest.setPhone(account.getPhone());
             try{
-                WoLifeBasicResponse woLifeBasicResponse = woLifeFeignService.refundWriteOff(refundRequest.getPhone(), WoLifeRefundWriteOffDataRequest.of(refundRequest));
+                WoLifeBasicResponse woLifeBasicResponse = woLifeFeignService.refundWriteOff(refundRequest.getPhone(), WoLifeRefundWriteOffDataRequest.of(refundRequest, thePaidDeductionDetail.getOrderChannel()));
                 if(woLifeBasicResponse.isSuccess()){
                     thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.SUCCEED,woLifeBasicResponse,null);
                 }else{

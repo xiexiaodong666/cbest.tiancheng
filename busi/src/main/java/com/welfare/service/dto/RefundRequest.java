@@ -2,6 +2,7 @@ package com.welfare.service.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -43,4 +44,7 @@ public class RefundRequest {
     private String merCode;
     @ApiModelProperty("账户所在商家，返回参数")
     private String accountMerCode;
+    @ApiModelProperty("沃生活馆线上退款请求商品行数据")
+    private List<String> saleUnIds;
+
 }

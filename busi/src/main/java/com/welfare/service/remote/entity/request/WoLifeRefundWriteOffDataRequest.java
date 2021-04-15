@@ -1,5 +1,7 @@
 package com.welfare.service.remote.entity.request;
 
+import com.welfare.common.enums.ConsumeTypeEnum;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
@@ -7,6 +9,8 @@ import javax.validation.constraints.NotNull;
 
 import com.welfare.service.dto.RefundRequest;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * @author gaorui
@@ -29,10 +33,23 @@ public class WoLifeRefundWriteOffDataRequest {
   @NotNull
   private List<WoLifeRefundWriteOffRowsRequest> rows;
 
-  public static WoLifeRefundWriteOffDataRequest of(RefundRequest refundRequest){
+  public static WoLifeRefundWriteOffDataRequest of(RefundRequest refundRequest, String orderChannel){
     WoLifeRefundWriteOffDataRequest woLifeRefundWriteOffDataRequest = new WoLifeRefundWriteOffDataRequest();
     woLifeRefundWriteOffDataRequest.setOid(refundRequest.getOriginalTransNo());
-    woLifeRefundWriteOffDataRequest.setRows(Collections.singletonList(WoLifeRefundWriteOffRowsRequest.of(refundRequest)));
+    List<String> saleUnIds = refundRequest.getSaleUnIds();
+    if(CollectionUtils.isNotEmpty(saleUnIds) && ConsumeTypeEnum.ONLINE_MALL.getCode().equals(orderChannel)) {
+      List<WoLifeRefundWriteOffRowsRequest> refundWriteOffRowsRequestList = new ArrayList<>(saleUnIds.size());
+      for (String saleUnId:
+      saleUnIds ) {
+        WoLifeRefundWriteOffRowsRequest refundWriteOffRowsRequest = new WoLifeRefundWriteOffRowsRequest();
+        refundWriteOffRowsRequest.setSaleUnId(saleUnId);
+        refundWriteOffRowsRequestList.add(refundWriteOffRowsRequest);
+      }
+      woLifeRefundWriteOffDataRequest.setRows(refundWriteOffRowsRequestList);
+
+    } else {
+      woLifeRefundWriteOffDataRequest.setRows(Collections.singletonList(WoLifeRefundWriteOffRowsRequest.of(refundRequest)));
+    }
 
     return woLifeRefundWriteOffDataRequest;
   }

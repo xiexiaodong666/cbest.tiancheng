@@ -141,7 +141,7 @@ public class OrderMqInfo implements Serializable {
         orderInfo.setMerchantCode(account.getMerCode());
         orderInfo.setMerchantName(merchant.getMerName());
         orderInfo.setTransType(WelfareConstant.TransType.CONSUME.code());
-        orderInfo.setTransTypeName(WelfareConstant.TransType.CONSUME.name());
+        orderInfo.setTransTypeName(WelfareConstant.TransType.CONSUME.desc());
         return orderInfo;
     }
 }

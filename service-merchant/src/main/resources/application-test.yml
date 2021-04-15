@@ -69,7 +69,7 @@ platformUser:
   url: http://test-welfare-app.sjgo365.com/shop-api/tc/store
 
 shopping:
-  url: http://test-welfare-internal.kube.cbestcd.com/backend-api/rpc-base
+  url: http://test1-welfare-internal.kube-test.cbestcd.com/backend-api/rpc-base
 
 
 

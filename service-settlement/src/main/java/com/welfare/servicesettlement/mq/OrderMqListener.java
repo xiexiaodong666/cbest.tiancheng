@@ -13,7 +13,6 @@ import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.OrderInfo;
-import com.welfare.service.OrderService;
 import com.welfare.servicesettlement.dto.mall.OrderMqInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +61,7 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
             //没有交易单号，则没有支付过，不保存。老的员工卡也不保存
             return;
         }
-        OrderInfo orderInfoInDb = orderInfoDao.getOneByOrderNo(orderDTO.getOrgOrderNo().toString());
+        OrderInfo orderInfoInDb = orderInfoDao.getOneByOrderNo(orderDTO.getOrgOrderNo().toString(), WelfareConstant.TransType.CONSUME.code());
         if(!Objects.isNull(orderInfoInDb)){
             log.info("订单已经保存，不需要再次保存");
             return;

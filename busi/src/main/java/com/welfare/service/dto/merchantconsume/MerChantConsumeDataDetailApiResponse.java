@@ -10,6 +10,9 @@ import lombok.Data;
  */
 @Data
 public class MerChantConsumeDataDetailApiResponse {
+  @ApiModelProperty("虚拟id")
+  private Long id;
+
   @ApiModelProperty("消费方式")
   private String consumeType;
 

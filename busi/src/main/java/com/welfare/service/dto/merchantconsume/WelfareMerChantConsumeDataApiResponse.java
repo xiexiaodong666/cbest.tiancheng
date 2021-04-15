@@ -40,6 +40,9 @@ public class WelfareMerChantConsumeDataApiResponse {
   @ApiModel("列表汇总数据")
   @Data
   public static class TableExt {
+    @ApiModelProperty("虚拟id")
+    private Long id;
+
     @ApiModelProperty("商户名称")
     private String merName;
 

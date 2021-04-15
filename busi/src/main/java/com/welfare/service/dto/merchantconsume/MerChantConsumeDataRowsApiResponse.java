@@ -14,6 +14,9 @@ import lombok.Data;
 @Data
 public class MerChantConsumeDataRowsApiResponse {
 
+  @ApiModelProperty("虚拟id")
+  private Long id;
+
   @ApiModelProperty("商户代码")
   private String merCode;
 

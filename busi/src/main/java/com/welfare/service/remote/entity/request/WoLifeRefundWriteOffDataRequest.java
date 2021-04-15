@@ -37,15 +37,18 @@ public class WoLifeRefundWriteOffDataRequest {
     WoLifeRefundWriteOffDataRequest woLifeRefundWriteOffDataRequest = new WoLifeRefundWriteOffDataRequest();
     woLifeRefundWriteOffDataRequest.setOid(refundRequest.getOriginalTransNo());
     List<String> saleUnIds = refundRequest.getSaleUnIds();
-    if(CollectionUtils.isNotEmpty(saleUnIds) && ConsumeTypeEnum.ONLINE_MALL.getCode().equals(orderChannel)) {
-      List<WoLifeRefundWriteOffRowsRequest> refundWriteOffRowsRequestList = new ArrayList<>(saleUnIds.size());
-      for (String saleUnId:
-      saleUnIds ) {
-        WoLifeRefundWriteOffRowsRequest refundWriteOffRowsRequest = new WoLifeRefundWriteOffRowsRequest();
-        refundWriteOffRowsRequest.setSaleUnId(saleUnId);
-        refundWriteOffRowsRequestList.add(refundWriteOffRowsRequest);
+    if(ConsumeTypeEnum.ONLINE_MALL.getCode().equals(orderChannel)) {
+      if(CollectionUtils.isNotEmpty(saleUnIds)) {
+        List<WoLifeRefundWriteOffRowsRequest> refundWriteOffRowsRequestList = new ArrayList<>(saleUnIds.size());
+
+        for (String saleUnId:
+            saleUnIds ) {
+          WoLifeRefundWriteOffRowsRequest refundWriteOffRowsRequest = new WoLifeRefundWriteOffRowsRequest();
+          refundWriteOffRowsRequest.setSaleUnId(saleUnId);
+          refundWriteOffRowsRequestList.add(refundWriteOffRowsRequest);
+        }
+        woLifeRefundWriteOffDataRequest.setRows(refundWriteOffRowsRequestList);
       }
-      woLifeRefundWriteOffDataRequest.setRows(refundWriteOffRowsRequestList);
 
     } else {
       woLifeRefundWriteOffDataRequest.setRows(Collections.singletonList(WoLifeRefundWriteOffRowsRequest.of(refundRequest)));

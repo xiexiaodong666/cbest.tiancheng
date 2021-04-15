@@ -66,7 +66,42 @@ public class MerChantConsumeDataController {
       return R.success();
     }
 
-    return R.success(getApiResponse(response));
+    Long id = 0l;
+    WelfareMerChantConsumeDataApiResponse apiResponse = getApiResponse(response);
+    List<MerChantConsumeDataRowsApiResponse> rowsApiResponseList = apiResponse.getRowsData();
+    if (CollectionUtils.isNotEmpty(rowsApiResponseList)) {
+      for (MerChantConsumeDataRowsApiResponse merChantConsumeDataRowsApiResponse:
+      rowsApiResponseList) {
+        id++;
+        merChantConsumeDataRowsApiResponse.setId(id);
+        List<MerChantConsumeDataDetailApiResponse> dataDetailApiResponseList = merChantConsumeDataRowsApiResponse.getConsumeTypeDetailList();
+        if(CollectionUtils.isNotEmpty(dataDetailApiResponseList)) {
+          for (MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse:
+          dataDetailApiResponseList) {
+            id++;
+            merChantConsumeDataDetailApiResponse.setId(id);
+          }
+        }
+      }
+    }
+    List<TableExt> tableExtList = apiResponse.getTableExt();
+    if(CollectionUtils.isNotEmpty(tableExtList)) {
+      for (TableExt tableExt:
+      tableExtList) {
+        id++;
+        tableExt.setId(id);
+        List<MerChantConsumeDataDetailApiResponse> dataDetailApiResponseList = tableExt.getConsumeTypeDetailList();
+        if(CollectionUtils.isNotEmpty(dataDetailApiResponseList)) {
+          for (MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse:
+              dataDetailApiResponseList) {
+            id++;
+            merChantConsumeDataDetailApiResponse.setId(id);
+          }
+        }
+      }
+    }
+
+    return R.success(apiResponse);
   }
 
   @PostMapping("/export")

@@ -99,7 +99,7 @@ xxl:
     accessToken:
 
 notification:
-  url: http://test-welfare-internal.kube.cbestcd.com
+  url: http://test1-welfare-internal.kube-test.cbestcd.com
   targetPath: https://test-welfare-app.sjgo365.com/tc/redirect?target=center
 
 wo-life:

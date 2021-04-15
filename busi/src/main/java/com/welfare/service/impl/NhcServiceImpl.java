@@ -181,7 +181,8 @@ public class NhcServiceImpl implements NhcService {
         try {
             List<AccountDepositApply> applyList = accountDepositApplyService.listByRequestId(req.getRequestId());
             BizAssert.isTrue(CollectionUtils.isEmpty(applyList), ExceptionCode.ILLEGALITY_ARGURMENTS, "不能重复充值");
-            List<AccountAmountType> accountAmountTypes = null;//accountAmountTypeDao.listByAccountCodes(req.getAccountCodes());
+            List<Long> accountCodes = req.getAccountCodes().stream().map(Long::valueOf).collect(Collectors.toList());
+            List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.listByAccountCodes(accountCodes, WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
             BizAssert.isTrue(CollectionUtils.isNotEmpty(accountAmountTypes) && accountAmountTypes.size() == req.getAccountCodes().size(),
                     ExceptionCode.ILLEGALITY_ARGURMENTS,
                     "员工福利账户不存在");

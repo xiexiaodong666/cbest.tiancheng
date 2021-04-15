@@ -19,7 +19,8 @@
         (
         SELECT
         merchant_code,
-        GROUP_CONCAT( `name` ORDER BY show_order ASC SEPARATOR ' / ' ) as payment_channels
+        GROUP_CONCAT( `name` ORDER BY show_order ASC SEPARATOR ' / ' ) as payment_channels,
+        create_time as createTime
         FROM
         payment_channel
         WHERE
@@ -34,6 +35,6 @@
                and m.mer_name like concat('%',#{merName},'%')
             </if>
         </where>
-        order by m.create_time desc
+        order by a.createTime desc
     </select>
 </mapper>

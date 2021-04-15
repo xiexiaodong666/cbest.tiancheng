@@ -2,6 +2,7 @@ package com.welfare.servicesettlement.mq;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.OrderInfoDao;
@@ -14,8 +15,6 @@ import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
 
 /**
  * Description:
@@ -49,9 +48,9 @@ public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrder
             return;
         }
         String orderNo = aftersaleOrderMqInfo.getOrgOrderNo().toString();
-        OrderInfo orderInfo = orderInfoDao.getOneByOrderNo(orderNo);
-        BizAssert.notNull(orderInfo, ExceptionCode.DATA_NOT_EXIST,"正向订单不存在");
-        orderInfo.setReturnTransNo(tradeNo);
-        orderInfoDao.updateById(orderInfo);
+        OrderInfo originalOrder = orderInfoDao.getOneByOrderNo(orderNo, WelfareConstant.TransType.CONSUME.code());
+        BizAssert.notNull(originalOrder, ExceptionCode.DATA_NOT_EXIST,"正向订单不存在");
+        OrderInfo orderInfo = aftersaleOrderMqInfo.parseFromOriginalOrder(originalOrder);
+        orderInfoDao.save(orderInfo);
     }
 }

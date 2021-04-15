@@ -87,6 +87,8 @@ cdn:
 merchant:
   url: http://172.30.37.188:10016
 
+service-mirror:
+  url: http://192.1.30.96:8889
 ftp:
   enabled: true
   host: paycheckftp.e-cbest.com

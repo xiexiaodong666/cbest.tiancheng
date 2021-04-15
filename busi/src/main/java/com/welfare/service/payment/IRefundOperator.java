@@ -64,8 +64,8 @@ public interface IRefundOperator {
                 .map(AccountDeductionDetail::getTransAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal reversedAmount = thePaidDeductionDetail.getReversedAmount() == null?BigDecimal.ZERO:thePaidDeductionDetail.getReversedAmount();
-        boolean isMoreThanPaid = paidAmount.subtract(reversedAmount).compareTo(BigDecimal.ZERO) < 0;
-        BizAssert.isTrue(isMoreThanPaid, ExceptionCode.REFUND_MORE_THAN_PAID);
+        boolean isLessThanPaid = paidAmount.subtract(reversedAmount).compareTo(BigDecimal.ZERO) >= 0;
+        BizAssert.isTrue(isLessThanPaid, ExceptionCode.REFUND_MORE_THAN_PAID);
         Account account = getAccountDao().queryByAccountCode(accountCode);
         refundRequest.setPhone(account.getPhone());
         AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail, refundRequest);
@@ -128,7 +128,8 @@ public interface IRefundOperator {
         refundDeductionDetail.setReversedAmount(BigDecimal.ZERO);
         refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);
-        thePayDeductionDetail.setReversedAmount(refundRequest.getAmount());
+        refundDeductionDetail.setTransAmount(refundRequest.getAmount());
+        thePayDeductionDetail.setReversedAmount(thePayDeductionDetail.getReversedAmount().add(refundRequest.getAmount()));
         return refundDeductionDetail;
     }
 

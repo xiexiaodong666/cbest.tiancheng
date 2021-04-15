@@ -112,6 +112,7 @@ public class Deposit {
             deposit.setTransNo(sequences.get(index.getAndIncrement()) + "");
             deposit.setAccountCode(accountAmountType.getAccountCode());
             deposit.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
+            deposit.setChannel(WelfareConstant.Channel.PLATFORM.code());
             deposits.add(deposit);
         });
         return deposits;

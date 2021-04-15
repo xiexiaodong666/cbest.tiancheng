@@ -175,7 +175,7 @@ public class NhcServiceImpl implements NhcService {
     }
 
     @Override
-    public Boolean rechargeMallPoint(NhcUserPointRechargeReq req) {
+    public void rechargeMallPoint(NhcUserPointRechargeReq req) {
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, req.getRequestId());
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
@@ -185,21 +185,21 @@ public class NhcServiceImpl implements NhcService {
             BizAssert.isTrue(CollectionUtils.isNotEmpty(accountAmountTypes) && accountAmountTypes.size() == req.getAccountCodes().size(),
                     ExceptionCode.ILLEGALITY_ARGURMENTS,
                     "员工福利账户不存在");
-            // 没有加入组的员工
+            // 筛选出没有加入组的员工
             List<AccountAmountType> noGroupAccountAmountTypes = accountAmountTypes.stream().filter(accountAmountType ->
                     Objects.isNull(accountAmountType.getAccountAmountTypeGroupId()) && (Objects.isNull(accountAmountType.getJoinedGroup()) || !accountAmountType.getJoinedGroup()))
                     .collect(Collectors.toList());
-            // 加入组的员工
+            // 筛选出已加入组的员工
             Map<Long, List<AccountAmountType>> groupAccountAmountTypeMap = accountAmountTypes.stream().filter(accountAmountType ->
                     Objects.nonNull(accountAmountType.getAccountAmountTypeGroupId()) && Objects.nonNull(accountAmountType.getJoinedGroup()) && accountAmountType.getJoinedGroup())
                     .collect(Collectors.groupingBy(AccountAmountType::getAccountAmountTypeGroupId));
             BatchSequence sequences = sequenceService.batchGenerate(WelfareConstant.SequenceType.DEPOSIT.code(), accountAmountTypes.size());
-            List<Sequence> groupSequences = sequences.getSequences().subList(0, groupAccountAmountTypeMap.size());
             // 员工组充值
+            List<Sequence> groupSequences = sequences.getSequences().subList(0, groupAccountAmountTypeMap.size());
             accountAmountTypeGroupService.batchUpdateGroupAmount(GroupDeposit.of(req.getAmount(), groupSequences, groupAccountAmountTypeMap));
+            // 员工充值
             List<Sequence> noGroupSequences = sequences.getSequences().subList(groupAccountAmountTypeMap.size(), noGroupAccountAmountTypes.size());
-            //accountAmountTypeService.batchUpdateAccountAmountType(GroupDeposit.of(req.getAmount(), groupSequences, groupAccountAmountTypeMap));
-            return true;
+            accountAmountTypeService.batchUpdateAccountAmountType(Deposit.of(req.getAmount(), noGroupSequences, noGroupAccountAmountTypes));
         } finally {
             DistributedLockUtil.unlock(lock);
         }

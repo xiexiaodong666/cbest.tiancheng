@@ -29,7 +29,7 @@ public interface NhcService {
    * @param pointRechargeReq
    * @return
    */
-  Boolean rechargeMallPoint(NhcUserPointRechargeReq pointRechargeReq);
+  void rechargeMallPoint(NhcUserPointRechargeReq pointRechargeReq);
 
   /**
    * 查询用户账户记录

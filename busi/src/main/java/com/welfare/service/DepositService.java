@@ -42,4 +42,10 @@ public interface DepositService {
      * @param deposits
      */
     void batchDeposit(List<Deposit> deposits);
+
+    /**
+     * 充值 批量(如果员工属于某个组，则金额加到该组上)
+     * @param deposits
+     */
+    void batchDepositToGroup(List<Deposit> deposits);
 }

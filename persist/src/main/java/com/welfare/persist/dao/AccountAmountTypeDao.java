@@ -68,4 +68,11 @@ public class AccountAmountTypeDao extends ServiceImpl<AccountAmountTypeMapper, A
                 .eq(AccountAmountType::getAccountAmountTypeGroupId, accountAmountGroupId)
         );
     }
+
+    public List<AccountAmountType> listByAccountCodes(List<Long> accountCodes, String merAccountTypeCode){
+        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(AccountAmountType.ACCOUNT_CODE, accountCodes);
+        queryWrapper.eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, merAccountTypeCode);
+        return list(queryWrapper);
+    }
 }

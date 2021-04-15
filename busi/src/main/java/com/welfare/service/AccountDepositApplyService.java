@@ -60,6 +60,13 @@ public interface AccountDepositApplyService {
     AccountDepositApply getByRequestId(String requestId);
 
     /**
+     * 通过requestId查询申请信息
+     * @param requestId
+     * @return
+     */
+    List<AccountDepositApply> listByRequestId(String requestId);
+
+    /**
      * 审批
      * @param req
      * @return

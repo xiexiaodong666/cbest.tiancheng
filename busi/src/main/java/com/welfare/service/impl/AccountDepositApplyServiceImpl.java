@@ -324,6 +324,13 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     }
 
     @Override
+    public List<AccountDepositApply> listByRequestId(String requestId) {
+        QueryWrapper<AccountDepositApply> wrapper = new QueryWrapper<>();
+        wrapper.eq(AccountDepositApply.REQUEST_ID, requestId);
+        return accountDepositApplyDao.list(wrapper);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Long approval(AccountDepositApprovalRequest request) {
         AccountDepositApply apply = accountDepositApplyDao.getById(request.getId());

@@ -38,7 +38,7 @@ public class DepositServiceImpl implements DepositService {
     @Transactional(rollbackFor = Exception.class)
     public void deposit(Deposit deposit) {
         BigDecimal amount = deposit.getAmount();
-        merchantCreditService.decreaseAccountType(deposit.getMerchantCode(), RECHARGE_LIMIT, amount, deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT_DECR.code() );
+        //merchantCreditService.decreaseAccountType(deposit.getMerchantCode(), RECHARGE_LIMIT, amount, deposit.getTransNo(), WelfareConstant.TransType.DEPOSIT_DECR.code() );
         accountAmountTypeService.updateAccountAmountType(deposit);
         deposit.setDepositStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
     }
@@ -68,7 +68,13 @@ public class DepositServiceImpl implements DepositService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeposit(List<Deposit> deposits) {
-        merchantCreditService.batchDecreaseLimit(DecreaseMerchantCredit.of(deposits));
+        //merchantCreditService.batchDecreaseLimit(DecreaseMerchantCredit.of(deposits));
         accountAmountTypeService.batchUpdateAccountAmountType(deposits);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDepositToGroup(List<Deposit> deposits) {
+
     }
 }

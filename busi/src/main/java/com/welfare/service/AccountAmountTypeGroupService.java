@@ -2,7 +2,10 @@ package com.welfare.service;
 
 
 import com.welfare.persist.entity.AccountAmountTypeGroup;
+import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.account.AccountAmountTypeGroupDTO;
+
+import java.util.List;
 
 /**
  * @Author: duanhy
@@ -11,8 +14,10 @@ import com.welfare.service.dto.account.AccountAmountTypeGroupDTO;
  */
 public interface AccountAmountTypeGroupService {
 
+
     /**
      * 移除员工
+     * @param merCode
      * @param accountCode
      * @param merAccountTypeCode
      * @return
@@ -21,6 +26,7 @@ public interface AccountAmountTypeGroupService {
 
     /**
      * 加入组
+     * @param merCode
      * @param joinAccountCode 新加入的员工编码
      * @param groupAccountCode 组内的某个员工的编码
      * @param merAccountTypeCode 福利类型
@@ -50,4 +56,9 @@ public interface AccountAmountTypeGroupService {
      */
     Long countGroups(String merCode,String merAccountTypeCode);
 
+    /**
+     * 充值 批量(金额加到该组上)
+     * @param deposits
+     */
+    Boolean batchUpdateGroupAmount(List<GroupDeposit> deposits);
 }

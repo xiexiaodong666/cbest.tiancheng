@@ -58,7 +58,17 @@ public class NhcUserInfoDTO {
 
   public static List<NhcUserInfoDTO> of(Map<Long, Account> accountMap, Map<Long, AccountAmountType> accountAmountTypes, Merchant merchant) {
     List<NhcUserInfoDTO> list = new ArrayList<>();
-
+    accountMap.forEach((accountCode, account) -> {
+      NhcUserInfoDTO userInfoDTO = new NhcUserInfoDTO();
+      userInfoDTO.setUserName(account.getAccountName());
+      userInfoDTO.setAccountCode(String.valueOf(account.getAccountCode()));
+      userInfoDTO.setMerCode(account.getMerCode());
+      userInfoDTO.setMerName(merchant.getMerName());
+      userInfoDTO.setPhone(account.getPhone());
+      AccountAmountType accountAmountType = accountAmountTypes.get(accountCode);
+      userInfoDTO.setMallPoint(accountAmountType != null ? accountAmountType.getAccountBalance() : BigDecimal.ZERO);
+      list.add(userInfoDTO);
+    });
     return list;
   }
 

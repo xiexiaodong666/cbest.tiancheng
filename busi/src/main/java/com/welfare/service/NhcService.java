@@ -43,7 +43,7 @@ public interface NhcService {
    * @param userCode
    * @return
    */
-  Boolean leaveFamily(String userCode);
+  Boolean leaveFamily(String merCode, String userCode);
 
   /**
    * 查询家庭信息

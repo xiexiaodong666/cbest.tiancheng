@@ -70,6 +70,11 @@ public class RedisKeyConstant {
    */
   public static final String PULL_EMPLOYEE_SETTLE_DETAIL = "e-welfare_pull_employee_settle_detail:";
 
+  /**
+   * 操作AccountAmountTypeGroup表的更新需要的锁key前缀
+   */
+  public static final String ACCOUNT_AMOUNT_TYPE_GROUP_OPERATE = "e-welfare_account_amount_type_group_operate:";
+
   public static String buidKey(String perfix, String... part) {
     return StringUtils.removeEnd(perfix, ":").concat(":").concat(StringUtils.join(part, ":"));
   }

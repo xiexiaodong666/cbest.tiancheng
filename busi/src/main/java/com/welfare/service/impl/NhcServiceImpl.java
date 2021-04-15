@@ -3,27 +3,28 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import com.welfare.common.constants.AccountBindStatus;
-import com.welfare.common.constants.AccountChangeType;
-import com.welfare.common.constants.AccountStatus;
-import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.*;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.dto.AccountReq;
+import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.nhc.*;
+import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -66,8 +67,12 @@ public class NhcServiceImpl implements NhcService {
     private AccountChangeEventRecordService accountChangeEventRecordService;
     @Autowired
     private AccountAmountTypeGroupDao accountAmountTypeGroupDao;
-
-
+    @Autowired
+    private AccountDepositApplyDao accountDepositApplyDao;
+    @Autowired
+    private AccountDepositApplyService accountDepositApplyService;
+    @Autowired
+    private AccountAmountTypeService accountAmountTypeService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -170,18 +175,50 @@ public class NhcServiceImpl implements NhcService {
     }
 
     @Override
-    public Boolean rechargeMallPoint(NhcUserPointRechargeReq pointRechargeReq) {
-        return null;
+    public Boolean rechargeMallPoint(NhcUserPointRechargeReq req) {
+        String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, req.getRequestId());
+        RLock lock = DistributedLockUtil.lockFairly(lockKey);
+        try {
+            List<AccountDepositApply> applyList = accountDepositApplyService.listByRequestId(req.getRequestId());
+            BizAssert.isTrue(CollectionUtils.isEmpty(applyList), ExceptionCode.ILLEGALITY_ARGURMENTS, "不能重复充值");
+            List<AccountAmountType> accountAmountTypes = null;//accountAmountTypeDao.listByAccountCodes(req.getAccountCodes());
+            BizAssert.isTrue(CollectionUtils.isNotEmpty(accountAmountTypes) && accountAmountTypes.size() == req.getAccountCodes().size(),
+                    ExceptionCode.ILLEGALITY_ARGURMENTS,
+                    "员工福利账户不存在");
+            // 没有加入组的员工
+            List<AccountAmountType> noGroupAccountAmountTypes = accountAmountTypes.stream().filter(accountAmountType ->
+                    Objects.isNull(accountAmountType.getAccountAmountTypeGroupId()) && (Objects.isNull(accountAmountType.getJoinedGroup()) || !accountAmountType.getJoinedGroup()))
+                    .collect(Collectors.toList());
+            // 加入组的员工
+            Map<Long, List<AccountAmountType>> groupAccountAmountTypeMap = accountAmountTypes.stream().filter(accountAmountType ->
+                    Objects.nonNull(accountAmountType.getAccountAmountTypeGroupId()) && Objects.nonNull(accountAmountType.getJoinedGroup()) && accountAmountType.getJoinedGroup())
+                    .collect(Collectors.groupingBy(AccountAmountType::getAccountAmountTypeGroupId));
+            BatchSequence sequences = sequenceService.batchGenerate(WelfareConstant.SequenceType.DEPOSIT.code(), accountAmountTypes.size());
+            List<Sequence> groupSequences = sequences.getSequences().subList(0, groupAccountAmountTypeMap.size());
+            // 员工组充值
+            accountAmountTypeGroupService.batchUpdateGroupAmount(GroupDeposit.of(req.getAmount(), groupSequences, groupAccountAmountTypeMap));
+            List<Sequence> noGroupSequences = sequences.getSequences().subList(groupAccountAmountTypeMap.size(), noGroupAccountAmountTypes.size());
+            //accountAmountTypeService.batchUpdateAccountAmountType(GroupDeposit.of(req.getAmount(), groupSequences, groupAccountAmountTypeMap));
+            return true;
+        } finally {
+            DistributedLockUtil.unlock(lock);
+        }
     }
 
+    public static void main(String[] args) {
+        List<Integer> list = Lists.newArrayList(1,2,3,4,5);
+        System.out.println(list.subList(0,1));
+    //    System.out.println(list.subList(1,));
+    }
     @Override
     public Page<NhcAccountBillDetailDTO> getUserBillPage(NhcUserPageReq userPageReq) {
         return null;
     }
 
     @Override
-    public Boolean leaveFamily(String userCode) {
-        return null;
+    public Boolean leaveFamily(String merCode, String userCode) {
+        String merAccountTypeCode = WelfareConstant.MerAccountTypeCode.MALL_POINT.code();
+        return accountAmountTypeGroupService.removeByAccountCode(merCode, Long.parseLong(userCode), merAccountTypeCode);
     }
 
     @Override

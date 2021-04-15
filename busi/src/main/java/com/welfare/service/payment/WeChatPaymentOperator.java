@@ -33,4 +33,9 @@ public class WeChatPaymentOperator implements IPaymentOperator,IRefundOperator{
     public void refund(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionInDbs, List<AccountDeductionDetail> paidDeductionDetails, Long accountCode) {
         doRefund(refundRequest, paidDeductionDetails,accountCode);
     }
+
+    @Override
+    public void operateMerchantRefund(RefundRequest refundRequest, Account account){
+        //微信支付不用退款商户,所以没有任何实现
+    }
 }

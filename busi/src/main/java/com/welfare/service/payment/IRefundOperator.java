@@ -1,6 +1,8 @@
 package com.welfare.service.payment;
 
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.AccountBillDetailDao;
@@ -15,7 +17,6 @@ import com.welfare.service.MerchantCreditService;
 import com.welfare.service.dto.RefundRequest;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -62,15 +63,9 @@ public interface IRefundOperator {
         BigDecimal paidAmount = paidDeductionDetails.stream()
                 .map(AccountDeductionDetail::getTransAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        Assert.isTrue(paidAmount.subtract(refundRequest.getAmount())
-                .compareTo(BigDecimal.ZERO) == 0, "当前场景退款必须全额退款");
-
-        List<AccountDeductionDetail> accountDeductionDetails = getAccountDeductionDetailDao()
-                .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
-        if(!CollectionUtils.isEmpty(accountDeductionDetails)){
-            //已经退款过就不处理
-            return;
-        }
+        BigDecimal reversedAmount = thePaidDeductionDetail.getReversedAmount() == null?BigDecimal.ZERO:thePaidDeductionDetail.getReversedAmount();
+        boolean isMoreThanPaid = paidAmount.subtract(reversedAmount).compareTo(BigDecimal.ZERO) < 0;
+        BizAssert.isTrue(isMoreThanPaid, ExceptionCode.REFUND_MORE_THAN_PAID);
         Account account = getAccountDao().queryByAccountCode(accountCode);
         refundRequest.setPhone(account.getPhone());
         AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(thePaidDeductionDetail, refundRequest);
@@ -78,7 +73,7 @@ public interface IRefundOperator {
         SupplierStore supplierStore = getSupplierDao().getOneByCode(refundBillDetail.getStoreCode());
         if(!Objects.equals(account.getMerCode(),supplierStore.getMerCode())){
             //非自营才有退回商户操作,和扣款时保持一致
-            operateMerchant(refundRequest, account);
+            operateMerchantRefund(refundRequest, account);
         }
 
         getAccountBillDetailDao().saveOrUpdateBatch(Arrays.asList(refundBillDetail, thePaidBilDetail));
@@ -103,7 +98,7 @@ public interface IRefundOperator {
      * @param refundRequest 退款请求
      * @param account 账户
      */
-    default void operateMerchant(RefundRequest refundRequest,Account account){
+    default void operateMerchantRefund(RefundRequest refundRequest, Account account){
         RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         try {
             getMerchantCreditService().increaseAccountType(
@@ -133,7 +128,7 @@ public interface IRefundOperator {
         refundDeductionDetail.setReversedAmount(BigDecimal.ZERO);
         refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);
-        thePayDeductionDetail.setReversedAmount(thePayDeductionDetail.getTransAmount());
+        thePayDeductionDetail.setReversedAmount(refundRequest.getAmount());
         return refundDeductionDetail;
     }
 
@@ -149,7 +144,7 @@ public interface IRefundOperator {
         refundBillDetail.setTransNo(refundRequest.getTransNo());
         refundBillDetail.setTransType(WelfareConstant.TransType.REFUND.code());
         refundBillDetail.setTransTime(refundRequest.getRefundDate());
-
+        refundBillDetail.setTransAmount(refundRequest.getAmount());
         refundBillDetail.setId(null);
         refundBillDetail.setVersion(0);
         return refundBillDetail;

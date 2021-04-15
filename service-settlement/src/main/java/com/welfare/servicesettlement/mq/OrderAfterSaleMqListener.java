@@ -2,6 +2,7 @@ package com.welfare.servicesettlement.mq;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.OrderInfoDao;
@@ -48,10 +49,15 @@ public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrder
             //没有交易单号，则没有支付过，不保存。老的员工卡也不保存
             return;
         }
+        OrderInfo refundOrderInDb = orderInfoDao.getOneByTradeNo(tradeNo, WelfareConstant.TransType.CONSUME.code());
+        if(Objects.nonNull(refundOrderInDb)){
+            log.info("此流水号对应的订单已经保存，不需要再次保存");
+            return;
+        }
         String orderNo = aftersaleOrderMqInfo.getOrgOrderNo().toString();
-        OrderInfo orderInfo = orderInfoDao.getOneByOrderNo(orderNo);
-        BizAssert.notNull(orderInfo, ExceptionCode.DATA_NOT_EXIST,"正向订单不存在");
-        orderInfo.setReturnTransNo(tradeNo);
-        orderInfoDao.updateById(orderInfo);
+        OrderInfo originalOrder = orderInfoDao.getOneByOrderNo(orderNo, WelfareConstant.TransType.CONSUME.code());
+        BizAssert.notNull(originalOrder, ExceptionCode.DATA_NOT_EXIST,"正向订单不存在");
+        OrderInfo orderInfo = aftersaleOrderMqInfo.parseFromOriginalOrder(originalOrder);
+        orderInfoDao.save(orderInfo);
     }
 }

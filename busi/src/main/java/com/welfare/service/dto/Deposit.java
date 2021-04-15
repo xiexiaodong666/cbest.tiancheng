@@ -41,6 +41,8 @@ public class Deposit {
     private String channel;
     @ApiModelProperty("申请编号")
     private String applyCode;
+    @ApiModelProperty("支付渠道")
+    private String paymentChannel;
 
     public static Deposit of(AccountDepositApply accountDepositApply,AccountDepositApplyDetail accountDepositApplyDetail){
         Deposit deposit = new Deposit();
@@ -96,6 +98,7 @@ public class Deposit {
         accountBillDetail.setSurplusQuota(account.getSurplusQuota());
         accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
         accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
+        accountBillDetail.setPaymentChannel(deposit.getPaymentChannel());
         return accountBillDetail;
     }
 }

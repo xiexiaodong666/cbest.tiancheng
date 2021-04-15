@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @email yuxiang.li@sjgo365.com
  * @date 1/27/2021
  */
-@FeignClient(value = "notificationFeign", url = "${notification.url:http://test-welfare-internal.kube.cbestcd.com}", fallbackFactory = NotificationFallback.class)
+@FeignClient(value = "notificationFeign", url = "${notification.url:http://test1-welfare-internal.kube-test.cbestcd.com}", fallbackFactory = NotificationFallback.class)
 @ConditionalOnHavingProperty("notification.url")
 public interface NotificationFeign {
 

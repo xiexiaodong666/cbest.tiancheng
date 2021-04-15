@@ -82,7 +82,7 @@ public class AftersaleOrderMqInfo extends OrderMqInfo{
         afterSaleOrderInfo.setReturnTransNo(originalOrderInfo.getTransNo());
         afterSaleOrderInfo.setOrderTime(this.getOrderTime());
         afterSaleOrderInfo.setTransType(WelfareConstant.TransType.REFUND.code());
-        afterSaleOrderInfo.setTransTypeName(WelfareConstant.TransType.REFUND.name());
+        afterSaleOrderInfo.setTransTypeName(WelfareConstant.TransType.REFUND.desc());
         //需要insert，id置空
         afterSaleOrderInfo.setId(null);
         return afterSaleOrderInfo;

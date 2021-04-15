@@ -16,6 +16,8 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 /**
  * Description:
  *
@@ -45,6 +47,11 @@ public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrder
         if(Strings.isEmpty(tradeNo) ||  IGNORE_PAY_TYPE.equals(aftersaleOrderMqInfo.getPayType())){
             log.info("此逆向订单不需要保存");
             //没有交易单号，则没有支付过，不保存。老的员工卡也不保存
+            return;
+        }
+        OrderInfo refundOrderInDb = orderInfoDao.getOneByTradeNo(tradeNo, WelfareConstant.TransType.CONSUME.code());
+        if(Objects.nonNull(refundOrderInDb)){
+            log.info("此流水号对应的订单已经保存，不需要再次保存");
             return;
         }
         String orderNo = aftersaleOrderMqInfo.getOrgOrderNo().toString();

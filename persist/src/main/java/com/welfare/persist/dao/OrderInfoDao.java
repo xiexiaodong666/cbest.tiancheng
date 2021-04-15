@@ -35,4 +35,10 @@ public class OrderInfoDao extends ServiceImpl<OrderInfoMapper, OrderInfo> {
                 Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getOrderId,orderNo).eq(OrderInfo::getTransType,transType).last("limit 1")
         );
     }
+
+    public OrderInfo getOneByTradeNo(String orderNo, String transType){
+        return getOne(
+                Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getOrderId,orderNo).eq(OrderInfo::getTransType,transType).last("limit 1")
+        );
+    }
 }

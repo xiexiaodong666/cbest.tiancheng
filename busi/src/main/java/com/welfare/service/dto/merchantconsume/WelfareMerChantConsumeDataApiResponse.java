@@ -100,9 +100,17 @@ public class WelfareMerChantConsumeDataApiResponse {
       return tableExt;
     }
 
-    public static TableExt thirdOf(WelfareMerChantConsumeDataBaiscResponse response) {
+    public static TableExt thirdOf(WelfareMerChantConsumeDataBaiscResponse response, boolean isFillMerchantAttributes) {
       TableExt tableExt = new TableExt();
 
+      if(isFillMerchantAttributes) {
+        tableExt.setMerName("汇总");
+        tableExt.setUserNum(response.getUserNum());
+        tableExt.setCurrentBalance(response.getCurrentBalance());
+        tableExt.setRemainingLimit(response.getRemainingLimit());
+        tableExt.setSettledMoney(response.getSettledMoney());
+        tableExt.setUnsettledMoney(response.getUnsettledMoney());
+      }
       tableExt.setBusinessType(BusinessTypeEnum.valueOf(response.getBusinessType().toUpperCase()).desc());
       tableExt.setConsumeMoney(response.getConsumeMoneyCollect());
       tableExt.setConsumePeopleNum(response.getConsumePeopleNumCollect());

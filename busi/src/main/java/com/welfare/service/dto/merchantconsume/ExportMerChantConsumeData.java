@@ -14,44 +14,44 @@ import lombok.Data;
 @Data
 public class ExportMerChantConsumeData {
 
-  @ApiModelProperty("商户代码")
-  @ExcelProperty(value = "商户代码")
+  @ApiModelProperty("商户ID")
+  @ExcelProperty(value = "商户ID")
   @ColumnWidth(10)
   private String merCode;
 
   @ApiModelProperty("商户名称")
   @ExcelProperty(value = "商户名称")
-  @ColumnWidth(10)
+  @ColumnWidth(30)
   private String merName;
 
-  @ApiModelProperty("员工人数")
-  @ExcelProperty(value = "员工人数")
+  @ApiModelProperty("员工数（人）")
+  @ExcelProperty(value = "员工数（人）")
   @ColumnWidth(10)
   private String userNum;
 
-  @ApiModelProperty("商户余额")
-  @ExcelProperty(value = "商户余额")
-  @ColumnWidth(10)
+  @ApiModelProperty("商户余额（元）")
+  @ExcelProperty(value = "商户余额（元）")
+  @ColumnWidth(20)
   private String currentBalance;
 
-  @ApiModelProperty("剩余信用额度/信用额度")
-  @ExcelProperty(value = "剩余信用额度/信用额度")
-  @ColumnWidth(10)
+  @ApiModelProperty("剩余信用额度/信用额度（元）")
+  @ExcelProperty(value = "剩余信用额度/信用额度（元）")
+  @ColumnWidth(20)
   private String remainingLimit;
 
-  @ApiModelProperty("结算额度")
-  @ExcelProperty(value = "结算额度")
-  @ColumnWidth(10)
+  @ApiModelProperty("累计结算金额（元）")
+  @ExcelProperty(value = "累计结算金额（元）")
+  @ColumnWidth(20)
   private String settledMoney;
 
-  @ApiModelProperty("待结算额度")
-  @ExcelProperty(value = "待结算额度")
-  @ColumnWidth(10)
+  @ApiModelProperty("待结算金额（元）")
+  @ExcelProperty(value = "待结算金额（元）")
+  @ColumnWidth(20)
   private String unsettledMoney;
 
   @ApiModelProperty("业务类型")
   @ExcelProperty(value = "业务类型")
-  @ColumnWidth(30)
+  @ColumnWidth(20)
   private String businessType;
 
   @ApiModelProperty("消费方式")
@@ -59,29 +59,29 @@ public class ExportMerChantConsumeData {
   @ColumnWidth(30)
   private String consumeType;
 
-  @ApiModelProperty("消费总金额")
-  @ExcelProperty(value = "消费总金额")
-  @ColumnWidth(10)
+  @ApiModelProperty("消费总金额（元）")
+  @ExcelProperty(value = "消费总金额（元）")
+  @ColumnWidth(15)
   private Double consumeMoney;
 
-  @ApiModelProperty("消费人数")
-  @ExcelProperty(value = "消费人数")
-  @ColumnWidth(10)
+  @ApiModelProperty("消费人数（人）")
+  @ExcelProperty(value = "消费人数（人）")
+  @ColumnWidth(15)
   private Integer consumePeopleNum;
 
-  @ApiModelProperty("交易笔数")
-  @ExcelProperty(value = "交易笔数")
-  @ColumnWidth(10)
+  @ApiModelProperty("交易笔数（笔）")
+  @ExcelProperty(value = "交易笔数（笔）")
+  @ColumnWidth(15)
   private Integer transNum;
 
-  @ApiModelProperty("人均消费")
-  @ExcelProperty(value = "人均消费")
-  @ColumnWidth(10)
+  @ApiModelProperty("人均消费金额（元）")
+  @ExcelProperty(value = "人均消费金额（元）")
+  @ColumnWidth(15)
   private Double avgPeopleConsumeMoney;
 
-  @ApiModelProperty("每笔平均交易额")
-  @ExcelProperty(value = "每笔平均交易额")
-  @ColumnWidth(10)
+  @ApiModelProperty("每笔交易平均金额（元）")
+  @ExcelProperty(value = "每笔交易平均金额（元）")
+  @ColumnWidth(15)
   private Double avgTransMoney;
 
   public static ExportMerChantConsumeData rowsOf(MerChantConsumeDataRowsApiResponse response) {
@@ -126,7 +126,7 @@ public class ExportMerChantConsumeData {
 
     ExportMerChantConsumeData exportMerChantConsumeData = new ExportMerChantConsumeData();
 
-    exportMerChantConsumeData.setMerCode("汇总");
+    //exportMerChantConsumeData.setMerCode("汇总");
     exportMerChantConsumeData.setMerName(response.getMerName());
     exportMerChantConsumeData.setUserNum(response.getUserNum());
     exportMerChantConsumeData.setCurrentBalance(response.getCurrentBalance());

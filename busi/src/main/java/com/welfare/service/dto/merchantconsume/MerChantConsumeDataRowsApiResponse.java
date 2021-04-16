@@ -78,9 +78,18 @@ public class MerChantConsumeDataRowsApiResponse {
     return merChantConsumeDataRowsApiResponse;
   }
 
-  public static MerChantConsumeDataRowsApiResponse thirdOf(WelfareMerChantConsumeDataBaiscResponse response) {
+  public static MerChantConsumeDataRowsApiResponse thirdOf(WelfareMerChantConsumeDataBaiscResponse response, boolean isFillMerchantAttributes) {
     MerChantConsumeDataRowsApiResponse merChantConsumeDataRowsApiResponse = new MerChantConsumeDataRowsApiResponse();
 
+    if(isFillMerchantAttributes) {
+      merChantConsumeDataRowsApiResponse.setMerCode(response.getMerCode());
+      merChantConsumeDataRowsApiResponse.setMerName(response.getMerName());
+      merChantConsumeDataRowsApiResponse.setUserNum(response.getUserNum());
+      merChantConsumeDataRowsApiResponse.setCurrentBalance(response.getCurrentBalance());
+      merChantConsumeDataRowsApiResponse.setRemainingLimit(response.getRemainingLimit());
+      merChantConsumeDataRowsApiResponse.setSettledMoney(response.getSettledMoney());
+      merChantConsumeDataRowsApiResponse.setUnsettledMoney(response.getUnsettledMoney());
+    }
     merChantConsumeDataRowsApiResponse.setBusinessType(BusinessTypeEnum.valueOf(response.getBusinessType().toUpperCase()).desc());
     merChantConsumeDataRowsApiResponse.setConsumeMoney(response.getConsumeMoneyCollect());
     merChantConsumeDataRowsApiResponse.setConsumePeopleNum(response.getConsumePeopleNumCollect());

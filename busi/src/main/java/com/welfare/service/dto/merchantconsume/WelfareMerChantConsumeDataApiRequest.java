@@ -1,9 +1,11 @@
 package com.welfare.service.dto.merchantconsume;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import java.util.List;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @author gaorui
@@ -27,11 +29,15 @@ public class WelfareMerChantConsumeDataApiRequest {
    * 消费时间筛选结束
    */
   @ApiModelProperty("消费时间筛选结束")
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
+  @JsonFormat(pattern = "yyyy-MM-dd")
   private Date endDate;
   /**
    * 消费时间筛选起始
    */
   @ApiModelProperty("消费时间筛选起始")
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
+  @JsonFormat(pattern = "yyyy-MM-dd")
   private Date startDate;
   /**
    * 商户代码

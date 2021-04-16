@@ -183,6 +183,11 @@ public class MerChantConsumeDataController {
     // 处理表格行数据
     List<WelfareMerChantConsumeDataBaiscResponse> rowsList = listMap.get("1");
     // 根据商户分组排序
+    if(CollectionUtils.isEmpty(rowsList)) {
+
+      return apiResponse;
+    }
+
     Map<String, List<WelfareMerChantConsumeDataBaiscResponse>> merMap = rowsList
         .stream().collect(Collectors.groupingBy(WelfareMerChantConsumeDataBaiscResponse::getMerCode,
                                                 LinkedHashMap::new, Collectors.toList()
@@ -200,39 +205,47 @@ public class MerChantConsumeDataController {
 
       List<WelfareMerChantConsumeDataBaiscResponse> selfDataList = businessMap.get("self");
       List<WelfareMerChantConsumeDataBaiscResponse> thirdDataList = businessMap.get("third");
+      boolean isFillMerchantAttributes = true;
+      if(CollectionUtils.isNotEmpty(selfDataList)) {
+        // 该商户具有自营属性, 非自营不用填充表格前面的商户共同属性数据
+        isFillMerchantAttributes = false;
+        WelfareMerChantConsumeDataBaiscResponse selfResponse = selfDataList.get(0);
+        MerChantConsumeDataRowsApiResponse selfOf = MerChantConsumeDataRowsApiResponse.selfOf(
+            selfResponse);
+        List<MerChantConsumeDataDetailApiResponse> selfMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
+        selfDataList.forEach(s->{
+          MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
+          s.setConsumeType(ConsumeTypeEnum.getByType(s.getConsumeType()).getDesc());
+          BeanUtils.copyProperties(s, merChantConsumeDataDetailApiResponse);
+          selfMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
+        });
 
-      WelfareMerChantConsumeDataBaiscResponse selfResponse = selfDataList.get(0);
+        selfOf.setConsumeTypeDetailList(selfMerChantConsumeDataDetailApiResponseList);
 
-      WelfareMerChantConsumeDataBaiscResponse thirdResponse = thirdDataList.get(0);
-      MerChantConsumeDataRowsApiResponse selfOf = MerChantConsumeDataRowsApiResponse.selfOf(
-          selfResponse);
-      MerChantConsumeDataRowsApiResponse thirdOf = MerChantConsumeDataRowsApiResponse.thirdOf(
-          thirdResponse);
+        rowsData.add(selfOf);
+      }
 
-      List<MerChantConsumeDataDetailApiResponse> selfMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
-      selfDataList.forEach(s->{
-        MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
-        s.setConsumeType(ConsumeTypeEnum.valueOf(s.getConsumeType()).getDesc());
-        BeanUtils.copyProperties(s, merChantConsumeDataDetailApiResponse);
-        selfMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
-      });
+      if(CollectionUtils.isNotEmpty(thirdDataList)) {
+        WelfareMerChantConsumeDataBaiscResponse thirdResponse = thirdDataList.get(0);
 
-      selfOf.setConsumeTypeDetailList(selfMerChantConsumeDataDetailApiResponseList);
+        MerChantConsumeDataRowsApiResponse thirdOf = MerChantConsumeDataRowsApiResponse.thirdOf(
+            thirdResponse, isFillMerchantAttributes);
 
-      List<MerChantConsumeDataDetailApiResponse> thirdMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
+        List<MerChantConsumeDataDetailApiResponse> thirdMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
 
-      thirdDataList.forEach(t->{
-        MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
-        t.setConsumeType(ConsumeTypeEnum.valueOf(t.getConsumeType()).getDesc());
+        thirdDataList.forEach(t->{
+          MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
+          t.setConsumeType(ConsumeTypeEnum.getByType(t.getConsumeType()).getDesc());
 
-        BeanUtils.copyProperties(t, merChantConsumeDataDetailApiResponse);
-        thirdMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
-      });
+          BeanUtils.copyProperties(t, merChantConsumeDataDetailApiResponse);
+          thirdMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
+        });
 
-      thirdOf.setConsumeTypeDetailList(thirdMerChantConsumeDataDetailApiResponseList);
+        thirdOf.setConsumeTypeDetailList(thirdMerChantConsumeDataDetailApiResponseList);
 
-      rowsData.add(selfOf);
-      rowsData.add(thirdOf);
+        rowsData.add(thirdOf);
+      }
+
     }
 
     // 处理表格总的汇总数据
@@ -246,37 +259,45 @@ public class MerChantConsumeDataController {
     List<WelfareMerChantConsumeDataBaiscResponse> selfDataList = businessMap.get("self");
     List<WelfareMerChantConsumeDataBaiscResponse> thirdDataList = businessMap.get("third");
 
-    WelfareMerChantConsumeDataBaiscResponse selfResponse = selfDataList.get(0);
+    boolean isFillMerchantAttributes = true;
 
-    WelfareMerChantConsumeDataBaiscResponse thirdResponse = thirdDataList.get(0);
-    TableExt selfOf = TableExt.selfOf(selfResponse);
-    TableExt thirdOf = TableExt.thirdOf(thirdResponse);
+    if(CollectionUtils.isNotEmpty(selfDataList)) {
+      isFillMerchantAttributes = false;
+      WelfareMerChantConsumeDataBaiscResponse selfResponse = selfDataList.get(0);
+      TableExt selfOf = TableExt.selfOf(selfResponse);
+      List<MerChantConsumeDataDetailApiResponse> selfMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
+      selfDataList.forEach(s->{
+        MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
+        s.setConsumeType(ConsumeTypeEnum.getByType(s.getConsumeType()).getDesc());
 
-    List<MerChantConsumeDataDetailApiResponse> selfMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
-    selfDataList.forEach(s->{
-      MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
-      s.setConsumeType(ConsumeTypeEnum.valueOf(s.getConsumeType()).getDesc());
+        BeanUtils.copyProperties(s, merChantConsumeDataDetailApiResponse);
+        selfMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
+      });
 
-      BeanUtils.copyProperties(s, merChantConsumeDataDetailApiResponse);
-      selfMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
-    });
+      selfOf.setConsumeTypeDetailList(selfMerChantConsumeDataDetailApiResponseList);
 
-    selfOf.setConsumeTypeDetailList(selfMerChantConsumeDataDetailApiResponseList);
+      tableExtList.add(selfOf);
+    }
 
-    List<MerChantConsumeDataDetailApiResponse> thirdMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
+    if(CollectionUtils.isNotEmpty(thirdDataList)) {
+      WelfareMerChantConsumeDataBaiscResponse thirdResponse = thirdDataList.get(0);
 
-    thirdDataList.forEach(t->{
-      MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
+      TableExt thirdOf = TableExt.thirdOf(thirdResponse, isFillMerchantAttributes);
 
-      t.setConsumeType(ConsumeTypeEnum.valueOf(t.getConsumeType()).getDesc());
-      BeanUtils.copyProperties(t, merChantConsumeDataDetailApiResponse);
-      thirdMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
-    });
+      List<MerChantConsumeDataDetailApiResponse> thirdMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
 
-    thirdOf.setConsumeTypeDetailList(thirdMerChantConsumeDataDetailApiResponseList);
+      thirdDataList.forEach(t->{
+        MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
 
-    tableExtList.add(selfOf);
-    tableExtList.add(thirdOf);
+        t.setConsumeType(ConsumeTypeEnum.getByType(t.getConsumeType()).getDesc());
+        BeanUtils.copyProperties(t, merChantConsumeDataDetailApiResponse);
+        thirdMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
+      });
+
+      thirdOf.setConsumeTypeDetailList(thirdMerChantConsumeDataDetailApiResponseList);
+
+      tableExtList.add(thirdOf);
+    }
 
     return apiResponse;
   }

@@ -13,19 +13,16 @@ import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
-import com.welfare.service.dto.AccountReq;
 import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.nhc.*;
-import com.welfare.service.enums.ApprovalStatus;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -70,7 +67,7 @@ public class NhcServiceImpl implements NhcService {
     @Autowired
     private AccountDepositApplyDao accountDepositApplyDao;
     @Autowired
-    private AccountDepositApplyService accountDepositApplyService;
+    private TempAccountDepositApplyDao tempAccountDepositApplyDao;
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
 
@@ -85,7 +82,7 @@ public class NhcServiceImpl implements NhcService {
         if (StringUtils.isNoneBlank(userReq.getAccountCode())) {
             // 修改
             account = accountService.getByAccountCode(Long.parseLong(userReq.getAccountCode()));
-            BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("员工不存在[%s]", userReq.getAccountCode()));
+            BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("用户不存在[%s]", userReq.getAccountCode()));
             BizAssert.isTrue(userReq.getMerCode().equals(account.getMerCode()), ExceptionCode.ILLEGALITY_ARGURMENTS, "无权限操作！");
             account.setAccountName(userReq.getUserName());
             account.setPhone(userReq.getPhone());
@@ -143,10 +140,6 @@ public class NhcServiceImpl implements NhcService {
         accountAmountType1.setAccountCode(accountCode);
         accountAmountType1.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
         accountAmountType1.setJoinedGroup(false);
-        AccountAmountType accountAmountType2 = new AccountAmountType();
-        accountAmountType2.setAccountCode(accountCode);
-        accountAmountType2.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE.code());
-        accountAmountTypeDao.saveBatch(Lists.newArrayList(accountAmountType1,accountAmountType2));
 
         AccountChangeEventRecord accountChangeEventRecord = AccountUtils
                 .assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, account.getAccountCode(),
@@ -166,7 +159,7 @@ public class NhcServiceImpl implements NhcService {
         } else {
             throw new BizException("参数为空");
         }
-        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
+        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "用户不存在");
         Merchant merchant = merchantService.getMerchantByMerCode(account.getMerCode());
         BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
         AccountAmountType accountAmountType = accountAmountTypeDao.queryByAccountCodeAndAmountType(account.getAccountCode(),
@@ -175,11 +168,12 @@ public class NhcServiceImpl implements NhcService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void rechargeMallPoint(NhcUserPointRechargeReq req) {
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, req.getRequestId());
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
-            List<AccountDepositApply> applyList = accountDepositApplyService.listByRequestId(req.getRequestId());
+            List<TempAccountDepositApply> applyList = tempAccountDepositApplyDao.listByRequestId(req.getRequestId());
             BizAssert.isTrue(CollectionUtils.isEmpty(applyList), ExceptionCode.ILLEGALITY_ARGURMENTS, "不能重复充值");
             List<Long> accountCodes = req.getAccountCodes().stream().map(Long::valueOf).collect(Collectors.toList());
             List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.listByAccountCodes(accountCodes, WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
@@ -201,16 +195,22 @@ public class NhcServiceImpl implements NhcService {
             // 员工充值
             List<Sequence> noGroupSequences = sequences.getSequences().subList(groupAccountAmountTypeMap.size(), noGroupAccountAmountTypes.size());
             accountAmountTypeService.batchUpdateAccountAmountType(Deposit.of(req.getAmount(), noGroupSequences, noGroupAccountAmountTypes));
+            TempAccountDepositApply accountDepositApply = assemblyUserTempAccountDepositApply(req.getRequestId());
+            tempAccountDepositApplyDao.save(accountDepositApply);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
     }
 
-    public static void main(String[] args) {
-        List<Integer> list = Lists.newArrayList(1,2,3,4,5);
-        System.out.println(list.subList(0,1));
-    //    System.out.println(list.subList(1,));
+    private TempAccountDepositApply assemblyUserTempAccountDepositApply(String requestId) {
+        TempAccountDepositApply depositApply = new TempAccountDepositApply();
+        depositApply.setAccountCode(9999999999L);
+        depositApply.setPhone("00000000000");
+        depositApply.setFileId(requestId);
+        depositApply.setRequestId(requestId);
+        return depositApply;
     }
+
     @Override
     public Page<NhcAccountBillDetailDTO> getUserBillPage(NhcUserPageReq userPageReq) {
         return null;
@@ -225,7 +225,7 @@ public class NhcServiceImpl implements NhcService {
     @Override
     public NhcFamilyMemberDTO getFamilyInfo(String userCode) {
         Account account = accountService.getByAccountCode(Long.parseLong(userCode));
-        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
+        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "用户不存在");
         Merchant merchant = merchantService.getMerchantByMerCode(account.getMerCode());
         BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
         AccountAmountType accountAmountType = accountAmountTypeDao.queryByAccountCodeAndAmountType(account.getAccountCode(),

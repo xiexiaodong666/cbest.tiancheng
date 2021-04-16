@@ -20,6 +20,7 @@ import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.FileUniversalStorageEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.AccountUtil;
@@ -157,6 +158,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountAmountTypeService accountAmountTypeService;
 
     private final CbestPayService cbestPayService;
+    private final MerchantExtendDao merchantExtendDao;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -478,14 +480,30 @@ public class AccountServiceImpl implements AccountService {
         // 添加
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
-        PaymentChannelReq req =new PaymentChannelReq();
-        req.setFiltered(false);
-        req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
-        List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
-        boolean result2 = subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
+        Merchant merchant = merchantService.getMerchantByMerCode(accountReq.getMerCode());
+        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+        MerchantExtend merchantExtend = merchantExtendDao.getByMerCode(accountReq.getMerCode());
+        if(Objects.nonNull(merchantExtend) && !StringUtils.isEmpty(merchantExtend.getIndustryTag())
+                && merchantExtend.getIndustryTag().contains(WelfareConstant.IndustryTag.COMMUNITY_HOSPITAL.code())) {
+            //批发福利账户
+            AccountAmountType accountAmountType = getAccountAmountType(account.getAccountCode(),
+                    BigDecimal.ZERO, account.getMerCode(),
+                    MerAccountTypeCode.WHOLESALE.code());
+            accountAmountTypeMapper.insert(accountAmountType);
+            SubAccount subAccount = new SubAccount();
+            subAccount.setAccountCode(account.getAccountCode());
+            subAccount.setSubAccountType(WelfareConstant.PaymentChannel.WELFARE.code());
+            subAccountDao.save(subAccount);
+        } else {
+            PaymentChannelReq req = new PaymentChannelReq();
+            req.setFiltered(false);
+            req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+            List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
+            subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
+        }
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
             .accountList(Arrays.asList(account)).build());
-        return result && result2;
+        return result;
     }
 
     private List<SubAccount> assemableSubAccount(List<PaymentChannelDTO> paymentChannels, Account account) {
@@ -517,7 +535,7 @@ public class AccountServiceImpl implements AccountService {
             merCode,
             merAccountTypeCode);
         if (null == merchantAccountType) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无授信额度福利类型", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无福利类型", null);
         }
         AccountAmountType accountAmountType = new AccountAmountType();
         accountAmountType.setAccountCode(accountCode);

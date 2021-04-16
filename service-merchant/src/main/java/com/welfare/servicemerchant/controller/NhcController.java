@@ -64,26 +64,6 @@ public class NhcController {
         return null;
     }
 
-    @PostMapping("/account/saveOrUpdate")
-    @ApiOperation("新增或修改员工")
-    @MerchantUser
-    public R<String> saveOrUpdateAccount(@Validated @RequestBody NhcAccountReq nhcAccountReq) {
-        return null;
-    }
-
-    @GetMapping("/account/info/{accountCode}")
-    @ApiOperation("查询员工信息")
-    @MerchantUser
-    public R<NhcAccountInfoDTO> getAccountInfo(@PathVariable("accountCode") String accountCode) {
-        return null;
-    }
-
-    @PostMapping("/account/bill")
-    @ApiOperation("查询员工账户记录")
-    @MerchantUser
-    public R<Page<NhcAccountBillDetailDTO>> accountBillPage(@Validated @RequestBody NhcUserPageReq nhcUserPageReq) {
-        return null;
-    }
 
     @PostMapping("/user/family/info/{accountCode}")
     @ApiOperation("查询家庭信息")

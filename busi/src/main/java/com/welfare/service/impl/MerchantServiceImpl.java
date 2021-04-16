@@ -12,6 +12,7 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dao.MerchantDao;
+import com.welfare.persist.dao.MerchantExtendDao;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.dto.query.MerchantPageReq;
@@ -68,7 +69,10 @@ public class MerchantServiceImpl implements MerchantService {
     @Autowired
     MerchantAccountTypeService merchantAccountTypeService;
     private final MessagePushConfigService messagePushConfigService;
-
+    @Autowired
+    private MerchantExtendService merchantExtendService;
+    @Autowired
+    private MerchantExtendDao merchantExtendDao;
     @Override
     public List<Merchant> list(MerchantReq req) {
         QueryWrapper<Merchant> q=QueryHelper.getWrapper(req);
@@ -139,6 +143,8 @@ public class MerchantServiceImpl implements MerchantService {
             merchantDetailDTO.setCreditLimit(merchantCredit.getCreditLimit());
             merchantDetailDTO.setRemainingLimit(merchantCredit.getRemainingLimit());
         }
+        MerchantExtendDTO merchantExtendDTO = MerchantExtendDTO.of(merchantExtendDao.getByMerCode(merchantDetailDTO.getMerCode()));
+        merchantDetailDTO.setExtend(merchantExtendDTO);
         dictService.trans(MerchantDetailDTO.class, Merchant.class.getSimpleName(), true, merchantDetailDTO);
         return merchantDetailDTO;
     }
@@ -176,6 +182,7 @@ public class MerchantServiceImpl implements MerchantService {
         merchantCreditService.init(merchant.getMerCode());
         boolean flag3=merchantAccountTypeService.init(merCode);
         boolean flag4=true;
+        boolean flag5=merchantExtendService.saveOrUpdate(merchant.getExtend(), merCode);
         List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (merIdentitys.contains(MerIdentityEnum.customer.getCode())) {
             flag4 = messagePushConfigService.init(merCode);
@@ -190,7 +197,7 @@ public class MerchantServiceImpl implements MerchantService {
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).timestamp(new Date()).build());
-        return flag&&flag2&flag3&&flag4;
+        return flag&&flag2&flag3&&flag4&&flag5;
     }
 
     @Override
@@ -204,6 +211,7 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag= 1==merchantDao.updateAllColumnById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
         boolean flag3=true;
+        boolean flag4=merchantExtendService.saveOrUpdate(merchant.getExtend(), update.getMerCode());
         List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (merIdentitys.contains(MerIdentityEnum.customer.getCode())) {
             flag3 = messagePushConfigService.init(update.getMerCode());
@@ -217,7 +225,7 @@ public class MerchantServiceImpl implements MerchantService {
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).timestamp(new Date()).build());
-        return flag&&flag2&&flag3;
+        return flag&&flag2&&flag3&&flag4;
     }
     private Merchant buildEntity(MerchantUpdateDTO merchant){
         Merchant entity=merchantDao.getById(merchant.getId());

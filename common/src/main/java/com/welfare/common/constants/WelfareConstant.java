@@ -596,4 +596,65 @@ public class WelfareConstant {
         }
     }
 
+    /**
+     * 员工类型
+     */
+    public enum AccountType{
+        /**
+         * 用于卫计委商户
+         */
+        DOCTOR("doctor","医生"),
+        /**
+         * 用于卫计委商户
+         */
+        PURCHASER("purchaser","采购员"),
+        /**
+         * 用于卫计委商户
+         */
+        COMMON_USER("common_user","普通用户"),
+        /**
+         * 用于卫计委商户
+         */
+        PATIENT("patient","病人");
+        private final String code;
+        private final String desc;
+
+        AccountType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+
+    /**
+     * 行业标签
+     */
+    public enum IndustryTag{
+        /**
+         * 社区医院
+         */
+        COMMUNITY_HOSPITAL("community_hospital","社区医院");
+        private final String code;
+        private final String desc;
+
+        IndustryTag(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
 }

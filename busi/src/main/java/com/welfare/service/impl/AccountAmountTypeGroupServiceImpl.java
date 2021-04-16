@@ -1,7 +1,6 @@
 package com.welfare.service.impl;
 
 import com.google.common.collect.Lists;
-import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
@@ -10,7 +9,6 @@ import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountAmountTypeGroupDao;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
-import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;

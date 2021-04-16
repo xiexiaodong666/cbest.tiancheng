@@ -44,7 +44,7 @@ public class MerchantExtend extends Model<MerchantExtend> implements Serializabl
     @ApiModelProperty("商户编码")   
     private String merCode;
     /**
-     * 行业标签
+     * 行业标签(多个逗号隔开)
      */
     @ApiModelProperty("行业标签")
     private String industryTag;

@@ -261,7 +261,7 @@ public class WelfareConstant {
         SELF("self","自主余额"),
         SURPLUS_QUOTA("surplus_quota","授信额度"),
         SURPLUS_QUOTA_OVERPAY("surplus_quota_overpay","授信额度溢缴款"),
-        MALL_POINT("mall_point","商城积分"),
+        MALL_POINT("mall_point","积分账户余额"),
         WHOLESALE("wholesale","批发采购");
         private final String code;
         private final String desc;

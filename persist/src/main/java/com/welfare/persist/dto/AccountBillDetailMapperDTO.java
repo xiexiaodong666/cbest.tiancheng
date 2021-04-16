@@ -12,6 +12,7 @@ import java.util.Date;
  */
 @Data
 public class AccountBillDetailMapperDTO {
+  private String transNo;
   private String storeName;
   private String transType;
   private String transTypeString;

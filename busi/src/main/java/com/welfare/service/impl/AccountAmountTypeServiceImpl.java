@@ -197,6 +197,15 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<AccountAmountType> batchQueryByAccount(List<Long> accountCodes, String merAccountTypeCode) {
+        List<AccountAmountType> accountAmountTypes = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(accountCodes)) {
+            accountAmountTypes = accountAmountTypeDao.listByAccountCodes(accountCodes, merAccountTypeCode);
+        }
+        return accountAmountTypes;
+    }
+
     private AccountDeductionDetail assemblyAccountDeductionDetail(Deposit deposit, Account account,
                                                                   AccountAmountType accountAmountType) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();

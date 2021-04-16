@@ -13,12 +13,14 @@ import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.*;
+import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.nhc.*;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
+import com.welfare.service.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -213,7 +215,30 @@ public class NhcServiceImpl implements NhcService {
 
     @Override
     public Page<NhcAccountBillDetailDTO> getUserBillPage(NhcUserPageReq userPageReq) {
-        return null;
+        Page<AccountBillDetailDTO> page = accountService.queryAccountBillDetail(userPageReq.getCurrent(), userPageReq.getSize(),
+                userPageReq.getAccountCode(), null, null);
+        List<NhcAccountBillDetailDTO> list = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(page.getRecords())) {
+            page.getRecords().forEach(billDetail -> {
+                NhcAccountBillDetailDTO dto = new NhcAccountBillDetailDTO();
+                dto.setTransNo(billDetail.getTransNo());
+                dto.setTransTime(billDetail.getCreateTime());
+                dto.setTransTypeName(billDetail.getTransTypeString());
+                dto.setMerAccountTypeName(billDetail.getAccountTypeName());
+                dto.setTransAmount(billDetail.getTransAmount());
+                if (WelfareConstant.TransType.DEPOSIT_INCR.code().equals(billDetail.getTransType())) {
+                    dto.setEvent("积分充值");
+                } else if (WelfareConstant.TransType.DEPOSIT_BACK.code().equals(billDetail.getTransType())) {
+                    dto.setEvent("积分回冲");
+                } else if (WelfareConstant.TransType.CONSUME.code().equals(billDetail.getTransType())) {
+                    dto.setEvent("积分商品兑换");
+                } else if (WelfareConstant.TransType.REFUND.code().equals(billDetail.getTransType())) {
+                    dto.setEvent("积分商品退款");
+                }
+                list.add(dto);
+            });
+        }
+        return PageUtils.toPage(page, list);
     }
 
     @Override

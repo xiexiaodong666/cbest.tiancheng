@@ -11,7 +11,6 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
-import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
@@ -125,7 +124,7 @@ public class PaymentServiceImpl implements PaymentService {
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
                 List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
                 List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs = merAccountTypeConsumeSceneConfigFuture.get();
-                accountAmountDOList = filterAvailable(accountAmountDOList, merAccountTypeConsumeSceneConfigs);
+                accountAmountDOList = filterAvailable(accountAmountDOList, merAccountTypeConsumeSceneConfigs, paymentRequest.bizType());
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
                 //支付前的校验
                 chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
@@ -174,16 +173,27 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
-    private List<AccountAmountDO> filterAvailable(List<AccountAmountDO> accountAmountDOList, List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs) {
+    private List<AccountAmountDO> filterAvailable(List<AccountAmountDO> accountAmountDOList, List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs, WelfareConstant.PaymentBizType bizType) {
         List<String> configs = merAccountTypeConsumeSceneConfigs.stream()
                 .map(MerAccountTypeConsumeSceneConfig::getMerAccountTypeCode)
                 .collect(Collectors.toList());
         if(CollectionUtils.isEmpty(configs)){
             return Collections.emptyList();
         }
-        accountAmountDOList = accountAmountDOList.stream()
-                .filter(amountDO -> configs.contains(amountDO.getAccountAmountType().getMerAccountTypeCode()))
-                .collect(Collectors.toList());
+        if(WelfareConstant.PaymentBizType.HOSPITAL_POINTS.equals(bizType)){
+            accountAmountDOList = accountAmountDOList.stream()
+                    .filter(amountDO ->
+                            WelfareConstant.MerAccountTypeCode.MALL_POINT.code()
+                                    .equals(amountDO.getAccountAmountType().getMerAccountTypeCode()))
+                    .collect(Collectors.toList());
+        }else{
+            accountAmountDOList = accountAmountDOList.stream()
+                    .filter(amountDO -> configs.contains(amountDO.getAccountAmountType().getMerAccountTypeCode())
+                            && !WelfareConstant.MerAccountTypeCode.MALL_POINT.code()
+                            .equals(amountDO.getAccountAmountType().getMerAccountTypeCode()))
+                    .collect(Collectors.toList());
+        }
+
         return accountAmountDOList;
     }
 

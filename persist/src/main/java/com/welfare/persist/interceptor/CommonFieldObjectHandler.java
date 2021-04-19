@@ -2,10 +2,12 @@ package com.welfare.persist.interceptor;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.google.common.collect.Lists;
 import com.welfare.common.domain.UserInfo;
 import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.PaymentChannelConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -35,7 +37,7 @@ public class CommonFieldObjectHandler implements MetaObjectHandler {
         this.setFieldValByName(CREATE_TIME, Calendar.getInstance().getTime(), metaObject);
         this.setFieldValByName(VERSION, 0, metaObject);
         TableInfo tableInfo = findTableInfo(metaObject);
-        if (tableInfo.getEntityType() == Account.class) {
+        if (Lists.newArrayList(Account.class, PaymentChannelConfig.class).contains(tableInfo.getEntityType())) {
             this.setFieldValByName(DELETED, 0L, metaObject);
         } else {
             this.setFieldValByName(DELETED, false, metaObject);

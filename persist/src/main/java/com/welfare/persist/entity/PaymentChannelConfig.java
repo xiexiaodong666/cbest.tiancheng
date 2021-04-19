@@ -89,7 +89,7 @@ public class PaymentChannelConfig extends Model<PaymentChannelConfig> implements
      */
     @ApiModelProperty("删除标志") @TableLogic(delval = "unix_timestamp()")
     @TableField(fill = FieldFill.INSERT)
-	private Boolean deleted;
+	private Long deleted;
     /**
      * 版本
      */

@@ -9,6 +9,7 @@ import com.welfare.service.dto.nhc.*;
  * @Date: 2021/4/13 9:43 上午
  */
 public interface NhcService {
+  String DEFAULT_PHONE_PREFIX = "M";
 
   /**
    * 新增或修改用户

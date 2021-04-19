@@ -61,4 +61,6 @@ public interface AccountAmountTypeGroupService {
      * @param deposits
      */
     Boolean batchUpdateGroupAmount(List<GroupDeposit> deposits);
+
+    List<AccountAmountTypeGroup> listById(List<Long> groupIds);
 }

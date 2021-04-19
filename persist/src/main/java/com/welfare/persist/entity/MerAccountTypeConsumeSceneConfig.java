@@ -85,9 +85,9 @@ public class MerAccountTypeConsumeSceneConfig extends Model<MerAccountTypeConsum
     /**
      * 删除标志  1-删除、0-未删除
      */
-    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic   
+    @ApiModelProperty("删除标志  1-删除、0-未删除") @TableLogic(delval = "unix_timestamp()")
     @TableField(fill = FieldFill.INSERT)
-	private Boolean deleted;
+	private Long deleted;
     /**
      * 版本
      */

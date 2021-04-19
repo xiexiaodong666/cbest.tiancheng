@@ -1,13 +1,15 @@
 package com.welfare.service.dto.nhc;
 
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.AccountAmountTypeGroup;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: duanhy
@@ -23,13 +25,27 @@ public class NhcUserMallPointDTO {
   @ApiModelProperty("用户积分")
   private BigDecimal mallPoint;
 
-  public static List<NhcUserMallPointDTO> of(List<AccountAmountType> accountAmountTypes) {
+  public static List<NhcUserMallPointDTO> of(List<AccountAmountTypeGroup> groups, List<AccountAmountType> accountAmountTypes) {
     List<NhcUserMallPointDTO> mallPointList = new ArrayList<>();
+    Map<Long, AccountAmountTypeGroup> groupMap = new HashMap<>();
+    if (CollectionUtils.isNotEmpty(groups)) {
+      groupMap = groups.stream().collect(Collectors.toMap(AccountAmountTypeGroup::getId, a->a));
+    }
     if (CollectionUtils.isNotEmpty(accountAmountTypes)) {
+      Map<Long, AccountAmountTypeGroup> finalGroupMap = groupMap;
       accountAmountTypes.forEach(accountAmountType -> {
         NhcUserMallPointDTO mallPointDTO = new NhcUserMallPointDTO();
-        mallPointDTO.setMallPoint(accountAmountType.getAccountBalance());
+        if (Objects.nonNull(accountAmountType.getAccountAmountTypeGroupId()) && Objects.nonNull(accountAmountType.getJoinedGroup())
+                && accountAmountType.getJoinedGroup()) {
+          mallPointDTO.setMallPoint(accountAmountType.getAccountBalance());
+          if (finalGroupMap.containsKey(accountAmountType.getAccountAmountTypeGroupId())) {
+            mallPointDTO.setMallPoint(finalGroupMap.get(accountAmountType.getAccountAmountTypeGroupId()).getBalance());
+          }
+        } else {
+          mallPointDTO.setMallPoint(accountAmountType.getAccountBalance());
+        }
         mallPointDTO.setAccountCode(String.valueOf(accountAmountType.getAccountCode()));
+        mallPointList.add(mallPointDTO);
       });
     }
     return mallPointList;

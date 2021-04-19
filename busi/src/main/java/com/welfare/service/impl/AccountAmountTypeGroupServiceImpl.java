@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
@@ -20,6 +21,7 @@ import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.dto.account.AccountAmountTypeGroupDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +87,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         accountAmountType.setJoinedGroup(Boolean.FALSE);
         accountAmountType.setAccountAmountTypeGroupId(null);
         // 记录流水
-        String transNo = sequenceService.nextFullNo(WelfareConstant.SequenceType.DEPOSIT.code());
+        String transNo = "" + sequenceService.nextNo(WelfareConstant.SequenceType.DEPOSIT.code());
         AccountBillDetail accountBillDetail = assemblyAccountBillDetail(
                 account,
                 accountAmountType.getAccountBalance(),
@@ -99,7 +101,8 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
                 WelfareConstant.TransType.LEAVE_GROUP,
                 accountAmountType.getAccountBalance(),
                 accountAmountType,
-                groupId);
+                groupId,
+                BigDecimal.ZERO);
         accountBillDetailDao.save(accountBillDetail);
         accountDeductionDetailDao.save(accountDeductionDetail);
         return accountAmountTypeDao.updateById(accountAmountType);
@@ -157,10 +160,9 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
             List<AccountBillDetail> accountBillDetails = new ArrayList<>();
             List<AccountDeductionDetail> accountDeductionDetails = new ArrayList<>();
             deposits.forEach(groupDeposit -> {
-                BigDecimal sumAmount = groupDeposit.getDeposits().stream().map(GroupDeposit.DepositItem::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                 AccountAmountTypeGroup group = groupMap.get(groupDeposit.getGroupId());
-                group.setBalance(group.getBalance().add(sumAmount));
                 groupDeposit.getDeposits().forEach(depositItem -> {
+                    group.setBalance(group.getBalance().add(depositItem.getAmount()));
                     Account account = accountMap.get(depositItem.getAccountCode());
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(depositItem.getAccountCode());
                     AccountBillDetail accountBillDetail = assemblyAccountBillDetail(
@@ -177,7 +179,8 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
                             WelfareConstant.TransType.DEPOSIT_INCR,
                             depositItem.getAmount(),
                             accountAmountType,
-                            group.getId());
+                            group.getId(),
+                            group.getBalance());
                     accountDeductionDetails.add(accountDeductionDetail);
                 });
             });
@@ -187,6 +190,16 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         } finally {
             DistributedLockUtil.unlock(multiLock);
         }
+    }
+
+    @Override
+    public List<AccountAmountTypeGroup> listById(List<Long> groupIds) {
+        if (CollectionUtils.isNotEmpty(groupIds)) {
+            QueryWrapper<AccountAmountTypeGroup> queryWrapper = new QueryWrapper<>();
+            queryWrapper.in(AccountAmountTypeGroup.ID, groupIds);
+            return accountAmountTypeGroupDao.list(queryWrapper);
+        }
+        return new ArrayList<>();
     }
 
     private void validationUpdateAmountParams(List<GroupDeposit> deposits,  Map<Long, AccountAmountTypeGroup> groupMap, Map<Long, Account> accountMap,
@@ -218,7 +231,9 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         Account joinAccount = accountService.getByAccountCode(joinAccountCode);
         BizAssert.notNull(joinAccount, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
         Account groupAccount = accountService.getByAccountCode(groupAccountCode);
-        BizAssert.notNull(groupAccount, ExceptionCode.ILLEGALITY_ARGURMENTS, "家庭员工不存在");
+        BizAssert.notNull(groupAccount, ExceptionCode.ILLEGALITY_ARGURMENTS, "组员工不存在");
+        BizAssert.isTrue(!joinAccount.getAccountCode().equals(groupAccount.getAccountCode()),
+                ExceptionCode.ILLEGALITY_ARGURMENTS, "不能和自己一个组");
         Map<Long, Account> accountMap = new HashMap<>();
         accountMap.put(joinAccount.getAccountCode(), joinAccount);
         accountMap.put(groupAccount.getAccountCode(), groupAccount);
@@ -239,10 +254,12 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
             amountTypeGroup = new AccountAmountTypeGroup();
             amountTypeGroup.setBalance(joinAccountAmountType.getAccountBalance().add(groupAccountAmountType.getAccountBalance()));
             amountTypeGroup.setMerAccountTypeCode(merAccountTypeCode);
-            amountTypeGroup.setGroupCode(sequenceService.nextFullNo(WelfareConstant.SequenceType.ACCOUNT_AMOUNT_TYPE_GROUP_CODE.code()));
+            amountTypeGroup.setGroupCode("" + sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_AMOUNT_TYPE_GROUP_CODE.code()));
             updateAccountAmountTypes.add(joinAccountAmountType);
             updateAccountAmountTypes.add(groupAccountAmountType);
         }
+        // 创建或更新组
+        boolean flag1 = accountAmountTypeGroupDao.saveOrUpdate(amountTypeGroup);
         // 记录流水
         List<AccountBillDetail> accountBillDetails = new ArrayList<>();
         List<AccountDeductionDetail> accountDeductionDetails = new ArrayList<>();
@@ -264,19 +281,17 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
                     WelfareConstant.TransType.JOINED_GROUP,
                     accountAmountType.getAccountBalance(),
                     accountAmountType,
-                    amountTypeGroup.getId());
+                    amountTypeGroup.getId(),
+                    amountTypeGroup.getBalance());
             accountDeductionDetails.add(accountDeductionDetail);
         });
         accountBillDetailDao.saveBatch(accountBillDetails);
         accountDeductionDetailDao.saveBatch(accountDeductionDetails);
-        // 创建或更新组
-        boolean flag1 = accountAmountTypeGroupDao.saveOrUpdate(amountTypeGroup);
-        joinAccountAmountType.setJoinedGroup(Boolean.TRUE);
-        joinAccountAmountType.setAccountAmountTypeGroupId(amountTypeGroup.getId());
-        joinAccountAmountType.setAccountBalance(BigDecimal.ZERO);
-        groupAccountAmountType.setJoinedGroup(Boolean.TRUE);
-        groupAccountAmountType.setAccountAmountTypeGroupId(amountTypeGroup.getId());
-        groupAccountAmountType.setAccountBalance(BigDecimal.ZERO);
+        updateAccountAmountTypes.forEach(accountAmountType -> {
+            accountAmountType.setJoinedGroup(Boolean.TRUE);
+            accountAmountType.setAccountAmountTypeGroupId(amountTypeGroup.getId());
+            accountAmountType.setAccountBalance(BigDecimal.ZERO);
+        });
         // 组成员福利账户金额清零
         boolean flag2 = accountAmountTypeDao.updateBatchById(updateAccountAmountTypes);
         return flag1 && flag2;
@@ -302,11 +317,12 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
                                                                   WelfareConstant.TransType transType,
                                                                   BigDecimal amount,
                                                                   AccountAmountType accountAmountType,
-                                                                  Long accountAmountTypeGroupId) {
+                                                                  Long accountAmountTypeGroupId,
+                                                                  BigDecimal remainingAccountAmountTypeBalance) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(account.getAccountCode());
         accountDeductionDetail.setAccountDeductionAmount(amount.abs());
-        accountDeductionDetail.setAccountAmountTypeBalance(BigDecimal.ZERO);
+        accountDeductionDetail.setAccountAmountTypeBalance(remainingAccountAmountTypeBalance);
         accountDeductionDetail.setMerAccountType(accountAmountType.getMerAccountTypeCode());
         accountDeductionDetail.setTransNo(transNo);
         accountDeductionDetail.setTransType(transType.code());

@@ -112,7 +112,7 @@ public class Deposit {
         accountAmountTypes.forEach(accountAmountType -> {
             Deposit deposit = new Deposit();
             deposit.setAmount(amount);
-            deposit.setTransNo(sequences.get(index.getAndIncrement()) + "");
+            deposit.setTransNo(sequences.get(index.getAndIncrement()).getSequenceNo() + "");
             deposit.setAccountCode(accountAmountType.getAccountCode());
             deposit.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
             deposit.setChannel(WelfareConstant.Channel.PLATFORM.code());

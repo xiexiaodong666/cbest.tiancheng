@@ -51,10 +51,10 @@ public class GroupDeposit {
                 depositItem.setAccountCode(accountAmountType.getAccountCode());
                 depositItem.setAmount(amount);
                 depositItem.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
-                depositItem.setTransNo(sequences.get(index.getAndIncrement()) + "");
+                depositItem.setTransNo(sequences.get(index.getAndIncrement()).getSequenceNo() + "");
                 deposits.add(depositItem);
             });
         });
-        return null;
+        return groupDeposits;
     }
 }

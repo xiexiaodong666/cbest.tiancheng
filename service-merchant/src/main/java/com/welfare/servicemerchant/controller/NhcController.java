@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.AccountAmountTypeGroup;
+import com.welfare.service.AccountAmountTypeGroupService;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.NhcService;
 import com.welfare.service.dto.nhc.*;
@@ -17,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -35,6 +39,8 @@ public class NhcController {
     private NhcService nhcService;
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
+    @Autowired
+    private AccountAmountTypeGroupService accountAmountTypeGroupService;
 
     @PostMapping("/user/saveOrUpdate")
     @ApiOperation("新增或修改用户")
@@ -88,6 +94,10 @@ public class NhcController {
             return R.success();
         }
         List<Long> accountCodes = batchQueryUserReq.getAccountCodes().stream().map(Long::valueOf).collect(Collectors.toList());
-        return R.success(NhcUserMallPointDTO.of(accountAmountTypeService.batchQueryByAccount(accountCodes, WelfareConstant.MerAccountTypeCode.MALL_POINT.code())));
+        List<AccountAmountType> accountAmountTypes = accountAmountTypeService.batchQueryByAccount(accountCodes, WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
+        List<AccountAmountTypeGroup> groups = accountAmountTypeGroupService.listById(accountAmountTypes.stream()
+                .map(AccountAmountType::getAccountAmountTypeGroupId)
+                .filter(Objects::nonNull).collect(Collectors.toList()));
+        return R.success(NhcUserMallPointDTO.of(groups, accountAmountTypeService.batchQueryByAccount(accountCodes, WelfareConstant.MerAccountTypeCode.MALL_POINT.code())));
     }
 }

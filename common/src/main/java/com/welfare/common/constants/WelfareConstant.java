@@ -233,7 +233,9 @@ public class WelfareConstant {
         RESET_ACCOUNT_SURPLUS_QUOTA("reset_account_surplus_quota","员工账号授信额度变更"),
         EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号"),
         MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码"),
-        ACCOUNT_AMOUNT_TYPE_GROUP_CODE("account_amount_type_group_code","员工福利账号组编码");
+        ACCOUNT_AMOUNT_TYPE_GROUP_CODE("account_amount_type_group_code","员工福利账号组编码"),
+        DEFAULT_PHONE("default_phone","默认手机号");
+
 
         private final String code;
         private final String desc;

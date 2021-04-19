@@ -4,15 +4,19 @@ import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.persist.entity.AccountAmountTypeGroup;
 import com.welfare.persist.entity.Merchant;
+import com.welfare.service.NhcService;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -41,9 +45,8 @@ public class NhcUserInfoDTO {
   @ApiModelProperty(value = "积分")
   private BigDecimal mallPoint;
 
-  public static NhcUserInfoDTO of(Account account, AccountAmountType accountAmountType, Merchant merchant) {
+  public static NhcUserInfoDTO of(AccountAmountTypeGroup group, Account account, AccountAmountType accountAmountType, Merchant merchant) {
     BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
-    BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "积分福利不存在");
     BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
 
     NhcUserInfoDTO userInfoDTO = new NhcUserInfoDTO();
@@ -51,12 +54,18 @@ public class NhcUserInfoDTO {
     userInfoDTO.setAccountCode(String.valueOf(account.getAccountCode()));
     userInfoDTO.setMerCode(account.getMerCode());
     userInfoDTO.setMerName(merchant.getMerName());
-    userInfoDTO.setPhone(account.getPhone());
-    userInfoDTO.setMallPoint(accountAmountType != null ? accountAmountType.getAccountBalance() : BigDecimal.ZERO);
+    if (StringUtils.isNoneBlank(account.getPhone()) && !account.getPhone().startsWith(NhcService.DEFAULT_PHONE_PREFIX)) {
+      userInfoDTO.setPhone(account.getPhone());
+    }
+    if (Objects.nonNull(group)) {
+      userInfoDTO.setMallPoint(group.getBalance());
+    } else {
+      userInfoDTO.setMallPoint(accountAmountType != null ? accountAmountType.getAccountBalance() : BigDecimal.ZERO);
+    }
     return userInfoDTO;
   }
 
-  public static List<NhcUserInfoDTO> of(Map<Long, Account> accountMap, Map<Long, AccountAmountType> accountAmountTypes, Merchant merchant) {
+  public static List<NhcUserInfoDTO> of(AccountAmountTypeGroup group , Map<Long, Account> accountMap, Map<Long, AccountAmountType> accountAmountTypes, Merchant merchant) {
     List<NhcUserInfoDTO> list = new ArrayList<>();
     accountMap.forEach((accountCode, account) -> {
       NhcUserInfoDTO userInfoDTO = new NhcUserInfoDTO();
@@ -64,9 +73,15 @@ public class NhcUserInfoDTO {
       userInfoDTO.setAccountCode(String.valueOf(account.getAccountCode()));
       userInfoDTO.setMerCode(account.getMerCode());
       userInfoDTO.setMerName(merchant.getMerName());
-      userInfoDTO.setPhone(account.getPhone());
+      if (StringUtils.isNoneBlank(account.getPhone()) && !account.getPhone().startsWith(NhcService.DEFAULT_PHONE_PREFIX)) {
+        userInfoDTO.setPhone(account.getPhone());
+      }
       AccountAmountType accountAmountType = accountAmountTypes.get(accountCode);
-      userInfoDTO.setMallPoint(accountAmountType != null ? accountAmountType.getAccountBalance() : BigDecimal.ZERO);
+      if (Objects.nonNull(group)) {
+        userInfoDTO.setMallPoint(group.getBalance());
+      } else {
+        userInfoDTO.setMallPoint(accountAmountType != null ? accountAmountType.getAccountBalance() : BigDecimal.ZERO);
+      }
       list.add(userInfoDTO);
     });
     return list;

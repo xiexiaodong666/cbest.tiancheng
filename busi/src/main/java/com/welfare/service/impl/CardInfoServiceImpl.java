@@ -145,6 +145,7 @@ public class CardInfoServiceImpl implements CardInfoService {
 
     @Override
     public CardInfo createAndBind(CardInfo cardInfo) {
+
         Account account = accountDao.queryByAccountCode(cardInfo.getAccountCode());
         BizAssert.notNull(account,ExceptionCode.DATA_NOT_EXIST,"账户不存在");
         BizAssert.isTrue(
@@ -152,6 +153,13 @@ public class CardInfoServiceImpl implements CardInfoService {
                 ExceptionCode.ILLEGALITY_ARGURMENTS,
                 "账户已禁用"
         );
+        CardInfo cardInfoInDb = cardInfoDao.getOneByCardId(cardInfo.getCardId());
+        if(Objects.nonNull(cardInfoInDb) && !Objects.equals(cardInfo.getAccountCode(),cardInfoInDb.getAccountCode())){
+            throw new BizException(ExceptionCode.CARD_ALREADY_BIND);
+        }else if(Objects.equals(cardInfo.getAccountCode(),cardInfoInDb.getAccountCode())){
+            log.info("already bind, return");
+            return cardInfoInDb;
+        }
         cardInfo.setCardStatus(WelfareConstant.CardStatus.BIND.code());
         Date now = Calendar.getInstance().getTime();
         cardInfo.setBindTime(now);

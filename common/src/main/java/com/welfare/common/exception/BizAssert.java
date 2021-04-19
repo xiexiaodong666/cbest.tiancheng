@@ -85,4 +85,22 @@ public class BizAssert {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
         }
     }
+
+    public static void isNull(Object obj){
+        if(Objects.nonNull(obj)){
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
+        }
+    }
+
+    public static void isNull(Object obj,ExceptionCode exceptionCode){
+        if(Objects.nonNull(obj)){
+            throw new BizException(exceptionCode,exceptionCode.getMsg(), null);
+        }
+    }
+
+    public static void isNull(Object obj,ExceptionCode exceptionCode,String exceptionMsg){
+        if(Objects.nonNull(obj)){
+            throw new BizException(exceptionCode,exceptionMsg, null);
+        }
+    }
 }

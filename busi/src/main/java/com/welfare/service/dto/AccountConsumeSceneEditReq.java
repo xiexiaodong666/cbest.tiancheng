@@ -1,8 +1,5 @@
 package com.welfare.service.dto;
 
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

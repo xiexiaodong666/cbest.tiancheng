@@ -2,7 +2,7 @@ package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.persist.dto.WelfareSettleSumDTO;
 import com.welfare.persist.dto.WelfareSettleSummaryDTO;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
@@ -99,7 +99,7 @@ public class WelfareSettleController implements IController {
             path = fileUploadService.uploadExcelFile(
                     welfareSettleDetailRespList, WelfareSettleDetailResp.class, "应付消费明细");
         } catch (IOException e) {
-            throw new BusiException(null, "文件导出异常", null);
+            throw new BizException(null, "文件导出异常", null);
         }
         return success(fileUploadService.getFileServerUrl(path));
     }

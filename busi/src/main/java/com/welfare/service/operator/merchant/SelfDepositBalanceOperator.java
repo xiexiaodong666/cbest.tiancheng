@@ -1,7 +1,7 @@
 package com.welfare.service.operator.merchant;
 
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.enums.IncOrDecType;
@@ -57,7 +57,7 @@ public class SelfDepositBalanceOperator extends AbstractMerAccountTypeOperator i
     protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo, String transType) {
         AbstractMerAccountTypeOperator nextOperator = getNext();
         if (Objects.isNull(nextOperator)) {
-            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "组织(公司)余额不足", null);
+            throw new BizException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "组织(公司)余额不足", null);
         }
         merchantCredit.setSelfDepositBalance(BigDecimal.ZERO);
         MerchantAccountOperation operation = MerchantAccountOperation.of(

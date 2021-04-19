@@ -10,7 +10,6 @@ import com.welfare.persist.dao.PullAccountDetailRecordDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.PullAccountDetailRecord;
-import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.mapper.MerchantMapper;
 import com.welfare.persist.mapper.PullAccountDetailRecordMapper;
 import com.welfare.service.PullAccountDetailRecordService;
@@ -21,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

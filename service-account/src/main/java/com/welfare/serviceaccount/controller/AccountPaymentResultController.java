@@ -6,6 +6,11 @@ import com.welfare.service.AccountPaymentResultService;
 import com.welfare.service.dto.BarcodePaymentNotifyReq;
 import com.welfare.service.dto.BarcodePaymentResultDTO;
 import com.welfare.service.dto.BarcodePaymentResultReq;
+import com.welfare.service.dto.CreateThirdPartyPaymentDTO;
+import com.welfare.service.dto.CreateThirdPartyPaymentReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementQueryResp;
+import com.welfare.service.remote.entity.CbestPayBaseResp;
+import com.welfare.service.remote.entity.CbestPayRespStatusConstant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +44,29 @@ public class AccountPaymentResultController implements IController {
     public R<BarcodePaymentResultDTO> barcodePaymentResult(BarcodePaymentResultReq req) {
         req.setAccountCode(AccountUserHolder.getAccountUser().getAccountCode());
         return success(accountPaymentResultService.queryBarcodePaymentResult(req));
+    }
+
+    @ApiOperation("第三方交易创建通知")
+    @PostMapping("/createThirdPartyPaymentNotify")
+    public String createThirdPartyPaymentNotify(@RequestBody CbestPayBaseResp resp) {
+        accountPaymentResultService.createThirdPartyPaymentNotify(resp);
+        return CbestPayRespStatusConstant.SUCCESS;
+    }
+
+    @ApiOperation("前端轮询第三方支付结果")
+    @GetMapping("/createThirdPartyPayment")
+    @AccountUser
+    public R<CreateThirdPartyPaymentDTO> createThirdPartyPayment(CreateThirdPartyPaymentReq req) {
+        CreateThirdPartyPaymentDTO createThirdPartyPaymentDTO = accountPaymentResultService
+            .createThirdPartyPayment(req);
+        return success(createThirdPartyPaymentDTO);
+    }
+
+    @ApiOperation("第三方签约或解约结果通知")
+    @PostMapping("/thirdPartySignResultNotify")
+    public String thirdPartySignResultNotify(@RequestBody CbestPayBaseResp resp) {
+        accountPaymentResultService.thirdPartySignResultNotify(resp);
+        return CbestPayRespStatusConstant.SUCCESS;
     }
 
 }

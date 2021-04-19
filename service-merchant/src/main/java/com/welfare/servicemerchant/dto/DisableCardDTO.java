@@ -1,7 +1,8 @@
 package com.welfare.servicemerchant.dto;
 
-import java.util.Set;
 import lombok.Data;
+
+import java.util.Set;
 
 /**
  * @author gaorui

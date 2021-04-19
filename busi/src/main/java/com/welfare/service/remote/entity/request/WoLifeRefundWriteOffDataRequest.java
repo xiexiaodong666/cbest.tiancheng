@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
 import com.welfare.service.dto.RefundRequest;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.logging.log4j.util.Strings;
 
 /**
  * @author gaorui

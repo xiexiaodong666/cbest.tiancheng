@@ -56,6 +56,7 @@ public abstract class PaymentRequest {
     @ApiModelProperty("账户所在商家，返回参数")
     private String accountMerCode;
     private String paymentScene;
+    private boolean notification = false;
 
     @ApiModelProperty("沃生活馆线上支付请求商品行数据,json格式 ["
         + "  {"
@@ -75,8 +76,9 @@ public abstract class PaymentRequest {
 
     /**
      * 是不是O2O或者ONLINE_SHOPPING
-     * @param machineNo
-     * @return
+     * @param machineNo 机器号（收银机）
+     * @param storeCode 门店号
+     * @return 消费场景
      */
     private String queryPaymentScene(String machineNo, String storeCode) {
         StoreConsumeTypeDao storeConsumeTypeDao = SpringBeanUtils.getBean(StoreConsumeTypeDao.class);

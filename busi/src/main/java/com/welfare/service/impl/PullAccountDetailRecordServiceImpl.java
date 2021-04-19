@@ -1,10 +1,9 @@
 package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.constants.WelfareSettleConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DateUtil;
 import com.welfare.persist.dao.MerchantBillDetailDao;
@@ -16,12 +15,9 @@ import com.welfare.persist.entity.PullAccountDetailRecord;
 import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.mapper.PullAccountDetailRecordMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
-import com.welfare.service.MerchantBillDetailService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.PullAccountDetailRecordService;
 import com.welfare.service.SettleDetailService;
-import com.welfare.service.operator.merchant.RebateLimitOperator;
-import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -29,11 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.validation.BindException;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
@@ -98,7 +95,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
                 MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merCode);
                 if (!settleDetails.isEmpty()) {
                     params.put("minId", settleDetails.get(settleDetails.size() - 1).getId() + 1);
-                    List<MerchantBillDetail> merchantBillDetails = settleDetailService.calculateAndSetRebate(merchantCredit,settleDetails);
+                    List<MerchantBillDetail> merchantBillDetails = settleDetailService.rebateAndOrderNoCalculate(merchantCredit,settleDetails);
                     List<String> rebateTransNos = merchantBillDetails.stream().map(MerchantBillDetail::getTransNo).collect(Collectors.toList());
                     if(!CollectionUtils.isEmpty(merchantBillDetails)){
                         //返利需要幂等，先删除相关记录，再重新保存。
@@ -112,7 +109,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
                 }
             }catch (Exception e){
                 log.error("循环拉取账户细交易数据异常:{}", e);
-                throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "循环拉取账户细交易数据异常", null);
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "循环拉取账户细交易数据异常", null);
             }finally {
                 lock.unlock();
             }

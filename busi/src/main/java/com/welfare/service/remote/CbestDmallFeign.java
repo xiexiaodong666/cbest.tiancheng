@@ -1,14 +1,23 @@
 package com.welfare.service.remote;
 
 import com.welfare.common.annotation.ConditionalOnHavingProperty;
+import com.welfare.common.constants.FrameworkConstant;
+import com.welfare.service.dto.messagepushconfig.WarningSettingSaveReq;
+import com.welfare.service.dto.offline.OfflineOrderAccountSummaryDTO;
+import com.welfare.service.dto.offline.OfflineOrderDTO;
+import com.welfare.service.dto.offline.OfflineOrderExportReq;
+import com.welfare.service.dto.offline.OfflineOrderHangupSummaryDTO;
 import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.pos.*;
 import com.welfare.service.remote.fallback.CbestDmallFeignFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +30,7 @@ import java.util.Map;
 @ConditionalOnHavingProperty("cbest.dmall.url")
 public interface CbestDmallFeign {
 
-  String SUCCESS_CODE = "0000";
+  Integer SUCCESS_CODE = 200;
 
   /**
    * 分页查询价格模板
@@ -70,4 +79,47 @@ public interface CbestDmallFeign {
    */
   @PostMapping("/orangeapi/manage/terminal/price-template/modify")
   DmallResponse<PosTerminalPriceTemplateResp> modifyTerminalPriceTemplate(@RequestBody TerminalPriceTemplateUpdateReq req);
+
+  /**
+   * 分页查询离线订单
+   * @param req
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/list")
+  DmallResponse<PagingResult<OfflineOrderDTO>> listOfflineTrade(@RequestBody OfflineTradeReq req);
+
+  /**
+   * 导出查询离线订单
+   * @param req
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/download")
+  DmallResponse<Object> exportOfflineTrade(@RequestBody OfflineTradeReq req);
+
+  /**
+   * 查询当前挂起的离线订单的汇总数据
+   * @param merCode
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/hangup/summary")
+  DmallResponse<OfflineOrderHangupSummaryDTO> summaryHangupOfflineTrade(Map<String, String> merCode);
+
+  /**
+   * 汇总查询员工的离线订单
+   * @param merCode
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/account/summary")
+  DmallResponse<List<OfflineOrderAccountSummaryDTO>> summaryAccountOfflineTrade(Map<String, String> merCode);
+
+  /**
+   * 保存短信通知设置
+   * @param req
+   * @return
+   */
+  @PostMapping("/orangeapi/manage/offline-trade/warning-setting/save")
+  DmallResponse<Object> saveWarningSetting(@RequestBody WarningSettingSaveReq req,
+                                           @RequestHeader(name = FrameworkConstant.USER_ID) String userId,
+                                           @RequestHeader(name = FrameworkConstant.USER_NAME) String userName,
+                                           @RequestHeader(name = FrameworkConstant.TIMETAMP) String timestamp);
 }

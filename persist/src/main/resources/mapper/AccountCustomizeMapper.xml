@@ -386,34 +386,85 @@
   </select>
 
   <select id="queryBill" resultType="com.welfare.persist.dto.AccountBillMapperDTO">
-    SELECT
-    abd.account_code AS accountCode,
-    SUM(
-    CASE
-
-    WHEN abd.trans_type = 'deposit_incr' THEN
-    trans_amount
-    WHEN abd.trans_type = 'consume' THEN
-    trans_amount  * ( - 1 )
-    WHEN abd.trans_type = 'refund' THEN
-    trans_amount
-    WHEN abd.trans_type = 'deposit_back' THEN
-    trans_amount * ( - 1 )
-    END
-    ) AS accountTotalAmount,
-    COUNT( abd.id ) AS tradeNum,
-    a.account_balance AS accountBalance
-    FROM
-    account_bill_detail abd
-    LEFT JOIN account a ON a.account_code = abd.account_code
-    WHERE abd.trans_type in('deposit_incr','consume','refund','deposit_back') and
-    abd.account_code = #{accountCode}
+    select count(*) as tradeNum,
+           #{accountCode} as accountCode,
+           (select account_balance from account where account_code = #{accountCode}) as accountBalance,
+           sum(groupedResult.transAmount) as accountTotalAmount
+    from
+         (SELECT
+            abd.trans_no,
+            CASE abd.trans_type
+            WHEN 'deposit_incr' THEN
+            m.mer_name
+            ELSE
+            ss.store_name
+            END AS storeName,
+            abd.trans_type AS transType,
+            CASE
+            WHEN abd.trans_type = 'deposit_incr' THEN
+            "入账"
+            WHEN abd.trans_type = 'consume' THEN
+            "出账"
+            WHEN abd.trans_type = 'refund' THEN
+            "入账"
+            WHEN abd.trans_type = 'deposit_back' THEN
+            "出账"
+            END AS transTypeString,
+            sum(
+            DISTINCT (
+            CASE
+            WHEN abd.trans_type = 'deposit_incr' THEN
+            abd.trans_amount
+            WHEN abd.trans_type = 'consume' THEN
+            abd.trans_amount * (- 1)
+            WHEN abd.trans_type = 'refund' THEN
+            abd.trans_amount
+            WHEN abd.trans_type = 'deposit_back' THEN
+            abd.trans_amount * (- 1)
+            END
+            )
+            ) AS transAmount,
+            abd.create_time AS createTime,
+            (
+            SELECT
+            abdTemp.account_balance
+            FROM
+            account_bill_detail abdTemp
+            WHERE
+            id = (
+            SELECT
+            max(id)
+            FROM
+            account_bill_detail abd2
+            WHERE
+            abd2.trans_no = abd.trans_no
+            )) AS accountBalance,
+            GROUP_CONCAT(
+            DISTINCT (mat.mer_account_type_name)
+            ) AS accountTypeName
+            FROM
+            account_bill_detail abd
+            LEFT JOIN account a ON a.account_code = abd.account_code
+            LEFT JOIN merchant m ON m.mer_code = a.mer_code
+            LEFT JOIN merchant_account_type mat ON m.mer_code = mat.mer_code
+            LEFT JOIN account_deduction_detail addetail ON abd.trans_no = addetail.trans_no
+            LEFT JOIN supplier_store ss ON addetail.store_code = ss.store_code
+            WHERE
+            abd.trans_type IN (
+            'deposit_incr',
+            'consume',
+            'refund',
+            'deposit_back'
+            )
+            AND addetail.mer_account_type = mat.mer_account_type_code and abd.account_code = #{accountCode}
     <if test="createTimeStart != null ">
       and abd.create_time <![CDATA[>=]]> #{createTimeStart}
     </if>
     <if test="createTimeEnd != null ">
       and abd.create_time <![CDATA[<=]]> #{createTimeEnd}
     </if>
+    GROUP BY
+    abd.trans_no) groupedResult
   </select>
 
   <select id="queryIncrementDTO" resultType="com.welfare.persist.dto.AccountIncrementDTO">
@@ -425,15 +476,17 @@
 
              WHEN (
                  a.deleted = 0
-                 AND AT.deleted = 0
-                 AND acs.deleted = 0
                  AND a.account_status = 1
-                 AND acs.`status` = 1
-                 AND locate(relation.scene_consum_type, #{consumeType}) > 0
+                 AND AT.deleted = 0
+                 AND locate( '0',GROUP_CONCAT( acs.deleted ) ) > 0
+                 AND locate( '1', GROUP_CONCAT( acs.`status` ) ) > 0
+                 AND locate( 'SHOP_CONSUMPTION' ,GROUP_CONCAT( if(relation.deleted=0,relation.scene_consum_type,'') )) > 0
                ) THEN
                TRUE
              ELSE FALSE
-             END                            AS canUse
+             END                            AS canUse,
+           CASE WHEN (a.offline_lock = NULL or a.offline_lock = 0) THEN FALSE
+                ELSE TRUE END AS offlineCanUse
     FROM account a
            LEFT JOIN account_type AT
     ON AT.type_code = a.account_type_code and a.mer_code = at.mer_code

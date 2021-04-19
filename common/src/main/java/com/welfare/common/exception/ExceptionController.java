@@ -32,8 +32,18 @@ public class ExceptionController implements IController {
             logger.error("参数解析异常：", ex);
             return fail(SystemCode.PARAM_BIND_ERROR,ex.getMessage());
         }
-
         logger.error("业务异常： 请求路径：{}， 业务参数：{}, 异常：", reqURL, params, e);
-        return fail(SystemCode.FAILURE,e.getMessage());
+
+        if(e instanceof BizException){
+            return fail(((BizException) e).getCodeEnum(),e.getMessage());
+        } else if(e instanceof DmallException){
+            R result = new R();
+            result.setCode(((DmallException) e).getCode());
+            result.setMsg(e.getMessage());
+            return result;
+        } else{
+            return fail(SystemCode.FAILURE,e.getMessage());
+        }
+
     }
 }

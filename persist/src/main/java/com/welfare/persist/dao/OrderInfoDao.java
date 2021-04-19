@@ -1,5 +1,6 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.welfare.persist.entity.OrderInfo;
 import com.welfare.persist.mapper.OrderInfoMapper;
@@ -16,5 +17,28 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class OrderInfoDao extends ServiceImpl<OrderInfoMapper, OrderInfo> {
+    /**
+     * 根据交易单号获取一条订单
+     * @param transNo
+     * @return
+     */
+    public OrderInfo getOneByTransNo(String transNo){
+        return getOne(
+                Wrappers.<OrderInfo>lambdaQuery()
+                        .eq(OrderInfo::getTransNo,transNo)
+                        .last("limit 1")
+        );
+    }
 
+    public OrderInfo getOneByOrderNo(String orderNo, String transType){
+        return getOne(
+                Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getOrderId,orderNo).eq(OrderInfo::getTransType,transType).last("limit 1")
+        );
+    }
+
+    public OrderInfo getOneByTradeNo(String orderNo, String transType){
+        return getOne(
+                Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getOrderId,orderNo).eq(OrderInfo::getTransType,transType).last("limit 1")
+        );
+    }
 }

@@ -7,7 +7,7 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.DepartmentDao;
 import com.welfare.persist.dto.AccountSyncDTO;
@@ -23,14 +23,14 @@ import com.welfare.service.remote.entity.EmployerReqDTO;
 import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author yaoxiao
@@ -111,7 +111,7 @@ public class AccountHandler {
     log.info("同步员工账户，resp【{}】req【{}】", JSON.toJSONString(roleConsumptionResp), JSON.toJSONString(employerReqDTO));
 
     if (!("0000").equals(roleConsumptionResp.getCode())) {
-      throw new BusiException("同步员工账户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
+      throw new BizException("同步员工账户数据到商城中心失败msg【" + roleConsumptionResp.getMsg() + "】");
     }
 
   }

@@ -7,8 +7,7 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
-import com.welfare.common.util.ConsumeTypesUtils;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.service.dto.MerchantAddressDTO;
 import com.welfare.service.dto.StoreConsumeTypeDTO;
@@ -18,14 +17,15 @@ import com.welfare.service.remote.entity.RoleConsumptionResp;
 import com.welfare.service.remote.entity.StoreShoppingReq;
 import com.welfare.service.remote.entity.StoreShoppingReq.ListBean.ConsumeSettingsBean;
 import com.welfare.service.sync.event.SupplierStoreEvt;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.killbill.bus.api.PersistentBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -77,7 +77,7 @@ public class SupplierStoreHandler {
                 consumeTypeMap = mapper.readValue(
                         supplierStoreDetailDTO.getConsumType(), Map.class);
             } catch (JsonProcessingException e) {
-                throw new BusiException("同步门店信息到商城中心，消费类型转换失败【"+supplierStoreDetailDTO.getConsumType()+"】");
+                throw new BizException("同步门店信息到商城中心，消费类型转换失败【"+supplierStoreDetailDTO.getConsumType()+"】");
             }
             if(consumeTypeMap!= null && consumeTypeMap.get(ConsumeTypeEnum.SHOP_SHOPPING.getCode())) {
                 ConsumeSettingsBean consumeSettingsBean = new ConsumeSettingsBean();
@@ -125,7 +125,7 @@ public class SupplierStoreHandler {
         RoleConsumptionResp resp = shoppingFeignClient.addOrUpdateStore(storeShoppingReq);
         log.info("同步门店到商城中台，res【{}】req【{}】", JSON.toJSONString(resp), JSON.toJSONString(storeShoppingReq));
         if (!("0000").equals(resp.getCode())) {
-            throw new BusiException("同步门店数据到商城中心失败msg【"+resp.getMsg()+"】");
+            throw new BizException("同步门店数据到商城中心失败msg【"+resp.getMsg()+"】");
         }
     }
 }

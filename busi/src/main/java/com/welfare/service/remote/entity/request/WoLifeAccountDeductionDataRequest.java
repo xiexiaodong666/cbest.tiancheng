@@ -4,17 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
-import com.welfare.common.exception.BusiException;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
+import com.welfare.common.exception.BizException;
 import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 import org.apache.logging.log4j.util.Strings;
+
 
 /**
  * @author gaorui
@@ -62,7 +63,7 @@ public class WoLifeAccountDeductionDataRequest {
         woLifeAccountDeductionDataRequest.setRows(rows);
         woLifeAccountDeductionDataRequest.setTotalCount(rows.size());
       } catch (JsonProcessingException e) {
-        throw new BusiException("[沃生活馆]支付异常:线上支付商品行参数转换错误" + saleRows);
+        throw new BizException("[沃生活馆]支付异常:线上支付商品行参数转换错误" + saleRows);
       }
 
     } else {

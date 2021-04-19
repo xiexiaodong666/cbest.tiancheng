@@ -7,6 +7,7 @@ import com.welfare.persist.entity.CardInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
@@ -18,6 +19,7 @@ import java.util.Objects;
  * @email yuxiang.li@sjgo365.com
  * @date 1/11/2021
  */
+@EqualsAndHashCode(callSuper = true)
 @ApiModel("刷卡支付请求")
 @Data
 public class CardPaymentRequest extends PaymentRequest {

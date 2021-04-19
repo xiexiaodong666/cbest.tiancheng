@@ -2,7 +2,7 @@ package com.welfare.service.operator.merchant;
 
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.enums.IncOrDecType;
@@ -71,7 +71,7 @@ public class RemainingLimitOperator extends AbstractMerAccountTypeOperator imple
     protected List<MerchantAccountOperation> doWhenMoreThan(MerchantCredit merchantCredit, BigDecimal amountLeftToBeIncrease, String transNo, String transType) {
         AbstractMerAccountTypeOperator nextOperator = getNext();
         if (Objects.isNull(nextOperator)) {
-            throw new BusiException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
+            throw new BizException(ExceptionCode.MERCHANT_RECHARGE_LIMIT_EXCEED, "超过余额限度", null);
         }
         List<MerchantAccountOperation> operations = new ArrayList<>();
         BigDecimal creditLimit = merchantCredit.getCreditLimit();

@@ -1,7 +1,6 @@
 package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
@@ -9,10 +8,13 @@ import com.github.pagehelper.PageInfo;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.AccountUtil;
 import com.welfare.persist.dao.*;
+import com.welfare.persist.dao.MerchantDao;
+import com.welfare.persist.dao.MerchantStoreRelationDao;
+import com.welfare.persist.dao.SettleDetailDao;
+import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerTransDetailQuery;
 import com.welfare.persist.dto.query.ProprietaryConsumePageQuery;
@@ -24,15 +26,14 @@ import com.welfare.persist.mapper.MerchantCreditMapper;
 import com.welfare.persist.mapper.MonthSettleMapper;
 import com.welfare.persist.mapper.SettleDetailMapper;
 import com.welfare.service.MerchantAccountTypeService;
-import com.welfare.service.MerchantService;
 import com.welfare.service.MerchantStoreRelationService;
 import com.welfare.service.SettleDetailService;
 import com.welfare.service.dto.*;
 import com.welfare.service.dto.proprietary.ProprietaryConsumePageReq;
 import com.welfare.service.operator.merchant.RebateLimitOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
-import com.welfare.service.utils.PageReq;
 import com.welfare.service.utils.PageUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +59,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Autowired
@@ -92,6 +94,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
 
     @Autowired
     private PaymentChannelDao paymentChannelDao;
+    private final OrderInfoDao orderInfoDao;
 
     @Override
     public WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery){
@@ -160,7 +163,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         String merCode = welfareSettleDetailPageReq.getMerCode();
 
         if(StringUtils.isBlank(merCode)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
         }
 
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
@@ -205,11 +208,11 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
         MonthSettle monthSettle = settleDetailMapper.getSettleByCondition(welfareSettleDetailQuery);
         if(Objects.isNull(monthSettle)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "构选的消费明细正在结算中或结算已完成。", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "构选的消费明细正在结算中或结算已完成。", null);
         }
         monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
         if(monthSettle.getSettleAmount().compareTo(new BigDecimal(0)) < 0){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "结算金额为负，无法生成结算单", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "结算金额为负，无法生成结算单", null);
         }
 
         List<SettleStatisticsInfoDTO> settleStatisticsInfoDTOList = settleDetailMapper.getSettleStatisticsInfoByCondition(welfareSettleDetailQuery);
@@ -295,11 +298,14 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         //修改数据
     }
 
-    private SettleDetail calculateAndSetRebate(SettleDetail settleDetail) {
+    private SettleDetail rebateAndOrderNoCalculate(SettleDetail settleDetail) {
         String storeCode = settleDetail.getStoreCode();
         String merCode = settleDetail.getMerCode();
         MerchantStoreRelation relation = merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(storeCode, merCode);
-
+        OrderInfo orderInfo = orderInfoDao.getOneByTransNo(settleDetail.getTransNo());
+        if(Objects.nonNull(orderInfo)){
+            settleDetail.setOrderId(orderInfo.getOrderId());
+        }
         // jian.zhou 2021-01-24
         // 处理未配置的商户和门店的情况
         if (relation == null){
@@ -344,10 +350,10 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     }
 
     @Override
-    public List<MerchantBillDetail> calculateAndSetRebate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails) {
+    public List<MerchantBillDetail> rebateAndOrderNoCalculate(MerchantCredit merchantCredit, List<SettleDetail> settleDetails) {
         return settleDetails.stream().sorted(Comparator.comparing(SettleDetail::getTransTime))
                 .map(detail -> {
-                    SettleDetail settleDetail = calculateAndSetRebate(detail);
+                    SettleDetail settleDetail = rebateAndOrderNoCalculate(detail);
                     if (Objects.isNull(detail.getRebateAmount()) || detail.getRebateAmount().equals(BigDecimal.ZERO)) {
                         //计算返利后，需要返利为0
                         return null;
@@ -367,7 +373,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
                                 WelfareConstant.TransType.REBATE_DECR.code()
                         );
                     } else{
-                        throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS,"计算返利时，数据异常",null);
+                        throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"计算返利时，数据异常",null);
                     }
                 }).filter(operations -> !Objects.isNull(operations))
                 .flatMap(Collection::stream)
@@ -379,7 +385,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     public Page<ProprietaryConsumeResp> queryProprietaryConsumePage(ProprietaryConsumePageReq welfareSettleDetailPageReq) {
         String merCode = welfareSettleDetailPageReq.getMerCode();
         if(StringUtils.isBlank(merCode)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
         }
         ProprietaryConsumePageQuery proprietaryConsumePageQuery = new ProprietaryConsumePageQuery();
         BeanUtils.copyProperties(welfareSettleDetailPageReq, proprietaryConsumePageQuery);
@@ -405,7 +411,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     public List<ProprietaryConsumeResp> queryProprietaryConsume(ProprietaryConsumePageReq welfareSettleDetailPageReq) {
         String merCode = welfareSettleDetailPageReq.getMerCode();
         if(StringUtils.isBlank(merCode)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
         }
         ProprietaryConsumePageQuery proprietaryConsumePageQuery = new ProprietaryConsumePageQuery();
         BeanUtils.copyProperties(welfareSettleDetailPageReq, proprietaryConsumePageQuery);
@@ -429,7 +435,7 @@ public class SettleDetailServiceImpl implements SettleDetailService {
     public List<WelfareTypeTotalAmountResp> statisticalAmountGroupByWelfareTypeCode(ProprietaryConsumePageReq welfareSettleDetailPageReq) {
         String merCode = welfareSettleDetailPageReq.getMerCode();
         if(StringUtils.isBlank(merCode)){
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编号不能为空", null);
         }
         ProprietaryConsumePageQuery proprietaryConsumePageQuery = new ProprietaryConsumePageQuery();
         BeanUtils.copyProperties(welfareSettleDetailPageReq, proprietaryConsumePageQuery);

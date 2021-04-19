@@ -16,10 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DmallResponse <T> {
 
-  /**
-   * 成功：0000
-   */
-  private String code;
+  private Integer code;
 
   /**
    * 成功

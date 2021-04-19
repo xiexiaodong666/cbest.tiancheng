@@ -5,7 +5,6 @@ import com.welfare.service.dto.AccountRestoreCreditLimitReq;
 import com.welfare.service.remote.config.FeignConfiguration;
 import com.welfare.service.remote.entity.WelfareResp;
 import com.welfare.service.remote.fallback.AccountCreditFeignFallback;
-import com.welfare.service.remote.fallback.MerchantCreditFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;

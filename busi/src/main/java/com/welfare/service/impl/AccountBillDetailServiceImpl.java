@@ -2,7 +2,6 @@ package com.welfare.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.Channel;
 import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.persist.dao.AccountBillDetailDao;
@@ -15,19 +14,17 @@ import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountBillDetailService;
-import com.welfare.service.AccountService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.dto.Deposit;
-import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 用户流水明细服务接口实现
@@ -65,20 +62,10 @@ public class AccountBillDetailServiceImpl implements AccountBillDetailService {
                 e -> e));
 
     @Override
-    public void saveNewAccountBillDetail(Deposit deposit, AccountAmountType accountAmountType,
-        Account account) {
-        AccountBillDetail accountBillDetail = new AccountBillDetail();
-        Long accountCode = deposit.getAccountCode();
-        BigDecimal amount = deposit.getAmount();
-        accountBillDetail.setAccountCode(accountCode);
-        accountBillDetail.setAccountBalance(account.getAccountBalance());
-        accountBillDetail.setChannel(deposit.getChannel());
-        accountBillDetail.setTransNo(deposit.getTransNo());
-        accountBillDetail.setTransAmount(amount);
-        accountBillDetail.setTransTime(Calendar.getInstance().getTime());
-        accountBillDetail.setSurplusQuota(account.getSurplusQuota());
-        accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
-        accountBillDetail.setTransType(TransType.DEPOSIT_INCR.code());
+    public void saveNewAccountBillDetail(Deposit deposit,
+                                         AccountAmountType accountAmountType,
+                                         Account account) {
+        AccountBillDetail accountBillDetail = Deposit.assemblyAccountBillDetail(deposit, accountAmountType, account);
         accountBillDetailDao.save(accountBillDetail);
     }
 

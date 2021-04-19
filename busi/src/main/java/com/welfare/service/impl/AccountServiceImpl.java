@@ -2,38 +2,25 @@ package com.welfare.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.google.common.collect.Lists;
-import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.enums.FileUniversalStorageEnum;
-import com.welfare.service.converter.DepartmentAndAccountTreeConverter;
-import com.welfare.service.dto.UploadImgErrorMsgDTO;
-import com.welfare.service.enums.AccountBalanceType;
-import com.welfare.service.enums.AccountBalanceType.Welfare;
-import com.welfare.service.enums.AccountBalanceType.WoLife;
-import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
-import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
-import com.welfare.service.remote.service.WoLifeFeignService;
-import java.util.Date;
-
-
-import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
-
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.AccountStatus;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.constants.WelfareConstant.TransType;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.FileUniversalStorageEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.AccountUtil;
 import com.welfare.common.util.DistributedLockUtil;
@@ -50,13 +37,28 @@ import com.welfare.persist.mapper.AccountDeductionDetailMapper;
 import com.welfare.persist.mapper.AccountMapper;
 import com.welfare.service.*;
 import com.welfare.service.converter.AccountConverter;
+import com.welfare.service.converter.DepartmentAndAccountTreeConverter;
 import com.welfare.service.dto.*;
+import com.welfare.service.enums.AccountBalanceType;
+import com.welfare.service.enums.AccountBalanceType.Welfare;
+import com.welfare.service.enums.AccountBalanceType.WoLife;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.remote.ShoppingFeignClient;
+import com.welfare.service.remote.entity.AlipayUserAgreementPageSignReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementPageSignResp;
+import com.welfare.service.remote.entity.AlipayUserAgreementSignReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementSignResp;
+import com.welfare.service.remote.entity.AlipayUserAgreementUnsignReq;
+import com.welfare.service.remote.entity.AlipayUserAgreementUnsignResp;
+import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
+import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
+import com.welfare.service.remote.service.CbestPayService;
+import com.welfare.service.remote.service.WoLifeFeignService;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +79,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
 
 /**
  * 账户信息服务接口实现
@@ -140,9 +150,13 @@ public class AccountServiceImpl implements AccountService {
                 e -> e));
 
     private final WoLifeFeignService woLifeFeignService;
-
+    private final DepartmentDao departmentDao;
+    private final MerchantDao merchantDao;
+    private final AccountTypeDao accountTypeDao;
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
+
+    private final CbestPayService cbestPayService;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -208,10 +222,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String uploadAccount(MultipartFile multipartFile) {
+    public String uploadAccount(MultipartFile multipartFile) throws IOException {
         try {
             AccountUploadListener listener = new AccountUploadListener(accountTypeService, this,
-                merchantService, departmentService, sequenceService);
+                merchantService, departmentService, sequenceService, accountTypeDao, departmentDao, accountDao);
             EasyExcel.read(multipartFile.getInputStream(), AccountUploadDTO.class, listener).sheet()
                 .doRead();
             String result = listener.getUploadInfo().toString();
@@ -219,8 +233,8 @@ public class AccountServiceImpl implements AccountService {
             return result;
         } catch (Exception e) {
             log.info("批量新增员工解析 Excel exception:{}", e.getMessage());
+            throw e;
         }
-        return "解析失败";
     }
 
     @Override
@@ -258,7 +272,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean delete(Long id) {
         Account syncAccount = accountMapper.selectById(id);
         if (null == syncAccount) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         boolean result = accountDao.removeById(id);
         subAccountDao.deleteAccountCode(syncAccount.getAccountCode());
@@ -274,7 +288,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean active(Long id, Integer accountStatus) {
         Account syncAccount = accountMapper.selectById(id);
         if (null == syncAccount) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         Account account = new Account();
         account.setId(id);
@@ -311,7 +325,7 @@ public class AccountServiceImpl implements AccountService {
             .queryDetailByParam(accountDetailParam.getId(), accountDetailParam.getAccountCode(),
                 accountDetailParam.getPhone(), accountDetailParam.getMerCode());
         if (null == accountDetailMapperDTO) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该员工账号不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该员工账号不存在", null);
         }
         AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
         BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
@@ -465,7 +479,7 @@ public class AccountServiceImpl implements AccountService {
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
         PaymentChannelReq req =new PaymentChannelReq();
-        req.setFiltered(true);
+        req.setFiltered(false);
         req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
         List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
         boolean result2 = subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
@@ -503,7 +517,7 @@ public class AccountServiceImpl implements AccountService {
             merCode,
             merAccountTypeCode);
         if (null == merchantAccountType) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无授信额度福利类型", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无授信额度福利类型", null);
         }
         AccountAmountType accountAmountType = new AccountAmountType();
         accountAmountType.setAccountCode(accountCode);
@@ -517,31 +531,31 @@ public class AccountServiceImpl implements AccountService {
     private void validationAccount(Account account, Boolean isNew) {
         Merchant merchant = merchantService.detailByMerCode(account.getMerCode());
         if (null == merchant) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
         }
         AccountType accountType = accountTypeService
             .queryByTypeCode(account.getMerCode(), account.getAccountTypeCode());
         if (null == accountType) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在", null);
         }
         Department department = departmentService.getByDepartmentCode(account.getDepartment());
         if (null == department) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
         }
         if (isNew) {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
             if (null != queryAccount) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
             }
         } else {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
             if (queryAccount != null && queryAccount.getId().longValue() != account.getId()
                 .longValue()) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经有其他员工绑定了该手机", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经有其他员工绑定了该手机", null);
             }
             Account syncAccount = accountMapper.selectById(account.getId());
             if (null == syncAccount) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
             }
         }
     }
@@ -551,7 +565,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean batchSave(List<Account> accountList) {
         PaymentChannelReq req = new PaymentChannelReq();
         req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
-        req.setFiltered(true);
+        req.setFiltered(false);
         List<PaymentChannelDTO> paymentChannelDTOS = paymentChannelService.list(req);
         return accountDao.saveBatch(accountList)
                 && subAccountDao.saveBatch(AccountUtils.assemableSubAccount(accountList, paymentChannelDTOS));
@@ -642,7 +656,7 @@ public class AccountServiceImpl implements AccountService {
             } else {
                 //判断剩余授信额度  如果是增加,那么额度就是
                 if (surplusQuota.compareTo(oldMaxQuota.subtract(newMaxQuota)) < 0) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
                 }
                 //修改了额度
                 int incrAccountResult = accountCustomizeMapper
@@ -653,13 +667,13 @@ public class AccountServiceImpl implements AccountService {
                     newMaxQuota.subtract(oldMaxQuota),
                     updateUser);//先判断有没有记录 如果没有插入 如果有减少
                 if (incrAccountResult <= 0 || incrAmountResult <= 0) {
-                    throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
                 }
             }
         } else {
             //关闭授信额度,账户以及账户金额类型表变0
             if (oldMaxQuota.compareTo(surplusQuota) != 0) {
-                throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "授信额度已使用 无法关闭", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "授信额度已使用 无法关闭", null);
             }
             accountAmountTypeMapper
                 .updateBalance(accountCode, MerAccountTypeCode.SURPLUS_QUOTA.code(),
@@ -881,11 +895,27 @@ public class AccountServiceImpl implements AccountService {
             channelList = paymentChannelDao.listByDefaultGroupByCode();
         }
 
+        List<String> paymentChannelCodeList = channelList.stream().map(PaymentChannel::getCode)
+            .collect(Collectors.toList());
+
+        List<SubAccount> subAccountList = subAccountDao.getBaseMapper().selectList(
+            Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
+                .in(SubAccount::getSubAccountType, paymentChannelCodeList));
+        final Map<String, String> subAccountMap = new HashMap<>();
+        if(CollectionUtil.isNotEmpty(subAccountList)) {
+            for (SubAccount subAccount : subAccountList) {
+                subAccountMap.put(subAccount.getSubAccountType(), subAccount.getPasswordFreeSignature());
+            }
+        }
+
         List<AccountPaymentChannelDTO> paymentChannelList = channelList.stream()
             .map(paymentChannel -> {
+                String code = paymentChannel.getCode();
                 AccountPaymentChannelDTO accountPaymentChannelDTO = new AccountPaymentChannelDTO();
                 accountPaymentChannelDTO.setPaymentChannel(paymentChannel.getCode());
                 accountPaymentChannelDTO.setPaymentChannelDesc(paymentChannel.getName());
+                String passwordFreeSignature = subAccountMap.get(code);
+                accountPaymentChannelDTO.setPasswordFree(passwordFreeSignature != null);
                 return accountPaymentChannelDTO;
             }).collect(Collectors.toList());
         return paymentChannelList;
@@ -939,17 +969,17 @@ public class AccountServiceImpl implements AccountService {
     public boolean bindingCard(String accountCode, String cardId) {
         Account account = this.getByAccountCode(Long.parseLong(accountCode));
         if (null == account) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
         }
         CardInfo cardInfo = cardInfoService.getByCardNo(cardId);
         if (null == cardInfo) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号不存在", null);
         }
         if (cardInfoService.cardIsBind(cardId)) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
         }
         if (cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue()) {
-            throw new BusiException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请确认该卡片状态", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请确认该卡片状态", null);
         }
         //绑定创建卡号信息
         cardInfo.setAccountCode(account.getAccountCode());
@@ -1034,7 +1064,7 @@ public class AccountServiceImpl implements AccountService {
             case BARCODE:
                 BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
                 accountCode = barcodeService
-                    .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
+                    .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true, false);
                 break;
             default:
                 break;
@@ -1068,7 +1098,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDO queryByQueryInfo(String queryInfo, String queryType) {
+    public AccountDO queryByQueryInfo(String queryInfo, String queryType,Date transDate) {
         Long accountCode = null;
         if (WelfareConstant.ConsumeQueryType.CARD.code().equals(queryType)) {
             CardInfoDao cardInfoDao = SpringBeanUtils.getBean(CardInfoDao.class);
@@ -1080,10 +1110,14 @@ public class AccountServiceImpl implements AccountService {
         } else if (WelfareConstant.ConsumeQueryType.BARCODE.code().equals(queryType)) {
             BarcodeService barcodeService = SpringBeanUtils.getBean(BarcodeService.class);
             accountCode = barcodeService
-                .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true);
+                .parseAccountFromBarcode(queryInfo, Calendar.getInstance().getTime(), true, false);
         }
         Assert.notNull(accountCode, "根据条件没有解析出账号");
-        return AccountDO.of(this.getByAccountCode(accountCode));
+        Account account = this.getByAccountCode(accountCode);
+        Assert.notNull(account,"找不到账号:"+accountCode);
+        Department department = departmentDao.queryByCode(account.getDepartment());
+        Merchant merchant = merchantDao.queryByCode(account.getMerCode());
+        return AccountDO.of(account, department, merchant);
     }
 
     @Override
@@ -1129,20 +1163,20 @@ public class AccountServiceImpl implements AccountService {
                     BigDecimal restoreAmount = restoreLimit.getRestoreAmount();
                     Account account = accountsMap.get(accountCode);
                     if (account == null) {
-                        throw new BusiException(String.format("员工不存在[%s]", accountCode));
+                        throw new BizException(String.format("员工不存在[%s]", accountCode));
                     }
                     AccountAmountType surplusQuota = surplusQuotaMap.get(accountCode);
                     if (Objects.isNull(surplusQuota)) {
-                        throw new BusiException(String.format("员工授信额度账户不存在[%s]", accountCode));
+                        throw new BizException(String.format("员工授信额度账户不存在[%s]", accountCode));
                     }
                     // 溢缴款账户
                     AccountAmountType surplusQuotaOverpay = surplusQuotaOverpayMap.get(accountCode);
                     if (Objects.isNull(surplusQuotaOverpay)) {
-                        throw new BusiException(String.format("员工溢缴款账户不存在[%s]", accountCode));
+                        throw new BizException(String.format("员工溢缴款账户不存在[%s]", accountCode));
                     }
                     if (surplusQuota.getAccountBalance().compareTo(account.getMaxQuota()) > 0
                         || account.getSurplusQuota().compareTo(account.getMaxQuota()) > 0) {
-                        throw new BusiException(
+                        throw new BizException(
                             String.format("数据异常，剩余授信额度超过最大额度[%s]", accountCode));
                     }
                     BigDecimal overAmount = surplusQuota.getAccountBalance().add(restoreAmount)
@@ -1253,7 +1287,7 @@ public class AccountServiceImpl implements AccountService {
                     flag2 = accountAmountTypeDao.updateBatchById(updatedAccountTypes);
                 }
                 if (!flag1 || !flag2) {
-                    throw new BusiException("操作繁忙，请稍后再试！");
+                    throw new BizException("操作繁忙，请稍后再试！");
                 }
             } finally {
                 DistributedLockUtil.unlock(multiLock);
@@ -1344,5 +1378,78 @@ public class AccountServiceImpl implements AccountService {
                 }
             });
         }
+    }
+
+    @Override
+    public AccountPasswordFreePageSignDTO passwordFreePageSign(Long accountCode, String paymentChannel) {
+        WelfareConstant.PaymentChannel paymentChannelEnum = PAYMENT_CHANNEL_MAP.get(paymentChannel);
+        String signPage;
+        switch (paymentChannelEnum) {
+            case ALIPAY:
+                Account account = getByAccountCode(accountCode);
+                AlipayUserAgreementPageSignReq req = new AlipayUserAgreementPageSignReq();
+                req.setExternalLogonId(String.valueOf(accountCode));
+                AlipayUserAgreementPageSignResp alipayUserAgreementPageSignResp = cbestPayService
+                    .alipayUserAgreementPageSign(req);
+                signPage = alipayUserAgreementPageSignResp.getSignPage();
+                break;
+            default:
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
+        }
+
+        AccountPasswordFreePageSignDTO accountPasswordFreePageSignDTO = new AccountPasswordFreePageSignDTO();
+        accountPasswordFreePageSignDTO.setSignPage(signPage);
+        return accountPasswordFreePageSignDTO;
+    }
+
+    @Override
+    public AccountPasswordFreeSignDTO passwordFreeSign(Long accountCode, String paymentChannel, String redirectUrl) {
+        WelfareConstant.PaymentChannel paymentChannelEnum = PAYMENT_CHANNEL_MAP.get(paymentChannel);
+        AccountPasswordFreeSignDTO accountPasswordFreeSignDTO = new AccountPasswordFreeSignDTO();
+        switch (paymentChannelEnum) {
+            case ALIPAY:
+                Account account = getByAccountCode(accountCode);
+                AlipayUserAgreementSignReq req = new AlipayUserAgreementSignReq();
+                req.setExternalLogonId(String.valueOf(accountCode));
+                if (!StringUtils.isEmpty(redirectUrl)) {
+                    req.setMerchantProcessUrl(redirectUrl);
+                }
+                AlipayUserAgreementSignResp alipayUserAgreementSignResp = cbestPayService
+                    .alipayUserAgreementSign(req);
+                String signParams = alipayUserAgreementSignResp.getSignParams();
+                String signUrl = alipayUserAgreementSignResp.getSignUrl();
+                accountPasswordFreeSignDTO.setSignUrl(signUrl);
+                accountPasswordFreeSignDTO.setSignParams(signParams);
+                break;
+            default:
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
+        }
+        return accountPasswordFreeSignDTO;
+    }
+
+    @Override
+    public AccountPasswordFreeSignDTO passwordFreeUnsign(Long accountCode, String paymentChannel) {
+        WelfareConstant.PaymentChannel paymentChannelEnum = PAYMENT_CHANNEL_MAP.get(paymentChannel);
+        AccountPasswordFreeSignDTO accountPasswordFreeSignDTO = new AccountPasswordFreeSignDTO();
+        switch (paymentChannelEnum) {
+            case ALIPAY:
+                Account account = getByAccountCode(accountCode);
+                AlipayUserAgreementUnsignReq req = new AlipayUserAgreementUnsignReq();
+                SubAccount subAccount = subAccountDao.getBaseMapper().selectOne(
+                    Wrappers.<SubAccount>lambdaQuery().eq(SubAccount::getAccountCode, accountCode)
+                        .eq(SubAccount::getSubAccountType,
+                            WelfareConstant.PaymentChannel.ALIPAY.code()));
+                req.setAgreementNo(subAccount.getPasswordFreeSignature());
+                AlipayUserAgreementUnsignResp alipayUserAgreementUnsignResp = cbestPayService
+                    .alipayUserAgreementUnsign(req);
+                String signParams = alipayUserAgreementUnsignResp.getSignParams();
+                String signUrl = alipayUserAgreementUnsignResp.getSignUrl();
+                accountPasswordFreeSignDTO.setSignUrl(signUrl);
+                accountPasswordFreeSignDTO.setSignParams(signParams);
+                break;
+            default:
+                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密解约", null);
+        }
+        return accountPasswordFreeSignDTO;
     }
 }

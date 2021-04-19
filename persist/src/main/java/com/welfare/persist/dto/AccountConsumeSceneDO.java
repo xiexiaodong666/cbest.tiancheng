@@ -1,7 +1,6 @@
 package com.welfare.persist.dto;
 
 import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

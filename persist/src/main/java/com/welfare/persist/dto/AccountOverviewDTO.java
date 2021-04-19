@@ -2,8 +2,9 @@ package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @ApiModel("员工卡首页账号概览信息")

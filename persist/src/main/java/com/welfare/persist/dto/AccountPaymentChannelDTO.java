@@ -13,4 +13,7 @@ public class AccountPaymentChannelDTO {
 
     @ApiModelProperty("账号支付渠道名称")
     private String paymentChannelDesc;
+
+    @ApiModelProperty("是否免密")
+    private Boolean passwordFree;
 }

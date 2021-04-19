@@ -37,10 +37,8 @@ logging:
     path: D:/home/finance/Logs/e-welfare-merchant.e-cbest.lotest
   level:
     root: info
-    com:
-      welfare:
-        service:
-          remote: debug
+    com.welfare.service.remote: debug
+    com.welfare.persist.mapper: debug
 encrypt:
   file: ${config.file:classpath:config/config.properties}
 

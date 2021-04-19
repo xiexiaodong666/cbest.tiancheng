@@ -165,9 +165,12 @@ public class CardInfoServiceImpl implements CardInfoService {
     @Override
     public CardInfo unbind(String cardNo) {
         CardInfo cardInfo = cardInfoDao.getOneByCardId(cardNo);
+        cardInfoDao.update(Wrappers.<CardInfo>lambdaUpdate()
+                .eq(CardInfo::getId,cardInfo.getId())
+                .set(CardInfo::getAccountCode,null)
+                .set(CardInfo::getEnabled,EnableEnum.DISABLE.getCode()));
         cardInfo.setAccountCode(null);
         cardInfo.setEnabled(EnableEnum.DISABLE.getCode());
-        cardInfoDao.updateAllColumnById(cardInfo);
         return cardInfo;
     }
 }

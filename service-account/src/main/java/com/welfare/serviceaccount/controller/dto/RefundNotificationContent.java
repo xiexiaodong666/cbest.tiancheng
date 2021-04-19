@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.welfare.service.dto.RefundRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -52,7 +53,8 @@ public class RefundNotificationContent implements Serializable {
         refundRequest.setRequestId(UUID.randomUUID().toString());
         refundRequest.setRefundDate(Calendar.getInstance().getTime());
         refundRequest.setOriginalTransNo(gatewayTradeNo);
-        refundRequest.setTransNo(outRefundNo);
+        //冲正场景，交易单号为空，特殊处理下
+        refundRequest.setTransNo(StringUtils.isEmpty(outRefundNo) ? gatewayTradeNo + "R1" : outRefundNo);
         refundRequest.setAmount(amount.divide(BigDecimal.valueOf(100),2, RoundingMode.HALF_UP));
         return refundRequest;
     }

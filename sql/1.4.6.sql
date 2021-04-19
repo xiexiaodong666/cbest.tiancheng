@@ -24,27 +24,31 @@ update third_party_payment_request t set t.payment_request_type = 'wo_life';
 
 # 初始化甜橙卡商户场景配置支付渠道
 INSERT INTO `payment_channel_config`(`id`, `mer_code`, `store_code`, `consume_type`, `payment_channel_code`, `payment_channel_name`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
-SELECT msr.id - 1000000000000000000,msr.mer_code,msr.store_code,'O2O','welfare', '甜橙卡', 'anonymous', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.O2O' = true and deleted = 0;
+SELECT msr.id - 100000000000000000,msr.mer_code,msr.store_code,'O2O','welfare', '甜橙卡', 'duanhy', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.O2O' = true and deleted = 0;
 
 INSERT INTO `payment_channel_config`(`id`, `mer_code`, `store_code`, `consume_type`, `payment_channel_code`, `payment_channel_name`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
-SELECT msr.id - 100000000000000000,msr.mer_code,msr.store_code,'ONLINE_MALL','welfare', '甜橙卡', 'anonymous', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.ONLINE_MALL' = true and deleted = 0;
+SELECT msr.id - 10000000000000000,msr.mer_code,msr.store_code,'ONLINE_MALL','welfare', '甜橙卡', 'duanhy', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.ONLINE_MALL' = true and deleted = 0;
 
 INSERT INTO `payment_channel_config`(`id`, `mer_code`, `store_code`, `consume_type`, `payment_channel_code`, `payment_channel_name`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
-SELECT msr.id - 10000000000000000,msr.mer_code,msr.store_code,'SHOP_CONSUMPTION','welfare', '甜橙卡', 'anonymous', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.SHOP_CONSUMPTION' = true and deleted = 0;
+SELECT msr.id - 1000000000000000,msr.mer_code,msr.store_code,'SHOP_CONSUMPTION','welfare', '甜橙卡', 'duanhy', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.SHOP_CONSUMPTION' = true and deleted = 0;
 
 INSERT INTO `payment_channel_config`(`id`, `mer_code`, `store_code`, `consume_type`, `payment_channel_code`, `payment_channel_name`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
-SELECT msr.id - 1000000000000000,msr.mer_code,msr.store_code,'WHOLESALE','welfare', '甜橙卡', 'anonymous', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.WHOLESALE' = true and deleted = 0;
+SELECT msr.id - 100000000000000,msr.mer_code,msr.store_code,'WHOLESALE','welfare', '甜橙卡', 'duanhy', now(), NULL, NULL, 0 ,0 from merchant_store_relation msr where consum_type->'$.WHOLESALE' = true and deleted = 0;
 
 # 初始化微信 支付宝支取渠道
-INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (263711297, 'wechat', '微信支付', 'default', 2, 0, 'anonymous', '2021-03-18 14:59:29', NULL, NULL, 5);
-INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (263711277, 'alipay', '支付宝', 'default', 3, 0, 'anonymous', '2021-03-18 14:59:29', NULL, NULL, 5);
+INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (1, 'wechat', '微信支付', 'default', 2, 0, 'duanhy', now(), NULL, NULL, 0);
+INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (2, 'alipay', '支付宝', 'default', 3, 0, 'duanhy', now(), NULL, NULL, 0);
+
+# 联通 微信 支付宝支取渠道
+INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (3, 'alipay', '支付宝', 'M132', 3, 0, 'duanhy', now(), NULL, NULL, 0);
+INSERT INTO `payment_channel`(`id`, `code`, `name`, `merchant_code`, `show_order`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`) VALUES (4, 'wechat', '微信支付', 'M132', 4, 0, 'duanhy', now(), NULL, NULL, 0);
 
 # 初始化微信 支付宝子账户
 INSERT INTO `sub_account`(`id`, `account_code`, `sub_account_type`, `balance`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
-select a.id - 100000000000000000,a.account_code,'alipay',0,'system',now(),NULL,NULL,0,0 from account a where a.deleted = 0;
+select a.id - 1000000000000000,a.account_code,'alipay',0,'duanhy',now(),NULL,NULL,0,0 from account a where a.deleted = 0;
 
 INSERT INTO `sub_account`(`id`, `account_code`, `sub_account_type`, `balance`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`)
-select a.id - 10000000000000000,a.account_code,'wechat',0,'system',now(),NULL,NULL,0,0 from account a where a.deleted = 0;
+select a.id - 100000000000000,a.account_code,'wechat',0,'duanhy',now(),NULL,NULL,0,0 from account a where a.deleted = 0;
 
 
 

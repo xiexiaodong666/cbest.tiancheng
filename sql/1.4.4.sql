@@ -37,6 +37,6 @@ alter table account add column offline_lock int(2) DEFAULT 1 comment '离线是�
 
 # 初始化离线短信模板
 INSERT INTO `message_push_config`(`id`, `config_code`, `config_name`, `mer_code`, `target_type`, `template_type`, `template_content`, `deleted`, `create_user`, `create_time`, `update_user`, `update_time`, `version`)
-SELECT m.id -1000000000000000000 ,CONCAT('TEMPLATE_', m.mer_code), '默认模板', m.mer_code, 'sms', 'string_replacer', '今日挂起订单#todayOrderCount#笔，交易额#todayOrderAmount#元，累计挂起订单#totalOrderCount#笔，交易额#totalOrderAmount#元，请登录甜橙生活查看并处理，以免影响正常交易', 0, 'system', '2021-03-22 16:28:36', NULL, NULL, 0 from merchant m where m.deleted = 0 and m.mer_identity LIKE '%PARTER%'
+SELECT m.id -1000000000000000000 ,CONCAT('TEMPLATE_', m.mer_code), '默认模板', m.mer_code, 'sms', 'string_replacer', '今日挂起订单#todayOrderCount#笔，交易额#todayOrderAmount#元，累计挂起订单#totalOrderCount#笔，交易额#totalOrderAmount#元，请登录甜橙生活查看并处理，以免影响正常交易', 0, 'duanhy', now(), NULL, NULL, 0 from merchant m where m.deleted = 0 and m.mer_identity LIKE '%PARTER%';
 
 

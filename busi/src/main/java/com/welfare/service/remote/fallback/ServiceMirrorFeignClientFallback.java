@@ -1,6 +1,6 @@
 package com.welfare.service.remote.fallback;
 
-import com.welfare.common.exception.BusiException;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.service.remote.ServiceMirrorFeignClient;
 import com.welfare.service.remote.entity.request.WelfareMerChantConsumeDataRequest;
@@ -25,7 +25,7 @@ public class ServiceMirrorFeignClientFallback implements FallbackFactory<Service
       public WelfareMerChantConsumeDataResponse getWelfareMerChantConsumeData(
           WelfareMerChantConsumeDataRequest request) {
         log.error("报表系统查询甜橙商户消费数据异常, 请求:{}", request, throwable);
-        throw new BusiException(ExceptionCode.UNKNOWON_EXCEPTION, "报表系统查询甜橙商户消费数据异常", null);
+        throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "报表系统查询甜橙商户消费数据异常", null);
       }
     };
   }

@@ -75,4 +75,5 @@ public class AccountDao extends ServiceImpl<AccountMapper, Account> {
         queryWrapper.eq(Account.MER_CODE, merCode);
         return getOne(queryWrapper);
     }
+
 }

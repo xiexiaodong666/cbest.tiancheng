@@ -9,6 +9,7 @@ import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.entity.SupplierStore;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,13 +37,38 @@ public abstract class AbstractMerchantInitOperator {
 
     @Transactional(rollbackFor = Exception.class)
     public void init(String merCode) {
+        doInitAccountType(merCode);
+        doInitDepartment(merCode);
+        doInitMerchantAccountType(merCode);
+        doInitSupplierStore(merCode);
+    }
 
-        accountTypeDao.saveBatch(initAccountType(merCode));
-        departmentDao.saveBatch(initDepartment(merCode));
-        merchantAccountTypeDao.saveBatch(initMerchantAccountType(merCode));
+    private void doInitSupplierStore(String merCode) {
         List<SupplierStore> supplierStores = initSupplierStore(merCode);
-        supplierStoreDao.saveBatch(supplierStores);
+        if (CollectionUtils.isNotEmpty(supplierStores)) {
+            supplierStoreDao.saveBatch(supplierStores);
+        }
+    }
 
+    private void doInitAccountType(String merCode) {
+        List<AccountType> accountTypes = initAccountType(merCode);
+        if (CollectionUtils.isNotEmpty(accountTypes)) {
+            accountTypeDao.saveBatch(accountTypes);
+        }
+    }
+
+    private void doInitDepartment(String merCode) {
+        List<Department> department = initDepartment(merCode);
+        if (CollectionUtils.isNotEmpty(department)) {
+            departmentDao.saveBatch(department);
+        }
+    }
+
+    private void doInitMerchantAccountType(String merCode) {
+        List<MerchantAccountType> merchantAccountTypes = initMerchantAccountType(merCode);
+        if (CollectionUtils.isNotEmpty(merchantAccountTypes)) {
+            merchantAccountTypeDao.saveBatch(merchantAccountTypes);
+        }
     }
 
     /**
@@ -73,5 +99,5 @@ public abstract class AbstractMerchantInitOperator {
      */
     public abstract List<SupplierStore> initSupplierStore(String merCode);
 
-    public abstract List<WelfareConstant.IndustryTag> industryTag();
+    public abstract WelfareConstant.IndustryTag industryTag();
 }

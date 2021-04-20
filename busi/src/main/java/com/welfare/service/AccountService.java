@@ -7,6 +7,7 @@ import com.welfare.persist.dto.*;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.service.dto.*;
+import com.welfare.service.remote.entity.EmployerReqDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -146,4 +147,11 @@ public interface AccountService {
    * @return
    */
   AccountPasswordFreeSignDTO passwordFreeUnsign(Long accountCode, String paymentChannel);
+
+
+  /**
+   * 创建并充值
+   * @param saveAndDepositReq
+   */
+  EmployerReqDTO saveAndDeposit(AccountSaveAndDepositReq saveAndDepositReq);
 }

@@ -25,11 +25,13 @@ import com.welfare.service.converter.MerchantSyncConverter;
 import com.welfare.service.converter.MerchantWithCreditConverter;
 import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
+import com.welfare.service.init.merchant.MerchantInitOperatorFactory;
 import com.welfare.service.sync.event.MerchantEvt;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -73,6 +75,8 @@ public class MerchantServiceImpl implements MerchantService {
     private MerchantExtendService merchantExtendService;
     @Autowired
     private MerchantExtendDao merchantExtendDao;
+    @Autowired
+    private MerchantInitOperatorFactory merchantInitOperatorFactory;
     @Override
     public List<Merchant> list(MerchantReq req) {
         QueryWrapper<Merchant> q=QueryHelper.getWrapper(req);
@@ -180,7 +184,7 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         merchantCreditService.init(merchant.getMerCode());
-        boolean flag3=merchantAccountTypeService.init(merCode);
+        boolean flag3=merchantAccountTypeService.init(merCode, merchant.getExtend());
         boolean flag4=true;
         boolean flag5=merchantExtendService.saveOrUpdate(merchant.getExtend(), merCode);
         List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));
@@ -191,6 +195,9 @@ public class MerchantServiceImpl implements MerchantService {
         if(!(flag&&flag2&flag3)){
             throw new BizException("新增商户失败");
         }
+        // 不同行业属性的初始化
+        List<String> industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+        merchantInitOperatorFactory.operators(industryTags).forEach(operator -> operator.init(merCode));
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
         detailDTO.setAddressList(merchant.getAddressList());
         detailDTO.setId(save.getId());
@@ -210,14 +217,13 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant update=buildEntity(merchant);
         boolean flag= 1==merchantDao.updateAllColumnById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
-        boolean flag3=true;
         boolean flag4=merchantExtendService.saveOrUpdate(merchant.getExtend(), update.getMerCode());
-        List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));
-        if (merIdentitys.contains(MerIdentityEnum.customer.getCode())) {
-            flag3 = messagePushConfigService.init(update.getMerCode());
+        if (BooleanUtils.toBooleanDefaultIfNull(merchant.getExtend().getPointMall(), false)) {
+            merchantAccountTypeService.saveIfExist(assemblyMerchantAccountType(update.getMerCode(), 888,
+                    WelfareConstant.MerAccountTypeCode.MALL_POINT.code(), WelfareConstant.MerAccountTypeCode.MALL_POINT.desc()));
         }
         //同步商城中台
-        if(!(flag&&flag2&&flag3)){
+        if(!(flag&&flag2)){
             throw new BizException("更新商户失败");
         }
         List<MerchantSyncDTO> syncList=new ArrayList<>();
@@ -225,8 +231,19 @@ public class MerchantServiceImpl implements MerchantService {
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).timestamp(new Date()).build());
-        return flag&&flag2&&flag3&&flag4;
+        return flag&&flag2&&flag4;
     }
+
+    private MerchantAccountType assemblyMerchantAccountType(String merCode, Integer deductionOrder, String code, String name) {
+        MerchantAccountType merchantAccountType = new MerchantAccountType();
+        merchantAccountType.setMerCode(merCode);
+        merchantAccountType.setMerAccountTypeName(name);
+        merchantAccountType.setMerAccountTypeCode(code);
+        merchantAccountType.setDeductionOrder(deductionOrder);
+        merchantAccountType.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+        return merchantAccountType;
+    }
+
     private Merchant buildEntity(MerchantUpdateDTO merchant){
         Merchant entity=merchantDao.getById(merchant.getId());
         if(EmptyChecker.isEmpty(entity)){

@@ -3,6 +3,7 @@ package com.welfare.persist.dao;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +73,13 @@ public class AccountAmountTypeDao extends ServiceImpl<AccountAmountTypeMapper, A
     public List<AccountAmountType> listByAccountCodes(List<Long> accountCodes, String merAccountTypeCode){
         QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.in(AccountAmountType.ACCOUNT_CODE, accountCodes);
+        queryWrapper.eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, merAccountTypeCode);
+        return list(queryWrapper);
+    }
+
+    public List<AccountAmountType> getByTypeAndAccountAmountTypeGroupId(String merAccountTypeCode, Long groupId) {
+        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountAmountType.ACCOUNT_AMOUNT_TYPE_GROUP_ID, groupId);
         queryWrapper.eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, merAccountTypeCode);
         return list(queryWrapper);
     }

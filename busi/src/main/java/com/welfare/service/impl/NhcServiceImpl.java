@@ -90,9 +90,8 @@ public class NhcServiceImpl implements NhcService {
             BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("用户不存在[%s]", userReq.getAccountCode()));
             BizAssert.isTrue(userReq.getMerCode().equals(account.getMerCode()), ExceptionCode.ILLEGALITY_ARGURMENTS, "无权限操作！");
             account.setAccountName(userReq.getUserName());
-            if (StringUtils.isBlank(userReq.getPhone())) {
-                account.setPhone(DEFAULT_PHONE_PREFIX + sequenceService.nextNo(WelfareConstant.SequenceType.DEFAULT_PHONE.code()));
-            } else {
+            if (StringUtils.isNoneBlank(userReq.getPhone())) {
+                BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
                 account.setPhone(userReq.getPhone());
             }
         } else {
@@ -112,6 +111,9 @@ public class NhcServiceImpl implements NhcService {
                     WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
             BizAssert.isTrue(success);
         }
+        if (StringUtils.isNoneBlank(account.getPhone()) && account.getPhone().startsWith(NhcService.DEFAULT_PHONE_PREFIX)) {
+            account.setPhone(null);
+        }
         // 同步商户
         applicationContext.publishEvent(AccountEvt.builder()
                 .typeEnum(StringUtils.isNoneBlank(userReq.getAccountCode()) ? ShoppingActionTypeEnum.UPDATE : ShoppingActionTypeEnum.ADD)
@@ -129,7 +131,7 @@ public class NhcServiceImpl implements NhcService {
         if (StringUtils.isBlank(userReq.getPhone())) {
             account.setPhone(DEFAULT_PHONE_PREFIX + sequenceService.nextNo(WelfareConstant.SequenceType.DEFAULT_PHONE.code()));
         } else {
-            BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不存在");
+            BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
             Account oldAccount= accountService.findByPhoneAndMerCode(userReq.getPhone(), userReq.getMerCode());
             BizAssert.isTrue(Objects.isNull(oldAccount), ExceptionCode.ILLEGALITY_ARGURMENTS, "员工已存在");
             account.setPhone(userReq.getPhone());

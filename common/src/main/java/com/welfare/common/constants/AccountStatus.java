@@ -34,4 +34,13 @@ public enum AccountStatus {
     return true;
   }
 
+  public static AccountStatus getByCode(Integer status) {
+      for(AccountStatus accountStatus: AccountStatus.values()){
+        if(status.equals(accountStatus.getCode())){
+          return accountStatus;
+        }
+      }
+      throw new RuntimeException("AccountStatus不存在");
+    }
+
 }

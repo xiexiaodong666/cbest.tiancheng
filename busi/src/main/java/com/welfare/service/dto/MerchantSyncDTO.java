@@ -51,4 +51,9 @@ public class MerchantSyncDTO {
 
 
   List<MerchantAddressDTO> addressList;
+
+  /**
+   * 行业属性
+   */
+  private List<String> tags;
 }

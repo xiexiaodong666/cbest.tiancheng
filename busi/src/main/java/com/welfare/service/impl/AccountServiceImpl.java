@@ -73,6 +73,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -1485,7 +1486,7 @@ public class AccountServiceImpl implements AccountService {
         BizAssert.notNull(department,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
 
         AccountReq accountReq = new AccountReq();
-        accountReq.setAccountName(req.getAccountName());
+        accountReq.setAccountName("默认名称");
         accountReq.setMerCode(merchant.getMerCode());
         accountReq.setPhone(req.getPhone());
         accountReq.setAccountStatus(AccountStatus.ENABLE.getCode());
@@ -1497,8 +1498,13 @@ public class AccountServiceImpl implements AccountService {
         //新增员工
         try {
             save(accountReq);
-        } catch (Exception e) {
-           // if
+        } catch (Exception exception) {
+            if (exception instanceof DuplicateKeyException) {
+                log.error("员工已存在 req:{}", JSON.toJSONString(req), exception);
+                throw new BizException("员工已存在");
+            } else {
+                throw exception;
+            }
         }
         // 充值
         List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeService.queryAllByMerCode(merchant.getMerCode());
@@ -1506,8 +1512,8 @@ public class AccountServiceImpl implements AccountService {
         DepositApplyRequest request = new DepositApplyRequest();
         request.setRequestId(UUID.randomUUID().toString());
         request.setApplyRemark("建行员工充值");
-        //request.setMerAccountTypeCode();
-       // request.setMerAccountTypeName();
+      //  request.setMerAccountTypeCode();
+    //    request.setMerAccountTypeName();
         request.setApprovalType(ApprovalType.SINGLE.getCode());
         AccountDepositRequest depositRequest = new AccountDepositRequest();
         depositRequest.setPhone(req.getPhone());

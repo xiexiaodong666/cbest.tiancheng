@@ -80,9 +80,10 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, merAccountTypeCode);
         BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "福利类型为空");
-        BizAssert.isTrue(accountAmountType.getJoinedGroup() != null && accountAmountType.getJoinedGroup()
-                        && Objects.nonNull(accountAmountType.getAccountAmountTypeGroupId()),
-                ExceptionCode.ILLEGALITY_ARGURMENTS, "该员工没有加入任何组");
+        if (accountAmountType.getJoinedGroup() == null || !accountAmountType.getJoinedGroup()
+                || Objects.isNull(accountAmountType.getAccountAmountTypeGroupId())) {
+            return true;
+        }
         long groupId = accountAmountType.getAccountAmountTypeGroupId();
         AccountAmountTypeGroup group = accountAmountTypeGroupDao.getById(groupId);
         BizAssert.notNull(group, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工福利账户组不存在");
@@ -276,6 +277,9 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
                 ExceptionCode.ILLEGALITY_ARGURMENTS, "福利账户不存在");
         AccountAmountTypeGroup amountTypeGroup;
         List<AccountAmountType> updateAccountAmountTypes = new ArrayList<>();
+
+        // 如果已属于某个组，先退组
+        removeByAccountCode(merCode, joinAccountCode, merAccountTypeCode);
 
         if (groupAccountAmountType.getJoinedGroup() && Objects.nonNull(groupAccountAmountType.getAccountAmountTypeGroupId())) {
             amountTypeGroup = accountAmountTypeGroupDao.getById(groupAccountAmountType.getAccountAmountTypeGroupId());

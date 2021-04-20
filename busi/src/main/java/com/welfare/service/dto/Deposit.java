@@ -2,13 +2,17 @@ package com.welfare.service.dto;
 
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.entity.*;
+import com.welfare.service.GroupDeposit;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -100,5 +104,20 @@ public class Deposit {
         accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
         accountBillDetail.setPaymentChannel(deposit.getPaymentChannel());
         return accountBillDetail;
+    }
+
+    public static List<Deposit> of(BigDecimal amount, List<Sequence> sequences, List<AccountAmountType> accountAmountTypes) {
+        AtomicInteger index = new AtomicInteger();
+        List<Deposit> deposits = new ArrayList<>();
+        accountAmountTypes.forEach(accountAmountType -> {
+            Deposit deposit = new Deposit();
+            deposit.setAmount(amount);
+            deposit.setTransNo(sequences.get(index.getAndIncrement()).getSequenceNo() + "");
+            deposit.setAccountCode(accountAmountType.getAccountCode());
+            deposit.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
+            deposit.setChannel(WelfareConstant.Channel.PLATFORM.code());
+            deposits.add(deposit);
+        });
+        return deposits;
     }
 }

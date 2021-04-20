@@ -24,12 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 public class AccountTypeDao extends ServiceImpl<AccountTypeMapper, AccountType> {
-    public AccountType getOneByAccountType(String accountType){
-        QueryWrapper<AccountType> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(AccountType.TYPE_CODE,accountType);
-        return getOne(queryWrapper);
-    }
-
+    
     public Map<String,AccountType> mapByMerCodeAndCodes(String merCode, Set<String> codes){
         QueryWrapper<AccountType> queryWrapper = new QueryWrapper<>();
         queryWrapper.in(AccountType.TYPE_CODE,codes);

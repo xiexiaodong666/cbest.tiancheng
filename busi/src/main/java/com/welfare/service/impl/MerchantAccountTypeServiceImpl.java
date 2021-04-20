@@ -10,6 +10,7 @@ import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
+import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.AccountAmountTypeService;
@@ -21,6 +22,7 @@ import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -207,7 +210,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean init(String merCode) {
+    public boolean init(String merCode, MerchantExtendDTO extend) {
         List<MerchantAccountType> initList=new ArrayList<>();
         MerchantAccountType merchantAccountType1=new MerchantAccountType();
         merchantAccountType1.setMerAccountTypeName("员工授信额度");
@@ -230,6 +233,24 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
         merchantAccountType3.setDeductionOrder(9000);
         merchantAccountType3.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
         initList.add(merchantAccountType3);
+
+        if (Objects.nonNull(extend) && BooleanUtils.toBooleanDefaultIfNull(extend.getPointMall(), false)) {
+            MerchantAccountType merchantAccountType4 = new MerchantAccountType();
+            merchantAccountType4.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.MALL_POINT.desc());
+            merchantAccountType4.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
+            merchantAccountType4.setMerCode(merCode);
+            merchantAccountType4.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+            merchantAccountType4.setDeductionOrder(888);
+            initList.add(merchantAccountType4);
+        }
         return merchantAccountTypeDao.saveBatch(initList);
+    }
+
+    @Override
+    public void saveIfExist(MerchantAccountType merchantAccountType) {
+        MerchantAccountType old = merchantAccountTypeDao.queryAllByMerCodeAndType(merchantAccountType.getMerCode(), merchantAccountType.getMerAccountTypeCode());
+        if (Objects.isNull(old)) {
+            merchantAccountTypeDao.save(merchantAccountType);
+        }
     }
 }

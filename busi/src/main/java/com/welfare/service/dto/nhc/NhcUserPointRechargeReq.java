@@ -7,6 +7,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author: duanhy
@@ -21,10 +22,10 @@ public class NhcUserPointRechargeReq {
   private String requestId;
 
   @ApiModelProperty(value = "积分", required = true)
-  @DecimalMin(value = "0", message = "积分必须大于零")
+  @DecimalMin(value = "0", message = "积分必须不能小于零")
   private BigDecimal amount;
 
   @ApiModelProperty(value = "要充值的用户编码列表", required = true)
   @NotEmpty(message = "用户编码列表不能为空")
-  private List<String> accountCodes;
+  private Set<String> accountCodes;
 }

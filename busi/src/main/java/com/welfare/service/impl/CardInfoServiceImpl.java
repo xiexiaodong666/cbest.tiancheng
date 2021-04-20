@@ -145,6 +145,7 @@ public class CardInfoServiceImpl implements CardInfoService {
 
     @Override
     public CardInfo createAndBind(CardInfo cardInfo) {
+
         Account account = accountDao.queryByAccountCode(cardInfo.getAccountCode());
         BizAssert.notNull(account,ExceptionCode.DATA_NOT_EXIST,"账户不存在");
         BizAssert.isTrue(
@@ -152,22 +153,49 @@ public class CardInfoServiceImpl implements CardInfoService {
                 ExceptionCode.ILLEGALITY_ARGURMENTS,
                 "账户已禁用"
         );
-        cardInfo.setCardStatus(WelfareConstant.CardStatus.BIND.code());
-        Date now = Calendar.getInstance().getTime();
-        cardInfo.setBindTime(now);
-        cardInfo.setWrittenTime(now);
-        cardInfo.setEnabled(EnableEnum.ENABLE.getCode());
-        cardInfo.setApplyCode("");
-        cardInfoDao.save(cardInfo);
+        CardInfo oneByAccountCode = cardInfoDao.getOneByAccountCode(account.getAccountCode());
+        BizAssert.isNull(oneByAccountCode,ExceptionCode.ACCOUNT_ALREADY_BIND);
+        CardInfo cardInfoInDb = cardInfoDao.getOneByCardId(cardInfo.getCardId());
+        if(Objects.nonNull(cardInfoInDb)){
+            return onCardExisted(cardInfo, cardInfoInDb);
+        }else{
+            cardInfo.setCardStatus(WelfareConstant.CardStatus.BIND.code());
+            Date now = Calendar.getInstance().getTime();
+            cardInfo.setBindTime(now);
+            cardInfo.setWrittenTime(now);
+            cardInfo.setEnabled(EnableEnum.ENABLE.getCode());
+            cardInfo.setApplyCode("");
+            cardInfoDao.save(cardInfo);
+        }
+
         return cardInfo;
+    }
+
+    private CardInfo onCardExisted(CardInfo cardInfo, CardInfo cardInfoInDb) {
+        if(Objects.nonNull(cardInfoInDb.getAccountCode())
+                && !Objects.equals(cardInfo.getAccountCode(), cardInfoInDb.getAccountCode())){
+            throw new BizException(ExceptionCode.CARD_ALREADY_BIND);
+        } else if (Objects.equals(cardInfo.getAccountCode(), cardInfoInDb.getAccountCode())){
+            log.info("already bind, return");
+            return cardInfoInDb;
+        } else {
+            log.info("already existed but not bind, directly bind");
+            cardInfoInDb.setAccountCode(cardInfo.getAccountCode());
+            cardInfoInDb.setEnabled(EnableEnum.ENABLE.getCode());
+            cardInfoDao.updateById(cardInfoInDb);
+            return cardInfoInDb;
+        }
     }
 
     @Override
     public CardInfo unbind(String cardNo) {
         CardInfo cardInfo = cardInfoDao.getOneByCardId(cardNo);
+        cardInfoDao.update(Wrappers.<CardInfo>lambdaUpdate()
+                .eq(CardInfo::getId,cardInfo.getId())
+                .set(CardInfo::getAccountCode,null)
+                .set(CardInfo::getEnabled,EnableEnum.DISABLE.getCode()));
         cardInfo.setAccountCode(null);
         cardInfo.setEnabled(EnableEnum.DISABLE.getCode());
-        cardInfoDao.updateAllColumnById(cardInfo);
         return cardInfo;
     }
 }

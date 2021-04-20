@@ -9,6 +9,7 @@ import com.welfare.service.dto.nhc.*;
  * @Date: 2021/4/13 9:43 上午
  */
 public interface NhcService {
+  String DEFAULT_PHONE_PREFIX = "M";
 
   /**
    * 新增或修改用户
@@ -29,7 +30,7 @@ public interface NhcService {
    * @param pointRechargeReq
    * @return
    */
-  Boolean rechargeMallPoint(NhcUserPointRechargeReq pointRechargeReq);
+  void rechargeMallPoint(NhcUserPointRechargeReq pointRechargeReq);
 
   /**
    * 查询用户账户记录
@@ -43,28 +44,7 @@ public interface NhcService {
    * @param userCode
    * @return
    */
-  Boolean leaveFamily(String userCode);
-
-  /**
-   * 新增或修改员工
-   * @param nhcAccountReq
-   * @return
-   */
-  String saveOrUpdateAccount(NhcAccountReq nhcAccountReq);
-
-  /**
-   * 查询员工信息
-   * @param accountCode
-   * @return
-   */
-  NhcAccountInfoDTO getAccountInfo(String accountCode);
-
-  /**
-   * 查询员工账户记录
-   * @param nhcUserPageReq
-   * @return
-   */
-  Page<NhcAccountBillDetailDTO> getAccountBillPage(NhcUserPageReq nhcUserPageReq);
+  Boolean leaveFamily(String merCode, String userCode);
 
   /**
    * 查询家庭信息

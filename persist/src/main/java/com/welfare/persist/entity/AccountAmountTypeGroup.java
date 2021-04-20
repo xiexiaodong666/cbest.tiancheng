@@ -81,9 +81,9 @@ public class AccountAmountTypeGroup extends Model<AccountAmountTypeGroup> implem
     /**
      * 删除标志
      */
-    @ApiModelProperty("删除标志") @TableLogic   
+    @ApiModelProperty("删除标志") @TableLogic
     @TableField(fill = FieldFill.INSERT)
-	private Long deleted;
+	private Boolean deleted;
     /**
      * 版本
      */

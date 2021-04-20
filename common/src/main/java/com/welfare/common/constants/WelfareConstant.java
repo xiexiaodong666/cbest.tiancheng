@@ -234,7 +234,9 @@ public class WelfareConstant {
         RESET_ACCOUNT_SURPLUS_QUOTA("reset_account_surplus_quota","员工账号授信额度变更"),
         EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号"),
         MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码"),
-        ACCOUNT_AMOUNT_TYPE_GROUP_CODE("account_amount_type_group_code","员工福利账号组编码");
+        ACCOUNT_AMOUNT_TYPE_GROUP_CODE("account_amount_type_group_code","员工福利账号组编码"),
+        DEFAULT_PHONE("default_phone","默认手机号");
+
 
         private final String code;
         private final String desc;
@@ -262,8 +264,8 @@ public class WelfareConstant {
         SELF("self","自主余额"),
         SURPLUS_QUOTA("surplus_quota","授信额度"),
         SURPLUS_QUOTA_OVERPAY("surplus_quota_overpay","授信额度溢缴款"),
-        MALL_POINT("mall_point","商城积分");
-
+        MALL_POINT("mall_point","积分账户余额"),
+        WHOLESALE("wholesale","批发采购");
         private final String code;
         private final String desc;
 
@@ -594,6 +596,67 @@ public class WelfareConstant {
                 }
             }
             return DEFAULT;
+        }
+    }
+
+    /**
+     * 员工类型
+     */
+    public enum AccountType{
+        /**
+         * 用于卫计委商户
+         */
+        DOCTOR("doctor","医生"),
+        /**
+         * 用于卫计委商户
+         */
+        PURCHASER("purchaser","采购员"),
+        /**
+         * 用于卫计委商户
+         */
+        COMMON_USER("common_user","普通用户"),
+        /**
+         * 用于卫计委商户
+         */
+        PATIENT("patient","病人");
+        private final String code;
+        private final String desc;
+
+        AccountType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+
+    /**
+     * 行业标签
+     */
+    public enum IndustryTag{
+        /**
+         * 社区医院
+         */
+        COMMUNITY_HOSPITAL("community_hospital","社区医院");
+        private final String code;
+        private final String desc;
+
+        IndustryTag(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
         }
     }
 

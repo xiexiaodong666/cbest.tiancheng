@@ -35,4 +35,10 @@ public class CardInfoDao extends ServiceImpl<CardInfoMapper, CardInfo> {
     public Integer updateAllColumnById(@Param(Constants.ENTITY) CardInfo entity){
         return getBaseMapper().alwaysUpdateSomeColumnById(entity);
     }
+
+    public CardInfo getOneByAccountCode(Long accountCode){
+        QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(CardInfo.ACCOUNT_CODE,accountCode).last("limit 1");
+        return getOne(queryWrapper);
+    }
 }

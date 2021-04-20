@@ -43,7 +43,7 @@ public class MerchantUpdateDTO {
    * 身份属性
    */
   @ApiModelProperty("身份属性  supplier:供应商；customer:客户,多个用，号分隔")
- @NotBlank
+  @NotBlank
   private String merIdentity;
   /**
    * 合作方式
@@ -66,4 +66,8 @@ public class MerchantUpdateDTO {
 
     @ApiModelProperty("员工卡消费明细门店显示")
     private String billDetailShowStoreName;
+
+    @ApiModelProperty("商户扩展信息")
+    @NotNull(message = "扩展信息不能为空")
+    private MerchantExtendDTO extend;
 }

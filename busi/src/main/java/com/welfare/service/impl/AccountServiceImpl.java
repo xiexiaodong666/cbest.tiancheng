@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.AccountStatus;
@@ -17,15 +18,14 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.CardStatus;
 import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.constants.WelfareConstant.TransType;
+import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.FileUniversalStorageEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.util.AccountUtil;
-import com.welfare.common.util.DistributedLockUtil;
-import com.welfare.common.util.MerchantUserHolder;
-import com.welfare.common.util.SpringBeanUtils;
+import com.welfare.common.util.*;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.entity.*;
@@ -39,18 +39,17 @@ import com.welfare.service.*;
 import com.welfare.service.converter.AccountConverter;
 import com.welfare.service.converter.DepartmentAndAccountTreeConverter;
 import com.welfare.service.dto.*;
+import com.welfare.service.dto.accountapply.AccountDepositApprovalRequest;
+import com.welfare.service.dto.accountapply.DepositApplyRequest;
 import com.welfare.service.enums.AccountBalanceType;
 import com.welfare.service.enums.AccountBalanceType.Welfare;
 import com.welfare.service.enums.AccountBalanceType.WoLife;
+import com.welfare.service.enums.ApprovalStatus;
+import com.welfare.service.enums.ApprovalType;
 import com.welfare.service.listener.AccountBatchBindCardListener;
 import com.welfare.service.listener.AccountUploadListener;
 import com.welfare.service.remote.ShoppingFeignClient;
-import com.welfare.service.remote.entity.AlipayUserAgreementPageSignReq;
-import com.welfare.service.remote.entity.AlipayUserAgreementPageSignResp;
-import com.welfare.service.remote.entity.AlipayUserAgreementSignReq;
-import com.welfare.service.remote.entity.AlipayUserAgreementSignResp;
-import com.welfare.service.remote.entity.AlipayUserAgreementUnsignReq;
-import com.welfare.service.remote.entity.AlipayUserAgreementUnsignResp;
+import com.welfare.service.remote.entity.*;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;
 import com.welfare.service.remote.service.CbestPayService;
@@ -157,6 +156,9 @@ public class AccountServiceImpl implements AccountService {
     private AccountAmountTypeService accountAmountTypeService;
 
     private final CbestPayService cbestPayService;
+    private final MerchantExtendDao merchantExtendDao;
+    @Autowired
+    private AccountDepositApplyService depositApplyService;
 
     @Override
     public Page<AccountDTO> getPageDTO(Page<AccountPageDTO> page, AccountPageReq accountPageReq) {
@@ -478,14 +480,30 @@ public class AccountServiceImpl implements AccountService {
         // 添加
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
-        PaymentChannelReq req =new PaymentChannelReq();
-        req.setFiltered(false);
-        req.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
-        List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
-        boolean result2 = subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
+        Merchant merchant = merchantService.getMerchantByMerCode(accountReq.getMerCode());
+        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+        MerchantExtend merchantExtend = merchantExtendDao.getByMerCode(accountReq.getMerCode());
+        if(Objects.nonNull(merchantExtend) && !StringUtils.isEmpty(merchantExtend.getIndustryTag())
+                && merchantExtend.getIndustryTag().contains(WelfareConstant.IndustryTag.COMMUNITY_HOSPITAL.code())) {
+            //批发福利账户
+            AccountAmountType accountAmountType = getAccountAmountType(account.getAccountCode(),
+                    BigDecimal.ZERO, account.getMerCode(),
+                    MerAccountTypeCode.WHOLESALE.code());
+            accountAmountTypeMapper.insert(accountAmountType);
+            SubAccount subAccount = new SubAccount();
+            subAccount.setAccountCode(account.getAccountCode());
+            subAccount.setSubAccountType(WelfareConstant.PaymentChannel.WELFARE.code());
+            subAccountDao.save(subAccount);
+        } else {
+            PaymentChannelReq req = new PaymentChannelReq();
+            req.setFiltered(false);
+            req.setMerCode(accountReq.getMerCode());
+            List<PaymentChannelDTO> paymentChannels = paymentChannelService.list(req);
+            subAccountDao.saveBatch(assemableSubAccount(paymentChannels, account));
+        }
         applicationContext.publishEvent(AccountEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD)
             .accountList(Arrays.asList(account)).build());
-        return result && result2;
+        return result;
     }
 
     private List<SubAccount> assemableSubAccount(List<PaymentChannelDTO> paymentChannels, Account account) {
@@ -505,7 +523,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = new Account();
         Long accounCode = sequenceService.nextNo(WelfareConstant.SequenceType.ACCOUNT_CODE.code());
         BeanUtils.copyProperties(accountReq, account);
-        account.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
+        account.setCreateUser(UserInfoHolder.getUserInfo().getUserName());
         account.setDepartment(accountReq.getDepartmentCode());
         account.setAccountCode(accounCode);
         return account;
@@ -517,13 +535,13 @@ public class AccountServiceImpl implements AccountService {
             merCode,
             merAccountTypeCode);
         if (null == merchantAccountType) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无授信额度福利类型", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无福利类型", null);
         }
         AccountAmountType accountAmountType = new AccountAmountType();
         accountAmountType.setAccountCode(accountCode);
         accountAmountType.setAccountBalance(accountBalance);
         accountAmountType.setCreateTime(new Date());
-        accountAmountType.setCreateUser(MerchantUserHolder.getMerchantUser().getUsername());
+        accountAmountType.setCreateUser(UserInfoHolder.getUserInfo().getUserName());
         accountAmountType.setMerAccountTypeCode(merAccountTypeCode);
         return accountAmountType;
     }
@@ -1451,5 +1469,61 @@ public class AccountServiceImpl implements AccountService {
                 throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密解约", null);
         }
         return accountPasswordFreeSignDTO;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public EmployerReqDTO saveAndDeposit(AccountSaveAndDepositReq req) {
+        Merchant merchant = merchantService.getMerchantByMerCode(req.getMerCode());
+        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+        List<AccountType> accountTypes = accountTypeDao.getByMerCode(merchant.getMerCode());
+        BizAssert.notEmpty(accountTypes, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户没有员工类型");
+        AccountType accountType = accountTypes.get(0);
+        List<DepartmentTree> departmentTrees = departmentService.tree(merchant.getMerCode());
+        BizAssert.notEmpty(departmentTrees.get(0).getChildren(),ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
+        DepartmentTree department = (DepartmentTree)departmentTrees.get(0).getChildren().get(0);
+        BizAssert.notNull(department,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
+
+        AccountReq accountReq = new AccountReq();
+        accountReq.setAccountName(req.getAccountName());
+        accountReq.setMerCode(merchant.getMerCode());
+        accountReq.setPhone(req.getPhone());
+        accountReq.setAccountStatus(AccountStatus.ENABLE.getCode());
+        accountReq.setAccountTypeCode(accountType.getTypeCode());
+        accountReq.setCredit(false);
+        accountReq.setDepartmentCode(department.getDepartmentCode());
+        accountReq.setRemark(req.getRemark());
+
+        //新增员工
+        try {
+            save(accountReq);
+        } catch (Exception e) {
+           // if
+        }
+        // 充值
+        List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeService.queryAllByMerCode(merchant.getMerCode());
+        BizAssert.notEmpty(merchantAccountTypes,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户没有福利类型");
+        DepositApplyRequest request = new DepositApplyRequest();
+        request.setRequestId(UUID.randomUUID().toString());
+        request.setApplyRemark("建行员工充值");
+        //request.setMerAccountTypeCode();
+       // request.setMerAccountTypeName();
+        request.setApprovalType(ApprovalType.SINGLE.getCode());
+        AccountDepositRequest depositRequest = new AccountDepositRequest();
+        depositRequest.setPhone(req.getPhone());
+        depositRequest.setRechargeAmount(new BigDecimal(30));
+        request.setInfo(depositRequest);
+        MerchantUserInfo merchantUserInfo = new MerchantUserInfo();
+        merchantUserInfo.setMerchantCode(req.getMerCode());
+        merchantUserInfo.setUserCode("platform");
+        merchantUserInfo.setUsername("platform");
+        Long applyId = depositApplyService.saveOne(request, merchantUserInfo);
+        AccountDepositApprovalRequest approvalRequest = new AccountDepositApprovalRequest();
+        approvalRequest.setId(String.valueOf(applyId));
+        approvalRequest.setApprovalUser("platform");
+        approvalRequest.setApprovalStatus(ApprovalStatus.AUDIT_SUCCESS.getCode());
+        depositApplyService.approval(approvalRequest);
+
+        return null;
     }
 }

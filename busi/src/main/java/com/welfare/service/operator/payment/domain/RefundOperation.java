@@ -1,5 +1,6 @@
 package com.welfare.service.operator.payment.domain;
 
+import com.welfare.persist.entity.AccountAmountTypeGroup;
 import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.entity.AccountDeductionDetail;
 import lombok.Data;
@@ -15,11 +16,13 @@ import lombok.Data;
 public class RefundOperation {
     private AccountBillDetail refundBillDetail;
     private AccountDeductionDetail refundDeductionDetail;
+    private AccountAmountTypeGroup accountAmountTypeGroup;
 
-    public static RefundOperation of(AccountBillDetail refundBillDetail,AccountDeductionDetail refundDeductionDetail){
+    public static RefundOperation of(AccountBillDetail refundBillDetail,AccountDeductionDetail refundDeductionDetail, AccountAmountTypeGroup accountAmountTypeGroup){
         RefundOperation refundOperation = new RefundOperation();
         refundOperation.setRefundBillDetail(refundBillDetail);
         refundOperation.setRefundDeductionDetail(refundDeductionDetail);
+        refundOperation.setAccountAmountTypeGroup(accountAmountTypeGroup);
         return refundOperation;
     }
 }

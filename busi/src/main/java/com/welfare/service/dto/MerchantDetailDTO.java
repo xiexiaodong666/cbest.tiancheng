@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -97,6 +98,9 @@ public class MerchantDetailDTO {
 
   @ApiModelProperty("员工卡消费明细门店显示(字典转义)")
   private String billDetailShowStoreNameName;
+
+  @ApiModelProperty("商户扩展信息")
+  private MerchantExtendDTO extend;
 
   @ApiModelProperty("批发限制授信额度")
   private BigDecimal wholesaleCreditLimit;

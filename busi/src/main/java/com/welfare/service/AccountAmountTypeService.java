@@ -55,4 +55,11 @@ public interface AccountAmountTypeService {
    * @return
    */
     List<AccountAmountDO> queryAccountAmountDO(Account account);
+
+    /**
+     * 批量查询
+     * @param accountCodes
+     * @return
+     */
+    List<AccountAmountType> batchQueryByAccount(List<Long> accountCodes, String merAccountTypeCode);
 }

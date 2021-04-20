@@ -16,6 +16,8 @@ import com.welfare.persist.dao.AccountDepositApplyDao;
 import com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.*;
+import com.welfare.persist.mapper.AccountDeductionDetailMapper;
+import com.welfare.persist.mapper.AccountDepositApplyDetailMapper;
 import com.welfare.service.*;
 import com.welfare.service.converter.AccountDepositApplyConverter;
 import com.welfare.service.converter.DepositApplyDetailConverter;
@@ -99,6 +101,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
     @Autowired
     private SequenceService sequenceService;
+
+    private final AccountDeductionDetailMapper accountDeductionDetailMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -320,6 +324,13 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     }
 
     @Override
+    public List<AccountDepositApply> listByRequestId(String requestId) {
+        QueryWrapper<AccountDepositApply> wrapper = new QueryWrapper<>();
+        wrapper.eq(AccountDepositApply.REQUEST_ID, requestId);
+        return accountDepositApplyDao.list(wrapper);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Long approval(AccountDepositApprovalRequest request) {
         AccountDepositApply apply = accountDepositApplyDao.getById(request.getId());
@@ -450,6 +461,11 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
           }
         }
         return detailInfo;
+    }
+
+    @Override
+    public BigDecimal sumDepositDetailAmount(String merCode, String merAccountTypeCode) {
+        return accountDeductionDetailMapper.sumDepositDetailAmount(merCode,merAccountTypeCode);
     }
 
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {

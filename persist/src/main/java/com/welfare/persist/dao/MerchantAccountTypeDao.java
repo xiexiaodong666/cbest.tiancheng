@@ -28,6 +28,10 @@ public class MerchantAccountTypeDao extends ServiceImpl<MerchantAccountTypeMappe
         queryWrapper.eq(MerchantAccountType.MER_CODE,merCode);
         return list(queryWrapper);
     }
-
-
+    public MerchantAccountType queryAllByMerCodeAndType(String merCode, String type) {
+        QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(MerchantAccountType.MER_CODE,merCode);
+        queryWrapper.eq(MerchantAccountType.MER_ACCOUNT_TYPE_CODE, type);
+        return getOne(queryWrapper);
+    }
 }

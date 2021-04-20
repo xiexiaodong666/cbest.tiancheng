@@ -153,6 +153,8 @@ public class CardInfoServiceImpl implements CardInfoService {
                 ExceptionCode.ILLEGALITY_ARGURMENTS,
                 "账户已禁用"
         );
+        CardInfo oneByAccountCode = cardInfoDao.getOneByAccountCode(account.getAccountCode());
+        BizAssert.isNull(oneByAccountCode,ExceptionCode.ACCOUNT_ALREADY_BIND);
         CardInfo cardInfoInDb = cardInfoDao.getOneByCardId(cardInfo.getCardId());
         if(Objects.nonNull(cardInfoInDb)){
             return onCardExisted(cardInfo, cardInfoInDb);

@@ -15,6 +15,7 @@ import com.welfare.service.MerchantBillDetailService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.MerchantService;
 import com.welfare.service.dto.DecreaseMerchantCredit;
+import com.welfare.service.dto.MerchantExtendDTO;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
 import com.welfare.service.operator.merchant.*;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;

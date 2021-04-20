@@ -30,16 +30,22 @@ import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.*;
 @Data
 public class AccountAmountDO {
     private AccountAmountType accountAmountType;
+    private AccountAmountTypeGroup accountAmountTypeGroup;
     private MerchantAccountType merchantAccountType;
     private Account account;
     private String transNo;
-    public static AccountAmountDO of(AccountAmountType accountAmountType, MerchantAccountType merchantAccountType, Account account){
+
+    public static AccountAmountDO of(AccountAmountType accountAmountType,
+                                     MerchantAccountType merchantAccountType,
+                                     Account account,
+                                     AccountAmountTypeGroup accountAmountTypeGroup) {
         AccountAmountDO accountAmountDO = new AccountAmountDO();
-        Assert.notNull(accountAmountType,"子账户不能为空");
-        Assert.notNull(merchantAccountType,"商户子账户不能为空");
+        Assert.notNull(accountAmountType, "子账户不能为空");
+        Assert.notNull(merchantAccountType, "商户子账户不能为空");
         accountAmountDO.setAccountAmountType(accountAmountType);
         accountAmountDO.setMerchantAccountType(merchantAccountType);
         accountAmountDO.setAccount(account);
+        accountAmountDO.setAccountAmountTypeGroup(accountAmountTypeGroup);
         return accountAmountDO;
     }
 
@@ -62,7 +68,10 @@ public class AccountAmountDO {
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public  static AccountBillDetail generateAccountBillDetail(PaymentRequest paymentRequest, BigDecimal operatedAmount, List<AccountAmountType> accountAmountTypes) {
+    public static AccountBillDetail generateAccountBillDetail(PaymentRequest paymentRequest,
+                                                              BigDecimal operatedAmount,
+                                                              List<AccountAmountType> accountAmountTypes,
+                                                              AccountAmountTypeGroup accountAmountTypeGroup) {
         AccountBillDetail accountBillDetail = new AccountBillDetail();
         accountBillDetail.setAccountCode(paymentRequest.calculateAccountCode());
         accountBillDetail.setTransType(WelfareConstant.TransType.CONSUME.code());
@@ -74,17 +83,18 @@ public class AccountAmountDO {
         accountBillDetail.setCardId(paymentRequest.getCardNo());
         accountBillDetail.setOrderChannel(paymentRequest.getPaymentScene());
         accountBillDetail.setPaymentChannel(paymentRequest.getPaymentChannel());
-        if(paymentRequest instanceof CardPaymentRequest){
+        accountBillDetail.setAccountAmountTypeGroupId(accountAmountTypeGroup == null? null : accountAmountTypeGroup.getId());
+        if (paymentRequest instanceof CardPaymentRequest) {
             accountBillDetail.setPaymentType(PaymentTypeEnum.CARD.getCode());
             accountBillDetail.setPaymentTypeInfo(((CardPaymentRequest) paymentRequest).getCardInsideInfo());
-        }else if(paymentRequest instanceof BarcodePaymentRequest){
+        } else if (paymentRequest instanceof BarcodePaymentRequest) {
             accountBillDetail.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
             accountBillDetail.setPaymentTypeInfo(((BarcodePaymentRequest) paymentRequest).getBarcode());
-        }else if(paymentRequest instanceof OnlinePaymentRequest){
+        } else if (paymentRequest instanceof OnlinePaymentRequest) {
             accountBillDetail.setPaymentType(PaymentTypeEnum.ONLINE.getCode());
-        }else if(paymentRequest instanceof DoorAccessPaymentRequest){
+        } else if (paymentRequest instanceof DoorAccessPaymentRequest) {
             accountBillDetail.setPaymentType(PaymentTypeEnum.DOOR_ACCESS.getCode());
-        }else if (paymentRequest instanceof WholesalePaymentRequest){
+        } else if (paymentRequest instanceof WholesalePaymentRequest) {
             accountBillDetail.setPaymentType(PaymentTypeEnum.WHOLESALE.getCode());
         }
         BigDecimal accountBalance = AccountAmountDO.calculateAccountBalance(accountAmountTypes);
@@ -102,13 +112,14 @@ public class AccountAmountDO {
                                                                         PaymentOperation paymentOperation,
                                                                         Account account, SupplierStore supplierStore,
                                                                         MerchantCredit merchantCredit,
-                                                                        AbstractMerAccountTypeOperator merAccountTypeOperator) {
+                                                                        AbstractMerAccountTypeOperator merAccountTypeOperator,
+                                                                        AccountAmountTypeGroup accountAmountTypeGroup) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(paymentRequest.calculateAccountCode());
         accountDeductionDetail.setOrderChannel(paymentRequest.getPaymentScene());
         accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
-        accountDeductionDetail.setAccountAmountTypeBalance(Objects.isNull(accountAmountType)?BigDecimal.ZERO:accountAmountType.getAccountBalance());
-        accountDeductionDetail.setMerAccountType(Objects.isNull(accountAmountType)?null:accountAmountType.getMerAccountTypeCode());
+        accountDeductionDetail.setAccountAmountTypeBalance(Objects.isNull(accountAmountType) ? BigDecimal.ZERO : accountAmountType.getAccountBalance());
+        accountDeductionDetail.setMerAccountType(Objects.isNull(accountAmountType) ? null : accountAmountType.getMerAccountTypeCode());
         accountDeductionDetail.setPos(paymentRequest.getMachineNo());
         accountDeductionDetail.setTransNo(paymentRequest.getTransNo());
         accountDeductionDetail.setPayCode(WelfareConstant.PayCode.WELFARE_CARD.code());
@@ -118,13 +129,14 @@ public class AccountAmountDO {
         accountDeductionDetail.setTransTime(paymentRequest.getPaymentDate());
         accountDeductionDetail.setStoreCode(paymentRequest.getStoreNo());
         accountDeductionDetail.setPaymentChannel(paymentRequest.getPaymentChannel());
+        accountDeductionDetail.setAccountAmountTypeGroupId(accountAmountTypeGroup == null ? null : accountAmountTypeGroup.getId());
         if (paymentRequest instanceof CardPaymentRequest) {
             accountDeductionDetail.setCardId(paymentRequest.getCardNo());
         }
-        if(accountAmountType == null){
+        if (accountAmountType == null) {
             //联通沃生活馆，没有福利类型
             accountDeductionDetail.setSelfDeductionAmount(BigDecimal.ZERO);
-        }else{
+        } else {
             accountDeductionDetail.setSelfDeductionAmount(SELF.code().equals(accountAmountType.getMerAccountTypeCode()) ? operatedAmount : BigDecimal.ZERO);
         }
         accountDeductionDetail.setAccountDeductionAmount(operatedAmount);

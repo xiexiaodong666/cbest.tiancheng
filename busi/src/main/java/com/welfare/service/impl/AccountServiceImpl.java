@@ -1504,7 +1504,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         // 充值
-        MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(merchant.getMerCode(), req.getAccountTypeCode());
+        MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(merchant.getMerCode(), req.getMerAccountTypeCode());
         BizAssert.notNull(merchantAccountType,ExceptionCode.ILLEGALITY_ARGURMENTS, "福利类型不存在");
         // 申请
         DepositApplyRequest request = new DepositApplyRequest();

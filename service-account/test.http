@@ -9,3 +9,6 @@ GET http://localhost:10015/account/info
 Content-Type: application/json
 Source: cbest-saas-rewardmall
 accountUser: {"accountCode":"111111"}
+
+### 卫计委绑卡
+POST http://localhost:10015/

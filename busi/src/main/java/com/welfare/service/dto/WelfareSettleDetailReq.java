@@ -76,4 +76,10 @@ public class WelfareSettleDetailReq{
 
     @ApiModelProperty(value = "部门编码列表")
     private List<String> departmentCodes;
+
+    @ApiModelProperty("合作方式")
+    private String merCooperationMode;
+
+    @ApiModelProperty(value = "商户名称")
+    private String merName;
 }

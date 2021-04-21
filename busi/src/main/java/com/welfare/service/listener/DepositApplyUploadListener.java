@@ -65,8 +65,8 @@ public class DepositApplyUploadListener extends AnalysisEventListener<AccountDep
 //    if (!AccountUtil.validPhone(request.getPhone())) {
 //      throw new BizException(String.format("[%s]手机号不合法！", request.getPhone()));
 //    }
-    if (request.getRechargeAmount() == null || request.getRechargeAmount().compareTo(BigDecimal.ZERO) < 0) {
-      throw new BizException(String.format("[%s]金额不能小于0！", request.getPhone()));
+    if (request.getRechargeAmount() == null) {
+      throw new BizException(String.format("[%s]金额不能为空！", request.getPhone()));
     }
     if (request.getRechargeAmount().compareTo(MAX_AMOUNT) > 0) {
       throw new BizException(String.format("[%s]金额超过限制[%s]！", request.getPhone(), MAX_AMOUNT));

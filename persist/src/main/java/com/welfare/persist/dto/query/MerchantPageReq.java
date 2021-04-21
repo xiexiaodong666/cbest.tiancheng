@@ -29,4 +29,10 @@ public class MerchantPageReq {
 
     @ApiModelProperty("结束时间")
     private Date endTime;
+
+    @ApiModelProperty("余额查询开始时间")
+    private Date balanceStartTime;
+
+    @ApiModelProperty("余额查询结束时间")
+    private Date balanceEndTime;
 }

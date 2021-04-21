@@ -378,6 +378,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             accountDepositApplyDetailDao.updateBatchById(details);
             return apply.getId();
         } catch (Exception e) {
+            TempAccountDepositApply accountDepositApply = new TempAccountDepositApply();
+            accountDepositApply.setRequestId("haha");
+            accountDepositApply.setAccountCode(2222L);
+            tempAccountDepositApplyService.saveAll(Lists.newArrayList(accountDepositApply));
             log.error("审批员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {

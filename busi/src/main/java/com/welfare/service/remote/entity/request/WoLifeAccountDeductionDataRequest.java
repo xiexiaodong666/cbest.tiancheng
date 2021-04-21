@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
 
 
@@ -53,18 +54,13 @@ public class WoLifeAccountDeductionDataRequest {
 
     woLifeAccountDeductionDataRequest.setOid(paymentRequest.getTransNo());
     woLifeAccountDeductionDataRequest.setTotalPrice(paymentRequest.getAmount());
-    String saleRows = paymentRequest.getSaleRows();
-
+    // String saleRows = paymentRequest.getSaleRows();
+    List<WoLifeAccountDeductionRowsRequest> woLifeAccountDeductionRowsRequestList = paymentRequest.getSaleRows();
     // 处理线上商城支付请求
-    if(Strings.isNotEmpty(saleRows) && ConsumeTypeEnum.ONLINE_MALL.getCode().equals(paymentRequest.getPaymentScene())) {
-      ObjectMapper objectMapper = new ObjectMapper();
-      try {
-        List<WoLifeAccountDeductionRowsRequest> rows = objectMapper.readValue(saleRows, new TypeReference<List<WoLifeAccountDeductionRowsRequest>>(){});
-        woLifeAccountDeductionDataRequest.setRows(rows);
-        woLifeAccountDeductionDataRequest.setTotalCount(rows.size());
-      } catch (JsonProcessingException e) {
-        throw new BizException("[沃生活馆]支付异常:线上支付商品行参数转换错误" + saleRows);
-      }
+    if(CollectionUtils.isNotEmpty(woLifeAccountDeductionRowsRequestList) && ConsumeTypeEnum.ONLINE_MALL.getCode().equals(paymentRequest.getPaymentScene())) {
+
+        woLifeAccountDeductionDataRequest.setRows(woLifeAccountDeductionRowsRequestList);
+        woLifeAccountDeductionDataRequest.setTotalCount(woLifeAccountDeductionRowsRequestList.size());
 
     } else {
       woLifeAccountDeductionDataRequest.setRows(Collections.singletonList(WoLifeAccountDeductionRowsRequest.of(paymentRequest)));

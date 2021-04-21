@@ -152,7 +152,7 @@ public class MerChantConsumeDataController {
     }
 
     String path = fileUploadServiceUtil.uploadExcelFile(
-        exportMerChantConsumeDataList, ExportMerChantConsumeData.class, "客户消费情况统计报表");
+        exportMerChantConsumeDataList, ExportMerChantConsumeData.class, "客户消费汇总表");
 
     return R.success(fileUploadServiceUtil.getFileServerUrl(path));
   }

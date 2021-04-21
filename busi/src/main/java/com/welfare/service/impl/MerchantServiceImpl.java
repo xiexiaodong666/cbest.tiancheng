@@ -199,7 +199,8 @@ public class MerchantServiceImpl implements MerchantService {
         List<String> industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
         merchantInitOperatorFactory.operators(industryTags).forEach(operator -> operator.init(merCode));
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
-        detailDTO.setTags(industryTags);
+        List<String> syncIndustryTag = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
+        detailDTO.setTags(syncIndustryTag);
         detailDTO.setAddressList(merchant.getAddressList());
         detailDTO.setId(save.getId());
         List<MerchantSyncDTO> syncList=new ArrayList<>();

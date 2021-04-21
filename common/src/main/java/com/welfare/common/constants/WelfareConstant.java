@@ -657,6 +657,16 @@ public class WelfareConstant {
         public String desc(){
             return this.desc;
         }
+
+        public static IndustryTag fromCode(String code){
+            IndustryTag[] values = IndustryTag.values();
+            for (IndustryTag c : values) {
+                if(c.code.equals(code)){
+                    return c;
+                }
+            }
+            throw new RuntimeException("不存在的IndustryTag类型");
+        }
     }
 
 }

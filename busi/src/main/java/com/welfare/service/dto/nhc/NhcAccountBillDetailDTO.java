@@ -32,7 +32,7 @@ public class NhcAccountBillDetailDTO {
   private String merAccountTypeCode;
 
   @ApiModelProperty("交易总金额")
-  private BigDecimal transAmount;
+  private String transAmount;
 
   @ApiModelProperty("事件")
   private String event;

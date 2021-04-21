@@ -73,6 +73,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -457,7 +458,7 @@ public class AccountServiceImpl implements AccountService {
             .assemableChangeEvent(AccountChangeType.ACCOUNT_NEW, account.getAccountCode(),
                 account.getCreateUser());
         accountChangeEventRecordService.save(accountChangeEventRecord);
-        if (accountReq.getCredit()) {
+        if (accountReq.getCredit() != null && accountReq.getCredit()) {
             //授信额度
             AccountAmountType accountAmountType = getAccountAmountType(account.getAccountCode(),
                 account.getMaxQuota(), account.getMerCode(),
@@ -1476,54 +1477,60 @@ public class AccountServiceImpl implements AccountService {
     public EmployerReqDTO saveAndDeposit(AccountSaveAndDepositReq req) {
         Merchant merchant = merchantService.getMerchantByMerCode(req.getMerCode());
         BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
-        List<AccountType> accountTypes = accountTypeDao.getByMerCode(merchant.getMerCode());
-        BizAssert.notEmpty(accountTypes, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户没有员工类型");
-        AccountType accountType = accountTypes.get(0);
-        List<DepartmentTree> departmentTrees = departmentService.tree(merchant.getMerCode());
-        BizAssert.notEmpty(departmentTrees.get(0).getChildren(),ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
-        DepartmentTree department = (DepartmentTree)departmentTrees.get(0).getChildren().get(0);
+        AccountType accountType = accountTypeService.queryByTypeCode(merchant.getMerCode(),req.getAccountTypeCode());
+        BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在");
+        Department department = departmentService.getByDepartmentCode(req.getDepartmentCode());
         BizAssert.notNull(department,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
-
         AccountReq accountReq = new AccountReq();
-        accountReq.setAccountName(req.getAccountName());
+        accountReq.setAccountName("默认名称");
         accountReq.setMerCode(merchant.getMerCode());
         accountReq.setPhone(req.getPhone());
-        accountReq.setAccountStatus(AccountStatus.ENABLE.getCode());
+        accountReq.setAccountStatus(AccountStatus.getByCode(req.getAccountStatus()).getCode());
         accountReq.setAccountTypeCode(accountType.getTypeCode());
-        accountReq.setCredit(false);
+        accountReq.setCredit(req.getCredit());
         accountReq.setDepartmentCode(department.getDepartmentCode());
         accountReq.setRemark(req.getRemark());
 
         //新增员工
         try {
             save(accountReq);
-        } catch (Exception e) {
-           // if
+        } catch (Exception exception) {
+            if (exception instanceof DuplicateKeyException) {
+                log.error("员工已存在 req:{}", JSON.toJSONString(req), exception);
+                throw new BizException("员工已存在");
+            } else {
+                throw exception;
+            }
         }
+
         // 充值
-        List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeService.queryAllByMerCode(merchant.getMerCode());
-        BizAssert.notEmpty(merchantAccountTypes,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户没有福利类型");
+        MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(merchant.getMerCode(), req.getAccountTypeCode());
+        BizAssert.notNull(merchantAccountType,ExceptionCode.ILLEGALITY_ARGURMENTS, "福利类型不存在");
+        // 申请
         DepositApplyRequest request = new DepositApplyRequest();
         request.setRequestId(UUID.randomUUID().toString());
-        request.setApplyRemark("建行员工充值");
-        //request.setMerAccountTypeCode();
-       // request.setMerAccountTypeName();
+        request.setApplyRemark("注册并充值");
+        request.setMerAccountTypeCode(merchantAccountType.getMerAccountTypeCode());
+        request.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
         request.setApprovalType(ApprovalType.SINGLE.getCode());
         AccountDepositRequest depositRequest = new AccountDepositRequest();
         depositRequest.setPhone(req.getPhone());
-        depositRequest.setRechargeAmount(new BigDecimal(30));
+        depositRequest.setRechargeAmount(req.getAmount());
         request.setInfo(depositRequest);
         MerchantUserInfo merchantUserInfo = new MerchantUserInfo();
         merchantUserInfo.setMerchantCode(req.getMerCode());
         merchantUserInfo.setUserCode("platform");
         merchantUserInfo.setUsername("platform");
         Long applyId = depositApplyService.saveOne(request, merchantUserInfo);
+        // 审核
         AccountDepositApprovalRequest approvalRequest = new AccountDepositApprovalRequest();
         approvalRequest.setId(String.valueOf(applyId));
         approvalRequest.setApprovalUser("platform");
         approvalRequest.setApprovalStatus(ApprovalStatus.AUDIT_SUCCESS.getCode());
         depositApplyService.approval(approvalRequest);
 
-        return null;
+        Account account = accountDao.getByMerCodeAndPhone(req.getMerCode(), req.getPhone());
+        BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "新增员工失败");
+        return EmployerReqDTO.of(ShoppingActionTypeEnum.ADD, account, accountType, department);
     }
 }

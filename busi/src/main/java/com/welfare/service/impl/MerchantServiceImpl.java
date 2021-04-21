@@ -199,6 +199,8 @@ public class MerchantServiceImpl implements MerchantService {
         List<String> industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
         merchantInitOperatorFactory.operators(industryTags).forEach(operator -> operator.init(merCode));
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
+        List<String> syncIndustryTag = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
+        detailDTO.setTags(syncIndustryTag);
         detailDTO.setAddressList(merchant.getAddressList());
         detailDTO.setId(save.getId());
         List<MerchantSyncDTO> syncList=new ArrayList<>();
@@ -228,6 +230,9 @@ public class MerchantServiceImpl implements MerchantService {
         }
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
+
+        List<String> industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+        detailDTO.setTags(industryTags);
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).timestamp(new Date()).build());

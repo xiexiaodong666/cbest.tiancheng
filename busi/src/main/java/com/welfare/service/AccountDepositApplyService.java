@@ -87,4 +87,6 @@ public interface AccountDepositApplyService {
    * @return
    */
   AccountDepositApplyDetailInfo detail(Long id);
+
+  void approvalAndFail(AccountDepositApprovalRequest req);
 }

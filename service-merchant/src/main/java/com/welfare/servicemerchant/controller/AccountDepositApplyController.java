@@ -113,7 +113,12 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("审批账号额度申请")
   @MerchantUser
   public R<String> approval(@Validated@RequestBody AccountDepositApprovalRequest request){
-    return success(depositApplyService.approval(request)+"");
+    try {
+      return success(depositApplyService.approval(request) + "");
+    } catch (Exception e) {
+      depositApplyService.approvalAndFail(request);
+      return fail(e.getMessage());
+    }
   }
 
   @PostMapping("/save")

@@ -42,6 +42,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 账户充值申请服务接口实现
@@ -378,10 +379,6 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             accountDepositApplyDetailDao.updateBatchById(details);
             return apply.getId();
         } catch (Exception e) {
-            TempAccountDepositApply accountDepositApply = new TempAccountDepositApply();
-            accountDepositApply.setRequestId("haha");
-            accountDepositApply.setAccountCode(2222L);
-            tempAccountDepositApplyService.saveAll(Lists.newArrayList(accountDepositApply));
             log.error("审批员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
         } finally {
@@ -454,6 +451,19 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
           }
         }
         return detailInfo;
+    }
+
+    @Override
+    public void approvalAndFail(AccountDepositApprovalRequest req) {
+        AccountDepositApply apply = accountDepositApplyDao.getById(req.getId());
+        if (Objects.nonNull(apply)) {
+            apply.setRechargeStatus(RechargeStatus.NO.getCode());
+            apply.setApprovalOpinion(req.getApprovalOpinion());
+            apply.setApprovalRemark(req.getApplyRemark());
+            apply.setApprovalUser(req.getApprovalUser());
+            apply.setApprovalStatus(req.getApprovalStatus());
+            accountDepositApplyDao.updateById(apply);
+        }
     }
 
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {

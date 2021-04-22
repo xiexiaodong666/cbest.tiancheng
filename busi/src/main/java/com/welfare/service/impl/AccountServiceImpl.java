@@ -751,6 +751,13 @@ public class AccountServiceImpl implements AccountService {
         Page<AccountBillDetailMapperDTO> page = new Page<>(currentPage, pageSize);
         IPage<AccountBillDetailMapperDTO> iPage = accountCustomizeMapper
             .queryAccountBillDetail(page, accountCode, createTimeStart, createTimeEnd);
+        if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
+            iPage.getRecords().forEach(accountBillDetailMapperDTO -> {
+                if (TransType.DEPOSIT_BACK.code().equals(accountBillDetailMapperDTO.getTransType())) {
+                    accountBillDetailMapperDTO.setTransAmount(accountBillDetailMapperDTO.getTransAmount().abs().negate());
+                }
+            });
+        }
         return accountConverter.toBillDetailPage(iPage);
     }
 

@@ -564,7 +564,7 @@ public class AccountServiceImpl implements AccountService {
         if (isNew) {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
             if (null != queryAccount) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工手机号已经存在", null);
+                throw new BizException(ExceptionCode.ACCOUNT_EXIST, "员工手机号已经存在", null);
             }
         } else {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
@@ -1495,16 +1495,19 @@ public class AccountServiceImpl implements AccountService {
         try {
             save(accountReq);
         } catch (Exception exception) {
-            if (exception instanceof DuplicateKeyException) {
-                log.error("员工已存在 req:{}", JSON.toJSONString(req), exception);
-                throw new BizException("员工已存在");
+            if (exception instanceof DuplicateKeyException ||
+                    ( exception instanceof BizException && ((BizException) exception).getCodeEnum() == ExceptionCode.ACCOUNT_EXIST )) {
+                log.warn("员工已存在 req:{}", JSON.toJSONString(req), exception);
+                Account account = accountDao.getByMerCodeAndPhone(req.getMerCode(), req.getPhone());
+                BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "新增员工失败");
+                return EmployerReqDTO.of(ShoppingActionTypeEnum.ADD, account, accountType, department);
             } else {
                 throw exception;
             }
         }
 
         // 充值
-        MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(merchant.getMerCode(), req.getAccountTypeCode());
+        MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(merchant.getMerCode(), req.getMerAccountTypeCode());
         BizAssert.notNull(merchantAccountType,ExceptionCode.ILLEGALITY_ARGURMENTS, "福利类型不存在");
         // 申请
         DepositApplyRequest request = new DepositApplyRequest();

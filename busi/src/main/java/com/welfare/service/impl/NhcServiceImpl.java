@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.*;
@@ -12,7 +13,9 @@ import com.welfare.common.util.AccountUtil;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.*;
+import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.entity.*;
+import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.*;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.BatchSequence;
@@ -75,6 +78,8 @@ public class NhcServiceImpl implements NhcService {
     private TempAccountDepositApplyDao tempAccountDepositApplyDao;
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
+    @Autowired
+    private AccountCustomizeMapper accountCustomizeMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -243,8 +248,8 @@ public class NhcServiceImpl implements NhcService {
 
     @Override
     public Page<NhcAccountBillDetailDTO> getUserBillPage(NhcUserPageReq userPageReq) {
-        Page<AccountBillDetailDTO> page = accountService.queryAccountBillDetail(userPageReq.getCurrent(), userPageReq.getSize(),
-                userPageReq.getAccountCode(), null, null);
+        Page<AccountBillDetailMapperDTO> page = new Page<>(userPageReq.getCurrent(), userPageReq.getSize());
+        accountCustomizeMapper.queryAccountBillDetail(page, userPageReq.getAccountCode(), null, null);
         List<NhcAccountBillDetailDTO> list = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(page.getRecords())) {
             page.getRecords().forEach(billDetail -> {

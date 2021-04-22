@@ -85,7 +85,7 @@ merchant:
   url: http://welfaremerchant.api.cbest.gam
 
 service-mirror:
-  url: http://192.1.30.96:8889
+  url: http://192.1.30.96
 
 ftp:
   enabled: true

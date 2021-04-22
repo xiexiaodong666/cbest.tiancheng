@@ -49,6 +49,9 @@ public class WelfareMerChantConsumeDataApiResponse {
     @ApiModelProperty("员工人数")
     private String userNum;
 
+    @ApiModelProperty("付费类型")
+    private String merCooperationMode;
+
     @ApiModelProperty("商户余额")
     private String currentBalance;
 
@@ -66,6 +69,15 @@ public class WelfareMerChantConsumeDataApiResponse {
 
     @ApiModelProperty("消费总金额")
     private Double consumeMoney;
+
+    @ApiModelProperty("百货消费总金额")
+    private String bhConsumeMoney;
+
+    @ApiModelProperty("超市消费总金额")
+    private String dqConsumeMoney;
+
+    @ApiModelProperty("电器消费总金额")
+    private String csConsumeMoney;
 
     @ApiModelProperty("消费人数")
     private Integer consumePeopleNum;
@@ -86,6 +98,7 @@ public class WelfareMerChantConsumeDataApiResponse {
       TableExt tableExt = new TableExt();
       tableExt.setMerName("汇总");
       tableExt.setUserNum(response.getUserNum());
+      tableExt.setMerCooperationMode("-");
       tableExt.setCurrentBalance(response.getCurrentBalance());
       tableExt.setRemainingLimit(response.getRemainingLimit());
       tableExt.setSettledMoney(response.getSettledMoney());
@@ -97,6 +110,9 @@ public class WelfareMerChantConsumeDataApiResponse {
       tableExt.setAvgPeopleConsumeMoney(response.getAvgPeopleConsumeMoneyCollect());
       tableExt.setAvgTransMoney(response.getAvgTransMoneyCollect());
 
+      tableExt.setBhConsumeMoney("-");
+      tableExt.setCsConsumeMoney("-");
+      tableExt.setDqConsumeMoney("-");
       return tableExt;
     }
 
@@ -106,6 +122,7 @@ public class WelfareMerChantConsumeDataApiResponse {
       if(isFillMerchantAttributes) {
         tableExt.setMerName("汇总");
         tableExt.setUserNum(response.getUserNum());
+        tableExt.setMerCooperationMode("-");
         tableExt.setCurrentBalance(response.getCurrentBalance());
         tableExt.setRemainingLimit(response.getRemainingLimit());
         tableExt.setSettledMoney(response.getSettledMoney());
@@ -118,6 +135,9 @@ public class WelfareMerChantConsumeDataApiResponse {
       tableExt.setAvgPeopleConsumeMoney(response.getAvgPeopleConsumeMoneyCollect());
       tableExt.setAvgTransMoney(response.getAvgTransMoneyCollect());
 
+      tableExt.setBhConsumeMoney(response.getBhConsumeMoneyCollect());
+      tableExt.setDqConsumeMoney(response.getDqConsumeMoneyCollect());
+      tableExt.setCsConsumeMoney(response.getCsConsumeMoneyCollect());
       return tableExt;
     }
 

@@ -1,5 +1,6 @@
 package com.welfare.servicesettlement.controller;
 
+import cn.hutool.core.date.StopWatch;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.service.dto.merchantconsume.ExportMerChantConsumeData;
 import com.welfare.service.dto.merchantconsume.MerChantConsumeDataDetailApiResponse;
@@ -57,10 +58,13 @@ public class MerChantConsumeDataController {
   @ApiOperation("查询商户消费统计")
   public R<WelfareMerChantConsumeDataApiResponse> getWelfareMerChantConsumeData(
       @RequestBody WelfareMerChantConsumeDataApiRequest request) {
+    StopWatch sw = new StopWatch();
+    sw.start();
 
     WelfareMerChantConsumeDataResponse response = serviceMirrorFeignClient
         .getWelfareMerChantConsumeData(WelfareMerChantConsumeDataRequest.of(request));
-
+    sw.stop();
+    log.info("调用客户消费汇总表数仓耗时{}", sw.getTotalTimeMillis());
     if (response == null || !"200".equals(response.getCode()) || CollectionUtils.isEmpty(
         response.getDatas())) {
       return R.success();
@@ -109,8 +113,12 @@ public class MerChantConsumeDataController {
   public R<String> exportWelfareMerChantConsumeData(
       @RequestBody WelfareMerChantConsumeDataApiRequest request) throws IOException {
 
+    StopWatch sw = new StopWatch();
+    sw.start();
     WelfareMerChantConsumeDataResponse response = serviceMirrorFeignClient
         .getWelfareMerChantConsumeData(WelfareMerChantConsumeDataRequest.of(request));
+    sw.stop();
+    log.info("调用客户消费汇总表数仓耗时{}", sw.getTotalTimeMillis());
 
     if (response == null || !"200".equals(response.getCode())) {
       return R.success();
@@ -216,6 +224,9 @@ public class MerChantConsumeDataController {
         selfDataList.forEach(s->{
           MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
           s.setConsumeType(ConsumeTypeEnum.getByType(s.getConsumeType()).getDesc());
+          s.setBhConsumeMoney("-");
+          s.setCsConsumeMoney("-");
+          s.setDqConsumeMoney("-");
           BeanUtils.copyProperties(s, merChantConsumeDataDetailApiResponse);
           selfMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
         });
@@ -269,7 +280,9 @@ public class MerChantConsumeDataController {
       selfDataList.forEach(s->{
         MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
         s.setConsumeType(ConsumeTypeEnum.getByType(s.getConsumeType()).getDesc());
-
+        s.setBhConsumeMoney("-");
+        s.setCsConsumeMoney("-");
+        s.setDqConsumeMoney("-");
         BeanUtils.copyProperties(s, merChantConsumeDataDetailApiResponse);
         selfMerChantConsumeDataDetailApiResponseList.add(merChantConsumeDataDetailApiResponse);
       });

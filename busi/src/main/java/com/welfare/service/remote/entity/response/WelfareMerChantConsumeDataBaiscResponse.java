@@ -104,4 +104,23 @@ public class WelfareMerChantConsumeDataBaiscResponse {
    * 类型标注，1明细 3总的汇总数据 4 最顶部的数据
    */
   private String attribute;
+
+  /**
+   * 付费类型
+   */
+  private String merCooperationMode;
+
+  private String bhConsumeMoneyCollect;
+
+  private String bhConsumeMoney;
+
+  private String dqConsumeMoneyCollect;
+
+  private String dqConsumeMoney;
+
+  private String csConsumeMoneyCollect;
+
+  private String csConsumeMoney;
+
+
 }

@@ -19,6 +19,15 @@ public class MerChantConsumeDataDetailApiResponse {
   @ApiModelProperty("消费总金额")
   private Double consumeMoney;
 
+  @ApiModelProperty("百货消费总金额")
+  private String bhConsumeMoney;
+
+  @ApiModelProperty("超市消费总金额")
+  private String dqConsumeMoney;
+
+  @ApiModelProperty("电器消费总金额")
+  private String csConsumeMoney;
+
   @ApiModelProperty("消费人数")
   private Integer consumePeopleNum;
 

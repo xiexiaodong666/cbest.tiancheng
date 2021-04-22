@@ -1,6 +1,7 @@
 package com.welfare.service.dto.merchantconsume;
 
 import com.welfare.common.constants.WelfareSettleConstant.BusinessTypeEnum;
+import com.welfare.common.enums.MerCooperationModeEnum;
 import com.welfare.service.remote.entity.response.WelfareMerChantConsumeDataBaiscResponse;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
@@ -26,6 +27,9 @@ public class MerChantConsumeDataRowsApiResponse {
   @ApiModelProperty("员工人数")
   private String userNum;
 
+  @ApiModelProperty("付费类型")
+  private String merCooperationMode;
+
   @ApiModelProperty("商户余额")
   private String currentBalance;
 
@@ -43,6 +47,16 @@ public class MerChantConsumeDataRowsApiResponse {
 
   @ApiModelProperty("消费总金额")
   private Double consumeMoney;
+
+  @ApiModelProperty("百货消费总金额")
+  private String bhConsumeMoney;
+
+  @ApiModelProperty("超市消费总金额")
+  private String dqConsumeMoney;
+
+  @ApiModelProperty("电器消费总金额")
+  private String csConsumeMoney;
+
 
   @ApiModelProperty("消费人数")
   private Integer consumePeopleNum;
@@ -64,12 +78,16 @@ public class MerChantConsumeDataRowsApiResponse {
     merChantConsumeDataRowsApiResponse.setMerCode(response.getMerCode());
     merChantConsumeDataRowsApiResponse.setMerName(response.getMerName());
     merChantConsumeDataRowsApiResponse.setUserNum(response.getUserNum());
+    merChantConsumeDataRowsApiResponse.setMerCooperationMode(MerCooperationModeEnum.getByCode(response.getMerCooperationMode()).getDesc());
     merChantConsumeDataRowsApiResponse.setCurrentBalance(response.getCurrentBalance());
     merChantConsumeDataRowsApiResponse.setRemainingLimit(response.getRemainingLimit());
     merChantConsumeDataRowsApiResponse.setSettledMoney(response.getSettledMoney());
     merChantConsumeDataRowsApiResponse.setUnsettledMoney(response.getUnsettledMoney());
     merChantConsumeDataRowsApiResponse.setBusinessType(BusinessTypeEnum.valueOf(response.getBusinessType().toUpperCase()).desc());
     merChantConsumeDataRowsApiResponse.setConsumeMoney(response.getConsumeMoneyCollect());
+    merChantConsumeDataRowsApiResponse.setCsConsumeMoney("-");
+    merChantConsumeDataRowsApiResponse.setBhConsumeMoney("-");
+    merChantConsumeDataRowsApiResponse.setDqConsumeMoney("-");
     merChantConsumeDataRowsApiResponse.setConsumePeopleNum(response.getConsumePeopleNumCollect());
     merChantConsumeDataRowsApiResponse.setTransNum(response.getTransNumCollect());
     merChantConsumeDataRowsApiResponse.setAvgPeopleConsumeMoney(response.getAvgPeopleConsumeMoneyCollect());
@@ -85,6 +103,7 @@ public class MerChantConsumeDataRowsApiResponse {
       merChantConsumeDataRowsApiResponse.setMerCode(response.getMerCode());
       merChantConsumeDataRowsApiResponse.setMerName(response.getMerName());
       merChantConsumeDataRowsApiResponse.setUserNum(response.getUserNum());
+      merChantConsumeDataRowsApiResponse.setMerCooperationMode(MerCooperationModeEnum.getByCode(response.getMerCooperationMode()).getDesc());
       merChantConsumeDataRowsApiResponse.setCurrentBalance(response.getCurrentBalance());
       merChantConsumeDataRowsApiResponse.setRemainingLimit(response.getRemainingLimit());
       merChantConsumeDataRowsApiResponse.setSettledMoney(response.getSettledMoney());
@@ -92,6 +111,9 @@ public class MerChantConsumeDataRowsApiResponse {
     }
     merChantConsumeDataRowsApiResponse.setBusinessType(BusinessTypeEnum.valueOf(response.getBusinessType().toUpperCase()).desc());
     merChantConsumeDataRowsApiResponse.setConsumeMoney(response.getConsumeMoneyCollect());
+    merChantConsumeDataRowsApiResponse.setCsConsumeMoney(response.getCsConsumeMoneyCollect());
+    merChantConsumeDataRowsApiResponse.setBhConsumeMoney(response.getBhConsumeMoneyCollect());
+    merChantConsumeDataRowsApiResponse.setDqConsumeMoney(response.getDqConsumeMoneyCollect());
     merChantConsumeDataRowsApiResponse.setConsumePeopleNum(response.getConsumePeopleNumCollect());
     merChantConsumeDataRowsApiResponse.setTransNum(response.getTransNumCollect());
     merChantConsumeDataRowsApiResponse.setAvgPeopleConsumeMoney(response.getAvgPeopleConsumeMoneyCollect());

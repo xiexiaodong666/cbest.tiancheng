@@ -29,6 +29,11 @@ public class ExportMerChantConsumeData {
   @ColumnWidth(10)
   private String userNum;
 
+  @ApiModelProperty("付费类型")
+  @ExcelProperty(value = "付费类型")
+  @ColumnWidth(10)
+  private String merCooperationMode;
+
   @ApiModelProperty("商户余额（元）")
   @ExcelProperty(value = "商户余额（元）")
   @ColumnWidth(20)
@@ -44,8 +49,8 @@ public class ExportMerChantConsumeData {
   @ColumnWidth(20)
   private String settledMoney;
 
-  @ApiModelProperty("待结算金额（元）")
-  @ExcelProperty(value = "待结算金额（元）")
+  @ApiModelProperty("未结算金额（元）\n (包含待结算及结算中)")
+  @ExcelProperty(value = "未结算金额（元）\n (包含待结算及结算中)")
   @ColumnWidth(20)
   private String unsettledMoney;
 
@@ -63,6 +68,23 @@ public class ExportMerChantConsumeData {
   @ExcelProperty(value = "消费总金额（元）")
   @ColumnWidth(15)
   private Double consumeMoney;
+
+
+  @ApiModelProperty("百货消费总金额（元）")
+  @ExcelProperty(value = "百货消费总金额（元）")
+  @ColumnWidth(15)
+  private String bhConsumeMoney;
+
+  @ApiModelProperty("超市消费总金额（元）")
+  @ExcelProperty(value = "超市消费总金额（元）")
+  @ColumnWidth(15)
+  private String csConsumeMoney;
+
+  @ApiModelProperty("电器消费总金额（元）")
+  @ExcelProperty(value = "电器消费总金额（元）")
+  @ColumnWidth(15)
+  private String dqConsumeMoney;
+
 
   @ApiModelProperty("消费人数（人）")
   @ExcelProperty(value = "消费人数（人）")
@@ -91,6 +113,7 @@ public class ExportMerChantConsumeData {
     exportMerChantConsumeData.setMerCode(response.getMerCode());
     exportMerChantConsumeData.setMerName(response.getMerName());
     exportMerChantConsumeData.setUserNum(response.getUserNum());
+    exportMerChantConsumeData.setMerCooperationMode(response.getMerCooperationMode());
     exportMerChantConsumeData.setCurrentBalance(response.getCurrentBalance());
     exportMerChantConsumeData.setRemainingLimit(response.getRemainingLimit());
     exportMerChantConsumeData.setSettledMoney(response.getSettledMoney());
@@ -102,6 +125,9 @@ public class ExportMerChantConsumeData {
     exportMerChantConsumeData.setTransNum(response.getTransNum());
     exportMerChantConsumeData.setAvgPeopleConsumeMoney(response.getAvgPeopleConsumeMoney());
     exportMerChantConsumeData.setAvgTransMoney(response.getAvgTransMoney());
+    exportMerChantConsumeData.setBhConsumeMoney(response.getBhConsumeMoney());
+    exportMerChantConsumeData.setCsConsumeMoney(response.getCsConsumeMoney());
+    exportMerChantConsumeData.setDqConsumeMoney(response.getDqConsumeMoney());
 
     return exportMerChantConsumeData;
   }
@@ -116,6 +142,9 @@ public class ExportMerChantConsumeData {
     exportMerChantConsumeData.setTransNum(response.getTransNum());
     exportMerChantConsumeData.setAvgPeopleConsumeMoney(response.getAvgPeopleConsumeMoney());
     exportMerChantConsumeData.setAvgTransMoney(response.getAvgTransMoney());
+    exportMerChantConsumeData.setBhConsumeMoney(response.getBhConsumeMoney());
+    exportMerChantConsumeData.setCsConsumeMoney(response.getCsConsumeMoney());
+    exportMerChantConsumeData.setDqConsumeMoney(response.getDqConsumeMoney());
 
     return exportMerChantConsumeData;
   }
@@ -129,6 +158,7 @@ public class ExportMerChantConsumeData {
     //exportMerChantConsumeData.setMerCode("汇总");
     exportMerChantConsumeData.setMerName(response.getMerName());
     exportMerChantConsumeData.setUserNum(response.getUserNum());
+    exportMerChantConsumeData.setMerCooperationMode(response.getMerCooperationMode());
     exportMerChantConsumeData.setCurrentBalance(response.getCurrentBalance());
     exportMerChantConsumeData.setRemainingLimit(response.getRemainingLimit());
     exportMerChantConsumeData.setSettledMoney(response.getSettledMoney());
@@ -140,6 +170,10 @@ public class ExportMerChantConsumeData {
     exportMerChantConsumeData.setTransNum(response.getTransNum());
     exportMerChantConsumeData.setAvgPeopleConsumeMoney(response.getAvgPeopleConsumeMoney());
     exportMerChantConsumeData.setAvgTransMoney(response.getAvgTransMoney());
+
+    exportMerChantConsumeData.setBhConsumeMoney(response.getBhConsumeMoney());
+    exportMerChantConsumeData.setCsConsumeMoney(response.getCsConsumeMoney());
+    exportMerChantConsumeData.setDqConsumeMoney(response.getDqConsumeMoney());
 
     return exportMerChantConsumeData;
   }

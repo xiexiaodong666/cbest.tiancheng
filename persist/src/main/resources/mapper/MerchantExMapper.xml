@@ -29,11 +29,8 @@
     WHERE id in
           ( SELECT MAX( mbd.id ) FROM merchant_bill_detail mbd
           <where>
-            <if test="req!=null and req.balanceStartTime!=null">
-              and mbd.create_time &gt;= #{balanceStartTime}
-            </if>
             <if test="req!=null and req.balanceEndTime!=null">
-              and mbd.create_time &lt;= #{balanceEndTime}
+              and mbd.create_time &lt;= #{req.balanceEndTime}
             </if>
           </where>
           GROUP BY mbd.mer_code

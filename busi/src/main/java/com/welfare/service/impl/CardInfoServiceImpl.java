@@ -181,6 +181,7 @@ public class CardInfoServiceImpl implements CardInfoService {
             log.info("already existed but not bind, directly bind");
             cardInfoInDb.setAccountCode(cardInfo.getAccountCode());
             cardInfoInDb.setEnabled(EnableEnum.ENABLE.getCode());
+            cardInfoInDb.setCardStatus(WelfareConstant.CardStatus.BIND.code());
             cardInfoDao.updateById(cardInfoInDb);
             return cardInfoInDb;
         }
@@ -192,7 +193,8 @@ public class CardInfoServiceImpl implements CardInfoService {
         cardInfoDao.update(Wrappers.<CardInfo>lambdaUpdate()
                 .eq(CardInfo::getId,cardInfo.getId())
                 .set(CardInfo::getAccountCode,null)
-                .set(CardInfo::getEnabled,EnableEnum.DISABLE.getCode()));
+                .set(CardInfo::getEnabled,EnableEnum.DISABLE.getCode())
+                .set(CardInfo::getCardStatus, WelfareConstant.CardStatus.NEW));
         cardInfo.setAccountCode(null);
         cardInfo.setEnabled(EnableEnum.DISABLE.getCode());
         return cardInfo;

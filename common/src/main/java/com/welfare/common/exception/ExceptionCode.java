@@ -49,8 +49,8 @@ public enum ExceptionCode implements IResultCode {
     ACCOUNT_NOT_EXIST(5008003,"账户不存在");
 
 
-    private int code;
-    private String msg;
+    private final int code;
+    private final String msg;
 
     ExceptionCode(int code,String msg) {
         this.code =  code;

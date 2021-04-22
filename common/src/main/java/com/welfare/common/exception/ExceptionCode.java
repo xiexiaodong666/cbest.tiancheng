@@ -43,7 +43,7 @@ public enum ExceptionCode implements IResultCode {
     NO_AVAILABLE_AMOUNT_TYPE(50070001,"当前场景没有可用的福利类型"),
 
     //______员工相关异常------
-    ACCOUNT_EXIST(50080001,"员工已存在");
+    ACCOUNT_ALREADY_EXIST(50080001,"员工已存在");
 
     private int code;
     private String msg;

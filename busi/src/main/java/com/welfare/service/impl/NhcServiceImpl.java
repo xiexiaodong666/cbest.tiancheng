@@ -95,11 +95,11 @@ public class NhcServiceImpl implements NhcService {
             BizAssert.isTrue(userReq.getMerCode().equals(account.getMerCode()), ExceptionCode.ILLEGALITY_ARGURMENTS, "无权限操作！");
             account.setAccountName(userReq.getUserName());
             if (Objects.nonNull(userReq.getAccountStatus())) {
-
                 account.setAccountStatus(AccountStatus.getByCode(userReq.getAccountStatus()).getCode());
             }
             if (StringUtils.isNoneBlank(userReq.getPhone())) {
-                BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
+                BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()),
+                        ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
                 account.setPhone(userReq.getPhone());
             }
         } else {
@@ -138,7 +138,7 @@ public class NhcServiceImpl implements NhcService {
         } else {
             BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
             Account oldAccount= accountService.findByPhoneAndMerCode(userReq.getPhone(), userReq.getMerCode());
-            BizAssert.isTrue(Objects.isNull(oldAccount), ExceptionCode.ILLEGALITY_ARGURMENTS, "员工已存在");
+            BizAssert.isTrue(Objects.isNull(oldAccount), ExceptionCode.ACCOUNT_ALREADY_EXIST, "员工已存在");
             account.setPhone(userReq.getPhone());
         }
         if (userReq.getAccountStatus() != null) {
@@ -150,8 +150,8 @@ public class NhcServiceImpl implements NhcService {
         account.setBinding(AccountBindStatus.NO_BIND.getCode());
         account.setAccountTypeCode(WelfareConstant.AccountType.PATIENT.code());
         List<DepartmentTree> departmentTrees = departmentService.tree(userReq.getMerCode());
+        BizAssert.notEmpty(departmentTrees.get(0).getChildren(),ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
         DepartmentTree department = (DepartmentTree)departmentTrees.get(0).getChildren().get(0);
-        BizAssert.notNull(department,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
         account.setDepartment(department.getDepartmentCode());
         // 创建甜橙卡子账户
         SubAccount subAccount = new SubAccount();

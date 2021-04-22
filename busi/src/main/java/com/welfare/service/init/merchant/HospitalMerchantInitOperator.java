@@ -2,12 +2,15 @@ package com.welfare.service.init.merchant;
 
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.DepartmentTypeEnum;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
 import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.service.AbstractMerchantInitOperator;
+import com.welfare.service.SequenceService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,6 +25,8 @@ import java.util.List;
 @Slf4j
 public class HospitalMerchantInitOperator extends AbstractMerchantInitOperator {
 
+    @Autowired
+    private SequenceService sequenceService;
 
     @Override
     public List<AccountType> initAccountType(String merCode) {
@@ -49,7 +54,16 @@ public class HospitalMerchantInitOperator extends AbstractMerchantInitOperator {
 
     @Override
     public List<Department> initDepartment(String merCode) {
-        return Lists.newArrayList();
+        Department department = new Department();
+        String departmentCode = sequenceService.nextNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()).toString();
+        department.setMerCode(merCode);
+        department.setDepartmentCode(departmentCode);
+        department.setDepartmentName(departmentCode);
+        department.setDepartmentPath(merCode + "-" + departmentCode);
+        department.setDepartmentLevel(2);
+        department.setDepartmentParent(merCode);
+        department.setDepartmentType(DepartmentTypeEnum.DEPARTMENT.getType());
+        return Lists.newArrayList(department);
     }
 
     @Override

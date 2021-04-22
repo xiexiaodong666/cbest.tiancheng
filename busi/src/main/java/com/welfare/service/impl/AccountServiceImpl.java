@@ -564,7 +564,7 @@ public class AccountServiceImpl implements AccountService {
         if (isNew) {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
             if (null != queryAccount) {
-                throw new BizException(ExceptionCode.ACCOUNT_EXIST, "员工手机号已经存在", null);
+                throw new BizException(ExceptionCode.ACCOUNT_ALREADY_EXIST, "员工手机号已经存在", null);
             }
         } else {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
@@ -1496,7 +1496,7 @@ public class AccountServiceImpl implements AccountService {
             save(accountReq);
         } catch (Exception exception) {
             if (exception instanceof DuplicateKeyException ||
-                    ( exception instanceof BizException && ((BizException) exception).getCodeEnum() == ExceptionCode.ACCOUNT_EXIST )) {
+                    ( exception instanceof BizException && ((BizException) exception).getCodeEnum() == ExceptionCode.ACCOUNT_ALREADY_EXIST )) {
                 log.warn("员工已存在 req:{}", JSON.toJSONString(req), exception);
                 Account account = accountDao.getByMerCodeAndPhone(req.getMerCode(), req.getPhone());
                 BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "新增员工失败");

@@ -42,11 +42,14 @@ public enum ExceptionCode implements IResultCode {
     //______配置相关异常------
     NO_AVAILABLE_AMOUNT_TYPE(50070001,"当前场景没有可用的福利类型"),
 
-    //______员工相关异常------
-    ACCOUNT_ALREADY_EXIST(50080001,"员工已存在");
+    //______账户、员工相关异常------
+    ACCOUNT_ALREADY_EXIST(50080001,"员工已存在"),
+    ACCOUNT_DISABLED(5008002,"账户已禁用"),
+    ACCOUNT_NOT_EXIST(5008003,"账户不存在");
 
-    private int code;
-    private String msg;
+
+    private final int code;
+    private final String msg;
 
     ExceptionCode(int code,String msg) {
         this.code =  code;

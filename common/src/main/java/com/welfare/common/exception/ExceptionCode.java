@@ -45,8 +45,11 @@ public enum ExceptionCode implements IResultCode {
     //______账户、员工相关异常------
     ACCOUNT_ALREADY_EXIST(50080001,"员工已存在"),
     ACCOUNT_DISABLED(5008002,"账户已禁用"),
-    ACCOUNT_NOT_EXIST(5008003,"账户不存在");
+    ACCOUNT_NOT_EXIST(5008003,"账户不存在"),
 
+
+    //______账户组------
+    NO_AND_OWN_GROUP(50090001,"不能和自己一个组");
 
     private final int code;
     private final String msg;

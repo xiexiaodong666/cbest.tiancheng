@@ -266,7 +266,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         Account groupAccount = accountService.getByAccountCode(groupAccountCode);
         BizAssert.notNull(groupAccount, ExceptionCode.ILLEGALITY_ARGURMENTS, "组员工不存在");
         BizAssert.isTrue(!joinAccount.getAccountCode().equals(groupAccount.getAccountCode()),
-                ExceptionCode.ILLEGALITY_ARGURMENTS, "不能和自己一个组");
+                ExceptionCode.NO_AND_OWN_GROUP, "不能和自己一个组");
         Map<Long, Account> accountMap = new HashMap<>();
         accountMap.put(joinAccount.getAccountCode(), joinAccount);
         accountMap.put(groupAccount.getAccountCode(), groupAccount);

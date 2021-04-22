@@ -147,11 +147,10 @@ public class CardInfoServiceImpl implements CardInfoService {
     public CardInfo createAndBind(CardInfo cardInfo) {
 
         Account account = accountDao.queryByAccountCode(cardInfo.getAccountCode());
-        BizAssert.notNull(account,ExceptionCode.DATA_NOT_EXIST,"账户不存在");
+        BizAssert.notNull(account,ExceptionCode.ACCOUNT_NOT_EXIST);
         BizAssert.isTrue(
                 AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()),
-                ExceptionCode.ILLEGALITY_ARGURMENTS,
-                "账户已禁用"
+                ExceptionCode.ACCOUNT_DISABLED
         );
         CardInfo oneByAccountCode = cardInfoDao.getOneByAccountCode(account.getAccountCode());
         BizAssert.isNull(oneByAccountCode,ExceptionCode.ACCOUNT_ALREADY_BIND);

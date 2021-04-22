@@ -22,6 +22,7 @@ public enum ExceptionCode implements IResultCode {
 
     //----------业务异常------------------------------------------------------------------------------------------------
 
+
     //---------资金相关异常----
     MERCHANT_RECHARGE_LIMIT_EXCEED(5002001,"商户余额不足"),
     INSUFFICIENT_BALANCE(5002002,"用户余额不足"),
@@ -40,8 +41,10 @@ public enum ExceptionCode implements IResultCode {
     //______数据相关异常------
     DATA_NOT_EXIST(50060001,"数据不存在"),
     //______配置相关异常------
-    NO_AVAILABLE_AMOUNT_TYPE(50070001,"当前场景没有可用的福利类型");
-
+    NO_AVAILABLE_AMOUNT_TYPE(50070001,"当前场景没有可用的福利类型"),
+    //______账户相关异常------
+    ACCOUNT_NOT_EXIST(5008001,"账户不存在"),
+    ACCOUNT_DISABLED(5008002,"账户已禁用");
 
     private int code;
     private String msg;

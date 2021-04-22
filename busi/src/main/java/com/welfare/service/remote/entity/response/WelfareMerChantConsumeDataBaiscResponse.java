@@ -50,7 +50,7 @@ public class WelfareMerChantConsumeDataBaiscResponse {
   /**
    * 消费总金额
    */
-  private Double consumeMoney;
+  private String consumeMoney;
   /**
    * 消费人数
    */
@@ -62,15 +62,15 @@ public class WelfareMerChantConsumeDataBaiscResponse {
   /**
    * 人均消费
    */
-  private Double avgPeopleConsumeMoney;
+  private String avgPeopleConsumeMoney;
   /**
    * 每笔平均交易额
    */
-  private Double avgTransMoney;
+  private String avgTransMoney;
   /**
    * 消费总金额(按业务类型汇总)
    */
-  private Double consumeMoneyCollect;
+  private String consumeMoneyCollect;
   /**
    * 消费人数(按业务类型汇总)
    */
@@ -82,11 +82,11 @@ public class WelfareMerChantConsumeDataBaiscResponse {
   /**
    * 人均消费(按业务类型汇总)
    */
-  private Double avgPeopleConsumeMoneyCollect;
+  private String avgPeopleConsumeMoneyCollect;
   /**
    * 每笔平均交易额(按业务类型汇总)
    */
-  private Double avgTransMoneyCollect;
+  private String avgTransMoneyCollect;
   /**
    * 消费商户数
    */

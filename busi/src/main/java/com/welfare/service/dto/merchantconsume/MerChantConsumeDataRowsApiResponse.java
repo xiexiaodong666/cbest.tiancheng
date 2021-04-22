@@ -46,7 +46,7 @@ public class MerChantConsumeDataRowsApiResponse {
   private String businessType;
 
   @ApiModelProperty("消费总金额")
-  private Double consumeMoney;
+  private String consumeMoney;
 
   @ApiModelProperty("百货消费总金额")
   private String bhConsumeMoney;
@@ -65,10 +65,10 @@ public class MerChantConsumeDataRowsApiResponse {
   private Integer transNum;
 
   @ApiModelProperty("人均消费")
-  private Double avgPeopleConsumeMoney;
+  private String avgPeopleConsumeMoney;
 
   @ApiModelProperty("每笔平均交易额")
-  private Double avgTransMoney;
+  private String avgTransMoney;
 
   @ApiModelProperty("消费方式明细集合")
   private List<MerChantConsumeDataDetailApiResponse> consumeTypeDetailList;

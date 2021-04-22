@@ -44,7 +44,7 @@ public class RefundRequest {
     private String merCode;
     @ApiModelProperty("账户所在商家，返回参数")
     private String accountMerCode;
-    @ApiModelProperty("沃生活馆线上退款请求商品id集合 [\"1234\",\"5678\"]")
+    @ApiModelProperty("沃生活馆线上退款请求商品id集合")
     private List<String> saleUnIds;
 
 }

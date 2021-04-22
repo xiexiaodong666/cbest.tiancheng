@@ -67,7 +67,7 @@ public class ExportMerChantConsumeData {
   @ApiModelProperty("消费总金额（元）")
   @ExcelProperty(value = "消费总金额（元）")
   @ColumnWidth(15)
-  private Double consumeMoney;
+  private String consumeMoney;
 
 
   @ApiModelProperty("百货消费总金额（元）")
@@ -99,12 +99,12 @@ public class ExportMerChantConsumeData {
   @ApiModelProperty("人均消费金额（元）")
   @ExcelProperty(value = "人均消费金额（元）")
   @ColumnWidth(15)
-  private Double avgPeopleConsumeMoney;
+  private String avgPeopleConsumeMoney;
 
   @ApiModelProperty("每笔交易平均金额（元）")
   @ExcelProperty(value = "每笔交易平均金额（元）")
   @ColumnWidth(15)
-  private Double avgTransMoney;
+  private String avgTransMoney;
 
   public static ExportMerChantConsumeData rowsOf(MerChantConsumeDataRowsApiResponse response) {
 

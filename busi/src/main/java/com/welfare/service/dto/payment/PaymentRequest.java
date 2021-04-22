@@ -5,7 +5,9 @@ import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.StoreConsumeTypeDao;
 import com.welfare.persist.entity.StoreConsumeType;
+import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRowsRequest;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 import lombok.Data;
 import org.springframework.util.Assert;
 
@@ -58,6 +60,15 @@ public abstract class PaymentRequest {
     private String paymentScene;
     private boolean notification = false;
 
+    @ApiModelProperty("沃生活馆线上支付请求商品行数据,json格式 ["
+        + "  {"
+        + "    \"name\": \"重百线上商品 (注释:商品名称)\","
+        + "    \"price\": 1 (注释:商品单价, 元),"
+        + "    \"count\": 1 (注释:购买数量),"
+        + "    \"saleUnId\": 123456789 (注释:商品id)"
+        + "  }"
+        + "]")
+    private List<WoLifeAccountDeductionRowsRequest> saleRows;
     public String calculatePaymentScene(){
         String consumeType = queryPaymentScene(machineNo,storeNo);
         //不是O2O或者ONLINE_SHOPPING,则为到店消费

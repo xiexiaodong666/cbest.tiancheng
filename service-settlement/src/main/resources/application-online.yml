@@ -84,6 +84,9 @@ cdn:
 merchant:
   url: http://welfaremerchant.api.cbest.gam
 
+service-mirror:
+  url: http://192.1.30.96
+
 ftp:
   enabled: true
   host: paycheckftp.e-cbest.com

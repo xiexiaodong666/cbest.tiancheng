@@ -1,10 +1,10 @@
 package com.welfare.service.remote.fallback;
 
 
-import com.alibaba.fastjson.JSON;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.service.remote.WoLifeFeignClient;
+
 import com.welfare.service.remote.entity.response.WoLifeAccountDeductionResponse;
 import com.welfare.service.remote.entity.response.WoLifeBasicResponse;
 import com.welfare.service.remote.entity.response.WoLifeGetUserMoneyResponse;

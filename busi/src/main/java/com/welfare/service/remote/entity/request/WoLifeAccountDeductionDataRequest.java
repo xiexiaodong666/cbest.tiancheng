@@ -1,5 +1,11 @@
 package com.welfare.service.remote.entity.request;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.enums.ConsumeTypeEnum;
+
+import com.welfare.common.exception.BizException;
 import com.welfare.service.dto.payment.PaymentRequest;
 import lombok.Data;
 
@@ -8,6 +14,9 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.util.Strings;
+
 
 /**
  * @author gaorui
@@ -16,7 +25,6 @@ import java.util.List;
  */
 @Data
 public class WoLifeAccountDeductionDataRequest {
-
   /**
    * 订单id
    */
@@ -43,10 +51,22 @@ public class WoLifeAccountDeductionDataRequest {
 
   public static WoLifeAccountDeductionDataRequest of(PaymentRequest paymentRequest){
     WoLifeAccountDeductionDataRequest woLifeAccountDeductionDataRequest = new WoLifeAccountDeductionDataRequest();
+
     woLifeAccountDeductionDataRequest.setOid(paymentRequest.getTransNo());
-    woLifeAccountDeductionDataRequest.setTotalCount(1);
     woLifeAccountDeductionDataRequest.setTotalPrice(paymentRequest.getAmount());
-    woLifeAccountDeductionDataRequest.setRows(Collections.singletonList(WoLifeAccountDeductionRowsRequest.of(paymentRequest)));
+    // String saleRows = paymentRequest.getSaleRows();
+    List<WoLifeAccountDeductionRowsRequest> woLifeAccountDeductionRowsRequestList = paymentRequest.getSaleRows();
+    // 处理线上商城支付请求
+    if(CollectionUtils.isNotEmpty(woLifeAccountDeductionRowsRequestList) && ConsumeTypeEnum.ONLINE_MALL.getCode().equals(paymentRequest.getPaymentScene())) {
+
+        woLifeAccountDeductionDataRequest.setRows(woLifeAccountDeductionRowsRequestList);
+        woLifeAccountDeductionDataRequest.setTotalCount(woLifeAccountDeductionRowsRequestList.size());
+
+    } else {
+      woLifeAccountDeductionDataRequest.setRows(Collections.singletonList(WoLifeAccountDeductionRowsRequest.of(paymentRequest)));
+      woLifeAccountDeductionDataRequest.setTotalCount(1);
+    }
+
     return woLifeAccountDeductionDataRequest;
   }
 }

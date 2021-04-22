@@ -93,11 +93,12 @@ public class Deposit {
         accountBillDetail.setAccountBalance(account.getAccountBalance());
         accountBillDetail.setChannel(deposit.getChannel());
         accountBillDetail.setTransNo(deposit.getTransNo());
-        accountBillDetail.setTransAmount(amount);
+        accountBillDetail.setTransAmount(amount.abs());
         accountBillDetail.setTransTime(Calendar.getInstance().getTime());
         accountBillDetail.setSurplusQuota(account.getSurplusQuota());
         accountBillDetail.setSurplusQuotaOverpay(account.getSurplusQuotaOverpay());
-        accountBillDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
+        accountBillDetail.setTransType(amount.compareTo(BigDecimal.ZERO) < 0 ?
+                WelfareConstant.TransType.DEPOSIT_BACK.code() :  WelfareConstant.TransType.DEPOSIT_INCR.code());
         accountBillDetail.setPaymentChannel(deposit.getPaymentChannel());
         return accountBillDetail;
     }

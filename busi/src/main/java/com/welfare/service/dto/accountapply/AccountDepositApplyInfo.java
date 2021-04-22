@@ -121,4 +121,10 @@ public class AccountDepositApplyInfo {
    */
   @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")
   private String approvalType;
+
+  /**
+   * 充值状态
+   */
+  @ApiModelProperty("充值状态(成功:SUCCESS  失败:NO  待充值:INIT)")
+  private String rechargeStatus;
 }

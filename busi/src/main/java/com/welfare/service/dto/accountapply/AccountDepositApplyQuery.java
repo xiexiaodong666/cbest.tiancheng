@@ -73,4 +73,11 @@ public class AccountDepositApplyQuery extends PageReq{
   @ApiModelProperty("福利类型code")
   @Query(type = Query.Type.EQUAL)
   private String merAccountTypeCode;
+
+  /**
+   * 充值状态
+   */
+  @ApiModelProperty("充值状态(成功:SUCCESS  失败:NO  待充值:INIT)")
+  @Query(type = Query.Type.EQUAL)
+  private String rechargeStatus;
 }

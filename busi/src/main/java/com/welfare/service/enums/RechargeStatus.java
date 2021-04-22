@@ -14,7 +14,7 @@ public enum RechargeStatus {
    */
   SUCCESS("SUCCESS","充值成功"),
   NO("NO","审批未通过不充值"),
-  INIT("INIT","还未充值");
+  INIT("INIT","待充值");
 
   private final String code;
   private final String value;

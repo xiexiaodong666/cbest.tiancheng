@@ -206,12 +206,13 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                                                                   AccountAmountType accountAmountType) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(account.getAccountCode());
-        accountDeductionDetail.setAccountDeductionAmount(deposit.getAmount());
+        accountDeductionDetail.setAccountDeductionAmount(deposit.getAmount().abs());
         accountDeductionDetail.setAccountAmountTypeBalance(accountAmountType.getAccountBalance());
         accountDeductionDetail.setMerAccountType(accountAmountType.getMerAccountTypeCode());
         accountDeductionDetail.setTransNo(deposit.getTransNo());
-        accountDeductionDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
-        accountDeductionDetail.setTransAmount(deposit.getAmount());
+        accountDeductionDetail.setTransType(deposit.getAmount().compareTo(BigDecimal.ZERO) < 0 ?
+                WelfareConstant.TransType.DEPOSIT_BACK.code() :  WelfareConstant.TransType.DEPOSIT_INCR.code());
+        accountDeductionDetail.setTransAmount(deposit.getAmount().abs());
         accountDeductionDetail.setReversedAmount(BigDecimal.ZERO);
         accountDeductionDetail.setTransTime(Calendar.getInstance().getTime());
         accountDeductionDetail.setMerDeductionCreditAmount(BigDecimal.ZERO);

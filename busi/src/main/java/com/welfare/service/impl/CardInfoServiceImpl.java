@@ -194,9 +194,10 @@ public class CardInfoServiceImpl implements CardInfoService {
                 .eq(CardInfo::getId,cardInfo.getId())
                 .set(CardInfo::getAccountCode,null)
                 .set(CardInfo::getEnabled,EnableEnum.DISABLE.getCode())
-                .set(CardInfo::getCardStatus, WelfareConstant.CardStatus.NEW));
+                .set(CardInfo::getCardStatus, WelfareConstant.CardStatus.NEW.code()));
         cardInfo.setAccountCode(null);
         cardInfo.setEnabled(EnableEnum.DISABLE.getCode());
+        cardInfo.setCardStatus(WelfareConstant.CardStatus.NEW.code());
         return cardInfo;
     }
 }

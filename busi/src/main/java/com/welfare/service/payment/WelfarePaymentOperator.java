@@ -57,7 +57,10 @@ public class WelfarePaymentOperator implements IPaymentOperator {
         List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         for (AccountAmountDO accountAmountDO : accountAmountDOList) {
-            if (BigDecimal.ZERO.compareTo(accountAmountDO.getAccountAmountType().getAccountBalance()) == 0) {
+            BigDecimal accountBalance = accountAmountDO.getAccountAmountTypeGroup()!=null
+                    ?accountAmountDO.getAccountAmountTypeGroup().getBalance()
+                    :accountAmountDO.getAccountAmountType().getAccountBalance();
+            if (BigDecimal.ZERO.compareTo(accountBalance) == 0) {
                 //当前的accountType没钱，则继续下一个账户
                 continue;
             }

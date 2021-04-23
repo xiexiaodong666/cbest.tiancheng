@@ -48,6 +48,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 
@@ -79,6 +80,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentChannelConfigDao paymentChannelConfigDao;
     private final SubAccountDao subAccountDao;
     private final MerAccountTypeConsumeSceneConfigDao merAccountTypeConsumeSceneConfigDao;
+    private final AccountAmountTypeGroupDao accountAmountTypeGroupDao;
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
     @Resource(name = "e-welfare-paymentQueryAsync")
@@ -317,19 +319,22 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
-        List<AccountBillDetail> billDetails = paymentOperations.stream()
-                .map(PaymentOperation::getAccountBillDetail)
+        List<AccountBillDetail> billDetails = paymentOperations.stream().map(PaymentOperation::getAccountBillDetail)
                 .collect(Collectors.toList());
-        List<AccountDeductionDetail> deductionDetails = paymentOperations.stream()
-                .map(PaymentOperation::getAccountDeductionDetail)
+        List<AccountDeductionDetail> deductionDetails = paymentOperations.stream().map(PaymentOperation::getAccountDeductionDetail)
                 .collect(Collectors.toList());
-        List<AccountAmountType> accountTypes = paymentOperations.stream()
-                .map(PaymentOperation::getAccountAmountType).filter(Objects::nonNull)
+        List<AccountAmountType> accountTypes = paymentOperations.stream().map(PaymentOperation::getAccountAmountType)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        List<AccountAmountTypeGroup> accountAmountTypeGroups = paymentOperations.stream().map(PaymentOperation::getAccountAmountTypeGroup)
                 .collect(Collectors.toList());
         AccountAmountDO.updateAccountAfterOperated(account, accountAmountTypes);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
+        if(!CollectionUtils.isEmpty(accountAmountTypeGroups)){
+            accountAmountTypeGroupDao.updateBatchById(accountAmountTypeGroups);
+        }
         if(!CollectionUtils.isEmpty(accountTypes)){
             //联通沃支付，没有修改accountTypes，所以if判断
             accountAmountTypeDao.saveOrUpdateBatch(accountTypes);

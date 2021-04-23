@@ -119,7 +119,7 @@ public class NhcServiceImpl implements NhcService {
         if (StringUtils.isNoneBlank(account.getPhone()) && account.getPhone().startsWith(NhcService.DEFAULT_PHONE_PREFIX)) {
             account.setPhone(null);
         }
-        // 同步商户
+        // 同步员工
         applicationContext.publishEvent(AccountEvt.builder()
                 .typeEnum(StringUtils.isNoneBlank(userReq.getAccountCode()) ? ShoppingActionTypeEnum.UPDATE : ShoppingActionTypeEnum.ADD)
                 .accountList(Collections.singletonList(account)).build());

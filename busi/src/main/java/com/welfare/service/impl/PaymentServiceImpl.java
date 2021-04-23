@@ -327,6 +327,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         List<AccountAmountTypeGroup> accountAmountTypeGroups = paymentOperations.stream().map(PaymentOperation::getAccountAmountTypeGroup)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         AccountAmountDO.updateAccountAfterOperated(account, accountAmountTypes);
         accountDao.updateById(account);

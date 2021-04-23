@@ -196,8 +196,11 @@ public class MerchantServiceImpl implements MerchantService {
             throw new BizException("新增商户失败");
         }
         // 不同行业属性的初始化
-        List<String> industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
-        merchantInitOperatorFactory.operators(industryTags).forEach(operator -> operator.init(merCode));
+        List<String> industryTags = new ArrayList<>();
+        if (StringUtils.isNoneBlank(merchant.getExtend().getIndustryTag())) {
+            industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+            merchantInitOperatorFactory.operators(industryTags).forEach(operator -> operator.init(merCode));
+        }
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
         List<String> syncIndustryTag = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
         detailDTO.setTags(syncIndustryTag);
@@ -230,8 +233,11 @@ public class MerchantServiceImpl implements MerchantService {
         }
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
-
-        List<String> industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+        List<String> industryTags = new ArrayList<>();
+        if (StringUtils.isNoneBlank(merchant.getExtend().getIndustryTag())) {
+            industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+            industryTags = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
+        }
         detailDTO.setTags(industryTags);
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);

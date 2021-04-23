@@ -263,13 +263,13 @@ public class NhcServiceImpl implements NhcService {
                     dto.setTransAmount("+" + billDetail.getTransAmount().abs());
                 } else if (WelfareConstant.TransType.DEPOSIT_BACK.code().equals(billDetail.getTransType())) {
                     dto.setEvent("积分回冲");
-                    dto.setTransAmount("-" + billDetail.getTransAmount().negate());
+                    dto.setTransAmount("-" + billDetail.getTransAmount().abs());
                 } else if (WelfareConstant.TransType.CONSUME.code().equals(billDetail.getTransType())) {
                     dto.setEvent("积分商品兑换");
-                    dto.setTransAmount("+" + billDetail.getTransAmount().abs());
+                    dto.setTransAmount("-" + billDetail.getTransAmount().abs());
                 } else if (WelfareConstant.TransType.REFUND.code().equals(billDetail.getTransType())) {
                     dto.setEvent("积分商品退款");
-                    dto.setTransAmount("-" + billDetail.getTransAmount().negate());
+                    dto.setTransAmount("+" + billDetail.getTransAmount().abs());
                 }
                 list.add(dto);
             });

@@ -87,6 +87,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.WelfareConstant.MerCreditType.RECHARGE_LIMIT;
 
 /**
  * 账户信息服务接口实现
@@ -144,6 +145,7 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private PaymentChannelService paymentChannelService;
     private final PaymentChannelDao paymentChannelDao;
+    private final MerchantCreditService merchantCreditService;
     private final static Map<String, WelfareConstant.PaymentChannel> PAYMENT_CHANNEL_MAP = Stream
         .of(WelfareConstant.PaymentChannel.values()).collect(Collectors
             .toMap(WelfareConstant.PaymentChannel::code,
@@ -1509,6 +1511,7 @@ public class AccountServiceImpl implements AccountService {
         // 充值
         MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(merchant.getMerCode(), req.getMerAccountTypeCode());
         BizAssert.notNull(merchantAccountType,ExceptionCode.ILLEGALITY_ARGURMENTS, "福利类型不存在");
+
         // 申请
         DepositApplyRequest request = new DepositApplyRequest();
         request.setRequestId(UUID.randomUUID().toString());

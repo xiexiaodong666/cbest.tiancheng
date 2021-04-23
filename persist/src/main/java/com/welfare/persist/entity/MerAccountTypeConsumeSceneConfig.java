@@ -42,7 +42,7 @@ public class MerAccountTypeConsumeSceneConfig extends Model<MerAccountTypeConsum
      * 商户编码
      */
     @ApiModelProperty("商户编码")   
-    private Long merCode;
+    private String merCode;
     /**
      * 福利类型
      */

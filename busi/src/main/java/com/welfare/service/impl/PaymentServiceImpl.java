@@ -109,7 +109,7 @@ public class PaymentServiceImpl implements PaymentService {
                         threadPoolTaskExecutor.submit(() -> merchantCreditService.getByMerCode(account.getMerCode()));
                 Future<List<MerAccountTypeConsumeSceneConfig>> merAccountTypeConsumeSceneConfigFuture =
                         threadPoolTaskExecutor.submit(() -> merAccountTypeConsumeSceneConfigDao
-                                .query(account.getMerCode(),paymentRequest.getStoreNo(),paymentRequest.getPaymentScene()));
+                                .query(account.getMerCode(),paymentRequest.getStoreNo(),paymentSceneFuture.get()));
                 Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();

@@ -189,5 +189,34 @@ public class WelfareSettleConstant {
         }
     }
 
+    /**
+     * 客户消费报表业务类型
+     */
+    public enum BusinessTypeEnum {
+        /**
+         * 自营
+         */
+        SELF("self","企业福利（自营）"),
+        /**
+         * 第三方
+         */
+        THIRD("third","企业福利（非自营）");
+
+        private String code;
+        private String desc;
+
+        BusinessTypeEnum(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
     public static final Integer LIMIT = 2000;
 }

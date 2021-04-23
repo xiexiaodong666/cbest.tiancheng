@@ -22,12 +22,15 @@ import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
+import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.service.payment.IPaymentOperator;
+import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRowsRequest;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -254,6 +257,14 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式", null);
         }
+
+        if(!CollectionUtils.isEmpty(paymentRequest.getSaleRows())) {
+            // 线上沃生活check 订单总金额和商品行金额的和是否相等
+            Assert.isTrue(paymentRequest.getAmount().compareTo( paymentRequest.getSaleRows().stream().reduce(BigDecimal.ZERO, (x, y) -> {
+                return x.add(y.getPrice().multiply(new BigDecimal(y.getCount())));
+            }, BigDecimal::add)) == 0, "订单总金额与商品合计金额不相等,请检查上游服务");
+        }
+
     }
 
     @Override

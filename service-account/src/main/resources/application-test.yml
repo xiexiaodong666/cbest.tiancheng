@@ -104,3 +104,5 @@ notification:
 
 wo-life:
   url: http://113.204.98.245:8900/testlivingroom
+cache:
+  cache-expire-secs: 30

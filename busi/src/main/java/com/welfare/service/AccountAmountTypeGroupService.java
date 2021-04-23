@@ -59,6 +59,7 @@ public interface AccountAmountTypeGroupService {
     /**
      * 充值 批量(金额加到该组上)
      * @param deposits
+     * @return
      */
     Boolean batchUpdateGroupAmount(List<GroupDeposit> deposits);
 

@@ -187,7 +187,8 @@ public class WelfareConstant {
         CREDIT_LIMIT("creditLimit", "信用额度"),
         REMAINING_LIMIT("remainingLimit", "剩余信用额度"),
         REBATE_LIMIT("rebateLimit", "返利余额"),
-        WHOLESALE_CREDIT_LIMIT("wholesaleCreditLimit", "批发采购信用额度");
+        WHOLESALE_CREDIT_LIMIT("wholesaleCreditLimit", "批发采购信用额度"),
+        WHOLESALE_CREDIT("wholesaleCredit", "剩余批发采购信用额度");
 
         MerCreditType(String code, String desc) {
             this.code = code;

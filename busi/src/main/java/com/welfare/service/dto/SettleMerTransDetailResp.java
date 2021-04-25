@@ -29,7 +29,7 @@ public class SettleMerTransDetailResp {
     @ExcelProperty(value = "出入账类型")
     private String inOrOutType;
 
-    @ApiModelProperty(value = "所属类型")
+    @ApiModelProperty(value = "所属类型(目前余额:currentBalance 自主充值:self_deposit 信用额度:creditLimit 剩余信用额度:remainingLimit 返利余额:rebateLimit 批发采购信用额度:wholesaleCreditLimit 剩余批发采购信用额度:wholesaleCredit)")
     @ExcelProperty(value = "所属类型")
     private String transType;
 

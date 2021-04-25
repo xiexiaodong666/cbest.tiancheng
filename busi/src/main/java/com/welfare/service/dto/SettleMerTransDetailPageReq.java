@@ -21,7 +21,7 @@ public class SettleMerTransDetailPageReq extends PageReq {
     @ApiModelProperty(value = "出入账类型 in-入账 out-出账")
     private String inOrOutType;
 
-    @ApiModelProperty(value = "所属类型")
+    @ApiModelProperty(value = "所属类型(目前余额:currentBalance 自主充值:self_deposit 信用额度:creditLimit 剩余信用额度:remainingLimit 返利余额:rebateLimit 批发采购信用额度:wholesaleCreditLimit 剩余批发采购信用额度:wholesaleCredit)")
     private String transType;
 
     @ApiModelProperty(value = "起始时间")

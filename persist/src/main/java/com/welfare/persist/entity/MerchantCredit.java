@@ -171,5 +171,13 @@ public class MerchantCredit extends Model<MerchantCredit> implements Serializabl
     * 版本
     */
     public static final String VERSION = "version";
+    /**
+     * 批发限制授信额度
+     */
+    public static final String WHOLESALE_CREDIT_LIMIT = "wholesale_credit_limit";
+    /**
+     * 批发授信额度
+     */
+    public static final String WHOLESALE_CREDIT = "wholesale_credit";
 
 }

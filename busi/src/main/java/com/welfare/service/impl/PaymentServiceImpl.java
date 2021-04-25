@@ -109,10 +109,25 @@ public class PaymentServiceImpl implements PaymentService {
                         merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(), account.getMerCode()));
                 Future<MerchantCredit> merchantCreditFuture =
                         threadPoolTaskExecutor.submit(() -> merchantCreditService.getByMerCode(account.getMerCode()));
+                String paymentScene = paymentSceneFuture.get();
                 Future<List<MerAccountTypeConsumeSceneConfig>> merAccountTypeConsumeSceneConfigFuture =
                         threadPoolTaskExecutor.submit(() -> merAccountTypeConsumeSceneConfigDao
-                                .query(account.getMerCode(),paymentRequest.getStoreNo(),paymentSceneFuture.get()));
+                                .query(account.getMerCode(),paymentRequest.getStoreNo(), paymentScene));
                 Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
+                Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() -> paymentChannelConfigDao
+                        .getBaseMapper().selectList(
+                                Wrappers.<PaymentChannelConfig>lambdaQuery()
+                                        .eq(PaymentChannelConfig::getMerCode, account.getMerCode())
+                                        .eq(PaymentChannelConfig::getStoreCode, paymentRequest.getStoreNo())
+                                        .eq(PaymentChannelConfig::getConsumeType, paymentScene)
+                                        .eq(PaymentChannelConfig::getPaymentChannelCode, paymentRequest.getPaymentChannel())));
+                //检查支付渠道消费场景
+                List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigListFuture
+                        .get();
+                if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
+                    log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式");
+                }
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();
                 if (WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
@@ -125,7 +140,6 @@ public class PaymentServiceImpl implements PaymentService {
                 }
                 SupplierStore supplierStore = supplierStoreFuture.get();
                 List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture.get();
-                String paymentScene = paymentSceneFuture.get();
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
                 List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
                 List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs = merAccountTypeConsumeSceneConfigFuture.get();

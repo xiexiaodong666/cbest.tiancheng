@@ -11,7 +11,7 @@ Source: cbest-saas-rewardmall
 accountUser: {"accountCode":"111111"}
 
 ### 卫计委绑卡
-DELETE http://localhost:10016/card-info/card-unbinding/4323225
+DELETE http://localhost:10016/card-info/card-unbinding/1001000002267779552
 Content-Type: application/json
 Source: cbest-saas-rewardmall
 

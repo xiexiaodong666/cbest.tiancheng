@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BizException;
 import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.PaymentChannelConfigDao;
 import com.welfare.persist.dto.PayChannelConfigSimple;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -187,7 +189,16 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
         boolean flag = true;
         boolean flag3 = true;
         if (CollectionUtils.isNotEmpty(saveList)) {
-            flag = paymentChannelConfigDao.saveBatch(saveList);
+            try {
+                flag = paymentChannelConfigDao.saveBatch(saveList);
+            } catch (Exception exception) {
+                if (exception instanceof DuplicateKeyException) {
+                    log.error("保存支付渠道配置失败", exception);
+                    throw new BizException("操作频繁，请刷新页面重新操作");
+                } else {
+                    throw exception;
+                }
+            }
         }
         if (CollectionUtils.isNotEmpty(removeList)) {
             flag3 = paymentChannelConfigDao.removeByIds(removeList);

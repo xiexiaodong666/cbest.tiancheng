@@ -147,11 +147,10 @@ public class CardInfoServiceImpl implements CardInfoService {
     public CardInfo createAndBind(CardInfo cardInfo) {
 
         Account account = accountDao.queryByAccountCode(cardInfo.getAccountCode());
-        BizAssert.notNull(account,ExceptionCode.DATA_NOT_EXIST,"账户不存在");
+        BizAssert.notNull(account,ExceptionCode.ACCOUNT_NOT_EXIST);
         BizAssert.isTrue(
                 AccountStatus.ENABLE.getCode().equals(account.getAccountStatus()),
-                ExceptionCode.ILLEGALITY_ARGURMENTS,
-                "账户已禁用"
+                ExceptionCode.ACCOUNT_DISABLED
         );
         CardInfo oneByAccountCode = cardInfoDao.getOneByAccountCode(account.getAccountCode());
         BizAssert.isNull(oneByAccountCode,ExceptionCode.ACCOUNT_ALREADY_BIND);
@@ -182,6 +181,7 @@ public class CardInfoServiceImpl implements CardInfoService {
             log.info("already existed but not bind, directly bind");
             cardInfoInDb.setAccountCode(cardInfo.getAccountCode());
             cardInfoInDb.setEnabled(EnableEnum.ENABLE.getCode());
+            cardInfoInDb.setCardStatus(WelfareConstant.CardStatus.BIND.code());
             cardInfoDao.updateById(cardInfoInDb);
             return cardInfoInDb;
         }
@@ -193,9 +193,11 @@ public class CardInfoServiceImpl implements CardInfoService {
         cardInfoDao.update(Wrappers.<CardInfo>lambdaUpdate()
                 .eq(CardInfo::getId,cardInfo.getId())
                 .set(CardInfo::getAccountCode,null)
-                .set(CardInfo::getEnabled,EnableEnum.DISABLE.getCode()));
+                .set(CardInfo::getEnabled,EnableEnum.DISABLE.getCode())
+                .set(CardInfo::getCardStatus, WelfareConstant.CardStatus.NEW.code()));
         cardInfo.setAccountCode(null);
         cardInfo.setEnabled(EnableEnum.DISABLE.getCode());
+        cardInfo.setCardStatus(WelfareConstant.CardStatus.NEW.code());
         return cardInfo;
     }
 }

@@ -47,7 +47,7 @@ CREATE TABLE `mer_account_type_consume_scene_config` (
 alter table account_bill_detail add column account_amount_type_group_id bigint(20) comment '福利类型组id' after payment_channel;
 alter table account_deduction_detail add column account_amount_type_group_id bigint(20) comment '福利类型组id' after payment_channel;
 
-alter table account_amount_type add column joined_group tinyint(1) comment '是否加入组' after account_balance;
+alter table account_amount_type add column joined_group tinyint(1) DEFAULT 0  comment '是否加入组' after account_balance;
 alter table account_amount_type add column account_amount_type_group_id bigint(20) comment '家庭id' after account_balance;
 
 

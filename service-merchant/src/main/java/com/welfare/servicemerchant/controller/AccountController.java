@@ -294,8 +294,8 @@ public class AccountController implements IController {
 
 
   @PostMapping("/saveAndDeposit")
-  @ApiOperation("新增账户并充值（建行注册用户)")
-  public R<EmployerReqDTO> saveAndDeposit(@RequestBody AccountSaveAndDepositReq req) {
+  @ApiOperation("新增账户并充值")
+  public R<EmployerReqDTO> saveAndDeposit(@Validated @RequestBody AccountSaveAndDepositReq req) {
     return success(accountService.saveAndDeposit(req));
   }
 }

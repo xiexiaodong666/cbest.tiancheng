@@ -68,9 +68,9 @@ public class PaymentServiceImplTest extends BaseTest{
         MerchantAccountType merchantAccountType2 = new MerchantAccountType();
         merchantAccountType2.setMerAccountTypeCode("surplus_overpay");
         merchantAccountType2.setDeductionOrder(3);
-        accountAmountDOs.add(AccountAmountDO.of(accountAmountType,merchantAccountType,account));
-        accountAmountDOs.add(AccountAmountDO.of(accountAmountType1,merchantAccountType1,account));
-        accountAmountDOs.add(AccountAmountDO.of(accountAmountType2,merchantAccountType2,account));
+        accountAmountDOs.add(AccountAmountDO.of(accountAmountType,merchantAccountType,account,null));
+        accountAmountDOs.add(AccountAmountDO.of(accountAmountType1,merchantAccountType1,account,null));
+        accountAmountDOs.add(AccountAmountDO.of(accountAmountType2,merchantAccountType2,account,null));
         supplierStore = new SupplierStore();
         supplierStore.setStoreCode("testStoreCode01");
         supplierStore.setMerCode("merCode002");//与请求不一样

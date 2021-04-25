@@ -2,6 +2,7 @@ package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.welfare.persist.dto.AccountDepositIncreDTO;
+import com.welfare.persist.dto.UpdateAccountAmountTypeDTO;
 import com.welfare.persist.entity.AccountAmountType;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -46,5 +47,7 @@ public interface AccountAmountTypeMapper extends BaseMapper<AccountAmountType> {
    * @return 分组数量
    */
   Long countByMerCodeAndMerAccountType(@Param("merCode") String merCode, @Param("merAccountTypeCode") String merAccountTypeCode);
+
+  int batchUpdate(List<UpdateAccountAmountTypeDTO> accountAmountType);
 
 }

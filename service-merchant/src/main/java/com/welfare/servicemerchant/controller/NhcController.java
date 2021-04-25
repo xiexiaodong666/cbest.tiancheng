@@ -78,7 +78,6 @@ public class NhcController {
         return R.success(nhcService.leaveFamily(MerchantUserHolder.getMerchantUser().getMerchantCode(), accountCode));
     }
 
-
     @PostMapping("/user/family/info/{accountCode}")
     @ApiOperation("查询家庭信息")
     @MerchantUser

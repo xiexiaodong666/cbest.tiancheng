@@ -94,6 +94,10 @@ public class AccountAmountType extends Model<AccountAmountType> implements Seria
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
+    public Boolean getJoinedGroup(){
+        return joinedGroup != null && joinedGroup;
+    }
+
 //以下为列明常量
 
     /**

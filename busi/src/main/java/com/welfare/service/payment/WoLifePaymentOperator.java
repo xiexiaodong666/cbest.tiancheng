@@ -76,7 +76,7 @@ public class WoLifePaymentOperator implements IPaymentOperator, IRefundOperator{
 
             ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestService.generateRefundHandling(refundRequest);
             try{
-                WoLifeBasicResponse woLifeBasicResponse = woLifeFeignService.refundWriteOff(refundRequest.getPhone(), WoLifeRefundWriteOffDataRequest.of(refundRequest));
+                WoLifeBasicResponse woLifeBasicResponse = woLifeFeignService.refundWriteOff(refundRequest.getPhone(), WoLifeRefundWriteOffDataRequest.of(refundRequest, paidDeductionDetails.get(0).getOrderChannel()));
                 if(woLifeBasicResponse.isSuccess()){
                     thirdPartyPaymentRequestService.updateResult(thirdPartyPaymentRequest, WelfareConstant.AsyncStatus.SUCCEED,woLifeBasicResponse,null);
                 }else{

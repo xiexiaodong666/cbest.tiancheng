@@ -22,12 +22,15 @@ import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
+import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.service.payment.IPaymentOperator;
+import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRowsRequest;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +48,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 
@@ -76,6 +80,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentChannelConfigDao paymentChannelConfigDao;
     private final SubAccountDao subAccountDao;
     private final MerAccountTypeConsumeSceneConfigDao merAccountTypeConsumeSceneConfigDao;
+    private final AccountAmountTypeGroupDao accountAmountTypeGroupDao;
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
     @Resource(name = "e-welfare-paymentQueryAsync")
@@ -106,7 +111,7 @@ public class PaymentServiceImpl implements PaymentService {
                         threadPoolTaskExecutor.submit(() -> merchantCreditService.getByMerCode(account.getMerCode()));
                 Future<List<MerAccountTypeConsumeSceneConfig>> merAccountTypeConsumeSceneConfigFuture =
                         threadPoolTaskExecutor.submit(() -> merAccountTypeConsumeSceneConfigDao
-                                .query(account.getMerCode(),paymentRequest.getStoreNo(),paymentRequest.getPaymentScene()));
+                                .query(account.getMerCode(),paymentRequest.getStoreNo(),paymentSceneFuture.get()));
                 Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();
@@ -254,6 +259,14 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式", null);
         }
+
+        if(!CollectionUtils.isEmpty(paymentRequest.getSaleRows())) {
+            // 线上沃生活check 订单总金额和商品行金额的和是否相等
+            Assert.isTrue(paymentRequest.getAmount().compareTo( paymentRequest.getSaleRows().stream().reduce(BigDecimal.ZERO, (x, y) -> {
+                return x.add(y.getPrice().multiply(new BigDecimal(y.getCount())));
+            }, BigDecimal::add)) == 0, "订单总金额与商品合计金额不相等,请检查上游服务");
+        }
+
     }
 
     @Override
@@ -306,19 +319,23 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
-        List<AccountBillDetail> billDetails = paymentOperations.stream()
-                .map(PaymentOperation::getAccountBillDetail)
+        List<AccountBillDetail> billDetails = paymentOperations.stream().map(PaymentOperation::getAccountBillDetail)
                 .collect(Collectors.toList());
-        List<AccountDeductionDetail> deductionDetails = paymentOperations.stream()
-                .map(PaymentOperation::getAccountDeductionDetail)
+        List<AccountDeductionDetail> deductionDetails = paymentOperations.stream().map(PaymentOperation::getAccountDeductionDetail)
                 .collect(Collectors.toList());
-        List<AccountAmountType> accountTypes = paymentOperations.stream()
-                .map(PaymentOperation::getAccountAmountType).filter(Objects::nonNull)
+        List<AccountAmountType> accountTypes = paymentOperations.stream().map(PaymentOperation::getAccountAmountType)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        List<AccountAmountTypeGroup> accountAmountTypeGroups = paymentOperations.stream().map(PaymentOperation::getAccountAmountTypeGroup)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         AccountAmountDO.updateAccountAfterOperated(account, accountAmountTypes);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
+        if(!CollectionUtils.isEmpty(accountAmountTypeGroups)){
+            accountAmountTypeGroupDao.updateBatchById(accountAmountTypeGroups);
+        }
         if(!CollectionUtils.isEmpty(accountTypes)){
             //联通沃支付，没有修改accountTypes，所以if判断
             accountAmountTypeDao.saveOrUpdateBatch(accountTypes);

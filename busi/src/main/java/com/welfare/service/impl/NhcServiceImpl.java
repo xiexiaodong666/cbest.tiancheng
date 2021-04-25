@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.*;
@@ -12,7 +13,9 @@ import com.welfare.common.util.AccountUtil;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.*;
+import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.entity.*;
+import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.*;
 import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.BatchSequence;
@@ -75,6 +78,8 @@ public class NhcServiceImpl implements NhcService {
     private TempAccountDepositApplyDao tempAccountDepositApplyDao;
     @Autowired
     private AccountAmountTypeService accountAmountTypeService;
+    @Autowired
+    private AccountCustomizeMapper accountCustomizeMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -83,27 +88,27 @@ public class NhcServiceImpl implements NhcService {
         Merchant merchant = merchantService.getMerchantByMerCode(userReq.getMerCode());
         BizAssert.notNull(merchant,
                 ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
-        boolean joinGroup = false;
         if (StringUtils.isNoneBlank(userReq.getAccountCode())) {
             // 修改
             account = accountService.getByAccountCode(Long.parseLong(userReq.getAccountCode()));
             BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("用户不存在[%s]", userReq.getAccountCode()));
             BizAssert.isTrue(userReq.getMerCode().equals(account.getMerCode()), ExceptionCode.ILLEGALITY_ARGURMENTS, "无权限操作！");
             account.setAccountName(userReq.getUserName());
+            if (Objects.nonNull(userReq.getAccountStatus())) {
+                account.setAccountStatus(AccountStatus.getByCode(userReq.getAccountStatus()).getCode());
+            }
             if (StringUtils.isNoneBlank(userReq.getPhone())) {
-                BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
+                BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()),
+                        ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
                 account.setPhone(userReq.getPhone());
             }
         } else {
             // 新增
             account = assemblyUser(userReq, merchant);
-            if (StringUtils.isNoneBlank(userReq.getFamilyUserCode())) {
-                joinGroup = true;
-            }
         }
         BizAssert.isTrue(accountDao.saveOrUpdate(account));
         // 加入家庭
-        if (joinGroup) {
+        if (StringUtils.isNoneBlank(userReq.getFamilyUserCode())) {
             boolean success = accountAmountTypeGroupService.addByAccountCodeAndMerAccountTypeCode(
                     account.getMerCode(),
                     account.getAccountCode(),
@@ -114,7 +119,7 @@ public class NhcServiceImpl implements NhcService {
         if (StringUtils.isNoneBlank(account.getPhone()) && account.getPhone().startsWith(NhcService.DEFAULT_PHONE_PREFIX)) {
             account.setPhone(null);
         }
-        // 同步商户
+        // 同步员工
         applicationContext.publishEvent(AccountEvt.builder()
                 .typeEnum(StringUtils.isNoneBlank(userReq.getAccountCode()) ? ShoppingActionTypeEnum.UPDATE : ShoppingActionTypeEnum.ADD)
                 .accountList(Collections.singletonList(account)).build());
@@ -133,16 +138,20 @@ public class NhcServiceImpl implements NhcService {
         } else {
             BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
             Account oldAccount= accountService.findByPhoneAndMerCode(userReq.getPhone(), userReq.getMerCode());
-            BizAssert.isTrue(Objects.isNull(oldAccount), ExceptionCode.ILLEGALITY_ARGURMENTS, "员工已存在");
+            BizAssert.isTrue(Objects.isNull(oldAccount), ExceptionCode.ACCOUNT_ALREADY_EXIST, "员工已存在");
             account.setPhone(userReq.getPhone());
         }
-        account.setAccountStatus(AccountStatus.ENABLE.getCode());
+        if (userReq.getAccountStatus() != null) {
+            account.setAccountStatus(AccountStatus.getByCode(userReq.getAccountStatus()).getCode());
+        } else {
+            account.setAccountStatus(AccountStatus.ENABLE.getCode());
+        }
         account.setOfflineLock(WelfareConstant.AccountOfflineFlag.ENABLE.code());
         account.setBinding(AccountBindStatus.NO_BIND.getCode());
         account.setAccountTypeCode(WelfareConstant.AccountType.PATIENT.code());
         List<DepartmentTree> departmentTrees = departmentService.tree(userReq.getMerCode());
+        BizAssert.notEmpty(departmentTrees.get(0).getChildren(),ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
         DepartmentTree department = (DepartmentTree)departmentTrees.get(0).getChildren().get(0);
-        BizAssert.notNull(department,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
         account.setDepartment(department.getDepartmentCode());
         // 创建甜橙卡子账户
         SubAccount subAccount = new SubAccount();
@@ -239,8 +248,8 @@ public class NhcServiceImpl implements NhcService {
 
     @Override
     public Page<NhcAccountBillDetailDTO> getUserBillPage(NhcUserPageReq userPageReq) {
-        Page<AccountBillDetailDTO> page = accountService.queryAccountBillDetail(userPageReq.getCurrent(), userPageReq.getSize(),
-                userPageReq.getAccountCode(), null, null);
+        Page<AccountBillDetailMapperDTO> page = new Page<>(userPageReq.getCurrent(), userPageReq.getSize());
+        accountCustomizeMapper.queryAccountBillDetail(page, userPageReq.getAccountCode(), null, null);
         List<NhcAccountBillDetailDTO> list = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(page.getRecords())) {
             page.getRecords().forEach(billDetail -> {
@@ -249,15 +258,18 @@ public class NhcServiceImpl implements NhcService {
                 dto.setTransTime(billDetail.getCreateTime());
                 dto.setTransTypeName(billDetail.getTransTypeString());
                 dto.setMerAccountTypeName(billDetail.getAccountTypeName());
-                dto.setTransAmount(billDetail.getTransAmount());
                 if (WelfareConstant.TransType.DEPOSIT_INCR.code().equals(billDetail.getTransType())) {
                     dto.setEvent("积分充值");
+                    dto.setTransAmount("+" + billDetail.getTransAmount().abs());
                 } else if (WelfareConstant.TransType.DEPOSIT_BACK.code().equals(billDetail.getTransType())) {
                     dto.setEvent("积分回冲");
+                    dto.setTransAmount("-" + billDetail.getTransAmount().abs());
                 } else if (WelfareConstant.TransType.CONSUME.code().equals(billDetail.getTransType())) {
                     dto.setEvent("积分商品兑换");
+                    dto.setTransAmount("-" + billDetail.getTransAmount().abs());
                 } else if (WelfareConstant.TransType.REFUND.code().equals(billDetail.getTransType())) {
                     dto.setEvent("积分商品退款");
+                    dto.setTransAmount("+" + billDetail.getTransAmount().abs());
                 }
                 list.add(dto);
             });
@@ -281,6 +293,8 @@ public class NhcServiceImpl implements NhcService {
                 WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
         BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "积分福利账户为空");
         NhcFamilyMemberDTO dto = new NhcFamilyMemberDTO();
+        dto.setMembers(new ArrayList<>());
+        dto.setFamilyCode("0001");
         if (Objects.nonNull(accountAmountType.getAccountAmountTypeGroupId())
                 && accountAmountType.getJoinedGroup() != null && accountAmountType.getJoinedGroup()) {
             AccountAmountTypeGroup group = accountAmountTypeGroupDao.getById(accountAmountType.getAccountAmountTypeGroupId());
@@ -290,7 +304,8 @@ public class NhcServiceImpl implements NhcService {
             QueryWrapper<AccountAmountType> accountAmountTypeQueryWrapper = new QueryWrapper<>();
             accountAmountTypeQueryWrapper
                     .eq(AccountAmountType.ACCOUNT_AMOUNT_TYPE_GROUP_ID, group.getId())
-                    .eq(AccountAmountType.JOINED_GROUP, true);
+                    .eq(AccountAmountType.JOINED_GROUP, true)
+                    .ne(AccountAmountType.ACCOUNT_CODE, userCode);
             List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(accountAmountTypeQueryWrapper);
             Map<Long, AccountAmountType> accountAmountTypeMap = accountAmountTypes.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, type->type));
             List<Long> accountCodes = accountAmountTypes.stream().map(AccountAmountType::getAccountCode).collect(Collectors.toList());

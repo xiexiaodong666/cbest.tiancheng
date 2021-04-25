@@ -2,6 +2,7 @@ package com.welfare.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.persist.dto.ThirdPartyPaymentRequestDao;
 import com.welfare.persist.entity.ThirdPartyPaymentRequest;
@@ -65,10 +66,15 @@ public class ThirdPartyPaymentRequestServiceImpl implements ThirdPartyPaymentReq
         ThirdPartyPaymentRequest thirdPartyPaymentRequest = new ThirdPartyPaymentRequest();
         thirdPartyPaymentRequest.setPaymentRequest(JSON.toJSONString(paymentRequest));
         thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.HANDLING.code());
-        thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
         thirdPartyPaymentRequest.setAccountCode(paymentRequest.getAccountCode());
         thirdPartyPaymentRequest.setTransType(WelfareConstant.TransType.CONSUME.code());
-        thirdPartyPaymentRequest.setPaymentTypeInfo(((BarcodePaymentRequest) paymentRequest).getBarcode());
+        thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.BARCODE.getCode());
+        if(ConsumeTypeEnum.ONLINE_MALL.getCode().equals(paymentRequest.getPaymentScene())) {
+            thirdPartyPaymentRequest.setPaymentType(PaymentTypeEnum.ONLINE.getCode());
+        } else {
+            thirdPartyPaymentRequest.setPaymentTypeInfo(((BarcodePaymentRequest) paymentRequest).getBarcode());
+        }
+
         thirdPartyPaymentRequest.setTransNo(paymentRequest.getTransNo());
         thirdPartyPaymentRequest.setTransAmount(paymentRequest.getAmount());
         thirdPartyPaymentRequest.setPaymentChannel(WelfareConstant.PaymentChannel.WO_LIFE.code());

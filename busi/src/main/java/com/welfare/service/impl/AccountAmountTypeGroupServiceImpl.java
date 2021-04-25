@@ -1,8 +1,10 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
@@ -10,6 +12,7 @@ import com.welfare.persist.dao.AccountAmountTypeDao;
 import com.welfare.persist.dao.AccountAmountTypeGroupDao;
 import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
+import com.welfare.persist.dto.UpdateAccountAmountTypeDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.entity.Account;
@@ -80,9 +83,10 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, merAccountTypeCode);
         BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "福利类型为空");
-        BizAssert.isTrue(accountAmountType.getJoinedGroup() != null && accountAmountType.getJoinedGroup()
-                        && Objects.nonNull(accountAmountType.getAccountAmountTypeGroupId()),
-                ExceptionCode.ILLEGALITY_ARGURMENTS, "该员工没有加入任何组");
+        if (accountAmountType.getJoinedGroup() == null || !accountAmountType.getJoinedGroup()
+                || Objects.isNull(accountAmountType.getAccountAmountTypeGroupId())) {
+            return true;
+        }
         long groupId = accountAmountType.getAccountAmountTypeGroupId();
         AccountAmountTypeGroup group = accountAmountTypeGroupDao.getById(groupId);
         BizAssert.notNull(group, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工福利账户组不存在");
@@ -137,7 +141,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         });
         accountBillDetailDao.saveBatch(accountBillDetails);
         accountDeductionDetailDao.saveBatch(accountDeductionDetails);
-        return accountAmountTypeDao.updateBatchById(removeAccountAmountTypes);
+        return accountAmountTypeDao.getBaseMapper().batchUpdate(UpdateAccountAmountTypeDTO.of(removeAccountAmountTypes)) > 0;
     }
 
     @Override
@@ -265,7 +269,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         Account groupAccount = accountService.getByAccountCode(groupAccountCode);
         BizAssert.notNull(groupAccount, ExceptionCode.ILLEGALITY_ARGURMENTS, "组员工不存在");
         BizAssert.isTrue(!joinAccount.getAccountCode().equals(groupAccount.getAccountCode()),
-                ExceptionCode.ILLEGALITY_ARGURMENTS, "不能和自己一个组");
+                ExceptionCode.NO_AND_OWN_GROUP, "不能和自己一个组");
         Map<Long, Account> accountMap = new HashMap<>();
         accountMap.put(joinAccount.getAccountCode(), joinAccount);
         accountMap.put(groupAccount.getAccountCode(), groupAccount);
@@ -276,6 +280,9 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
                 ExceptionCode.ILLEGALITY_ARGURMENTS, "福利账户不存在");
         AccountAmountTypeGroup amountTypeGroup;
         List<AccountAmountType> updateAccountAmountTypes = new ArrayList<>();
+
+        // 如果已属于某个组，先退组
+        removeByAccountCode(merCode, joinAccountCode, merAccountTypeCode);
 
         if (groupAccountAmountType.getJoinedGroup() && Objects.nonNull(groupAccountAmountType.getAccountAmountTypeGroupId())) {
             amountTypeGroup = accountAmountTypeGroupDao.getById(groupAccountAmountType.getAccountAmountTypeGroupId());

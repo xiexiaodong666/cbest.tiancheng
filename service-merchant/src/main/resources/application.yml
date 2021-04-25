@@ -1,5 +1,5 @@
 server:
-  port: ${tomcat.port:8080}
+  port: ${tomcat.port:10016}
 spring:
   profiles:
     active: persist,dev

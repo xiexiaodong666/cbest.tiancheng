@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @Author: duanhy
@@ -29,4 +30,10 @@ public class NhcUserReq {
 
   @ApiModelProperty(value = "用户手机号码")
   private String phone;
+
+  /**
+   * 账号状态
+   */
+  @ApiModelProperty("账号状态(1正常 2禁用)")
+  private Integer accountStatus;
 }

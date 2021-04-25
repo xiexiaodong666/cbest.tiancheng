@@ -219,12 +219,6 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             if (!apply.getApprovalType().equals(ApprovalType.SINGLE.getCode())) {
                 throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非单个申请修改", null);
             }
-            // 判断金额是否超限
-            MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
-            // 修改充值明细表
-            if (merchantCredit.getRechargeLimit().compareTo(request.getInfo().getRechargeAmount()) < 0) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
-            }
             Date now = new Date();
             apply.setUpdateTime(now);
             apply.setUpdateUser(merchantUserInfo.getUserCode());
@@ -288,11 +282,6 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 }
                 // 判断金额是否超限
                 BigDecimal sumAmount = temps.stream().map(TempAccountDepositApplyDTO::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
-                // 修改充值明细表
-                if (merchantCredit.getRechargeLimit().compareTo(sumAmount) < 0) {
-                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
-                }
                 List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
                 depositApplyDetailService.physicalDelByApplyCode(apply.getApplyCode());
                 accountDepositApplyDetailDao.saveBatch(details);
@@ -471,7 +460,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {
         AccountDepositApplyDetail detail;
         detail = new AccountDepositApplyDetail();
-        Account account = accountService.findByPhoneAndMerCode(accountAmounts.getPhone(), MerchantUserHolder.getMerchantUser().getMerchantCode());
+        Account account = accountService.findByPhoneAndMerCode(accountAmounts.getPhone(), apply.getMerCode());
         if (account == null) {
           throw new BizException("员工不存在");
         }
@@ -544,11 +533,6 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持对属于[客户]的商户充值", null);
-        }
-        // 判断金额是否超限
-        MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUser.getMerchantCode());
-        if (merchantCredit.getRechargeLimit().compareTo(amount) < 0) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
         }
     }
 }

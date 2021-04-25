@@ -572,7 +572,7 @@ public class WelfareConstant {
          *
          */
         DEFAULT("default","默认"),
-        HOSPITAL_POINTS("hospital_points","卫计委积分"),
+        HOSPITAL_POINTS("NHC","卫计委积分"),
         WHOLESALE("wholesale","批发");
         private final String code;
         private final String desc;
@@ -658,6 +658,16 @@ public class WelfareConstant {
         }
         public String desc(){
             return this.desc;
+        }
+
+        public static IndustryTag fromCode(String code){
+            IndustryTag[] values = IndustryTag.values();
+            for (IndustryTag c : values) {
+                if(c.code.equals(code)){
+                    return c;
+                }
+            }
+            throw new RuntimeException("不存在的IndustryTag类型");
         }
     }
 

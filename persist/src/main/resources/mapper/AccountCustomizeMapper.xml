@@ -324,7 +324,7 @@
     WHEN abd.trans_type = 'refund' THEN
     "入账"
     WHEN abd.trans_type = 'deposit_back' THEN
-    "出账"
+    "入账"
     END AS transTypeString,
     sum(
     DISTINCT (

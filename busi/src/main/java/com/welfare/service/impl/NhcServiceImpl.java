@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -112,7 +113,7 @@ public class NhcServiceImpl implements NhcService {
             try {
                 account = assemblyUser(userReq, merchant);
             } catch (Exception exception) {
-                if (exception instanceof DuplicateKeyException) {
+                if (exception instanceof SQLIntegrityConstraintViolationException) {
                     throw new BizException(ExceptionCode.ACCOUNT_ALREADY_EXIST);
                 } else {
                     throw exception;

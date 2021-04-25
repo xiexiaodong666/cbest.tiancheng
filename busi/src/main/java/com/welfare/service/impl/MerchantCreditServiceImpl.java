@@ -59,6 +59,9 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final RebateLimitOperator rebateLimitOperator;
     private final MerchantBillDetailDao merchantBillDetailDao;
     private final SelfDepositBalanceOperator selfDepositBalanceOperator;
+    private final WholesaleCreditLimitOperator wholesaleCreditLimitOperator;
+
+
     @Autowired
     private  MerchantService merchantService;
     private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
@@ -209,25 +212,6 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     }
 
     @Override
-    public void setWholesaleLimit(String merCode, MerCreditType merCreditType, BigDecimal amount,
-        String transNo) {
-        RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
-        lock.lock();
-        try{
-            MerchantCredit merchantCredit = this.getByMerCode(merCode);
-            AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            List<MerchantAccountOperation> increase = merAccountTypeOperator.set(merchantCredit, amount,transNo );
-            merchantCreditDao.updateById(merchantCredit);
-            List<MerchantBillDetail> merchantBillDetails = increase.stream()
-                .map(MerchantAccountOperation::getMerchantBillDetail)
-                .collect(Collectors.toList());
-            merchantBillDetailDao.saveBatch(merchantBillDetails);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void restoreRemainingLimit(RestoreRemainingLimitReq req) {
         Merchant merchant = merchantService.queryByCode(req.getMerCode());
@@ -277,6 +261,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         operatorMap.put(REMAINING_LIMIT, remainingLimitOperator);
         operatorMap.put(REBATE_LIMIT, rebateLimitOperator);
         operatorMap.put(SELF_DEPOSIT,selfDepositBalanceOperator);
+        operatorMap.put(WHOLESALE_CREDIT_LIMIT, wholesaleCreditLimitOperator);
 
     }
 }

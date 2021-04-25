@@ -65,6 +65,4 @@ public class MerchantAddDTO {
   @NotNull(message = "扩展信息不能为空")
   private MerchantExtendDTO extend;
 
-  @ApiModelProperty("结算方式")
-  private String supplierWholesaleSettleMethod;
 }

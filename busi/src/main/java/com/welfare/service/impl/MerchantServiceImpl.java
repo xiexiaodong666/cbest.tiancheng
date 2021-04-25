@@ -190,17 +190,6 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag3=merchantAccountTypeService.init(merCode, merchant.getExtend());
         // 写入extend
 
-        MerchantExtend merchantExtend = merchantExtendDao.getBaseMapper().selectOne(Wrappers.<MerchantExtend>lambdaQuery().eq(MerchantExtend::getMerCode, merchant.getMerCode()));
-        if(merchantExtend == null) {
-            merchantExtend = new MerchantExtend();
-            merchantExtend.setMerCode(merchant.getMerCode());
-            merchantExtend.setSupplierWholesaleSettleMethod(merchant.getSupplierWholesaleSettleMethod());
-
-            merchantExtendDao.getBaseMapper().insert(merchantExtend);
-        } else {
-            merchantExtend.setSupplierWholesaleSettleMethod(merchant.getSupplierWholesaleSettleMethod());
-            merchantExtendDao.getBaseMapper().updateById(merchantExtend);
-        }
 
 
         boolean flag4=true;

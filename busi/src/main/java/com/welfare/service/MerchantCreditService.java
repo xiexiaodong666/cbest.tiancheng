@@ -85,14 +85,6 @@ public interface MerchantCreditService {
    */
   void setAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
 
-  /**
-   * 设置批发额度
-   * @param merCode
-   * @param merCreditType
-   * @param amount
-   * @param transNo
-   */
-  void setWholesaleLimit(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo);
 
   /**
    * 恢复剩余信用额度

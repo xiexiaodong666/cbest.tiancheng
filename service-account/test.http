@@ -14,3 +14,12 @@ accountUser: {"accountCode":"111111"}
 DELETE http://localhost:10016/card-info/card-unbinding/4323225
 Content-Type: application/json
 Source: cbest-saas-rewardmall
+
+### 磁条卡制卡
+POST http://localhost:10016/cardApply
+Content-Type: application/json
+Source: cbest-saas-rewardmall
+apiUser: {"accountCode":"111111"}
+merchantUser: {"merchantCode":"M123"}
+
+{"cardMedium":"MAGNETIC_CARD","cardName":"liyxtest1","cardType":"HEALTH_CARD","cardNum":11,"merCode":"M272","remark":""}

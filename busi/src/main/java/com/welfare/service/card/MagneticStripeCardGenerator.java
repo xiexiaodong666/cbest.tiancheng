@@ -45,8 +45,7 @@ public class MagneticStripeCardGenerator implements ICardGenerator {
 
     private void generateCardId(CardInfo cardInfo, Long sequenceNo){
         long checkCode = RandomUtil.randomLong(10000000L, 99999999L);
-        long cardId = sequenceNo + checkCode;
-        String fullCardId = PREFIX + cardId;
+        String fullCardId = PREFIX + sequenceNo +checkCode;
         cardInfo.setCardId(fullCardId);
         cardInfo.setMagneticStripe(fullCardId);
         cardInfo.setCheckCode(checkCode);

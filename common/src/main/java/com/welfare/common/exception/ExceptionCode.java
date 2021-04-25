@@ -35,6 +35,7 @@ public enum ExceptionCode implements IResultCode {
     CARD_WRITTEN_OR_BIND(5004001,"卡片已被写入或者绑定, 不能删除"),
     CARD_ALREADY_BIND(5004002,"卡片已经被绑定其他用户"),
     ACCOUNT_ALREADY_BIND(5004003,"用户已经绑定卡"),
+    CARD_NOT_EXIST(5004004,"卡片不存在"),
     //______授权相关异常------
     BUSI_ERROR_NO_PERMISSION(5005001,"未登录"),
 

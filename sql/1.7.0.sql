@@ -112,3 +112,6 @@ INSERT INTO `sequence`(`id`, `sequence_type`, `prefix`, `sequence_no`, `min_sequ
 # 磁条卡序列配置
 
 INSERT INTO `sequence` (`id`, `sequence_type`, `prefix`, `sequence_no`, `min_sequence`, `max_sequence`, `handler_for_max`, `create_user`, `create_time`, `update_user`, `update_time`, `deleted`, `version`) VALUES ('666666777778888', 'MAGNETIC_STRIPE_CARD_ID', '100', '10000000', 10000000, 99999999, 'com.welfare.service.sequence.CommonMaxHandler', 'liyx', '2021-04-25 11:21:23', NULL, NULL, '0', '0');
+
+UPDATE dict set deleted = 1 where dict_type = 'Merchant.merCreditType' and  dict_code = 'rechargeLimit';
+

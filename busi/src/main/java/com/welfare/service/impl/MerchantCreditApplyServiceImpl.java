@@ -252,7 +252,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         } else if (merCreditType == WelfareConstant.MerCreditType.CREDIT_LIMIT) {
             merchantCreditService.setAccountType(merCode,merCreditType,amount,transNo);
         } else if (merCreditType == WelfareConstant.MerCreditType.WHOLESALE_CREDIT_LIMIT) {
-
+            merchantCreditService.setAccountType(merCode,merCreditType,amount,transNo);
         } else {
             merchantCreditService.increaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.DEPOSIT_INCR.code());
         }

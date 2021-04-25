@@ -36,6 +36,7 @@ public class MerchantExtendServiceImpl implements MerchantExtendService {
         if (Objects.nonNull(extendDTO)) {
             merchantExtend.setIndustryTag(extendDTO.getIndustryTag());
             merchantExtend.setPointMall(extendDTO.getPointMall());
+            merchantExtend.setSupplierWholesaleSettleMethod(extendDTO.getSupplierWholesaleSettleMethod());
         }
         return merchantExtendDao.saveOrUpdate(merchantExtend);
     }

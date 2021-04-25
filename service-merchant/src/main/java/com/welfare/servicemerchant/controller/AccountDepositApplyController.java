@@ -3,6 +3,7 @@ package com.welfare.servicemerchant.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
@@ -118,7 +119,11 @@ public class AccountDepositApplyController implements IController {
       return success(depositApplyService.approval(request) + "");
     } catch (Exception e) {
       depositApplyService.approvalAndFail(request);
-      return fail(e.getMessage());
+      if (e instanceof BizException) {
+        return fail(e.getMessage());
+      } else {
+        return fail("审核失败");
+      }
     }
   }
 

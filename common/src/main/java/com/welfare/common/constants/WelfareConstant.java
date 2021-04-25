@@ -266,7 +266,8 @@ public class WelfareConstant {
         SURPLUS_QUOTA("surplus_quota","授信额度"),
         SURPLUS_QUOTA_OVERPAY("surplus_quota_overpay","授信额度溢缴款"),
         MALL_POINT("mall_point","积分账户余额"),
-        WHOLESALE("wholesale","批发采购");
+        WHOLESALE("wholesale","批发采购"),
+        WHOLESALE_PROCUREMENT("wholesale_procurement","员工批发采购账户");
         private final String code;
         private final String desc;
 
@@ -671,4 +672,26 @@ public class WelfareConstant {
         }
     }
 
+    /**
+     * 员工充值类型
+     */
+    public enum AccountDepositApply{
+
+        WHOLESALE_CREDIT_LIMIT_APPLY("wholesaleCreditLimitApply","批发采购充值"),
+        WELFARE_APPLY("welfareApply","福利充值");
+        private final String code;
+        private final String desc;
+
+        AccountDepositApply(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
 }

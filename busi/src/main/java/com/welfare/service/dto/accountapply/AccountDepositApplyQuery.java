@@ -73,4 +73,11 @@ public class AccountDepositApplyQuery extends PageReq{
   @ApiModelProperty("福利类型code")
   @Query(type = Query.Type.EQUAL)
   private String merAccountTypeCode;
+
+  /**
+   * 充值类型
+   */
+  @ApiModelProperty("充值类型（批发采购充值：wholesaleCreditLimitApply  福利充值：welfareApply)")
+  @Query(type = Query.Type.EQUAL, propName = "applyType")
+  private String applyType;
 }

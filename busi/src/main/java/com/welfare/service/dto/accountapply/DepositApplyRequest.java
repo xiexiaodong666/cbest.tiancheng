@@ -57,4 +57,9 @@ public class DepositApplyRequest {
   @NotNull(message = "申请员工额度信息为空")
   @Valid
   private AccountDepositRequest info;
+
+  /**
+   * 充值类型
+   */
+  private String applyType;
 }

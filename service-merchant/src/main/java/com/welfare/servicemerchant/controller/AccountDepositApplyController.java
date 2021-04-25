@@ -2,6 +2,7 @@ package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.AccountApplyTotalDTO;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
@@ -120,6 +121,7 @@ public class AccountDepositApplyController implements IController {
   @ApiOperation("新增额度申请(单个)")
   @MerchantUser
   public R<String> save(@Validated@RequestBody DepositApplyRequest request){
+    request.setApplyType(WelfareConstant.AccountDepositApply.WELFARE_APPLY.code());
     return success(depositApplyService.saveOne(request, MerchantUserHolder.getMerchantUser())+"");
   }
 
@@ -132,6 +134,7 @@ public class AccountDepositApplyController implements IController {
     applyRequest.setApplyRemark(request.getApplyRemark());
     applyRequest.setMerAccountTypeCode(request.getMerAccountTypeCode());
     applyRequest.setMerAccountTypeName(request.getMerAccountTypeName());
+    request.setApplyType(WelfareConstant.AccountDepositApply.WELFARE_APPLY.code());
     return success(depositApplyService.saveBatch(applyRequest, request.getFileId(), MerchantUserHolder.getMerchantUser())+"");
   }
 
@@ -158,4 +161,19 @@ public class AccountDepositApplyController implements IController {
     return success(tempAccountDepositApplyService.getUserCountAndTotalmount(fileId,
             MerchantUserHolder.getMerchantUser().getMerchantCode()));
   }
+
+//  @PostMapping("/save")
+//  @ApiOperation("新增额度申请(单个)")
+//  @MerchantUser
+//  public R<String> save(@Validated@RequestBody DepositApplyRequest request){
+//    request.setApplyType(WelfareConstant.AccountDepositApply.WELFARE_APPLY.code());
+//    return success(depositApplyService.saveOne(request, MerchantUserHolder.getMerchantUser())+"");
+//  }
+//
+//  @PostMapping("/update")
+//  @ApiOperation("修改账号额度申请(单个)")
+//  @MerchantUser
+//  public R<String> update(@Validated @RequestBody DepositApplyUpdateRequest requst){
+//    return success(depositApplyService.updateOne(requst, MerchantUserHolder.getMerchantUser())+"");
+//  }
 }

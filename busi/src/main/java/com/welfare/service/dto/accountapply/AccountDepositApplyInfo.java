@@ -115,10 +115,15 @@ public class AccountDepositApplyInfo {
   @NotEmpty(message = "余额类型为空")
   private String merAccountTypeCode;
 
-
   /**
    * 审批类型
    */
   @ApiModelProperty("审批类型（单个：SINGLE，批量：BATCH）")
   private String approvalType;
+
+  /**
+   * 充值类型
+   */
+  @ApiModelProperty("充值类型（批发采购充值：wholesaleCreditLimitApply  福利充值：welfareApply)")
+  private String applyType;
 }

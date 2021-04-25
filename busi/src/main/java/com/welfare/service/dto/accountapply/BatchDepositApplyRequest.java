@@ -53,4 +53,9 @@ public class BatchDepositApplyRequest {
    */
   @ApiModelProperty("文件id")
   private String fileId;
+
+  /**
+   * 充值类型
+   */
+  private String applyType;
 }

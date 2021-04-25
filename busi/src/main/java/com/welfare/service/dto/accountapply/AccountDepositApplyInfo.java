@@ -115,6 +115,7 @@ public class AccountDepositApplyInfo {
   @NotEmpty(message = "余额类型为空")
   private String merAccountTypeCode;
 
+
   /**
    * 审批类型
    */
@@ -126,4 +127,10 @@ public class AccountDepositApplyInfo {
    */
   @ApiModelProperty("充值类型（批发采购充值：wholesaleCreditLimitApply  福利充值：welfareApply)")
   private String applyType;
+
+  /**
+   * 充值状态
+   */
+  @ApiModelProperty("充值状态(成功:SUCCESS  失败:NO  待充值:INIT)")
+  private String rechargeStatus;
 }

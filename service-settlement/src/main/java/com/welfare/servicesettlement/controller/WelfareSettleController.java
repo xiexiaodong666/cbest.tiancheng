@@ -112,4 +112,38 @@ public class WelfareSettleController implements IController {
 
         return success(null);
     }
+
+    @PostMapping("/detail/exportGroupByMer")
+    @ApiOperation("结算页面导出")
+    public Object exportMonthSettleDetail2(@RequestBody WelfareSettleDetail2Req welfareSettleDetailReq2){
+
+
+        List<WelfareSettleDetailResp> welfareSettleDetailRespList = new ArrayList<>();
+        List<WelfareSettleDetailResp> welfareSettleDetailRespListTemp;
+        WelfareSettleDetailReq req = new WelfareSettleDetailReq();
+        req.setMinId(0L);
+        req.setMerName(welfareSettleDetailReq2.getMerName());
+        req.setSupplierCode(welfareSettleDetailReq2.getSupplierCode());
+        req.setStartTime(welfareSettleDetailReq2.getStartTime());
+        req.setEndTime(welfareSettleDetailReq2.getEndTime());
+        req.setMerCooperationMode(welfareSettleDetailReq2.getMerCooperationMode());
+        do {
+            welfareSettleDetailRespListTemp = settleDetailService.queryWelfareSettleDetail(req);
+            if(!welfareSettleDetailRespListTemp.isEmpty()){
+                welfareSettleDetailRespList.addAll(welfareSettleDetailRespListTemp);
+                req.setMinId(welfareSettleDetailRespListTemp.get(welfareSettleDetailRespListTemp.size()-1).getId()+1);
+            }else{
+                break;
+            }
+        }while(true);
+
+        String path = null;
+        try {
+            path = fileUploadService.uploadExcelFile(
+                    WelfareSettleDetailExcelDTO.of(welfareSettleDetailRespList), WelfareSettleDetailExcelDTO.class, "应付消费明细");
+        } catch (IOException e) {
+            throw new BizException(null, "文件导出异常", null);
+        }
+        return success(fileUploadService.getFileServerUrl(path));
+    }
 }

@@ -80,4 +80,11 @@ public class AccountDepositApplyQuery extends PageReq{
   @ApiModelProperty("充值类型（批发采购充值：wholesaleCreditLimitApply  福利充值：welfareApply)")
   @Query(type = Query.Type.EQUAL, propName = "applyType")
   private String applyType;
+
+  /**
+   * 充值状态
+   */
+  @ApiModelProperty("充值状态(成功:SUCCESS  失败:NO  待充值:INIT)")
+  @Query(type = Query.Type.EQUAL)
+  private String rechargeStatus;
 }

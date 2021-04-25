@@ -13,8 +13,8 @@
     m.mer_identity merIdentity,
     m.mer_cooperation_mode merCooperationMode,
     mc.credit_limit creditLimit,
-    mc.remaining_limit remainingLimit,
-    mc.current_balance currentBalance,
+    bill.remaining_limit remainingLimit,
+    bill.current_balance currentBalance,
     m.create_time createTime,
     NULL merName2,
     NULL merType2,
@@ -23,6 +23,20 @@
     FROM
     merchant m
     LEFT JOIN merchant_credit mc ON m.mer_code = mc.mer_code
+    LEFT JOIN
+    (
+    SELECT * FROM merchant_bill_detail
+    WHERE id in
+          ( SELECT MAX( mbd.id ) FROM merchant_bill_detail mbd
+          <where>
+            <if test="req!=null and req.balanceEndTime!=null">
+              and mbd.create_time &lt;= #{req.balanceEndTime}
+            </if>
+          </where>
+          GROUP BY mbd.mer_code
+        )
+    )
+    bill ON bill.mer_code = m.mer_code
     where  mc.deleted=0 and m.deleted=0 ) temp0
     <where>
       <if test="req!=null and req.merCode!=null and req.merCode!=''">

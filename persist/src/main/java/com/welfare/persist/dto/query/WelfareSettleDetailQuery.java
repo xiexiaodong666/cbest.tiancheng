@@ -79,4 +79,10 @@ public class WelfareSettleDetailQuery {
 
     @ApiModelProperty("支付渠道")
     private String paymentChannel;
+
+    @ApiModelProperty("合作方式")
+    private String merCooperationMode;
+
+    @ApiModelProperty(value = "商户名称")
+    private String merName;
 }

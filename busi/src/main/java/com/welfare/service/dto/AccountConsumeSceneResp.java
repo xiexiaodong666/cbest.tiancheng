@@ -20,10 +20,24 @@ public class AccountConsumeSceneResp {
   private String id;
 
   /**
+   * 福利类型id
+   */
+  @ApiModelProperty("福利类型Code")
+  private String accountWelfareCode;
+
+  /**
    * 员工类型ID
    */
   @ApiModelProperty("员工类型Code")
   private String accountTypeCode;
+
+  /**
+   * 福利类型名称
+   */
+  @ApiModelProperty("福利类型名称")
+  private String accountWelfareName;
+
+
   /**
    * 员工类型名称
    */

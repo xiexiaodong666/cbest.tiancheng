@@ -257,4 +257,27 @@ WHERE
         WHERE
             acs.mer_code = #{merCode} and acstr.deleted = 0 and acs.deleted = 0 and msr.deleted = 0
     </select>
+
+
+  <select id="findAllAccountWelfareConsumeSceneDTO" resultType="com.welfare.persist.dto.AccountConsumeStoreInfoDTO">
+        SELECT
+            acs.id,
+            acs.mer_code AS merCode,
+            acs.mer_account_type_code AS accountWelfareCode,
+            mat.mer_account_type_name AS accountWelfareName,
+            acs.store_code AS storeCode,
+            msr.store_alias AS storeName,
+            msr.consum_type AS consumType,
+            acs.scene_consume_type AS sceneConsumType,
+            m.mer_code as supplierCode,
+            m.mer_name as supplierName
+        FROM
+            mer_account_type_consume_scene_config acs
+                inner JOIN merchant_store_relation msr ON  acs.mer_code = msr.mer_code
+                inner JOIN merchant_account_type mat ON mat.mer_account_type_code = acs.mer_account_type_code and mat.mer_code = acs.mer_code
+                inner JOIN supplier_store sp ON sp.store_code = acs.store_code
+                inner JOIN merchant m ON m.mer_code = sp.mer_code
+        WHERE
+            acs.mer_code = #{merCode}  and acs.deleted = 0 and msr.deleted = 0
+    </select>
 </mapper>

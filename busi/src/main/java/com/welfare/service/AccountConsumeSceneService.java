@@ -40,9 +40,25 @@ public interface AccountConsumeSceneService {
   List<AccountConsumeSceneResp> findAllAccountConsumeSceneDTO(String merCode);
 
   /**
+   * 查询商户下所有已配置的福利类型门店配置
+   * @param merCode
+   * @return
+   */
+  List<AccountConsumeSceneResp> findAllAccountWelfareConsumeSceneDTO(String merCode);
+
+
+  /**
    * 变更商户下对应员工类型的消费配置
    * @param consumeSceneEditReq
    * @return
    */
   Boolean edit(List<AccountConsumeSceneEditReq> consumeSceneEditReq);
+
+
+  /**
+   * 变更商户下对应福利类型的消费配置
+   * @param consumeSceneEditReq
+   * @return
+   */
+  Boolean editWelfare(List<AccountWelfareConsumeSceneEditReq> consumeSceneEditReq);
 }

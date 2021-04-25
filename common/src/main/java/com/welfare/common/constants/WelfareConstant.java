@@ -234,7 +234,8 @@ public class WelfareConstant {
         EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号"),
         MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码"),
         ACCOUNT_AMOUNT_TYPE_GROUP_CODE("account_amount_type_group_code","员工福利账号组编码"),
-        DEFAULT_PHONE("default_phone","默认手机号");
+        DEFAULT_PHONE("default_phone","默认手机号"),
+        CONSTRUCTION_BANK_AUTO_INR("construction_bank_auto_inr","建行用户名称自增");
 
 
         private final String code;

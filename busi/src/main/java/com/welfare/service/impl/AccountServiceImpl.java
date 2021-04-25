@@ -1484,7 +1484,8 @@ public class AccountServiceImpl implements AccountService {
         Department department = departmentService.getByDepartmentCode(req.getDepartmentCode());
         BizAssert.notNull(department,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
         AccountReq accountReq = new AccountReq();
-        accountReq.setAccountName("默认名称");
+        String i = sequenceService.nextFullNo(WelfareConstant.SequenceType.CONSTRUCTION_BANK_AUTO_INR.code());
+        accountReq.setAccountName("默认名称" + i);
         accountReq.setMerCode(merchant.getMerCode());
         accountReq.setPhone(req.getPhone());
         accountReq.setAccountStatus(AccountStatus.getByCode(req.getAccountStatus()).getCode());

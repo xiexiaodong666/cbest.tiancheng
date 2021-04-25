@@ -110,17 +110,17 @@ public class NhcServiceImpl implements NhcService {
             }
         } else {
             // 新增
-            try {
-                account = assemblyUser(userReq, merchant);
-            } catch (Exception exception) {
-                if (exception instanceof SQLIntegrityConstraintViolationException) {
-                    throw new BizException(ExceptionCode.ACCOUNT_ALREADY_EXIST);
-                } else {
-                    throw exception;
-                }
+            account = assemblyUser(userReq, merchant);
+        }
+        try {
+            BizAssert.isTrue(accountDao.saveOrUpdate(account));
+        } catch (Exception exception) {
+            if (exception instanceof SQLIntegrityConstraintViolationException) {
+                throw new BizException(ExceptionCode.ACCOUNT_ALREADY_EXIST);
+            } else {
+                throw exception;
             }
         }
-        BizAssert.isTrue(accountDao.saveOrUpdate(account));
         // 加入家庭
         if (StringUtils.isNoneBlank(userReq.getFamilyUserCode())) {
             boolean success = accountAmountTypeGroupService.addByAccountCodeAndMerAccountTypeCode(

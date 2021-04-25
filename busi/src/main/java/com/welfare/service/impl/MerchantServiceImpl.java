@@ -251,7 +251,7 @@ public class MerchantServiceImpl implements MerchantService {
         merchantAccountType.setMerAccountTypeName(name);
         merchantAccountType.setMerAccountTypeCode(code);
         merchantAccountType.setDeductionOrder(deductionOrder);
-        merchantAccountType.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+        merchantAccountType.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
         return merchantAccountType;
     }
 

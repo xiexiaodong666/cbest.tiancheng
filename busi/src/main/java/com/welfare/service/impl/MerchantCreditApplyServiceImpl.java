@@ -240,6 +240,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持[客户]充值", null);
         }
+        WelfareConstant.MerCreditType merCreditType = WelfareConstant.MerCreditType.findByCode(typeStr);
     }
 
     /**

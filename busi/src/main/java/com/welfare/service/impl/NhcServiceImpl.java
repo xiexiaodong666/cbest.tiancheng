@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -22,6 +23,7 @@ import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.nhc.*;
+import com.welfare.service.remote.entity.EmployerReqDTO;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
 import com.welfare.service.utils.PageUtils;
@@ -32,10 +34,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -101,10 +105,20 @@ public class NhcServiceImpl implements NhcService {
                 BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()),
                         ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
                 account.setPhone(userReq.getPhone());
+            } else {
+                account.setPhone(DEFAULT_PHONE_PREFIX + sequenceService.nextNo(WelfareConstant.SequenceType.DEFAULT_PHONE.code()));
             }
         } else {
             // 新增
-            account = assemblyUser(userReq, merchant);
+            try {
+                account = assemblyUser(userReq, merchant);
+            } catch (Exception exception) {
+                if (exception instanceof SQLIntegrityConstraintViolationException) {
+                    throw new BizException(ExceptionCode.ACCOUNT_ALREADY_EXIST);
+                } else {
+                    throw exception;
+                }
+            }
         }
         BizAssert.isTrue(accountDao.saveOrUpdate(account));
         // 加入家庭

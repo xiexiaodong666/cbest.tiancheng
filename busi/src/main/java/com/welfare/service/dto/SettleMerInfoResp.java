@@ -31,4 +31,10 @@ public class SettleMerInfoResp {
 
     @ApiModelProperty(value = "返利余额")
     private BigDecimal rebateLimit;
+
+    @ApiModelProperty("批发限制授信额度")
+    private BigDecimal wholesaleCreditLimit;
+
+    @ApiModelProperty("批发授信额度")
+    private BigDecimal wholesaleCredit;
 }

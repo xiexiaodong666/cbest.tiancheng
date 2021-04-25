@@ -252,6 +252,8 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         settleMerInfoResp.setRebateLimit(merchantCredit.getRebateLimit());
         settleMerInfoResp.setRemainingLimit(merchantCredit.getRemainingLimit());
         settleMerInfoResp.setRechargeLimit(merchantCredit.getRechargeLimit());
+        settleMerInfoResp.setWholesaleCredit(merchantCredit.getWholesaleCredit());
+        settleMerInfoResp.setWholesaleCreditLimit(merchantCredit.getWholesaleCreditLimit());
         return settleMerInfoResp;
     }
 

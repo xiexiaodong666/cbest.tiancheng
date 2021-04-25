@@ -9,7 +9,8 @@ public enum SequenceTypeEnum {
   /**
    *
    */
-  CARDID("CARDID", "卡号");
+  CARDID("CARDID", "卡号"),
+  MAGNETIC_STRIPE_CARD_ID("MAGNETIC_STRIPE_CARD_ID","磁条卡卡号");
 
 
   public String getCode() {

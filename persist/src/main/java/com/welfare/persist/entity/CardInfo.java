@@ -44,6 +44,9 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      */
     @ApiModelProperty("卡号")   
     private String cardId;
+
+    @ApiModelProperty("校验码")
+    private Long checkCode;
     /**
      * 卡状态
      */

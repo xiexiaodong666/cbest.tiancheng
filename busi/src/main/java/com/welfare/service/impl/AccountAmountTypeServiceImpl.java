@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.AccountDepositIncreDTO;
@@ -145,6 +147,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     } else {
                         accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
                     }
+                    WelfareConstant.MerAccountTypeCode accountType = WelfareConstant.MerAccountTypeCode.findByCode(deposit.getMerAccountTypeCode());
+                    BizAssert.isTrue(accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) >= 0,
+                            ExceptionCode.ILLEGALITY_ARGURMENTS, accountType.desc() + "余额不足");
                     Account account = accountMap.get(deposit.getAccountCode());
                     account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();

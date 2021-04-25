@@ -276,6 +276,15 @@ public class WelfareConstant {
             this.desc = desc;
         }
 
+        public static MerAccountTypeCode findByCode(String code) {
+            for (MerAccountTypeCode type : MerAccountTypeCode.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的MerAccountTypeCode类型");
+        }
+
         public String code(){
             return this.code;
         }

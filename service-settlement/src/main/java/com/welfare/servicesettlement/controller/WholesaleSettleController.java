@@ -5,11 +5,14 @@ import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroup
 import com.welfare.service.settlement.WholesaleSettlementService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
@@ -30,12 +33,13 @@ public class WholesaleSettleController implements IController {
 
     @GetMapping("/page-receivable-summary")
     @ApiOperation("分页查询平台应收账单分组汇总")
-    public R<PageInfo<PlatformWholesaleSettleGroupDTO>> pageQueryReceivableSummary(String merCode,
-                                                                            String supplierCode,
-                                                                            Date transTimeStart,
-                                                                            Date transTimeEnd,
-                                                                            int pageIndex,
-                                                                            int pageSize){
+    public R<PageInfo<PlatformWholesaleSettleGroupDTO>> pageQueryReceivableSummary(
+            @RequestParam @ApiParam("商户编码") String merCode,
+            @RequestParam @ApiParam("商户编码") String supplierCode,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间起始 yyyy-MM-dd HH:mm:ss") Date transTimeStart,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间截至 yyyy-MM-dd HH:mm:ss") Date transTimeEnd,
+            @RequestParam @ApiParam("页码") int pageIndex,
+            @RequestParam @ApiParam("单页大小") int pageSize) {
         PageInfo<PlatformWholesaleSettleGroupDTO> pageInfo = wholesaleSettlementService.pageQueryReceivable(
                 merCode,
                 supplierCode,
@@ -49,10 +53,11 @@ public class WholesaleSettleController implements IController {
 
     @GetMapping("/receivable-summary")
     @ApiOperation("查询平台应收账单汇总")
-    public R<PlatformWholesaleSettleGroupDTO> queryReceivableSummary(String merCode,
-                                                                            String supplierCode,
-                                                                            Date transTimeStart,
-                                                                            Date transTimeEnd){
+    public R<PlatformWholesaleSettleGroupDTO> queryReceivableSummary(
+            @RequestParam @ApiParam("商户编码") String merCode,
+            @RequestParam @ApiParam("商户编码") String supplierCode,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间起始 yyyy-MM-dd HH:mm:ss") Date transTimeStart,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间截至 yyyy-MM-dd HH:mm:ss") Date transTimeEnd) {
         PlatformWholesaleSettleGroupDTO pageInfo = wholesaleSettlementService.queryReceivableSummary(
                 merCode,
                 supplierCode,

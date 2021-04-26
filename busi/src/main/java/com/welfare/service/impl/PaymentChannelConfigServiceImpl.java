@@ -261,7 +261,7 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
             Map<String, List<PaymentChannelConfig>> channelConfigMap = channelConfigs.stream().collect(Collectors.groupingBy(PaymentChannelConfig::getPaymentChannelCode));
             paymentChannels.forEach(dto -> {
                 if (channelConfigMap.containsKey(dto.getPaymentChannelCode())) {
-                    result.addAll(channelConfigMap.get(dto.getPaymentChannelCode()));
+                    result.add(channelConfigMap.get(dto.getPaymentChannelCode()).get(0));
                 }
             });
         }

@@ -21,7 +21,7 @@ import java.util.List;
 public interface PaymentChannelService {
 
   /**
-   * 根据条件查询支付取代
+   * 根据条件查询支付渠道
    * @return
    */
   List<com.welfare.service.dto.PaymentChannelDTO> list(PaymentChannelReq req);

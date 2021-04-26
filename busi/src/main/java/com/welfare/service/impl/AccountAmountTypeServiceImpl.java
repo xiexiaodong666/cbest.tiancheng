@@ -237,7 +237,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 resp.setShowOrder(merchantAccountType.getDeductionOrder());
                 resp.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
                 resp.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
-                if (accountAmountType.equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
+                if (accountAmountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
                     resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
                 } else {
                     resp.setBalance(accountAmountType.getAccountBalance() + "");

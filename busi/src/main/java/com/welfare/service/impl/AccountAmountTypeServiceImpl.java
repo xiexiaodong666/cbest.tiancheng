@@ -226,22 +226,31 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     public List<AccountAmountTypeResp> list(Long accountCode) {
         Account account = accountService.getByAccountCode(accountCode);
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByAccountCode(accountCode);
-        List<AccountAmountTypeResp> resps = new ArrayList<>();
-        if (Objects.nonNull(account) && org.apache.commons.collections4.CollectionUtils.isNotEmpty(accountAmountTypes)) {
+        Map<String, AccountAmountType> accountTypeMap = accountAmountTypes.stream().collect(Collectors.toMap(AccountAmountType::getMerAccountTypeCode, type -> type));
+          List<AccountAmountTypeResp> resps = new ArrayList<>();
+        if (Objects.nonNull(account)) {
             List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
-            Map<String, MerchantAccountType> merchantAccountTypeMap = merchantAccountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
-            accountAmountTypes.forEach(accountAmountType -> {
+            merchantAccountTypes.forEach(merchantAccountType -> {
                 AccountAmountTypeResp resp = new AccountAmountTypeResp();
-                MerchantAccountType merchantAccountType = merchantAccountTypeMap.get(accountAmountType.getMerAccountTypeCode());
                 resp.setAccountCode(accountCode);
                 resp.setShowOrder(merchantAccountType.getDeductionOrder());
-                resp.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
+                resp.setMerAccountTypeCode(merchantAccountType.getMerAccountTypeCode());
                 resp.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
-                if (accountAmountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
-                    resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                AccountAmountType accountAmountType = accountTypeMap.get(merchantAccountType.getMerAccountTypeCode());
+                if (Objects.nonNull(accountAmountType)) {
+                    if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
+                        resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                    } else {
+                        resp.setBalance(accountAmountType.getAccountBalance() + "");
+                    }
                 } else {
-                    resp.setBalance(accountAmountType.getAccountBalance() + "");
+                    if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
+                        resp.setBalance(BigDecimal.ZERO.toString() + "/" + account.getMaxQuota());
+                    } else {
+                        resp.setBalance(BigDecimal.ZERO.toString());
+                    }
                 }
+                resps.add(resp);
             });
         }
         return resps;

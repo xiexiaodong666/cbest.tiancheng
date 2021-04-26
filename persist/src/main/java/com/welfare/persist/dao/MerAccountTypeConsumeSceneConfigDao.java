@@ -1,6 +1,8 @@
 package com.welfare.persist.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.welfare.persist.entity.AccountConsumeScene;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import com.welfare.persist.entity.MerAccountTypeConsumeSceneConfig;
@@ -30,5 +32,11 @@ public class MerAccountTypeConsumeSceneConfigDao extends ServiceImpl<MerAccountT
                 .eq(MerAccountTypeConsumeSceneConfig::getStoreCode,storeCode)
                 .eq(MerAccountTypeConsumeSceneConfig::getSceneConsumeType,sceneConsumeType)
         );
+    }
+
+    public List<MerAccountTypeConsumeSceneConfig> getAllByMercode(List<String> merCodes){
+        QueryWrapper<MerAccountTypeConsumeSceneConfig> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(AccountConsumeScene.MER_CODE, merCodes);
+        return list(queryWrapper);
     }
 }

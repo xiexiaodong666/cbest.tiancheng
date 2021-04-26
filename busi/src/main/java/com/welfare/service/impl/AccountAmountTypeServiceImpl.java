@@ -135,11 +135,14 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 List<Long> accountCodes = deposits.stream().map(Deposit::getAccountCode).collect(Collectors.toList());
                 Map<Long, Account> accountMap = accountDao.mapByAccountCodes(accountCodes);
                 Map<Long, AccountAmountType> accountAmountTypeMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, merAccountTypeCode);
+
                 List<AccountDeductionDetail> deductionDetails = new ArrayList<>();
                 List<AccountChangeEventRecord> records = new ArrayList<>();
                 List<AccountBillDetail> details = new ArrayList<>();
                 List<OrderTransRelation> relations = new ArrayList<>();
                 List<AccountAmountType> newAccountAmountTypes = new ArrayList<>();
+                List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(deposits.get(0).getMerchantCode());
+                Map<String, MerchantAccountType> merchantAccountTypeMap = merchantAccountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
 
                 for (Deposit deposit : deposits) {
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(deposit.getAccountCode());
@@ -152,8 +155,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                         accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
                     }
                     WelfareConstant.MerAccountTypeCode accountType = WelfareConstant.MerAccountTypeCode.findByCode(deposit.getMerAccountTypeCode());
+
                     BizAssert.isTrue(accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) >= 0,
-                            ExceptionCode.ILLEGALITY_ARGUMENTS, accountType.desc() + "余额不足");
+                            ExceptionCode.ILLEGALITY_ARGUMENTS, merchantAccountTypeMap.get(deposit.getMerAccountTypeCode()) + "余额不足");
                     Account account = accountMap.get(deposit.getAccountCode());
                     account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();

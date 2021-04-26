@@ -82,7 +82,7 @@ public interface CardInfoService {
      * @param cardInfo
      * @return
      */
-    CardInfo createAndBind(CardInfo cardInfo);
+    CardInfo bind(CardInfo cardInfo);
 
     /**
      * 解绑卡

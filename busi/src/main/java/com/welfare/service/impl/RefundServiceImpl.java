@@ -89,7 +89,7 @@ public class RefundServiceImpl implements RefundService {
                 return true;
             }
             if (refundedAmount.add(refundRequest.getAmount()).compareTo(paidAmount) > 0) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款总额不能大于已付款金额", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "退款总额不能大于已付款金额", null);
             }
 
         }

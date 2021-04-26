@@ -1,10 +1,8 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
@@ -80,18 +78,18 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     @CacheEvict(value = TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT,key = "#merCode")
     public boolean removeByAccountCode(String merCode, Long accountCode, String merAccountTypeCode) {
         Account account = accountService.getByAccountCode(accountCode);
-        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
+        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工不存在");
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, merAccountTypeCode);
-        BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "福利类型为空");
+        BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGUMENTS, "福利类型为空");
         if (accountAmountType.getJoinedGroup() == null || !accountAmountType.getJoinedGroup()
                 || Objects.isNull(accountAmountType.getAccountAmountTypeGroupId())) {
             return true;
         }
         long groupId = accountAmountType.getAccountAmountTypeGroupId();
         AccountAmountTypeGroup group = accountAmountTypeGroupDao.getById(groupId);
-        BizAssert.notNull(group, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工福利账户组不存在");
+        BizAssert.notNull(group, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工福利账户组不存在");
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.getByTypeAndAccountAmountTypeGroupId(WelfareConstant.MerAccountTypeCode.MALL_POINT.code(), groupId);
-        BizAssert.notEmpty(accountAmountTypes, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工福利账户组没有任何员工");
+        BizAssert.notEmpty(accountAmountTypes, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工福利账户组没有任何员工");
 
         accountAmountType.setJoinedGroup(Boolean.FALSE);
         accountAmountType.setAccountAmountTypeGroupId(null);
@@ -102,7 +100,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         removeAccountAmountTypes.add(accountAmountType);
         if (accountAmountTypes.size() == 2) {
             Map<Long, AccountAmountType> accountAmountTypeMap = accountAmountTypes.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, a->a));
-            BizAssert.isTrue(accountAmountTypeMap.containsKey(accountAmountType.getAccountCode()), ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不在该组内");
+            BizAssert.isTrue(accountAmountTypeMap.containsKey(accountAmountType.getAccountCode()), ExceptionCode.ILLEGALITY_ARGUMENTS, "员工不在该组内");
             // 解散组，将组的金额继承到组内最后一人
             accountAmountTypeMap.forEach((code, amountType) -> {
                 if (!code.equals(accountAmountType.getAccountCode())) {
@@ -175,14 +173,14 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean batchUpdateGroupAmount(List<GroupDeposit> deposits) {
-        BizAssert.notEmpty(deposits, ExceptionCode.ILLEGALITY_ARGURMENTS, "参数为空");
+        BizAssert.notEmpty(deposits, ExceptionCode.ILLEGALITY_ARGUMENTS, "参数为空");
         Set<Long> groupIds = deposits.stream().map(GroupDeposit::getGroupId).collect(Collectors.toSet());
         List<RLock> locks = new ArrayList<>();
         RLock multiLock = null;
         try {
             Set<Long> accountCodes = new HashSet<>();
             deposits.forEach(deposit -> {
-                BizAssert.notEmpty(deposit.getDeposits(), ExceptionCode.ILLEGALITY_ARGURMENTS, "充值明细为空");
+                BizAssert.notEmpty(deposit.getDeposits(), ExceptionCode.ILLEGALITY_ARGUMENTS, "充值明细为空");
                 accountCodes.addAll(deposit.getDeposits().stream().map(GroupDeposit.DepositItem::getAccountCode).collect(Collectors.toSet()));
                 locks.add(redissonClient.getFairLock(ACCOUNT_AMOUNT_TYPE_GROUP_OPERATE + deposit.getGroupId()));
             });
@@ -241,20 +239,20 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     private void validationUpdateAmountParams(List<GroupDeposit> deposits,  Map<Long, AccountAmountTypeGroup> groupMap, Map<Long, Account> accountMap,
                                               Map<Long, AccountAmountType> accountAmountTypeMap) {
         deposits.forEach(groupDeposit -> {
-            BizAssert.isTrue(groupMap.containsKey(groupDeposit.getGroupId()), ExceptionCode.ILLEGALITY_ARGURMENTS,
+            BizAssert.isTrue(groupMap.containsKey(groupDeposit.getGroupId()), ExceptionCode.ILLEGALITY_ARGUMENTS,
                     "员工福利账号组不存在");
             groupDeposit.getDeposits().forEach(depositItem -> {
-                BizAssert.isTrue(accountMap.containsKey(depositItem.getAccountCode()), ExceptionCode.ILLEGALITY_ARGURMENTS,
+                BizAssert.isTrue(accountMap.containsKey(depositItem.getAccountCode()), ExceptionCode.ILLEGALITY_ARGUMENTS,
                         "员工不存在");
-                BizAssert.isTrue(accountAmountTypeMap.containsKey(depositItem.getAccountCode()), ExceptionCode.ILLEGALITY_ARGURMENTS,
+                BizAssert.isTrue(accountAmountTypeMap.containsKey(depositItem.getAccountCode()), ExceptionCode.ILLEGALITY_ARGUMENTS,
                         "员工福利类型不存在");
                 AccountAmountType accountAmountType = accountAmountTypeMap.get(depositItem.getAccountCode());
                 Boolean joinedGroup = accountAmountType.getJoinedGroup();
                 Long joinedGroupId = accountAmountType.getAccountAmountTypeGroupId();
                 BizAssert.isTrue(Objects.nonNull(joinedGroup) && joinedGroup && Objects.nonNull(joinedGroupId),
-                        ExceptionCode.ILLEGALITY_ARGURMENTS,
+                        ExceptionCode.ILLEGALITY_ARGUMENTS,
                         "员工没有加入任何组");
-                BizAssert.isTrue(joinedGroupId.equals(groupDeposit.getGroupId()), ExceptionCode.ILLEGALITY_ARGURMENTS,
+                BizAssert.isTrue(joinedGroupId.equals(groupDeposit.getGroupId()), ExceptionCode.ILLEGALITY_ARGUMENTS,
                         "员工不属于该组");
             });
         });
@@ -265,19 +263,19 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
     @CacheEvict(value = TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT,key = "#merCode")
     public boolean addByAccountCodeAndMerAccountTypeCode(String merCode, Long joinAccountCode, Long groupAccountCode, String merAccountTypeCode) {
         Account joinAccount = accountService.getByAccountCode(joinAccountCode);
-        BizAssert.notNull(joinAccount, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
+        BizAssert.notNull(joinAccount, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工不存在");
         Account groupAccount = accountService.getByAccountCode(groupAccountCode);
-        BizAssert.notNull(groupAccount, ExceptionCode.ILLEGALITY_ARGURMENTS, "组员工不存在");
+        BizAssert.notNull(groupAccount, ExceptionCode.ILLEGALITY_ARGUMENTS, "组员工不存在");
         BizAssert.isTrue(!joinAccount.getAccountCode().equals(groupAccount.getAccountCode()),
                 ExceptionCode.NO_AND_OWN_GROUP, "不能和自己一个组");
         Map<Long, Account> accountMap = new HashMap<>();
         accountMap.put(joinAccount.getAccountCode(), joinAccount);
         accountMap.put(groupAccount.getAccountCode(), groupAccount);
-        BizAssert.isTrue(joinAccount.getMerCode().equals(groupAccount.getMerCode()), ExceptionCode.ILLEGALITY_ARGURMENTS, "家庭员工不存在");
+        BizAssert.isTrue(joinAccount.getMerCode().equals(groupAccount.getMerCode()), ExceptionCode.ILLEGALITY_ARGUMENTS, "家庭员工不存在");
         AccountAmountType joinAccountAmountType = accountAmountTypeService.queryOne(joinAccountCode, merAccountTypeCode);
         AccountAmountType groupAccountAmountType = accountAmountTypeService.queryOne(groupAccountCode, merAccountTypeCode);
         BizAssert.isTrue(Objects.nonNull(joinAccountAmountType) && Objects.nonNull(groupAccountAmountType),
-                ExceptionCode.ILLEGALITY_ARGURMENTS, "福利账户不存在");
+                ExceptionCode.ILLEGALITY_ARGUMENTS, "福利账户不存在");
         AccountAmountTypeGroup amountTypeGroup;
         List<AccountAmountType> updateAccountAmountTypes = new ArrayList<>();
 
@@ -286,7 +284,7 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
 
         if (groupAccountAmountType.getJoinedGroup() && Objects.nonNull(groupAccountAmountType.getAccountAmountTypeGroupId())) {
             amountTypeGroup = accountAmountTypeGroupDao.getById(groupAccountAmountType.getAccountAmountTypeGroupId());
-            BizAssert.notNull(amountTypeGroup, ExceptionCode.ILLEGALITY_ARGURMENTS, "用户组不存在");
+            BizAssert.notNull(amountTypeGroup, ExceptionCode.ILLEGALITY_ARGUMENTS, "用户组不存在");
             updateAccountAmountTypes.add(joinAccountAmountType);
         } else {
             amountTypeGroup = new AccountAmountTypeGroup();

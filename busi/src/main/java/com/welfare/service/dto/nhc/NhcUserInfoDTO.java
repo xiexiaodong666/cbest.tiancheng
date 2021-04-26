@@ -11,7 +11,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +45,8 @@ public class NhcUserInfoDTO {
   private BigDecimal mallPoint;
 
   public static NhcUserInfoDTO of(AccountAmountTypeGroup group, Account account, AccountAmountType accountAmountType, Merchant merchant) {
-    BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在");
-    BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+    BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工不存在");
+    BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在");
 
     NhcUserInfoDTO userInfoDTO = new NhcUserInfoDTO();
     userInfoDTO.setUserName(account.getAccountName());

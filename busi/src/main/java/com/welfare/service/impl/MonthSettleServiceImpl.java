@@ -255,7 +255,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
         MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq, "api");
         if(merchantCreditResp.getCode()!=1){
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "恢复商户授信额度失败", null);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "恢复商户授信额度失败", null);
         }
         return i;
     }
@@ -317,7 +317,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         MonthSettle monthSettle = monthSettleMapper.selectById(id);
 
         if(monthSettle == null){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"参数异常，未获取到账单信息", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"参数异常，未获取到账单信息", null);
         }
 
         MonthSettleDetailQuery monthSettleDetailQuery = new MonthSettleDetailQuery();

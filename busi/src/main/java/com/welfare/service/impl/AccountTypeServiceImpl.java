@@ -93,12 +93,12 @@ public class AccountTypeServiceImpl implements AccountTypeService {
     private void validationAccountType(AccountType accountType,boolean isNew){
         Merchant merchant = merchantService.detailByMerCode(accountType.getMerCode());
         if( null == merchant ) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"商户不存在",null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"商户不存在",null);
         }
         if( isNew ){
             AccountType queryAccountType = this.queryByTypeCode(accountType.getMerCode(),accountType.getTypeCode());
             if( null != queryAccountType ){
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型code已经存在",null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"员工类型code已经存在",null);
             }
         }
     }
@@ -115,7 +115,7 @@ public class AccountTypeServiceImpl implements AccountTypeService {
     public Boolean delete(Long id) {
         AccountType accountType = accountTypeDao.getById(id);
         if( null ==  accountType) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"员工类型不存在",null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"员工类型不存在",null);
         }
         boolean update = accountTypeDao.removeById(id);
         if( update ){

@@ -14,7 +14,6 @@ import com.welfare.service.dto.messagepushconfig.MessagPushConfigExcelDTO;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.core.result.R;
@@ -51,7 +50,7 @@ public class MessagePushConfigController {
   @ApiOperation("查询单个配置")
   @MerchantUser
   public R<MessagPushConfigContactDTO> oneContact(String id) {
-    BizAssert.notBlank(id, ExceptionCode.ILLEGALITY_ARGURMENTS, "id不能为空");
+    BizAssert.notBlank(id, ExceptionCode.ILLEGALITY_ARGUMENTS, "id不能为空");
     return R.success(configContactService.findOneById(id));
   }
 
@@ -69,7 +68,7 @@ public class MessagePushConfigController {
   @ApiOperation("删除配置")
   @MerchantUser
   public R<Boolean> contactDel(@PathVariable("id") String id) {
-    BizAssert.notBlank(id, ExceptionCode.ILLEGALITY_ARGURMENTS, "id不能为空");
+    BizAssert.notBlank(id, ExceptionCode.ILLEGALITY_ARGUMENTS, "id不能为空");
     return R.success(configContactService.delete(id));
   }
 

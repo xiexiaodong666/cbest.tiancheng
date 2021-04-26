@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -197,9 +196,9 @@ public class CardController implements IController {
 
     @PostMapping("/card-binding")
     @ApiOperation("创建并绑定卡")
-    public R<CardInfo> createAndBind(@RequestBody CardSimpleDTO cardSimpleDTO){
+    public R<CardInfo> cardBinding(@RequestBody CardSimpleDTO cardSimpleDTO){
         CardInfo cardInfo = cardSimpleDTO.toCardInfo();
-        return success(cardInfoService.createAndBind(cardInfo));
+        return success(cardInfoService.bind(cardInfo));
     }
 
     @DeleteMapping("/card-unbinding/{cardNo}")

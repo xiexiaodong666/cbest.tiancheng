@@ -21,7 +21,7 @@ public class SinglePrefixAddHandler implements MaxSequenceExceedHandler{
         char[] chars = prefix.toCharArray();
         char c = (char) (chars[0] + 1);
         if(c > Z){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"序列号前缀达到最大",null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"序列号前缀达到最大",null);
         }
         sequence.setPrefix(String.valueOf(c));
         sequence.setSequenceNo(sequence.getMinSequence()+1);

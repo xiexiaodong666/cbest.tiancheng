@@ -28,13 +28,13 @@ public class NotificationFallback implements FallbackFactory<NotificationFeign> 
             @Override
             public NotificationResp doNotify(NotificationReq notificationReq) {
                 log.error(StrUtil.format("调用通知系统出错, req: {}", JSON.toJSONString(notificationReq)), throwable);
-                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+                throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", null);
             }
 
             @Override
             public NotificationResp doSendSms(SendMessageReq sendMessageReq) {
                 log.error(StrUtil.format("调用通知系统发送短信出错, req: {}", JSON.toJSONString(sendMessageReq)), throwable);
-                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+                throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", null);
             }
         };
     }

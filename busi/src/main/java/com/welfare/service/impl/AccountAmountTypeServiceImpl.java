@@ -153,7 +153,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     }
                     WelfareConstant.MerAccountTypeCode accountType = WelfareConstant.MerAccountTypeCode.findByCode(deposit.getMerAccountTypeCode());
                     BizAssert.isTrue(accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) >= 0,
-                            ExceptionCode.ILLEGALITY_ARGURMENTS, accountType.desc() + "余额不足");
+                            ExceptionCode.ILLEGALITY_ARGUMENTS, accountType.desc() + "余额不足");
                     Account account = accountMap.get(deposit.getAccountCode());
                     account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
@@ -221,6 +221,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         }
         return accountAmountTypes;
     }
+
 
     @Override
     public List<AccountAmountTypeResp> list(Long accountCode) {

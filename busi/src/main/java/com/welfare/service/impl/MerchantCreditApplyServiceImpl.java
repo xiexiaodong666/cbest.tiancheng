@@ -82,7 +82,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             merDepositApplyFileService.save(apply.getApplyCode(), request.getEnclosures());
             return String.valueOf(apply.getId());
         } catch (Exception e) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
@@ -100,20 +100,20 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     public String update(MerchantCreditApplyUpdateReq request, UserInfo user) {
         MerchantCreditApply apply = merchantCreditApplyDao.getById(Long.parseLong(request.getId()));
         if (apply == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户额度申请不存在", null);
         }
         if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
             apply = merchantCreditApplyDao.getById(request.getId());
             if (apply == null) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户额度申请不存在", null);
             }
             if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经审批过了", null);
             }
             validationParmas(request.getApplyType(), apply.getMerCode());
             apply.setApplyType(request.getApplyType());
@@ -124,7 +124,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             merchantCreditApplyDao.saveOrUpdate(apply);
             return String.valueOf(apply.getId());
         } catch (Exception e) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
@@ -135,20 +135,20 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     public String approval(MerchantCreditApprovalReq request, UserInfo user) {
         MerchantCreditApply apply = merchantCreditApplyDao.getById(Long.parseLong(request.getId()));
         if (apply == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户额度申请不存在", null);
         }
         if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.MERCHANT_CREDIT_APPLY, request.getId()+"");
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
             apply = merchantCreditApplyDao.getById(request.getId());
             if (apply == null) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户额度申请不存在", null);
             }
             if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经审批过了", null);
             }
             validationParmas(apply.getApplyType(), apply.getMerCode());
             apply.setApprovalRemark(request.getApprovalRemark());
@@ -163,7 +163,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
             }
             return String.valueOf(apply.getId());
         } catch (Exception e) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
@@ -173,7 +173,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     public MerchantCreditApplyInfo detail(Long id) {
         MerchantCreditApply apply = merchantCreditApplyDao.getById(id);
         if (apply == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户额度申请不存在！", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户额度申请不存在！", null);
         }
         MerchantCreditApplyInfo info = creditApplyConverter.toInfo(apply);
         List<MerDepositApplyFile> fileUrls = merDepositApplyFileService.listByMerDepositApplyCode(apply.getApplyCode());
@@ -231,14 +231,14 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
     private void validationParmas(String typeStr, String merCode){
         Merchant merchant = merchantService.detailByMerCode(merCode);
         if (merchant == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在！", null);
         }
         if (StringUtils.isBlank(merchant.getMerIdentity())) {
             throw new BizException("商户没有设置属性！");
         }
         List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持[客户]充值", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "仅支持[客户]充值", null);
         }
         WelfareConstant.MerCreditType merCreditType = WelfareConstant.MerCreditType.findByCode(typeStr);
     }

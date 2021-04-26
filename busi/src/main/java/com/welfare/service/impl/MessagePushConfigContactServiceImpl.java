@@ -1,7 +1,6 @@
 package com.welfare.service.impl;
 
 import com.google.common.collect.Lists;
-import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
@@ -14,7 +13,6 @@ import com.welfare.service.dto.MessagePushConfigDao;
 import com.welfare.service.dto.messagepushconfig.MessagConfigContactAddReq;
 import com.welfare.service.dto.messagepushconfig.MessagConfigContactEditReq;
 import com.welfare.service.dto.messagepushconfig.MessagPushConfigContactDTO;
-import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.sync.event.MessagePushConfigEvt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 /**
  * 服务接口实现
@@ -51,13 +47,13 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
         // 查询主表信息
         String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
         MessagePushConfig config = messagePushConfigDao.getByMerCode(merCode);
-        BizAssert.notNull(config, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户短信配置不存在");
+        BizAssert.notNull(config, ExceptionCode.ILLEGALITY_ARGUMENTS, "商户短信配置不存在");
         req.getPushTimes().forEach(s -> {
             BizAssert.isTrue(StringUtil.validationHHmm(s),
-                    ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("发送时间格式错误[%s]", s));
+                    ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("发送时间格式错误[%s]", s));
         });
         BizAssert.isTrue(messagePushConfigContactDao.getByMerCodeAndContact(merCode, req.getContact()) == null,
-                ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("配置已存在[%s]", req.getContact()));
+                ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("配置已存在[%s]", req.getContact()));
         MessagePushConfigContact contact = new MessagePushConfigContact();
         contact.setMessagePushConfigId(config.getId());
         contact.setConfigCode(contact.getConfigCode());
@@ -81,13 +77,13 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
     public String edit(MessagConfigContactEditReq req) {
         String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
         MessagePushConfig config = messagePushConfigDao.getByMerCode(merCode);
-        BizAssert.notNull(config, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户短信配置不存在");
+        BizAssert.notNull(config, ExceptionCode.ILLEGALITY_ARGUMENTS, "商户短信配置不存在");
         req.getPushTimes().forEach(s -> {
             BizAssert.isTrue(StringUtil.validationHHmm(s),
-                    ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("发送时间格式错误[%s]", s));
+                    ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("发送时间格式错误[%s]", s));
         });
         MessagePushConfigContact contact = messagePushConfigContactDao.getById(req.getId());
-        BizAssert.notNull(contact, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("配置不已存在[%s]", req.getId()));
+        BizAssert.notNull(contact, ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("配置不已存在[%s]", req.getId()));
         contact.setContact(req.getContact());
         contact.setContactPerson(req.getContactPerson());
         contact.setPushTime(String.join(";", req.getPushTimes()));
@@ -104,7 +100,7 @@ public class MessagePushConfigContactServiceImpl implements MessagePushConfigCon
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(String id) {
         MessagePushConfigContact contact = messagePushConfigContactDao.getById(id);
-        BizAssert.notNull(contact, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("配置不已存在[%s]", id));
+        BizAssert.notNull(contact, ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("配置不已存在[%s]", id));
         boolean flag = messagePushConfigContactDao.removeById(id);
         // 推送给智慧食堂
         if (flag) {

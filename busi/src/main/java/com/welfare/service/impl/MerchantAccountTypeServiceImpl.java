@@ -239,7 +239,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             merchantAccountType4.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.MALL_POINT.desc());
             merchantAccountType4.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
             merchantAccountType4.setMerCode(merCode);
-            merchantAccountType4.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+            merchantAccountType4.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
             merchantAccountType4.setDeductionOrder(888);
             initList.add(merchantAccountType4);
         }

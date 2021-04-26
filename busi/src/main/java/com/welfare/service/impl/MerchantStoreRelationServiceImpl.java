@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BizException;
@@ -19,12 +18,10 @@ import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
 import com.welfare.persist.entity.MerchantStoreRelation;
-import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantStoreRelationMapper;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
 import com.welfare.service.MerchantStoreRelationService;
-import com.welfare.service.dto.StoreCodeNameDTO;
 import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.remote.ShoppingFeignClient;
 import com.welfare.service.remote.entity.RoleConsumptionBindingsReq;
@@ -108,7 +105,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
   public boolean add(MerchantStoreRelationAddReq relationAddReq) {
     // 防止门店，消费门店  消费方法不一致
     if (!validateConsumeType(relationAddReq.getAdminMerchantStoreList())) {
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "门店,消费门店  消费方法不一致", null);
     }
     QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(MerchantStoreRelation.MER_CODE, relationAddReq.getMerCode());
@@ -116,7 +113,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     List<MerchantStoreRelation> validateMerchantStoreRelationList = merchantStoreRelationDao.list(
         queryWrapper);
     if (CollectionUtils.isNotEmpty(validateMerchantStoreRelationList)) {
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该商户已配置了门店", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "该商户已配置了门店", null);
     }
 
     RoleConsumptionReq roleConsumptionReq = new RoleConsumptionReq();
@@ -189,7 +186,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     // 防止门店，消费门店  消费方法不一致
     if (!validateConsumeType(relationUpdateReq.getAdminMerchantStoreList())) {
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店,消费门店  消费方法不一致", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "门店,消费门店  消费方法不一致", null);
     }
 
     QueryWrapper<MerchantStoreRelation> queryWrapper = new QueryWrapper<>();

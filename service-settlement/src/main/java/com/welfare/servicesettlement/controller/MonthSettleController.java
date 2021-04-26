@@ -159,7 +159,7 @@ public class MonthSettleController implements IController {
     public R monthSettleSend(@PathVariable("id")Long id){
         UserInfo userInfo = UserInfoHolder.getUserInfo();
         if(userInfo==null){
-            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
+            throw new BizException(ExceptionCode.BIZ_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
         }
         Integer count = monthSettleService.monthSettleSend(id);
         return count == 1 ? R.success():R.fail("发送账单失败,请检查账单状态");
@@ -181,7 +181,7 @@ public class MonthSettleController implements IController {
     public R monthSettleFinish(@PathVariable("id")Long id){
         UserInfo userInfo = UserInfoHolder.getUserInfo();
         if(userInfo==null){
-            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
+            throw new BizException(ExceptionCode.BIZ_ERROR_NO_PERMISSION, "当前用户无数据操作权限",null);
         }
 
         Integer count = monthSettleService.monthSettleFinish(id);
@@ -221,7 +221,7 @@ public class MonthSettleController implements IController {
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
             if(!monthSettleById.getMerCode().equals(merchantUser.getMerchantCode())){
-                throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION, "当前商户无此数据权限",null);
+                throw new BizException(ExceptionCode.BIZ_ERROR_NO_PERMISSION, "当前商户无此数据权限",null);
             }
         }
     }

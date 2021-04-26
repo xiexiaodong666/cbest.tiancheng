@@ -28,13 +28,13 @@ public class BizAssert {
 
     public static void isTrue(boolean expression){
         if(!expression){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,ExceptionCode.ILLEGALITY_ARGUMENTS.getMsg(), null);
         }
     }
 
     public static void notNull(Object obj){
         if(Objects.isNull(obj)){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,ExceptionCode.ILLEGALITY_ARGUMENTS.getMsg(), null);
         }
     }
 
@@ -76,19 +76,19 @@ public class BizAssert {
 
     public static void notBlank(String str){
         if(StringUtils.isBlank(str)){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,ExceptionCode.ILLEGALITY_ARGUMENTS.getMsg(), null);
         }
     }
 
     public static void notBlank(String str, ExceptionCode exceptionCode,String exceptionMsg){
         if(StringUtils.isBlank(str)){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,ExceptionCode.ILLEGALITY_ARGUMENTS.getMsg(), null);
         }
     }
 
     public static void isNull(Object obj){
         if(Objects.nonNull(obj)){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,ExceptionCode.ILLEGALITY_ARGURMENTS.getMsg(), null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,ExceptionCode.ILLEGALITY_ARGUMENTS.getMsg(), null);
         }
     }
 

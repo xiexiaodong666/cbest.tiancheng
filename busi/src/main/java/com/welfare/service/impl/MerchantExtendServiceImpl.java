@@ -27,7 +27,7 @@ public class MerchantExtendServiceImpl implements MerchantExtendService {
 
     @Override
     public boolean saveOrUpdate(MerchantExtendDTO extendDTO, String merCode) {
-        BizAssert.isTrue(StringUtils.isNoneBlank(merCode), ExceptionCode.ILLEGALITY_ARGURMENTS, "商户编码为空");
+        BizAssert.isTrue(StringUtils.isNoneBlank(merCode), ExceptionCode.ILLEGALITY_ARGUMENTS, "商户编码为空");
         MerchantExtend merchantExtend = merchantExtendDao.getByMerCode(merCode);
         if (Objects.isNull(merchantExtend)) {
             merchantExtend = new MerchantExtend();

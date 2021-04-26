@@ -69,12 +69,12 @@ public class AccountDepositRecordServiceImpl extends
         String payType = req.getPayType();
         AccountPayTypeEnum accountPayTypeEnum = AccountPayTypeEnum.getByType(payType);
         if (accountPayTypeEnum == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "支付方式有误", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "支付方式有误", null);
         }
         Long accountCode = req.getAccountCode();
         Account account = accountService.getByAccountCode(accountCode);
         if (account == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "获取用户信息失败", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "获取用户信息失败", null);
         }
 
         //组装参数，请求微信H5交易创建接口
@@ -95,7 +95,7 @@ public class AccountDepositRecordServiceImpl extends
             log.error(
                 StrUtil.format("调用重百付微信H5交易创建接口异常-req: {}, resp: {}", JSON.toJSONString(req),
                     JSON.toJSONString(resp)));
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", null);
         }
         //保存支付信息
         AccountDepositRecord accountDepositRecord = new AccountDepositRecord();
@@ -118,7 +118,7 @@ public class AccountDepositRecordServiceImpl extends
         boolean saved = save(accountDepositRecord);
         if (!saved) {
             log.error(StrUtil.format("保存支付信息失败-入参：{}", JSON.toJSONString(req)));
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "保存支付信息失败", null);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "保存支付信息失败", null);
         }
         //返回支付流水号和支付链接
         AccountDepositDTO accountDepositDTO = new AccountDepositDTO();

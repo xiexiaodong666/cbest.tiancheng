@@ -38,7 +38,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -176,7 +175,7 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean add(MerchantAddDTO merchant) {
         if(EmptyChecker.notEmpty(merchant.getAddressList())
                 &&merchant.getAddressList().size()>10){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "收货地址不能超过十个", null);
         }
         String merCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code());
         merchant.setMerCode(merCode);
@@ -217,7 +216,7 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean update(MerchantUpdateDTO merchant) {
         if(EmptyChecker.notEmpty(merchant.getAddressList())
                 &&merchant.getAddressList().size()>10){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "收货地址不能超过十个", null);
         }
         Merchant update=buildEntity(merchant);
         boolean flag= 1==merchantDao.updateAllColumnById(update);

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.welfare.common.exception.ExceptionCode.ILLEGALITY_ARGURMENTS;
+import static com.welfare.common.exception.ExceptionCode.ILLEGALITY_ARGUMENTS;
 import static net.dreamlu.mica.core.result.R.success;
 
 /**
@@ -73,7 +73,7 @@ public class EmployeeSettleController {
      if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
          employeeSettleConsumePageReq.setMerCode(merchantUser.getMerchantCode());
      }else {
-         throw new BizException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+         throw new BizException(ILLEGALITY_ARGUMENTS, "账户门店异常", null);
      }
      return success(employeeSettleDetailService.pageQuery(employeeSettleConsumePageReq));
   }
@@ -86,7 +86,7 @@ public class EmployeeSettleController {
      if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
          employeeSettleConsumeQuery.setMerCode(merchantUser.getMerchantCode());
      }else {
-         throw new BizException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+         throw new BizException(ILLEGALITY_ARGUMENTS, "账户门店异常", null);
      }
      return success(employeeSettleDetailService.summary(employeeSettleConsumeQuery));
 
@@ -143,7 +143,7 @@ public class EmployeeSettleController {
     if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
       billPageReq.setMerCode(merchantUser.getMerchantCode());
     }else {
-      throw new BizException(ILLEGALITY_ARGURMENTS, "账户门店异常", null);
+      throw new BizException(ILLEGALITY_ARGUMENTS, "账户门店异常", null);
     }
     Page<EmployeeSettleBillResp> page = employeeSettleService.pageQueryBill(billPageReq);
     return success(page);
@@ -208,7 +208,7 @@ public class EmployeeSettleController {
     @ApiOperation("查询员工授信消费所有门店name和code")
     public R<List<StoreCodeNameDTO>> allStoresInMonthSettle(@RequestParam(value = "settleNo", required = false)String settleNo, @RequestParam(value = "accountCode", required = false)String accountCode){
     if (StringUtils.isBlank(settleNo)&&StringUtils.isBlank(accountCode)){
-        throw new BizException(ILLEGALITY_ARGURMENTS, "缺少参数", null);
+        throw new BizException(ILLEGALITY_ARGUMENTS, "缺少参数", null);
     }
     List<StoreCodeNameDTO> supplierStores =  employeeSettleDetailService.allStoresInMonthSettle(settleNo, accountCode);
     return success(supplierStores);

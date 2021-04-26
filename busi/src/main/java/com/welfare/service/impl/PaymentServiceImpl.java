@@ -22,15 +22,12 @@ import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
-import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.service.payment.IPaymentOperator;
-import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRowsRequest;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +45,6 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 
@@ -126,7 +122,7 @@ public class PaymentServiceImpl implements PaymentService {
                         .get();
                 if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
                     log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
-                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式");
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式");
                 }
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();
@@ -185,7 +181,7 @@ public class PaymentServiceImpl implements PaymentService {
             return paymentRequest;
         } catch (InterruptedException | ExecutionException e) {
             log.error("异步执行查询异常", e);
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, e.getCause().getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(accountLock);
         }
@@ -271,7 +267,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
             log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式", null);
         }
 
         if(!CollectionUtils.isEmpty(paymentRequest.getSaleRows())) {
@@ -404,7 +400,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .get();
             if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
                 log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式");
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式");
             }
             SubAccount subAccount = subAccountFuture.get();
             ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = new ThirdPartyBarcodePaymentDTO();
@@ -419,7 +415,7 @@ public class PaymentServiceImpl implements PaymentService {
             return thirdPartyBarcodePaymentDTO;
         } catch (InterruptedException | ExecutionException e) {
             log.error(StrUtil.format("查询检查第三方支付码异步执行异常, paymentRequest: {}", JSON.toJSON(paymentRequest)), e);
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", e);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", e);
         }
     }
 

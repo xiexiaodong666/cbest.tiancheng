@@ -109,7 +109,7 @@ public class PullAccountDetailRecordServiceImpl implements PullAccountDetailReco
                 }
             }catch (Exception e){
                 log.error("循环拉取账户细交易数据异常:{}", e);
-                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "循环拉取账户细交易数据异常", null);
+                throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "循环拉取账户细交易数据异常", null);
             }finally {
                 lock.unlock();
             }

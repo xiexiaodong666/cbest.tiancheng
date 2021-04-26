@@ -93,7 +93,7 @@ public class CardInfoServiceImpl implements CardInfoService {
         queryWrapper.in(CardInfo.CARD_ID, cardIdSet);
         List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapper);
         if (CollectionUtils.isEmpty(cardInfoList)) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未找到对应卡号", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "未找到对应卡号", null);
         }
 
         for (CardInfo cardInfo :

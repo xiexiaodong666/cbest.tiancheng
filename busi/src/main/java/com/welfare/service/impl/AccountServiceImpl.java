@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.constants.AccountBindStatus;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.AccountStatus;
@@ -80,14 +79,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
-import static com.welfare.common.constants.WelfareConstant.MerCreditType.RECHARGE_LIMIT;
 
 /**
  * 账户信息服务接口实现
@@ -277,7 +269,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean delete(Long id) {
         Account syncAccount = accountMapper.selectById(id);
         if (null == syncAccount) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户不存在", null);
         }
         boolean result = accountDao.removeById(id);
         subAccountDao.deleteAccountCode(syncAccount.getAccountCode());
@@ -293,7 +285,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean active(Long id, Integer accountStatus) {
         Account syncAccount = accountMapper.selectById(id);
         if (null == syncAccount) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户不存在", null);
         }
         Account account = new Account();
         account.setId(id);
@@ -330,7 +322,7 @@ public class AccountServiceImpl implements AccountService {
             .queryDetailByParam(accountDetailParam.getId(), accountDetailParam.getAccountCode(),
                 accountDetailParam.getPhone(), accountDetailParam.getMerCode());
         if (null == accountDetailMapperDTO) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该员工账号不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "该员工账号不存在", null);
         }
         AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
         BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
@@ -484,7 +476,7 @@ public class AccountServiceImpl implements AccountService {
         account.setChangeEventId(accountChangeEventRecord.getId());
         boolean result = accountDao.save(account);
         Merchant merchant = merchantService.getMerchantByMerCode(accountReq.getMerCode());
-        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在");
         MerchantExtend merchantExtend = merchantExtendDao.getByMerCode(accountReq.getMerCode());
         if(Objects.nonNull(merchantExtend) && !StringUtils.isEmpty(merchantExtend.getIndustryTag())
                 && merchantExtend.getIndustryTag().contains(WelfareConstant.IndustryTag.COMMUNITY_HOSPITAL.code())) {
@@ -538,7 +530,7 @@ public class AccountServiceImpl implements AccountService {
             merCode,
             merAccountTypeCode);
         if (null == merchantAccountType) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户无福利类型", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户无福利类型", null);
         }
         AccountAmountType accountAmountType = new AccountAmountType();
         accountAmountType.setAccountCode(accountCode);
@@ -552,16 +544,16 @@ public class AccountServiceImpl implements AccountService {
     private void validationAccount(Account account, Boolean isNew) {
         Merchant merchant = merchantService.detailByMerCode(account.getMerCode());
         if (null == merchant) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在", null);
         }
         AccountType accountType = accountTypeService
             .queryByTypeCode(account.getMerCode(), account.getAccountTypeCode());
         if (null == accountType) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "员工类型不存在", null);
         }
         Department department = departmentService.getByDepartmentCode(account.getDepartment());
         if (null == department) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工部门不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "员工部门不存在", null);
         }
         if (isNew) {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
@@ -572,11 +564,11 @@ public class AccountServiceImpl implements AccountService {
             Account queryAccount = this.findByPhone(account.getPhone(), account.getMerCode());
             if (queryAccount != null && queryAccount.getId().longValue() != account.getId()
                 .longValue()) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经有其他员工绑定了该手机", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经有其他员工绑定了该手机", null);
             }
             Account syncAccount = accountMapper.selectById(account.getId());
             if (null == syncAccount) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户不存在", null);
             }
         }
     }
@@ -677,7 +669,7 @@ public class AccountServiceImpl implements AccountService {
             } else {
                 //判断剩余授信额度  如果是增加,那么额度就是
                 if (surplusQuota.compareTo(oldMaxQuota.subtract(newMaxQuota)) < 0) {
-                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "剩余授信额度不足", null);
                 }
                 //修改了额度
                 int incrAccountResult = accountCustomizeMapper
@@ -688,13 +680,13 @@ public class AccountServiceImpl implements AccountService {
                     newMaxQuota.subtract(oldMaxQuota),
                     updateUser);//先判断有没有记录 如果没有插入 如果有减少
                 if (incrAccountResult <= 0 || incrAmountResult <= 0) {
-                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "剩余授信额度不足", null);
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "剩余授信额度不足", null);
                 }
             }
         } else {
             //关闭授信额度,账户以及账户金额类型表变0
             if (oldMaxQuota.compareTo(surplusQuota) != 0) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "授信额度已使用 无法关闭", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "授信额度已使用 无法关闭", null);
             }
             accountAmountTypeMapper
                 .updateBalance(accountCode, MerAccountTypeCode.SURPLUS_QUOTA.code(),
@@ -990,17 +982,17 @@ public class AccountServiceImpl implements AccountService {
     public boolean bindingCard(String accountCode, String cardId) {
         Account account = this.getByAccountCode(Long.parseLong(accountCode));
         if (null == account) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工账户不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户不存在", null);
         }
         CardInfo cardInfo = cardInfoService.getByCardNo(cardId);
         if (null == cardInfo) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "该卡号不存在", null);
         }
         if (cardInfoService.cardIsBind(cardId)) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "该卡号已经绑定其他账号", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "该卡号已经绑定其他账号", null);
         }
         if (cardInfo.getCardStatus().intValue() != CardStatus.WRITTEN.code().intValue()) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请确认该卡片状态", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "请确认该卡片状态", null);
         }
         //绑定创建卡号信息
         cardInfo.setAccountCode(account.getAccountCode());
@@ -1415,7 +1407,7 @@ public class AccountServiceImpl implements AccountService {
                 signPage = alipayUserAgreementPageSignResp.getSignPage();
                 break;
             default:
-                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
+                throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "暂不支付此支付渠道免密签约", null);
         }
 
         AccountPasswordFreePageSignDTO accountPasswordFreePageSignDTO = new AccountPasswordFreePageSignDTO();
@@ -1443,7 +1435,7 @@ public class AccountServiceImpl implements AccountService {
                 accountPasswordFreeSignDTO.setSignParams(signParams);
                 break;
             default:
-                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密签约", null);
+                throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "暂不支付此支付渠道免密签约", null);
         }
         return accountPasswordFreeSignDTO;
     }
@@ -1469,7 +1461,7 @@ public class AccountServiceImpl implements AccountService {
                 accountPasswordFreeSignDTO.setSignParams(signParams);
                 break;
             default:
-                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "暂不支付此支付渠道免密解约", null);
+                throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "暂不支付此支付渠道免密解约", null);
         }
         return accountPasswordFreeSignDTO;
     }
@@ -1478,11 +1470,11 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(rollbackFor = Exception.class)
     public EmployerReqDTO saveAndDeposit(AccountSaveAndDepositReq req) {
         Merchant merchant = merchantService.getMerchantByMerCode(req.getMerCode());
-        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在");
         AccountType accountType = accountTypeService.queryByTypeCode(merchant.getMerCode(),req.getAccountTypeCode());
-        BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工类型不存在");
+        BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工类型不存在");
         Department department = departmentService.getByDepartmentCode(req.getDepartmentCode());
-        BizAssert.notNull(department,ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
+        BizAssert.notNull(department,ExceptionCode.ILLEGALITY_ARGUMENTS, "商户部门不存在");
         AccountReq accountReq = new AccountReq();
         String i = sequenceService.nextFullNo(WelfareConstant.SequenceType.CONSTRUCTION_BANK_AUTO_INR.code());
         accountReq.setAccountName("默认名称" + i);
@@ -1502,7 +1494,7 @@ public class AccountServiceImpl implements AccountService {
                     ( exception instanceof BizException && ((BizException) exception).getCodeEnum() == ExceptionCode.ACCOUNT_ALREADY_EXIST )) {
                 log.warn("员工已存在 req:{}", JSON.toJSONString(req), exception);
                 Account account = accountDao.getByMerCodeAndPhone(req.getMerCode(), req.getPhone());
-                BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "新增员工失败");
+                BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGUMENTS, "新增员工失败");
                 return EmployerReqDTO.of(ShoppingActionTypeEnum.ADD, account, accountType, department);
             } else {
                 throw exception;
@@ -1511,7 +1503,7 @@ public class AccountServiceImpl implements AccountService {
 
         // 充值
         MerchantAccountType merchantAccountType = merchantAccountTypeService.queryOneByCode(merchant.getMerCode(), req.getMerAccountTypeCode());
-        BizAssert.notNull(merchantAccountType,ExceptionCode.ILLEGALITY_ARGURMENTS, "福利类型不存在");
+        BizAssert.notNull(merchantAccountType,ExceptionCode.ILLEGALITY_ARGUMENTS, "福利类型不存在");
 
         // 申请
         DepositApplyRequest request = new DepositApplyRequest();
@@ -1537,7 +1529,7 @@ public class AccountServiceImpl implements AccountService {
         depositApplyService.approval(approvalRequest);
 
         Account account = accountDao.getByMerCodeAndPhone(req.getMerCode(), req.getPhone());
-        BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "新增员工失败");
+        BizAssert.notNull(accountType, ExceptionCode.ILLEGALITY_ARGUMENTS, "新增员工失败");
         return EmployerReqDTO.of(ShoppingActionTypeEnum.ADD, account, accountType, department);
     }
 }

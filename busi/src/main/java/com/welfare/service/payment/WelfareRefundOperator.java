@@ -1,5 +1,6 @@
 package com.welfare.service.payment;
 
+import com.alibaba.excel.util.CollectionUtils;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizException;
@@ -272,6 +273,13 @@ public class WelfareRefundOperator implements IRefundOperator{
         List<AccountDeductionDetail> refundDeductionDetails = refundOperations.stream()
                 .map(RefundOperation::getRefundDeductionDetail)
                 .collect(Collectors.toList());
+        List<AccountAmountTypeGroup> accountAmountTypeGroups = refundOperations.stream()
+                .map(RefundOperation::getAccountAmountTypeGroup)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(accountAmountTypeGroups)){
+            accountAmountTypeGroupDao.updateBatchById(accountAmountTypeGroups);
+        }
         AccountAmountDO.updateAccountAfterOperated(account,accountAmountTypes);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(refundBillDetails);

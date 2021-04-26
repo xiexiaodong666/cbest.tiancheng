@@ -844,7 +844,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountBalanceDTO assemblyWholesaleAccountBalance(Long accountCode) {
         AccountBalanceDTO accountBalanceDTO = new AccountBalanceDTO();
         accountBalanceDTO.setCode(MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
-        accountBalanceDTO.setCode(MerAccountTypeCode.WHOLESALE_PROCUREMENT.name());
+        accountBalanceDTO.setName("批发采购余额");
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
         accountBalanceDTO.setValue(BigDecimal.ZERO);
         if (Objects.nonNull(accountAmountType)) {

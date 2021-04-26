@@ -284,19 +284,19 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     checkConsumType(supplierStore.getConsumType());
     if(EmptyChecker.notEmpty(supplierStore.getAddressList())
             &&supplierStore.getAddressList().size()>10){
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "自提点不能超过十个", null);
     }
     Merchant merchant = merchantService.detailByMerCode(supplierStore.getMerCode());
     if (EmptyChecker.isEmpty(merchant)) {
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在", null);
     }
     if (!Arrays.asList(merchant.getMerIdentity().split(",")).contains(
         MerIdentityEnum.supplier.getCode())) {
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "非供应商商户", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "非供应商商户", null);
 
     }
     if (EmptyChecker.notEmpty(this.getSupplierStoreByStoreCode(supplierStore.getStoreCode()))) {
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "门店编码已存在", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "门店编码已存在", null);
 
     }
 //    if (EmptyChecker.notEmpty(this.getSupplierStoreByCashierNo(supplierStore.getCashierNo()))) {
@@ -536,7 +536,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
     checkConsumType(supplierStore.getConsumType());
     if(EmptyChecker.notEmpty(supplierStore.getAddressList())
             &&supplierStore.getAddressList().size()>10){
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "自提点不能超过十个", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "自提点不能超过十个", null);
     }
     SupplierStore entity = supplierStoreDao.getById(supplierStore.getId());
     if (EmptyChecker.isEmpty(entity)) {
@@ -600,7 +600,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   private void checkConsumType(String consumType) {
     List<String> consumTypes = Arrays.asList(consumType.split(","));
     if (!ConsumeTypeEnum.getCodeList().containsAll(consumTypes)) {
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未输入正确的消费类型", null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "未输入正确的消费类型", null);
     }
     /*if (consumTypes.contains(ConsumeTypeEnum.O2O.getCode())
             && consumTypes.contains(ConsumeTypeEnum.ONLINE_MALL.getCode())) {

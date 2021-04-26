@@ -93,7 +93,7 @@ public class CardInfoServiceImpl implements CardInfoService {
         queryWrapper.in(CardInfo.CARD_ID, cardIdSet);
         List<CardInfo> cardInfoList = cardInfoDao.list(queryWrapper);
         if (CollectionUtils.isEmpty(cardInfoList)) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "未找到对应卡号", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "未找到对应卡号", null);
         }
 
         for (CardInfo cardInfo :
@@ -144,7 +144,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     @Override
-    public CardInfo createAndBind(CardInfo cardInfo) {
+    public CardInfo bind(CardInfo cardInfo) {
 
         Account account = accountDao.queryByAccountCode(cardInfo.getAccountCode());
         BizAssert.notNull(account,ExceptionCode.ACCOUNT_NOT_EXIST);
@@ -158,16 +158,8 @@ public class CardInfoServiceImpl implements CardInfoService {
         if(Objects.nonNull(cardInfoInDb)){
             return onCardExisted(cardInfo, cardInfoInDb);
         }else{
-            cardInfo.setCardStatus(WelfareConstant.CardStatus.BIND.code());
-            Date now = Calendar.getInstance().getTime();
-            cardInfo.setBindTime(now);
-            cardInfo.setWrittenTime(now);
-            cardInfo.setEnabled(EnableEnum.ENABLE.getCode());
-            cardInfo.setApplyCode("");
-            cardInfoDao.save(cardInfo);
+            throw new BizException(ExceptionCode.CARD_NOT_EXIST);
         }
-
-        return cardInfo;
     }
 
     private CardInfo onCardExisted(CardInfo cardInfo, CardInfo cardInfoInDb) {

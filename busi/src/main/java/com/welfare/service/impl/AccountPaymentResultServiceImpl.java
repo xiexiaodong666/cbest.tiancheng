@@ -159,7 +159,7 @@ public class AccountPaymentResultServiceImpl implements AccountPaymentResultServ
                 thirdPartyPaymentRequest.setPaymentChannel(PaymentChannel.ALIPAY.code());
             }else{
                 log.warn("支付通知收到不支持的条码:{}",req.getBarcode());
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"不支持的条码"+req.getBarcode());
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"不支持的条码"+req.getBarcode());
             }
             thirdPartyPaymentRequest.setTransStatus(WelfareConstant.AsyncStatus.SUCCEED.code());
             thirdPartyPaymentRequestDao.updateById(thirdPartyPaymentRequest);

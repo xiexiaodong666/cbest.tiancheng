@@ -106,7 +106,7 @@ public class DictServiceImpl implements DictService {
                         .type(type)
                         .build());
             } catch (NoSuchMethodException e) {
-                throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
+                throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "枚举转换错误", e);
             }
         }
         for (T t : list) {
@@ -133,9 +133,9 @@ public class DictServiceImpl implements DictService {
                         fieldMethod.getSMethod().invoke(c.cast(t), dictName);
                     }
                 } catch (IllegalAccessException e) {
-                    throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
+                    throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "枚举转换错误", e);
                 } catch (InvocationTargetException e) {
-                    throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "枚举转换错误", e);
+                    throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "枚举转换错误", e);
                 }
             }
 

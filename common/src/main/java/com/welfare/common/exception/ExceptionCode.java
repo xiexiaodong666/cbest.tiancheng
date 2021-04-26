@@ -14,10 +14,10 @@ public enum ExceptionCode implements IResultCode {
     /**
      * 未知异常
      */
-    UNKNOWON_EXCEPTION(5000000,"未知异常"),
+    UNKNOWN_EXCEPTION(5000000,"未知异常"),
 
     //----------系统异常-----------
-    ILLEGALITY_ARGURMENTS(5001001,"参数校验异常"),
+    ILLEGALITY_ARGUMENTS(5001001,"参数校验异常"),
     DATA_BASE_ERROR(5001002,"数据库异常"),
 
     //----------业务异常------------------------------------------------------------------------------------------------
@@ -33,11 +33,13 @@ public enum ExceptionCode implements IResultCode {
     BARCODE_EXPIRE(5003001,"条码过期"),
 
     //______卡片相关异常------
+    UNKNOWN_CARD_MEDIUM(5004004,"不支持的卡片介质"),
     CARD_WRITTEN_OR_BIND(5004001,"卡片已被写入或者绑定, 不能删除"),
     CARD_ALREADY_BIND(5004002,"卡片已经被绑定其他用户"),
     ACCOUNT_ALREADY_BIND(5004003,"用户已经绑定卡"),
+    CARD_NOT_EXIST(5004004,"卡片不存在"),
     //______授权相关异常------
-    BUSI_ERROR_NO_PERMISSION(5005001,"未登录"),
+    BIZ_ERROR_NO_PERMISSION(5005001,"未登录"),
 
     //______数据相关异常------
     DATA_NOT_EXIST(50060001,"数据不存在"),

@@ -1,9 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Lists;
 import com.welfare.common.constants.*;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BizAssert;
@@ -17,7 +15,6 @@ import com.welfare.persist.dto.AccountBillDetailMapperDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
 import com.welfare.service.*;
-import com.welfare.service.dto.AccountBillDetailDTO;
 import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.dto.Deposit;
@@ -27,15 +24,16 @@ import com.welfare.service.utils.AccountUtils;
 import com.welfare.service.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,26 +85,38 @@ public class NhcServiceImpl implements NhcService {
         Account account;
         Merchant merchant = merchantService.getMerchantByMerCode(userReq.getMerCode());
         BizAssert.notNull(merchant,
-                ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+                ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在");
         if (StringUtils.isNoneBlank(userReq.getAccountCode())) {
             // 修改
             account = accountService.getByAccountCode(Long.parseLong(userReq.getAccountCode()));
-            BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("用户不存在[%s]", userReq.getAccountCode()));
-            BizAssert.isTrue(userReq.getMerCode().equals(account.getMerCode()), ExceptionCode.ILLEGALITY_ARGURMENTS, "无权限操作！");
+            BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("用户不存在[%s]", userReq.getAccountCode()));
+            BizAssert.isTrue(userReq.getMerCode().equals(account.getMerCode()), ExceptionCode.ILLEGALITY_ARGUMENTS, "无权限操作！");
             account.setAccountName(userReq.getUserName());
             if (Objects.nonNull(userReq.getAccountStatus())) {
                 account.setAccountStatus(AccountStatus.getByCode(userReq.getAccountStatus()).getCode());
             }
             if (StringUtils.isNoneBlank(userReq.getPhone())) {
                 BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()),
-                        ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
+                        ExceptionCode.ILLEGALITY_ARGUMENTS, "手机号不合法");
+                Account oldAccount = accountService.findByPhoneAndMerCode(userReq.getPhone(), userReq.getMerCode());
+                BizAssert.isTrue(Objects.isNull(oldAccount) || oldAccount.getAccountCode().equals(account.getAccountCode()), ExceptionCode.ACCOUNT_ALREADY_EXIST);
                 account.setPhone(userReq.getPhone());
+            } else {
+                account.setPhone(DEFAULT_PHONE_PREFIX + sequenceService.nextNo(WelfareConstant.SequenceType.DEFAULT_PHONE.code()));
             }
         } else {
             // 新增
             account = assemblyUser(userReq, merchant);
         }
-        BizAssert.isTrue(accountDao.saveOrUpdate(account));
+        try {
+            BizAssert.isTrue(accountDao.saveOrUpdate(account));
+        } catch (Exception exception) {
+            if (exception instanceof DuplicateKeyException || exception instanceof SQLIntegrityConstraintViolationException) {
+                throw new BizException(ExceptionCode.ACCOUNT_ALREADY_EXIST);
+            } else {
+                throw exception;
+            }
+        }
         // 加入家庭
         if (StringUtils.isNoneBlank(userReq.getFamilyUserCode())) {
             boolean success = accountAmountTypeGroupService.addByAccountCodeAndMerAccountTypeCode(
@@ -136,7 +146,7 @@ public class NhcServiceImpl implements NhcService {
         if (StringUtils.isBlank(userReq.getPhone())) {
             account.setPhone(DEFAULT_PHONE_PREFIX + sequenceService.nextNo(WelfareConstant.SequenceType.DEFAULT_PHONE.code()));
         } else {
-            BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
+            BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()), ExceptionCode.ILLEGALITY_ARGUMENTS, "手机号不合法");
             Account oldAccount= accountService.findByPhoneAndMerCode(userReq.getPhone(), userReq.getMerCode());
             BizAssert.isTrue(Objects.isNull(oldAccount), ExceptionCode.ACCOUNT_ALREADY_EXIST, "员工已存在");
             account.setPhone(userReq.getPhone());
@@ -150,7 +160,7 @@ public class NhcServiceImpl implements NhcService {
         account.setBinding(AccountBindStatus.NO_BIND.getCode());
         account.setAccountTypeCode(WelfareConstant.AccountType.PATIENT.code());
         List<DepartmentTree> departmentTrees = departmentService.tree(userReq.getMerCode());
-        BizAssert.notEmpty(departmentTrees.get(0).getChildren(),ExceptionCode.ILLEGALITY_ARGURMENTS, "商户部门不存在");
+        BizAssert.notEmpty(departmentTrees.get(0).getChildren(),ExceptionCode.ILLEGALITY_ARGUMENTS, "商户部门不存在");
         DepartmentTree department = (DepartmentTree)departmentTrees.get(0).getChildren().get(0);
         account.setDepartment(department.getDepartmentCode());
         // 创建甜橙卡子账户
@@ -183,9 +193,9 @@ public class NhcServiceImpl implements NhcService {
         } else {
             throw new BizException("参数为空");
         }
-        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "用户不存在");
+        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGUMENTS, "用户不存在");
         Merchant merchant = merchantService.getMerchantByMerCode(account.getMerCode());
-        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在");
         AccountAmountType accountAmountType = accountAmountTypeDao.queryByAccountCodeAndAmountType(account.getAccountCode(),
                 WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
         AccountAmountTypeGroup group = null;
@@ -204,11 +214,11 @@ public class NhcServiceImpl implements NhcService {
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
             List<TempAccountDepositApply> applyList = tempAccountDepositApplyDao.listByRequestId(req.getRequestId());
-            BizAssert.isTrue(CollectionUtils.isEmpty(applyList), ExceptionCode.ILLEGALITY_ARGURMENTS, "不能重复充值");
+            BizAssert.isTrue(CollectionUtils.isEmpty(applyList), ExceptionCode.ILLEGALITY_ARGUMENTS, "不能重复充值");
             List<Long> accountCodes = req.getAccountCodes().stream().map(Long::valueOf).collect(Collectors.toList());
             List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.listByAccountCodes(accountCodes, WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
             BizAssert.isTrue(CollectionUtils.isNotEmpty(accountAmountTypes) && accountAmountTypes.size() == req.getAccountCodes().size(),
-                    ExceptionCode.ILLEGALITY_ARGURMENTS,
+                    ExceptionCode.ILLEGALITY_ARGUMENTS,
                     "员工福利账户不存在");
             // 筛选出没有加入组的员工
             List<AccountAmountType> noGroupAccountAmountTypes = accountAmountTypes.stream().filter(accountAmountType ->
@@ -286,19 +296,19 @@ public class NhcServiceImpl implements NhcService {
     @Override
     public NhcFamilyMemberDTO getFamilyInfo(String userCode) {
         Account account = accountService.getByAccountCode(Long.parseLong(userCode));
-        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGURMENTS, "用户不存在");
+        BizAssert.notNull(account, ExceptionCode.ILLEGALITY_ARGUMENTS, "用户不存在");
         Merchant merchant = merchantService.getMerchantByMerCode(account.getMerCode());
-        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在");
+        BizAssert.notNull(merchant, ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在");
         AccountAmountType accountAmountType = accountAmountTypeDao.queryByAccountCodeAndAmountType(account.getAccountCode(),
                 WelfareConstant.MerAccountTypeCode.MALL_POINT.code());
-        BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGURMENTS, "积分福利账户为空");
+        BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGUMENTS, "积分福利账户为空");
         NhcFamilyMemberDTO dto = new NhcFamilyMemberDTO();
         dto.setMembers(new ArrayList<>());
         dto.setFamilyCode("0001");
         if (Objects.nonNull(accountAmountType.getAccountAmountTypeGroupId())
                 && accountAmountType.getJoinedGroup() != null && accountAmountType.getJoinedGroup()) {
             AccountAmountTypeGroup group = accountAmountTypeGroupDao.getById(accountAmountType.getAccountAmountTypeGroupId());
-            BizAssert.notNull(group, ExceptionCode.ILLEGALITY_ARGURMENTS, "员工福利账号组为空");
+            BizAssert.notNull(group, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工福利账号组为空");
             dto.setFamilyCode(group.getGroupCode());
             dto.setFamilyBalance(String.valueOf(group.getBalance()));
             QueryWrapper<AccountAmountType> accountAmountTypeQueryWrapper = new QueryWrapper<>();

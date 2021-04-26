@@ -39,7 +39,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -179,7 +178,7 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean add(MerchantAddDTO merchant) {
         if(EmptyChecker.notEmpty(merchant.getAddressList())
                 &&merchant.getAddressList().size()>10){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "收货地址不能超过十个", null);
         }
         String merCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code());
         merchant.setMerCode(merCode);
@@ -203,8 +202,11 @@ public class MerchantServiceImpl implements MerchantService {
             throw new BizException("新增商户失败");
         }
         // 不同行业属性的初始化
-        List<String> industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
-        merchantInitOperatorFactory.operators(industryTags).forEach(operator -> operator.init(merCode));
+        List<String> industryTags = new ArrayList<>();
+        if (StringUtils.isNoneBlank(merchant.getExtend().getIndustryTag())) {
+            industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+            merchantInitOperatorFactory.operators(industryTags).forEach(operator -> operator.init(merCode));
+        }
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
         List<String> syncIndustryTag = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
         detailDTO.setTags(syncIndustryTag);
@@ -221,7 +223,7 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean update(MerchantUpdateDTO merchant) {
         if(EmptyChecker.notEmpty(merchant.getAddressList())
                 &&merchant.getAddressList().size()>10){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "收货地址不能超过十个", null);
         }
         Merchant update=buildEntity(merchant);
         boolean flag= 1==merchantDao.updateAllColumnById(update);
@@ -237,8 +239,11 @@ public class MerchantServiceImpl implements MerchantService {
         }
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
-
-        List<String> industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+        List<String> industryTags = new ArrayList<>();
+        if (StringUtils.isNoneBlank(merchant.getExtend().getIndustryTag())) {
+            industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+            industryTags = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
+        }
         detailDTO.setTags(industryTags);
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
@@ -252,7 +257,7 @@ public class MerchantServiceImpl implements MerchantService {
         merchantAccountType.setMerAccountTypeName(name);
         merchantAccountType.setMerAccountTypeCode(code);
         merchantAccountType.setDeductionOrder(deductionOrder);
-        merchantAccountType.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+        merchantAccountType.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
         return merchantAccountType;
     }
 

@@ -10,6 +10,8 @@ import com.welfare.persist.dto.AccountPasswordFreeSignDTO;
 import com.welfare.persist.dto.AccountPaymentChannelDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
 import com.welfare.service.AccountAmountTypeService;
+import com.welfare.persist.entity.Account;
+import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountService;
 import com.welfare.service.dto.AccountAmountTypeResp;
 import com.welfare.service.dto.AccountDO;

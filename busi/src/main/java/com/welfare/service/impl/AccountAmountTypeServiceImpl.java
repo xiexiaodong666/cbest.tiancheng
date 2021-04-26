@@ -6,9 +6,6 @@ import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.common.exception.BizAssert;
-import com.welfare.common.exception.BizException;
-import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.AccountDepositIncreDTO;
@@ -153,7 +150,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     }
                     WelfareConstant.MerAccountTypeCode accountType = WelfareConstant.MerAccountTypeCode.findByCode(deposit.getMerAccountTypeCode());
                     BizAssert.isTrue(accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) >= 0,
-                            ExceptionCode.ILLEGALITY_ARGURMENTS, accountType.desc() + "余额不足");
+                            ExceptionCode.ILLEGALITY_ARGUMENTS, accountType.desc() + "余额不足");
                     Account account = accountMap.get(deposit.getAccountCode());
                     account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
@@ -220,6 +217,31 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             accountAmountTypes = accountAmountTypeDao.listByAccountCodes(accountCodes, merAccountTypeCode);
         }
         return accountAmountTypes;
+    }
+
+    @Override
+    public List<AccountAmountTypeResp> list(Long accountCode) {
+        Account account = accountService.getByAccountCode(accountCode);
+        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByAccountCode(accountCode);
+        List<AccountAmountTypeResp> resps = new ArrayList<>();
+        if (Objects.nonNull(account) && org.apache.commons.collections4.CollectionUtils.isNotEmpty(accountAmountTypes)) {
+            List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
+            Map<String, MerchantAccountType> merchantAccountTypeMap = merchantAccountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
+            accountAmountTypes.forEach(accountAmountType -> {
+                AccountAmountTypeResp resp = new AccountAmountTypeResp();
+                MerchantAccountType merchantAccountType = merchantAccountTypeMap.get(accountAmountType.getMerAccountTypeCode());
+                resp.setAccountCode(accountCode);
+                resp.setShowOrder(merchantAccountType.getDeductionOrder());
+                resp.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
+                resp.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
+                if (WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())) {
+                    resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                } else {
+                    resp.setBalance(accountAmountType.getAccountBalance() + "");
+                }
+            });
+        }
+        return resps;
     }
 
     @Override

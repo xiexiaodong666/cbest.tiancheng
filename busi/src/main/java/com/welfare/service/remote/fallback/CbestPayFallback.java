@@ -17,7 +17,7 @@ public class CbestPayFallback implements FallbackFactory<CbestPayFeign> {
     public CbestPayFeign create(Throwable throwable) {
         return req -> {
             log.error(StrUtil.format("调用重百付接口异常, req: {}", JSON.toJSONString(req)), throwable);
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", null);
         };
     }
 }

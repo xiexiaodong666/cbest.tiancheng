@@ -26,7 +26,7 @@ public class RepeatRequestVerificationAspect {
     if(stringRedisTemplate.opsForValue().setIfAbsent(lockPrefix +key ,"true",1, TimeUnit.SECONDS)){
       return joinPoint.proceed();
     }else{
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS,"请勿重复提交",null);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"请勿重复提交",null);
     }
   }
 

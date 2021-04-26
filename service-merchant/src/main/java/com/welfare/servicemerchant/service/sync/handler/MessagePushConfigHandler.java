@@ -53,7 +53,7 @@ public class MessagePushConfigHandler {
   public void onMessagePushConfigChange(MessagePushConfigEvt evt) {
     log.info("离线消息配置同步请求数据开始:{}", JSON.toJSONString(evt.getContact()));
     MessagePushConfigContact contact = evt.getContact();
-    BizAssert.notNull(contact, ExceptionCode.ILLEGALITY_ARGURMENTS, "商户消息联系人配置为空");
+    BizAssert.notNull(contact, ExceptionCode.ILLEGALITY_ARGUMENTS, "商户消息联系人配置为空");
     MessagePushConfig config = messagePushConfigDao.getByMerCode(contact.getMerCode());
     String templateContent = DEFAULT_TEMPLATE_CONTENT;
     if (config == null) {

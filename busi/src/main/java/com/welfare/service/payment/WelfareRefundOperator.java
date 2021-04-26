@@ -89,7 +89,7 @@ public class WelfareRefundOperator implements IRefundOperator{
         int compareTo = paidAmount.compareTo(totalToRefundAmount);
         List<RefundOperation> refundOperations;
         if (compareTo < 0) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款金额大于付款金额:" + totalToRefundAmount + ":" + paidAmount, null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "退款金额大于付款金额:" + totalToRefundAmount + ":" + paidAmount, null);
         } else {
             refundOperations = partlyRefund(paidDeductionDetails, accountAmountTypes, refundRequest, account);
         }
@@ -233,7 +233,7 @@ public class WelfareRefundOperator implements IRefundOperator{
             }
         }
         if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常，退款金额计算错误", null);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常，退款金额计算错误", null);
         }
     }
 

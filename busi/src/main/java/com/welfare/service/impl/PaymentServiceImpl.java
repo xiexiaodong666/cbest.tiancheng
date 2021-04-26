@@ -22,15 +22,12 @@ import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
-import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.service.payment.IPaymentOperator;
-import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRowsRequest;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +45,6 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 
@@ -109,10 +105,25 @@ public class PaymentServiceImpl implements PaymentService {
                         merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(), account.getMerCode()));
                 Future<MerchantCredit> merchantCreditFuture =
                         threadPoolTaskExecutor.submit(() -> merchantCreditService.getByMerCode(account.getMerCode()));
+                String paymentScene = paymentSceneFuture.get();
                 Future<List<MerAccountTypeConsumeSceneConfig>> merAccountTypeConsumeSceneConfigFuture =
                         threadPoolTaskExecutor.submit(() -> merAccountTypeConsumeSceneConfigDao
-                                .query(account.getMerCode(),paymentRequest.getStoreNo(),paymentSceneFuture.get()));
+                                .query(account.getMerCode(),paymentRequest.getStoreNo(), paymentScene));
                 Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
+                Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() -> paymentChannelConfigDao
+                        .getBaseMapper().selectList(
+                                Wrappers.<PaymentChannelConfig>lambdaQuery()
+                                        .eq(PaymentChannelConfig::getMerCode, account.getMerCode())
+                                        .eq(PaymentChannelConfig::getStoreCode, paymentRequest.getStoreNo())
+                                        .eq(PaymentChannelConfig::getConsumeType, paymentScene)
+                                        .eq(PaymentChannelConfig::getPaymentChannelCode, paymentRequest.getPaymentChannel())));
+                //检查支付渠道消费场景
+                List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigListFuture
+                        .get();
+                if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
+                    log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式");
+                }
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();
                 if (WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
@@ -125,7 +136,6 @@ public class PaymentServiceImpl implements PaymentService {
                 }
                 SupplierStore supplierStore = supplierStoreFuture.get();
                 List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture.get();
-                String paymentScene = paymentSceneFuture.get();
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
                 List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
                 List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs = merAccountTypeConsumeSceneConfigFuture.get();
@@ -171,7 +181,7 @@ public class PaymentServiceImpl implements PaymentService {
             return paymentRequest;
         } catch (InterruptedException | ExecutionException e) {
             log.error("异步执行查询异常", e);
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, e.getCause().getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(accountLock);
         }
@@ -257,7 +267,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
             log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式", null);
         }
 
         if(!CollectionUtils.isEmpty(paymentRequest.getSaleRows())) {
@@ -390,7 +400,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .get();
             if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
                 log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式");
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式");
             }
             SubAccount subAccount = subAccountFuture.get();
             ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = new ThirdPartyBarcodePaymentDTO();
@@ -405,7 +415,7 @@ public class PaymentServiceImpl implements PaymentService {
             return thirdPartyBarcodePaymentDTO;
         } catch (InterruptedException | ExecutionException e) {
             log.error(StrUtil.format("查询检查第三方支付码异步执行异常, paymentRequest: {}", JSON.toJSON(paymentRequest)), e);
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", e);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", e);
         }
     }
 

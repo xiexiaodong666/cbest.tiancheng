@@ -54,16 +54,16 @@ public class HospitalMerchantInitOperator extends AbstractMerchantInitOperator {
 
     @Override
     public List<Department> initDepartment(String merCode) {
-//        Department department = new Department();
-//        String departmentCode = sequenceService.nextNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()).toString();
-//        department.setMerCode(merCode);
-//        department.setDepartmentCode(departmentCode);
-//        department.setDepartmentName(departmentCode);
-//        department.setDepartmentPath(merCode + "-" + departmentCode);
-//        department.setDepartmentLevel(2);
-//        department.setDepartmentParent(merCode);
-//        department.setDepartmentType(DepartmentTypeEnum.DEPARTMENT.getType());
-        return Lists.newArrayList();
+        Department department = new Department();
+        String departmentCode = sequenceService.nextNo(WelfareConstant.SequenceType.DEPARTMENT_CODE.code()).toString();
+        department.setMerCode(merCode);
+        department.setDepartmentCode(departmentCode);
+        department.setDepartmentName("默认部门");
+        department.setDepartmentPath(merCode + "-" + departmentCode);
+        department.setDepartmentLevel(2);
+        department.setDepartmentParent(merCode);
+        department.setDepartmentType(DepartmentTypeEnum.DEPARTMENT.getType());
+        return Lists.newArrayList(department);
     }
 
     @Override

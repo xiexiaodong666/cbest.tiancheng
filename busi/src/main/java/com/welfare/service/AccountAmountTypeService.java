@@ -3,6 +3,7 @@ package com.welfare.service;
 import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
+import com.welfare.service.dto.AccountAmountTypeResp;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 
@@ -62,4 +63,11 @@ public interface AccountAmountTypeService {
      * @return
      */
     List<AccountAmountType> batchQueryByAccount(List<Long> accountCodes, String merAccountTypeCode);
+
+    /**
+     * 查询福利类型账号列表
+     * @param accountCode
+     * @return
+     */
+    List<AccountAmountTypeResp> list(Long accountCode);
 }

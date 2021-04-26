@@ -1,6 +1,5 @@
 package com.welfare.serviceaccount.controller;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.welfare.common.annotation.AccountUser;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.AccountUserHolder;
@@ -10,8 +9,9 @@ import com.welfare.persist.dto.AccountPasswordFreePageSignDTO;
 import com.welfare.persist.dto.AccountPasswordFreeSignDTO;
 import com.welfare.persist.dto.AccountPaymentChannelDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
-import com.welfare.persist.entity.Account;
+import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountService;
+import com.welfare.service.dto.AccountAmountTypeResp;
 import com.welfare.service.dto.AccountDO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +49,9 @@ import java.util.stream.Collectors;
 public class AccountController implements IController {
 
     private final AccountService accountService;
+
+    @Autowired
+    private AccountAmountTypeService accountAmountTypeService;
 
     @ApiOperation("账号信息")
     @GetMapping("/info")
@@ -143,5 +147,13 @@ public class AccountController implements IController {
     public R<AccountPasswordFreeSignDTO> passwordFreeUnsign(String paymentChannel) {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.passwordFreeUnsign(accountCode, paymentChannel));
+    }
+
+    @ApiOperation("员工所有福利类型账号信息")
+    @GetMapping("/mer-account_type/list")
+    @AccountUser
+    public R<List<AccountAmountTypeResp>> merAccountTypeList() {
+        Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
+        return success(accountAmountTypeService.list(accountCode));
     }
 }

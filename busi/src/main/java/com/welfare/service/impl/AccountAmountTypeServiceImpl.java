@@ -15,6 +15,7 @@ import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.*;
+import com.welfare.service.dto.AccountAmountTypeResp;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
@@ -220,6 +221,32 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         }
         return accountAmountTypes;
     }
+
+    @Override
+    public List<AccountAmountTypeResp> list(Long accountCode) {
+        Account account = accountService.getByAccountCode(accountCode);
+        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByAccountCode(accountCode);
+        List<AccountAmountTypeResp> resps = new ArrayList<>();
+        if (Objects.nonNull(account) && org.apache.commons.collections4.CollectionUtils.isNotEmpty(accountAmountTypes)) {
+            List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
+            Map<String, MerchantAccountType> merchantAccountTypeMap = merchantAccountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
+            accountAmountTypes.forEach(accountAmountType -> {
+                AccountAmountTypeResp resp = new AccountAmountTypeResp();
+                MerchantAccountType merchantAccountType = merchantAccountTypeMap.get(accountAmountType.getMerAccountTypeCode());
+                resp.setAccountCode(accountCode);
+                resp.setShowOrder(merchantAccountType.getDeductionOrder());
+                resp.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
+                resp.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
+                if (accountAmountType.equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
+                    resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                } else {
+                    resp.setBalance(accountAmountType.getAccountBalance() + "");
+                }
+            });
+        }
+        return resps;
+    }
+
 
     private AccountDeductionDetail assemblyAccountDeductionDetail(Deposit deposit, Account account,
                                                                   AccountAmountType accountAmountType) {

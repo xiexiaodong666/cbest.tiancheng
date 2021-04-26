@@ -104,6 +104,8 @@ public class NhcServiceImpl implements NhcService {
             if (StringUtils.isNoneBlank(userReq.getPhone())) {
                 BizAssert.isTrue(userReq.getPhone().length() == 11 && AccountUtil.isNumeric(userReq.getPhone()),
                         ExceptionCode.ILLEGALITY_ARGURMENTS, "手机号不合法");
+                Account oldAccount = accountService.findByPhoneAndMerCode(userReq.getPhone(), userReq.getMerCode());
+                BizAssert.isTrue(Objects.isNull(oldAccount) || oldAccount.getAccountCode().equals(account.getAccountCode()), ExceptionCode.ACCOUNT_ALREADY_EXIST);
                 account.setPhone(userReq.getPhone());
             } else {
                 account.setPhone(DEFAULT_PHONE_PREFIX + sequenceService.nextNo(WelfareConstant.SequenceType.DEFAULT_PHONE.code()));
@@ -115,7 +117,7 @@ public class NhcServiceImpl implements NhcService {
         try {
             BizAssert.isTrue(accountDao.saveOrUpdate(account));
         } catch (Exception exception) {
-            if (exception instanceof SQLIntegrityConstraintViolationException) {
+            if (exception instanceof DuplicateKeyException || exception instanceof SQLIntegrityConstraintViolationException) {
                 throw new BizException(ExceptionCode.ACCOUNT_ALREADY_EXIST);
             } else {
                 throw exception;

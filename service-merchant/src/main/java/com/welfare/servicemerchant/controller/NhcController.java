@@ -10,6 +10,7 @@ import com.welfare.service.AccountAmountTypeGroupService;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.NhcService;
 import com.welfare.service.dto.nhc.*;
+import com.welfare.service.remote.entity.EmployerReqDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class NhcController {
     @PostMapping("/user/saveOrUpdate")
     @ApiOperation("新增或修改用户")
     @MerchantUser
-    public R<String> saveOrUpdateUser(@Validated @RequestBody NhcUserReq userReq) {
+    public R<EmployerReqDTO> saveOrUpdateUser(@Validated @RequestBody NhcUserReq userReq) {
         return R.success(nhcService.saveOrUpdateUser(userReq));
     }
 

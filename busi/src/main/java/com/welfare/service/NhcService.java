@@ -2,6 +2,7 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.service.dto.nhc.*;
+import com.welfare.service.remote.entity.EmployerReqDTO;
 
 /**
  * @Author: duanhy
@@ -16,7 +17,7 @@ public interface NhcService {
    * @param userReq
    * @return
    */
-  String saveOrUpdateUser(NhcUserReq userReq);
+  EmployerReqDTO saveOrUpdateUser(NhcUserReq userReq);
 
   /**
    * 查询用户信息

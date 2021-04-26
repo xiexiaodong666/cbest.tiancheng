@@ -272,16 +272,16 @@ public class AccountAmountTypeGroupServiceImpl implements AccountAmountTypeGroup
         accountMap.put(joinAccount.getAccountCode(), joinAccount);
         accountMap.put(groupAccount.getAccountCode(), groupAccount);
         BizAssert.isTrue(joinAccount.getMerCode().equals(groupAccount.getMerCode()), ExceptionCode.ILLEGALITY_ARGUMENTS, "家庭员工不存在");
-        AccountAmountType joinAccountAmountType = accountAmountTypeService.queryOne(joinAccountCode, merAccountTypeCode);
-        AccountAmountType groupAccountAmountType = accountAmountTypeService.queryOne(groupAccountCode, merAccountTypeCode);
-        BizAssert.isTrue(Objects.nonNull(joinAccountAmountType) && Objects.nonNull(groupAccountAmountType),
-                ExceptionCode.ILLEGALITY_ARGUMENTS, "福利账户不存在");
         AccountAmountTypeGroup amountTypeGroup;
         List<AccountAmountType> updateAccountAmountTypes = new ArrayList<>();
 
         // 如果已属于某个组，先退组
         removeByAccountCode(merCode, joinAccountCode, merAccountTypeCode);
 
+        AccountAmountType joinAccountAmountType = accountAmountTypeService.queryOne(joinAccountCode, merAccountTypeCode);
+        AccountAmountType groupAccountAmountType = accountAmountTypeService.queryOne(groupAccountCode, merAccountTypeCode);
+        BizAssert.isTrue(Objects.nonNull(joinAccountAmountType) && Objects.nonNull(groupAccountAmountType),
+                ExceptionCode.ILLEGALITY_ARGUMENTS, "福利账户不存在");
         if (groupAccountAmountType.getJoinedGroup() && Objects.nonNull(groupAccountAmountType.getAccountAmountTypeGroupId())) {
             amountTypeGroup = accountAmountTypeGroupDao.getById(groupAccountAmountType.getAccountAmountTypeGroupId());
             BizAssert.notNull(amountTypeGroup, ExceptionCode.ILLEGALITY_ARGUMENTS, "用户组不存在");

@@ -822,6 +822,10 @@ public class AccountServiceImpl implements AccountService {
             ? surplusQuota.add(surplusQuotaOverpay) : surplusQuota);
         accountSimpleDTO.setSurplusQuotaOverpay(surplusQuotaOverpay);
         accountSimpleDTO.setCredit(account.getCredit());
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, MerAccountTypeCode.WHOLESALE.code());
+        if (Objects.nonNull(accountAmountType)) {
+            accountSimpleDTO.setWholesaleCredit(accountAmountType.getAccountBalance());
+        }
         return accountSimpleDTO;
     }
 

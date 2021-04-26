@@ -24,7 +24,7 @@
     <select id="queryReceivableSummary" resultType="com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO">
         select
         sum(d.trans_amount) as settleAmount,
-        sum(d.trans_amount) as transAmount,
+        sum(d.trans_amount) as transAmount
         from wholesale_payable_settle_detail d
         inner join supplier_store s on s.store_code = d.store_code
         inner join merchant supplier on supplier.mer_code = s.mer_code

@@ -841,6 +841,18 @@ public class AccountServiceImpl implements AccountService {
         return accountBalanceDTO;
     }
 
+    private AccountBalanceDTO assemblyWholesaleAccountBalance(Long accountCode) {
+        AccountBalanceDTO accountBalanceDTO = new AccountBalanceDTO();
+        accountBalanceDTO.setCode(MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+        accountBalanceDTO.setCode(MerAccountTypeCode.WHOLESALE_PROCUREMENT.name());
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+        accountBalanceDTO.setValue(BigDecimal.ZERO);
+        if (Objects.nonNull(accountAmountType)) {
+            accountBalanceDTO.setValue(accountAmountType.getAccountBalance());
+        }
+        return  accountBalanceDTO;
+    }
+
     @Override
     public AccountOverviewDTO queryAccountOverview(Long accountCode, String paymentChannel) {
         Account account = getByAccountCode(accountCode);
@@ -855,6 +867,7 @@ public class AccountServiceImpl implements AccountService {
                     .stream()
                     .map(welfare -> getAccountBalanceValue(welfare, account))
                     .collect(Collectors.toList());
+                balanceList.add(assemblyWholesaleAccountBalance(accountCode));
                 break;
             case WO_LIFE:
                 String phone = account.getPhone();

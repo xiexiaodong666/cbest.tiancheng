@@ -45,7 +45,7 @@ public enum ExceptionCode implements IResultCode {
     DATA_NOT_EXIST(50060001,"数据不存在"),
     //______配置相关异常------
     NO_AVAILABLE_AMOUNT_TYPE(50070001,"当前场景没有可用的福利类型"),
-
+    NO_AVAILABLE_MER_ACCOUNT_TYPE_CONSUME_SCENE_CONFIG(50070002,"没有找到员工消费场景配置"),
     //______账户、员工相关异常------
     ACCOUNT_ALREADY_EXIST(50080001,"员工已存在"),
     ACCOUNT_DISABLED(5008002,"账户已禁用"),

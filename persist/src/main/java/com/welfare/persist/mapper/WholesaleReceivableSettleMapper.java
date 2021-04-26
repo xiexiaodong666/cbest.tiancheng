@@ -1,8 +1,13 @@
 package com.welfare.persist.mapper;
 
+import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 批发应收结算账单(wholesale_receivable_settle)数据Mapper
@@ -13,5 +18,28 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface WholesaleReceivableSettleMapper extends BaseMapper<WholesaleReceivableSettle> {
-
+    /**
+     *  查询汇总明细
+     * @param merCode 商户编码
+     * @param supplierCode 供应商编码
+     * @param transTimeStart 交易时间start
+     * @param transTimeEnd 交易时间end
+     * @return 应收汇总明细
+     */
+    List<PlatformWholesaleSettleGroupDTO> queryReceivable(@Param("merCode") String merCode,
+                                                          @Param("supplierCode") String supplierCode,
+                                                          @Param("transTimeStart") Date transTimeStart,
+                                                          @Param("transTimeEnd") Date transTimeEnd);
+    /**
+     *  查询汇总
+     * @param merCode 商户编码
+     * @param supplierCode 供应商编码
+     * @param transTimeStart 交易时间start
+     * @param transTimeEnd 交易时间end
+     * @return 应收汇总
+     */
+    PlatformWholesaleSettleGroupDTO queryReceivableSummary(@Param("merCode") String merCode,
+                                                          @Param("supplierCode") String supplierCode,
+                                                          @Param("transTimeStart") Date transTimeStart,
+                                                          @Param("transTimeEnd") Date transTimeEnd);
 }

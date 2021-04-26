@@ -220,7 +220,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
 
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         monthSettle.setConfirmTime(new Date());
-        monthSettle.setupdateUser(merchantUser.getUserCode());
+        monthSettle.setUpdateUser(merchantUser.getUserCode());
 
         return monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()
@@ -239,7 +239,7 @@ public class MonthSettleServiceImpl implements MonthSettleService {
         monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
 
         UserInfo userInfo = UserInfoHolder.getUserInfo();
-        monthSettle.setupdateUser(userInfo.getUserId());
+        monthSettle.setUpdateUser(userInfo.getUserId());
 
         int i = monthSettleMapper.update(monthSettle,
                 Wrappers.<MonthSettle>lambdaUpdate()

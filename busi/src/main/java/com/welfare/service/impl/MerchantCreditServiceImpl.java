@@ -79,6 +79,8 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         credit.setRemainingLimit(BigDecimal.ZERO);
         credit.setRebateLimit(BigDecimal.ZERO);
         credit.setSelfDepositBalance(BigDecimal.ZERO);
+        credit.setWholesaleCredit(BigDecimal.ZERO);
+        credit.setWholesaleCreditLimit(BigDecimal.ZERO);
         return merchantCreditDao.save(credit);
     }
 

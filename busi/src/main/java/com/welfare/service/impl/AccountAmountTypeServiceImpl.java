@@ -6,6 +6,9 @@ import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.AccountDepositIncreDTO;
@@ -259,7 +262,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 resp.setShowOrder(merchantAccountType.getDeductionOrder());
                 resp.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
                 resp.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
-                if (accountAmountType.equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
+                if (accountAmountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
                     resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
                 } else {
                     resp.setBalance(accountAmountType.getAccountBalance() + "");

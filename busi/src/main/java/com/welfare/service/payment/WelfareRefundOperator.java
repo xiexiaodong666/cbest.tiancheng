@@ -232,7 +232,7 @@ public class WelfareRefundOperator implements IRefundOperator{
             if (refundCompare == 0) {
                 break;
             }
-        }
+          }
         if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
             throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常，退款金额计算错误", null);
         }

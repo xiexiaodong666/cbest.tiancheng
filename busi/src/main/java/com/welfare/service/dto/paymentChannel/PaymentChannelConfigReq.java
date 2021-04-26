@@ -20,7 +20,7 @@ public class PaymentChannelConfigReq {
 
   @ApiModelProperty(value = "门店编码", required = true)
   @NotEmpty(message = "门店编码不能为空")
-  private Set<String> storeCodes;
+  private String storeCode;
 
   @ApiModelProperty(value = "消费场景", required = true)
   @NotEmpty(message = "消费场景不能为空")

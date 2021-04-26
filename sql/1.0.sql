@@ -712,7 +712,7 @@ CREATE TABLE `month_settle` (
                                 `settle_end_time` datetime DEFAULT NULL COMMENT '账单结束时间',
                                 `create_user` varchar(50) DEFAULT NULL COMMENT '创建人',
                                 `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-                                `uppdate_user` varchar(50) DEFAULT NULL COMMENT '更新人',
+                                `update_user` varchar(50) DEFAULT NULL COMMENT '更新人',
                                 `update_time` datetime DEFAULT NULL COMMENT '更新时间',
                                 `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
                                 `settle_statistics_info` text COMMENT '账单账户类型统计信息',

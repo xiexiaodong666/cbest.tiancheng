@@ -132,7 +132,7 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
      * 更新人
      */
     @ApiModelProperty("更新人")   
-    private String uppdateUser;
+    private String updateUser;
     /**
      * 更新时间
      */
@@ -215,7 +215,7 @@ public class MonthSettle extends Model<MonthSettle> implements Serializable {
     /**
     * 更新人
     */
-    public static final String UPPDATE_USER = "uppdate_user";
+    public static final String update_user = "update_user";
     /**
     * 更新时间
     */

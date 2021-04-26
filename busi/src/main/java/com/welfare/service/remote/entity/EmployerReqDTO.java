@@ -1,10 +1,12 @@
 package com.welfare.service.remote.entity;
 
 import com.google.common.collect.Lists;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountType;
 import com.welfare.persist.entity.Department;
+import com.welfare.service.dto.DepartmentTree;
 import lombok.Data;
 
 import java.util.Date;
@@ -34,6 +36,27 @@ public class EmployerReqDTO {
     employerDTO.setRemark(account.getRemark());
     employerDTO.setStatus(account.getAccountStatus());
     employerDTO.setRoleName(accountType.getTypeName());
+    employerDTO.setDepartmentName(department.getDepartmentName());
+    employerDTO.setDepartmentCode(account.getDepartment());
+    EmployerReqDTO reqDTO = new EmployerReqDTO();
+    reqDTO.setActionType(actionType);
+    reqDTO.setList(Lists.newArrayList(employerDTO));
+    reqDTO.setRequestId(UUID.randomUUID().toString());
+    reqDTO.setTimestamp(new Date());
+    return reqDTO;
+  }
+
+  public static EmployerReqDTO of(ShoppingActionTypeEnum actionType, Account account, WelfareConstant.AccountType accountType, DepartmentTree department) {
+    EmployerDTO employerDTO = new EmployerDTO();
+    employerDTO.setEmployerId(String.valueOf(account.getAccountCode()));
+    employerDTO.setEmployerRole(account.getAccountTypeCode());
+    employerDTO.setPartnerCode(account.getMerCode());
+    employerDTO.setMerchantId("0");
+    employerDTO.setMobile(account.getPhone());
+    employerDTO.setName(account.getAccountName());
+    employerDTO.setRemark(account.getRemark());
+    employerDTO.setStatus(account.getAccountStatus());
+    employerDTO.setRoleName(accountType.desc());
     employerDTO.setDepartmentName(department.getDepartmentName());
     employerDTO.setDepartmentCode(account.getDepartment());
     EmployerReqDTO reqDTO = new EmployerReqDTO();

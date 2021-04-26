@@ -6,7 +6,35 @@
     </sql>
 
     <sql id="baseColumn">
-        id,settle_no,settle_month,mer_code,trans_amount,settle_amount,settle_self_amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,uppdate_user,update_time,deleted,settle_statistics_info
+        id,settle_no,settle_month,mer_code,trans_amount,settle_amount,settle_self_amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,update_user,update_time,deleted,settle_statistics_info
     </sql>
 
+    <select id="queryReceivable" resultType="com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO">
+        select
+            sum(d.trans_amount) as settleAmount,
+            sum(d.trans_amount) as transAmount,
+            d.mer_code,
+            d.mer_name
+        from wholesale_payable_settle_detail d
+            inner join supplier_store s on s.store_code = d.store_code
+            inner join merchant supplier on supplier.mer_code = s.mer_code
+        <include refid="queryReceivableWhere"/>
+        group by d.mer_code,d.mer_name
+    </select>
+    <select id="queryReceivableSummary" resultType="com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO">
+        select
+        sum(d.trans_amount) as settleAmount,
+        sum(d.trans_amount) as transAmount,
+        from wholesale_payable_settle_detail d
+        inner join supplier_store s on s.store_code = d.store_code
+        inner join merchant supplier on supplier.mer_code = s.mer_code
+        <include refid="queryReceivableWhere"/>
+    </select>
+    <sql id="queryReceivableWhere">
+        <where>
+            d.mer_code = #{merCode}
+            and d.trans_time BETWEEN #{transTimeStart} and #{transTimeEnd}
+            and supplier.mer_code = #{supplierCode}
+        </where>
+    </sql>
 </mapper>

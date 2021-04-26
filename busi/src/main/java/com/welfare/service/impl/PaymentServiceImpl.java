@@ -11,6 +11,7 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
+import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
@@ -139,6 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
                 List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
                 List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs = merAccountTypeConsumeSceneConfigFuture.get();
+                BizAssert.notEmpty(merAccountTypeConsumeSceneConfigs,ExceptionCode.NO_AVAILABLE_MER_ACCOUNT_TYPE_CONSUME_SCENE_CONFIG);
                 accountAmountDOList = filterAvailable(accountAmountDOList, merAccountTypeConsumeSceneConfigs, paymentRequest.bizType());
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
                 //支付前的校验

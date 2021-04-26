@@ -19,6 +19,8 @@ import com.welfare.service.dto.BatchSequence;
 import com.welfare.service.dto.DepartmentTree;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.dto.nhc.*;
+import com.welfare.service.remote.entity.EmployerDTO;
+import com.welfare.service.remote.entity.EmployerReqDTO;
 import com.welfare.service.sync.event.AccountEvt;
 import com.welfare.service.utils.AccountUtils;
 import com.welfare.service.utils.PageUtils;
@@ -81,7 +83,7 @@ public class NhcServiceImpl implements NhcService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String saveOrUpdateUser(NhcUserReq userReq) {
+    public EmployerDTO saveOrUpdateUser(NhcUserReq userReq) {
         Account account;
         Merchant merchant = merchantService.getMerchantByMerCode(userReq.getMerCode());
         BizAssert.notNull(merchant,
@@ -129,11 +131,10 @@ public class NhcServiceImpl implements NhcService {
         if (StringUtils.isNoneBlank(account.getPhone()) && account.getPhone().startsWith(NhcService.DEFAULT_PHONE_PREFIX)) {
             account.setPhone(null);
         }
-        // 同步员工
-        applicationContext.publishEvent(AccountEvt.builder()
-                .typeEnum(StringUtils.isNoneBlank(userReq.getAccountCode()) ? ShoppingActionTypeEnum.UPDATE : ShoppingActionTypeEnum.ADD)
-                .accountList(Collections.singletonList(account)).build());
-        return String.valueOf(account.getAccountCode());
+        List<DepartmentTree> departmentTrees = departmentService.tree(userReq.getMerCode());
+        BizAssert.notEmpty(departmentTrees.get(0).getChildren(),ExceptionCode.ILLEGALITY_ARGUMENTS, "商户部门不存在");
+        DepartmentTree department = (DepartmentTree)departmentTrees.get(0).getChildren().get(0);
+        return EmployerReqDTO.of(ShoppingActionTypeEnum.ADD, account, WelfareConstant.AccountType.PATIENT, department).getList().get(0);
     }
 
     private Account assemblyUser(NhcUserReq userReq, Merchant merchant) {

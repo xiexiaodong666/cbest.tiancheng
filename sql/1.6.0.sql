@@ -8,3 +8,4 @@ ALTER TABLE account_deposit_apply ADD COLUMN apply_type VARCHAR(20) DEFAULT NULL
 
 UPDATE account_deposit_apply set apply_type = 'welfareApply'
 
+alter table month_settle change  uppdate_user  update_user varchar(20) comment '更新人';

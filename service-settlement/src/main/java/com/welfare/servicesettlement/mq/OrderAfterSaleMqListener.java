@@ -6,7 +6,9 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.OrderInfoDao;
+import com.welfare.persist.dao.OrderInfoDetailDao;
 import com.welfare.persist.entity.OrderInfo;
+import com.welfare.persist.entity.OrderInfoDetail;
 import com.welfare.servicesettlement.dto.mall.AftersaleOrderMqInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -34,6 +37,7 @@ import java.util.Objects;
 )
 public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrderMqInfo> {
     private final OrderInfoDao orderInfoDao;
+    private final OrderInfoDetailDao orderInfoDetailDao;
     /**
      * 此种类型的pay_type需要忽略（表示老的员工卡支付的）
      */
@@ -58,6 +62,8 @@ public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrder
         OrderInfo originalOrder = orderInfoDao.getOneByOrderNo(orderNo, WelfareConstant.TransType.CONSUME.code());
         BizAssert.notNull(originalOrder, ExceptionCode.DATA_NOT_EXIST,"正向订单不存在");
         OrderInfo orderInfo = aftersaleOrderMqInfo.parseFromOriginalOrder(originalOrder);
+        List<OrderInfoDetail> orderInfoDetails = aftersaleOrderMqInfo.parseOrderInfoDetails();
+        orderInfoDetailDao.saveBatch(orderInfoDetails);
         orderInfoDao.save(orderInfo);
     }
 }

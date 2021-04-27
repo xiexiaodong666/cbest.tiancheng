@@ -1,18 +1,18 @@
 package com.welfare.servicesettlement.dto.mall;
 
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountDeductionDetail;
-import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.OrderInfo;
+import com.welfare.persist.entity.*;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Description:
@@ -127,6 +127,8 @@ public class OrderMqInfo implements Serializable {
     @ApiModelProperty("重百付交易单号")
     private String tradeNo;
 
+    private List<OrderDetailMqInfo> orderDetails;
+
     public static OrderInfo  parseToOrderInfo(OrderMqInfo orderMqInfo, AccountDeductionDetail accountDeductionDetail, Account account, Merchant merchant){
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setOrderId(orderMqInfo.getOrgOrderNo().toString());
@@ -144,4 +146,12 @@ public class OrderMqInfo implements Serializable {
         orderInfo.setTransTypeName(WelfareConstant.TransType.CONSUME.desc());
         return orderInfo;
     }
+
+    public List<OrderInfoDetail> parseOrderInfoDetails(){
+        if (CollectionUtils.isEmpty(orderDetails)) {
+            return Collections.emptyList();
+        }
+        return orderDetails.stream().map(OrderDetailMqInfo::toOrderInfoDetail).collect(Collectors.toList());
+    }
+
 }

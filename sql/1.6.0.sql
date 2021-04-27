@@ -6,7 +6,7 @@ INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `delet
 
 ALTER TABLE account_deposit_apply ADD COLUMN apply_type VARCHAR(20) DEFAULT NULL;
 
-UPDATE account_deposit_apply set apply_type = 'welfareApply'
+UPDATE account_deposit_apply set apply_type = 'welfareApply';
 
 alter table month_settle change  uppdate_user  update_user varchar(20) comment '更新人';
 
@@ -37,7 +37,7 @@ CREATE TABLE `wholesale_payable_settle` (
   `settle_end_time` datetime DEFAULT NULL COMMENT '账单结束时间',
   `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `uppdate_user` varchar(20) DEFAULT NULL COMMENT '更新人',
+  `update_user` varchar(20) DEFAULT NULL COMMENT '更新人',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
   `settle_statistics_info` text COMMENT '账单账户类型统计信息',
@@ -125,7 +125,7 @@ CREATE TABLE `wholesale_receivable_settle` (
   `settle_end_time` datetime DEFAULT NULL COMMENT '账单结束时间',
   `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `uppdate_user` varchar(20) DEFAULT NULL COMMENT '更新人',
+  `update_user` varchar(20) DEFAULT NULL COMMENT '更新人',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
   `settle_statistics_info` text COMMENT '账单账户类型统计信息',
@@ -184,3 +184,24 @@ CREATE TABLE `wholesale_receivable_settle_detail` (
 ) ENGINE=InnoDB AUTO_INCREMENT=22223 DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+create table order_info_detail(
+                                  id bigint(20) primary key comment 'pk',
+                                  order_id varchar(20) comment '订单id',
+                                  product_id varchar(50) comment '商品id',
+                                  uuid varchar(36) comment '行uuid',
+                                  sku_id varchar(50) comment '商品skuid',
+                                  sku_no varchar(50) comment '商品skuNo',
+                                  sku_name varchar(50) comment '商品sku名称',
+                                  `count` int(8) comment '商品数量',
+                                  refund_count int(8) comment '售后数量',
+                                  wholesale_price decimal(10,2) comment '商品结算单价',
+                                  wholesale_amount decimal(15,2) comment '商品结算总金额',
+                                  wholesale_tax_rate decimal(8,4) comment '税率',
+                                  `create_user` varchar(20)  COMMENT '创建人',
+                                  `create_time` datetime  COMMENT '创建时间',
+                                  `update_user` varchar(20)  COMMENT '更新人',
+                                  `update_time` datetime  COMMENT '更新时间',
+                                  `deleted` tinyint(1) DEFAULT 0 COMMENT '删除标志',
+                                  `version` bigint(20) DEFAULT 0 COMMENT '版本'
+);

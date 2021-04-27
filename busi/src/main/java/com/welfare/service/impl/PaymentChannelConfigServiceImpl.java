@@ -252,7 +252,7 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
         List<com.welfare.service.dto.PaymentChannelDTO> paymentChannels = paymentChannelService.list(channelReq);
         QueryWrapper<PaymentChannelConfig> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(PaymentChannelConfig.MER_CODE, req.getMerCode());
-        queryWrapper.in(PaymentChannelConfig.STORE_CODE, req.getStoreCodes());
+        queryWrapper.eq(PaymentChannelConfig.STORE_CODE, req.getStoreCode());
         queryWrapper.eq(PaymentChannelConfig.CONSUME_TYPE, req.getConsumeType());
         List<PaymentChannelConfig> result = new ArrayList<>();
         List<PaymentChannelConfig> channelConfigs = paymentChannelConfigDao.list(queryWrapper);

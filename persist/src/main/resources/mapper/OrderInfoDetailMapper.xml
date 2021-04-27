@@ -8,5 +8,15 @@
     <sql id="baseColumn">
         id,order_id,product_id,uuid,sku_id,sku_no,sku_name,count,refund_count,wholesale_price,wholesale_amount,wholesale_tax_rate,create_user,create_time,uppdate_user,update_time,deleted,version
     </sql>
+    <select id="queryGroupByTaxRate" resultType="com.welfare.persist.entity.OrderInfoDetail">
+        select
+            sum(d.wholesale_amount) as wholesaleAmount,
+            d.wholesale_tax_rate
+        from order_info_detail d where d.order_id in
+        <foreach collection="list" item="orderNo" separator="," open="(" close=")">
+            #{orderNo,jdbcType=VARCHAR}
+        </foreach>
+        group by d.wholesale_tax_rate
+    </select>
 
 </mapper>

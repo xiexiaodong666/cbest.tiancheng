@@ -4,6 +4,8 @@ import com.welfare.persist.entity.OrderInfoDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * (order_info_detail)数据Mapper
  *
@@ -14,4 +16,10 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface OrderInfoDetailMapper extends BaseMapper<OrderInfoDetail> {
 
+    /**
+     * 根据订单号查询，根据税率分组统计
+     * @param orderNos 订单号
+     * @return 分组后的orderInfoDetail
+     */
+    List<OrderInfoDetail> queryGroupByTaxRate(List<String> orderNos);
 }

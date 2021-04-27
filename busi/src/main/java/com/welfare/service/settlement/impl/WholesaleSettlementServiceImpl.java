@@ -7,14 +7,17 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.persist.dao.OrderInfoDetailDao;
 import com.welfare.persist.dao.WholesaleReceivableSettleDao;
 import com.welfare.persist.dao.WholesaleReceivableSettleDetailDao;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
+import com.welfare.persist.entity.OrderInfoDetail;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
 import com.welfare.persist.entity.WholesaleReceivableSettleDetail;
+import com.welfare.persist.mapper.OrderInfoDetailMapper;
 import com.welfare.persist.mapper.WholesaleReceivableSettleMapper;
 import com.welfare.service.SequenceService;
 import com.welfare.service.remote.entity.PlatformUser;
@@ -43,6 +46,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     private final WholesaleReceivableSettleMapper wholesaleReceivableSettleMapper;
     private final WholesaleReceivableSettleDao wholesaleReceivableSettleDao;
     private final WholesaleReceivableSettleDetailDao wholesaleReceivableSettleDetailDao;
+    private final OrderInfoDetailMapper orderInfoDetailMapper;
     @Override
     public PageInfo<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
                                                                          String supplierCode,
@@ -98,6 +102,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                 totalTransAmount = totalTransAmount.add(dto.getTransAmount().negate());
             }
         }
+        List<OrderInfoDetail> groupByTaxRateDetails = orderInfoDetailMapper.queryGroupByTaxRate(new ArrayList<>(orderNoSet));
         WholesaleReceivableSettle wholesaleReceivableSettle = new WholesaleReceivableSettle();
         Date now = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");

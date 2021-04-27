@@ -151,7 +151,21 @@ public class OrderMqInfo implements Serializable {
         if (CollectionUtils.isEmpty(orderDetails)) {
             return Collections.emptyList();
         }
-        return orderDetails.stream().map(OrderDetailMqInfo::toOrderInfoDetail).collect(Collectors.toList());
+        return orderDetails.stream().map(orderDetailMqInfo -> {
+            OrderInfoDetail detail = new OrderInfoDetail();
+            detail.setOrderId(orderDetailMqInfo.getOrderId());
+            detail.setCount(orderDetailMqInfo.getCount());
+            detail.setProductId(orderDetailMqInfo.getProductId());
+            detail.setRefundCount(orderDetailMqInfo.getRefundCount());
+            detail.setUuid(orderDetailMqInfo.getUuid());
+            detail.setSkuId(orderDetailMqInfo.getSkuId());
+            detail.setSkuNo(orderDetailMqInfo.getSkuNo());
+            detail.setSkuName(orderDetailMqInfo.getSkuName());
+            detail.setWholesaleAmount(orderDetailMqInfo.getWholesaleAmount());
+            detail.setWholesaleTaxRate(orderDetailMqInfo.getWholesaleTaxRate());
+            detail.setWholesalePrice(orderDetailMqInfo.getWholesalePrice());
+            return detail;
+        }).collect(Collectors.toList());
     }
 
 }

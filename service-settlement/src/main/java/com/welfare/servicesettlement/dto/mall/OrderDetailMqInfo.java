@@ -160,20 +160,4 @@ public class OrderDetailMqInfo implements Serializable {
      * 商品结算税率
      */
     private BigDecimal wholesaleTaxRate;
-
-    public OrderInfoDetail toOrderInfoDetail(){
-        OrderInfoDetail detail = new OrderInfoDetail();
-        detail.setOrderId(this.orderId);
-        detail.setCount(this.count);
-        detail.setProductId(this.productId);
-        detail.setRefundCount(this.refundCount);
-        detail.setUuid(this.uuid);
-        detail.setSkuId(this.skuId);
-        detail.setSkuNo(this.skuNo);
-        detail.setSkuName(this.skuName);
-        detail.setWholesaleAmount(this.wholesaleAmount);
-        detail.setWholesaleTaxRate(this.wholesaleTaxRate);
-        detail.setWholesalePrice(this.wholesalePrice);
-        return detail;
-    }
 }

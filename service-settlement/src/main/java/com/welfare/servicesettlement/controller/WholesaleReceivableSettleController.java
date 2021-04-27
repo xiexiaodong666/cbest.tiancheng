@@ -1,19 +1,18 @@
 package com.welfare.servicesettlement.controller;
 
-import com.alibaba.druid.util.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageInfo;
-import com.welfare.common.base.BasePageVo;
-import com.welfare.common.domain.MerchantUserInfo;
-import com.welfare.common.util.MerchantUserHolder;
-import com.welfare.persist.dto.query.MerchantPageReq;
+import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
+import com.welfare.persist.dto.WholesaleReceivableSettleResp;
+import com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp;
+import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
+import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery;
+import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
-import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
-import com.welfare.service.dto.MonthSettlePageReq;
-import com.welfare.service.dto.MonthSettleResp;
 import com.welfare.service.settlement.WholesaleSettlementService;
 import com.welfare.servicesettlement.dto.wholesale.WholesaleSettleStatusDTO;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
@@ -132,18 +131,28 @@ public class WholesaleReceivableSettleController implements IController {
         return success(wholesaleReceivableSettle);
     }
 
-//    @GetMapping("/settled/page-receivable-summary")
-//    @ApiOperation("分页查询应收结算单分组列表")
-//    public R<BasePageVo<MonthSettleResp>> pageQuery(MonthSettlePageReq monthSettleReqDto){
-//
-//        //商户用户只能查询本商户数据
-//        MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
-//        if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
-//            monthSettleReqDto.setMerCode(merchantUser.getMerchantCode());
-//        }
-//
-//        BasePageVo<MonthSettleResp> monthSettleRespDtoPage =  monthSettleService.pageQuery(monthSettleReqDto);
-//        return success(monthSettleRespDtoPage);
-//    }
 
+    @GetMapping("/receivable/bill/page")
+    @ApiOperation("分页查询应收结算单分组列表")
+    public R<Page<WholesaleReceivableSettleResp>> receivableBillPage(WholesaleReceivableSettleBillQuery query){
+        return success(null);
+    }
+
+    @GetMapping("/receivable/bill/{id}/page")
+    @ApiOperation("分页查询某个应收结算单明细列表")
+    public R<Page<WholesaleReceivableSettleDetailResp>> receivableBillDetailPage(@PathVariable("id") Long id, WholesaleReceiveSettleDetailPageQuery query){
+        return success(null);
+    }
+
+    @GetMapping("/receivable/bill/{id}/summary")
+    @ApiOperation("查询应收结算单明细数据汇总")
+    public R<WholesaleReceiveSettleSummaryResp> receivableBillDetailSummary(@PathVariable("id") Long id, WholesaleReceiveSettleDetailQuery query){
+        return success(null);
+    }
+
+    @GetMapping("/receivable/bill/{id}/export")
+    @ApiOperation("应收结算明细数据单导出")
+    public R<String> receivableBillDetailExport(@PathVariable("id") Long id, WholesaleReceiveSettleDetailQuery query){
+        return success(null);
+    }
 }

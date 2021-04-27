@@ -2,6 +2,8 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.PaymentChannelConfig;
+import com.welfare.persist.dto.query.PaymentChannelConfigReqDTO;
+import com.welfare.persist.dto.PaymentChannelSimpleResp;
 import com.welfare.service.dto.paymentChannel.*;
 
 import java.util.List;
@@ -56,4 +58,12 @@ public interface PaymentChannelConfigService {
    * @return
    */
   List<PaymentChannelConfig> getByMerCodeAndStoreAndConsume(PaymentChannelConfigReq req);
+
+
+  /**
+   * 查询支付渠道并取交集返回
+   * @param req
+   * @return
+   */
+  List<PaymentChannelSimpleResp> intersection(PaymentChannelConfigReqDTO req);
 }

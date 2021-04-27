@@ -1,14 +1,12 @@
 package com.welfare.service.payment;
 
+import com.alibaba.excel.util.CollectionUtils;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
-import com.welfare.persist.dao.AccountAmountTypeDao;
-import com.welfare.persist.dao.AccountBillDetailDao;
-import com.welfare.persist.dao.AccountDao;
-import com.welfare.persist.dao.AccountDeductionDetailDao;
+import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountService;
@@ -52,6 +50,7 @@ public class WelfareRefundOperator implements IRefundOperator{
     private final MerchantCreditService merchantCreditService;
     private final AccountAmountTypeService accountAmountTypeService;
     private final SupplierStoreService supplierStoreService;
+    private final AccountAmountTypeGroupDao accountAmountTypeGroupDao;
 
     @Override
     public void refund(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionDetailInDb, List<AccountDeductionDetail> accountDeductionDetails,Long accountCode) {
@@ -91,7 +90,7 @@ public class WelfareRefundOperator implements IRefundOperator{
         int compareTo = paidAmount.compareTo(totalToRefundAmount);
         List<RefundOperation> refundOperations;
         if (compareTo < 0) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "退款金额大于付款金额:" + totalToRefundAmount + ":" + paidAmount, null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "退款金额大于付款金额:" + totalToRefundAmount + ":" + paidAmount, null);
         } else {
             refundOperations = partlyRefund(paidDeductionDetails, accountAmountTypes, refundRequest, account);
         }
@@ -150,7 +149,7 @@ public class WelfareRefundOperator implements IRefundOperator{
                     surplusType.setAccountBalance(surplusType.getAccountBalance().add(maxRefundToSurplusQuota));
                     Assert.isTrue(surplusType.getAccountBalance().compareTo(maxQuota) == 0,"退款金额异常，请联系管理员。");
                     operateMerchantCredit(account, surplusRefundDeductionDetail);
-                    RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail);
+                    RefundOperation refundOperation = RefundOperation.of(refundBillDetail, surplusRefundDeductionDetail,null);
                     refundOperations.add(refundOperation);
                 }
                 Assert.notNull(surplusOverpayType,"该用户不存在溢缴款账户,请检查配置");
@@ -160,7 +159,7 @@ public class WelfareRefundOperator implements IRefundOperator{
                 refundedAmount = refundedAmount.add(surplusQuotaOverpayAmount);
                 remainingRefundAmount = remainingRefundAmount.subtract(surplusQuotaOverpayAmount);
                 operateMerchantCredit(account,surplusOverpayRefundDeductionDetail);
-                RefundOperation overpayRefundOperation = RefundOperation.of(overpayRefundBillDetail, surplusOverpayRefundDeductionDetail);
+                RefundOperation overpayRefundOperation = RefundOperation.of(overpayRefundBillDetail, surplusOverpayRefundDeductionDetail,null);
                 refundOperations.add(overpayRefundOperation);
                 isSurplusHandled = true;
             }
@@ -215,20 +214,27 @@ public class WelfareRefundOperator implements IRefundOperator{
                 thisAccountTypeRefundAmount = thisTypeMaxRefundAmount;
                 remainingRefundAmount = remainingRefundAmount.subtract(thisAccountTypeRefundAmount);
             }
-            accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(thisAccountTypeRefundAmount));
+            AccountAmountTypeGroup accountAmountTypeGroup = null;
+            if(accountAmountType.getJoinedGroup()){
+                //如果福利账户有分组，则需要退款到分组账户
+                accountAmountTypeGroup = accountAmountTypeGroupDao.getById(accountAmountType.getAccountAmountTypeGroupId());
+                accountAmountTypeGroup.setBalance(accountAmountTypeGroup.getBalance().add(thisAccountTypeRefundAmount));
+            }else{
+                accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(thisAccountTypeRefundAmount));
+            }
             refundedAmount = refundedAmount.add(thisAccountTypeRefundAmount);
             AccountDeductionDetail refundDeductionDetail = toRefundDeductionDetail(accountDeductionDetail, refundRequest, thisAccountTypeRefundAmount,accountAmountType);
             AccountBillDetail refundBillDetail = toRefundBillDetail(refundDeductionDetail, accountAmountTypes, tmpAccountBillDetail.getOrderChannel());
             operateMerchantCredit(account, refundDeductionDetail);
-            RefundOperation refundOperation = RefundOperation.of(refundBillDetail, refundDeductionDetail);
+            RefundOperation refundOperation = RefundOperation.of(refundBillDetail, refundDeductionDetail,accountAmountTypeGroup);
             refundOperations.add(refundOperation);
             int refundCompare = refundedAmount.compareTo(refundRequest.getAmount());
             if (refundCompare == 0) {
                 break;
             }
-        }
+          }
         if (remainingRefundAmount.compareTo(BigDecimal.ZERO) != 0) {
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常，退款金额计算错误", null);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常，退款金额计算错误", null);
         }
     }
 
@@ -267,6 +273,13 @@ public class WelfareRefundOperator implements IRefundOperator{
         List<AccountDeductionDetail> refundDeductionDetails = refundOperations.stream()
                 .map(RefundOperation::getRefundDeductionDetail)
                 .collect(Collectors.toList());
+        List<AccountAmountTypeGroup> accountAmountTypeGroups = refundOperations.stream()
+                .map(RefundOperation::getAccountAmountTypeGroup)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(accountAmountTypeGroups)){
+            accountAmountTypeGroupDao.updateBatchById(accountAmountTypeGroups);
+        }
         AccountAmountDO.updateAccountAfterOperated(account,accountAmountTypes);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(refundBillDetails);

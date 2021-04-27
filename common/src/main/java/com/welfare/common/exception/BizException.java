@@ -16,7 +16,7 @@ public class BizException extends RuntimeException{
     }
     public BizException(String msg) {
         super(msg);
-        this.code = ExceptionCode.UNKNOWON_EXCEPTION;
+        this.code = ExceptionCode.UNKNOWN_EXCEPTION;
         this.msg = msg;
     }
 

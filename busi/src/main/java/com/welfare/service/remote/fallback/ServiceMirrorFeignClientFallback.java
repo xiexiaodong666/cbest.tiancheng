@@ -25,7 +25,7 @@ public class ServiceMirrorFeignClientFallback implements FallbackFactory<Service
       public WelfareMerChantConsumeDataResponse getWelfareMerChantConsumeData(
           WelfareMerChantConsumeDataRequest request) {
         log.error("报表系统查询甜橙商户消费数据异常, 请求:{}", request, throwable);
-        throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "报表系统查询甜橙商户消费数据异常", null);
+        throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "报表系统查询甜橙商户消费数据异常", null);
       }
     };
   }

@@ -1,9 +1,6 @@
 package com.welfare.service.operator.payment.domain;
 
-import com.welfare.persist.entity.AccountAmountType;
-import com.welfare.persist.entity.AccountBillDetail;
-import com.welfare.persist.entity.AccountDeductionDetail;
-import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.persist.entity.*;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.Data;
 
@@ -21,6 +18,7 @@ import java.util.List;
 public class PaymentOperation {
     private MerchantAccountType merchantAccountType;
     private AccountAmountType accountAmountType;
+    private AccountAmountTypeGroup accountAmountTypeGroup;
     private AccountBillDetail accountBillDetail;
     private AccountDeductionDetail accountDeductionDetail;
     private List<MerchantAccountOperation> merchantAccountOperations;

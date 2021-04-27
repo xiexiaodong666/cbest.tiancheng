@@ -10,6 +10,7 @@ import com.welfare.persist.dto.AccountDepositIncreDTO;
 import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import com.welfare.service.*;
+import com.welfare.service.dto.AccountAmountTypeResp;
 import com.welfare.service.dto.Deposit;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     private final AccountChangeEventRecordDao accountChangeEventRecordDao;
     private final AccountBillDetailDao accountBillDetailDao;
     private final OrderTransRelationDao orderTransRelationDao;
+    private final AccountAmountTypeGroupDao accountAmountTypeGroupDao;
     /**
      * 循环依赖问题，所以未采用构造器注入
      */
@@ -75,7 +77,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
     @Override
     public void updateAccountAmountType(Deposit deposit) {
         RLock lock = DistributedLockUtil.lockFairly(ACCOUNT_AMOUNT_TYPE_OPERATE + deposit.getAccountCode());
-        try{
+        try {
             AccountAmountType accountAmountType = this.queryOne(deposit.getAccountCode(),
                     deposit.getMerAccountTypeCode());
             Account account = accountService.getByAccountCode(deposit.getAccountCode());
@@ -186,15 +188,55 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         queryWrapper.eq(AccountAmountType.ACCOUNT_CODE, account.getAccountCode());
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.list(queryWrapper);
         List<MerchantAccountType> types = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
-        if(CollectionUtils.isEmpty(accountAmountTypes) || CollectionUtils.isEmpty(types)){
+        if (CollectionUtils.isEmpty(accountAmountTypes) || CollectionUtils.isEmpty(types)) {
             return Collections.emptyList();
         }
         Map<String, MerchantAccountType> map = types.stream()
                 .collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
         return accountAmountTypes.stream()
-                .map(accountAmountType ->
-                        AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode()),account))
-                .collect(Collectors.toList());
+                .map(accountAmountType -> {
+                            if (accountAmountType.getJoinedGroup()) {
+                                AccountAmountTypeGroup accountAmountTypeGroup = accountAmountTypeGroupDao.getById(accountAmountType.getAccountAmountTypeGroupId());
+                                return AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode()), account, accountAmountTypeGroup);
+                            } else {
+                                return AccountAmountDO.of(accountAmountType, map.get(accountAmountType.getMerAccountTypeCode()), account, null);
+                            }
+                        }
+                ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AccountAmountType> batchQueryByAccount(List<Long> accountCodes, String merAccountTypeCode) {
+        List<AccountAmountType> accountAmountTypes = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(accountCodes)) {
+            accountAmountTypes = accountAmountTypeDao.listByAccountCodes(accountCodes, merAccountTypeCode);
+        }
+        return accountAmountTypes;
+    }
+
+    @Override
+    public List<AccountAmountTypeResp> list(Long accountCode) {
+        Account account = accountService.getByAccountCode(accountCode);
+        List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByAccountCode(accountCode);
+        List<AccountAmountTypeResp> resps = new ArrayList<>();
+        if (Objects.nonNull(account) && org.apache.commons.collections4.CollectionUtils.isNotEmpty(accountAmountTypes)) {
+            List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
+            Map<String, MerchantAccountType> merchantAccountTypeMap = merchantAccountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
+            accountAmountTypes.forEach(accountAmountType -> {
+                AccountAmountTypeResp resp = new AccountAmountTypeResp();
+                MerchantAccountType merchantAccountType = merchantAccountTypeMap.get(accountAmountType.getMerAccountTypeCode());
+                resp.setAccountCode(accountCode);
+                resp.setShowOrder(merchantAccountType.getDeductionOrder());
+                resp.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
+                resp.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
+                if (WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())) {
+                    resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                } else {
+                    resp.setBalance(accountAmountType.getAccountBalance() + "");
+                }
+            });
+        }
+        return resps;
     }
 
     private AccountDeductionDetail assemblyAccountDeductionDetail(Deposit deposit, Account account,

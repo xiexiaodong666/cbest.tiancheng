@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.MerAccountTypeConsumeSceneConfigMapper">
+    <sql id="tableName">
+        mer_account_type_consume_scene_config
+    </sql>
+
+    <sql id="baseColumn">
+        id,mer_code,mer_account_type_code,store_code,scene_consume_type,create_user,create_time,update_user,update_time,deleted,version
+    </sql>
+
+</mapper>

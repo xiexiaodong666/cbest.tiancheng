@@ -53,7 +53,7 @@ public class MerInfoController  implements IController {
     public R<SettleMerInfoResp> getAccountInfo(){
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         if(merchantUser == null){
-            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
+            throw new BizException(ExceptionCode.BIZ_ERROR_NO_PERMISSION,"未登录的商户",null);
         }
         SettleMerInfoResp settleAccountInfoResp= settleDetailService.getMerAccountInfo(merchantUser.getMerchantCode());
         return R.success(settleAccountInfoResp);
@@ -66,7 +66,7 @@ public class MerInfoController  implements IController {
     public R<BasePageVo<SettleMerTransDetailResp>> getAccountTransPageDetail(SettleMerTransDetailPageReq settleMerTransDetailPageReq){
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         if(merchantUser == null){
-            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
+            throw new BizException(ExceptionCode.BIZ_ERROR_NO_PERMISSION,"未登录的商户",null);
         }
         BasePageVo<SettleMerTransDetailResp> settleAccountTransDetailRespPage = settleDetailService.getMerAccountTransPageDetail(merchantUser.getMerchantCode(), settleMerTransDetailPageReq);
         return R.success(settleAccountTransDetailRespPage);
@@ -78,7 +78,7 @@ public class MerInfoController  implements IController {
     public R<String> getAccountTransDetail(SettleMerTransDetailReq settleMerTransDetailReq){
         MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
         if(merchantUser == null){
-            throw new BizException(ExceptionCode.BUSI_ERROR_NO_PERMISSION,"未登录的商户",null);
+            throw new BizException(ExceptionCode.BIZ_ERROR_NO_PERMISSION,"未登录的商户",null);
         }
         List<SettleMerTransDetailResp> settleAccountTransDetailRespPage = settleDetailService
                 .getMerAccountTransDetail(merchantUser.getMerchantCode(), settleMerTransDetailReq)

@@ -85,7 +85,7 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
         dto.setMerchantName(merchant.getMerName());
         // 查询所有的消费场景
         DictReq dictReq = new DictReq();
-        dictReq.setDictType(WelfareConstant.DictType.STORE_CONSUM_TYPE.code());
+        dictReq.setDictType(WelfareConstant.DictType.STORE_CONSUME_TYPE.code());
         List<DictDTO> allConsumeTypes = dictService.getByType(dictReq);
         dto.setHeader(PayChannelConfigDetailDTO.ConsumeType.of(allConsumeTypes));
         PayChannelConfigQuery query = new PayChannelConfigQuery();

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -59,4 +60,8 @@ public class MerchantAddDTO {
 
   @ApiModelProperty("员工卡消费明细门店显示")
   private String billDetailShowStoreName;
+
+  @ApiModelProperty("商户扩展信息")
+  @NotNull(message = "扩展信息不能为空")
+  private MerchantExtendDTO extend;
 }

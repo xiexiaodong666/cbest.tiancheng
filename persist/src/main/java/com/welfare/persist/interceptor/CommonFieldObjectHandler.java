@@ -8,6 +8,8 @@ import com.welfare.common.util.DateUtil;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.PaymentChannelConfig;
+import com.welfare.persist.entity.AccountAmountTypeGroup;
+import com.welfare.persist.entity.MerAccountTypeConsumeSceneConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -37,7 +39,7 @@ public class CommonFieldObjectHandler implements MetaObjectHandler {
         this.setFieldValByName(CREATE_TIME, Calendar.getInstance().getTime(), metaObject);
         this.setFieldValByName(VERSION, 0, metaObject);
         TableInfo tableInfo = findTableInfo(metaObject);
-        if (Lists.newArrayList(Account.class, PaymentChannelConfig.class).contains(tableInfo.getEntityType())) {
+        if (Lists.newArrayList(Account.class, MerAccountTypeConsumeSceneConfig.class, PaymentChannelConfig.class).contains(tableInfo.getEntityType())) {
             this.setFieldValByName(DELETED, 0L, metaObject);
         } else {
             this.setFieldValByName(DELETED, false, metaObject);

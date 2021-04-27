@@ -23,7 +23,7 @@ public interface MerchantAccountTypeService {
      */
     List<MerchantAccountType>  list(MerchantAccountTypeReq req);
 
-    boolean init(String merCode);
+    boolean init(String merCode,  MerchantExtendDTO extend);
 
     /**
      * 查询商户详情
@@ -83,4 +83,10 @@ public interface MerchantAccountTypeService {
      * @return
      */
     List<MerchantAccountType> queryAllByMerCode(String merCode);
+
+    /**
+     * 新增
+     * @param merchantAccountType
+     */
+    void saveIfExist(MerchantAccountType merchantAccountType);
 }

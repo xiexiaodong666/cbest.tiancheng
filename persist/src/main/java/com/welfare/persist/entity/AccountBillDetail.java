@@ -102,6 +102,9 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     private String paymentType;
     @ApiModelProperty("支付方式信息，二维码条码或者卡磁条号")
     private String paymentTypeInfo;
+
+    @ApiModelProperty("福利分组id")
+    private Long accountAmountTypeGroupId;
     /**
      * 创建人
      */
@@ -218,4 +221,6 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     public static final String PAYMENT_TYPE_INFO = "payment_type_info";
     public static final String SURPLUS_QUOTA_OVERPAY = "surplus_quota_overpay";
     public static final String PAYMENT_CHANNEL = "payment_channel";
+    public static final String ACCOUNT_AMOUNT_TYPE_GROUP_ID = "account_amount_type_group_id";
+
 }

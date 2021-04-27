@@ -12,6 +12,7 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dao.MerchantDao;
+import com.welfare.persist.dao.MerchantExtendDao;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dto.MerchantWithCreditDTO;
 import com.welfare.persist.dto.query.MerchantPageReq;
@@ -24,18 +25,19 @@ import com.welfare.service.converter.MerchantSyncConverter;
 import com.welfare.service.converter.MerchantWithCreditConverter;
 import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
+import com.welfare.service.init.merchant.MerchantInitOperatorFactory;
 import com.welfare.service.sync.event.MerchantEvt;
 import com.welfare.service.utils.TreeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,7 +70,12 @@ public class MerchantServiceImpl implements MerchantService {
     @Autowired
     MerchantAccountTypeService merchantAccountTypeService;
     private final MessagePushConfigService messagePushConfigService;
-
+    @Autowired
+    private MerchantExtendService merchantExtendService;
+    @Autowired
+    private MerchantExtendDao merchantExtendDao;
+    @Autowired
+    private MerchantInitOperatorFactory merchantInitOperatorFactory;
     @Override
     public List<Merchant> list(MerchantReq req) {
         QueryWrapper<Merchant> q=QueryHelper.getWrapper(req);
@@ -139,6 +146,8 @@ public class MerchantServiceImpl implements MerchantService {
             merchantDetailDTO.setCreditLimit(merchantCredit.getCreditLimit());
             merchantDetailDTO.setRemainingLimit(merchantCredit.getRemainingLimit());
         }
+        MerchantExtendDTO merchantExtendDTO = MerchantExtendDTO.of(merchantExtendDao.getByMerCode(merchantDetailDTO.getMerCode()));
+        merchantDetailDTO.setExtend(merchantExtendDTO);
         dictService.trans(MerchantDetailDTO.class, Merchant.class.getSimpleName(), true, merchantDetailDTO);
         return merchantDetailDTO;
     }
@@ -166,7 +175,7 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean add(MerchantAddDTO merchant) {
         if(EmptyChecker.notEmpty(merchant.getAddressList())
                 &&merchant.getAddressList().size()>10){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "收货地址不能超过十个", null);
         }
         String merCode=sequenceService.nextFullNo(WelfareConstant.SequenceType.MER_CODE.code());
         merchant.setMerCode(merCode);
@@ -174,8 +183,9 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag=merchantDao.save(save);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),save.getId());
         merchantCreditService.init(merchant.getMerCode());
-        boolean flag3=merchantAccountTypeService.init(merCode);
+        boolean flag3=merchantAccountTypeService.init(merCode, merchant.getExtend());
         boolean flag4=true;
+        boolean flag5=merchantExtendService.saveOrUpdate(merchant.getExtend(), merCode);
         List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (merIdentitys.contains(MerIdentityEnum.customer.getCode())) {
             flag4 = messagePushConfigService.init(merCode);
@@ -184,13 +194,21 @@ public class MerchantServiceImpl implements MerchantService {
         if(!(flag&&flag2&flag3)){
             throw new BizException("新增商户失败");
         }
+        // 不同行业属性的初始化
+        List<String> industryTags = new ArrayList<>();
+        if (StringUtils.isNoneBlank(merchant.getExtend().getIndustryTag())) {
+            industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+            merchantInitOperatorFactory.operators(industryTags).forEach(operator -> operator.init(merCode));
+        }
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
+        List<String> syncIndustryTag = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
+        detailDTO.setTags(syncIndustryTag);
         detailDTO.setAddressList(merchant.getAddressList());
         detailDTO.setId(save.getId());
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.ADD).merchantDetailDTOList(syncList).timestamp(new Date()).build());
-        return flag&&flag2&flag3&&flag4;
+        return flag&&flag2&flag3&&flag4&&flag5;
     }
 
     @Override
@@ -198,27 +216,44 @@ public class MerchantServiceImpl implements MerchantService {
     public boolean update(MerchantUpdateDTO merchant) {
         if(EmptyChecker.notEmpty(merchant.getAddressList())
                 &&merchant.getAddressList().size()>10){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "收货地址不能超过十个", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "收货地址不能超过十个", null);
         }
         Merchant update=buildEntity(merchant);
         boolean flag= 1==merchantDao.updateAllColumnById(update);
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
-        boolean flag3=true;
-        List<String> merIdentitys = Lists.newArrayList(merchant.getMerIdentity().split(","));
-        if (merIdentitys.contains(MerIdentityEnum.customer.getCode())) {
-            flag3 = messagePushConfigService.init(update.getMerCode());
+        boolean flag4=merchantExtendService.saveOrUpdate(merchant.getExtend(), update.getMerCode());
+        if (BooleanUtils.toBooleanDefaultIfNull(merchant.getExtend().getPointMall(), false)) {
+            merchantAccountTypeService.saveIfExist(assemblyMerchantAccountType(update.getMerCode(), 888,
+                    WelfareConstant.MerAccountTypeCode.MALL_POINT.code(), WelfareConstant.MerAccountTypeCode.MALL_POINT.desc()));
         }
         //同步商城中台
-        if(!(flag&&flag2&&flag3)){
+        if(!(flag&&flag2)){
             throw new BizException("更新商户失败");
         }
         List<MerchantSyncDTO> syncList=new ArrayList<>();
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(update);
+        List<String> industryTags = new ArrayList<>();
+        if (StringUtils.isNoneBlank(merchant.getExtend().getIndustryTag())) {
+            industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
+            industryTags = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
+        }
+        detailDTO.setTags(industryTags);
         detailDTO.setAddressList(merchant.getAddressList());
         syncList.add(detailDTO);
         applicationContext.publishEvent( MerchantEvt.builder().typeEnum(ShoppingActionTypeEnum.UPDATE).merchantDetailDTOList(syncList).timestamp(new Date()).build());
-        return flag&&flag2&&flag3;
+        return flag&&flag2&&flag4;
     }
+
+    private MerchantAccountType assemblyMerchantAccountType(String merCode, Integer deductionOrder, String code, String name) {
+        MerchantAccountType merchantAccountType = new MerchantAccountType();
+        merchantAccountType.setMerCode(merCode);
+        merchantAccountType.setMerAccountTypeName(name);
+        merchantAccountType.setMerAccountTypeCode(code);
+        merchantAccountType.setDeductionOrder(deductionOrder);
+        merchantAccountType.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
+        return merchantAccountType;
+    }
+
     private Merchant buildEntity(MerchantUpdateDTO merchant){
         Merchant entity=merchantDao.getById(merchant.getId());
         if(EmptyChecker.isEmpty(entity)){

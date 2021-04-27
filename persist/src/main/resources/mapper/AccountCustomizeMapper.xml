@@ -80,7 +80,7 @@
     select
     <include refid="baseColumn"/>
     from account a
-    left join account_type at on a.account_type_code = at.type_code
+    left join account_type at on a.account_type_code = at.type_code and at.mer_code = a.mer_code
     left join account_consume_scene acs on acs.account_type_code = at.type_code
     where acs.id in
     <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
@@ -308,7 +308,7 @@
   <select id="queryAccountBillDetail"
     resultType="com.welfare.persist.dto.AccountBillDetailMapperDTO">
     SELECT
-    abd.trans_no,
+    abd.trans_no as transNo,
     CASE abd.trans_type
     WHEN 'deposit_incr' THEN
     m.mer_name
@@ -324,7 +324,7 @@
     WHEN abd.trans_type = 'refund' THEN
     "入账"
     WHEN abd.trans_type = 'deposit_back' THEN
-    "出账"
+    "入账"
     END AS transTypeString,
     sum(
     DISTINCT (

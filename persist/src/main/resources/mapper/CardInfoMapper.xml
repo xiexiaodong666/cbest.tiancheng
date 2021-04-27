@@ -7,7 +7,7 @@
     </sql>
 
   <sql id="baseColumn">
-        id,apply_code,card_id,card_status,flag,create_user,create_time,update_user,update_time,account_id,version
+        id,apply_code,card_id,card_status,create_user,create_time,update_user,update_time,account_code,version,magnetic_stripe,written_time,bind_time,enabled
     </sql>
 
 

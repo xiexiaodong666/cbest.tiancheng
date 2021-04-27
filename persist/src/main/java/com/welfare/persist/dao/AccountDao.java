@@ -68,4 +68,12 @@ public class AccountDao extends ServiceImpl<AccountMapper, Account> {
         queryWrapper.eq(Account.ACCOUNT_CODE,accountCode);
         return getOne(queryWrapper);
     }
+
+    public Account getByMerCodeAndPhone(String merCode, String phone) {
+        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Account.PHONE, phone);
+        queryWrapper.eq(Account.MER_CODE, merCode);
+        return getOne(queryWrapper);
+    }
+
 }

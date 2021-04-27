@@ -113,10 +113,10 @@ public class TempAccountDepositApplyServiceImpl implements TempAccountDepositApp
 //        }
         return fileId;
       } else {
-        throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "操作频繁稍后再试！", null);
+        throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "操作频繁稍后再试！", null);
       }
     } catch (Exception e) {
-      throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+      throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
     } finally {
       lock.unlock();
     }

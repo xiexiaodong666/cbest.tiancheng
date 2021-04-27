@@ -2,3 +2,24 @@ POST http://localhost:10015/payment/password-free/notification/refund
 Content-Type: application/json
 
 {"status":"SUCCESS","msg":"SUCCESS","biz_status":"SUCCESS","biz_msg":"SUCCESS","biz_content":"{\"market\":\"1001\",\"terminal\":\"1111\",\"barcode\":\"712404792842169711022\",\"amount\":\"1\",\"account_code\":\"1000010562\",\"gateway_trade_no\":\"202104100190727006198435840\",\"out_refund_no\":\"809A0011111210408144417PR1\",\"refund_detail\":\"5065-甜橙生活-1\"}"}
+
+
+###账户信息
+GET http://localhost:10015/account/info
+Content-Type: application/json
+Source: cbest-saas-rewardmall
+accountUser: {"accountCode":"111111"}
+
+### 卫计委绑卡
+DELETE http://localhost:10016/card-info/card-unbinding/1001000002267779552
+Content-Type: application/json
+Source: cbest-saas-rewardmall
+
+### 磁条卡制卡
+POST http://localhost:10016/cardApply
+Content-Type: application/json
+Source: cbest-saas-rewardmall
+apiUser: {"accountCode":"111111"}
+merchantUser: {"merchantCode":"M123"}
+
+{"cardMedium":"MAGNETIC_CARD","cardName":"liyxtest1","cardType":"HEALTH_CARD","cardNum":11,"merCode":"M272","remark":""}

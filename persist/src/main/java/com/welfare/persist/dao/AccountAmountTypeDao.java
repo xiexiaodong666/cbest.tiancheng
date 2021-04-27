@@ -1,17 +1,22 @@
 package com.welfare.persist.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.mapper.AccountAmountTypeMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.welfare.common.constants.CacheConstant.TOTAL_ACCOUNT_AMOUNT_TYPE_GROUP_COUNT;
 
 /**
  * (account_amount_type)数据DAO
@@ -50,5 +55,32 @@ public class AccountAmountTypeDao extends ServiceImpl<AccountAmountTypeMapper, A
             map = list.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, a -> a,(k1, k2)->k1));
         }
         return map;
+    }
+
+    public AccountAmountType queryByAccountCodeAndAmountType(Long accountCode, String merAccountType){
+        return getOne(Wrappers.<AccountAmountType>lambdaQuery()
+                .eq(AccountAmountType::getAccountCode, accountCode)
+                .eq(AccountAmountType::getMerAccountTypeCode, merAccountType)
+        );
+    }
+
+    public List<AccountAmountType> queryByGroupId(Long accountAmountGroupId){
+        return list(Wrappers.<AccountAmountType>lambdaQuery()
+                .eq(AccountAmountType::getAccountAmountTypeGroupId, accountAmountGroupId)
+        );
+    }
+
+    public List<AccountAmountType> listByAccountCodes(List<Long> accountCodes, String merAccountTypeCode){
+        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(AccountAmountType.ACCOUNT_CODE, accountCodes);
+        queryWrapper.eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, merAccountTypeCode);
+        return list(queryWrapper);
+    }
+
+    public List<AccountAmountType> getByTypeAndAccountAmountTypeGroupId(String merAccountTypeCode, Long groupId) {
+        QueryWrapper<AccountAmountType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(AccountAmountType.ACCOUNT_AMOUNT_TYPE_GROUP_ID, groupId);
+        queryWrapper.eq(AccountAmountType.MER_ACCOUNT_TYPE_CODE, merAccountTypeCode);
+        return list(queryWrapper);
     }
 }

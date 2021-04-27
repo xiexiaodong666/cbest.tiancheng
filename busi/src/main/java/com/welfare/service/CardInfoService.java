@@ -19,61 +19,75 @@ import java.util.Set;
  */
 public interface CardInfoService {
 
-  /**
-   * 根据卡号获取卡信息
-   */
-  CardInfo getByCardNo(String cardNo);
+    /**
+     * 根据卡号获取卡信息
+     */
+    CardInfo getByCardNo(String cardNo);
 
-  /**
-   * 根据磁条号获取卡信息
-   * @param magneticStripe
-   * @return
-   */
-  CardInfo getByMagneticStripe(String magneticStripe);
-  /**
-   * 根据申请号查询出所有
-   */
-  List<CardInfoApiDTO> listByApplyCode(String applyCode, Integer status);
+    /**
+     * 根据磁条号获取卡信息
+     * @param magneticStripe
+     * @return
+     */
+    CardInfo getByMagneticStripe(String magneticStripe);
+    /**
+     * 根据申请号查询出所有
+     */
+    List<CardInfoApiDTO> listByApplyCode(String applyCode, Integer status);
 
-  /**
-   * 更新卡信息为已写入
-   */
-  CardInfo updateWritten(CardInfo cardInfo);
+    /**
+     * 更新卡信息为已写入
+     */
+    CardInfo updateWritten(CardInfo cardInfo);
 
-  /**
-   * 禁用卡片信息
-   * @param cardIdSet
-   * @return
-   */
-  boolean disableCard(Set<String> cardIdSet, Integer enabled);
+    /**
+     * 禁用卡片信息
+     * @param cardIdSet
+     * @return
+     */
+    boolean disableCard(Set<String> cardIdSet, Integer enabled);
 
 
-  /**
-   * 查询卡信息集合
-   * @param currentPage
-   * @param pageSize
-   * @param cardName
-   * @param merCode
-   * @param cardType
-   * @param cardMedium
-   * @param cardStatus
-   * @param writtenStartTime
-   * @param writtenEndTime
-   * @param startTime
-   * @param endTime
-   * @param bindStartTime
-   * @param bindEndTime
-   * @return
-   */
-  Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardId,String applyCode, String cardName, String merCode,
-      String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
-      Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
-      Date bindEndTime);
+    /**
+     * 查询卡信息集合
+     * @param currentPage
+     * @param pageSize
+     * @param cardName
+     * @param merCode
+     * @param cardType
+     * @param cardMedium
+     * @param cardStatus
+     * @param writtenStartTime
+     * @param writtenEndTime
+     * @param startTime
+     * @param endTime
+     * @param bindStartTime
+     * @param bindEndTime
+     * @return
+     */
+    Page<CardInfoDTO> list(Integer currentPage, Integer pageSize, String cardId,String applyCode, String cardName, String merCode,
+                           String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
+                           Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
+                           Date bindEndTime);
 
-  List<CardInfoDTO> exportCardInfo(String cardId, String cardName, String merCode,
-      String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
-      Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
-      Date bindEndTime);
+    List<CardInfoDTO> exportCardInfo(String cardId, String cardName, String merCode,
+                                     String cardType, String cardMedium, Integer cardStatus, Date writtenStartTime,
+                                     Date writtenEndTime, Date startTime, Date endTime, Date bindStartTime,
+                                     Date bindEndTime);
 
-  boolean cardIsBind(String cardId);
+    boolean cardIsBind(String cardId);
+
+    /**
+     * 创建并绑定
+     * @param cardInfo
+     * @return
+     */
+    CardInfo bind(CardInfo cardInfo);
+
+    /**
+     * 解绑卡
+     * @param cardNo
+     * @return
+     */
+    CardInfo unbind(String cardNo);
 }

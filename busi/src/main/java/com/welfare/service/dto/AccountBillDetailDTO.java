@@ -65,5 +65,5 @@ public class AccountBillDetailDTO implements Serializable {
   @ApiModelProperty("名目")
   private String accountTypeName;
 
-
+  private String transNo;
 }

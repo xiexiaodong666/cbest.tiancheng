@@ -54,5 +54,4 @@ public interface AccountBalanceType<T> {
             return name;
         }
     }
-
 }

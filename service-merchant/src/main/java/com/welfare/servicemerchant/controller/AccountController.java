@@ -9,6 +9,7 @@ import com.welfare.persist.dto.AccountIncrementDTO;
 import com.welfare.persist.dto.AccountPageDTO;
 import com.welfare.service.AccountService;
 import com.welfare.service.dto.*;
+import com.welfare.service.remote.entity.EmployerReqDTO;
 import com.welfare.servicemerchant.dto.UpdateStatusReq;
 import com.welfare.servicemerchant.service.FileUploadService;
 import io.swagger.annotations.Api;
@@ -145,7 +146,7 @@ public class AccountController implements IController {
   @RepeatRequestVerification(prefixKey= "e-welfare-repeat-request:account_save")
   public R<Boolean> save(@RequestBody AccountReq accountReq) {
     try {
-
+      accountReq.setMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
       return success(accountService.save(accountReq));
     } catch (BizException be) {
       return R.fail(be.getMessage());
@@ -289,5 +290,12 @@ public class AccountController implements IController {
   public R<List<DepartmentAndAccountTreeResp>> groupByDepartment(){
     List<DepartmentAndAccountTreeResp> list = accountService.groupByDepartment(MerchantUserHolder.getMerchantUser().getMerchantCode());
     return success(list);
+  }
+
+
+  @PostMapping("/saveAndDeposit")
+  @ApiOperation("新增账户并充值")
+  public R<EmployerReqDTO> saveAndDeposit(@Validated @RequestBody AccountSaveAndDepositReq req) {
+    return success(accountService.saveAndDeposit(req));
   }
 }

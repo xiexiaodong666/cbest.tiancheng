@@ -98,7 +98,7 @@ public class WelfareConstant {
         /**
          * 门店消费类型
          */
-        STORE_CONSUM_TYPE("SupplierStore.consumType", "消费类型");
+        STORE_CONSUME_TYPE("SupplierStore.consumType", "消费类型");
 
         private final String code;
         private final String desc;
@@ -232,7 +232,11 @@ public class WelfareConstant {
         ACCOUNT_DEPOSIT_APPLY("account_deposit_apply", "员工账号福利余额变更申请"),
         RESET_ACCOUNT_SURPLUS_QUOTA("reset_account_surplus_quota","员工账号授信额度变更"),
         EMPLOYEE_SETTLE_NO("employee_settle_no","员工授信结算单号"),
-        MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码");
+        MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码"),
+        ACCOUNT_AMOUNT_TYPE_GROUP_CODE("account_amount_type_group_code","员工福利账号组编码"),
+        DEFAULT_PHONE("default_phone","默认手机号"),
+        CONSTRUCTION_BANK_AUTO_INR("construction_bank_auto_inr","建行用户名称自增");
+
 
         private final String code;
         private final String desc;
@@ -259,8 +263,9 @@ public class WelfareConstant {
          */
         SELF("self","自主余额"),
         SURPLUS_QUOTA("surplus_quota","授信额度"),
-        SURPLUS_QUOTA_OVERPAY("surplus_quota_overpay","授信额度溢缴款");
-
+        SURPLUS_QUOTA_OVERPAY("surplus_quota_overpay","授信额度溢缴款"),
+        MALL_POINT("mall_point","积分账户余额"),
+        WHOLESALE("wholesale","批发采购");
         private final String code;
         private final String desc;
 
@@ -292,7 +297,9 @@ public class WelfareConstant {
         RESET_DECR("reset_decr","设置（减少)"),
         REBATE_DECR("rebate_decr","返点（减少)"),
         REBATE_INCR("rebate_incr","返点（新增)"),
-        DEPOSIT_BACK("deposit_back","回冲");
+        DEPOSIT_BACK("deposit_back","回冲"),
+        JOINED_GROUP("joined_group","加入福利类型账户组"),
+        LEAVE_GROUP("leave_group","离开福利类型账户组");
         private final String code;
         private final String desc;
 
@@ -506,6 +513,9 @@ public class WelfareConstant {
      */
     public enum MessagePushTargetType {
 
+        /**
+         *
+         */
         SMS("sms", "短信"),
         EMAIL("email", "邮件");
 
@@ -531,6 +541,9 @@ public class WelfareConstant {
      */
     public enum MessagePushTemplateType {
 
+        /**
+         *
+         */
         STRING_REPLACER("string_replacer", "字符串替换");
 
         private final String code;
@@ -549,4 +562,112 @@ public class WelfareConstant {
             return this.desc;
         }
     }
+
+    /**
+     * 支付业务类型
+     */
+    public enum PaymentBizType{
+        /**
+         *
+         */
+        DEFAULT("default","默认"),
+        HOSPITAL_POINTS("NHC","卫计委积分"),
+        WHOLESALE("wholesale","批发");
+        private final String code;
+        private final String desc;
+
+        PaymentBizType(String code, String desc){
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+
+        public static PaymentBizType fromCode(String code){
+            PaymentBizType[] values = PaymentBizType.values();
+            for (PaymentBizType bizType : values) {
+                if(bizType.code.equals(code)){
+                    return bizType;
+                }
+            }
+            return DEFAULT;
+        }
+    }
+
+    /**
+     * 员工类型
+     */
+    public enum AccountType{
+        /**
+         * 用于卫计委商户
+         */
+        DOCTOR("doctor","医生"),
+        /**
+         * 用于卫计委商户
+         */
+        PURCHASER("purchaser","采购员"),
+        /**
+         * 用于卫计委商户
+         */
+        COMMON_USER("common_user","普通用户"),
+        /**
+         * 用于卫计委商户
+         */
+        PATIENT("patient","病人");
+        private final String code;
+        private final String desc;
+
+        AccountType(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
+
+
+    /**
+     * 行业标签
+     */
+    public enum IndustryTag{
+        /**
+         * 社区医院
+         */
+        COMMUNITY_HOSPITAL("community_hospital","社区医院");
+        private final String code;
+        private final String desc;
+
+        IndustryTag(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+
+        public static IndustryTag fromCode(String code){
+            IndustryTag[] values = IndustryTag.values();
+            for (IndustryTag c : values) {
+                if(c.code.equals(code)){
+                    return c;
+                }
+            }
+            throw new RuntimeException("不存在的IndustryTag类型");
+        }
+    }
+
 }

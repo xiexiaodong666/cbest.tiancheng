@@ -607,7 +607,7 @@
         LEFT JOIN merchant m on s.mer_code = m.mer_code
         LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
         LEFT JOIN department d on d.department_code = t.department
-        LEFT JOIN account_type aty on aty.type_code = t.account_type_code
+        LEFT JOIN account_type aty on aty.type_code = t.account_type_code and aty.mer_code = t.mer_code
         <where>
             <if test="orderPageQuery.accountName != null">
                 and t.account_name = #{orderPageQuery.accountName}
@@ -702,7 +702,7 @@
             LEFT JOIN merchant m on s.mer_code = m.mer_code
             LEFT JOIN order_info oi on oi.trans_no = ab.trans_no
             LEFT JOIN department d on d.department_code = t.department
-            LEFT JOIN account_type aty on aty.type_code = t.account_type_code
+            LEFT JOIN account_type aty on aty.type_code = t.account_type_code and aty.mer_code = t.mer_code
             <where>
                 <if test="orderPageQuery.accountName != null">
                     and t.account_name = #{orderPageQuery.accountName}

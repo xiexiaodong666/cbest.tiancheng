@@ -26,7 +26,7 @@ public class MerchantCreditFallback implements FallbackFactory<MerchantCreditFei
       @Override
       public MerchantCreditResp remainingLimit(RestoreRemainingLimitReq request, String source) {
         log.error(StrUtil.format("调用商户恢复商户信用额度异常, req: {}", JSON.toJSONString(request)), throwable);
-        throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", null);
+        throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", null);
       }
     };
   }

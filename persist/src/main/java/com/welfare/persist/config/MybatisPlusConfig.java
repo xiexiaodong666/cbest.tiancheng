@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.github.pagehelper.PageInterceptor;
 import com.welfare.persist.injector.MySqlInjector;
 import com.welfare.persist.interceptor.CommonFieldObjectHandler;
+import com.welfare.persist.interceptor.OptimisticExceptionLockerInnerInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +34,8 @@ public class MybatisPlusConfig {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         //分页
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
-        //乐观锁
-        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+        //自定义抛出异常的乐观锁
+        interceptor.addInnerInterceptor(new OptimisticExceptionLockerInnerInterceptor());
         return interceptor;
     }
 

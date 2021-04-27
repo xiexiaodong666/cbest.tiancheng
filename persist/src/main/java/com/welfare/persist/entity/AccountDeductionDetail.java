@@ -128,6 +128,9 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
 
     @ApiModelProperty("支付渠道")
     private String paymentChannel;
+
+    @ApiModelProperty("福利分组id")
+    private Long accountAmountTypeGroupId;
     /**
      * 创建人
      */
@@ -265,5 +268,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     public static final String VERSION = "version";
 
     public static final String PAYMENT_CHANNEL = "payment_channel";
+
+    public static final String ACCOUNT_AMOUNT_TYPE_GROUP_ID = "account_amount_type_group_id";
 
 }

@@ -56,7 +56,7 @@ public interface IPaymentOperator {
                 .collect(Collectors.toList());
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();
-        AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, paymentAmount, accountAmountTypes);
+        AccountBillDetail accountBillDetail = AccountAmountDO.generateAccountBillDetail(paymentRequest, paymentAmount, accountAmountTypes, null);
         paymentOperation.setAccountBillDetail(accountBillDetail);
         paymentOperation.setTransNo(paymentRequest.getTransNo());
         AccountDeductionDetail accountDeductionDetail = AccountAmountDO.generateAccountDeductionDetail(paymentRequest,
@@ -66,7 +66,7 @@ public interface IPaymentOperator {
                 account,
                 supplierStore,
                 merchantCredit,
-                merAccountTypeOperator);
+                merAccountTypeOperator, null);
         paymentOperation.setAccountDeductionDetail(accountDeductionDetail);
         paymentOperation.setOperateAmount(paymentAmount);
         paymentOperation.setMerchantAccountType(null);

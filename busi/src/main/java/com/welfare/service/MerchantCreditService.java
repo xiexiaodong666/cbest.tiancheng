@@ -4,6 +4,7 @@ package com.welfare.service;
 import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.dto.DecreaseMerchantCredit;
+import com.welfare.service.dto.MerchantExtendDTO;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
 import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;

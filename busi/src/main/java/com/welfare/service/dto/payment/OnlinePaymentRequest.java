@@ -1,5 +1,6 @@
 package com.welfare.service.dto.payment;
 
+import com.welfare.common.constants.WelfareConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,9 +18,13 @@ public class OnlinePaymentRequest extends PaymentRequest {
 
     @ApiModelProperty("支付渠道")
     private String paymentChannel;
-
     @Override
     public Long calculateAccountCode(){
         return super.getAccountCode();
+    }
+
+    @Override
+    public WelfareConstant.PaymentBizType bizType(){
+        return WelfareConstant.PaymentBizType.fromCode(getBizType());
     }
 }

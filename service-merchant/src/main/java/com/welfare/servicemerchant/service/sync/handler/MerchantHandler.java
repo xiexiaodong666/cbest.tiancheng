@@ -84,6 +84,7 @@ public class MerchantHandler  {
                 }
                 listBean.setAddress(addressBeans);
             }
+            listBean.setTags(merchant.getTags());
             list.add(listBean);
             merCodeList.add(merchant.getMerCode());
         }

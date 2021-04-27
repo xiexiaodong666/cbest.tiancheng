@@ -16,6 +16,7 @@ import com.welfare.persist.dao.AccountDepositApplyDao;
 import com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import com.welfare.persist.entity.*;
+import com.welfare.persist.mapper.AccountDeductionDetailMapper;
 import com.welfare.service.*;
 import com.welfare.service.converter.AccountDepositApplyConverter;
 import com.welfare.service.converter.DepositApplyDetailConverter;
@@ -100,6 +101,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     @Autowired
     private SequenceService sequenceService;
 
+    private final AccountDeductionDetailMapper accountDeductionDetailMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUser) {
@@ -121,7 +124,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             apply = depositApplyConverter.toAccountDepositApply(request);
             Account account = accountService.findByPhoneAndMerCode(request.getInfo().getPhone(), merchantUser.getMerchantCode());
             if (account == null) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("商户下没有[%s]员工！", request.getInfo().getPhone()), null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("商户下没有[%s]员工！", request.getInfo().getPhone()), null);
             }
             initAccountDepositApply(apply, request, merchant, merchantUser);
             // 设置充值人数
@@ -136,7 +139,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return apply.getId();
         } catch (Exception e) {
             log.error("新增员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), JSON.toJSONString(merchantUser), e);
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
@@ -164,7 +167,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             List<TempAccountDepositApplyDTO> deposits = tempAccountDepositApplyService.listByFileIdExistAccount(fileId,
                     merchantUser.getMerchantCode());
             if (CollectionUtils.isEmpty(deposits)) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "请导入已存在的员工", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "请导入已存在的员工", null);
             }
             BigDecimal sumAmount = deposits.stream().map(TempAccountDepositApplyDTO::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             validationParmas(request,merchant,merchantUser,sumAmount);
@@ -183,7 +186,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return apply.getId();
         } catch (Exception e) {
             log.error("批量员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), JSON.toJSONString(merchantUser), e);
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
@@ -194,32 +197,26 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     public Long updateOne(DepositApplyUpdateRequest request, MerchantUserInfo merchantUserInfo) {
         AccountDepositApply apply = accountDepositApplyDao.getById(request.getId());
         if (apply == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "申请不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "申请不存在", null);
         }
         //已经审批过了
         if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
             apply = accountDepositApplyDao.getById(request.getId());
             if (apply == null) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "申请不存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "申请不存在", null);
             }
             //已经审批过了
             if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经审批过了", null);
             }
             //不支持非单个申请修改
             if (!apply.getApprovalType().equals(ApprovalType.SINGLE.getCode())) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非单个申请修改", null);
-            }
-            // 判断金额是否超限
-            MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
-            // 修改充值明细表
-            if (merchantCredit.getRechargeLimit().compareTo(request.getInfo().getRechargeAmount()) < 0) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "不支持非单个申请修改", null);
             }
             Date now = new Date();
             apply.setUpdateTime(now);
@@ -233,7 +230,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             if (CollectionUtils.isNotEmpty(details)) {
                 AccountDepositApplyDetail detail = details.get(0);
                 if (accountService.getByAccountCode(detail.getAccountCode()) == null) {
-                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "员工不存在！", null);
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "员工不存在！", null);
                 }
                 detail.setRechargeAmount(request.getInfo().getRechargeAmount());
                 detail.setUpdateUser(merchantUserInfo.getUserCode());
@@ -243,7 +240,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return apply.getId();
         } catch (Exception e) {
             log.error("修改员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
@@ -254,41 +251,36 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     public Long updateBatch(DepositApplyUpdateRequest request, String fileId, MerchantUserInfo merchantUserInfo) {
         AccountDepositApply apply = accountDepositApplyDao.getById(request.getId());
         if (apply == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "申请不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "申请不存在", null);
         }
         //已经审批过了
         if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经审批过了", null);
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
         try {
             apply = accountDepositApplyDao.getById(request.getId());
             if (apply == null) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "申请不存在", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "申请不存在", null);
             }
             //已经审批过了
             if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "已经审批过了", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "已经审批过了", null);
             }
             //不支持非批量申请修改
             if (!apply.getApprovalType().equals(ApprovalType.BATCH.getCode())) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "不支持非批量申请修改", null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "不支持非批量申请修改", null);
             }
             if (StringUtils.isNotBlank(fileId)) {
                 List<TempAccountDepositApplyDTO> temps = tempAccountDepositApplyService.listByFileIdExistAccount(fileId,
                         merchantUserInfo.getMerchantCode());
                 // 至少选一个员工
                 if (CollectionUtils.isEmpty(temps)) {
-                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "至少重新上传一个员工", null);
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "至少重新上传一个员工", null);
                 }
                 // 判断金额是否超限
                 BigDecimal sumAmount = temps.stream().map(TempAccountDepositApplyDTO::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUserInfo.getMerchantCode());
-                // 修改充值明细表
-                if (merchantCredit.getRechargeLimit().compareTo(sumAmount) < 0) {
-                    throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
-                }
                 List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, temps);
                 depositApplyDetailService.physicalDelByApplyCode(apply.getApplyCode());
                 accountDepositApplyDetailDao.saveBatch(details);
@@ -306,7 +298,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return apply.getId();
         } catch (Exception e) {
             log.error("批量修改员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
@@ -320,11 +312,18 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     }
 
     @Override
+    public List<AccountDepositApply> listByRequestId(String requestId) {
+        QueryWrapper<AccountDepositApply> wrapper = new QueryWrapper<>();
+        wrapper.eq(AccountDepositApply.REQUEST_ID, requestId);
+        return accountDepositApplyDao.list(wrapper);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Long approval(AccountDepositApprovalRequest request) {
         AccountDepositApply apply = accountDepositApplyDao.getById(request.getId());
         if (apply == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "申请不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "申请不存在", null);
         }
         //已经审批过了
         if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
@@ -335,7 +334,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         try {
             apply = accountDepositApplyDao.getById(request.getId());
             if (apply == null) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, String.format("账号存款申请不存在[requestId:%s]", request.getId()), null);
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("账号存款申请不存在[requestId:%s]", request.getId()), null);
             }
             //已经审批过了
             if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
@@ -379,7 +378,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             return apply.getId();
         } catch (Exception e) {
             log.error("审批员工账号申请失败, 参数:{}, 商户:{}", JSON.toJSONString(request), e);
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, e.getMessage(), e);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, e.getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(lock);
         }
@@ -429,7 +428,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         AccountDepositApplyDetailInfo detailInfo = new AccountDepositApplyDetailInfo();
         AccountDepositApply apply = accountDepositApplyDao.getById(id);
         if (apply == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "申请不存在", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "申请不存在", null);
         }
         AccountDepositApplyInfo info = depositApplyConverter.toInfo(apply);
         detailInfo.setMainInfo(info);
@@ -452,10 +451,15 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         return detailInfo;
     }
 
+    @Override
+    public BigDecimal sumDepositDetailAmount(String merCode, String merAccountTypeCode) {
+        return accountDeductionDetailMapper.sumDepositDetailAmount(merCode,merAccountTypeCode);
+    }
+
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {
         AccountDepositApplyDetail detail;
         detail = new AccountDepositApplyDetail();
-        Account account = accountService.findByPhoneAndMerCode(accountAmounts.getPhone(), MerchantUserHolder.getMerchantUser().getMerchantCode());
+        Account account = accountService.findByPhoneAndMerCode(accountAmounts.getPhone(), apply.getMerCode());
         if (account == null) {
           throw new BizException("员工不存在");
         }
@@ -520,19 +524,14 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     private void validationParmas(DepositApplyRequest request,Merchant merchant,
                                  MerchantUserInfo merchantUser, BigDecimal amount){
         if (merchant == null) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户不存在！", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户不存在！", null);
         }
         if (StringUtils.isBlank(merchant.getMerIdentity())) {
             throw new BizException("商户没有设置属性！");
         }
         List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "仅支持对属于[客户]的商户充值", null);
-        }
-        // 判断金额是否超限
-        MerchantCredit merchantCredit = merchantCreditService.getByMerCode(merchantUser.getMerchantCode());
-        if (merchantCredit.getRechargeLimit().compareTo(amount) < 0) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "商户充值额度不足！", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "仅支持对属于[客户]的商户充值", null);
         }
     }
 }

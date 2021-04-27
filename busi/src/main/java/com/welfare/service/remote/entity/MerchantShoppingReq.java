@@ -27,6 +27,7 @@ public class MerchantShoppingReq implements Serializable {
     private String merchantName;
     private List<AddressBean> address;
     private List<String> idTypes;
+    private List<String> tags;
     @Data
     public static class AddressBean  {
       private String address;

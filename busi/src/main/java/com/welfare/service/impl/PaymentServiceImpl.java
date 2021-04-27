@@ -10,8 +10,8 @@ import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.EnableEnum;
-import com.welfare.common.enums.PaymentTypeEnum;
 import com.welfare.common.enums.SupplierStoreStatusEnum;
+import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
@@ -23,15 +23,12 @@ import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
 import com.welfare.service.dto.payment.CardPaymentRequest;
-import com.welfare.service.dto.payment.OnlinePaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
 import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.service.payment.IPaymentOperator;
-import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRowsRequest;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -45,16 +42,12 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
-import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.SELF;
 
 /**
  * Description:
@@ -83,6 +76,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final AsyncService asyncService;
     private final PaymentChannelConfigDao paymentChannelConfigDao;
     private final SubAccountDao subAccountDao;
+    private final MerAccountTypeConsumeSceneConfigDao merAccountTypeConsumeSceneConfigDao;
+    private final AccountAmountTypeGroupDao accountAmountTypeGroupDao;
     private final ImmutableMap<String,List<String>> SPECIAL_STORE_ACCOUNT_TYPE_MAP =
             ImmutableMap.of("2189",Arrays.asList("12","28","39","40"));
     @Resource(name = "e-welfare-paymentQueryAsync")
@@ -111,7 +106,25 @@ public class PaymentServiceImpl implements PaymentService {
                         merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(), account.getMerCode()));
                 Future<MerchantCredit> merchantCreditFuture =
                         threadPoolTaskExecutor.submit(() -> merchantCreditService.getByMerCode(account.getMerCode()));
+                String paymentScene = paymentSceneFuture.get();
+                Future<List<MerAccountTypeConsumeSceneConfig>> merAccountTypeConsumeSceneConfigFuture =
+                        threadPoolTaskExecutor.submit(() -> merAccountTypeConsumeSceneConfigDao
+                                .query(account.getMerCode(),paymentRequest.getStoreNo(), paymentScene));
                 Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
+                Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() -> paymentChannelConfigDao
+                        .getBaseMapper().selectList(
+                                Wrappers.<PaymentChannelConfig>lambdaQuery()
+                                        .eq(PaymentChannelConfig::getMerCode, account.getMerCode())
+                                        .eq(PaymentChannelConfig::getStoreCode, paymentRequest.getStoreNo())
+                                        .eq(PaymentChannelConfig::getConsumeType, paymentScene)
+                                        .eq(PaymentChannelConfig::getPaymentChannelCode, paymentRequest.getPaymentChannel())));
+                //检查支付渠道消费场景
+                List<PaymentChannelConfig> paymentChannelConfigList = paymentChannelConfigListFuture
+                        .get();
+                if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
+                    log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
+                    throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式");
+                }
                 //获取异步结果
                 PaymentRequest requestHandled = queryResultFuture.get();
                 if (WelfareConstant.AsyncStatus.SUCCEED.code().equals(requestHandled.getPaymentStatus())
@@ -124,9 +137,11 @@ public class PaymentServiceImpl implements PaymentService {
                 }
                 SupplierStore supplierStore = supplierStoreFuture.get();
                 List<AccountConsumeSceneStoreRelation> sceneStoreRelations = sceneStoreRelationsFuture.get();
-                String paymentScene = paymentSceneFuture.get();
                 MerchantStoreRelation merStoreRelation = merchantStoreRelationFuture.get();
                 List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
+                List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs = merAccountTypeConsumeSceneConfigFuture.get();
+                BizAssert.notEmpty(merAccountTypeConsumeSceneConfigs,ExceptionCode.NO_AVAILABLE_MER_ACCOUNT_TYPE_CONSUME_SCENE_CONFIG);
+                accountAmountDOList = filterAvailable(accountAmountDOList, merAccountTypeConsumeSceneConfigs, paymentRequest.bizType());
                 MerchantCredit merchantCredit = merchantCreditFuture.get();
                 //支付前的校验
                 chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, paymentScene, sceneStoreRelations);
@@ -168,11 +183,35 @@ public class PaymentServiceImpl implements PaymentService {
             return paymentRequest;
         } catch (InterruptedException | ExecutionException e) {
             log.error("异步执行查询异常", e);
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, e.getCause().getMessage(), e);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, e.getCause().getMessage(), e);
         } finally {
             DistributedLockUtil.unlock(accountLock);
         }
 
+    }
+
+    private List<AccountAmountDO> filterAvailable(List<AccountAmountDO> accountAmountDOList, List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs, WelfareConstant.PaymentBizType bizType) {
+        List<String> configs = merAccountTypeConsumeSceneConfigs.stream()
+                .map(MerAccountTypeConsumeSceneConfig::getMerAccountTypeCode)
+                .collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(configs)){
+            return Collections.emptyList();
+        }
+        if(WelfareConstant.PaymentBizType.HOSPITAL_POINTS.equals(bizType)){
+            accountAmountDOList = accountAmountDOList.stream()
+                    .filter(amountDO ->
+                            WelfareConstant.MerAccountTypeCode.MALL_POINT.code()
+                                    .equals(amountDO.getAccountAmountType().getMerAccountTypeCode()))
+                    .collect(Collectors.toList());
+        }else{
+            accountAmountDOList = accountAmountDOList.stream()
+                    .filter(amountDO -> configs.contains(amountDO.getAccountAmountType().getMerAccountTypeCode())
+                            && !WelfareConstant.MerAccountTypeCode.MALL_POINT.code()
+                            .equals(amountDO.getAccountAmountType().getMerAccountTypeCode()))
+                    .collect(Collectors.toList());
+        }
+
+        return accountAmountDOList;
     }
 
     private <T extends PaymentRequest> Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationFuture(T paymentRequest, Account account) {
@@ -230,7 +269,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
         if (!sceneConsumeTypes.contains(paymentScene)) {
             log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式", null);
         }
 
         if(!CollectionUtils.isEmpty(paymentRequest.getSaleRows())) {
@@ -292,19 +331,23 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     private void saveDetails(List<PaymentOperation> paymentOperations, Account account, List<AccountAmountType> accountAmountTypes) {
-        List<AccountBillDetail> billDetails = paymentOperations.stream()
-                .map(PaymentOperation::getAccountBillDetail)
+        List<AccountBillDetail> billDetails = paymentOperations.stream().map(PaymentOperation::getAccountBillDetail)
                 .collect(Collectors.toList());
-        List<AccountDeductionDetail> deductionDetails = paymentOperations.stream()
-                .map(PaymentOperation::getAccountDeductionDetail)
+        List<AccountDeductionDetail> deductionDetails = paymentOperations.stream().map(PaymentOperation::getAccountDeductionDetail)
                 .collect(Collectors.toList());
-        List<AccountAmountType> accountTypes = paymentOperations.stream()
-                .map(PaymentOperation::getAccountAmountType).filter(Objects::nonNull)
+        List<AccountAmountType> accountTypes = paymentOperations.stream().map(PaymentOperation::getAccountAmountType)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        List<AccountAmountTypeGroup> accountAmountTypeGroups = paymentOperations.stream().map(PaymentOperation::getAccountAmountTypeGroup)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         AccountAmountDO.updateAccountAfterOperated(account, accountAmountTypes);
         accountDao.updateById(account);
         accountBillDetailDao.saveBatch(billDetails);
         accountDeductionDetailDao.saveBatch(deductionDetails);
+        if(!CollectionUtils.isEmpty(accountAmountTypeGroups)){
+            accountAmountTypeGroupDao.updateBatchById(accountAmountTypeGroups);
+        }
         if(!CollectionUtils.isEmpty(accountTypes)){
             //联通沃支付，没有修改accountTypes，所以if判断
             accountAmountTypeDao.saveOrUpdateBatch(accountTypes);
@@ -359,7 +402,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .get();
             if(CollectionUtils.isEmpty(paymentChannelConfigList)) {
                 log.error("当前用户不支持此消费场景:" + ConsumeTypeEnum.getByType(paymentScene).getDesc());
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGURMENTS, "当前门店不支持该支付方式");
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "当前门店不支持该支付方式");
             }
             SubAccount subAccount = subAccountFuture.get();
             ThirdPartyBarcodePaymentDTO thirdPartyBarcodePaymentDTO = new ThirdPartyBarcodePaymentDTO();
@@ -374,7 +417,7 @@ public class PaymentServiceImpl implements PaymentService {
             return thirdPartyBarcodePaymentDTO;
         } catch (InterruptedException | ExecutionException e) {
             log.error(StrUtil.format("查询检查第三方支付码异步执行异常, paymentRequest: {}", JSON.toJSON(paymentRequest)), e);
-            throw new BizException(ExceptionCode.UNKNOWON_EXCEPTION, "系统异常", e);
+            throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", e);
         }
     }
 

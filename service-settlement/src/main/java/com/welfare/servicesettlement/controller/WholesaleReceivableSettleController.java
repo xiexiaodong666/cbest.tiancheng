@@ -1,6 +1,10 @@
 package com.welfare.servicesettlement.controller;
 
+import com.alibaba.druid.util.StringUtils;
 import com.github.pagehelper.PageInfo;
+import com.welfare.common.base.BasePageVo;
+import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dto.query.MerchantPageReq;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
@@ -8,6 +12,8 @@ import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettl
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
+import com.welfare.service.dto.MonthSettlePageReq;
+import com.welfare.service.dto.MonthSettleResp;
 import com.welfare.service.settlement.WholesaleSettlementService;
 import com.welfare.servicesettlement.dto.wholesale.WholesaleSettleStatusDTO;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
@@ -32,7 +38,7 @@ import java.util.List;
  * @date 4/26/2021
  */
 @RestController
-@RequestMapping("/settlement/wholesale/")
+@RequestMapping("/settlement/wholesale")
 @RequiredArgsConstructor
 @Api(tags = "批发应收结算")
 public class WholesaleReceivableSettleController implements IController {
@@ -113,7 +119,7 @@ public class WholesaleReceivableSettleController implements IController {
     @PostMapping("/receivable")
     @ApiOperation("生成应收结算单")
     public R<WholesaleReceivableSettle> generateReceivableSettle(@RequestBody PlatformWholesaleSettleDetailParam param){
-        WholesaleReceivableSettle settle =  wholesaleSettlementService.generateReceivableSettle(param);
+        WholesaleReceivableSettle settle = wholesaleSettlementService.generateReceivableSettle(param);
         return success(settle);
     }
 
@@ -125,4 +131,19 @@ public class WholesaleReceivableSettleController implements IController {
                 updateReceivableStatus(settleId,wholesaleSettleStatusDTO.getSendStatus(),wholesaleSettleStatusDTO.getSettleStatus());
         return success(wholesaleReceivableSettle);
     }
+
+//    @GetMapping("/settled/page-receivable-summary")
+//    @ApiOperation("分页查询应收结算单分组列表")
+//    public R<BasePageVo<MonthSettleResp>> pageQuery(MonthSettlePageReq monthSettleReqDto){
+//
+//        //商户用户只能查询本商户数据
+//        MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
+//        if(merchantUser!=null && !StringUtils.isEmpty(merchantUser.getMerchantCode())){
+//            monthSettleReqDto.setMerCode(merchantUser.getMerchantCode());
+//        }
+//
+//        BasePageVo<MonthSettleResp> monthSettleRespDtoPage =  monthSettleService.pageQuery(monthSettleReqDto);
+//        return success(monthSettleRespDtoPage);
+//    }
+
 }

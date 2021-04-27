@@ -1,5 +1,7 @@
 package com.welfare.service.impl;
 
+import static com.welfare.common.constants.WelfareConstant.ACCOUNT_WELFARE_TYPE_CACHE_NAME;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -411,6 +413,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
     List<MerAccountTypeConsumeSceneConfig> oldScenes = accountTypeConsumeSceneConfigDao.getAllByMercode(Lists.newArrayList(merCode));
 
+    try{
       if (CollectionUtils.isNotEmpty(oldScenes)) {
         List<Long> oldConsumeSceneIds = oldScenes.stream()
             .map(MerAccountTypeConsumeSceneConfig::getId).collect(Collectors.toList());
@@ -420,24 +423,48 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
       List<MerAccountTypeConsumeSceneConfig> newScenes = new ArrayList<>();
       // 保存最新配置
 
-    for (AccountWelfareConsumeSceneEditReq consumeSceneEditReq:
-    consumeSceneEditReqs) {
+      for (AccountWelfareConsumeSceneEditReq consumeSceneEditReq:
+          consumeSceneEditReqs) {
         if(CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
           for (AccountConsumeStoreRelationEditReq storeRelationEditReq:
-          consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs() ) {
+              consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs() ) {
             MerAccountTypeConsumeSceneConfig merAccountTypeConsumeSceneConfig
-          = new  MerAccountTypeConsumeSceneConfig();
+                = new  MerAccountTypeConsumeSceneConfig();
             merAccountTypeConsumeSceneConfig.setMerCode(consumeSceneEditReq.getMerCode());
             merAccountTypeConsumeSceneConfig.setMerAccountTypeCode(consumeSceneEditReq.getAccountTypeCode());
             merAccountTypeConsumeSceneConfig.setStoreCode(storeRelationEditReq.getStoreCode());
             merAccountTypeConsumeSceneConfig.setSceneConsumeType(storeRelationEditReq.getSceneConsumType());
 
             newScenes.add(merAccountTypeConsumeSceneConfig);
-        }
+          }
 
+        }
+      }
+      accountTypeConsumeSceneConfigDao.saveBatch(newScenes);
+      return true;
+    } finally {
+      if (TransactionSynchronizationManager.isActualTransactionActive()) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+          @Override
+          public void afterCompletion(int status) {
+            if (CollectionUtils.isNotEmpty(oldScenes)) {
+              String cacheName = ACCOUNT_WELFARE_TYPE_CACHE_NAME;
+              Cache cache = cacheManager.getCache(cacheName);
+              if (cache != null) {
+                oldScenes.forEach(scene -> {
+                  String key = scene.getMerAccountTypeCode() + scene.getMerCode();
+                  if (cache.evictIfPresent(key)) {
+                    log.info("删除缓存，name:{} key:{}", cacheName, key);
+                  } else {
+                    log.info("没有缓存，name:{} key:{}", cacheName, key);
+                  }
+                });
+              }
+            }
+          }
+        });
       }
     }
-    accountTypeConsumeSceneConfigDao.saveBatch(newScenes);
-      return true;
+
   }
 }

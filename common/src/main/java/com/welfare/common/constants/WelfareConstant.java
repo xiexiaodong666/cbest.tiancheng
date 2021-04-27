@@ -12,6 +12,9 @@ public class WelfareConstant {
 
     }
 
+    public static final String ACCOUNT_WELFARE_TYPE_CACHE_NAME = "getAccountWelfareAndMerCode";
+
+
     public static final String DEFAULT_SALE_UNID = "cbest-offline-default";
     public static final String DEFAULT_SALE_UNNAME = "重百线下消费商品";
 

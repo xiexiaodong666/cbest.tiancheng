@@ -2,15 +2,27 @@ package com.welfare.service.settlement.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.persist.dao.WholesaleReceivableSettleDao;
+import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
+import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
+import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
+import com.welfare.persist.entity.WholesaleReceivableSettle;
 import com.welfare.persist.mapper.WholesaleReceivableSettleMapper;
+import com.welfare.service.SequenceService;
 import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.settlement.WholesaleSettlementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Description:
@@ -23,7 +35,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class WholesaleSettlementServiceImpl implements WholesaleSettlementService {
     private final WholesaleReceivableSettleMapper wholesaleReceivableSettleMapper;
-
+    private final SequenceService sequenceService;
     @Override
     public PageInfo<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
                                                                          String supplierCode,
@@ -37,10 +49,63 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
+    public List<PlatformWholesaleSettleGroupDTO> queryReceivable(String merCode, String supplierCode, Date transTimeStart, Date transTimeEnd) {
+        return wholesaleReceivableSettleMapper.queryReceivable(merCode,supplierCode,transTimeStart,transTimeEnd);
+    }
+
+    @Override
     public PlatformWholesaleSettleGroupDTO queryReceivableSummary(String merCode,
                                                                   String supplierCode,
                                                                   Date transTimeStart,
                                                                   Date transTimeEnd){
         return wholesaleReceivableSettleMapper.queryReceivableSummary(merCode, supplierCode, transTimeStart, transTimeEnd);
     }
+
+    @Override
+    public PageInfo<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
+        return PageHelper.startPage(param.getPageIndex(), param.getPageSize()).doSelectPageInfo(() -> {
+            wholesaleReceivableSettleMapper.queryReceivableDetails(param);
+        });
+    }
+
+    @Override
+    public List<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
+        return wholesaleReceivableSettleMapper.queryReceivableDetails(param);
+    }
+
+    @Override
+    public PlatformWholesaleSettleDetailSummaryDTO queryReceivableDetailsSummary(PlatformWholesaleSettleDetailParam param) {
+        return wholesaleReceivableSettleMapper.queryReceivableDetailsSummary(param);
+    }
+
+    @Override
+    public WholesaleReceivableSettle generateReceivableSettle(PlatformWholesaleSettleDetailParam param) {
+        List<PlatformWholesaleSettleDetailDTO> settleDetailDTOList = queryReceivableDetails(param);
+        Set<String> orderNoSet = new HashSet<>();
+        BigDecimal totalTransAmount = BigDecimal.ZERO;
+        for (PlatformWholesaleSettleDetailDTO dto : settleDetailDTOList) {
+            orderNoSet.add(dto.getOrderNo());
+            if (WelfareConstant.TransType.CONSUME.code().equals(dto.getTransType())) {
+                totalTransAmount = totalTransAmount.add(dto.getTransAmount());
+            } else if (WelfareConstant.TransType.REFUND.code().equals(dto.getTransType())) {
+                totalTransAmount = totalTransAmount.add(dto.getTransAmount().negate());
+            }
+        }
+        WholesaleReceivableSettle wholesaleReceivableSettle = new WholesaleReceivableSettle();
+        Date now = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String settleNo = param.getMerCode() + dateFormat.format(now);
+        wholesaleReceivableSettle.setSettleNo(settleNo);
+        wholesaleReceivableSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
+        wholesaleReceivableSettle.setMerCode(param.getMerCode());
+        wholesaleReceivableSettle.setOrderNum(orderNoSet.size());
+        wholesaleReceivableSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code());
+        wholesaleReceivableSettle.setSettleStartTime(param.getTransTimeStart());
+        wholesaleReceivableSettle.setSettleEndTime(param.getTransTimeEnd());
+        wholesaleReceivableSettle.setTransAmount(totalTransAmount);
+        wholesaleReceivableSettle.setSettleAmount(totalTransAmount);
+        return wholesaleReceivableSettle;
+    }
+
+
 }

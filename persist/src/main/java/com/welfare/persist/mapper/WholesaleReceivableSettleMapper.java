@@ -1,6 +1,9 @@
 package com.welfare.persist.mapper;
 
+import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
+import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
+import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -42,4 +45,18 @@ public interface WholesaleReceivableSettleMapper extends BaseMapper<WholesaleRec
                                                           @Param("supplierCode") String supplierCode,
                                                           @Param("transTimeStart") Date transTimeStart,
                                                           @Param("transTimeEnd") Date transTimeEnd);
+
+    /**
+     * 查询平台应收结算明细
+     * @param param 查询参数
+     * @return 应收结算明细
+     */
+    List<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param);
+
+    /**
+     * 查询平台批发应收结算汇总
+     * @param param 查询参数
+     * @return 应收结算汇总
+     */
+    PlatformWholesaleSettleDetailSummaryDTO queryReceivableDetailsSummary(PlatformWholesaleSettleDetailParam param);
 }

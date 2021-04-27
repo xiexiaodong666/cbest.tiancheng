@@ -9,3 +9,178 @@ ALTER TABLE account_deposit_apply ADD COLUMN apply_type VARCHAR(20) DEFAULT NULL
 UPDATE account_deposit_apply set apply_type = 'welfareApply'
 
 alter table month_settle change  uppdate_user  update_user varchar(20) comment '更新人';
+
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for wholesale_payable_settle
+-- ----------------------------
+DROP TABLE IF EXISTS `wholesale_payable_settle`;
+CREATE TABLE `wholesale_payable_settle` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `settle_no` varchar(50) DEFAULT NULL COMMENT '账单编号',
+  `settle_month` varchar(20) DEFAULT NULL COMMENT '账单月',
+  `mer_code` varchar(20) DEFAULT NULL COMMENT '商户代码',
+  `trans_amount` decimal(10,2) DEFAULT NULL COMMENT '交易金额',
+  `settle_amount` decimal(10,2) DEFAULT NULL COMMENT '结算金额',
+  `settle_self_amount` decimal(10,2) DEFAULT NULL COMMENT '结算的自费额度',
+  `rebate_amount` decimal(10,2) DEFAULT NULL COMMENT '返利金额',
+  `order_num` int(11) DEFAULT NULL COMMENT '交易笔数',
+  `rec_status` varchar(20) DEFAULT NULL COMMENT '对账状态（待确认-unconfirmed；已确认-confirmed）',
+  `settle_status` varchar(20) DEFAULT NULL COMMENT '结算状态（待结算-unsettled；已结算-settled）',
+  `send_status` varchar(20) DEFAULT NULL COMMENT '发送状态（待发送-unsended；已发送-sended）',
+  `send_time` datetime DEFAULT NULL COMMENT '发送时间',
+  `confirm_time` datetime DEFAULT NULL COMMENT '确定时间',
+  `settle_start_time` date DEFAULT NULL COMMENT '账单开始时间',
+  `settle_end_time` datetime DEFAULT NULL COMMENT '账单结束时间',
+  `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `uppdate_user` varchar(20) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
+  `settle_statistics_info` text COMMENT '账单账户类型统计信息',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=383 DEFAULT CHARSET=utf8mb4 COMMENT='批发应付结算账单';
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for wholesale_payable_settle_detail
+-- ----------------------------
+DROP TABLE IF EXISTS `wholesale_payable_settle_detail`;
+CREATE TABLE `wholesale_payable_settle_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `settle_no` varchar(50) DEFAULT NULL COMMENT '账单编号',
+  `order_id` varchar(50) DEFAULT NULL COMMENT '订单编码',
+  `trans_no` varchar(50) DEFAULT NULL COMMENT '交易流水号',
+  `account_code` int(10) DEFAULT NULL COMMENT '账户',
+  `account_name` varchar(20) DEFAULT NULL COMMENT '账户名称',
+  `card_id` int(11) DEFAULT NULL COMMENT '卡号',
+  `mer_code` varchar(20) DEFAULT NULL COMMENT '商户代码',
+  `mer_name` varchar(50) DEFAULT NULL COMMENT '商户名称',
+  `store_code` varchar(20) DEFAULT NULL COMMENT '门店编码',
+  `store_name` varchar(50) DEFAULT NULL COMMENT '门店名称',
+  `trans_time` datetime DEFAULT NULL COMMENT '交易时间',
+  `pos` varchar(20) DEFAULT NULL COMMENT 'pos机器编码',
+  `pay_code` varchar(20) DEFAULT NULL COMMENT '支付编码',
+  `pay_name` varchar(50) DEFAULT NULL COMMENT '支付名称',
+  `trans_type` varchar(20) DEFAULT NULL COMMENT '交易类型',
+  `trans_type_name` varchar(20) DEFAULT NULL COMMENT '交易类型名',
+  `trans_amount` decimal(10,2) DEFAULT NULL COMMENT '交易金额',
+  `mer_account_type` varchar(32) DEFAULT NULL COMMENT '福利类型(餐费、交通费等)',
+  `mer_account_type_name` varchar(20) DEFAULT NULL COMMENT '福利类型(餐费、交通费等)',
+  `account_amount` decimal(10,2) DEFAULT NULL COMMENT '子账户扣款金额',
+  `account_balance` decimal(10,2) DEFAULT NULL COMMENT '子账户余额',
+  `mer_deduction_amount` decimal(20,2) DEFAULT NULL COMMENT '商户余额扣款金额',
+  `mer_credit_deduction_amount` decimal(10,2) DEFAULT NULL COMMENT '商户信用扣款金额',
+  `self_deduction_amount` decimal(10,2) DEFAULT NULL COMMENT '自费扣款金额',
+  `data_type` varchar(20) DEFAULT NULL COMMENT '数据支付类型 welfare-员工卡支付 third-其它三方支付',
+  `settle_flag` varchar(20) DEFAULT NULL COMMENT '结算标志 settled已结算 unsettled未结算',
+  `order_channel` varchar(20) DEFAULT NULL COMMENT '订单渠道',
+  `payment_channel` varchar(20) DEFAULT NULL COMMENT '支付渠道',
+  `create_user` varchar(50) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_user` varchar(50) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `version` int(11) DEFAULT NULL COMMENT '版本',
+  `rebate_amount` decimal(15,4) DEFAULT NULL COMMENT '返点标志 unrebated未返点 rebated 已返点',
+  `mer_credit` decimal(10,2) DEFAULT NULL COMMENT '商户授信额度',
+  `mer_balance` decimal(10,2) DEFAULT NULL COMMENT '商户余额',
+  `order_wholesale_amount` decimal(10,2) DEFAULT NULL COMMENT '结算金额',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22223 DEFAULT CHARSET=utf8mb4;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for wholesale_receivable_settle
+-- ----------------------------
+DROP TABLE IF EXISTS `wholesale_receivable_settle`;
+CREATE TABLE `wholesale_receivable_settle` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `settle_no` varchar(50) DEFAULT NULL COMMENT '账单编号',
+  `settle_month` varchar(20) DEFAULT NULL COMMENT '账单月',
+  `mer_code` varchar(20) DEFAULT NULL COMMENT '商户代码',
+  `trans_amount` decimal(10,2) DEFAULT NULL COMMENT '交易金额',
+  `settle_amount` decimal(10,2) DEFAULT NULL COMMENT '结算金额',
+  `settle_self_amount` decimal(10,2) DEFAULT NULL COMMENT '结算的自费额度',
+  `rebate_amount` decimal(10,2) DEFAULT NULL COMMENT '返利金额',
+  `order_num` int(11) DEFAULT NULL COMMENT '交易笔数',
+  `rec_status` varchar(20) DEFAULT NULL COMMENT '对账状态（待确认-unconfirmed；已确认-confirmed）',
+  `settle_status` varchar(20) DEFAULT NULL COMMENT '结算状态（待结算-unsettled；已结算-settled）',
+  `send_status` varchar(20) DEFAULT NULL COMMENT '发送状态（待发送-unsended；已发送-sended）',
+  `send_time` datetime DEFAULT NULL COMMENT '发送时间',
+  `confirm_time` datetime DEFAULT NULL COMMENT '确定时间',
+  `settle_start_time` date DEFAULT NULL COMMENT '账单开始时间',
+  `settle_end_time` datetime DEFAULT NULL COMMENT '账单结束时间',
+  `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `uppdate_user` varchar(20) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
+  `settle_statistics_info` text COMMENT '账单账户类型统计信息',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=383 DEFAULT CHARSET=utf8mb4 COMMENT='批发应收结算账单';
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for wholesale_receivable_settle_detail
+-- ----------------------------
+DROP TABLE IF EXISTS `wholesale_receivable_settle_detail`;
+CREATE TABLE `wholesale_receivable_settle_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `settle_no` varchar(50) DEFAULT NULL COMMENT '账单编号',
+  `order_id` varchar(50) DEFAULT NULL COMMENT '订单编码',
+  `trans_no` varchar(50) DEFAULT NULL COMMENT '交易流水号',
+  `account_code` int(10) DEFAULT NULL COMMENT '账户',
+  `account_name` varchar(20) DEFAULT NULL COMMENT '账户名称',
+  `card_id` int(11) DEFAULT NULL COMMENT '卡号',
+  `mer_code` varchar(20) DEFAULT NULL COMMENT '商户代码',
+  `mer_name` varchar(50) DEFAULT NULL COMMENT '商户名称',
+  `store_code` varchar(20) DEFAULT NULL COMMENT '门店编码',
+  `store_name` varchar(50) DEFAULT NULL COMMENT '门店名称',
+  `trans_time` datetime DEFAULT NULL COMMENT '交易时间',
+  `pos` varchar(20) DEFAULT NULL COMMENT 'pos机器编码',
+  `pay_code` varchar(20) DEFAULT NULL COMMENT '支付编码',
+  `pay_name` varchar(50) DEFAULT NULL COMMENT '支付名称',
+  `trans_type` varchar(20) DEFAULT NULL COMMENT '交易类型',
+  `trans_type_name` varchar(20) DEFAULT NULL COMMENT '交易类型名',
+  `trans_amount` decimal(10,2) DEFAULT NULL COMMENT '交易金额',
+  `mer_account_type` varchar(32) DEFAULT NULL COMMENT '福利类型(餐费、交通费等)',
+  `mer_account_type_name` varchar(20) DEFAULT NULL COMMENT '福利类型(餐费、交通费等)',
+  `account_amount` decimal(10,2) DEFAULT NULL COMMENT '子账户扣款金额',
+  `account_balance` decimal(10,2) DEFAULT NULL COMMENT '子账户余额',
+  `mer_deduction_amount` decimal(20,2) DEFAULT NULL COMMENT '商户余额扣款金额',
+  `mer_credit_deduction_amount` decimal(10,2) DEFAULT NULL COMMENT '商户信用扣款金额',
+  `self_deduction_amount` decimal(10,2) DEFAULT NULL COMMENT '自费扣款金额',
+  `data_type` varchar(20) DEFAULT NULL COMMENT '数据支付类型 welfare-员工卡支付 third-其它三方支付',
+  `settle_flag` varchar(20) DEFAULT NULL COMMENT '结算标志 settled已结算 unsettled未结算',
+  `order_channel` varchar(20) DEFAULT NULL COMMENT '订单渠道',
+  `payment_channel` varchar(20) DEFAULT NULL COMMENT '支付渠道',
+  `create_user` varchar(50) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_user` varchar(50) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `version` int(11) DEFAULT NULL COMMENT '版本',
+  `rebate_amount` decimal(15,4) DEFAULT NULL COMMENT '返点标志 unrebated未返点 rebated 已返点',
+  `mer_credit` decimal(10,2) DEFAULT NULL COMMENT '商户授信额度',
+  `mer_balance` decimal(10,2) DEFAULT NULL COMMENT '商户余额',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22223 DEFAULT CHARSET=utf8mb4;
+
+SET FOREIGN_KEY_CHECKS = 1;

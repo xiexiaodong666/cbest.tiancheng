@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
 import com.welfare.persist.entity.PaymentChannelConfig;
 import com.welfare.service.PaymentChannelConfigService;
+import com.welfare.service.dto.PaymentChannelConfigReqDTO;
+import com.welfare.service.dto.PaymentChannelSimpleResp;
 import com.welfare.service.dto.paymentChannel.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,5 +58,11 @@ public class PaymentChannelConfigController {
   @ApiOperation("通过商户编码、门店编码、消费场景查询")
   public R<List<PaymentChannelConfig>> get(@Validated @RequestBody PaymentChannelConfigReq req) {
     return R.success(channelConfigService.getByMerCodeAndStoreAndConsume(req));
+  }
+
+  @PostMapping("/intersection")
+  @ApiOperation("查询支付渠道并取交集返回")
+  public R<List<PaymentChannelSimpleResp>> intersection(@Validated @RequestBody PaymentChannelConfigReqDTO req) {
+    return R.success(channelConfigService.intersection(req));
   }
 }

@@ -16,10 +16,9 @@ import com.welfare.persist.entity.PaymentChannelConfig;
 import com.welfare.service.DictService;
 import com.welfare.service.PaymentChannelConfigService;
 import com.welfare.service.PaymentChannelService;
-import com.welfare.service.dto.DictDTO;
-import com.welfare.service.dto.DictReq;
-import com.welfare.service.dto.PaymentChannelReq;
+import com.welfare.service.dto.*;
 import com.welfare.service.dto.paymentChannel.*;
+import com.welfare.service.dto.paymentChannel.PaymentChannelDTO;
 import com.welfare.service.utils.PageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -266,6 +265,11 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
             });
         }
         return result;
+    }
+
+    @Override
+    public List<PaymentChannelSimpleResp> intersection(PaymentChannelConfigReqDTO req) {
+        return null;
     }
 
     private List<PayChannelConfigRowDTO.PaymentChannel> getCompletionOtherPaymentChannel(List<com.welfare.service.dto.PaymentChannelDTO> all,

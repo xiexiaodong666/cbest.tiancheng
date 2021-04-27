@@ -140,7 +140,7 @@ public class WelfareSettleController implements IController {
         String path = null;
         try {
             path = fileUploadService.uploadExcelFile(
-                    WelfareSettleDetailExcelDTO.of(welfareSettleDetailRespList), WelfareSettleDetailExcelDTO.class, "应付消费明细");
+                    WelfareSettleDetailExcelDTO.of(welfareSettleDetailRespList), WelfareSettleDetailExcelDTO.class, "应收消费明细");
         } catch (IOException e) {
             throw new BizException(null, "文件导出异常", null);
         }

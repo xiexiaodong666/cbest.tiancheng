@@ -92,4 +92,34 @@
         </where>
     </select>
 
+
+    <select id="queryGroupByPaymentChannelCode" parameterType="com.welfare.persist.dto.query.PaymentChannelConfigReqDTO" resultType="com.welfare.persist.dto.PaymentChannelSimpleResp" >
+        SELECT
+            payment_channel_code as paymentChannelCode,
+            payment_channel_name as paymentChannelName
+        FROM
+            payment_channel_config
+        WHERE
+        <where>
+            deleted = 0
+            <if test="query.merchants != null and query.merchants.size()>0 ">
+                and
+                <foreach item="item" index="index" collection="query.merchants" open="(" separator=" or "
+                         close=")">
+                   ( mer_code = #{item.merCode}
+
+
+                       )
+
+
+
+                </foreach>
+            </if>
+
+        </where>
+
+        GROUP BY payment_channel_code
+        HAVING count(DISTINCT mer_code) = #{query.merchants.size}
+    </select>
+
 </mapper>

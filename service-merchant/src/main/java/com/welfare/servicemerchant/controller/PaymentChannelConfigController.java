@@ -1,11 +1,10 @@
 package com.welfare.servicemerchant.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.common.annotation.MerchantUser;
 import com.welfare.persist.entity.PaymentChannelConfig;
 import com.welfare.service.PaymentChannelConfigService;
-import com.welfare.service.dto.PaymentChannelConfigReqDTO;
-import com.welfare.service.dto.PaymentChannelSimpleResp;
+import com.welfare.persist.dto.query.PaymentChannelConfigReqDTO;
+import com.welfare.persist.dto.PaymentChannelSimpleResp;
 import com.welfare.service.dto.paymentChannel.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

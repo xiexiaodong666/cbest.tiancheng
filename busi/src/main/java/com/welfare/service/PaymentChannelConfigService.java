@@ -2,8 +2,8 @@ package com.welfare.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.entity.PaymentChannelConfig;
-import com.welfare.service.dto.PaymentChannelConfigReqDTO;
-import com.welfare.service.dto.PaymentChannelSimpleResp;
+import com.welfare.persist.dto.query.PaymentChannelConfigReqDTO;
+import com.welfare.persist.dto.PaymentChannelSimpleResp;
 import com.welfare.service.dto.paymentChannel.*;
 
 import java.util.List;

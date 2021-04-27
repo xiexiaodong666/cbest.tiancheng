@@ -1,4 +1,4 @@
-package com.welfare.service.dto;
+package com.welfare.persist.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

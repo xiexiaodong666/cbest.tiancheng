@@ -1,6 +1,5 @@
 package com.welfare.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
@@ -9,9 +8,10 @@ import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.PaymentChannelConfigDao;
 import com.welfare.persist.dto.PayChannelConfigSimple;
 import com.welfare.persist.dto.PaymentChannelConfigDetailDTO;
+import com.welfare.persist.dto.query.PaymentChannelConfigReqDTO;
+import com.welfare.persist.dto.PaymentChannelSimpleResp;
 import com.welfare.persist.dto.query.PayChannelConfigQuery;
 import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.MerchantAccountType;
 import com.welfare.persist.entity.PaymentChannelConfig;
 import com.welfare.service.DictService;
 import com.welfare.service.PaymentChannelConfigService;

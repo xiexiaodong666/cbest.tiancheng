@@ -29,12 +29,90 @@
         inner join supplier_store s on s.store_code = d.store_code
         inner join merchant supplier on supplier.mer_code = s.mer_code
         <include refid="queryReceivableWhere"/>
+        order by d.mer_code
     </select>
     <sql id="queryReceivableWhere">
         <where>
             d.mer_code = #{merCode}
             and d.trans_time BETWEEN #{transTimeStart} and #{transTimeEnd}
             and supplier.mer_code = #{supplierCode}
+        </where>
+    </sql>
+
+    <select id="queryReceivableDetails" resultType="com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO" parameterType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam">
+        SELECT
+            d.id as id,
+            d.trans_no as transNo,
+            d.order_id as orderNo,
+            d.trans_time as transTime,
+            d.account_code as accountCode,
+            d.account_name as accountName,
+            a.phone as phone,
+            supplier.mer_code as supplierCode,
+            supplier.mer_name as supplierName,
+            d.store_code as storeCode,
+            d.store_name as storeName,
+            d.trans_amount as transAmount,
+            d.trans_amount as settleAmount,
+            d.settle_flag as settleFlag
+        FROM wholesale_receivable_settle_detail d
+                INNER JOIN account a ON d.account_code = a.account_code
+                inner join supplier_store s on s.store_code = d.store_code
+                inner join merchant supplier on s.mer_code = supplier.mer_code
+        <include refid="queryReceivableDetailsCondition"/>
+        order by d.trans_time desc
+    </select>
+    <select id="queryReceivableDetailsSummary"
+            resultType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO"
+            parameterType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam">
+        select sum(d.trans_amount) as transAmount,
+               sum(d.trans_amount) as settleAmount,
+               max(d.mer_name) as merName,
+               max(d.mer_code) as merCode
+        FROM wholesale_receivable_settle_detail d
+                INNER JOIN account a ON d.account_code = a.account_code
+                inner join supplier_store s on s.store_code = d.store_code
+                inner join merchant supplier on s.mer_code = supplier.mer_code
+        <include refid="queryReceivableDetailsCondition"/>
+    </select>
+    <sql id="queryReceivableDetailsCondition">
+        <where>
+            <if test="orderNo !=null and orderNo!=''">
+                d.order_no = #{orderNo}
+            </if>
+            <if test="transNo !=null and transNo != ''">
+                d.trans_no = #{transNo}
+            </if>
+            <if test="settleFlag !=null and settleFlag!= ''">
+                d.settle_flag = #{settleFlag}
+            </if>
+            <if test="supplierCode != null and supplierCode != ''">
+                supplier.supplier_code = #{supplierCode}
+            </if>
+            <if test="storeCode != null and storeCode != ''">
+                d.store_code = #{storeCode}
+            </if>
+            <if test="transTimeStart != null">
+                d.trans_time <![CDATA[>=]]> #{transTimeStart}
+            </if>
+            <if test="transTimeEnd != null">
+                d.trans_time <![CDATA[<]]> #{transTimeEnd}
+            </if>
+            <if test="phone != null and phone != ''">
+                a.phone = #{phone}
+            </if>
+            <if test = "merCode != null and merCode != ''">
+                d.mer_code = #{merCode}
+            </if>
+            <if test="settleNo != null and settleNo != ''">
+                d.settle_no = #{settleNo}
+            </if>
+            <if test="excludeIds != null and excludeIds.length !=0">
+                d.id not in
+                <foreach collection="excludeIds" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
         </where>
     </sql>
 </mapper>

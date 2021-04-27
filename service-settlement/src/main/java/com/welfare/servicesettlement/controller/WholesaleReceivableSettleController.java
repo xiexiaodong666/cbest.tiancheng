@@ -9,6 +9,7 @@ import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettl
 import com.welfare.persist.entity.WholesaleReceivableSettle;
 import com.welfare.service.dto.MerchantWithCreditAndTreeDTO;
 import com.welfare.service.settlement.WholesaleSettlementService;
+import com.welfare.servicesettlement.dto.wholesale.WholesaleSettleStatusDTO;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,8 +34,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/settlement/wholesale/")
 @RequiredArgsConstructor
-@Api(tags = "批发结算")
-public class WholesaleSettleController implements IController {
+@Api(tags = "批发应收结算")
+public class WholesaleReceivableSettleController implements IController {
     private final WholesaleSettlementService wholesaleSettlementService;
     private final FileUploadServiceUtil fileUploadService;
     @GetMapping("/page-receivable-summary")
@@ -103,7 +104,7 @@ public class WholesaleSettleController implements IController {
 
     @PostMapping("/export-receivable-details")
     @ApiOperation("导出平台应收账单明细")
-    public R<String> exportReceivableDetails(@RequestBody(required = false) PlatformWholesaleSettleDetailParam param) throws IOException {
+    public R<String> exportReceivableDetails(@RequestBody PlatformWholesaleSettleDetailParam param) throws IOException {
         List<PlatformWholesaleSettleDetailDTO> resultList = wholesaleSettlementService.queryReceivableDetails(param);
         String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleDetailDTO.class, "批发应收结算明细");
         return R.success(fileUploadService.getFileServerUrl(filePath));
@@ -111,8 +112,17 @@ public class WholesaleSettleController implements IController {
 
     @PostMapping("/receivable")
     @ApiOperation("生成应收结算单")
-    public R<WholesaleReceivableSettle> generateReceivableSettle(PlatformWholesaleSettleDetailParam param){
+    public R<WholesaleReceivableSettle> generateReceivableSettle(@RequestBody PlatformWholesaleSettleDetailParam param){
         WholesaleReceivableSettle settle =  wholesaleSettlementService.generateReceivableSettle(param);
         return success(settle);
+    }
+
+    @PatchMapping("/receivable/status")
+    @ApiOperation("更新应收结算单状态")
+    public R<WholesaleReceivableSettle> updateReceivableStatus(@RequestBody WholesaleSettleStatusDTO wholesaleSettleStatusDTO){
+        Long settleId = wholesaleSettleStatusDTO.getId();
+        WholesaleReceivableSettle wholesaleReceivableSettle= wholesaleSettlementService.
+                updateReceivableStatus(settleId,wholesaleSettleStatusDTO.getSendStatus(),wholesaleSettleStatusDTO.getSettleStatus());
+        return success(wholesaleReceivableSettle);
     }
 }

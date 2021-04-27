@@ -85,4 +85,13 @@ public interface WholesaleSettlementService {
      * @return 生成的应收结算单
      */
     WholesaleReceivableSettle generateReceivableSettle(PlatformWholesaleSettleDetailParam param);
+
+    /**
+     * 更新应收结算单状态
+     * @param settleId 结算单id
+     * @param sendStatus 发送状态
+     * @param settleStatus 结算状态
+     * @return
+     */
+    WholesaleReceivableSettle updateReceivableStatus(Long settleId, String sendStatus, String settleStatus);
 }

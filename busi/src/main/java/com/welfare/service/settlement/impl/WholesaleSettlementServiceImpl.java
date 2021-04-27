@@ -1,21 +1,27 @@
 package com.welfare.service.settlement.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.WholesaleReceivableSettleDao;
+import com.welfare.persist.dao.WholesaleReceivableSettleDetailDao;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
+import com.welfare.persist.entity.WholesaleReceivableSettleDetail;
 import com.welfare.persist.mapper.WholesaleReceivableSettleMapper;
 import com.welfare.service.SequenceService;
 import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.settlement.WholesaleSettlementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -35,7 +41,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class WholesaleSettlementServiceImpl implements WholesaleSettlementService {
     private final WholesaleReceivableSettleMapper wholesaleReceivableSettleMapper;
-    private final SequenceService sequenceService;
+    private final WholesaleReceivableSettleDao wholesaleReceivableSettleDao;
+    private final WholesaleReceivableSettleDetailDao wholesaleReceivableSettleDetailDao;
     @Override
     public PageInfo<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
                                                                          String supplierCode,
@@ -105,6 +112,24 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         wholesaleReceivableSettle.setTransAmount(totalTransAmount);
         wholesaleReceivableSettle.setSettleAmount(totalTransAmount);
         return wholesaleReceivableSettle;
+    }
+
+    @Override
+    public WholesaleReceivableSettle updateReceivableStatus(Long settleId, String sendStatus, String settleStatus) {
+        WholesaleReceivableSettle settle = wholesaleReceivableSettleDao.getById(settleId);
+        if(!StringUtils.isEmpty(settleId)){
+            settle.setSendStatus(sendStatus);
+        }
+        if(!StringUtils.isEmpty(settleStatus)){
+            settle.setSettleStatus(settleStatus);
+            boolean update = wholesaleReceivableSettleDetailDao.update(
+                    Wrappers.<WholesaleReceivableSettleDetail>lambdaUpdate()
+                            .eq(WholesaleReceivableSettleDetail::getSettleNo, settle.getSettleNo())
+                            .set(WholesaleReceivableSettleDetail::getSettleFlag, settleStatus));
+            BizAssert.isTrue(update, ExceptionCode.DATA_BASE_ERROR);
+        }
+        wholesaleReceivableSettleDao.updateById(settle);
+        return settle;
     }
 
 

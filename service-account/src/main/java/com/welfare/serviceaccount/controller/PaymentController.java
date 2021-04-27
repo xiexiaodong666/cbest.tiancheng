@@ -19,6 +19,8 @@ import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Description:
  *
@@ -41,6 +43,13 @@ public class PaymentController implements IController {
     public R<OnlinePaymentRequest> newOnlinePaymentRequest(@RequestBody OnlinePaymentRequest paymentRequest) {
         paymentService.paymentRequest(paymentRequest);
         return success(paymentRequest);
+    }
+
+    @PostMapping("/online/batch")
+    @ApiOperation("批量在线支付")
+    public R<List<OnlinePaymentRequest>> newBatchOnlinePaymentRequest(@RequestBody List<OnlinePaymentRequest> paymentRequests){
+        paymentService.batchPaymentRequest(paymentRequests);
+        return success(paymentRequests);
     }
 
     @PostMapping("/barcode")

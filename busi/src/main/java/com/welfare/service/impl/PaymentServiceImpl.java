@@ -111,8 +111,8 @@ public class PaymentServiceImpl implements PaymentService {
                         threadPoolTaskExecutor.submit(() -> merAccountTypeConsumeSceneConfigDao
                                 .query(account.getMerCode(),paymentRequest.getStoreNo(), paymentScene));
                 Future<List<AccountConsumeSceneStoreRelation>> sceneStoreRelationsFuture = sceneStoreRelationFuture(paymentRequest, account);
-                Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() -> paymentChannelConfigDao
-                        .getBaseMapper().selectList(
+                Future<List<PaymentChannelConfig>> paymentChannelConfigListFuture = threadPoolTaskExecutor.submit(() ->
+                        paymentChannelConfigDao.getBaseMapper().selectList(
                                 Wrappers.<PaymentChannelConfig>lambdaQuery()
                                         .eq(PaymentChannelConfig::getMerCode, account.getMerCode())
                                         .eq(PaymentChannelConfig::getStoreCode, paymentRequest.getStoreNo())
@@ -419,6 +419,16 @@ public class PaymentServiceImpl implements PaymentService {
             log.error(StrUtil.format("查询检查第三方支付码异步执行异常, paymentRequest: {}", JSON.toJSON(paymentRequest)), e);
             throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "系统异常", e);
         }
+    }
+
+    @Override
+    public <T extends PaymentRequest> List<T> batchPaymentRequest(List<T> paymentRequests) {
+        //为了使各种aop切面生效，从容器中拿当前paymentService
+        PaymentService paymentService = SpringBeanUtils.getBean(PaymentService.class);
+        for (T paymentRequest : paymentRequests) {
+            paymentService.paymentRequest(paymentRequest);
+        }
+        return paymentRequests;
     }
 
 }

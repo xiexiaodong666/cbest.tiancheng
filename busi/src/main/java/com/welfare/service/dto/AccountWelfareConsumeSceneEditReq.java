@@ -26,11 +26,11 @@ public class AccountWelfareConsumeSceneEditReq {
   private String merCode;
 
   /**
-   * 员工类型编码
+   * 福利类型编码
    */
   @ApiModelProperty("福利类型编码")
   @NotEmpty(message = "福利类型为空")
-  private String accountTypeCode;
+  private String accountWelfareCode;
 
   /**
    * 对应消费门店配置

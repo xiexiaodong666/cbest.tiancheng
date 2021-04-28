@@ -7,9 +7,10 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.persist.dao.OrderInfoDetailDao;
 import com.welfare.persist.dao.WholesaleReceivableSettleDao;
 import com.welfare.persist.dao.WholesaleReceivableSettleDetailDao;
+import com.welfare.persist.dto.WholesaleReceivableSettleResp;
+import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
@@ -18,9 +19,8 @@ import com.welfare.persist.entity.OrderInfoDetail;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
 import com.welfare.persist.entity.WholesaleReceivableSettleDetail;
 import com.welfare.persist.mapper.OrderInfoDetailMapper;
+import com.welfare.persist.mapper.WholesaleReceivableSettleDetailMapper;
 import com.welfare.persist.mapper.WholesaleReceivableSettleMapper;
-import com.welfare.service.SequenceService;
-import com.welfare.service.remote.entity.PlatformUser;
 import com.welfare.service.settlement.WholesaleSettlementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,8 +30,6 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * Description:
@@ -44,6 +42,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class WholesaleSettlementServiceImpl implements WholesaleSettlementService {
     private final WholesaleReceivableSettleMapper wholesaleReceivableSettleMapper;
+    private final WholesaleReceivableSettleDetailMapper wholesaleReceivableSettleDetailMapper;
+
     private final WholesaleReceivableSettleDao wholesaleReceivableSettleDao;
     private final WholesaleReceivableSettleDetailDao wholesaleReceivableSettleDetailDao;
     private final OrderInfoDetailMapper orderInfoDetailMapper;
@@ -55,13 +55,13 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                                                                          int pageIndex,
                                                                          int pageSize){
         return PageHelper.startPage(pageIndex, pageSize).doSelectPageInfo(() -> {
-            wholesaleReceivableSettleMapper.queryReceivable(merCode, supplierCode, transTimeStart, transTimeEnd);
+            wholesaleReceivableSettleDetailMapper.queryReceivable(merCode, supplierCode, transTimeStart, transTimeEnd);
         });
     }
 
     @Override
     public List<PlatformWholesaleSettleGroupDTO> queryReceivable(String merCode, String supplierCode, Date transTimeStart, Date transTimeEnd) {
-        return wholesaleReceivableSettleMapper.queryReceivable(merCode,supplierCode,transTimeStart,transTimeEnd);
+        return wholesaleReceivableSettleDetailMapper.queryReceivable(merCode,supplierCode,transTimeStart,transTimeEnd);
     }
 
     @Override
@@ -69,24 +69,24 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                                                                   String supplierCode,
                                                                   Date transTimeStart,
                                                                   Date transTimeEnd){
-        return wholesaleReceivableSettleMapper.queryReceivableSummary(merCode, supplierCode, transTimeStart, transTimeEnd);
+        return wholesaleReceivableSettleDetailMapper.queryReceivableSummary(merCode, supplierCode, transTimeStart, transTimeEnd);
     }
 
     @Override
     public PageInfo<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
-        return PageHelper.startPage(param.getPageIndex(), param.getPageSize()).doSelectPageInfo(() -> {
-            wholesaleReceivableSettleMapper.queryReceivableDetails(param);
+        return PageHelper.startPage(param.getCurrent(), param.getSize()).doSelectPageInfo(() -> {
+            wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
         });
     }
 
     @Override
     public List<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
-        return wholesaleReceivableSettleMapper.queryReceivableDetails(param);
+        return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
     }
 
     @Override
     public PlatformWholesaleSettleDetailSummaryDTO queryReceivableDetailsSummary(PlatformWholesaleSettleDetailParam param) {
-        return wholesaleReceivableSettleMapper.queryReceivableDetailsSummary(param);
+        return wholesaleReceivableSettleDetailMapper.queryReceivableDetailsSummary(param);
     }
 
     @Override
@@ -136,6 +136,14 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         wholesaleReceivableSettleDao.updateById(settle);
         return settle;
     }
+
+    @Override
+    public PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query) {
+        PageInfo<WholesaleReceivableSettleResp> wholesaleReceivableSettleRespPageInfo = PageHelper.startPage(query.getCurrent(), query.getSize()).doSelectPageInfo(() -> {
+            wholesaleReceivableSettleMapper.receivableBillPage(query);
+        });
+        List<WholesaleReceivableSettleResp> wholesaleReceivableSettleResps = wholesaleReceivableSettleRespPageInfo.getList();
+        return wholesaleReceivableSettleRespPageInfo;
 
 
 }

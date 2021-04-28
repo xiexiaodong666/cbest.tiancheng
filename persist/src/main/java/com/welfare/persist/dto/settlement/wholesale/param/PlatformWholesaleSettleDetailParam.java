@@ -1,5 +1,6 @@
 package com.welfare.persist.dto.settlement.wholesale.param;
 
+import com.welfare.persist.dto.query.PageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Data
 @ApiModel("平台应收结算明细")
-public class PlatformWholesaleSettleDetailParam {
+public class PlatformWholesaleSettleDetailParam  extends PageReq {
     @ApiModelProperty("商户编码")
     private String merCode;
     @ApiModelProperty("订单号")
@@ -39,8 +40,4 @@ public class PlatformWholesaleSettleDetailParam {
     private String settleNo;
     @ApiModelProperty("排除的结算明细id")
     private List<Long> excludeIds;
-    @ApiModelProperty("页码")
-    private int pageIndex;
-    @ApiModelProperty("单页大小")
-    private int pageSize;
 }

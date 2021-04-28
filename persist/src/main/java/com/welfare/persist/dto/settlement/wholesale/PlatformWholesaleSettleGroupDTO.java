@@ -16,5 +16,13 @@ public class PlatformWholesaleSettleGroupDTO {
     private String merCode;
     private String merName;
     private BigDecimal settleAmount;
-    private BigDecimal transAmount;
+    /**
+     * 消费总金额
+     */
+    private BigDecimal totalConsumeAmount;
+    /**
+     * 待结算金额
+     */
+    private BigDecimal unSettleAmount;
+
 }

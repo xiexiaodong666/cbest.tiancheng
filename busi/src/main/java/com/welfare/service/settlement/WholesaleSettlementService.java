@@ -1,6 +1,8 @@
 package com.welfare.service.settlement;
 
 import com.github.pagehelper.PageInfo;
+import com.welfare.persist.dto.WholesaleReceivableSettleResp;
+import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
@@ -94,4 +96,12 @@ public interface WholesaleSettlementService {
      * @return
      */
     WholesaleReceivableSettle updateReceivableStatus(Long settleId, String sendStatus, String settleStatus);
+
+
+    /**
+     * 分页查询应收结算单分组列表
+     * @param query
+     * @return
+     */
+    PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query);
 }

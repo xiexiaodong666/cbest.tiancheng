@@ -42,6 +42,7 @@ import java.util.List;
 @Api(tags = "批发应收结算")
 public class WholesaleReceivableSettleController implements IController {
     private final WholesaleSettlementService wholesaleSettlementService;
+
     private final FileUploadServiceUtil fileUploadService;
     @GetMapping("/page-receivable-summary")
     @ApiOperation("分页查询平台应收账单分组汇总")
@@ -50,15 +51,15 @@ public class WholesaleReceivableSettleController implements IController {
             @RequestParam @ApiParam("商户编码") String supplierCode,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间起始 yyyy-MM-dd HH:mm:ss") Date transTimeStart,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间截至 yyyy-MM-dd HH:mm:ss") Date transTimeEnd,
-            @RequestParam @ApiParam("页码") int pageIndex,
-            @RequestParam @ApiParam("单页大小") int pageSize) {
+            @RequestParam @ApiParam("页码") int current,
+            @RequestParam @ApiParam("单页大小") int size) {
         PageInfo<PlatformWholesaleSettleGroupDTO> pageInfo = wholesaleSettlementService.pageQueryReceivable(
                 merCode,
                 supplierCode,
                 transTimeStart,
                 transTimeEnd,
-                pageIndex,
-                pageSize
+                current,
+                size
         );
         return success(pageInfo);
     }
@@ -70,8 +71,8 @@ public class WholesaleReceivableSettleController implements IController {
             @RequestParam @ApiParam("商户编码") String supplierCode,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间起始 yyyy-MM-dd HH:mm:ss") Date transTimeStart,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间截至 yyyy-MM-dd HH:mm:ss") Date transTimeEnd,
-            @RequestParam @ApiParam("页码") int pageIndex,
-            @RequestParam @ApiParam("单页大小") int pageSize) throws IOException {
+            @RequestParam @ApiParam("页码") int current,
+            @RequestParam @ApiParam("单页大小") int size) throws IOException {
         List<PlatformWholesaleSettleGroupDTO> resultList = wholesaleSettlementService.queryReceivable(merCode, supplierCode, transTimeStart, transTimeEnd);
         String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleGroupDTO.class, "批发应收结算分组汇总");
         return R.success(fileUploadService.getFileServerUrl(filePath));
@@ -134,8 +135,11 @@ public class WholesaleReceivableSettleController implements IController {
 
     @GetMapping("/receivable/bill/page")
     @ApiOperation("分页查询应收结算单分组列表")
-    public R<Page<WholesaleReceivableSettleResp>> receivableBillPage(WholesaleReceivableSettleBillQuery query){
-        return success(null);
+    public R<PageInfo<WholesaleReceivableSettleResp>> receivableBillPage(WholesaleReceivableSettleBillQuery query){
+
+        PageInfo<WholesaleReceivableSettleResp> wholesaleReceivableSettleRespPageInfo = wholesaleSettlementService.receivableBillPage(query);
+
+        return success(wholesaleReceivableSettleRespPageInfo);
     }
 
     @GetMapping("/receivable/bill/{id}/page")

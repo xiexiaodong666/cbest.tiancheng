@@ -139,11 +139,13 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
 
     @Override
     public PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query) {
-        PageInfo<WholesaleReceivableSettleResp> wholesaleReceivableSettleRespPageInfo = PageHelper.startPage(query.getCurrent(), query.getSize()).doSelectPageInfo(() -> {
-            wholesaleReceivableSettleMapper.receivableBillPage(query);
-        });
-        List<WholesaleReceivableSettleResp> wholesaleReceivableSettleResps = wholesaleReceivableSettleRespPageInfo.getList();
+        PageInfo<WholesaleReceivableSettleResp> wholesaleReceivableSettleRespPageInfo = PageHelper
+            .startPage(query.getCurrent(), query.getSize()).doSelectPageInfo(() -> {
+                wholesaleReceivableSettleMapper.receivableBillPage(query);
+            });
+        List<WholesaleReceivableSettleResp> wholesaleReceivableSettleResps = wholesaleReceivableSettleRespPageInfo
+            .getList();
         return wholesaleReceivableSettleRespPageInfo;
 
-
+    }
 }

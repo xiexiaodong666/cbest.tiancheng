@@ -346,6 +346,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(
             merchantStoreRelation.getMerCode(), storeConsumeRelationDTOS);
 
+    accountConsumeSceneStoreRelationService.updateWelfareStoreConsumeTypeByDTOList(merchantStoreRelation.getMerCode(), storeConsumeRelationDTOS);
     if(CollectionUtils.isNotEmpty(removeMerchantStoreRelationList)) {
     merchantStoreRelations.removeAll(removeMerchantStoreRelationList);
   }
@@ -355,6 +356,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     boolean saveBath = true;
     if(CollectionUtils.isNotEmpty(deleteIds)) {
       accountConsumeSceneStoreRelationService.deleteConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
+      accountConsumeSceneStoreRelationService.deleteWelfareConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
       remove = merchantStoreRelationDao.removeByIds(deleteIds);
     }
     if(CollectionUtils.isNotEmpty(merchantStoreRelations)) {
@@ -466,6 +468,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     boolean remove = true;
     if (CollectionUtils.isNotEmpty(removeIds)) {
       accountConsumeSceneStoreRelationService.deleteConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
+      accountConsumeSceneStoreRelationService.deleteWelfareConsumeScene(merchantStoreRelation.getMerCode(), storeCodeList);
       remove = merchantStoreRelationDao.removeByIds(removeIds);
     }
 

@@ -26,4 +26,18 @@ public interface AccountConsumeSceneStoreRelationService {
    * @param merCode
    */
   public void deleteConsumeScene(String merCode,List<String> storeCodeList);
+
+
+  /**
+   * 福利类型批量修改商户关联门店消费场景
+   * @param merCode
+   * @param relationDTOList
+   */
+  public void updateWelfareStoreConsumeTypeByDTOList(String merCode,List<StoreConsumeRelationDTO> relationDTOList);
+
+  /**
+   * 福利类型在商户门店配置列表删除所有的配置消费场景门店
+   * @param merCode
+   */
+  public void deleteWelfareConsumeScene(String merCode,List<String> storeCodeList);
 }

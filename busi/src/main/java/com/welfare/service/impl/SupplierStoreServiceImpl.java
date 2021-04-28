@@ -753,6 +753,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       }
       
       accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(m.getKey(), relationDTOList);
+      accountConsumeSceneStoreRelationService.updateWelfareStoreConsumeTypeByDTOList(m.getKey(), relationDTOList);
     }
       queryWrapper = new QueryWrapper<>();
     queryWrapper.in(MerchantStoreRelation.MER_CODE, mapByMerCode.keySet());

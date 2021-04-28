@@ -428,14 +428,22 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
         if(CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
           for (AccountConsumeStoreRelationEditReq storeRelationEditReq:
               consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs() ) {
-            MerAccountTypeConsumeSceneConfig merAccountTypeConsumeSceneConfig
-                = new  MerAccountTypeConsumeSceneConfig();
-            merAccountTypeConsumeSceneConfig.setMerCode(consumeSceneEditReq.getMerCode());
-            merAccountTypeConsumeSceneConfig.setMerAccountTypeCode(consumeSceneEditReq.getAccountTypeCode());
-            merAccountTypeConsumeSceneConfig.setStoreCode(storeRelationEditReq.getStoreCode());
-            merAccountTypeConsumeSceneConfig.setSceneConsumeType(storeRelationEditReq.getSceneConsumType());
+            String sceneConsumeType = storeRelationEditReq.getSceneConsumType();
+            if(StringUtils.isNotBlank(sceneConsumeType)) {
+              String[] sceneConsumeTypeList = sceneConsumeType.split(",");
+              for (String type:
+              sceneConsumeTypeList) {
+                MerAccountTypeConsumeSceneConfig merAccountTypeConsumeSceneConfig
+                    = new  MerAccountTypeConsumeSceneConfig();
+                merAccountTypeConsumeSceneConfig.setMerCode(consumeSceneEditReq.getMerCode());
+                merAccountTypeConsumeSceneConfig.setMerAccountTypeCode(consumeSceneEditReq.getAccountTypeCode());
+                merAccountTypeConsumeSceneConfig.setStoreCode(storeRelationEditReq.getStoreCode());
+                merAccountTypeConsumeSceneConfig.setSceneConsumeType(type);
 
-            newScenes.add(merAccountTypeConsumeSceneConfig);
+                newScenes.add(merAccountTypeConsumeSceneConfig);
+              }
+            }
+
           }
 
         }

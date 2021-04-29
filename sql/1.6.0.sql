@@ -80,6 +80,7 @@ CREATE TABLE `wholesale_payable_settle_detail` (
   `mer_deduction_amount` decimal(20,2) DEFAULT NULL COMMENT '商户余额扣款金额',
   `mer_credit_deduction_amount` decimal(10,2) DEFAULT NULL COMMENT '商户信用扣款金额',
   `self_deduction_amount` decimal(10,2) DEFAULT NULL COMMENT '自费扣款金额',
+  `mer_wholesale_credit_deduction_amount` decimal(10,2) DEFAULT NULL COMMENT '商户批发信用扣款金额',
   `data_type` varchar(20) DEFAULT NULL COMMENT '数据支付类型 welfare-员工卡支付 third-其它三方支付',
   `settle_flag` varchar(20) DEFAULT NULL COMMENT '结算标志 settled已结算 unsettled未结算',
   `order_channel` varchar(20) DEFAULT NULL COMMENT '订单渠道',

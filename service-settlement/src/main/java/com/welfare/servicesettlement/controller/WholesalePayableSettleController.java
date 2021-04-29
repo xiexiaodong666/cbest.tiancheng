@@ -109,7 +109,7 @@ public class WholesalePayableSettleController implements IController {
 
 
     @PutMapping("/payable/bill/{id}/confirm")
-    @ApiOperation("商户确认账单")
+    @ApiOperation("(商户应收结算单)商户确认账单")
     @MerchantUser
     public R monthSettleConfirm(@PathVariable("id")Long id){
         return null;
@@ -117,25 +117,25 @@ public class WholesalePayableSettleController implements IController {
 
 
     @GetMapping("/payable/bill/page")
-    @ApiOperation("分页查询应付结算单分组列表")
+    @ApiOperation("(商户应收结算单)分页查询应付结算单分组列表")
     public R<Page<WholesalePayableSettleResp>> payableBillPage(WholesalePayableSettleBillQuery query){
         return success(null);
     }
 
     @GetMapping("/payable/bill/{id}/page")
-    @ApiOperation("分页查询某个应付结算单明细列表")
+    @ApiOperation("(商户应收结算单)分页查询某个应付结算单明细列表")
     public R<Page<WholesaleReceivableSettleDetailResp>> payableBillDetailPage(@PathVariable("id") Long id, WholesalePaySettleDetailPageQuery query){
         return success(null);
     }
 
     @GetMapping("/payable/bill/{id}/summary")
-    @ApiOperation("查询应付结算单明细数据汇总")
-    public R<PlatformWholesalePayableGroupDTO> payableBillDetailSummary(@PathVariable("id") Long id, WholesalePaySettleDetailQuery query){
+    @ApiOperation("(商户应收结算单)查询应付结算单明细数据汇总")
+    public R<WholesalePayableBillGroupDTO> payableBillDetailSummary(@PathVariable("id") Long id, WholesalePaySettleDetailQuery query){
         return success(null);
     }
 
     @GetMapping("/payable/bill/{id}/export")
-    @ApiOperation("应付结算明细数据单导出")
+    @ApiOperation("(商户应收结算单)应付结算明细数据单导出")
     public R<String> payableBillDetailExport(@PathVariable("id") Long id, WholesalePaySettleDetailQuery query){
         return success(null);
     }

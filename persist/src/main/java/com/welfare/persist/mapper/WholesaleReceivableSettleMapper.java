@@ -1,7 +1,9 @@
 package com.welfare.persist.mapper;
 
+import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
 import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
+import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
@@ -25,4 +27,6 @@ import java.util.List;
 public interface WholesaleReceivableSettleMapper extends BaseMapper<WholesaleReceivableSettle> {
 
   List<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query);
+
+  List<WholesaleReceivableSettleDetailResp> receivableBillDetailPage( WholesaleReceiveSettleDetailPageQuery query);
 }

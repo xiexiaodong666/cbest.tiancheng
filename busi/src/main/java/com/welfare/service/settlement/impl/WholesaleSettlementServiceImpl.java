@@ -1,6 +1,9 @@
 package com.welfare.service.settlement.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.constants.WelfareConstant;
@@ -9,8 +12,11 @@ import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.WholesaleReceivableSettleDao;
 import com.welfare.persist.dao.WholesaleReceivableSettleDetailDao;
+import com.welfare.persist.dto.SettleTaxSalesStatistics;
+import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
 import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
+import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
@@ -47,6 +53,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     private final WholesaleReceivableSettleDao wholesaleReceivableSettleDao;
     private final WholesaleReceivableSettleDetailDao wholesaleReceivableSettleDetailDao;
     private final OrderInfoDetailMapper orderInfoDetailMapper;
+    private final ObjectMapper objectMapper;
     @Override
     public PageInfo<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
                                                                          String supplierCode,
@@ -139,14 +146,29 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
-    public PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query) {
+    public PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query)
+        throws JsonProcessingException {
         PageInfo<WholesaleReceivableSettleResp> wholesaleReceivableSettleRespPageInfo = PageHelper
             .startPage(query.getCurrent(), query.getSize()).doSelectPageInfo(() -> {
                 wholesaleReceivableSettleMapper.receivableBillPage(query);
             });
         List<WholesaleReceivableSettleResp> wholesaleReceivableSettleResps = wholesaleReceivableSettleRespPageInfo
             .getList();
-        return wholesaleReceivableSettleRespPageInfo;
+        for (WholesaleReceivableSettleResp receivableSettleResp:
+        wholesaleReceivableSettleResps ) {
+            String settleTaxSalesStatistics = receivableSettleResp.getSettleTaxSalesStatistics();
+            List<SettleTaxSalesStatistics> settleTaxSalesStatisticsList = objectMapper.readValue(settleTaxSalesStatistics, new TypeReference<List<SettleTaxSalesStatistics>>() {});
 
+            receivableSettleResp.setSettleTaxSalesStatisticList(settleTaxSalesStatisticsList);
+        }
+        
+        return wholesaleReceivableSettleRespPageInfo;
+    }
+
+    @Override
+    public PageInfo<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id,
+        WholesaleReceiveSettleDetailPageQuery query) {
+        wholesaleReceivableSettleMapper.receivableBillDetailPage(query);
+        return null;
     }
 }

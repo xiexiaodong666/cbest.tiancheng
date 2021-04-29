@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,settle_no,settle_month,mer_code,trans_amount,settle_amount,settle_self_amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,update_user,update_time,deleted,settle_statistics_info
+        id,settle_no,settle_month,mer_code,trans_amount,settle_amount,settle_self_amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,update_user,update_time,deleted,settle_statistics_info,settle_tax_sales_statistics
     </sql>
 
 </mapper>

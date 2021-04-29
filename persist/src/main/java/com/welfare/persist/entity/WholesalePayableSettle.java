@@ -149,6 +149,11 @@ public class WholesalePayableSettle extends Model<WholesalePayableSettle> implem
     @ApiModelProperty("账单账户类型统计信息")   
     private String settleStatisticsInfo;
 
+    /**
+     * 账单商品税率统计信息
+     */
+    @ApiModelProperty("账单商品税率统计信息")
+    private String settleTaxSalesStatistics;
 //以下为列明常量
 
     /**

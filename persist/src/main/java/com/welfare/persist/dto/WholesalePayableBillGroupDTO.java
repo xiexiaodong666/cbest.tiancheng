@@ -8,15 +8,13 @@ import java.math.BigDecimal;
 /**
  * @Author: duanhy
  * @Version: 0.0.1
- * @Date: 2021/4/27 8:55 下午
+ * @Date: 2021/4/29 10:27 上午
  */
 @Data
-public class PlatformWholesalePayableGroupDTO {
+public class WholesalePayableBillGroupDTO {
 
     @ApiModelProperty("结算金额")
     private BigDecimal settleAmount;
-    @ApiModelProperty("消费金额")
-    private BigDecimal transAmount;
-    @ApiModelProperty("营收金额")
-    private BigDecimal revenueAmount;
+    @ApiModelProperty("商品销售基恩")
+    private BigDecimal goodsSaleAmount;
 }

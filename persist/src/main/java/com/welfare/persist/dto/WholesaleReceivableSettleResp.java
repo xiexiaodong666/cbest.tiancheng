@@ -86,4 +86,6 @@ public class WholesaleReceivableSettleResp {
     private Date settleEndTime;
 
     private List<SettleStatisticsInfoDTO> settleStatisticsInfoList;
+
+    private List<SettleTaxSalesStatistics> settleTaxSalesStatisticList;
 }

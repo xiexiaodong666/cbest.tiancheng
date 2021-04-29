@@ -19,14 +19,10 @@ public class WholesalePayableSettleBillQuery {
     @ApiModelProperty(value = "商户代码")
     private String merCode;
 
-    @ApiModelProperty(value = "商户名称")
-    private String merName;
-
     @ApiModelProperty(value = "起始时间 yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-
     private Date startDay;
 
     @ApiModelProperty(value = "结束时间 yyyy-MM-dd HH:mm:ss")
@@ -35,7 +31,7 @@ public class WholesalePayableSettleBillQuery {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date endDay;
 
-    @ApiModelProperty(value = "合作方式")
+    @ApiModelProperty(value = "合作方式 联营:joint_venture  经销:distribution")
     private String merCooperationMode;
 
     @ApiModelProperty(value = "结算状态:待结算-unsettled 已结算-settled")
@@ -44,4 +40,6 @@ public class WholesalePayableSettleBillQuery {
     @ApiModelProperty(value = "对账状态:待确认-unconfirmed 已确认-confirmed")
     private String recStatus;
 
+    @ApiModelProperty(value = "商户名称")
+    private String merName;
 }

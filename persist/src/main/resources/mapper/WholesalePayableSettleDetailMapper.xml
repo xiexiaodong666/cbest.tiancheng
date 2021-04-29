@@ -9,4 +9,30 @@
         id,settle_no,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,store_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,data_type,settle_flag,order_channel,payment_channel,create_user,create_time,update_user,update_time,version,rebate_amount,mer_credit,mer_balance,order_wholesale_amount,mer_wholesale_credit_deduction_amount,mer_wholesale_credit
     </sql>
 
+    <select id="pageUnsettleDataGroupBySupplierMerCode" resultType="com.welfare.persist.dto.PlatformPayableSettleGroupDTO">
+        SELECT
+            mer.mer_name AS merName,
+            mer.mer_code AS merCode,
+            me.supplier_wholesale_settle_method AS cooperationMode,
+            SUM( wpsd.trans_amount ) AS totalConsumeAmount,
+            SUM( wpsd.order_wholesale_amount ) AS unSettleAmount,
+            SUM( wpsd.trans_amount ) - SUM( wpsd.order_wholesale_amount ) AS revenueAmount
+        FROM
+            merchant mer
+                LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
+                LEFT JOIN supplier_store ss ON mer.mer_code = ss.mer_code
+                LEFT JOIN wholesale_payable_settle_detail wpsd ON wpsd.store_code = ss.store_code
+        WHERE
+            mer.mer_identity LIKE '%SUPPLIER%'
+          AND me.supplier_wholesale_settle_method IS NOT NULL
+          AND LENGTH( trim( me.supplier_wholesale_settle_method ) ) > 0
+          AND wpsd.settle_flag = 'unsettled'
+          <if test="query.merCode != null and query.merCode != '' ">
+              and mer.mer_code 
+          </if>
+        GROUP BY
+            mer.mer_code
+        order by mer.id desc
+    </select>
+
 </mapper>

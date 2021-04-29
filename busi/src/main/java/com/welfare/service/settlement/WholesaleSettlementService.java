@@ -1,14 +1,21 @@
 package com.welfare.service.settlement;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageInfo;
-import com.welfare.persist.dto.WholesaleReceivableSettleResp;
-import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
+import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.annotation.MerchantUser;
+import com.welfare.persist.dto.*;
+import com.welfare.persist.dto.query.*;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
+import com.welfare.persist.entity.WholesalePayableSettle;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -104,4 +111,5 @@ public interface WholesaleSettlementService {
      * @return
      */
     PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query);
+
 }

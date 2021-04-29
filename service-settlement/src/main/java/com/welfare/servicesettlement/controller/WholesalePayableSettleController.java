@@ -48,7 +48,7 @@ public class WholesalePayableSettleController implements IController {
 
     @GetMapping("/page-payable-summary")
     @ApiOperation("分页查询平台应付未结算分组汇总")
-    public R<Page<PlatformWholesaleSettleGroupDTO>> pageQueryPayableSummary(PlatformWholesalePayablePageQuery query) {
+    public R<Page<PlatformPayableSettleGroupDTO>> pageQueryPayableSummary(PlatformWholesalePayablePageQuery query) {
         return success(null);
     }
 

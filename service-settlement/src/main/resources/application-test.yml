@@ -109,3 +109,4 @@ rocketmq:
   topic:
     order-online: MSGCENTRAL_APP_WELFARE_ORDER_STATUS_CHANGE_TEST
     order-online-after-sale: MSGCENTRAL_APP_WELFARE_ORDER_AFTERSALE_CHANGED_TEST
+    account-deduction-detail: E-WELFARE-ACCOUNT-DEDUCTION-DETAIL

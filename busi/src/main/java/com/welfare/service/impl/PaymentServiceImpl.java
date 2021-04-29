@@ -21,20 +21,23 @@ import com.welfare.persist.entity.*;
 import com.welfare.service.*;
 import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
-import com.welfare.service.dto.payment.BarcodePaymentRequest;
-import com.welfare.service.dto.payment.CardPaymentRequest;
-import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.dto.payment.*;
 import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
 import com.welfare.service.payment.IPaymentOperator;
 import com.welfare.service.remote.entity.request.WoLifeAccountDeductionRowsRequest;
+import com.welfare.service.sync.event.PayDeductionDetailEvt;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +63,7 @@ import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPE
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class PaymentServiceImpl implements PaymentService {
+public class PaymentServiceImpl implements PaymentService, ApplicationContextAware {
     private final AccountAmountTypeService accountAmountTypeService;
     private final AccountService accountService;
     private final MerchantCreditService merchantCreditService;
@@ -83,12 +86,13 @@ public class PaymentServiceImpl implements PaymentService {
             ImmutableMap.of("2189", Arrays.asList("12", "28", "39", "40"));
     @Resource(name = "e-welfare-paymentQueryAsync")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
+    private ApplicationContext applicationContext;
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#paymentRequest.transNo")
     public <T extends PaymentRequest> T paymentRequest(final T paymentRequest) {
-        Future<? extends PaymentRequest> queryResultFuture = threadPoolTaskExecutor.submit(() -> queryResult(paymentRequest.getTransNo(), paymentRequest.getClass()));
+        Future<? extends PaymentRequest> queryResultFuture = threadPoolTaskExecutor.submit(() ->
+                queryResult(paymentRequest.getTransNo(), paymentRequest.getClass(), paymentRequest.getOrderNo()));
         Long accountCode = paymentRequest.calculateAccountCode();
         Assert.notNull(accountCode, "账号不能为空。");
         String lockKey = RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE + accountCode;
@@ -298,11 +302,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @SneakyThrows
-    public <T extends PaymentRequest> T queryResult(String transNo, Class<T> clazz) {
-        List<AccountBillDetail> accountDeductionDetails = accountBillDetailDao.queryByTransNoAndTransType(
-                transNo,
-                WelfareConstant.TransType.CONSUME.code()
-        );
+    public <T extends PaymentRequest> T queryResult(String transNo, Class<T> clazz, String orderNo) {
+        List<AccountBillDetail> accountDeductionDetails = accountBillDetailDao.queryByTransNoOrderNoAndTransType(
+                transNo, orderNo,
+                WelfareConstant.TransType.CONSUME.code());
         List<AccountDeductionDetail> refundDeductionDetails = accountDeductionDetailDao.queryByRelatedTransNoAndTransType(
                 transNo,
                 WelfareConstant.TransType.REFUND.code()
@@ -367,6 +370,12 @@ public class PaymentServiceImpl implements PaymentService {
             //联通沃支付，没有修改accountTypes，所以if判断
             accountAmountTypeDao.saveOrUpdateBatch(accountTypes);
         }
+        List<Long> accountDeductionDetailIds = deductionDetails.stream()
+                .map(AccountDeductionDetail::getId).collect(Collectors.toList());
+        PayDeductionDetailEvt payDeductionDetailEvt = PayDeductionDetailEvt.builder()
+                .accountDeductionDetailIds(accountDeductionDetailIds)
+                .build();
+        applicationContext.publishEvent(payDeductionDetailEvt);
     }
 
 
@@ -437,13 +446,18 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public <T extends PaymentRequest> List<T> batchPaymentRequest(List<T> paymentRequests) {
+    public MultiOrderPaymentRequest multiOrderUnionPay(MultiOrderPaymentRequest multiOrderPaymentRequest) {
         //为了使各种aop切面生效，从容器中拿当前paymentService
         PaymentService paymentService = SpringBeanUtils.getBean(PaymentService.class);
-        for (T paymentRequest : paymentRequests) {
-            paymentService.paymentRequest(paymentRequest);
+        List<OnlinePaymentRequest> onlinePaymentRequests = multiOrderPaymentRequest.toOnlinePaymentRequests();
+        for (OnlinePaymentRequest onlinePaymentRequest : onlinePaymentRequests) {
+            paymentService.paymentRequest(onlinePaymentRequest);
         }
-        return paymentRequests;
+        return multiOrderPaymentRequest;
     }
 
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

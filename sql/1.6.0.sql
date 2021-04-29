@@ -206,3 +206,6 @@ create table order_info_detail(
                                   `deleted` tinyint(1) DEFAULT 0 COMMENT '删除标志',
                                   `version` bigint(20) DEFAULT 0 COMMENT '版本'
 );
+
+alter table account_bill_detail add column order_no varchar(50) comment '订单号' after trans_no;
+alter table account_deduction_detail add column order_no varchar(50) comment '订单号' after trans_no;

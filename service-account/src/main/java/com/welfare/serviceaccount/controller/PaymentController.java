@@ -19,8 +19,6 @@ import net.dreamlu.mica.core.result.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * Description:
  *
@@ -45,11 +43,11 @@ public class PaymentController implements IController {
         return success(paymentRequest);
     }
 
-    @PostMapping("/online/batch")
-    @ApiOperation("批量在线支付")
-    public R<List<OnlinePaymentRequest>> newBatchOnlinePaymentRequest(@RequestBody List<OnlinePaymentRequest> paymentRequests){
-        paymentService.batchPaymentRequest(paymentRequests);
-        return success(paymentRequests);
+    @PostMapping("/online/multi-order")
+    @ApiOperation("多订单联合支付")
+    public R<MultiOrderPaymentRequest> newBatchOnlinePaymentRequest(@RequestBody MultiOrderPaymentRequest paymentRequest){
+        paymentService.multiOrderUnionPay(paymentRequest);
+        return success(paymentRequest);
     }
 
     @PostMapping("/barcode")
@@ -81,9 +79,10 @@ public class PaymentController implements IController {
 
     @GetMapping
     @ApiOperation("查询支付结果")
-    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
+    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam(value = "重百付支付流水号",required = true) String transNo,
+                                               @RequestParam(value = "订单号",required = false) @ApiParam("订单号") String orderNo) {
         //cardPaymentRequest包含全量信息，所以以CardPaymentRequest查询
-        PaymentRequest paymentRequest = paymentService.queryResult(transNo,CardPaymentRequest.class);
+        PaymentRequest paymentRequest = paymentService.queryResult(transNo,CardPaymentRequest.class, orderNo);
         return success(paymentRequest);
     }
 

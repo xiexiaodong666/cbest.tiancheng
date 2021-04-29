@@ -6,6 +6,7 @@ import com.welfare.persist.entity.AccountBillDetail;
 import com.welfare.persist.mapper.AccountBillDetailMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Date;
@@ -22,9 +23,12 @@ import java.util.List;
 @Repository
 public class AccountBillDetailDao extends ServiceImpl<AccountBillDetailMapper, AccountBillDetail> {
 
-    public List<AccountBillDetail> queryByTransNoAndTransType(String transNo, String transType) {
+    public List<AccountBillDetail> queryByTransNoOrderNoAndTransType(String transNo, String orderNo, String transType) {
         QueryWrapper<AccountBillDetail> wrapper = new QueryWrapper<>();
         wrapper.eq(AccountBillDetail.TRANS_NO,transNo);
+        if(!StringUtils.isEmpty(orderNo)){
+            wrapper.eq(AccountBillDetail.ORDER_NO,orderNo);
+        }
         wrapper.eq(AccountBillDetail.TRANS_TYPE,transType);
         return list(wrapper);
     }

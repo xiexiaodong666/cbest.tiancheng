@@ -58,7 +58,7 @@ public class WholesaleReceivableSettleDetail extends Model<WholesaleReceivableSe
      * 账户
      */
     @ApiModelProperty("账户")   
-    private Integer accountCode;
+    private Long accountCode;
     /**
      * 账户名称
      */
@@ -68,7 +68,7 @@ public class WholesaleReceivableSettleDetail extends Model<WholesaleReceivableSe
      * 卡号
      */
     @ApiModelProperty("卡号")   
-    private Integer cardId;
+    private String cardId;
     /**
      * 商户代码
      */

@@ -2,10 +2,8 @@ package com.welfare.service;
 
 import com.welfare.service.dto.ThirdPartyBarcodePaymentDTO;
 import com.welfare.service.dto.payment.BarcodePaymentRequest;
-import com.welfare.service.dto.payment.OnlinePaymentRequest;
+import com.welfare.service.dto.payment.MultiOrderPaymentRequest;
 import com.welfare.service.dto.payment.PaymentRequest;
-
-import java.util.List;
 
 /**
  * Description: 扣款相关service
@@ -28,9 +26,10 @@ public interface PaymentService {
      * 查询支付结果
      * @param transNo 交易单号
      * @param clazz 什么类型的PaymentRequest
+     * @param orderNo
      * @return 查询出的交易结果
      */
-    <T extends PaymentRequest> T queryResult(String transNo,Class<T> clazz);
+    <T extends PaymentRequest> T queryResult(String transNo, Class<T> clazz, String orderNo);
 
     /**
      * 第三方支付码（微信或支付宝）场景校验，并且返回免密支付签名
@@ -42,9 +41,8 @@ public interface PaymentService {
 
     /**
      * 批量支付
-     * @param paymentRequests 支付请求集合
-     * @param <T> 支付请求类型
+     * @param paymentRequest 支付请求
      * @return 支付请求
      */
-    <T extends PaymentRequest>List<T> batchPaymentRequest(List<T> paymentRequests);
+    MultiOrderPaymentRequest multiOrderUnionPay(MultiOrderPaymentRequest paymentRequest);
 }

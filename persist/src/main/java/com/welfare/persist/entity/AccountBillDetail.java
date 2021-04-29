@@ -51,6 +51,11 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     @ApiModelProperty("交易流水号")   
     private String transNo;
     /**
+     * 订单号
+     */
+    @ApiModelProperty("订单号")
+    private String orderNo;
+    /**
      * 消费门店
      */
     @ApiModelProperty("消费门店")   
@@ -222,5 +227,6 @@ public class AccountBillDetail extends Model<AccountBillDetail> implements Seria
     public static final String SURPLUS_QUOTA_OVERPAY = "surplus_quota_overpay";
     public static final String PAYMENT_CHANNEL = "payment_channel";
     public static final String ACCOUNT_AMOUNT_TYPE_GROUP_ID = "account_amount_type_group_id";
+    public static final String ORDER_NO = "orderNo";
 
 }

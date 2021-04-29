@@ -1,5 +1,8 @@
 package com.welfare.common.constants;
 
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
+
 /**
  * Description:
  *
@@ -331,6 +334,15 @@ public class WelfareConstant {
         public String desc(){
             return this.desc;
         }
+
+        public static TransType parseByCode(String code){
+            for (TransType value : TransType.values()) {
+                if(value.code.equals(code)){
+                    return value;
+                }
+            }
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"未知transType:"+code);
+        }
     }
 
     /**
@@ -355,6 +367,16 @@ public class WelfareConstant {
         }
         public String desc(){
             return this.desc;
+        }
+
+        public static PayCode parseByCode(String code){
+            PayCode[] values = PayCode.values();
+            for (PayCode value : values) {
+                if(value.code.equals(code)){
+                    return value;
+                }
+            }
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"未知payCode:"+code);
         }
     }
 

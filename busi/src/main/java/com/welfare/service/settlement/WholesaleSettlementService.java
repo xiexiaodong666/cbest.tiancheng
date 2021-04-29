@@ -1,23 +1,22 @@
 package com.welfare.service.settlement;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageInfo;
-import com.welfare.common.annotation.ApiUser;
-import com.welfare.common.annotation.MerchantUser;
-import com.welfare.persist.dto.*;
-import com.welfare.persist.dto.query.*;
+import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
+import com.welfare.persist.dto.WholesaleReceivableSettleResp;
+import com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp;
+import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
+import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery;
+import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
-import com.welfare.persist.entity.WholesalePayableSettle;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Description:
@@ -110,6 +109,22 @@ public interface WholesaleSettlementService {
      * @param query
      * @return
      */
-    PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query);
+    PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query)
+        throws JsonProcessingException;
 
+    /**
+     * 分页查询某个应收结算单明细列表
+     * @param id
+     * @param query
+     * @return
+     */
+    PageInfo<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id, WholesaleReceiveSettleDetailPageQuery query);
+
+    /**
+     *
+     * @param id
+     * @param query
+     * @return
+     */
+    WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(Long id, WholesaleReceiveSettleDetailQuery query);
 }

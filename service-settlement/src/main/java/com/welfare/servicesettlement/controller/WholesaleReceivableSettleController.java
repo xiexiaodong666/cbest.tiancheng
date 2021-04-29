@@ -1,6 +1,7 @@
 package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageInfo;
 import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
@@ -135,7 +136,8 @@ public class WholesaleReceivableSettleController implements IController {
 
     @GetMapping("/receivable/bill/page")
     @ApiOperation("分页查询应收结算单分组列表")
-    public R<PageInfo<WholesaleReceivableSettleResp>> receivableBillPage(WholesaleReceivableSettleBillQuery query){
+    public R<PageInfo<WholesaleReceivableSettleResp>> receivableBillPage(WholesaleReceivableSettleBillQuery query)
+        throws JsonProcessingException {
 
         PageInfo<WholesaleReceivableSettleResp> wholesaleReceivableSettleRespPageInfo = wholesaleSettlementService.receivableBillPage(query);
 
@@ -144,14 +146,15 @@ public class WholesaleReceivableSettleController implements IController {
 
     @GetMapping("/receivable/bill/{id}/page")
     @ApiOperation("分页查询某个应收结算单明细列表")
-    public R<Page<WholesaleReceivableSettleDetailResp>> receivableBillDetailPage(@PathVariable("id") Long id, WholesaleReceiveSettleDetailPageQuery query){
-        return success(null);
+    public R<PageInfo<WholesaleReceivableSettleDetailResp>> receivableBillDetailPage(@PathVariable("id") Long id, WholesaleReceiveSettleDetailPageQuery query){
+
+        return success(wholesaleSettlementService.receivableBillDetailPage(id, query));
     }
 
     @GetMapping("/receivable/bill/{id}/summary")
     @ApiOperation("查询应收结算单明细数据汇总")
     public R<WholesaleReceiveSettleSummaryResp> receivableBillDetailSummary(@PathVariable("id") Long id, WholesaleReceiveSettleDetailQuery query){
-        return success(null);
+        return success(wholesaleSettlementService.receivableBillDetailSummary(id, query));
     }
 
     @GetMapping("/receivable/bill/{id}/export")

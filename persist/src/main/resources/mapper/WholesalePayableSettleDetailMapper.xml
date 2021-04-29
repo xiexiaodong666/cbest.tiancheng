@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,settle_no,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,store_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,data_type,settle_flag,order_channel,payment_channel,create_user,create_time,update_user,update_time,version,rebate_amount,mer_credit,mer_balance,order_wholesale_amount,mer_wholesale_credit_deduction_amount
+        id,settle_no,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,store_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,data_type,settle_flag,order_channel,payment_channel,create_user,create_time,update_user,update_time,version,rebate_amount,mer_credit,mer_balance,order_wholesale_amount,mer_wholesale_credit_deduction_amount,mer_wholesale_credit
     </sql>
 
 </mapper>

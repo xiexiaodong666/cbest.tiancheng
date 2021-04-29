@@ -230,6 +230,11 @@ public class WholesalePayableSettleDetail extends Model<WholesalePayableSettleDe
     @ApiModelProperty("商户余额")   
     private BigDecimal merBalance;
     /**
+     * 商户剩余批发信用金额
+     */
+    @ApiModelProperty("商户剩余批发信用扣款金额")
+    private BigDecimal merWholesaleCredit;
+    /**
      * 结算金额
      */
     @ApiModelProperty("结算金额")   
@@ -393,4 +398,8 @@ public class WholesalePayableSettleDetail extends Model<WholesalePayableSettleDe
      * 商户批发信用扣款金额
      */
     public static final String MER_WHOLESALE_CREDIT_DEDECTION_AMOUNT = "mer_wholesale_credit_deduction_amount";
+    /**
+     * 商户剩余批发信用金额
+     */
+    public static final String MER_WHOLESALE_CREDIT = "mer_wholesale_credit";
 }

@@ -133,6 +133,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             // 设置充值总金额
             apply.setRechargeAmount(request.getInfo().getRechargeAmount());
             apply.setApprovalType(ApprovalType.SINGLE.getCode());
+            apply.setApplyType(getApplyTypeByMerAccountAmountType(request.getMerAccountTypeCode()).code());
             // 初始化明细
             AccountDepositApplyDetail detail = assemblyAccountDepositApplyDetailList(apply, request.getInfo());
             accountDepositApplyDao.save(apply);
@@ -178,6 +179,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             // 设置充值人数
             apply.setRechargeNum(deposits.size());
             apply.setApprovalType(ApprovalType.BATCH.getCode());
+            apply.setApplyType(getApplyTypeByMerAccountAmountType(request.getMerAccountTypeCode()).code());
             // 初始化明细
             List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, deposits);
             accountDepositApplyDetailDao.saveBatch(details);
@@ -546,6 +548,14 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "仅支持对属于[客户]的商户充值", null);
+        }
+    }
+
+    private WelfareConstant.AccountDepositApply getApplyTypeByMerAccountAmountType(String accountAmountType) {
+        if (WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code().equals(accountAmountType)) {
+            return WelfareConstant.AccountDepositApply.WHOLESALE_CREDIT_LIMIT_APPLY;
+        } else {
+            return WelfareConstant.AccountDepositApply.WELFARE_APPLY;
         }
     }
 }

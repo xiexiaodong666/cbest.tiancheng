@@ -16,6 +16,7 @@ import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettl
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
 import com.welfare.persist.entity.WholesalePayableSettle;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
+import com.welfare.persist.mapper.WholesalePayableSettleDetailMapper;
 import com.welfare.service.settlement.WholesaleSettlementService;
 import com.welfare.servicesettlement.dto.wholesale.WholesaleSettleStatusDTO;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
@@ -43,12 +44,12 @@ import java.util.List;
 @Api(tags = "批发应付结算")
 public class WholesalePayableSettleController implements IController {
 
-    private final WholesaleSettlementService wholesaleSettlementService;
+    private final WholesalePayableSettleDetailMapper wholesalePayableSettleDetailMapper;
     private final FileUploadServiceUtil fileUploadService;
 
     @GetMapping("/page-payable-summary")
     @ApiOperation("分页查询平台应付未结算分组汇总")
-    public R<Page<PlatformWholesaleSettleGroupDTO>> pageQueryPayableSummary(PlatformWholesalePayablePageQuery query) {
+    public R<Page<PlatformPayableSettleGroupDTO>> pageQueryPayableSummary(PlatformWholesalePayablePageQuery query) {
         return success(null);
     }
 

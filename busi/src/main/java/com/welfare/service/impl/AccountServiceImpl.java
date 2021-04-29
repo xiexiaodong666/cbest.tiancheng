@@ -80,6 +80,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT;
 
 /**
  * 账户信息服务接口实现
@@ -843,9 +844,9 @@ public class AccountServiceImpl implements AccountService {
 
     private AccountBalanceDTO assemblyWholesaleAccountBalance(Long accountCode) {
         AccountBalanceDTO accountBalanceDTO = new AccountBalanceDTO();
-        accountBalanceDTO.setCode(MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+        accountBalanceDTO.setCode(WHOLESALE_PROCUREMENT.code());
         accountBalanceDTO.setName("批发采购余额");
-        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, WHOLESALE_PROCUREMENT.code());
         accountBalanceDTO.setValue(BigDecimal.ZERO);
         if (Objects.nonNull(accountAmountType)) {
             accountBalanceDTO.setValue(accountAmountType.getAccountBalance());
@@ -1078,6 +1079,18 @@ public class AccountServiceImpl implements AccountService {
         }
         AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
         BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
+
+        MerchantCredit merchantCredit = merchantCreditService.getByMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+        if(merchantCredit != null) {
+            accountDetailDTO.setWholesaleCreditLimit(merchantCredit.getWholesaleCreditLimit());
+            accountDetailDTO.setWholesaleCredit(merchantCredit.getWholesaleCredit());
+        }
+
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(Long.valueOf(accountDetailDTO.getAccountCode()), WHOLESALE_PROCUREMENT.code());
+        if(accountAmountType != null) {
+            accountDetailDTO.setAccountWholesaleCreditLimit(accountAmountType.getAccountBalance());
+        }
+
         return accountDetailDTO;
     }
 

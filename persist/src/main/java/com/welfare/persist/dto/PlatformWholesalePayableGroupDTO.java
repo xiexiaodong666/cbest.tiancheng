@@ -14,9 +14,9 @@ import java.math.BigDecimal;
 public class PlatformWholesalePayableGroupDTO {
 
     @ApiModelProperty("结算金额")
-    private BigDecimal settleAmount;
+    private BigDecimal unSettleAmount;
     @ApiModelProperty("消费金额")
-    private BigDecimal transAmount;
+    private BigDecimal totalConsumeAmount;
     @ApiModelProperty("营收金额")
     private BigDecimal revenueAmount;
 }

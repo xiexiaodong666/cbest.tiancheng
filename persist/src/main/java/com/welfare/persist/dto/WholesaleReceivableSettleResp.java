@@ -85,6 +85,8 @@ public class WholesaleReceivableSettleResp {
     @JSONField(format = "yyyy-MM-dd")
     private Date settleEndTime;
 
+    private String settleTaxSalesStatistics;
+
     private List<SettleStatisticsInfoDTO> settleStatisticsInfoList;
 
     private List<SettleTaxSalesStatistics> settleTaxSalesStatisticList;

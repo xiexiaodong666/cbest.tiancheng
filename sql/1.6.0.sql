@@ -93,6 +93,7 @@ CREATE TABLE `wholesale_payable_settle_detail` (
   `rebate_amount` decimal(15,4) DEFAULT NULL COMMENT '返点标志 unrebated未返点 rebated 已返点',
   `mer_credit` decimal(10,2) DEFAULT NULL COMMENT '商户授信额度',
   `mer_balance` decimal(10,2) DEFAULT NULL COMMENT '商户余额',
+  `mer_wholesale_credit` decimal(10,2) DEFAULT NULL COMMENT '商户剩余批发采购额度',
   `order_wholesale_amount` decimal(10,2) DEFAULT NULL COMMENT '结算金额',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22223 DEFAULT CHARSET=utf8mb4;

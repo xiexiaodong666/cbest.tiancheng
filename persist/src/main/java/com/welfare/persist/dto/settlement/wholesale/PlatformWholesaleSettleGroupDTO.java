@@ -20,9 +20,9 @@ public class PlatformWholesaleSettleGroupDTO {
      * 消费总金额
      */
     private BigDecimal totalConsumeAmount;
+
     /**
      * 待结算金额
      */
     private BigDecimal unSettleAmount;
-
 }

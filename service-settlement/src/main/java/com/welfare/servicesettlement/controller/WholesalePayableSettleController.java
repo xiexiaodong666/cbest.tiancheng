@@ -2,6 +2,12 @@ package com.welfare.servicesettlement.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageInfo;
+import com.welfare.common.annotation.ApiUser;
+import com.welfare.common.annotation.MerchantUser;
+import com.welfare.common.domain.UserInfo;
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.*;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
@@ -61,21 +67,21 @@ public class WholesalePayableSettleController implements IController {
 
     @PostMapping("/page-payable-details")
     @ApiOperation("查询平台应付未结算账单明细")
-    public R<Page<PlatformWholesaleSettleDetailDTO>> queryReceivableDetails(@RequestBody PlatformWholesalePayableDetailPageQuery query){
+    public R<Page<PlatformWholesaleSettleDetailDTO>> queryPayableDetails(@RequestBody PlatformWholesalePayableDetailPageQuery query){
      //   PageInfo<PlatformWholesaleSettleDetailDTO> pageInfo = wholesaleSettlementService.pageQueryReceivableDetails(param);
         return success(null);
     }
 
     @PostMapping("/payable-details-summary")
     @ApiOperation("查询平台应付未结算帐单明细汇总")
-    public R<PlatformWholesaleSettleDetailSummaryDTO> queryReceivableDetailsSummary(PlatformWholesalePayableDetailQuery query){
+    public R<PlatformWholesalePayableDetailSummaryDTO> queryPayableDetailsSummary(PlatformWholesalePayableDetailQuery query){
        // PlatformWholesaleSettleDetailSummaryDTO platformWholesaleSettleDetailSummaryDTO = wholesaleSettlementService.queryReceivableDetailsSummary(param);
         return success(null);
     }
 
     @PostMapping("/export-payable-details")
     @ApiOperation("导出平台应付未结算账单明细")
-    public R<String> exportReceivableDetails(@RequestBody PlatformWholesalePayableDetailQuery query) throws IOException {
+    public R<String> exportPayableDetails(@RequestBody PlatformWholesalePayableDetailQuery query) throws IOException {
      //   List<PlatformWholesaleSettleDetailDTO> resultList = wholesaleSettlementService.queryReceivableDetails(param);
        // String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleDetailDTO.class, "批发应收结算明细");
         return R.success(fileUploadService.getFileServerUrl(null));
@@ -83,38 +89,54 @@ public class WholesalePayableSettleController implements IController {
 
     @PostMapping("/payable")
     @ApiOperation("生成应付结算单")
-    public R<WholesalePayableSettle> generateReceivableSettle(@RequestBody PlatformWholesalePayableDetailPageQuery query){
+    public R<WholesalePayableSettle> generatePayableSettle(@RequestBody PlatformWholesalePayableDetailPageQuery query){
         return success(null);
     }
 
-    @PatchMapping("/payable/status")
-    @ApiOperation("更新应付结算单状态")
-    public R<WholesalePayableSettle> updateReceivableStatus(@RequestBody WholesaleSettleStatusDTO wholesaleSettleStatusDTO){
-             return success(null);
+    @PutMapping("/payable/bill/{id}/send")
+    @ApiOperation("平台发送账单")
+    @ApiUser
+    public R monthSettleSend(@PathVariable("id")Long id){
+        return null;
+    }
+
+    @PutMapping("/payable/bill/{id}/finish")
+    @ApiOperation("平台确认账单完成")
+    @ApiUser
+    public R monthSettleFinish(@PathVariable("id")Long id){
+        return null;
+    }
+
+
+    @PutMapping("/payable/bill/{id}/confirm")
+    @ApiOperation("商户确认账单")
+    @MerchantUser
+    public R monthSettleConfirm(@PathVariable("id")Long id){
+        return null;
     }
 
 
     @GetMapping("/payable/bill/page")
     @ApiOperation("分页查询应付结算单分组列表")
-    public R<Page<WholesalePayableSettleResp>> receivableBillPage(WholesalePayableSettleBillQuery query){
+    public R<Page<WholesalePayableSettleResp>> payableBillPage(WholesalePayableSettleBillQuery query){
         return success(null);
     }
 
     @GetMapping("/payable/bill/{id}/page")
     @ApiOperation("分页查询某个应付结算单明细列表")
-    public R<Page<WholesaleReceivableSettleDetailResp>> receivableBillDetailPage(@PathVariable("id") Long id, WholesaleReceiveSettleDetailPageQuery query){
+    public R<Page<WholesaleReceivableSettleDetailResp>> payableBillDetailPage(@PathVariable("id") Long id, WholesalePaySettleDetailPageQuery query){
         return success(null);
     }
 
     @GetMapping("/payable/bill/{id}/summary")
     @ApiOperation("查询应付结算单明细数据汇总")
-    public R<PlatformWholesalePayableGroupDTO> receivableBillDetailSummary(@PathVariable("id") Long id, WholesaleReceiveSettleDetailQuery query){
+    public R<PlatformWholesalePayableGroupDTO> payableBillDetailSummary(@PathVariable("id") Long id, WholesalePaySettleDetailQuery query){
         return success(null);
     }
 
     @GetMapping("/payable/bill/{id}/export")
     @ApiOperation("应付结算明细数据单导出")
-    public R<String> receivableBillDetailExport(@PathVariable("id") Long id, WholesaleReceiveSettleDetailQuery query){
+    public R<String> payableBillDetailExport(@PathVariable("id") Long id, WholesalePaySettleDetailQuery query){
         return success(null);
     }
 }

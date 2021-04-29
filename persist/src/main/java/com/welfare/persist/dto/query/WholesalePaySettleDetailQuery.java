@@ -12,10 +12,10 @@ import java.util.List;
 /**
  * @Author: duanhy
  * @Version: 0.0.1
- * @Date: 2021/4/27 9:41 下午
+ * @Date: 2021/4/28 1:14 上午
  */
 @Data
-public class WholesalePaySettleDetailPageQuery extends PageReq{
+public class WholesalePaySettleDetailQuery {
     @ApiModelProperty(value = "订单编号")
     private String orderNo;
 

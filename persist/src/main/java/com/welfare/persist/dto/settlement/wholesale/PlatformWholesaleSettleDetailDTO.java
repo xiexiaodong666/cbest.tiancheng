@@ -1,5 +1,6 @@
 package com.welfare.persist.dto.settlement.wholesale;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,6 +18,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel("平台批发应收结算明细")
+@ExcelIgnoreUnannotated
 public class PlatformWholesaleSettleDetailDTO {
     @ApiModelProperty("结算明细ID")
     private String id;
@@ -36,20 +38,20 @@ public class PlatformWholesaleSettleDetailDTO {
     @ApiModelProperty("账户编码")
     private Long accountCode;
 
-    @ApiModelProperty("账户名称")
-    @ExcelProperty("账户名称")
+    @ApiModelProperty("消费人")
+    @ExcelProperty("消费人")
     private String accountName;
 
-    @ApiModelProperty("电话号码")
-    @ExcelProperty("电话号码")
+    @ApiModelProperty("手机号q")
+    @ExcelProperty("手机号")
     private String phone;
 
-    @ApiModelProperty("供应商编码")
-    private String supplierCode;
+    @ApiModelProperty("客户商户编码")
+    private String customerMerCode;
 
-    @ApiModelProperty("供应商名称")
-    @ExcelProperty("供应商名称")
-    private String supplierName;
+    @ApiModelProperty("客户商户名称")
+    @ExcelProperty("客户商户名称")
+    private String customerMerName;
 
     @ApiModelProperty("门店编码")
     private String storeCode;
@@ -58,9 +60,9 @@ public class PlatformWholesaleSettleDetailDTO {
     @ExcelProperty("门店名称")
     private String storeName;
 
-    @ApiModelProperty("交易金额")
-    @ExcelProperty("交易金额")
-    private BigDecimal transAmount;
+    @ApiModelProperty("销售金额")
+    @ExcelProperty("销售金额")
+    private BigDecimal saleAmount;
 
     @ApiModelProperty("交易类型")
     private String transType;
@@ -68,6 +70,10 @@ public class PlatformWholesaleSettleDetailDTO {
     @ApiModelProperty("结算金额")
     @ExcelProperty("结算金额")
     private BigDecimal settleAmount;
+
+    @ApiModelProperty("营收金额")
+    @ExcelProperty("营收金额")
+    private BigDecimal revenueAmount;
 
     @ApiModelProperty("结算状态")
     @ExcelProperty("结算状态")

@@ -16,14 +16,17 @@ import java.util.Date;
 public class PlatformWholesalePayablePageQuery extends PageReq{
 
     @ApiModelProperty("供应商商户名称")
-    String supplierMerName;
+    private String supplierMerName;
     @ApiParam("客户商户编码")
-    String customerMerCode;
+    private String customerMerCode;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("交易时间起始 yyyy-MM-dd HH:mm:ss")
-    Date transTimeStart;
+    private Date transTimeStart;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("交易时间截至 yyyy-MM-dd HH:mm:ss")
-    Date transTimeEnd;
+    private Date transTimeEnd;
+    @ApiModelProperty("合作方式(joint_venture:联营 distribution:经销)")
+    private String cooperationMode;
+
 
 }

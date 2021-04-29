@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Data
 public class PlatformWholesalePayableGroupDTO {
 
-    @ApiModelProperty("待结算金额")
+    @ApiModelProperty("结算金额")
     private BigDecimal settleAmount;
     @ApiModelProperty("消费金额")
     private BigDecimal transAmount;

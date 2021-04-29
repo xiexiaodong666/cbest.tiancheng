@@ -100,6 +100,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                 totalTransAmount = totalTransAmount.add(dto.getSaleAmount());
             } else if (WelfareConstant.TransType.REFUND.code().equals(dto.getTransType())) {
                 totalTransAmount = totalTransAmount.add(dto.getSaleAmount().negate());
+        //        totalTransAmount = totalTransAmount.add(dto.getTransAmount());
             }
         }
         List<OrderInfoDetail> groupByTaxRateDetails = orderInfoDetailMapper.queryGroupByTaxRate(new ArrayList<>(orderNoSet));

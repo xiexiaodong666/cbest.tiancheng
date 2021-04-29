@@ -35,6 +35,42 @@
       </where>
     </select>
 
+  <select id="receivableBillDetailSummary"
+    resultType="com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp"
+    parameterType="com.welfare.persist.dto.query.WholesaleReceiveSettleDetailQuery">
+    select sum(saleAmount) as transAmount ,sum(settleAmount) as  settleAmount from (select
+    t1.id,
+    t1.trans_no as transNo,
+    t1.order_id as orderNo,
+    t1.trans_time as transTime,
+    t1.store_code as storeCode,
+    t1.store_name as storeName,
+    ac.account_name as accountName,
+    ac.phone,
+    d.department_name,
+    supplier.mer_name as customerMerName,
+    case
+    when t1.trans_type='consume' then t1.trans_amount
+    when t1.trans_type='refund' then t1.trans_amount*-1 end as saleAmount,
+    case
+    when t1.trans_type='consume' then t1.order_wholesale_amount
+    when t1.trans_type='refund' then t1.order_wholesale_amount*-1
+    else 0
+    end as settleAmount
+
+    from wholesale_payable_settle_detail t1
+    inner join account ac on t1.account_code = ac.account_code
+    inner join department d on d.department_code = ac.department
+    left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
+    left join merchant t4 on t1.mer_code=t4.mer_code
+    left join merchant supplier on supplier.mer_code = t3.mer_code
+    left join store_consume_type t5 on t1.store_code = t5.store_code and t1.order_channel = t5.consum_type  and t5.deleted=0)t
+
+
+  </select>
+
+
+
   <select id="receivableBillDetailPage"
     resultType="com.welfare.persist.dto.WholesaleReceivableSettleDetailResp"
     parameterType="com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery">
@@ -51,12 +87,12 @@
     supplier.mer_name as customerMerName,
     case
     when t1.trans_type='consume' then t1.trans_amount
-    when t1.trans_type='refund' then t1.trans_amount*-1 end as pay_amount,
+    when t1.trans_type='refund' then t1.trans_amount*-1 end as saleAmount,
     case
-    when t1.trans_type='consume' then t1.trans_amount
-    when t1.trans_type='refund' then t1.trans_amount*-1
+    when t1.trans_type='consume' then t1.order_wholesale_amount
+    when t1.trans_type='refund' then t1.order_wholesale_amount*-1
     else 0
-    end as settle_amount
+    end as settleAmount
 
     from wholesale_payable_settle_detail t1
     inner join account ac on t1.account_code = ac.account_code
@@ -65,10 +101,6 @@
     left join merchant t4 on t1.mer_code=t4.mer_code
     left join merchant supplier on supplier.mer_code = t3.mer_code
     left join store_consume_type t5 on t1.store_code = t5.store_code and t1.order_channel = t5.consum_type  and t5.deleted=0
-    <where>
 
-    </where>
   </select>
-
-
 </mapper>

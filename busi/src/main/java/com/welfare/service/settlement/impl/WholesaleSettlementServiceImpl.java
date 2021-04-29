@@ -15,8 +15,10 @@ import com.welfare.persist.dao.WholesaleReceivableSettleDetailDao;
 import com.welfare.persist.dto.SettleTaxSalesStatistics;
 import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
+import com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp;
 import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
 import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery;
+import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
@@ -169,6 +171,14 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     public PageInfo<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id,
         WholesaleReceiveSettleDetailPageQuery query) {
         wholesaleReceivableSettleMapper.receivableBillDetailPage(query);
+        return null;
+    }
+
+    @Override
+    public WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(Long id,
+        WholesaleReceiveSettleDetailQuery query) {
+
+
         return null;
     }
 }

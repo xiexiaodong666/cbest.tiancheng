@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageInfo;
 import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
+import com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp;
 import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
 import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery;
+import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
@@ -117,4 +119,12 @@ public interface WholesaleSettlementService {
      * @return
      */
     PageInfo<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id, WholesaleReceiveSettleDetailPageQuery query);
+
+    /**
+     *
+     * @param id
+     * @param query
+     * @return
+     */
+    WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(Long id, WholesaleReceiveSettleDetailQuery query);
 }

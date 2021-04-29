@@ -154,7 +154,7 @@ public class WholesaleReceivableSettleController implements IController {
     @GetMapping("/receivable/bill/{id}/summary")
     @ApiOperation("查询应收结算单明细数据汇总")
     public R<WholesaleReceiveSettleSummaryResp> receivableBillDetailSummary(@PathVariable("id") Long id, WholesaleReceiveSettleDetailQuery query){
-        return success(null);
+        return success(wholesaleSettlementService.receivableBillDetailSummary(id, query));
     }
 
     @GetMapping("/receivable/bill/{id}/export")

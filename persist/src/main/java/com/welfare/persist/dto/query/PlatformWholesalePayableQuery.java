@@ -24,5 +24,6 @@ public class PlatformWholesalePayableQuery {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("交易时间截至 yyyy-MM-dd HH:mm:ss")
     Date transTimeEnd;
-
+    @ApiModelProperty("合作方式(joint_venture:联营 distribution:经销)")
+    private String cooperationMode;
 }

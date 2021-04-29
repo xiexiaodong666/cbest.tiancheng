@@ -2,6 +2,7 @@ package com.welfare.persist.dto.query;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.List;
@@ -26,13 +27,13 @@ public class PlatformWholesalePayableDetailQuery {
     private String customerMerCode;
     @ApiModelProperty("门店号")
     private String storeCode;
-    @ApiModelProperty("交易时间起始")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("交易时间起始 yyyy-MM-dd HH:mm:ss")
     private Date transTimeStart;
-    @ApiModelProperty("交易时间截至")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("交易时间截至 yyyy-MM-dd HH:mm:ss")
     private Date transTimeEnd;
 
     @ApiModelProperty("电话号码")
     private String phone;
-    @ApiModelProperty("排除的结算明细id")
-    private List<Long> excludeIds;
 }

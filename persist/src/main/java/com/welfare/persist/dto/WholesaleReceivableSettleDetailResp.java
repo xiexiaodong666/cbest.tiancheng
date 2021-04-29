@@ -19,6 +19,7 @@ import java.util.Date;
 @Data
 @ExcelIgnoreUnannotated
 public class WholesaleReceivableSettleDetailResp {
+
     @ExcelProperty(value = "序列号")
     @ApiModelProperty(value = "序列号")
     private Long id;
@@ -42,91 +43,34 @@ public class WholesaleReceivableSettleDetailResp {
     @ApiModelProperty(value = "消费门店编号")
     private String storeCode;
 
-    @ExcelProperty(value = "消费门店名称")
-    @ApiModelProperty(value = "消费门店名称")
+    @ExcelProperty(value = "消费门店")
+    @ApiModelProperty(value = "消费门店")
     private String storeName;
-
-    @ExcelProperty(value = "商户编号")
-    @ApiModelProperty(value = "商户编号")
-    private String merCode;
-
-    @ExcelProperty(value = "商户名称")
-    @ApiModelProperty(value = "商户名称")
-    private String merName;
-
-    @ExcelProperty(value = "门店类型")
-    @ApiModelProperty(value = "门店类型")
-    private String type;
-
-    @ApiModelProperty(value = "福利类型")
-    private String welfareTypeCode;
-
-    @ExcelProperty(value = "福利类型名称")
-    @ApiModelProperty(value = "福利类型名称")
-    private String welfareTypeName;
-
-    @ExcelProperty(value = "实际付款金额")
-    @ApiModelProperty(value = "实际付款金额")
-    private String payAmount;
-
-    @ExcelProperty(value = "退款金额")
-    @ApiModelProperty(value = "退款金额")
-    private String refundAmount;
-
-    @ExcelProperty(value = "实付金额")
-    @ApiModelProperty(value = "实付金额")
-    private String realAmount;
-
-    @ExcelProperty(value = "结算金额")
-    @ApiModelProperty(value = "结算金额")
-    private String settleAmount;
-
-    @ExcelProperty(value = "营收金额")
-    @ApiModelProperty(value = "营收金额")
-    private String revenueAmount;
 
     @ExcelProperty("手机号")
     @ApiModelProperty("手机号")
     private String phone;
 
-    @ExcelProperty("组织机构")
-    @ApiModelProperty("组织机构")
-    private String departmentName;
-
     @ExcelProperty("消费人")
     @ApiModelProperty("消费人")
     private String accountName;
 
-    @ExcelProperty("供应商")
-    @ApiModelProperty("供应商")
-    private String supplierName;
+    @ExcelProperty(value = "客户商户")
+    @ApiModelProperty(value = "客户商户")
+    private String customerMerName;
 
-    @ApiModelProperty("消费类型")
-    private String consumeType;
+    @ExcelProperty(value = "客户商户编号")
+    private String customerMerCode;
 
-    @ExcelProperty("消费类型")
-    @ApiModelProperty("消费类型")
-    private String consumeTypeName;
+    @ApiModelProperty("销售金额")
+    @ExcelProperty("销售金额")
+    private BigDecimal saleAmount;
 
-    @ApiModelProperty("待结算金额")
-    private String unsettledAmount;
+    @ApiModelProperty("结算金额")
+    @ExcelProperty("结算金额")
+    private BigDecimal settleAmount;
 
-    @ApiModelProperty("商户扣款方式")
-    private String merDeductionType;
-
-    @ExcelProperty("商户扣款方式")
-    @ApiModelProperty("商户扣款方式")
-    private String merDeductionTypeName;
-
-    @ApiModelProperty("支付渠道")
-    @ExcelProperty("支付渠道")
-    private String paymentChannel;
-
-    @ApiModelProperty("商户余额支出")
-    @ExcelProperty("商户余额支出")
-    private BigDecimal merDeductionAmount;
-
-    @ApiModelProperty("商户授信支出")
-    @ExcelProperty("商户授信支出")
-    private BigDecimal merDeductionCreditAmount;
+    @ApiModelProperty("营收金额")
+    @ExcelProperty("营收金额")
+    private BigDecimal revenueAmount;
 }

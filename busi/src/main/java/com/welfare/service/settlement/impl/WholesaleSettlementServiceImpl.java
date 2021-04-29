@@ -97,9 +97,9 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         for (PlatformWholesaleSettleDetailDTO dto : settleDetailDTOList) {
             orderNoSet.add(dto.getOrderNo());
             if (WelfareConstant.TransType.CONSUME.code().equals(dto.getTransType())) {
-                totalTransAmount = totalTransAmount.add(dto.getTransAmount());
+        //        totalTransAmount = totalTransAmount.add(dto.getTransAmount());
             } else if (WelfareConstant.TransType.REFUND.code().equals(dto.getTransType())) {
-                totalTransAmount = totalTransAmount.add(dto.getTransAmount().negate());
+            //    totalTransAmount = totalTransAmount.add(dto.getTransAmount().negate());
             }
         }
         List<OrderInfoDetail> groupByTaxRateDetails = orderInfoDetailMapper.queryGroupByTaxRate(new ArrayList<>(orderNoSet));

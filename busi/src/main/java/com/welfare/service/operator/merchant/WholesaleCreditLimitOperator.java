@@ -27,11 +27,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WholesaleCreditLimitOperator extends AbstractMerAccountTypeOperator implements InitializingBean {
 
-    private WelfareConstant.MerCreditType wholesaleCreditType = WelfareConstant.MerCreditType.WHOLESALE_CREDIT_LIMIT;
+    private final WelfareConstant.MerCreditType wholesaleCreditType = WelfareConstant.MerCreditType.WHOLESALE_CREDIT_LIMIT;
 
     @Autowired
     private RemainingWholesaleCreditLimitOperator remainingWholesaleCreditLimitOperator;
-
     @Override
     public List<MerchantAccountOperation> decrease(MerchantCredit merchantCredit, BigDecimal amount, String transNo, String transType) {
         log.info("ready to decrease merchantCredit.wholesaleCreditLimit for {}", amount.toString());
@@ -48,7 +47,7 @@ public class WholesaleCreditLimitOperator extends AbstractMerAccountTypeOperator
     protected List<MerchantAccountOperation> doWhenNotEnough(MerchantCredit merchantCredit, BigDecimal amountLeftToBeDecrease, BigDecimal operatedAmount, String transNo, String transType) {
         List<MerchantAccountOperation> operations = new ArrayList<>();
         BigDecimal oldWholesaleCreditLimit = merchantCredit.getWholesaleCreditLimit();
-        BigDecimal oldRemainingtWholesaleCredit = merchantCredit.getWholesaleCredit();
+        BigDecimal oldRemainingWholesaleCredit = merchantCredit.getWholesaleCredit();
 
         merchantCredit.setCreditLimit(oldWholesaleCreditLimit.subtract(amountLeftToBeDecrease));
         MerchantAccountOperation wholesaleCreditLimitLimitOperator = MerchantAccountOperation.of(
@@ -60,9 +59,8 @@ public class WholesaleCreditLimitOperator extends AbstractMerAccountTypeOperator
                 transType
         );
         operations.add(wholesaleCreditLimitLimitOperator);
-        AbstractMerAccountTypeOperator nextOperator = getNext();
         // 减批发剩余授信额度，不够减就为负数
-        merchantCredit.setRemainingLimit(oldRemainingtWholesaleCredit.subtract(amountLeftToBeDecrease));
+        merchantCredit.setRemainingLimit(oldRemainingWholesaleCredit.subtract(amountLeftToBeDecrease));
         MerchantAccountOperation remainingLimitLimitOperator = MerchantAccountOperation.of(
                 WelfareConstant.MerCreditType.WHOLESALE_CREDIT,
                 amountLeftToBeDecrease,
@@ -111,7 +109,7 @@ public class WholesaleCreditLimitOperator extends AbstractMerAccountTypeOperator
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         this.next(remainingWholesaleCreditLimitOperator);
     }
 }

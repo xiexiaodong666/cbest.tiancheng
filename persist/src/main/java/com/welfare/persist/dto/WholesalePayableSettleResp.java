@@ -38,7 +38,7 @@ public class WholesalePayableSettleResp {
     @ApiModelProperty(value = "交易笔数")
     private String orderNum;
 
-    @ApiModelProperty(value = "合作方式")
+    @ApiModelProperty(value = "合作方式 联营:joint_venture  经销:distribution\"")
     private String merCooperationMode;
 
     @ApiModelProperty(value = "创建时间")
@@ -85,6 +85,9 @@ public class WholesalePayableSettleResp {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JSONField(format = "yyyy-MM-dd")
     private Date settleEndTime;
+
+    @ApiModelProperty(value = "不同税率商品销售金额json")
+    private String settleTaxSalesStatistics;
 
     private List<SettleStatisticsInfoDTO> settleStatisticsInfoList;
 }

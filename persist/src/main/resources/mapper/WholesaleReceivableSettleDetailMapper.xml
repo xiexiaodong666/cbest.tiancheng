@@ -12,15 +12,15 @@
     <sql id = "getWelfareSettleSum">
         sum(
         case
-        when t1.settle_flag = 'unsettled' and t1.trans_type='consume' then t1.mer_credit_deduction_amount
-        when t1.settle_flag = 'unsettled' and t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
+        when t1.settle_flag = 'unsettled' and t1.trans_type='consume' then t1.order_wholesale_amount
+        when t1.settle_flag = 'unsettled' and t1.trans_type='refund' then t1.order_wholesale_amount*-1
         else 0
         end
         ) as unSettleAmount,
         sum(
         case
-        when t1.trans_type = 'consume' then t1.mer_credit_deduction_amount + t1.mer_deduction_amount
-        when t1.trans_type = 'refund'  then (t1.mer_credit_deduction_amount + t1.mer_deduction_amount) * -1
+        when t1.trans_type = 'consume' then t1.mer_wholesale_credit_deduction_amount + t1.mer_deduction_amount
+        when t1.trans_type = 'refund'  then t1.mer_wholesale_credit_deduction_amount * -1
         else 0
         end
         ) as totalConsumeAmount

@@ -79,6 +79,24 @@ public class AccountDetailDTO {
   private BigDecimal surplusQuota;
 
   /**
+   * 商户批发最大授权额度
+   */
+  @ApiModelProperty("商户批发最大授权额度")
+  private BigDecimal wholesaleCreditLimit;
+
+  /**
+   * 商户批发剩余授权额度
+   */
+  @ApiModelProperty("商户批发剩余授权额度")
+  private BigDecimal wholesaleCredit;
+
+  /**
+   * 当前员工批发采购账户余额
+   */
+  @ApiModelProperty("当前员工批发采购账户余额")
+  private BigDecimal accountWholesaleCreditLimit;
+
+  /**
    * 账户余额
    */
   @ApiModelProperty("账户余额")

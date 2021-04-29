@@ -26,13 +26,6 @@ public interface WholesalePayableSettletService {
     Page<PlatformPayableSettleGroupDTO> pageQueryPayableSummary(PlatformWholesalePayablePageQuery query);
 
     /**
-     * 查询平台应付未结算分组汇总
-     * @param query
-     * @return
-     */
-    List<PlatformWholesaleSettleGroupDTO> queryPayableSummaryList(PlatformWholesalePayableQuery query);
-
-    /**
      * 查询平台应付未结算账单汇总
      * @param query
      * @return

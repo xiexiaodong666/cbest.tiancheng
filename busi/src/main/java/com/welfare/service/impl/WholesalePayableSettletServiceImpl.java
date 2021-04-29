@@ -33,13 +33,8 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     }
 
     @Override
-    public List<PlatformWholesaleSettleGroupDTO> queryPayableSummaryList(PlatformWholesalePayableQuery query) {
-        return null;
-    }
-
-    @Override
     public PlatformWholesalePayableGroupDTO queryPayableSummary(PlatformWholesalePayableQuery query) {
-        return null;
+        return wholesalePayableSettleDetailMapper.summaryGroupBySupplierMerCode(query);
     }
 
     @Override

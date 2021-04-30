@@ -125,6 +125,6 @@ public class ConsumeTypesUtils {
 
     Map<String, Boolean> map = transfer(consumeType);
 
-    return map.get(ConsumeTypeEnum.WHOLESALE.getDesc());
+    return map.get(ConsumeTypeEnum.WHOLESALE.getCode());
   }
 }

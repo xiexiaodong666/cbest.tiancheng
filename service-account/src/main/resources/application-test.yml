@@ -108,5 +108,7 @@ cache:
   cache-expire-secs: 30
 rocketmq:
   name-server: 172.30.37.35:9876;172.30.37.35:9876
+  producer:
+    group: E-WELFARE-ACCOUNT
   topic:
     account-deduction-detail: E-WELFARE-ACCOUNT-DEDUCTION-DETAIL

@@ -26,7 +26,7 @@ public class PlatformWholesalePayableDetailQuery {
     @ApiModelProperty("客户商户编码")
     private String customerMerCode;
     @ApiModelProperty("门店号")
-    private String storeCode;
+    private String storeCodes;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("交易时间起始 yyyy-MM-dd HH:mm:ss")
     private Date transTimeStart;
@@ -36,4 +36,6 @@ public class PlatformWholesalePayableDetailQuery {
 
     @ApiModelProperty("电话号码")
     private String phone;
+    @ApiModelProperty("排除的结算明细id")
+    private List<Long> excludeIds;
 }

@@ -58,7 +58,7 @@ public interface WholesalePayableSettletService {
      * @param query
      * @return
      */
-    WholesalePayableSettle generatePayableSettle(PlatformWholesalePayableDetailPageQuery query);
+    WholesalePayableSettle generatePayableSettle(PlatformWholesalePayableDetailQuery query);
 
     /**
      * 平台发送账单

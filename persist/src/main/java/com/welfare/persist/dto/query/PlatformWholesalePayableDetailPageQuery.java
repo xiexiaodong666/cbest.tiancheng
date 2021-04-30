@@ -16,7 +16,7 @@ import java.util.Set;
 @Data
 public class PlatformWholesalePayableDetailPageQuery extends PageReq{
 
-    @ApiModelProperty("商户编码")
+    @ApiModelProperty(value = "商户编码")
     private String merCode;
     @ApiModelProperty("订单号")
     private String orderNo;

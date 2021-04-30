@@ -5,6 +5,7 @@ import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.*;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
+import com.welfare.persist.entity.WholesalePayableSettle;
 import com.welfare.persist.entity.WholesalePayableSettleDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -40,4 +41,6 @@ public interface WholesalePayableSettleDetailMapper extends BaseMapper<Wholesale
     WholesalePayableBillGroupDTO payableBillDetailSummary(@Param("query") WholesalePaySettleDetailQuery query);
 
     List<WholesalePayableSettleDetailResp> payableBillDetailPage(@Param("query") WholesalePaySettleDetailQuery query);
+
+    WholesalePayableSettle buildPayableSettle(@Param("query") PlatformWholesalePayableDetailQuery query);
 }

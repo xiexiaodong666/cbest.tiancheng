@@ -3,11 +3,13 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.domain.UserInfo;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.*;
@@ -21,6 +23,7 @@ import com.welfare.service.WholesalePayableSettletService;
 import com.welfare.service.dto.WholesalePaySettleDetailReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -69,8 +72,19 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     }
 
     @Override
-    public WholesalePayableSettle generatePayableSettle(PlatformWholesalePayableDetailPageQuery query) {
-        return null;
+    public WholesalePayableSettle generatePayableSettle(PlatformWholesalePayableDetailQuery query) {
+        BizAssert.notBlank(query.getMerCode(), ExceptionCode.ILLEGALITY_ARGUMENTS, "商户编码必传");
+        RLock rLock = DistributedLockUtil.lockFairly(RedisKeyConstant.buidKey(RedisKeyConstant.BUILD_WHOLESALE_PAYABLE_SETTLE, query.getMerCode()));
+        WholesalePayableSettle payableSettle;
+        try {
+            payableSettle = wholesalePayableSettleDetailMapper.buildPayableSettle(query);
+            BizAssert.notNull(payableSettle, ExceptionCode.DATA_NOT_EXIST, "没有可以结算的明细数据");
+            wholesalePayableSettleMapper.insert(payableSettle);
+
+        } finally {
+            DistributedLockUtil.unlock(rLock);
+        }
+        return payableSettle;
     }
 
     @Override

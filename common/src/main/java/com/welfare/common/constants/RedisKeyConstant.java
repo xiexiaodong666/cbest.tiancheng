@@ -75,6 +75,11 @@ public class RedisKeyConstant {
    */
   public static final String ACCOUNT_AMOUNT_TYPE_GROUP_OPERATE = "e-welfare_account_amount_type_group_operate:";
 
+  /**
+   * 生成批发应付结算单需要用到的锁key前缀
+   */
+  public static final String BUILD_WHOLESALE_PAYABLE_SETTLE = "e-welfare_build_wholesale_payable_settle:";
+
   public static String buidKey(String perfix, String... part) {
     return StringUtils.removeEnd(perfix, ":").concat(":").concat(StringUtils.join(part, ":"));
   }

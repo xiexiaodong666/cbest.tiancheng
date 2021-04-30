@@ -215,7 +215,7 @@ public class MerchantServiceImpl implements MerchantService {
             detailDTO.setSettlementMode(method);
         } else {
             detailDTO.setWholesaleEnabled(false);
-            detailDTO.setSettlementMode(null);
+            detailDTO.setSettlementMode("");
         }
         detailDTO.setTags(syncIndustryTag);
         detailDTO.setAddressList(merchant.getAddressList());
@@ -258,7 +258,7 @@ public class MerchantServiceImpl implements MerchantService {
             detailDTO.setSettlementMode(method);
         } else {
             detailDTO.setWholesaleEnabled(false);
-            detailDTO.setSettlementMode(null);
+            detailDTO.setSettlementMode("");
         }
         detailDTO.setTags(industryTags);
         detailDTO.setAddressList(merchant.getAddressList());

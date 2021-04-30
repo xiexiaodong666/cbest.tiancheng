@@ -101,6 +101,12 @@ public class PaymentController implements IController {
         return success(refundRequest);
     }
 
+    @PostMapping("/refund/multi-order")
+    @ApiOperation("多订单联合支付退款")
+    public R<MultiOrderRefundRequest> newRefundRequest(@RequestBody MultiOrderRefundRequest refundRequest){
+        return success(refundRequest);
+    }
+
     @PostMapping("/thirdPartyBarcodePaymentSceneCheck")
     @ApiOperation("第三方条码支付场景检验")
     public R<ThirdPartyBarcodePaymentDTO> thirdPartyBarcodePaymentSceneCheck(@RequestBody BarcodePaymentRequest paymentRequest) {

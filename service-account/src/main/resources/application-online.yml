@@ -93,5 +93,7 @@ wo-life:
   url: http://113.204.98.245:8900/livingroom
 rocketmq:
   name-server: a.broker.rocketmq.cbest.gam:9876;b.broker.rocketmq.cbest.gam:9876
+  producer:
+    group: E-WELFARE-ACCOUNT
   topic:
     account-deduction-detail: E-WELFARE-ACCOUNT-DEDUCTION-DETAIL

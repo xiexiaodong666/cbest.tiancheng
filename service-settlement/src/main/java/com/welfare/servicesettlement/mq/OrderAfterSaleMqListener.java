@@ -53,7 +53,7 @@ public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrder
             //没有交易单号，则没有支付过，不保存。老的员工卡也不保存
             return;
         }
-        OrderInfo refundOrderInDb = orderInfoDao.getOneByTradeNo(tradeNo, WelfareConstant.TransType.CONSUME.code());
+        OrderInfo refundOrderInDb = orderInfoDao.getOneByTradeNo(tradeNo, WelfareConstant.TransType.REFUND.code());
         if(Objects.nonNull(refundOrderInDb)){
             log.info("此流水号对应的订单已经保存，不需要再次保存");
             return;

@@ -36,9 +36,9 @@ public class OrderInfoDao extends ServiceImpl<OrderInfoMapper, OrderInfo> {
         );
     }
 
-    public OrderInfo getOneByTradeNo(String orderNo, String transType){
+    public OrderInfo getOneByTradeNo(String tradeNo, String transType){
         return getOne(
-                Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getOrderId,orderNo).eq(OrderInfo::getTransType,transType).last("limit 1")
+                Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getTransNo,tradeNo).eq(OrderInfo::getTransType,transType).last("limit 1")
         );
     }
 }

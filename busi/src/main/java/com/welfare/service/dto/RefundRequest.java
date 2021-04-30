@@ -24,6 +24,8 @@ public class RefundRequest {
     private String transNo;
     @ApiModelProperty("重百付正向支付流水号")
     private String originalTransNo;
+    @ApiModelProperty("订单号")
+    private String orderNo;
     @ApiModelProperty("退款金额")
     private BigDecimal amount;
     @ApiModelProperty(value = "退款处理状态,1:新增, 2:处理中, 3:处理成功 -1:处理失败")

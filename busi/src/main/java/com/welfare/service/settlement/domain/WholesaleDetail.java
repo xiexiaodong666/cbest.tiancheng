@@ -209,18 +209,15 @@ public class WholesaleDetail {
     public static WholesaleDetail fromAccountDeductionDetail(AccountDeductionDetail deductionDetail){
         AccountDao accountDao = SpringBeanUtils.getBean(AccountDao.class);
         MerchantDao merchantDao = SpringBeanUtils.getBean(MerchantDao.class);
-        OrderInfoDao orderInfoDao = SpringBeanUtils.getBean(OrderInfoDao.class);
         SupplierStoreDao supplierStoreDao = SpringBeanUtils.getBean(SupplierStoreDao.class);
         MerchantAccountTypeDao merchantAccountTypeDao = SpringBeanUtils.getBean(MerchantAccountTypeDao.class);
         Account account = accountDao.queryByAccountCode(deductionDetail.getAccountCode());
         Merchant merchant = merchantDao.queryByCode(account.getMerCode());
-        OrderInfo orderInfo = orderInfoDao.getOneByTransNo(deductionDetail.getTransNo());
         SupplierStore store = supplierStoreDao.getOneByCode(deductionDetail.getStoreCode());
         MerchantAccountType merchantAccountType = merchantAccountTypeDao
                 .queryAllByMerCodeAndType(account.getMerCode(), deductionDetail.getMerAccountType());
 
         WholesaleDetail wholesaleDetail = new WholesaleDetail();
-        //wholesaleDetail.setOrderId(orderInfo.getOrderId());
         wholesaleDetail.setAccountCode(account.getAccountCode());
         wholesaleDetail.setAccountName(account.getAccountName());
         wholesaleDetail.setCardId(deductionDetail.getCardId());

@@ -82,4 +82,234 @@
         </if>
     </select>
 
+
+    <select id="queryPagePayableDetails" resultType="com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO">
+        SELECT
+            wpsd.id AS id,
+            wpsd.trans_no AS transNo,
+            wpsd.order_id AS orderNo,
+            wpsd.trans_time AS transTime,
+            wpsd.account_code AS accountCode,
+            a.account_name AS accountName,
+            a.phone AS phone,
+            mer.mer_code AS customerMerCode,
+            mer.mer_name AS customerMerName,
+            ss.store_code AS storeCode,
+            ss.store_name AS storeName,
+            wpsd.trans_type AS transType,
+            wpsd.trans_amount AS saleAmount,
+            wpsd.order_wholesale_amount AS settleAmount,
+            wpsd.trans_amount - wpsd.order_wholesale_amount AS revenueAmount,
+            wpsd.settle_flag AS settleFlag
+        FROM
+            wholesale_payable_settle_detail wpsd
+                LEFT JOIN account a ON wpsd.account_code = a.account_code
+                LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+                LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
+                LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
+                LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        <where>
+            <if test="query.merCode != null and query.merCode != ''">
+                and cust.mer_code = #{query.merCode}
+            </if>
+            <if test="query.orderNo != null and query.orderNo != ''">
+                and wpsd.order_id = #{query.orderNo}
+            </if>
+            <if test="query.transNo != null and query.transNo != ''">
+                and wpsd.trans_no = #{query.transNo}
+            </if>
+            <if test="query.settleFlag != null and query.settleFlag != ''">
+                and wpsd.settle_flag = #{query.settleFlag}
+            </if>
+            <if test="query.customerMerCode != null and query.customerMerCode != ''">
+                and mer.mer_code = #{query.customerMerCode}
+            </if>
+            <if test="query.customerMerCode != null and query.customerMerCode != ''">
+                and mer.mer_code = #{query.customerMerCode}
+            </if>
+            <if test="query.transTimeStart != null">
+                <![CDATA[AND wpsd.trans_time >= #{query.transTimeStart}]]>
+            </if>
+            <if test="query.transTimeEnd != null">
+                <![CDATA[AND wpsd.trans_time < #{query.transTimeEnd}]]>
+            </if>
+            <if test="query.phone != null and query.phone != ''">
+                and a.phone = #{query.phone}
+            </if>
+            <if test="query.storeCodes != null and query.storeCodes.size > 0">
+                and wpsd.store_code in
+                <foreach collection="query.storeCodes" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.excludeIds != null and query.excludeIds.size > 0">
+                and wpsd.id not in
+                <foreach collection="query.excludeIds" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+
+
+    <select id="queryPayableDetailsSummary" resultType="com.welfare.persist.dto.PlatformWholesalePayableDetailSummaryDTO">
+        SELECT
+        supplier.mer_name as merName,
+        me.supplier_wholesale_settle_method as cooperationMode,
+        SUM( wpsd.trans_amount ) AS saleAmount,
+        SUM( wpsd.order_wholesale_amount ) AS unsettledAmount,
+        SUM( wpsd.trans_amount ) - SUM( wpsd.order_wholesale_amount ) AS revenueAmount
+        FROM
+        wholesale_payable_settle_detail wpsd
+        LEFT JOIN account a ON wpsd.account_code = a.account_code
+        LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
+        LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
+        LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        <where>
+            <if test="query.merCode != null and query.merCode != ''">
+                and cust.mer_code = #{query.merCode}
+            </if>
+            <if test="query.orderNo != null and query.orderNo != ''">
+                and wpsd.order_id = #{query.orderNo}
+            </if>
+            <if test="query.transNo != null and query.transNo != ''">
+                and wpsd.trans_no = #{query.transNo}
+            </if>
+            <if test="query.settleFlag != null and query.settleFlag != ''">
+                and wpsd.settle_flag = #{query.settleFlag}
+            </if>
+            <if test="query.customerMerCode != null and query.customerMerCode != ''">
+                and mer.mer_code = #{query.customerMerCode}
+            </if>
+            <if test="query.customerMerCode != null and query.customerMerCode != ''">
+                and mer.mer_code = #{query.customerMerCode}
+            </if>
+            <if test="query.transTimeStart != null">
+                <![CDATA[AND wpsd.trans_time >= #{query.transTimeStart}]]>
+            </if>
+            <if test="query.transTimeEnd != null">
+                <![CDATA[AND wpsd.trans_time < #{query.transTimeEnd}]]>
+            </if>
+            <if test="query.phone != null and query.phone != ''">
+                and a.phone = #{query.phone}
+            </if>
+            <if test="query.storeCodes != null and query.storeCodes.size > 0">
+                and wpsd.store_code in
+                <foreach collection="query.storeCodes" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.excludeIds != null and query.excludeIds.size > 0">
+                and wpsd.id not in
+                <foreach collection="query.excludeIds" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="payableBillDetailPage" resultType="com.welfare.persist.dto.WholesalePayableSettleDetailResp">
+        SELECT
+        wpsd.id AS id,
+        wpsd.trans_no AS transNo,
+        wpsd.order_id AS orderNo,
+        wpsd.trans_time AS transTime,
+        ss.store_code AS storeCode,
+        ss.store_name AS storeName,
+        a.phone AS phone,
+        wpsd.account_code AS accountCode,
+        a.account_name AS accountName,
+        mer.mer_code AS customerMerCode,
+        mer.mer_name AS customerMerName,
+        wpsd.trans_amount AS saleAmount,
+        wpsd.order_wholesale_amount AS settleAmount,
+        wpsd.trans_amount - wpsd.order_wholesale_amount AS revenueAmount
+        FROM
+        wholesale_payable_settle_detail wpsd
+        LEFT JOIN account a ON wpsd.account_code = a.account_code
+        LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
+        LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
+        LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        <where>
+
+            <if test="query.settleNo != null and query.settleNo != ''">
+                and wpsd.settle_no = #{query.settleNo}
+            </if>
+            <if test="query.orderNo != null and query.orderNo != ''">
+                and wpsd.order_id = #{query.orderNo}
+            </if>
+            <if test="query.storeCodes != null and query.storeCodes.size > 0">
+                and wpsd.store_code in
+                <foreach collection="query.storeCodes" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.startTime != null">
+                <![CDATA[AND wpsd.trans_time >= #{query.startTime}]]>
+            </if>
+            <if test="query.endTime != null">
+                <![CDATA[AND wpsd.trans_time < #{query.endTime}]]>
+            </if>
+            <if test="query.transNo != null and query.transNo != ''">
+                and wpsd.trans_no = #{query.transNo}
+            </if>
+            <if test="query.phone != null and query.phone != ''">
+                and a.phone = #{query.phone}
+            </if>
+            <if test="query.customerMerCode != null and query.customerMerCode != ''">
+                and mer.mer_code = #{query.customerMerCode}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="payableBillDetailSummary" resultType="com.welfare.persist.dto.WholesalePayableBillGroupDTO">
+        SELECT
+        SUM( wpsd.trans_amount ) AS goodsSaleAmount,
+        SUM( wpsd.trans_amount ) AS saleAmount,
+        SUM( wpsd.order_wholesale_amount ) AS settleAmount,
+        SUM( wpsd.trans_amount ) - SUM( wpsd.order_wholesale_amount ) AS revenueAmount
+        FROM
+        wholesale_payable_settle_detail wpsd
+        LEFT JOIN account a ON wpsd.account_code = a.account_code
+        LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
+        LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
+        LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        <where>
+
+            <if test="query.settleNo != null and query.settleNo != ''">
+                and wpsd.settle_no = #{query.settleNo}
+            </if>
+            <if test="query.orderNo != null and query.orderNo != ''">
+                and wpsd.order_id = #{query.orderNo}
+            </if>
+            <if test="query.storeCodes != null and query.storeCodes.size > 0">
+                and wpsd.store_code in
+                <foreach collection="query.storeCodes" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.startTime != null">
+                <![CDATA[AND wpsd.trans_time >= #{query.startTime}]]>
+            </if>
+            <if test="query.endTime != null">
+                <![CDATA[AND wpsd.trans_time < #{query.endTime}]]>
+            </if>
+            <if test="query.transNo != null and query.transNo != ''">
+                and wpsd.trans_no = #{query.transNo}
+            </if>
+            <if test="query.phone != null and query.phone != ''">
+                and a.phone = #{query.phone}
+            </if>
+            <if test="query.customerMerCode != null and query.customerMerCode != ''">
+                and mer.mer_code = #{query.customerMerCode}
+            </if>
+        </where>
+    </select>
+
 </mapper>

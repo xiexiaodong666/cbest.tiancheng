@@ -1,17 +1,30 @@
 package com.welfare.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.common.constants.WelfareSettleConstant;
+import com.welfare.common.domain.MerchantUserInfo;
+import com.welfare.common.domain.UserInfo;
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.*;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
-import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.entity.WholesalePayableSettle;
+import com.welfare.persist.entity.WholesalePayableSettleDetail;
 import com.welfare.persist.mapper.WholesalePayableSettleDetailMapper;
+import com.welfare.persist.mapper.WholesalePayableSettleMapper;
 import com.welfare.service.WholesalePayableSettletService;
+import com.welfare.service.dto.WholesalePaySettleDetailReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,6 +38,7 @@ import java.util.List;
 public class WholesalePayableSettletServiceImpl implements WholesalePayableSettletService {
 
     private WholesalePayableSettleDetailMapper wholesalePayableSettleDetailMapper;
+    private WholesalePayableSettleMapper wholesalePayableSettleMapper;
 
     @Override
     public Page<PlatformPayableSettleGroupDTO> pageQueryPayableSummary(PlatformWholesalePayablePageQuery query) {
@@ -39,17 +53,19 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
 
     @Override
     public Page<PlatformWholesaleSettleDetailDTO> queryPagePayableDetails(PlatformWholesalePayableDetailPageQuery query) {
-        return null;
+        Page<PlatformWholesaleSettleDetailDTO> page = new Page<>(query.getCurrent(), query.getSize());
+        page.addOrder(OrderItem.desc(WholesalePayableSettleDetail.ID));
+        return wholesalePayableSettleDetailMapper.queryPagePayableDetails(page, query);
     }
 
     @Override
     public PlatformWholesalePayableDetailSummaryDTO queryPayableDetailsSummary(PlatformWholesalePayableDetailQuery query) {
-        return null;
+        return wholesalePayableSettleDetailMapper.queryPayableDetailsSummary(query);
     }
 
     @Override
     public List<PlatformWholesaleSettleDetailDTO> queryPayableDetails(PlatformWholesalePayableDetailQuery query) {
-        return null;
+        return wholesalePayableSettleDetailMapper.queryPagePayableDetails(query);
     }
 
     @Override
@@ -58,37 +74,93 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     }
 
     @Override
-    public Integer monthSettleSend(Long id) {
-        return null;
+    public Integer settleSend(Long id) {
+        WholesalePayableSettle payableSettle = new WholesalePayableSettle();
+        //修改账单发送状态为已发送
+        payableSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.SENDED.code());
+        payableSettle.setSendTime(new Date());
+
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        payableSettle.setCreateUser(userInfo.getUserId());
+
+        return wholesalePayableSettleMapper.update(payableSettle,
+                Wrappers.<WholesalePayableSettle>lambdaUpdate()
+                        .eq(WholesalePayableSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code())
+                        .eq(WholesalePayableSettle::getId, id)
+        );
     }
 
     @Override
-    public Integer monthSettleFinish(Long id) {
-        return null;
+    public Integer settleFinish(Long id) {
+        //修改账单结算状态为已结算
+        WholesalePayableSettle payableSettle = new WholesalePayableSettle();
+        payableSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
+
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        payableSettle.setUpdateUser(userInfo.getUserId());
+
+        int i = wholesalePayableSettleMapper.update(payableSettle,
+                Wrappers.<WholesalePayableSettle>lambdaUpdate()
+                        .eq(WholesalePayableSettle::getSettleStatus, WelfareSettleConstant.SettleStatusEnum.SETTLING.code())
+                        .eq(WholesalePayableSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
+                        .eq(WholesalePayableSettle::getId, id)
+        );
+        return i;
     }
 
     @Override
-    public Integer monthSettleConfirm(Long id) {
-        return null;
+    public Integer settleConfirm(Long id) {
+        WholesalePayableSettle payableSettle = new WholesalePayableSettle();
+
+        //修改账单确认状态为已确认
+        payableSettle.setRecStatus(WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code());
+
+        MerchantUserInfo merchantUser = MerchantUserHolder.getMerchantUser();
+        payableSettle.setConfirmTime(new Date());
+        payableSettle.setUpdateUser(merchantUser.getUserCode());
+
+        return wholesalePayableSettleMapper.update(payableSettle,
+                Wrappers.<WholesalePayableSettle>lambdaUpdate()
+                        .eq(WholesalePayableSettle::getSendStatus, WelfareSettleConstant.SettleSendStatusEnum.SENDED.code())
+                        .eq(WholesalePayableSettle::getId, id)
+        );
     }
 
     @Override
     public Page<WholesalePayableSettleResp> payableBillPage(WholesalePayableSettleBillQuery query) {
-        return null;
+        Page<WholesalePayableSettleResp> page = new Page<>(query.getCurrent(), query.getSize());
+        page.addOrder(OrderItem.desc(WholesalePayableSettle.ID));
+        return wholesalePayableSettleMapper.payableBillPage(page, query);
     }
 
     @Override
-    public Page<WholesaleReceivableSettleDetailResp> payableBillDetailPage(Long id, WholesalePaySettleDetailPageQuery query) {
-        return null;
+    public Page<WholesalePayableSettleDetailResp> payableBillDetailPage(Long id, WholesalePaySettleDetailPageQuery query) {
+        WholesalePaySettleDetailReq wholesalePaySettleDetailReq = new WholesalePaySettleDetailReq();
+        BeanUtils.copyProperties(wholesalePaySettleDetailReq, query);
+        WholesalePaySettleDetailQuery paySettleDetailQuery = getWholesalePaySettleDetailQuery(id, wholesalePaySettleDetailReq);
+        Page<WholesaleReceivableSettleDetailResp> page = new Page<>(query.getCurrent(), query.getSize());
+        page.addOrder(OrderItem.desc(WholesalePayableSettleDetail.ID));
+        return wholesalePayableSettleDetailMapper.payableBillDetailPage(page, paySettleDetailQuery);
     }
 
     @Override
-    public WholesalePayableBillGroupDTO payableBillDetailSummary(Long id, WholesalePaySettleDetailQuery query) {
-        return null;
+    public WholesalePayableBillGroupDTO payableBillDetailSummary(Long id, WholesalePaySettleDetailReq query) {
+        WholesalePaySettleDetailQuery paySettleDetailQuery = getWholesalePaySettleDetailQuery(id, query);
+        return wholesalePayableSettleDetailMapper.payableBillDetailSummary(paySettleDetailQuery);
     }
 
     @Override
-    public List<WholesaleReceivableSettleDetailResp> queryPayableBillDetail(Long id, WholesalePaySettleDetailQuery query) {
-        return null;
+    public List<WholesalePayableSettleDetailResp> queryPayableBillDetail(Long id, WholesalePaySettleDetailReq query) {
+        WholesalePaySettleDetailQuery paySettleDetailQuery = getWholesalePaySettleDetailQuery(id, query);
+        return wholesalePayableSettleDetailMapper.payableBillDetailPage(paySettleDetailQuery);
+    }
+
+    private WholesalePaySettleDetailQuery getWholesalePaySettleDetailQuery(Long id, WholesalePaySettleDetailReq query) {
+        WholesalePayableSettle payableSettle = wholesalePayableSettleMapper.selectById(id);
+        BizAssert.notNull(payableSettle, ExceptionCode.DATA_NOT_EXIST, "结算单不存在");
+        WholesalePaySettleDetailQuery paySettleDetailQuery = new WholesalePaySettleDetailQuery();
+        BeanUtils.copyProperties(paySettleDetailQuery, query);
+        paySettleDetailQuery.setSettleNo(payableSettle.getSettleNo());
+        return paySettleDetailQuery;
     }
 }

@@ -14,7 +14,7 @@ import java.util.Date;
  * @Date: 2021/4/27 9:35 下午
  */
 @Data
-public class WholesalePayableSettleBillQuery {
+public class WholesalePayableSettleBillQuery extends PageReq{
 
     @ApiModelProperty(value = "商户代码")
     private String merCode;

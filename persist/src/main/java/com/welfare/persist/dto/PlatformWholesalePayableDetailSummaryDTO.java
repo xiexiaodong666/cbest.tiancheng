@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class PlatformWholesalePayableDetailSummaryDTO {
 
     @ApiModelProperty("商户名称")
-    private String merCode;
+    private String merName;
 
     @ApiModelProperty("合作方式")
     private String cooperationMode;

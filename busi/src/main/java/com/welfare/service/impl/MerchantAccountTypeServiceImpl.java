@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.MoveDirectionEnum;
 import com.welfare.common.exception.BizException;
@@ -55,6 +56,14 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
         QueryWrapper q=QueryHelper.getWrapper(req);
         q.eq(MerchantAccountType.SHOW_STATUS,MerchantAccountTypeShowStatusEnum.SHOW.getCode());
+        q.orderByDesc(MerchantAccountType.CREATE_TIME);
+        return merchantAccountTypeDao.list(q);
+    }
+
+    @Override
+    public List<MerchantAccountType> listExclusion(MerchantAccountTypeReq req) {
+        QueryWrapper q=QueryHelper.getWrapper(req);
+        q.ne(MerchantAccountType.MER_ACCOUNT_TYPE_CODE, MerAccountTypeCode.WHOLESALE_PROCUREMENT);
         q.orderByDesc(MerchantAccountType.CREATE_TIME);
         return merchantAccountTypeDao.list(q);
     }

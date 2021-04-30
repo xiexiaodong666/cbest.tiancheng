@@ -23,6 +23,8 @@ public interface MerchantAccountTypeService {
      */
     List<MerchantAccountType>  list(MerchantAccountTypeReq req);
 
+    List<MerchantAccountType>  listExclusion(MerchantAccountTypeReq req);
+
     boolean init(String merCode,  MerchantExtendDTO extend);
 
     /**

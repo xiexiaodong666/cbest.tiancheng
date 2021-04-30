@@ -117,4 +117,14 @@ public class ConsumeTypesUtils {
     }
     return consumeTypeEnums;
   }
+
+  /**
+   * 改门店是否包含批发业务
+   */
+  public static boolean isRelationedWholesale(String consumeType) {
+
+    Map<String, Boolean> map = transfer(consumeType);
+
+    return map.get(ConsumeTypeEnum.WHOLESALE.getDesc());
+  }
 }

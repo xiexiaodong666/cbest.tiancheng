@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.common.exception.BizException;
@@ -11,12 +12,14 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.ConsumeTypesUtils;
 import com.welfare.common.util.GenerateCodeUtil;
 import com.welfare.common.util.UserInfoHolder;
+import com.welfare.persist.dao.MerAccountTypeConsumeSceneConfigDao;
 import com.welfare.persist.dao.MerchantStoreRelationDao;
 import com.welfare.persist.dao.SettleDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.MerchantStoreRelationAddReq;
 import com.welfare.persist.dto.query.MerchantStoreRelationUpdateReq;
+import com.welfare.persist.entity.MerAccountTypeConsumeSceneConfig;
 import com.welfare.persist.entity.MerchantStoreRelation;
 import com.welfare.persist.entity.SupplierStore;
 import com.welfare.persist.mapper.MerchantStoreRelationMapper;
@@ -59,6 +62,9 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
   private final ObjectMapper mapper;
   private final SettleDetailDao settleDetailDao;
+  @Autowired
+  private MerAccountTypeConsumeSceneConfigDao merAccountTypeConsumeSceneConfigDao;
+
   @Autowired
   private AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final ApplicationContext applicationContext;
@@ -167,6 +173,10 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
       } catch (JsonProcessingException e) {
         log.error("[add] json convert error", e.getMessage());
+      }
+      // 客户供应商关联了批发门店,需要初始化福利类型消费场景配置和员工类型消费场景配置
+      if(ConsumeTypesUtils.isRelationedWholesale(merchantStoreRelation.getConsumType())) {
+        initWholesaleConsume(merchantStoreRelation.getMerCode(), merchantStoreRelation.getStoreCode());
       }
       merchantStoreRelationList.add(merchantStoreRelation);
     }
@@ -571,5 +581,20 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       settleDetails = settleDetails.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
     return settleDetails;
+  }
+
+  /**
+   * 初始化福利类型消费场景配置
+   * @param storeCode
+   */
+  private void initWholesaleConsume(String merCode, String storeCode) {
+    // 初始化福利类型消费场景配置
+    MerAccountTypeConsumeSceneConfig merAccountTypeConsumeSceneConfig = new MerAccountTypeConsumeSceneConfig();
+    merAccountTypeConsumeSceneConfig.setMerCode(merCode);
+    merAccountTypeConsumeSceneConfig.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+    merAccountTypeConsumeSceneConfig.setStoreCode(storeCode);
+    merAccountTypeConsumeSceneConfig.setSceneConsumeType(ConsumeTypeEnum.WHOLESALE.getCode());
+
+    merAccountTypeConsumeSceneConfigDao.save(merAccountTypeConsumeSceneConfig);
   }
 }

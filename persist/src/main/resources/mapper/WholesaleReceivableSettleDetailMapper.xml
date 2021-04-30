@@ -82,7 +82,7 @@
         supplier.mer_name as supplierName,
         d.store_code as storeCode,
         d.store_name as storeName,
-        d.trans_amount as transAmount,
+        d.trans_amount as saleAmount,
         d.trans_amount as settleAmount,
         d.settle_flag as settleFlag
         FROM wholesale_receivable_settle_detail d

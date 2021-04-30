@@ -28,6 +28,8 @@ public class MerchantShoppingReq implements Serializable {
     private List<AddressBean> address;
     private List<String> idTypes;
     private List<String> tags;
+    private boolean wholesaleEnabled;
+    private String settlementMode;
     @Data
     public static class AddressBean  {
       private String address;

@@ -56,4 +56,15 @@ public class MerchantSyncDTO {
    * 行业属性
    */
   private List<String> tags;
+
+  /**
+   * 是否开启批发商城
+   */
+  private Boolean wholesaleEnabled;
+
+  /**
+   * 结算模式
+   */
+  private String settlementMode;
+
 }

@@ -209,6 +209,14 @@ public class MerchantServiceImpl implements MerchantService {
         }
         MerchantSyncDTO detailDTO=merchantSyncConverter.toD(save);
         List<String> syncIndustryTag = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
+        String method = merchant.getExtend().getSupplierWholesaleSettleMethod();
+        if(StringUtils.isNotBlank(method)) {
+            detailDTO.setWholesaleEnabled(true);
+            detailDTO.setSettlementMode(method);
+        } else {
+            detailDTO.setWholesaleEnabled(false);
+            detailDTO.setSettlementMode(null);
+        }
         detailDTO.setTags(syncIndustryTag);
         detailDTO.setAddressList(merchant.getAddressList());
         detailDTO.setId(save.getId());
@@ -243,6 +251,14 @@ public class MerchantServiceImpl implements MerchantService {
         if (StringUtils.isNoneBlank(merchant.getExtend().getIndustryTag())) {
             industryTags = Lists.newArrayList(merchant.getExtend().getIndustryTag().split(","));
             industryTags = industryTags.stream().map(c -> WelfareConstant.IndustryTag.fromCode(c).name()).collect(Collectors.toList());
+        }
+        String method = merchant.getExtend().getSupplierWholesaleSettleMethod();
+        if(StringUtils.isNotBlank(method)) {
+            detailDTO.setWholesaleEnabled(true);
+            detailDTO.setSettlementMode(method);
+        } else {
+            detailDTO.setWholesaleEnabled(false);
+            detailDTO.setSettlementMode(null);
         }
         detailDTO.setTags(industryTags);
         detailDTO.setAddressList(merchant.getAddressList());

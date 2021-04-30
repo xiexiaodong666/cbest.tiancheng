@@ -1,4 +1,4 @@
-package com.welfare.persist.dto.query;
+package com.welfare.service.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,13 +12,10 @@ import java.util.List;
 /**
  * @Author: duanhy
  * @Version: 0.0.1
- * @Date: 2021/4/30 10:05 上午
+ * @Date: 2021/4/28 1:14 上午
  */
 @Data
-public class WholesalePaySettleDetailQuery {
-    @ApiModelProperty(value = "结算单号")
-    private String settleNo;
-
+public class WholesalePaySettleDetailReq {
     @ApiModelProperty(value = "订单编号")
     private String orderNo;
 

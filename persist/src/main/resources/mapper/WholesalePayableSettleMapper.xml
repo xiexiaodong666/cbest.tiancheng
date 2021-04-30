@@ -9,4 +9,52 @@
         id,settle_no,settle_month,mer_code,trans_amount,settle_amount,settle_self_amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,update_user,update_time,deleted,settle_statistics_info,settle_tax_sales_statistics
     </sql>
 
+    <select id="payableBillPage" resultType="com.welfare.persist.dto.WholesalePayableSettleResp">
+        SELECT
+        wps.id AS id,
+        wps.settle_no AS settleNo,
+        wps.mer_code as merCode,
+        supplier.mer_name as merName,
+        wps.trans_amount as transAmount,
+        wps.settle_amount as settleAmount,
+        wps.order_num  as orderNum,
+        me.supplier_wholesale_settle_method as merCooperationMode,
+        wps.create_time as createTime,
+        wps.rec_status as recStatus,
+        wps.send_status as sendStatus,
+        wps.settle_status as settleStatus,
+        wps.send_time as sendTime,
+        wps.confirm_time as confirmTime,
+        wps.rebate_amount as rebateAmount,
+        wps.settle_start_time as settleStartTime,
+        wps.settle_end_time as settleEndTime,
+        wps.settle_tax_sales_statistics  as settleTaxSalesStatistics
+        FROM
+            wholesale_payable_settle wps
+            LEFT JOIN merchant supplier ON supplier.mer_code = wps.mer_code
+            LEFT JOIN merchant_extend me on me.mer_code = supplier.mer_code
+        <where>
+            <if test="query.merName != null and query.merName != ''">
+                and supplier.mer_name lke contact('%', '', '%')
+            </if>
+            <if test="query.merCode != null and query.merCode != ''">
+                and wps.mer_code =
+            </if>
+            <if test="query.startDay != null">
+                <![CDATA[AND wps.create_time >= #{query.startDay}]]>
+            </if>
+            <if test="query.endDay != null">
+                <![CDATA[AND wps.create_time < #{query.endDay}]]>
+            </if>
+            <if test="query.merCooperationMode != null and query.merCooperationMode != ''">
+                and me.supplier_wholesale_settle_method =
+            </if>
+            <if test="query.settleStatus != null and query.settleStatus != ''">
+                and wps.settle_status =
+            </if>
+            <if test="query.recStatus != null and query.recStatus != ''">
+                and wps.rec_status =
+            </if>
+        </where>
+    </select>
 </mapper>

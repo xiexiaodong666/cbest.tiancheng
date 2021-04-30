@@ -15,6 +15,10 @@ public class WholesalePayableBillGroupDTO {
 
     @ApiModelProperty("结算金额")
     private BigDecimal settleAmount;
-    @ApiModelProperty("商品销售基恩")
+    @ApiModelProperty("商品销售金额")
     private BigDecimal goodsSaleAmount;
+    @ApiModelProperty("销售金额")
+    private BigDecimal saleAmount;
+    @ApiModelProperty("甜橙营收金额")
+    private BigDecimal revenueAmount;
 }

@@ -47,9 +47,6 @@ public class WholesalePayableSettleResp {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
-    @ApiModelProperty(value = "合作方式名称")
-    private String merCooperationModeName;
-
     @ApiModelProperty(value = "对账状态:待确认-unconfirmed 已确认-confirmed")
     private String recStatus;
 

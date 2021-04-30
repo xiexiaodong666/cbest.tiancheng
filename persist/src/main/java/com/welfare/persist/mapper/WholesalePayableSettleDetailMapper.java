@@ -1,15 +1,16 @@
 package com.welfare.persist.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.welfare.persist.dto.PlatformPayableSettleGroupDTO;
-import com.welfare.persist.dto.PlatformWholesalePayableGroupDTO;
-import com.welfare.persist.dto.query.PlatformWholesalePayablePageQuery;
-import com.welfare.persist.dto.query.PlatformWholesalePayableQuery;
+import com.welfare.persist.dto.*;
+import com.welfare.persist.dto.query.*;
+import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO;
 import com.welfare.persist.entity.WholesalePayableSettleDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * (wholesale_payable_settle_detail)数据Mapper
@@ -26,4 +27,17 @@ public interface WholesalePayableSettleDetailMapper extends BaseMapper<Wholesale
 
     PlatformWholesalePayableGroupDTO summaryGroupBySupplierMerCode(@Param("query") PlatformWholesalePayableQuery query);
 
+
+    Page<PlatformWholesaleSettleDetailDTO> queryPagePayableDetails(Page<PlatformWholesaleSettleDetailDTO> pag,
+                                                             @Param("query") PlatformWholesalePayableDetailPageQuery query);
+
+    PlatformWholesalePayableDetailSummaryDTO queryPayableDetailsSummary(@Param("query") PlatformWholesalePayableDetailQuery query);
+
+    List<PlatformWholesaleSettleDetailDTO> queryPagePayableDetails(@Param("query") PlatformWholesalePayableDetailQuery query);
+
+    Page<WholesalePayableSettleDetailResp> payableBillDetailPage(Page<WholesaleReceivableSettleDetailResp> page, @Param("query") WholesalePaySettleDetailQuery query);
+
+    WholesalePayableBillGroupDTO payableBillDetailSummary(@Param("query") WholesalePaySettleDetailQuery query);
+
+    List<WholesalePayableSettleDetailResp> payableBillDetailPage(@Param("query") WholesalePaySettleDetailQuery query);
 }

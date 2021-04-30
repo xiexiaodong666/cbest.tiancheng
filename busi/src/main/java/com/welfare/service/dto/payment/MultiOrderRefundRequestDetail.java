@@ -2,6 +2,7 @@ package com.welfare.service.dto.payment;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.List;
  * @date 4/30/2021
  */
 @ApiModel("多订单联合退款明细")
+@Data
 public class MultiOrderRefundRequestDetail {
     @ApiModelProperty("订单号")
     private String orderNo;

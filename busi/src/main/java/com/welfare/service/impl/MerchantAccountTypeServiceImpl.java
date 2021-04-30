@@ -234,6 +234,14 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
         merchantAccountType3.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
         initList.add(merchantAccountType3);
 
+        MerchantAccountType merchantAccountType4 = new MerchantAccountType();
+        merchantAccountType4.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.desc());
+        merchantAccountType4.setMerCode(merCode);
+        merchantAccountType4.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+        merchantAccountType4.setDeductionOrder(9001);
+        merchantAccountType4.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+        initList.add(merchantAccountType4);
+
         if (Objects.nonNull(extend) && BooleanUtils.toBooleanDefaultIfNull(extend.getPointMall(), false)) {
             MerchantAccountType merchantAccountType4 = new MerchantAccountType();
             merchantAccountType4.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.MALL_POINT.desc());

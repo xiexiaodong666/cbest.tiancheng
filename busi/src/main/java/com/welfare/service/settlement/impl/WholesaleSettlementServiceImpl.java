@@ -1,6 +1,7 @@
 package com.welfare.service.settlement.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +13,7 @@ import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.WholesaleReceivableSettleDao;
 import com.welfare.persist.dao.WholesaleReceivableSettleDetailDao;
+import com.welfare.persist.dto.PlatformPayableSettleGroupDTO;
 import com.welfare.persist.dto.SettleTaxSalesStatistics;
 import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
@@ -57,15 +59,15 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     private final OrderInfoDetailMapper orderInfoDetailMapper;
     private final ObjectMapper objectMapper;
     @Override
-    public PageInfo<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
+    public Page<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
                                                                          String supplierCode,
                                                                          Date transTimeStart,
                                                                          Date transTimeEnd,
                                                                          int pageIndex,
                                                                          int pageSize){
-        return PageHelper.startPage(pageIndex, pageSize).doSelectPageInfo(() -> {
-            wholesaleReceivableSettleDetailMapper.queryReceivable(merCode, supplierCode, transTimeStart, transTimeEnd);
-        });
+            Page<PlatformWholesaleSettleGroupDTO> page = new Page<>(pageIndex, pageSize);
+
+            return wholesaleReceivableSettleDetailMapper.queryReceivable(page, merCode, supplierCode, transTimeStart, transTimeEnd);
     }
 
     @Override
@@ -82,10 +84,10 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
-    public PageInfo<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
-        return PageHelper.startPage(param.getCurrent(), param.getSize()).doSelectPageInfo(() -> {
-            wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
-        });
+    public Page<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
+      Page<PlatformWholesaleSettleDetailDTO> page = new Page<>(param.getCurrent(), param.getSize());
+
+      return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(page, param);
     }
 
     @Override
@@ -178,7 +180,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     public WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(Long id,
         WholesaleReceiveSettleDetailQuery query) {
 
-
+        wholesaleReceivableSettleMapper.receivableBillDetailSummary(query);
         return null;
     }
 }

@@ -1,5 +1,7 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.welfare.persist.dto.PlatformPayableSettleGroupDTO;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
 import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
@@ -30,7 +32,7 @@ public interface WholesaleReceivableSettleDetailMapper extends BaseMapper<Wholes
    * @param transTimeEnd 交易时间end
    * @return 应收汇总明细
    */
-  List<PlatformWholesaleSettleGroupDTO> queryReceivable(@Param("merCode") String merCode,
+  Page<PlatformWholesaleSettleGroupDTO> queryReceivable(Page<PlatformWholesaleSettleGroupDTO> page, @Param("merCode") String merCode,
       @Param("supplierCode") String supplierCode,
       @Param("transTimeStart") Date transTimeStart,
       @Param("transTimeEnd") Date transTimeEnd);
@@ -49,10 +51,9 @@ public interface WholesaleReceivableSettleDetailMapper extends BaseMapper<Wholes
 
   /**
    * 查询平台应收结算明细
-   * @param param 查询参数
    * @return 应收结算明细
    */
-  List<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param);
+  Page<PlatformWholesaleSettleDetailDTO> queryReceivableDetails( Page<PlatformWholesaleSettleDetailDTO> page, PlatformWholesaleSettleDetailParam param);
 
   /**
    * 查询平台批发应收结算汇总

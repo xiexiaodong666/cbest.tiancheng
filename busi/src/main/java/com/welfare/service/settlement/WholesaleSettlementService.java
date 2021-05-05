@@ -1,5 +1,6 @@
 package com.welfare.service.settlement;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageInfo;
 import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
@@ -36,7 +37,7 @@ public interface WholesaleSettlementService {
      * @param pageSize 分页大小
      * @return 应收汇总明细
      */
-    PageInfo<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
+    Page<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
                                                                   String supplierCode,
                                                                   Date transTimeStart,
                                                                   Date transTimeEnd,
@@ -72,7 +73,7 @@ public interface WholesaleSettlementService {
      * @param param 查询参数
      * @return 应收结算明细
      */
-    PageInfo<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param);
+    Page<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param);
 
     /**
      * 查询平台应收结算明细

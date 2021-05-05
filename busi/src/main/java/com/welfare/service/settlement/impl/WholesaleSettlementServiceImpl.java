@@ -72,7 +72,8 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
 
     @Override
     public List<PlatformWholesaleSettleGroupDTO> queryReceivable(String merCode, String supplierCode, Date transTimeStart, Date transTimeEnd) {
-        return wholesaleReceivableSettleDetailMapper.queryReceivable(merCode,supplierCode,transTimeStart,transTimeEnd);
+
+      return null;
     }
 
     @Override
@@ -84,15 +85,15 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
-    public Page<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
-      Page<PlatformWholesaleSettleDetailDTO> page = new Page<>(param.getCurrent(), param.getSize());
+    public List<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
 
-      return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(page, param);
+      return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
     }
 
     @Override
     public List<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
-        return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
+
+      return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
     }
 
     @Override

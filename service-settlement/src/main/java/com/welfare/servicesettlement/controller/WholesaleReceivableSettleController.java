@@ -96,8 +96,7 @@ public class WholesaleReceivableSettleController implements IController {
     @PostMapping("/page-receivable-details")
     @ApiOperation("查询平台应收账单明细")
     public R<Page<PlatformWholesaleSettleDetailDTO>> queryReceivableDetails(@RequestBody PlatformWholesaleSettleDetailParam param){
-        Page<PlatformWholesaleSettleDetailDTO> pageInfo = wholesaleSettlementService.pageQueryReceivableDetails(param);
-        return success(pageInfo);
+       return null;
     }
 
     @PostMapping("/receivable-details-summary")
@@ -110,9 +109,7 @@ public class WholesaleReceivableSettleController implements IController {
     @PostMapping("/export-receivable-details")
     @ApiOperation("导出平台应收账单明细")
     public R<String> exportReceivableDetails(@RequestBody PlatformWholesaleSettleDetailParam param) throws IOException {
-        List<PlatformWholesaleSettleDetailDTO> resultList = wholesaleSettlementService.queryReceivableDetails(param);
-        String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleDetailDTO.class, "批发应收结算明细");
-        return R.success(fileUploadService.getFileServerUrl(filePath));
+        return null;
     }
 
     @PostMapping("/receivable")

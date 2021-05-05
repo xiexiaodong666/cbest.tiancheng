@@ -73,7 +73,7 @@ public interface WholesaleSettlementService {
      * @param param 查询参数
      * @return 应收结算明细
      */
-    Page<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param);
+    List<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param);
 
     /**
      * 查询平台应收结算明细

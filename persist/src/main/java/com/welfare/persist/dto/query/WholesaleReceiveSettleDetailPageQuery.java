@@ -15,7 +15,7 @@ import java.util.List;
  * @Date: 2021/4/27 8:27 下午
  */
 @Data
-public class WholesaleReceiveSettleDetailPageQuery {
+public class WholesaleReceiveSettleDetailPageQuery  extends  PageReq{
     @ApiModelProperty(value = "订单编号")
     private String orderNo;
 

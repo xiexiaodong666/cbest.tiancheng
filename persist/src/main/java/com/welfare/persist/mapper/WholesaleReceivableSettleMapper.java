@@ -1,5 +1,6 @@
 package com.welfare.persist.mapper;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
 import com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp;
@@ -28,9 +29,11 @@ import java.util.List;
 @Mapper
 public interface WholesaleReceivableSettleMapper extends BaseMapper<WholesaleReceivableSettle> {
 
-  List<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query);
+  Page<WholesaleReceivableSettleResp> receivableBillPage(Page<WholesaleReceivableSettleResp> page, WholesaleReceivableSettleBillQuery query);
 
   List<WholesaleReceivableSettleDetailResp> receivableBillDetailPage( WholesaleReceiveSettleDetailPageQuery query);
+
+  Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage( Page<WholesaleReceivableSettleDetailResp> page, WholesaleReceiveSettleDetailPageQuery query);
 
   WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(WholesaleReceiveSettleDetailQuery query);
 }

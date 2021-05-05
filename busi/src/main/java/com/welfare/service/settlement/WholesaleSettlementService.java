@@ -33,16 +33,14 @@ public interface WholesaleSettlementService {
      * @param supplierCode 供应商编码
      * @param transTimeStart 交易时间start
      * @param transTimeEnd 交易时间end
-     * @param pageIndex 页码
-     * @param pageSize 分页大小
      * @return 应收汇总明细
      */
     Page<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
                                                                   String supplierCode,
                                                                   Date transTimeStart,
                                                                   Date transTimeEnd,
-                                                                  int pageIndex,
-                                                                  int pageSize);
+                                                                  int current,
+                                                                  int size);
     /**
      *  查询汇总明细
      * @param merCode 商户编码
@@ -80,7 +78,7 @@ public interface WholesaleSettlementService {
      * @param param 查询参数
      * @return 应收结算明细
      */
-    List<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param);
+    Page<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param);
     /**
      * 查询平台批发应收结算汇总
      * @param param 查询参数
@@ -110,7 +108,7 @@ public interface WholesaleSettlementService {
      * @param query
      * @return
      */
-    PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query)
+    Page<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query)
         throws JsonProcessingException;
 
     /**
@@ -119,7 +117,9 @@ public interface WholesaleSettlementService {
      * @param query
      * @return
      */
-    PageInfo<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id, WholesaleReceiveSettleDetailPageQuery query);
+    Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id, WholesaleReceiveSettleDetailPageQuery query);
+
+    List<WholesaleReceivableSettleDetailResp> receivableBillDetail(Long id, WholesaleReceiveSettleDetailPageQuery query);
 
     /**
      *

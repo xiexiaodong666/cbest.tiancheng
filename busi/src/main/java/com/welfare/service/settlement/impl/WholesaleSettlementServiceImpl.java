@@ -1,5 +1,6 @@
 package com.welfare.service.settlement.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,7 +33,9 @@ import com.welfare.persist.mapper.OrderInfoDetailMapper;
 import com.welfare.persist.mapper.WholesaleReceivableSettleDetailMapper;
 import com.welfare.persist.mapper.WholesaleReceivableSettleMapper;
 import com.welfare.service.settlement.WholesaleSettlementService;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -63,9 +66,9 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                                                                          String supplierCode,
                                                                          Date transTimeStart,
                                                                          Date transTimeEnd,
-                                                                         int pageIndex,
-                                                                         int pageSize){
-            Page<PlatformWholesaleSettleGroupDTO> page = new Page<>(pageIndex, pageSize);
+                                                                         int current,
+                                                                         int size){
+            Page<PlatformWholesaleSettleGroupDTO> page = new Page<>(current, size);
 
             return wholesaleReceivableSettleDetailMapper.queryReceivable(page, merCode, supplierCode, transTimeStart, transTimeEnd);
     }
@@ -87,13 +90,15 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     @Override
     public List<PlatformWholesaleSettleDetailDTO> pageQueryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
 
-      return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
+        List<PlatformWholesaleSettleDetailDTO>  platformWholesaleSettleDetailDTOList = wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
+        return platformWholesaleSettleDetailDTOList;
     }
 
     @Override
-    public List<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
+    public Page<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
 
-      return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
+        Page<PlatformWholesaleSettleDetailDTO> page = new Page<>(param.getCurrent(), param.getSize());
+      return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(page, param);
     }
 
     @Override
@@ -103,7 +108,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
 
     @Override
     public WholesaleReceivableSettle generateReceivableSettle(PlatformWholesaleSettleDetailParam param) {
-        List<PlatformWholesaleSettleDetailDTO> settleDetailDTOList = queryReceivableDetails(param);
+        List<PlatformWholesaleSettleDetailDTO> settleDetailDTOList = wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
         Set<String> orderNoSet = new HashSet<>();
         BigDecimal totalTransAmount = BigDecimal.ZERO;
         for (PlatformWholesaleSettleDetailDTO dto : settleDetailDTOList) {
@@ -115,20 +120,38 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         //        totalTransAmount = totalTransAmount.add(dto.getTransAmount());
             }
         }
-        List<OrderInfoDetail> groupByTaxRateDetails = orderInfoDetailMapper.queryGroupByTaxRate(new ArrayList<>(orderNoSet));
+        Map<BigDecimal, BigDecimal> taxRateAndSettleAmountMap = new HashMap<>();
+
         WholesaleReceivableSettle wholesaleReceivableSettle = new WholesaleReceivableSettle();
-        Date now = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        String settleNo = param.getMerCode() + dateFormat.format(now);
-        wholesaleReceivableSettle.setSettleNo(settleNo);
-        wholesaleReceivableSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
-        wholesaleReceivableSettle.setMerCode(param.getMerCode());
-        wholesaleReceivableSettle.setOrderNum(orderNoSet.size());
-        wholesaleReceivableSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code());
-        wholesaleReceivableSettle.setSettleStartTime(param.getTransTimeStart());
-        wholesaleReceivableSettle.setSettleEndTime(param.getTransTimeEnd());
-        wholesaleReceivableSettle.setTransAmount(totalTransAmount);
-        wholesaleReceivableSettle.setSettleAmount(totalTransAmount);
+
+        if(CollectionUtils.isNotEmpty(settleDetailDTOList)) {
+            List<OrderInfoDetail> groupByTaxRateDetails = orderInfoDetailMapper.queryGroupByTaxRate(new ArrayList<>(orderNoSet));
+            Date now = Calendar.getInstance().getTime();
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+            String settleNo = param.getMerCode() + dateFormat.format(now);
+            wholesaleReceivableSettle.setSettleNo(settleNo);
+            wholesaleReceivableSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
+            wholesaleReceivableSettle.setMerCode(param.getMerCode());
+            wholesaleReceivableSettle.setOrderNum(orderNoSet.size());
+            wholesaleReceivableSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code());
+            wholesaleReceivableSettle.setSettleStartTime(param.getTransTimeStart());
+            wholesaleReceivableSettle.setSettleEndTime(param.getTransTimeEnd());
+            wholesaleReceivableSettle.setTransAmount(totalTransAmount);
+            wholesaleReceivableSettle.setSettleAmount(totalTransAmount);
+
+            if (CollectionUtils.isNotEmpty(groupByTaxRateDetails)) {
+                Map<BigDecimal, List<OrderInfoDetail>> map = groupByTaxRateDetails.stream().collect(Collectors
+                                                                                                        .groupingBy(OrderInfoDetail::getWholesaleTaxRate));
+                map.forEach((taxRate, list) -> {
+                    BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getWholesaleAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    taxRateAndSettleAmountMap.put(taxRate, settleAmount);
+                });
+                wholesaleReceivableSettle.setSettleTaxSalesStatistics(JSON.toJSONString(taxRateAndSettleAmountMap));
+            }
+
+            wholesaleReceivableSettleMapper.insert(wholesaleReceivableSettle);
+        }
+
         return wholesaleReceivableSettle;
     }
 
@@ -151,14 +174,12 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
-    public PageInfo<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query)
+    public Page<WholesaleReceivableSettleResp> receivableBillPage(WholesaleReceivableSettleBillQuery query)
         throws JsonProcessingException {
-        PageInfo<WholesaleReceivableSettleResp> wholesaleReceivableSettleRespPageInfo = PageHelper
-            .startPage(query.getCurrent(), query.getSize()).doSelectPageInfo(() -> {
-                wholesaleReceivableSettleMapper.receivableBillPage(query);
-            });
-        List<WholesaleReceivableSettleResp> wholesaleReceivableSettleResps = wholesaleReceivableSettleRespPageInfo
-            .getList();
+        Page<WholesaleReceivableSettleResp> page = new Page<>(query.getCurrent(), query.getSize());
+        Page<WholesaleReceivableSettleResp> wholesaleReceivableSettleRespPageInfo =
+            wholesaleReceivableSettleMapper.receivableBillPage(page, query);
+        List<WholesaleReceivableSettleResp> wholesaleReceivableSettleResps = wholesaleReceivableSettleRespPageInfo.getRecords();
         for (WholesaleReceivableSettleResp receivableSettleResp:
         wholesaleReceivableSettleResps ) {
             String settleTaxSalesStatistics = receivableSettleResp.getSettleTaxSalesStatistics();
@@ -171,17 +192,24 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
-    public PageInfo<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id,
+    public Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id,
         WholesaleReceiveSettleDetailPageQuery query) {
-        wholesaleReceivableSettleMapper.receivableBillDetailPage(query);
-        return null;
+        Page<WholesaleReceivableSettleDetailResp> page = new Page<>(query.getCurrent(), query.getSize());
+
+        return wholesaleReceivableSettleMapper.receivableBillDetailPage(page, query);
+    }
+
+    @Override
+    public List<WholesaleReceivableSettleDetailResp> receivableBillDetail(Long id,
+        WholesaleReceiveSettleDetailPageQuery query) {
+
+        return wholesaleReceivableSettleMapper.receivableBillDetailPage(query);
     }
 
     @Override
     public WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(Long id,
         WholesaleReceiveSettleDetailQuery query) {
 
-        wholesaleReceivableSettleMapper.receivableBillDetailSummary(query);
-        return null;
+        return  wholesaleReceivableSettleMapper.receivableBillDetailSummary(query);
     }
 }

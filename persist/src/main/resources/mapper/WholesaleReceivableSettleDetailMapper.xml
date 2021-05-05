@@ -57,10 +57,10 @@
             <if test="merCode != null and merCode != ''">
                 and t1.mer_code = #{merCode}
             </if>
-            <if test="transTimeStart != null and ">
+            <if test="transTimeStart != null ">
                 <![CDATA[AND t1.trans_time >= #{transTimeStart}]]>
             </if>
-            <if test="transTimeEnd != null and ">
+            <if test="transTimeEnd != null  ">
                 <![CDATA[AND t1.trans_time <= #{transTimeEnd}]]>
             </if>
             <if test="supplierCode != null and supplierCode != ''">
@@ -108,39 +108,39 @@
     </select>
     <sql id="queryReceivableDetailsCondition">
         <where>
-            <if test="orderNo !=null and orderNo!=''">
-                d.order_no = #{orderNo}
+            <if test="param.orderNo !=null and param.orderNo!=''">
+                d.order_no = #{param.orderNo}
             </if>
-            <if test="transNo !=null and transNo != ''">
-                d.trans_no = #{transNo}
+            <if test="param.transNo !=null and param.transNo != ''">
+                d.trans_no = #{param.transNo}
             </if>
-            <if test="settleFlag !=null and settleFlag!= ''">
-                d.settle_flag = #{settleFlag}
+            <if test="param.settleFlag !=null and param.settleFlag!= ''">
+                d.settle_flag = #{param.settleFlag}
             </if>
-            <if test="supplierCode != null and supplierCode != ''">
-                supplier.supplier_code = #{supplierCode}
+            <if test="param.supplierCode != null and param.supplierCode != ''">
+                supplier.supplier_code = #{param.supplierCode}
             </if>
-            <if test="storeCode != null and storeCode != ''">
-                d.store_code = #{storeCode}
+            <if test="param.storeCode != null and param.storeCode != ''">
+                d.store_code = #{param.storeCode}
             </if>
-            <if test="transTimeStart != null">
-                d.trans_time <![CDATA[>=]]> #{transTimeStart}
+            <if test="param.transTimeStart != null">
+                d.trans_time <![CDATA[>=]]> #{param.transTimeStart}
             </if>
-            <if test="transTimeEnd != null">
-                d.trans_time <![CDATA[<]]> #{transTimeEnd}
+            <if test="param.transTimeEnd != null">
+                d.trans_time <![CDATA[<]]> #{param.transTimeEnd}
             </if>
-            <if test="phone != null and phone != ''">
-                a.phone = #{phone}
+            <if test="param.phone != null and param.phone != ''">
+                a.phone = #{param.phone}
             </if>
-            <if test = "merCode != null and merCode != ''">
-                d.mer_code = #{merCode}
+            <if test = "param.merCode != null and param.merCode != ''">
+                d.mer_code = #{param.merCode}
             </if>
-            <if test="settleNo != null and settleNo != ''">
-                d.settle_no = #{settleNo}
+            <if test="param.settleNo != null and param.settleNo != ''">
+                d.settle_no = #{param.settleNo}
             </if>
-            <if test="excludeIds != null and excludeIds.length !=0">
+            <if test="param.excludeIds != null and param.excludeIds.length !=0">
                 d.id not in
-                <foreach collection="excludeIds" item="item" open="(" close=")" separator=",">
+                <foreach collection="param.excludeIds" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>

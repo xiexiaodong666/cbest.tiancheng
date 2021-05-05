@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,20 +16,26 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.*;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
+import com.welfare.persist.entity.OrderInfoDetail;
+import com.welfare.persist.entity.SettleDetail;
 import com.welfare.persist.entity.WholesalePayableSettle;
 import com.welfare.persist.entity.WholesalePayableSettleDetail;
+import com.welfare.persist.mapper.OrderInfoDetailMapper;
 import com.welfare.persist.mapper.WholesalePayableSettleDetailMapper;
 import com.welfare.persist.mapper.WholesalePayableSettleMapper;
 import com.welfare.service.WholesalePayableSettletService;
 import com.welfare.service.dto.WholesalePaySettleDetailReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: duanhy
@@ -40,8 +47,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WholesalePayableSettletServiceImpl implements WholesalePayableSettletService {
 
-    private WholesalePayableSettleDetailMapper wholesalePayableSettleDetailMapper;
-    private WholesalePayableSettleMapper wholesalePayableSettleMapper;
+    private final WholesalePayableSettleDetailMapper wholesalePayableSettleDetailMapper;
+    private final WholesalePayableSettleMapper wholesalePayableSettleMapper;
+    private final OrderInfoDetailMapper orderInfoDetailMapper;
 
     @Override
     public Page<PlatformPayableSettleGroupDTO> pageQueryPayableSummary(PlatformWholesalePayablePageQuery query) {
@@ -72,6 +80,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public WholesalePayableSettle generatePayableSettle(PlatformWholesalePayableDetailQuery query) {
         BizAssert.notBlank(query.getMerCode(), ExceptionCode.ILLEGALITY_ARGUMENTS, "商户编码必传");
         RLock rLock = DistributedLockUtil.lockFairly(RedisKeyConstant.buidKey(RedisKeyConstant.BUILD_WHOLESALE_PAYABLE_SETTLE, query.getMerCode()));
@@ -79,8 +88,37 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
         try {
             payableSettle = wholesalePayableSettleDetailMapper.buildPayableSettle(query);
             BizAssert.notNull(payableSettle, ExceptionCode.DATA_NOT_EXIST, "没有可以结算的明细数据");
-            wholesalePayableSettleMapper.insert(payableSettle);
 
+            query.setLimit(WelfareSettleConstant.LIMIT);
+            List<WholesalePayableSettleDetail> details;
+            Map<BigDecimal, BigDecimal> taxRateAndSettleAmountMap = new HashMap<>();
+            List<OrderInfoDetail> orderInfoDetails = new ArrayList<>();
+
+            do {
+                details = wholesalePayableSettleDetailMapper.getSettleDetailIdAndOrderIdList(query);
+                if (!details.isEmpty()) {
+                    List<Long> idList = details.stream().map(WholesalePayableSettleDetail::getId).collect(Collectors.toList());
+                    WholesalePayableSettleDetail settleDetail = new WholesalePayableSettleDetail();
+                    settleDetail.setSettleNo(payableSettle.getSettleNo());
+                    settleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
+                    wholesalePayableSettleDetailMapper.update(settleDetail, Wrappers.<WholesalePayableSettleDetail>lambdaUpdate()
+                            .in(WholesalePayableSettleDetail::getId, idList));
+                    // 计算各税点的商品结算金额
+                    List<String> orderList = details.stream().map(WholesalePayableSettleDetail::getOrderId).collect(Collectors.toList());
+                    orderInfoDetails.addAll(orderInfoDetailMapper.queryGroupByTaxRate(orderList));
+                } else {
+                    break;
+                }
+            } while (true);
+            if (CollectionUtils.isNotEmpty(orderInfoDetails)) {
+                Map<BigDecimal, List<OrderInfoDetail>> map = orderInfoDetails.stream().collect(Collectors.groupingBy(OrderInfoDetail::getWholesaleTaxRate));
+                map.forEach((taxRate, list) -> {
+                    BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getWholesaleAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    taxRateAndSettleAmountMap.put(taxRate, settleAmount);
+                });
+                payableSettle.setSettleTaxSalesStatistics(JSON.toJSONString(taxRateAndSettleAmountMap));
+            }
+            wholesalePayableSettleMapper.insert(payableSettle);
         } finally {
             DistributedLockUtil.unlock(rLock);
         }

@@ -35,10 +35,10 @@
             LEFT JOIN merchant_extend me on me.mer_code = supplier.mer_code
         <where>
             <if test="query.merName != null and query.merName != ''">
-                and supplier.mer_name lke contact('%', '', '%')
+                and supplier.mer_name like concat('%', '', '%')
             </if>
             <if test="query.merCode != null and query.merCode != ''">
-                and wps.mer_code =
+                and wps.mer_code = #{query.merCode}
             </if>
             <if test="query.startDay != null">
                 <![CDATA[AND wps.create_time >= #{query.startDay}]]>
@@ -47,13 +47,13 @@
                 <![CDATA[AND wps.create_time < #{query.endDay}]]>
             </if>
             <if test="query.merCooperationMode != null and query.merCooperationMode != ''">
-                and me.supplier_wholesale_settle_method =
+                and me.supplier_wholesale_settle_method = #{query.merCooperationMode}
             </if>
             <if test="query.settleStatus != null and query.settleStatus != ''">
-                and wps.settle_status =
+                and wps.settle_status = #{query.settleStatus}
             </if>
             <if test="query.recStatus != null and query.recStatus != ''">
-                and wps.rec_status =
+                and wps.rec_status = #{query.recStatus}
             </if>
         </where>
     </select>

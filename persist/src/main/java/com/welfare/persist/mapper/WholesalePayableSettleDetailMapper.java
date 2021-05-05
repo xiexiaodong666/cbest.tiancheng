@@ -43,4 +43,6 @@ public interface WholesalePayableSettleDetailMapper extends BaseMapper<Wholesale
     List<WholesalePayableSettleDetailResp> payableBillDetailPage(@Param("query") WholesalePaySettleDetailQuery query);
 
     WholesalePayableSettle buildPayableSettle(@Param("query") PlatformWholesalePayableDetailQuery query);
+
+    List<WholesalePayableSettleDetail> getSettleDetailIdAndOrderIdList(@Param("query") PlatformWholesalePayableDetailQuery query);
 }

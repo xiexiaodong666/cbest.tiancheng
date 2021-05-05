@@ -29,7 +29,7 @@
         AND LENGTH( trim( me.supplier_wholesale_settle_method ) ) > 0
         AND wpsd.settle_flag = 'unsettled'
         <if test="query.supplierMerName != null and query.supplierMerName != '' ">
-            and mer.mer_name like contact('%', #{query.supplierMerName}, '%')
+            and mer.mer_name like concat('%', #{query.supplierMerName}, '%')
         </if>
         <if test="query.customerMerCode != null and query.customerMerCode != '' ">
             and cust.mer_code = #{query.customerMerCode}
@@ -66,7 +66,7 @@
         AND LENGTH( trim( me.supplier_wholesale_settle_method ) ) > 0
         AND wpsd.settle_flag = 'unsettled'
         <if test="query.supplierMerName != null and query.supplierMerName != '' ">
-            and mer.mer_name like contact('%', #{query.supplierMerName}, '%')
+            and mer.mer_name like concat('%', #{query.supplierMerName}, '%')
         </if>
         <if test="query.customerMerCode != null and query.customerMerCode != '' ">
             and cust.mer_code = #{query.customerMerCode}
@@ -104,7 +104,7 @@
         FROM
             wholesale_payable_settle_detail wpsd
                 LEFT JOIN account a ON wpsd.account_code = a.account_code
-                LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+                LEFT JOIN merchant mer ON mer.mer_code = wpsd.mer_code
                 LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
                 LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
                 LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
@@ -145,6 +145,9 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="query.cooperationMode != null and query.cooperationMode != '' ">
+                and me.supplier_wholesale_settle_method = #{query.cooperationMode}
+            </if>
         </where>
     </select>
 
@@ -161,7 +164,7 @@
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
-        LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+        LEFT JOIN merchant mer ON mer.mer_code = wpsd.mer_code
         LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
@@ -224,7 +227,7 @@
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
-        LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+        LEFT JOIN merchant mer ON mer.mer_code = wpsd.mer_code
         LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
@@ -270,7 +273,7 @@
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
-        LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+        LEFT JOIN merchant mer ON mer.mer_code = wpsd.mer_code
         LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
@@ -325,7 +328,7 @@
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
-        LEFT JOIN merchant mer ON wpsd.mer_code = wpsd.mer_code
+        LEFT JOIN merchant mer ON  mer.mer_code = wpsd.mer_code
         LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
@@ -369,5 +372,59 @@
             </if>
         </where>
         group by supplier.mer_code
+    </select>
+
+
+    <select id="getSettleDetailIdAndOrderIdList" resultType="com.welfare.persist.entity.WholesalePayableSettleDetail">
+        SELECT
+        wpsd.id as id,
+        wpsd.order_id as orderId
+        FROM
+        wholesale_payable_settle_detail wpsd
+        LEFT JOIN account a ON wpsd.account_code = a.account_code
+        LEFT JOIN merchant mer ON  mer.mer_code = wpsd.mer_code
+        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
+        LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
+        LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        <where>
+            wpsd.settle_flag = 'unsettle'
+            <if test="query.merCode != null and query.merCode != ''">
+                and supplier.mer_code = #{query.merCode}
+            </if>
+            <if test="query.orderNo != null and query.orderNo != ''">
+                and wpsd.order_id = #{query.orderNo}
+            </if>
+            <if test="query.transNo != null and query.transNo != ''">
+                and wpsd.trans_no = #{query.transNo}
+            </if>
+            <if test="query.settleFlag != null and query.settleFlag != ''">
+                and wpsd.settle_flag = #{query.settleFlag}
+            </if>
+            <if test="query.customerMerCode != null and query.customerMerCode != ''">
+                and mer.mer_code = #{query.customerMerCode}
+            </if>
+            <if test="query.transTimeStart != null">
+                <![CDATA[AND wpsd.trans_time >= #{query.transTimeStart}]]>
+            </if>
+            <if test="query.transTimeEnd != null">
+                <![CDATA[AND wpsd.trans_time < #{query.transTimeEnd}]]>
+            </if>
+            <if test="query.phone != null and query.phone != ''">
+                and a.phone = #{query.phone}
+            </if>
+            <if test="query.storeCodes != null and query.storeCodes.size > 0">
+                and wpsd.store_code in
+                <foreach collection="query.storeCodes" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.excludeIds != null and query.excludeIds.size > 0">
+                and wpsd.id not in
+                <foreach collection="query.excludeIds" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by wpd.id
     </select>
 </mapper>

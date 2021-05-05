@@ -38,4 +38,5 @@ public class PlatformWholesalePayableDetailPageQuery extends PageReq{
     private String phone;
     @ApiModelProperty("排除的结算明细id")
     private List<Long> excludeIds;
+    private String cooperationMode;
 }

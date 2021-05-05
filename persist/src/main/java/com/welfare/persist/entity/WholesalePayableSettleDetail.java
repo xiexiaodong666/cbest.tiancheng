@@ -38,7 +38,7 @@ public class WholesalePayableSettleDetail extends Model<WholesalePayableSettleDe
      */
     @ApiModelProperty("id")   @JsonSerialize(using = ToStringSerializer.class)
     @TableId
-	private Integer id;
+	private Long id;
     /**
      * 账单编号
      */

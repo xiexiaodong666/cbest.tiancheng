@@ -138,7 +138,8 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private PaymentChannelService paymentChannelService;
     private final PaymentChannelDao paymentChannelDao;
-    private final MerchantCreditService merchantCreditService;
+    @Autowired
+    private MerchantCreditService merchantCreditService;
     private final static Map<String, WelfareConstant.PaymentChannel> PAYMENT_CHANNEL_MAP = Stream
         .of(WelfareConstant.PaymentChannel.values()).collect(Collectors
             .toMap(WelfareConstant.PaymentChannel::code,

@@ -157,6 +157,14 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
                         .eq(WholesalePayableSettle::getRecStatus, WelfareSettleConstant.SettleRecStatusEnum.CONFIRMED.code())
                         .eq(WholesalePayableSettle::getId, id)
         );
+
+        WholesalePayableSettle settle = wholesalePayableSettleMapper.selectById(id);
+        BizAssert.notNull(settle, ExceptionCode.ILLEGALITY_ARGUMENTS, "结算单不存在");
+        WholesalePayableSettleDetail detail = new WholesalePayableSettleDetail();
+        detail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
+        wholesalePayableSettleDetailMapper.update(detail, Wrappers.<WholesalePayableSettleDetail>lambdaUpdate()
+                        .eq(WholesalePayableSettleDetail::getSettleNo, settle.getSettleNo())
+        );
         return i;
     }
 

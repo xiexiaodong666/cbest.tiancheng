@@ -72,7 +72,8 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
 
     @Override
     public List<PlatformWholesaleSettleGroupDTO> queryReceivable(String merCode, String supplierCode, Date transTimeStart, Date transTimeEnd) {
-        return wholesaleReceivableSettleDetailMapper.queryReceivable(merCode,supplierCode,transTimeStart,transTimeEnd);
+        return null;
+        //return wholesaleReceivableSettleDetailMapper.queryReceivable(merCode,supplierCode,transTimeStart,transTimeEnd);
     }
 
     @Override
@@ -92,7 +93,9 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
 
     @Override
     public List<PlatformWholesaleSettleDetailDTO> queryReceivableDetails(PlatformWholesaleSettleDetailParam param) {
-        return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
+        return null;
+
+        //return wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
     }
 
     @Override

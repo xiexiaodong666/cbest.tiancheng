@@ -90,6 +90,7 @@ CREATE TABLE `wholesale_payable_settle_detail` (
   `update_user` varchar(50) DEFAULT NULL COMMENT '更新人',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `version` int(11) DEFAULT NULL COMMENT '版本',
+  `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
   `rebate_amount` decimal(15,4) DEFAULT NULL COMMENT '返点标志 unrebated未返点 rebated 已返点',
   `mer_credit` decimal(10,2) DEFAULT NULL COMMENT '商户授信额度',
   `mer_balance` decimal(10,2) DEFAULT NULL COMMENT '商户余额',

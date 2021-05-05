@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,settle_no,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,store_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,data_type,settle_flag,order_channel,payment_channel,create_user,create_time,update_user,update_time,version,rebate_amount,mer_credit,mer_balance,order_wholesale_amount,mer_wholesale_credit_deduction_amount,mer_wholesale_credit
+        id,settle_no,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,store_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,data_type,settle_flag,order_channel,payment_channel,create_user,create_time,update_user,update_time,version,rebate_amount,mer_credit,mer_balance,order_wholesale_amount,mer_wholesale_credit_deduction_amount,mer_wholesale_credit,deleted
     </sql>
 
     <select id="pageUnsettleDataGroupBySupplierMerCode" resultType="com.welfare.persist.dto.PlatformPayableSettleGroupDTO">
@@ -319,7 +319,7 @@
         SUM( wpsd.order_wholesale_amount ) AS settleAmount,
         count(distinct wpsd.trans_no) as orderNum,
         'unconfirmed' as  recStatus,
-        'unsettled' as settleStatus,
+        'settling' as settleStatus,
         'unsended' as sendStatus,
         supplier.mer_code as merCode,
         min(wpsd.trans_time) as settleStartTime,
@@ -333,7 +333,7 @@
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
         <where>
-            wpsd.settle_flag = 'unsettle'
+            wpsd.settle_flag = 'unsettled'
             <if test="query.merCode != null and query.merCode != ''">
                 and supplier.mer_code = #{query.merCode}
             </if>
@@ -387,7 +387,7 @@
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
         <where>
-            wpsd.settle_flag = 'unsettle'
+            wpsd.settle_flag = 'unsettled'
             <if test="query.merCode != null and query.merCode != ''">
                 and supplier.mer_code = #{query.merCode}
             </if>
@@ -425,6 +425,6 @@
                 </foreach>
             </if>
         </where>
-        order by wpd.id
+        order by wpsd.id
     </select>
 </mapper>

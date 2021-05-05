@@ -215,6 +215,12 @@ public class WholesalePayableSettleDetail extends Model<WholesalePayableSettleDe
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
     /**
+     * 删除标志
+     */
+    @ApiModelProperty("删除标志") @TableLogic
+    @TableField(fill = FieldFill.INSERT)
+    private Boolean deleted;
+    /**
      * 返点标志 unrebated未返点 rebated 已返点
      */
     @ApiModelProperty("返点标志 unrebated未返点 rebated 已返点")   
@@ -378,6 +384,10 @@ public class WholesalePayableSettleDetail extends Model<WholesalePayableSettleDe
     * 版本
     */
     public static final String VERSION = "version";
+    /**
+     * 删除标志
+     */
+    public static final String DELETED = "deleted";
     /**
     * 返点标志 unrebated未返点 rebated 已返点
     */

@@ -66,5 +66,5 @@ public interface WholesaleReceivableSettleDetailMapper extends BaseMapper<Wholes
    * @param param 查询参数
    * @return 应收结算汇总
    */
-  PlatformWholesaleSettleDetailSummaryDTO queryReceivableDetailsSummary(PlatformWholesaleSettleDetailParam param);
+  PlatformWholesaleSettleDetailSummaryDTO queryReceivableDetailsSummary(@Param("param") PlatformWholesaleSettleDetailParam param);
 }

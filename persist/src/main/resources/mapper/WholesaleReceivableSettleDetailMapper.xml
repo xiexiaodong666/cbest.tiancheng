@@ -139,7 +139,7 @@
             <if test="param.settleNo != null and param.settleNo != ''">
                 and d.settle_no = #{param.settleNo}
             </if>
-            <if test="param.excludeIds != null and param.excludeIds.length !=0">
+            <if test="param.excludeIds != null and param.excludeIds.size !=0">
                 and d.id not in
                 <foreach collection="param.excludeIds" item="item" open="(" close=")" separator=",">
                     #{item}

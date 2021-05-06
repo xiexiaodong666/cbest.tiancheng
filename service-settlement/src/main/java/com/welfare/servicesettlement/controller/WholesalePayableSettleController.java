@@ -126,6 +126,12 @@ public class WholesalePayableSettleController implements IController {
         return success(payableSettletService.payableBillDetailSummary(id, query));
     }
 
+    @GetMapping("/payable/bill/{id}/detail")
+    @ApiOperation("(商户应收结算单)根据id查询结算单详情")
+    public R<WholesalePayableSettleResp> payableBillById(@PathVariable("id") Long id){
+        return success(payableSettletService.payableBillById(id));
+    }
+
     @GetMapping("/payable/bill/{id}/export")
     @ApiOperation("(商户应收结算单)应付结算明细数据单导出")
     public R<String> payableBillDetailExport(@PathVariable("id") Long id, WholesalePaySettleDetailReq query) throws IOException {

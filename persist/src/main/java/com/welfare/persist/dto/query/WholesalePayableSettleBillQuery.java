@@ -42,4 +42,6 @@ public class WholesalePayableSettleBillQuery extends PageReq{
 
     @ApiModelProperty(value = "商户名称")
     private String merName;
+
+    private Long id;
 }

@@ -13,6 +13,7 @@ import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.constants.WelfareSettleConstant.SettleRecStatusEnum;
 import com.welfare.common.constants.WelfareSettleConstant.SettleStatusEnum;
 import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.WholesaleReceivableSettleDao;
 import com.welfare.persist.dao.WholesaleReceivableSettleDetailDao;
@@ -29,6 +30,7 @@ import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroup
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam;
 import com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO;
 import com.welfare.persist.entity.OrderInfoDetail;
+import com.welfare.persist.entity.WholesalePayableSettleDetail;
 import com.welfare.persist.entity.WholesaleReceivableSettle;
 import com.welfare.persist.entity.WholesaleReceivableSettleDetail;
 import com.welfare.persist.mapper.OrderInfoDetailMapper;
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -109,13 +112,17 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public WholesaleReceivableSettle generateReceivableSettle(PlatformWholesaleSettleDetailParam param) {
         param.setSettleFlag(SettleStatusEnum.UNSETTLED.code());
         List<PlatformWholesaleSettleDetailDTO> settleDetailDTOList = wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
+        if(CollectionUtils.isEmpty(settleDetailDTOList)){
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "构选的消费明细正在结算中或结算已完成。", null);
+        }
+
         Set<String> orderNoSet = new HashSet<>();
         BigDecimal totalTransAmount = BigDecimal.ZERO;
         BigDecimal totalSettleAmount = BigDecimal.ZERO;
-
         for (PlatformWholesaleSettleDetailDTO dto : settleDetailDTOList) {
             orderNoSet.add(dto.getOrderNo());
             if (WelfareConstant.TransType.CONSUME.code().equals(dto.getTransType())) {
@@ -127,11 +134,16 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                 totalSettleAmount = totalSettleAmount.add(dto.getSettleAmount().negate());
                 }
         }
+
+
         Map<BigDecimal, BigDecimal> taxRateAndSettleAmountMap = new HashMap<>();
 
         WholesaleReceivableSettle wholesaleReceivableSettle = new WholesaleReceivableSettle();
 
         if(CollectionUtils.isNotEmpty(settleDetailDTOList)) {
+
+
+
             List<OrderInfoDetail> groupByTaxRateDetails = orderInfoDetailMapper.queryGroupByTaxRate(new ArrayList<>(orderNoSet));
             Date now = Calendar.getInstance().getTime();
             DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -146,6 +158,15 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
             wholesaleReceivableSettle.setSettleEndTime(param.getTransTimeEnd());
             wholesaleReceivableSettle.setTransAmount(totalTransAmount);
             wholesaleReceivableSettle.setSettleAmount(totalSettleAmount);
+
+            //
+            List<String> idList = settleDetailDTOList.stream().map(PlatformWholesaleSettleDetailDTO::getId).collect(Collectors.toList());
+
+            WholesaleReceivableSettleDetail settleDetail = new WholesaleReceivableSettleDetail();
+            settleDetail.setSettleNo(wholesaleReceivableSettle.getSettleNo());
+            settleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
+            wholesaleReceivableSettleDetailMapper.update(settleDetail, Wrappers.<WholesaleReceivableSettleDetail>lambdaUpdate()
+                .in(WholesaleReceivableSettleDetail::getId, idList));
 
             if (CollectionUtils.isNotEmpty(groupByTaxRateDetails)) {
                 Map<BigDecimal, List<OrderInfoDetail>> map = groupByTaxRateDetails.stream().collect(Collectors
@@ -166,6 +187,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     @Override
     public WholesaleReceivableSettle updateReceivableStatus(Long settleId, String sendStatus, String settleStatus,  String recStatus) {
         WholesaleReceivableSettle settle = wholesaleReceivableSettleDao.getById(settleId);
+        BizAssert.isTrue(settle !=null, ExceptionCode.ILLEGALITY_ARGUMENTS);
         if(!StringUtils.isEmpty(sendStatus)){
             settle.setSendStatus(sendStatus);
         }

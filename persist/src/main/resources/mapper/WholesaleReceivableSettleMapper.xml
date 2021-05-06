@@ -14,6 +14,7 @@
       resultType="com.welfare.persist.dto.WholesaleReceivableSettleResp"
       parameterType="com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery">
        SELECT
+          wps.id,
           wps.settle_no AS settleNo,
           wps.mer_code AS merCode,
           m.mer_name AS merName,

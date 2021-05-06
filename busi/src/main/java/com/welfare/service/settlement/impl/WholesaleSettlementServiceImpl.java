@@ -40,6 +40,7 @@ import com.welfare.service.settlement.WholesaleSettlementService;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -142,8 +143,6 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
 
         if(CollectionUtils.isNotEmpty(settleDetailDTOList)) {
 
-
-
             List<OrderInfoDetail> groupByTaxRateDetails = orderInfoDetailMapper.queryGroupByTaxRate(new ArrayList<>(orderNoSet));
             Date now = Calendar.getInstance().getTime();
             DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -216,9 +215,11 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         for (WholesaleReceivableSettleResp receivableSettleResp:
         wholesaleReceivableSettleResps ) {
             String settleTaxSalesStatistics = receivableSettleResp.getSettleTaxSalesStatistics();
-            List<SettleTaxSalesStatistics> settleTaxSalesStatisticsList = objectMapper.readValue(settleTaxSalesStatistics, new TypeReference<List<SettleTaxSalesStatistics>>() {});
+            if(Strings.isNotEmpty(settleTaxSalesStatistics)) {
+                List<SettleTaxSalesStatistics> settleTaxSalesStatisticsList = objectMapper.readValue(settleTaxSalesStatistics, new TypeReference<List<SettleTaxSalesStatistics>>() {});
 
-            receivableSettleResp.setSettleTaxSalesStatisticList(settleTaxSalesStatisticsList);
+                receivableSettleResp.setSettleTaxSalesStatisticList(settleTaxSalesStatisticsList);
+            }
         }
 
         return wholesaleReceivableSettleRespPageInfo;

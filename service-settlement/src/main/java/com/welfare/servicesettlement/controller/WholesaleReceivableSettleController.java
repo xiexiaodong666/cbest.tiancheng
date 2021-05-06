@@ -136,7 +136,7 @@ public class WholesaleReceivableSettleController implements IController {
     public R<WholesaleReceivableSettle> updateReceivableStatus(@RequestBody WholesaleSettleStatusDTO wholesaleSettleStatusDTO){
         Long settleId = wholesaleSettleStatusDTO.getId();
         WholesaleReceivableSettle wholesaleReceivableSettle= wholesaleSettlementService.
-                updateReceivableStatus(settleId,wholesaleSettleStatusDTO.getSendStatus(),wholesaleSettleStatusDTO.getSettleStatus());
+                updateReceivableStatus(settleId,wholesaleSettleStatusDTO.getSendStatus(),wholesaleSettleStatusDTO.getSettleStatus(), wholesaleSettleStatusDTO.getRecStatus());
         return success(wholesaleReceivableSettle);
     }
 

@@ -156,10 +156,13 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
-    public WholesaleReceivableSettle updateReceivableStatus(Long settleId, String sendStatus, String settleStatus) {
+    public WholesaleReceivableSettle updateReceivableStatus(Long settleId, String sendStatus, String settleStatus,  String recStatus) {
         WholesaleReceivableSettle settle = wholesaleReceivableSettleDao.getById(settleId);
-        if(!StringUtils.isEmpty(settleId)){
+        if(!StringUtils.isEmpty(sendStatus)){
             settle.setSendStatus(sendStatus);
+        }
+        if(!StringUtils.isEmpty(recStatus)){
+            settle.setRecStatus(recStatus);
         }
         if(!StringUtils.isEmpty(settleStatus)){
             settle.setSettleStatus(settleStatus);
@@ -202,7 +205,12 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     @Override
     public List<WholesaleReceivableSettleDetailResp> receivableBillDetail(Long id,
         WholesaleReceiveSettleDetailPageQuery query) {
+        WholesaleReceivableSettle wholesaleReceivableSettle = wholesaleReceivableSettleDao.getById(id);
 
+        if(wholesaleReceivableSettle == null) {
+            return null;
+        }
+        query.setSettleNo(wholesaleReceivableSettle.getSettleNo());
         return wholesaleReceivableSettleMapper.receivableBillDetailPage(query);
     }
 

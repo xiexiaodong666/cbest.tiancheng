@@ -67,4 +67,7 @@ public class WholesaleReceiveSettleDetailPageQuery  extends  PageReq{
 
     @ApiModelProperty("支付渠道")
     private String paymentChannel;
+
+    @ApiModelProperty("结算编号")
+    private String settleNo;
 }

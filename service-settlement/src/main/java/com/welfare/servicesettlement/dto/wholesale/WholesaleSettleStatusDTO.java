@@ -20,4 +20,6 @@ public class WholesaleSettleStatusDTO {
     private String sendStatus;
     @ApiModelProperty("结算状态")
     private String settleStatus;
+    @ApiModelProperty("结算状态")
+    private String recStatus;
 }

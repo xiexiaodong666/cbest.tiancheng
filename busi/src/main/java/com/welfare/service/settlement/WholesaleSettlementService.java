@@ -100,7 +100,7 @@ public interface WholesaleSettlementService {
      * @param settleStatus 结算状态
      * @return
      */
-    WholesaleReceivableSettle updateReceivableStatus(Long settleId, String sendStatus, String settleStatus);
+    WholesaleReceivableSettle updateReceivableStatus(Long settleId, String sendStatus, String settleStatus, String recStatus);
 
 
     /**

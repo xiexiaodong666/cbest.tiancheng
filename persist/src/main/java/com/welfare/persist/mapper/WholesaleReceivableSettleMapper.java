@@ -29,11 +29,11 @@ import java.util.List;
 @Mapper
 public interface WholesaleReceivableSettleMapper extends BaseMapper<WholesaleReceivableSettle> {
 
-  Page<WholesaleReceivableSettleResp> receivableBillPage(Page<WholesaleReceivableSettleResp> page, WholesaleReceivableSettleBillQuery query);
+  Page<WholesaleReceivableSettleResp> receivableBillPage(Page<WholesaleReceivableSettleResp> page, @Param("query") WholesaleReceivableSettleBillQuery query);
 
-  List<WholesaleReceivableSettleDetailResp> receivableBillDetailPage( WholesaleReceiveSettleDetailPageQuery query);
+  List<WholesaleReceivableSettleDetailResp> receivableBillDetailPage( @Param("query") WholesaleReceiveSettleDetailPageQuery query);
 
-  Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage( Page<WholesaleReceivableSettleDetailResp> page, WholesaleReceiveSettleDetailPageQuery query);
+  Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage( Page<WholesaleReceivableSettleDetailResp> page,@Param("query")  WholesaleReceiveSettleDetailPageQuery query);
 
   WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(WholesaleReceiveSettleDetailQuery query);
 }

@@ -50,6 +50,7 @@
   <select id="receivableBill"
     resultType="com.welfare.persist.dto.WholesaleReceivableSettleResp">
     SELECT
+    wps.id,
     wps.settle_no AS settleNo,
     wps.mer_code AS merCode,
     m.mer_name AS merName,

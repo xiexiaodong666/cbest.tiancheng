@@ -131,7 +131,7 @@ public class WholesaleReceivableSettleController implements IController {
         return success(settle);
     }
 
-    @PatchMapping("/receivable/status")
+    @PostMapping("/receivable/status")
     @ApiOperation("更新应收结算单状态")
     public R<WholesaleReceivableSettle> updateReceivableStatus(@RequestBody WholesaleSettleStatusDTO wholesaleSettleStatusDTO){
         Long settleId = wholesaleSettleStatusDTO.getId();

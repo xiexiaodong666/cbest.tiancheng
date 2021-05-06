@@ -41,6 +41,9 @@ public class WholesalePayableSettleResp {
     @ApiModelProperty(value = "合作方式 联营:joint_venture  经销:distribution\"")
     private String merCooperationMode;
 
+    @ApiModelProperty(value = "合作方式 联营:joint_venture  经销:distribution\"")
+    private String merCooperationModeName;
+
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

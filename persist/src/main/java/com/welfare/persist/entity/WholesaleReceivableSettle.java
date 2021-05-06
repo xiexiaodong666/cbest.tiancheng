@@ -155,24 +155,6 @@ public class WholesaleReceivableSettle extends Model<WholesaleReceivableSettle> 
     @ApiModelProperty("账单商品税率统计信息")
     private String settleTaxSalesStatistics;
 
-    /**
-     * 结算金额
-     */
-    @ApiModelProperty("结算金额")
-    private BigDecimal orderWholesaleAmount;
-
-    /**
-     * 商户批发信用扣款金额
-     */
-    @ApiModelProperty("商户批发信用扣款金额")
-    private BigDecimal merWholesaleCreditDeductionAmount;
-
-    /**
-     * 商户剩余批发额度
-     */
-    @ApiModelProperty("商户剩余批发额度")
-    private BigDecimal merWholesaleCredit;
-
 //以下为列明常量
 
     /**

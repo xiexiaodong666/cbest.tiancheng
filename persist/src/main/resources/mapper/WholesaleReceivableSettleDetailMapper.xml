@@ -83,12 +83,13 @@
         d.store_code as storeCode,
         d.store_name as storeName,
         d.trans_amount as saleAmount,
-        d.trans_amount as settleAmount,
+        d.order_wholesale_amount as settleAmount,
         d.settle_flag as settleFlag
         FROM wholesale_receivable_settle_detail d
         INNER JOIN account a ON d.account_code = a.account_code
         inner join supplier_store s on s.store_code = d.store_code
         inner join merchant supplier on s.mer_code = supplier.mer_code
+
         <include refid="queryReceivableDetailsCondition"/>
         order by d.trans_time desc
     </select>
@@ -109,37 +110,37 @@
     <sql id="queryReceivableDetailsCondition">
         <where>
             <if test="param.orderNo !=null and param.orderNo!=''">
-                d.order_no = #{param.orderNo}
+                and d.order_no = #{param.orderNo}
             </if>
             <if test="param.transNo !=null and param.transNo != ''">
-                d.trans_no = #{param.transNo}
+                and d.trans_no = #{param.transNo}
             </if>
             <if test="param.settleFlag !=null and param.settleFlag!= ''">
-                d.settle_flag = #{param.settleFlag}
+                and d.settle_flag = #{param.settleFlag}
             </if>
             <if test="param.supplierCode != null and param.supplierCode != ''">
-                supplier.supplier_code = #{param.supplierCode}
+                and supplier.supplier_code = #{param.supplierCode}
             </if>
             <if test="param.storeCode != null and param.storeCode != ''">
-                d.store_code = #{param.storeCode}
+                and d.store_code = #{param.storeCode}
             </if>
             <if test="param.transTimeStart != null">
-                d.trans_time <![CDATA[>=]]> #{param.transTimeStart}
+                and d.trans_time <![CDATA[>=]]> #{param.transTimeStart}
             </if>
             <if test="param.transTimeEnd != null">
-                d.trans_time <![CDATA[<]]> #{param.transTimeEnd}
+                and d.trans_time <![CDATA[<]]> #{param.transTimeEnd}
             </if>
             <if test="param.phone != null and param.phone != ''">
-                a.phone = #{param.phone}
+                and a.phone = #{param.phone}
             </if>
             <if test = "param.merCode != null and param.merCode != ''">
-                d.mer_code = #{param.merCode}
+                and d.mer_code = #{param.merCode}
             </if>
             <if test="param.settleNo != null and param.settleNo != ''">
-                d.settle_no = #{param.settleNo}
+                and d.settle_no = #{param.settleNo}
             </if>
             <if test="param.excludeIds != null and param.excludeIds.length !=0">
-                d.id not in
+                and d.id not in
                 <foreach collection="param.excludeIds" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>

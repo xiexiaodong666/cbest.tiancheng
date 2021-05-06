@@ -35,6 +35,15 @@ public class WelfareSettleConstant {
         public String desc(){
             return this.desc;
         }
+
+        public static WelfareSettleConstant.WholesaleSettleMethodEnum findByCode(String code) {
+            for (WelfareSettleConstant.WholesaleSettleMethodEnum type : WelfareSettleConstant.WholesaleSettleMethodEnum.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的WholesaleSettleMethodEnum类型");
+        }
     }
 
     /**

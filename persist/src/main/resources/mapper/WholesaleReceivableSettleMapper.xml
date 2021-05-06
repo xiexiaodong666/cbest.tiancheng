@@ -25,9 +25,9 @@
           wps.rec_status AS recStatus,
           wps.settle_status AS settleStatus,
           m.mer_cooperation_mode AS merCooperationMode,
-          wps.settle_tax_sales_statistics as
-        FROM
-          wholesale_payable_settle wps
+          wps.settle_tax_sales_statistics as settleTaxSalesStatistics
+        from
+          wholesale_receivable_settle wps
           LEFT JOIN merchant m ON m.mer_code = wps.mer_code
 
       <where>
@@ -69,7 +69,7 @@
     else 0
     end as settleAmount
 
-    from wholesale_payable_settle_detail t1
+    from wholesale_receivable_settle_detail t1
     inner join account ac on t1.account_code = ac.account_code
     inner join department d on d.department_code = ac.department
     left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
@@ -105,7 +105,7 @@
     else 0
     end as settleAmount
 
-    from wholesale_payable_settle_detail t1
+    from wholesale_receivable_settle_detail t1
     inner join account ac on t1.account_code = ac.account_code
     inner join department d on d.department_code = ac.department
     left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0

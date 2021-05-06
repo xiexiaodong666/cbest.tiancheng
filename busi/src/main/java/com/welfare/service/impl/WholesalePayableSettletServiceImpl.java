@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.RedisKeyConstant;
+import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.domain.UserInfo;
@@ -190,7 +191,15 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     public Page<WholesalePayableSettleResp> payableBillPage(WholesalePayableSettleBillQuery query) {
         Page<WholesalePayableSettleResp> page = new Page<>(query.getCurrent(), query.getSize());
         page.addOrder(OrderItem.desc(WholesalePayableSettle.ID));
-        return wholesalePayableSettleMapper.payableBillPage(page, query);
+        page = wholesalePayableSettleMapper.payableBillPage(page, query);
+        if (CollectionUtils.isNotEmpty(page.getRecords())) {
+            page.getRecords().forEach(wholesalePayableSettleResp -> {
+                wholesalePayableSettleResp
+                        .setMerCooperationModeName(WelfareSettleConstant.WholesaleSettleMethodEnum
+                                .findByCode(wholesalePayableSettleResp.getMerCooperationMode()).desc());
+            });
+        }
+        return page;
     }
 
     @Override

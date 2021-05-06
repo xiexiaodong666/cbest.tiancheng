@@ -42,6 +42,8 @@ public class WholesaleReceivableSettleBillQuery extends PageReq{
 
     @ApiModelProperty(value = "合作方式")
     private String merCooperationMode;
+    @ApiModelProperty(value = "合作方式")
+    private String merCooperationModeName;
 
     @ApiModelProperty(value = "结算状态:待结算-unsettled 已结算-settled")
     private String settleStatus;

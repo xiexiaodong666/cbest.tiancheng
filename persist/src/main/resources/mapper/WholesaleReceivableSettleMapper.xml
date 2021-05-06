@@ -27,6 +27,10 @@
           wps.rec_status AS recStatus,
           wps.settle_status AS settleStatus,
           m.mer_cooperation_mode AS merCooperationMode,
+      case
+      when t4.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
+      when t4.mer_cooperation_mode = 'PAYED' then '后付费'
+      end as merCooperationModeName,
           wps.settle_tax_sales_statistics as settleTaxSalesStatistics
         from
           wholesale_receivable_settle wps
@@ -64,6 +68,10 @@
     wps.rec_status AS recStatus,
     wps.settle_status AS settleStatus,
     m.mer_cooperation_mode AS merCooperationMode,
+     case
+      when t4.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
+      when t4.mer_cooperation_mode = 'PAYED' then '后付费'
+      end as merCooperationModeName,
     wps.settle_tax_sales_statistics as settleTaxSalesStatistics
     from
     wholesale_receivable_settle wps

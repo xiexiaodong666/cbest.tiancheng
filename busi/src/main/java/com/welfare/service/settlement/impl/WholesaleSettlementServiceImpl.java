@@ -153,8 +153,8 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
             wholesaleReceivableSettle.setMerCode(param.getMerCode());
             wholesaleReceivableSettle.setOrderNum(orderNoSet.size());
             wholesaleReceivableSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code());
-            wholesaleReceivableSettle.setSettleStartTime(param.getTransTimeStart());
-            wholesaleReceivableSettle.setSettleEndTime(param.getTransTimeEnd());
+            wholesaleReceivableSettle.setSettleStartTime(settleDetailDTOList.get(settleDetailDTOList.size() -1).getTransTime());
+            wholesaleReceivableSettle.setSettleEndTime(settleDetailDTOList.get(0).getTransTime());
             wholesaleReceivableSettle.setTransAmount(totalTransAmount);
             wholesaleReceivableSettle.setSettleAmount(totalSettleAmount);
 

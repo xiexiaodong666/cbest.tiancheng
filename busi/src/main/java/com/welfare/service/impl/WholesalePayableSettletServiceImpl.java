@@ -200,6 +200,18 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     }
 
     @Override
+    public WholesalePayableSettleResp payableBillById(Long id) {
+        WholesalePayableSettleBillQuery query = new WholesalePayableSettleBillQuery();
+        query.setId(id);
+        Page<WholesalePayableSettleResp> page = payableBillPage(query);
+        if (CollectionUtils.isNotEmpty(page.getRecords())) {
+            return page.getRecords().get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public Page<WholesalePayableSettleDetailResp> payableBillDetailPage(Long id, WholesalePaySettleDetailPageQuery query) {
         WholesalePaySettleDetailReq wholesalePaySettleDetailReq = new WholesalePaySettleDetailReq();
         BeanUtils.copyProperties(wholesalePaySettleDetailReq, query);

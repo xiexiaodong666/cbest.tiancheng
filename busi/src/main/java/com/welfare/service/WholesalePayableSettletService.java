@@ -91,6 +91,13 @@ public interface WholesalePayableSettletService {
     Page<WholesalePayableSettleResp> payableBillPage(WholesalePayableSettleBillQuery query);
 
     /**
+     * 通过id查询结算单
+     * @param id
+     * @return
+     */
+    WholesalePayableSettleResp payableBillById(Long id);
+
+    /**
      * (商户应收结算单)分页查询某个应付结算单明细列表
      * @param id
      * @param query

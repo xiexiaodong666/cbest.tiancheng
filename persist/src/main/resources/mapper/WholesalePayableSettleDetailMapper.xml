@@ -14,9 +14,9 @@
         mer.mer_name AS merName,
         mer.mer_code AS merCode,
         me.supplier_wholesale_settle_method AS cooperationMode,
-        SUM( wpsd.trans_amount ) AS totalConsumeAmount,
-        SUM( wpsd.order_wholesale_amount ) AS unSettleAmount,
-        SUM( wpsd.trans_amount ) - SUM( wpsd.order_wholesale_amount ) AS revenueAmount
+        SUM( if(wpsd.trans_amount is NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) AS totalConsumeAmount,
+        SUM( if(wpsd.order_wholesale_amount is NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount ,-wpsd.order_wholesale_amount)) ) AS unSettleAmount,
+        SUM( if(wpsd.trans_amount is NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount ,-wpsd.trans_amount)) ) - SUM( if(wpsd.order_wholesale_amount is NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount ,-wpsd.order_wholesale_amount)) ) AS revenueAmount
         FROM
         merchant mer
         LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
@@ -51,9 +51,9 @@
 
     <select id="summaryGroupBySupplierMerCode" resultType="com.welfare.persist.dto.PlatformWholesalePayableGroupDTO">
         SELECT
-        SUM( wpsd.trans_amount ) AS totalConsumeAmount,
-        SUM( wpsd.order_wholesale_amount ) AS unSettleAmount,
-        SUM( wpsd.trans_amount ) - SUM( wpsd.order_wholesale_amount ) AS revenueAmount
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) AS totalConsumeAmount,
+        SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS unSettleAmount,
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) - SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS revenueAmount
         FROM
         merchant mer
         LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
@@ -97,10 +97,25 @@
             ss.store_code AS storeCode,
             ss.store_name AS storeName,
             wpsd.trans_type AS transType,
-            wpsd.trans_amount AS saleAmount,
-            wpsd.order_wholesale_amount AS settleAmount,
-            wpsd.trans_amount - wpsd.order_wholesale_amount AS revenueAmount,
-            wpsd.settle_flag AS settleFlag
+            case when wpsd.trans_type='consume' then wpsd.trans_amount
+            when wpsd.trans_type='refund' then -wpsd.trans_amount
+                end AS saleAmount,
+            case when wpsd.trans_type='consume' then wpsd.order_wholesale_amount
+            when wpsd.trans_type='refund' then -wpsd.order_wholesale_amount
+               end  AS settleAmount,
+
+            case when wpsd.trans_type='consume' then wpsd.trans_amount
+            when wpsd.trans_type='refund' then -wpsd.trans_amount
+            end
+            -
+            case when wpsd.trans_type='consume' then wpsd.order_wholesale_amount
+            when wpsd.trans_type='refund' then -wpsd.order_wholesale_amount
+            end  AS revenueAmount,
+
+            wpsd.settle_flag AS settleFlag,
+            case when wpsd.settle_flag='unsettled' then '待结算'
+            when wpsd.settle_flag='settling' then '结算中'
+            when wpsd.settle_flag='settled' then '已结算' end as settleFlagName
         FROM
             wholesale_payable_settle_detail wpsd
                 LEFT JOIN account a ON wpsd.account_code = a.account_code
@@ -158,9 +173,9 @@
         SELECT
         supplier.mer_name as merName,
         me.supplier_wholesale_settle_method as cooperationMode,
-        SUM( wpsd.trans_amount ) AS saleAmount,
-        SUM( wpsd.order_wholesale_amount ) AS unsettledAmount,
-        SUM( wpsd.trans_amount ) - SUM( wpsd.order_wholesale_amount ) AS revenueAmount
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) AS saleAmount,
+        SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS unsettledAmount,
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) - SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS revenueAmount
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
@@ -221,9 +236,20 @@
         a.account_name AS accountName,
         mer.mer_code AS customerMerCode,
         mer.mer_name AS customerMerName,
-        wpsd.trans_amount AS saleAmount,
-        wpsd.order_wholesale_amount AS settleAmount,
-        wpsd.trans_amount - wpsd.order_wholesale_amount AS revenueAmount
+        case when wpsd.trans_type='consume' then wpsd.trans_amount
+        when wpsd.trans_type='refund' then -wpsd.trans_amount
+        end AS saleAmount,
+        case when wpsd.trans_type='consume' then wpsd.order_wholesale_amount
+        when wpsd.trans_type='refund' then -wpsd.order_wholesale_amount
+        end  AS settleAmount,
+
+        case when wpsd.trans_type='consume' then wpsd.trans_amount
+        when wpsd.trans_type='refund' then -wpsd.trans_amount
+        end
+        -
+        case when wpsd.trans_type='consume' then wpsd.order_wholesale_amount
+        when wpsd.trans_type='refund' then -wpsd.order_wholesale_amount
+        end  AS revenueAmount
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
@@ -266,10 +292,10 @@
 
     <select id="payableBillDetailSummary" resultType="com.welfare.persist.dto.WholesalePayableBillGroupDTO">
         SELECT
-        SUM( wpsd.trans_amount ) AS goodsSaleAmount,
-        SUM( wpsd.trans_amount ) AS saleAmount,
-        SUM( wpsd.order_wholesale_amount ) AS settleAmount,
-        SUM( wpsd.trans_amount ) - SUM( wpsd.order_wholesale_amount ) AS revenueAmount
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) AS goodsSaleAmount,
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) AS saleAmount,
+        SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS settleAmount,
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) - SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS revenueAmount
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
@@ -315,8 +341,8 @@
     <select id="buildPayableSettle" resultType="com.welfare.persist.entity.WholesalePayableSettle">
         SELECT
         concat(supplier.mer_code,DATE_FORMAT(now(),'%Y%m%d%h%m%s')) as settleNo,
-        SUM( wpsd.trans_amount ) AS transAmount,
-        SUM( wpsd.order_wholesale_amount ) AS settleAmount,
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) AS transAmount,
+        SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS settleAmount,
         count(distinct wpsd.trans_no) as orderNum,
         'unconfirmed' as  recStatus,
         'settling' as settleStatus,

@@ -4,6 +4,11 @@ INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `delet
 
 INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES (112, 'AccountDepositApply.applyType', 'welfareApply', '福利充值', 1, 0, 2);
 
+INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES (113, 'WholesaleCooperationMode', 'joint_venture', '联营', 1, 0, 1);
+
+INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES (114, 'WholesaleCooperationMode', 'distribution', '经销', 1, 0, 2);
+
+
 ALTER TABLE account_deposit_apply ADD COLUMN apply_type VARCHAR(20) DEFAULT NULL;
 
 UPDATE account_deposit_apply set apply_type = 'welfareApply';

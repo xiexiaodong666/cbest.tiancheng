@@ -113,4 +113,18 @@ public interface WholesalePayableSettletService {
      * @return
      */
     List<WholesalePayableSettleDetailResp> queryPayableBillDetail(@PathVariable("id") Long id, WholesalePaySettleDetailReq query);
+
+    /**
+     * 查询结算单下所有的消费门店
+     * @param id
+     * @return
+     */
+    List<StoreCodeAndNameDTO> storesBySettleId(Long id);
+
+    /**
+     * 查询结算单下所有的消费客户
+     * @param id
+     * @return
+     */
+    List<MerCodeAndNameDTO> customerMersBySettleId(Long id);
 }

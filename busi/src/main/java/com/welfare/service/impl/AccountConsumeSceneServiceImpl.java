@@ -297,7 +297,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
     if (CollectionUtils.isNotEmpty(consumeStoreInfoDTOS)) {
       //按消费id分组
       consumeStoreInfoDTOS.stream()
-          .collect(Collectors.groupingBy(AccountConsumeStoreInfoDTO::getId))
+          .collect(Collectors.groupingBy(AccountConsumeStoreInfoDTO::getAccountWelfareCode))
           .forEach((id, accountConsumeStoreInfoDTOS) -> {
             AccountConsumeSceneResp resp = new AccountConsumeSceneResp();
             resp.setId(String.valueOf(id));

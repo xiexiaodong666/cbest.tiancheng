@@ -151,6 +151,15 @@ public class WholesaleReceivableSettleController implements IController {
         return success(wholesaleReceivableSettleRespPageInfo);
     }
 
+    @GetMapping("/receivable/bill/{id}")
+    @ApiOperation("应收明细结算单详情")
+    public R<WholesaleReceivableSettleResp> receivableBillDetail(@PathVariable("id") Long id)
+        throws JsonProcessingException {
+
+        return success(wholesaleSettlementService.receivableBillDetail(id));
+    }
+
+
     @GetMapping("/receivable/bill/{id}/page")
     @ApiOperation("分页查询某个应收结算单明细列表")
     public R<Page<WholesaleReceivableSettleDetailResp>> receivableBillDetailPage(@PathVariable("id") Long id, WholesaleReceiveSettleDetailPageQuery query){

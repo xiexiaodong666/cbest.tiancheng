@@ -241,6 +241,19 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     }
 
     @Override
+    public WholesaleReceivableSettleResp receivableBillDetail(Long id)
+        throws JsonProcessingException {
+
+        WholesaleReceivableSettleResp receivableSettleResp = wholesaleReceivableSettleMapper. receivableBill(id);
+        if(Strings.isNotEmpty(receivableSettleResp.getSettleTaxSalesStatistics())) {
+            List<SettleTaxSalesStatistics> settleTaxSalesStatisticsList = objectMapper.readValue(receivableSettleResp.getSettleTaxSalesStatistics(), new TypeReference<List<SettleTaxSalesStatistics>>() {});
+
+            receivableSettleResp.setSettleTaxSalesStatisticList(settleTaxSalesStatisticsList);
+        }
+        return receivableSettleResp;
+    }
+
+    @Override
     public List<WholesaleReceivableSettleDetailResp> receivableBillDetail(Long id,
         WholesaleReceiveSettleDetailPageQuery query) {
         WholesaleReceivableSettle wholesaleReceivableSettle = wholesaleReceivableSettleDao.getById(id);

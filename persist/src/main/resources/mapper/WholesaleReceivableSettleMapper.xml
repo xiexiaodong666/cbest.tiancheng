@@ -46,6 +46,28 @@
       </where>
     </select>
 
+  <select id="receivableBill"
+    resultType="com.welfare.persist.dto.WholesaleReceivableSettleResp">
+    SELECT
+    wps.settle_no AS settleNo,
+    wps.mer_code AS merCode,
+    m.mer_name AS merName,
+    wps.settle_amount AS settleAmount,
+    wps.order_num AS orderNum,
+    wps.create_time AS createTime,
+    wps.settle_start_time AS settleStartTime,
+    wps.settle_end_time AS settleEndTime,
+    wps.rec_status AS recStatus,
+    wps.settle_status AS settleStatus,
+    m.mer_cooperation_mode AS merCooperationMode,
+    wps.settle_tax_sales_statistics as settleTaxSalesStatistics
+    from
+    wholesale_receivable_settle wps
+    LEFT JOIN merchant m ON m.mer_code = wps.mer_code
+
+    where wps.id = #{id}
+  </select>
+
   <select id="receivableBillDetailSummary"
     resultType="com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp"
     parameterType="com.welfare.persist.dto.query.WholesaleReceiveSettleDetailQuery">

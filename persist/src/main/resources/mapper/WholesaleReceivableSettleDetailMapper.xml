@@ -83,12 +83,13 @@
         d.store_code as storeCode,
         d.store_name as storeName,
         d.trans_amount as saleAmount,
-        d.trans_amount as settleAmount,
+        d.order_wholesale_amount as settleAmount,
         d.settle_flag as settleFlag
         FROM wholesale_receivable_settle_detail d
         INNER JOIN account a ON d.account_code = a.account_code
         inner join supplier_store s on s.store_code = d.store_code
         inner join merchant supplier on s.mer_code = supplier.mer_code
+
         <include refid="queryReceivableDetailsCondition"/>
         order by d.trans_time desc
     </select>

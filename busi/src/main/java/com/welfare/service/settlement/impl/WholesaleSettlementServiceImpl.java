@@ -10,6 +10,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareSettleConstant;
+import com.welfare.common.constants.WelfareSettleConstant.SettleRecStatusEnum;
+import com.welfare.common.constants.WelfareSettleConstant.SettleStatusEnum;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dao.WholesaleReceivableSettleDao;
@@ -108,17 +110,22 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
 
     @Override
     public WholesaleReceivableSettle generateReceivableSettle(PlatformWholesaleSettleDetailParam param) {
+        param.setSettleFlag(SettleStatusEnum.UNSETTLED.code());
         List<PlatformWholesaleSettleDetailDTO> settleDetailDTOList = wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
         Set<String> orderNoSet = new HashSet<>();
         BigDecimal totalTransAmount = BigDecimal.ZERO;
+        BigDecimal totalSettleAmount = BigDecimal.ZERO;
+
         for (PlatformWholesaleSettleDetailDTO dto : settleDetailDTOList) {
             orderNoSet.add(dto.getOrderNo());
             if (WelfareConstant.TransType.CONSUME.code().equals(dto.getTransType())) {
                 totalTransAmount = totalTransAmount.add(dto.getSaleAmount());
+                totalSettleAmount = totalSettleAmount.add(dto.getSettleAmount());
+
             } else if (WelfareConstant.TransType.REFUND.code().equals(dto.getTransType())) {
                 totalTransAmount = totalTransAmount.add(dto.getSaleAmount().negate());
-        //        totalTransAmount = totalTransAmount.add(dto.getTransAmount());
-            }
+                totalSettleAmount = totalSettleAmount.add(dto.getSettleAmount().negate());
+                }
         }
         Map<BigDecimal, BigDecimal> taxRateAndSettleAmountMap = new HashMap<>();
 
@@ -131,13 +138,14 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
             String settleNo = param.getMerCode() + dateFormat.format(now);
             wholesaleReceivableSettle.setSettleNo(settleNo);
             wholesaleReceivableSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
+            wholesaleReceivableSettle.setRecStatus(SettleRecStatusEnum.UNCONFIRMED.code());
             wholesaleReceivableSettle.setMerCode(param.getMerCode());
             wholesaleReceivableSettle.setOrderNum(orderNoSet.size());
             wholesaleReceivableSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code());
             wholesaleReceivableSettle.setSettleStartTime(param.getTransTimeStart());
             wholesaleReceivableSettle.setSettleEndTime(param.getTransTimeEnd());
             wholesaleReceivableSettle.setTransAmount(totalTransAmount);
-            wholesaleReceivableSettle.setSettleAmount(totalTransAmount);
+            wholesaleReceivableSettle.setSettleAmount(totalSettleAmount);
 
             if (CollectionUtils.isNotEmpty(groupByTaxRateDetails)) {
                 Map<BigDecimal, List<OrderInfoDetail>> map = groupByTaxRateDetails.stream().collect(Collectors

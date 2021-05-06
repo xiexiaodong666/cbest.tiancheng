@@ -120,7 +120,7 @@ public class WholesaleReceivableSettleController implements IController {
     public R<String> exportReceivableDetails(@RequestBody PlatformWholesaleSettleDetailParam param) throws IOException {
       List<PlatformWholesaleSettleDetailDTO> resultList = wholesaleSettlementService.pageQueryReceivableDetails(param);
 
-      String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleGroupDTO.class, "批发应收结算分组汇总");
+      String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleDetailDTO.class, "批发应收结算分组汇总");
       return R.success(fileUploadService.getFileServerUrl(filePath));
     }
 

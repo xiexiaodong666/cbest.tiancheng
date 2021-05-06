@@ -134,13 +134,13 @@ public class WholesalePayableSettleController implements IController {
         return R.success(fileUploadService.getFileServerUrl(path));
     }
 
-    @GetMapping("/payable/{id}/stores")
+    @GetMapping("/payable/bill/{id}/stores")
     @ApiOperation("(商户应收结算单)查询结算单下所有的消费门店")
     public R<List<StoreCodeAndNameDTO>> storesBySettleId(@PathVariable("id") Long id) {
         return success(payableSettletService.storesBySettleId(id));
     }
 
-    @GetMapping("/payable/{id}/customerMers")
+    @GetMapping("/payable/bill/{id}/customerMers")
     @ApiOperation("(商户应收结算单)查询结算单下所有的消费客户")
     public R<List<MerCodeAndNameDTO>> customerMersBySettleId(@PathVariable("id") Long id) {
         return success(payableSettletService.customerMersBySettleId(id));

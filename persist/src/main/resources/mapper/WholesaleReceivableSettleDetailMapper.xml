@@ -32,7 +32,7 @@
 
         <include refid="getWelfareSettleSum"/>
         from  merchant t4
-        inner join wholesale_payable_settle_detail t1 on t1.mer_code=t4.mer_code
+        inner join wholesale_receivable_settle_detail t1 on t1.mer_code=t4.mer_code
         inner join supplier_store s on s.store_code = t1.store_code
         inner join merchant supplier on supplier.mer_code = s.mer_code
         <include refid="queryReceivableWhere"/>
@@ -45,7 +45,7 @@
         <include refid="getWelfareSettleSum"/>
 
         from  merchant t4
-        inner join wholesale_payable_settle_detail t1 on t1.mer_code=t4.mer_code
+        inner join wholesale_receivable_settle_detail t1 on t1.mer_code=t4.mer_code
         inner join supplier_store s on s.store_code = t1.store_code
         inner join merchant supplier on supplier.mer_code = s.mer_code
         <include refid="queryReceivableWhere"/>

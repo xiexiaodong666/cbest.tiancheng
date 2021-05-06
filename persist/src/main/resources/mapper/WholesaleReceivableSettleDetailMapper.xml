@@ -109,6 +109,9 @@
     </select>
     <sql id="queryReceivableDetailsCondition">
         <where>
+            <if test="param.merCode !=null and param.merCode!=''">
+                and d.mer_code = #{param.merCode}
+            </if>
             <if test="param.orderNo !=null and param.orderNo!=''">
                 and d.order_no = #{param.orderNo}
             </if>

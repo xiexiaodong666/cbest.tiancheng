@@ -35,5 +35,5 @@ public interface WholesaleReceivableSettleMapper extends BaseMapper<WholesaleRec
 
   Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage( Page<WholesaleReceivableSettleDetailResp> page,@Param("query")  WholesaleReceiveSettleDetailPageQuery query);
 
-  WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(WholesaleReceiveSettleDetailQuery query);
+  WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(@Param("query") WholesaleReceiveSettleDetailQuery query);
 }

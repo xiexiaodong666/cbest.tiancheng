@@ -22,6 +22,8 @@ public class WholesaleReceiveSettleDetailQuery {
     @ApiModelProperty(value = "门店名称")
     private String storeName;
 
+    @ApiModelProperty(value = "结算编号")
+    private String settleNo;
     @ApiModelProperty(value = "门店编号")
     private List<String> storeCodes;
 

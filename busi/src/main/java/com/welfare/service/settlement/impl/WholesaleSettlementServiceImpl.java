@@ -228,6 +228,13 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     @Override
     public Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id,
         WholesaleReceiveSettleDetailPageQuery query) {
+        WholesaleReceivableSettle wholesaleReceivableSettle = wholesaleReceivableSettleDao.getById(id);
+
+        if(wholesaleReceivableSettle == null) {
+            return null;
+        }
+        query.setSettleNo(wholesaleReceivableSettle.getSettleNo());
+
         Page<WholesaleReceivableSettleDetailResp> page = new Page<>(query.getCurrent(), query.getSize());
 
         return wholesaleReceivableSettleMapper.receivableBillDetailPage(page, query);
@@ -248,6 +255,12 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     @Override
     public WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(Long id,
         WholesaleReceiveSettleDetailQuery query) {
+        WholesaleReceivableSettle wholesaleReceivableSettle = wholesaleReceivableSettleDao.getById(id);
+
+        if(wholesaleReceivableSettle == null) {
+            return null;
+        }
+        query.setSettleNo(wholesaleReceivableSettle.getSettleNo());
 
         return  wholesaleReceivableSettleMapper.receivableBillDetailSummary(query);
     }

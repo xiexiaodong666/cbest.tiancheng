@@ -50,6 +50,7 @@ public class MultiOrderPaymentRequest {
             onlinePaymentRequest.setAmount(detail.getAmount());
             onlinePaymentRequest.setBizType(this.bizType);
             onlinePaymentRequest.setMachineNo(detail.getMachineNo());
+            onlinePaymentRequest.setStoreNo(detail.getStoreNo());
             onlinePaymentRequest.setPaymentDate(this.paymentDate);
             onlinePaymentRequest.setSaleRows(detail.getSaleRows());
             onlinePaymentRequest.setOrderNo(detail.getOrderNo());

@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -364,5 +365,32 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public List<Merchant> supplierByMer(String merCode) {
         return merchantDao.getBaseMapper().supplierByMer(merCode);
+    }
+
+    @Override
+    public List<Merchant> wholesaleByMer(String merCode) {
+
+        List<Merchant> allMerchantList = merchantDao.getBaseMapper().wholesaleByMer();
+        if(CollectionUtils.isEmpty(allMerchantList)) {
+            return Collections.emptyList();
+        }
+
+        List<Merchant> merchantList = new ArrayList<>();
+
+        if(Strings.isNotEmpty(merCode)) {
+            List<Merchant> supplierList = merchantDao.getBaseMapper().supplierByMer(merCode);
+            if(CollectionUtils.isNotEmpty(supplierList)) {
+                for (Merchant m:
+                    supplierList) {
+                    Optional<Merchant>  merchant = allMerchantList.stream().filter(c->c.getMerCode().equals(m.getMerCode())).findFirst();
+                    if(merchant.isPresent()) {
+                        merchantList.add(merchant.get());
+                    }
+                }
+                return merchantList;
+            }
+        }
+
+        return allMerchantList;
     }
 }

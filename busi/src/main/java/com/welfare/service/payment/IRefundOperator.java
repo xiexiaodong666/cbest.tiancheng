@@ -9,12 +9,10 @@ import com.welfare.persist.dao.AccountBillDetailDao;
 import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDeductionDetailDao;
 import com.welfare.persist.dao.SupplierStoreDao;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountBillDetail;
-import com.welfare.persist.entity.AccountDeductionDetail;
-import com.welfare.persist.entity.SupplierStore;
+import com.welfare.persist.entity.*;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.dto.RefundRequest;
+import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
@@ -56,9 +54,10 @@ public interface IRefundOperator {
 
         //沃生活，微信，支付宝只会有一条
         AccountDeductionDetail thePaidDeductionDetail = paidDeductionDetails.get(0);
-        AccountBillDetail thePaidBilDetail = getAccountBillDetailDao().getOneByTransNoAndTransType(
+        AccountBillDetail thePaidBilDetail = getAccountBillDetailDao().getOneByTransNoAndTransTypeAndOrderNo(
                 refundRequest.getOriginalTransNo(),
-                WelfareConstant.TransType.CONSUME.code()
+                WelfareConstant.TransType.CONSUME.code(),
+                refundRequest.getOrderNo()
         );
         BigDecimal paidAmount = paidDeductionDetails.stream()
                 .map(AccountDeductionDetail::getTransAmount)
@@ -73,7 +72,9 @@ public interface IRefundOperator {
         SupplierStore supplierStore = getSupplierDao().getOneByCode(refundBillDetail.getStoreCode());
         if(!Objects.equals(account.getMerCode(),supplierStore.getMerCode())){
             //非自营才有退回商户操作,和扣款时保持一致
-            operateMerchantRefund(refundRequest, account);
+            List<MerchantAccountOperation> merchantAccountOperations = operateMerchantRefund(refundRequest, account);
+            refundDeductionDetail.setMerDeductionAmount(MerchantAccountOperation.getCurrentBalanceOperated(merchantAccountOperations));
+            refundDeductionDetail.setMerDeductionCreditAmount(MerchantAccountOperation.getRemainingLimitOperated(merchantAccountOperations));
         }
 
         getAccountBillDetailDao().saveOrUpdateBatch(Arrays.asList(refundBillDetail, thePaidBilDetail));
@@ -97,11 +98,12 @@ public interface IRefundOperator {
      * 操作商家账户退款
      * @param refundRequest 退款请求
      * @param account 账户
+     * @return
      */
-    default void operateMerchantRefund(RefundRequest refundRequest, Account account){
+    default List<MerchantAccountOperation> operateMerchantRefund(RefundRequest refundRequest, Account account){
         RLock merAccountLock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + account.getMerCode());
         try {
-            getMerchantCreditService().increaseAccountType(
+            return getMerchantCreditService().increaseAccountType(
                     account.getMerCode(),
                     WelfareConstant.MerCreditType.REMAINING_LIMIT,
                     refundRequest.getAmount(),
@@ -126,6 +128,7 @@ public interface IRefundOperator {
         refundDeductionDetail.setTransType(WelfareConstant.TransType.REFUND.code());
         refundDeductionDetail.setTransTime(refundRequest.getRefundDate());
         refundDeductionDetail.setReversedAmount(BigDecimal.ZERO);
+        refundDeductionDetail.setAccountDeductionAmount(refundRequest.getAmount());
         refundDeductionDetail.setId(null);
         refundDeductionDetail.setVersion(0);
         refundDeductionDetail.setTransAmount(refundRequest.getAmount());

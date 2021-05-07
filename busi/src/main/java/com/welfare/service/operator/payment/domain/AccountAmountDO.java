@@ -77,6 +77,7 @@ public class AccountAmountDO {
         accountBillDetail.setTransType(WelfareConstant.TransType.CONSUME.code());
         accountBillDetail.setTransTime(paymentRequest.getPaymentDate());
         accountBillDetail.setTransNo(paymentRequest.getTransNo());
+        accountBillDetail.setOrderNo(paymentRequest.getOrderNo());
         accountBillDetail.setPos(paymentRequest.getMachineNo());
         accountBillDetail.setTransAmount(operatedAmount);
         accountBillDetail.setStoreCode(paymentRequest.getStoreNo());
@@ -118,6 +119,7 @@ public class AccountAmountDO {
         accountDeductionDetail.setAccountCode(paymentRequest.calculateAccountCode());
         accountDeductionDetail.setOrderChannel(paymentRequest.getPaymentScene());
         accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
+        accountDeductionDetail.setOrderNo(paymentRequest.getOrderNo());
         accountDeductionDetail.setAccountAmountTypeBalance(Objects.isNull(accountAmountType) ? BigDecimal.ZERO : accountAmountType.getAccountBalance());
         accountDeductionDetail.setMerAccountType(Objects.isNull(accountAmountType) ? null : accountAmountType.getMerAccountTypeCode());
         accountDeductionDetail.setPos(paymentRequest.getMachineNo());

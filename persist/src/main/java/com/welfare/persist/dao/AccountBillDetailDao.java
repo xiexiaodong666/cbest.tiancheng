@@ -33,10 +33,13 @@ public class AccountBillDetailDao extends ServiceImpl<AccountBillDetailMapper, A
         return list(wrapper);
     }
 
-    public AccountBillDetail getOneByTransNoAndTransType(String transNo, String transType) {
+    public AccountBillDetail getOneByTransNoAndTransTypeAndOrderNo(String transNo, String transType, String orderNo) {
         QueryWrapper<AccountBillDetail> wrapper = new QueryWrapper<>();
         wrapper.eq(AccountBillDetail.TRANS_NO,transNo);
         wrapper.eq(AccountBillDetail.TRANS_TYPE,transType);
+        if(!StringUtils.isEmpty(orderNo)){
+            wrapper.eq(AccountBillDetail.ORDER_NO,orderNo);
+        }
         wrapper.last("limit 1");
         return getOne(wrapper);
     }

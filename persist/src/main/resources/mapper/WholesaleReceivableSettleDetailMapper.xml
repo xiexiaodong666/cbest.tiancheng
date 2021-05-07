@@ -104,7 +104,7 @@
       resultType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO"
       parameterType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam">
         select sum(d.trans_amount) as transAmount,
-        sum(d.trans_amount) as settleAmount,
+        sum(d.order_wholesale_amount) as settleAmount,
         max(d.mer_name) as merName,
         max(d.mer_code) as merCode
         FROM wholesale_receivable_settle_detail d

@@ -3,6 +3,7 @@ package com.welfare.persist.dto.settlement.wholesale.param;
 import com.welfare.persist.dto.query.PageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.List;
 @ApiModel("平台应收结算明细")
 public class PlatformWholesaleSettleDetailParam  extends PageReq {
     @ApiModelProperty("商户编码")
+    @NotBlank
     private String merCode;
     @ApiModelProperty("商户名称")
     private String merName;

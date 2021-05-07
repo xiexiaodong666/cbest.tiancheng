@@ -115,7 +115,7 @@ public class WholesaleReceivableSettleController implements IController {
 
     @PostMapping("/receivable-details-summary")
     @ApiOperation("查询平台应收帐单明细汇总")
-    public R<PlatformWholesaleSettleDetailSummaryDTO> queryReceivableDetailsSummary(PlatformWholesaleSettleDetailParam param){
+    public R<PlatformWholesaleSettleDetailSummaryDTO> queryReceivableDetailsSummary(@RequestBody PlatformWholesaleSettleDetailParam param){
         PlatformWholesaleSettleDetailSummaryDTO platformWholesaleSettleDetailSummaryDTO = wholesaleSettlementService.queryReceivableDetailsSummary(param);
         return success(platformWholesaleSettleDetailSummaryDTO);
     }

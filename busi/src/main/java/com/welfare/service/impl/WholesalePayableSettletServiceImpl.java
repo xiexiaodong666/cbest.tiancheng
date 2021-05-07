@@ -215,7 +215,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     @Override
     public Page<WholesalePayableSettleDetailResp> payableBillDetailPage(Long id, WholesalePaySettleDetailPageQuery query) {
         WholesalePaySettleDetailReq wholesalePaySettleDetailReq = new WholesalePaySettleDetailReq();
-        BeanUtils.copyProperties(wholesalePaySettleDetailReq, query);
+        BeanUtils.copyProperties(query, wholesalePaySettleDetailReq);
         WholesalePaySettleDetailQuery paySettleDetailQuery = getWholesalePaySettleDetailQuery(id, wholesalePaySettleDetailReq);
         Page<WholesaleReceivableSettleDetailResp> page = new Page<>(query.getCurrent(), query.getSize());
         page.addOrder(OrderItem.desc(WholesalePayableSettleDetail.ID));
@@ -275,7 +275,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
         WholesalePayableSettle payableSettle = wholesalePayableSettleMapper.selectById(id);
         BizAssert.notNull(payableSettle, ExceptionCode.DATA_NOT_EXIST, "结算单不存在");
         WholesalePaySettleDetailQuery paySettleDetailQuery = new WholesalePaySettleDetailQuery();
-        BeanUtils.copyProperties(paySettleDetailQuery, query);
+        BeanUtils.copyProperties(query, paySettleDetailQuery);
         paySettleDetailQuery.setSettleNo(payableSettle.getSettleNo());
         return paySettleDetailQuery;
     }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.enums.MerIdentityEnum;
 import com.welfare.common.exception.BizException;
@@ -548,6 +549,11 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "仅支持对属于[客户]的商户充值", null);
+        }
+
+        // 批发采购福利类型不能充负
+        if(MerAccountTypeCode.WHOLESALE_PROCUREMENT.code().equals(request.getMerAccountTypeCode()) && new BigDecimal(0).compareTo(amount)>= 0) {
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "批发采购福利类型不能充负", null);
         }
     }
 

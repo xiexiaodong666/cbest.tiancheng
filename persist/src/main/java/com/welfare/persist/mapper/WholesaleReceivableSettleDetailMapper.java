@@ -32,7 +32,7 @@ public interface WholesaleReceivableSettleDetailMapper extends BaseMapper<Wholes
    * @param transTimeEnd 交易时间end
    * @return 应收汇总明细
    */
-  Page<PlatformWholesaleSettleGroupDTO> queryReceivable(Page<PlatformWholesaleSettleGroupDTO> page, @Param("merCode") String merCode,
+  Page<PlatformWholesaleSettleGroupDTO> queryReceivable(Page<PlatformWholesaleSettleGroupDTO> page, @Param("merCode") String merCode,@Param("merName") String merName,
       @Param("supplierCode") String supplierCode,
       @Param("transTimeStart") Date transTimeStart,
       @Param("transTimeEnd") Date transTimeEnd);
@@ -44,7 +44,7 @@ public interface WholesaleReceivableSettleDetailMapper extends BaseMapper<Wholes
    * @param transTimeEnd 交易时间end
    * @return 应收汇总
    */
-  PlatformWholesaleSettleGroupDTO queryReceivableSummary(@Param("merCode") String merCode,
+  PlatformWholesaleSettleGroupDTO queryReceivableSummary(@Param("merCode") String merCode,@Param("merName") String merName,
       @Param("supplierCode") String supplierCode,
       @Param("transTimeStart") Date transTimeStart,
       @Param("transTimeEnd") Date transTimeEnd);

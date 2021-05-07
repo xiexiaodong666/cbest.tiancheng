@@ -20,6 +20,8 @@ import java.util.List;
 public class PlatformWholesaleSettleDetailParam  extends PageReq {
     @ApiModelProperty("商户编码")
     private String merCode;
+    @ApiModelProperty("商户名称")
+    private String merName;
     @ApiModelProperty("订单号")
     private String orderNo;
     @ApiModelProperty("交易流水号")

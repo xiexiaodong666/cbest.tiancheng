@@ -49,6 +49,7 @@ public class WholesaleReceivableSettleController implements IController {
     @ApiOperation("分页查询平台应收账单分组汇总")
     public R<Page<PlatformWholesaleSettleGroupDTO>> pageQueryReceivableSummary(
             @RequestParam(required = false) @ApiParam("商户编码") String merCode,
+            @RequestParam(required = false) @ApiParam("商户名称") String merName,
             @RequestParam(required = false) @ApiParam("商户编码") String supplierCode,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间起始 yyyy-MM-dd HH:mm:ss") Date transTimeStart,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间截至 yyyy-MM-dd HH:mm:ss") Date transTimeEnd,
@@ -56,6 +57,7 @@ public class WholesaleReceivableSettleController implements IController {
             @RequestParam @ApiParam("单页大小") int size) {
         Page<PlatformWholesaleSettleGroupDTO> pageInfo = wholesaleSettlementService.pageQueryReceivable(
                 merCode,
+                merName,
                 supplierCode,
                 transTimeStart,
                 transTimeEnd,
@@ -69,6 +71,7 @@ public class WholesaleReceivableSettleController implements IController {
     @ApiOperation("导出平台应收账单分组汇总")
     public R<String> exportReceivableSummary(
             @RequestParam(required = false) @ApiParam("商户编码") String merCode,
+            @RequestParam(required = false) @ApiParam("商户名称") String merName,
             @RequestParam(required = false) @ApiParam("商户编码") String supplierCode,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间起始 yyyy-MM-dd HH:mm:ss") Date transTimeStart,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间截至 yyyy-MM-dd HH:mm:ss") Date transTimeEnd) throws IOException {
@@ -77,7 +80,7 @@ public class WholesaleReceivableSettleController implements IController {
       param.setSupplierCode(supplierCode);
       param.setTransTimeStart(transTimeStart);
       param.setTransTimeEnd(transTimeEnd);
-
+      param.setMerName(merName);
         List<PlatformWholesaleSettleDetailDTO> resultList = wholesaleSettlementService.pageQueryReceivableDetails(param);
 
         String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleDetailDTO.class, "批发应收结算分组汇总");
@@ -88,11 +91,13 @@ public class WholesaleReceivableSettleController implements IController {
     @ApiOperation("查询平台应收账单汇总")
     public R<PlatformWholesaleSettleGroupDTO> queryReceivableSummary(
             @RequestParam(required = false) @ApiParam("商户编码") String merCode,
+            @RequestParam(required = false) @ApiParam("商户名称") String merName,
             @RequestParam(required = false) @ApiParam("商户编码") String supplierCode,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间起始 yyyy-MM-dd HH:mm:ss") Date transTimeStart,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam("交易时间截至 yyyy-MM-dd HH:mm:ss") Date transTimeEnd) {
         PlatformWholesaleSettleGroupDTO pageInfo = wholesaleSettlementService.queryReceivableSummary(
                 merCode,
+                merName,
                 supplierCode,
                 transTimeStart,
                 transTimeEnd

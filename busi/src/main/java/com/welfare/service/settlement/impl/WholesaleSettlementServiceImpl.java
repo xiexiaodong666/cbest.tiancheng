@@ -69,6 +69,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     private final ObjectMapper objectMapper;
     @Override
     public Page<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
+        String merName,
                                                                          String supplierCode,
                                                                          Date transTimeStart,
                                                                          Date transTimeEnd,
@@ -76,21 +77,21 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                                                                          int size){
             Page<PlatformWholesaleSettleGroupDTO> page = new Page<>(current, size);
 
-            return wholesaleReceivableSettleDetailMapper.queryReceivable(page, merCode, supplierCode, transTimeStart, transTimeEnd);
+            return wholesaleReceivableSettleDetailMapper.queryReceivable(page, merCode, merName,supplierCode, transTimeStart, transTimeEnd);
     }
 
     @Override
-    public List<PlatformWholesaleSettleGroupDTO> queryReceivable(String merCode, String supplierCode, Date transTimeStart, Date transTimeEnd) {
+    public List<PlatformWholesaleSettleGroupDTO> queryReceivable(String merCode, String merName,String supplierCode, Date transTimeStart, Date transTimeEnd) {
 
       return null;
     }
 
     @Override
-    public PlatformWholesaleSettleGroupDTO queryReceivableSummary(String merCode,
+    public PlatformWholesaleSettleGroupDTO queryReceivableSummary(String merCode,String merName,
                                                                   String supplierCode,
                                                                   Date transTimeStart,
                                                                   Date transTimeEnd){
-        return wholesaleReceivableSettleDetailMapper.queryReceivableSummary(merCode, supplierCode, transTimeStart, transTimeEnd);
+        return wholesaleReceivableSettleDetailMapper.queryReceivableSummary(merCode,merName, supplierCode, transTimeStart, transTimeEnd);
     }
 
     @Override

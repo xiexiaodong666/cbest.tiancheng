@@ -36,6 +36,7 @@ public interface WholesaleSettlementService {
      * @return 应收汇总明细
      */
     Page<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
+                                                                  String merName,
                                                                   String supplierCode,
                                                                   Date transTimeStart,
                                                                   Date transTimeEnd,
@@ -50,6 +51,7 @@ public interface WholesaleSettlementService {
      * @return 应收汇总明细
      */
     List<PlatformWholesaleSettleGroupDTO> queryReceivable(String merCode,
+        String merName,
                                                                   String supplierCode,
                                                                   Date transTimeStart,
                                                                   Date transTimeEnd);
@@ -62,6 +64,7 @@ public interface WholesaleSettlementService {
      * @return 应收汇总
      */
     PlatformWholesaleSettleGroupDTO queryReceivableSummary(String merCode,
+        String merName,
                                                            String supplierCode,
                                                            Date transTimeStart,
                                                            Date transTimeEnd);

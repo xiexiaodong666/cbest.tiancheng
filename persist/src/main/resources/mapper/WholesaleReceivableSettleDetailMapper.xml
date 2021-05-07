@@ -57,6 +57,9 @@
             <if test="merCode != null and merCode != ''">
                 and t1.mer_code = #{merCode}
             </if>
+            <if test="merName != null and merName != ''">
+                and t1.mer_name like concat('%', #{merName}, '%')
+            </if>
             <if test="transTimeStart != null ">
                 <![CDATA[AND t1.trans_time >= #{transTimeStart}]]>
             </if>
@@ -78,13 +81,16 @@
         d.account_code as accountCode,
         d.account_name as accountName,
         a.phone as phone,
-        supplier.mer_code as supplierCode,
-        supplier.mer_name as supplierName,
+        supplier.mer_code as customerMerCode,
+        supplier.mer_name as customerMerName,
         d.store_code as storeCode,
         d.store_name as storeName,
         d.trans_amount as saleAmount,
         d.order_wholesale_amount as settleAmount,
-        d.settle_flag as settleFlag
+        d.settle_flag as settleFlag,
+        case when d.settle_flag='unsettled' then '待结算'
+        when d.settle_flag='settling' then '结算中'
+        when d.settle_flag='settled' then '已结算' end as settleFlagName
         FROM wholesale_receivable_settle_detail d
         INNER JOIN account a ON d.account_code = a.account_code
         inner join supplier_store s on s.store_code = d.store_code
@@ -135,6 +141,9 @@
             </if>
             <if test = "param.merCode != null and param.merCode != ''">
                 and d.mer_code = #{param.merCode}
+            </if>
+            <if test="param.merName != null and param.merName != ''">
+                and d.mer_name like concat('%', #{param.merName}, '%')
             </if>
             <if test="param.settleNo != null and param.settleNo != ''">
                 and d.settle_no = #{param.settleNo}

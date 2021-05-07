@@ -97,4 +97,6 @@ public interface MerchantService {
      * @return
      */
     List<Merchant> supplierByMer(String merCode);
+
+    List<Merchant> wholesaleByMer(String merCode);
 }

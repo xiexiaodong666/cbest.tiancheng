@@ -100,4 +100,10 @@ public class MerchantController implements IController {
     public R<List<MerchantInfo>> supplierByMer(String merCode) {
         return R.success(merchantConverter.toD(merchantService.supplierByMer(merCode)));
     }
+
+    @GetMapping("/wholesale")
+    @ApiOperation("查询具有批发属性的供应商")
+    public R<List<MerchantInfo>> wholesaleByMer(@RequestParam(value = "merCode", required = false)String merCode) {
+        return R.success(merchantConverter.toD(merchantService.wholesaleByMer(merCode)));
+    }
 }

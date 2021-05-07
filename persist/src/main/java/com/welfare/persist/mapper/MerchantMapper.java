@@ -30,4 +30,6 @@ public interface MerchantMapper extends BaseMapper<Merchant> {
      * @return
      */
     List<Merchant> supplierByMer(@Param("merCode") String merCode);
+
+    List<Merchant> wholesaleByMer();
 }

@@ -29,4 +29,21 @@
         GROUP BY supplier.mer_code
     </select>
 
+  <select id="wholesaleByMer" resultType="com.welfare.persist.entity.Merchant" >
+     select
+    supplier.id as id,
+    supplier.mer_code as merCode,
+    supplier.mer_name as merName,
+    supplier.mer_type as merType,
+    supplier.mer_identity as merIdentity,
+    supplier.mer_cooperation_mode as merCooperationMode,
+    supplier.self_recharge as selfRecharge,
+		supplier_wholesale_settle_method
+		from
+    merchant_extend me
+     INNER JOIN merchant supplier on supplier.mer_code = me.mer_code
+     where  supplier_wholesale_settle_method is not null and supplier_wholesale_settle_method !='' group by me.mer_code
+
+  </select>
+
 </mapper>

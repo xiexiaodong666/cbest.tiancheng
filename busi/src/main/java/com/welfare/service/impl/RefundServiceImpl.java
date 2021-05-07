@@ -1,5 +1,6 @@
 package com.welfare.service.impl;
 
+import com.alibaba.excel.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
@@ -12,6 +13,7 @@ import com.welfare.persist.entity.AccountDeductionDetail;
 import com.welfare.service.AccountService;
 import com.welfare.service.RefundService;
 import com.welfare.service.dto.RefundRequest;
+import com.welfare.service.dto.payment.MultiOrderRefundRequest;
 import com.welfare.service.enums.PaymentChannelOperatorEnum;
 import com.welfare.service.payment.IRefundOperator;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +55,12 @@ public class RefundServiceImpl implements RefundService {
                 originalTransNo,
                 WelfareConstant.TransType.CONSUME.code()
         );
+        accountDeductionDetails = accountDeductionDetails.stream().filter(detail ->{
+            if(StringUtils.isEmpty(refundRequest.getOrderNo()) && StringUtils.isEmpty(detail.getOrderNo())){
+                return true;
+            }
+            return Objects.equals(detail.getOrderNo(),refundRequest.getOrderNo());
+        }).collect(Collectors.toList());
         Assert.isTrue(!CollectionUtils.isEmpty(accountDeductionDetails), "未找到正向支付流水");
         AccountDeductionDetail first = accountDeductionDetails.get(0);
         Long accountCode = first.getAccountCode();
@@ -61,6 +70,12 @@ public class RefundServiceImpl implements RefundService {
 
         List<AccountDeductionDetail> refundDeductionDetailsInDb = accountDeductionDetailDao
                 .queryByRelatedTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.REFUND.code());
+        refundDeductionDetailsInDb = refundDeductionDetailsInDb.stream().filter(detail->{
+            if(StringUtils.isEmpty(refundRequest.getOrderNo()) && StringUtils.isEmpty(detail.getOrderNo())){
+                return true;
+            }
+            return Objects.equals(refundRequest.getOrderNo(),detail.getOrderNo());
+        }).collect(Collectors.toList());
         if (hasRefunded(refundRequest, refundDeductionDetailsInDb)) {
             return;
         }
@@ -69,8 +84,8 @@ public class RefundServiceImpl implements RefundService {
 
     /**
      * 是否已经处理过退款
-     * @param refundRequest
-     * @param refundDeductionDetailInDb
+     * @param refundRequest 退款请求
+     * @param refundDeductionDetailInDb 数据库里的退款记录
      * @return
      */
     private boolean hasRefunded(RefundRequest refundRequest, List<AccountDeductionDetail> refundDeductionDetailInDb) {
@@ -128,5 +143,14 @@ public class RefundServiceImpl implements RefundService {
             refundRequest.setMerCode(account.getMerCode());
         }
         return refundRequest;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void multiOrderRefund(MultiOrderRefundRequest multiOrderRefundRequest) {
+        List<RefundRequest> refundRequests = multiOrderRefundRequest.toSingleRefundRequests();
+        for (RefundRequest refundRequest : refundRequests) {
+            handleRefundRequest(refundRequest);
+        }
     }
 }

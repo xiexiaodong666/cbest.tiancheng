@@ -343,7 +343,7 @@
         concat(supplier.mer_code,DATE_FORMAT(now(),'%Y%m%d%h%m%s')) as settleNo,
         SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) AS transAmount,
         SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS settleAmount,
-        count(distinct wpsd.trans_no) as orderNum,
+        count(distinct wpsd.order_id) as orderNum,
         'unconfirmed' as  recStatus,
         'settling' as settleStatus,
         'unsended' as sendStatus,

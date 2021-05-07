@@ -40,6 +40,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -105,12 +106,8 @@ public class PaymentServiceImpl implements PaymentService, ApplicationContextAwa
             try {
                 //整体异步查询
                 Future<String> paymentSceneFuture = threadPoolTaskExecutor.submit(paymentRequest::calculatePaymentScene);
-                Future<List<AccountAmountDO>> accountAmountDoFuture = threadPoolTaskExecutor.submit(() ->
-                        accountAmountTypeService.queryAccountAmountDO(account));
                 Future<MerchantStoreRelation> merchantStoreRelationFuture = threadPoolTaskExecutor.submit(() ->
                         merchantStoreRelationDao.getOneByStoreCodeAndMerCodeCacheable(paymentRequest.getStoreNo(), account.getMerCode()));
-                Future<MerchantCredit> merchantCreditFuture = threadPoolTaskExecutor.submit(() ->
-                        merchantCreditService.getByMerCode(account.getMerCode()));
                 String paymentScene = paymentSceneFuture.get();
                 Future<List<MerAccountTypeConsumeSceneConfig>> merAccountTypeConsumeSceneConfigFuture = threadPoolTaskExecutor.submit(() ->
                         merAccountTypeConsumeSceneConfigDao.query(account.getMerCode(), paymentRequest.getStoreNo(), paymentScene));
@@ -119,7 +116,6 @@ public class PaymentServiceImpl implements PaymentService, ApplicationContextAwa
                         getPaymentChannelConfigs(paymentRequest, account, paymentScene));
                 //检查支付渠道消费场景
                 List<PaymentChannelConfig> paymentChannelConfigs = paymentChannelConfigListFuture.get();
-
                 T paymentRequestHandled = queryPaymentRequestHandled(paymentRequest, queryResultFuture);
                 if (paymentRequestHandled != null) {
                     return paymentRequestHandled;
@@ -130,11 +126,10 @@ public class PaymentServiceImpl implements PaymentService, ApplicationContextAwa
                 List<MerAccountTypeConsumeSceneConfig> merAccountTypeConsumeSceneConfigs = merAccountTypeConsumeSceneConfigFuture.get();
                 BizAssert.notEmpty(merAccountTypeConsumeSceneConfigs, ExceptionCode.NO_AVAILABLE_MER_ACCOUNT_TYPE_CONSUME_SCENE_CONFIG);
 
-                MerchantCredit merchantCredit = merchantCreditFuture.get();
+                MerchantCredit merchantCredit = merchantCreditService.getByMerCode(account.getMerCode());
                 //支付前的校验
                 chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, sceneStoreRelations, paymentChannelConfigs);
-
-                List<AccountAmountDO> accountAmountDOList = accountAmountDoFuture.get();
+                List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
                 accountAmountDOList = filterAvailable(accountAmountDOList, merAccountTypeConsumeSceneConfigs, paymentRequest.bizType());
                 IPaymentOperator paymentOperator = getPaymentOperator(paymentRequest.getPaymentChannel());
                 List<PaymentOperation> paymentOperations = paymentOperator.pay(
@@ -446,6 +441,7 @@ public class PaymentServiceImpl implements PaymentService, ApplicationContextAwa
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public MultiOrderPaymentRequest multiOrderUnionPay(MultiOrderPaymentRequest multiOrderPaymentRequest) {
         //为了使各种aop切面生效，从容器中拿当前paymentService
         PaymentService paymentService = SpringBeanUtils.getBean(PaymentService.class);

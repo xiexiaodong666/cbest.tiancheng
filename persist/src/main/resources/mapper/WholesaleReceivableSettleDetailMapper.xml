@@ -19,8 +19,8 @@
         ) as unSettleAmount,
         sum(
         case
-        when t1.trans_type = 'consume' then t1.mer_wholesale_credit_deduction_amount + t1.mer_deduction_amount
-        when t1.trans_type = 'refund'  then t1.mer_wholesale_credit_deduction_amount * -1
+        when t1.trans_type = 'consume' then t1.trans_mount
+        when t1.trans_type = 'refund'  then t1.trans_mount * -1
         else 0
         end
         ) as totalConsumeAmount
@@ -109,9 +109,6 @@
     </select>
     <sql id="queryReceivableDetailsCondition">
         <where>
-            <if test="param.merCode !=null and param.merCode!=''">
-                and d.mer_code = #{param.merCode}
-            </if>
             <if test="param.orderNo !=null and param.orderNo!=''">
                 and d.order_no = #{param.orderNo}
             </if>

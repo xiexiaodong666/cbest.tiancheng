@@ -26,6 +26,7 @@ import com.welfare.service.dto.WholesalePaySettleDetailReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -234,11 +235,14 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     }
 
     @Override
-    public List<StoreCodeAndNameDTO> storesBySettleId(Long id) {
+    public List<StoreCodeAndNameDTO> storesBySettleId(Long id, String merCode) {
         WholesalePayableSettle payableSettle = wholesalePayableSettleMapper.selectById(id);
         if (Objects.nonNull(payableSettle)) {
             List<WholesalePayableSettleDetail> details = wholesalePayableSettleDetailMapper.selectList(
-                    Wrappers.<WholesalePayableSettleDetail>lambdaQuery().eq(WholesalePayableSettleDetail::getSettleNo, payableSettle.getSettleNo()));
+                    Wrappers.<WholesalePayableSettleDetail>lambdaQuery()
+                            .eq(WholesalePayableSettleDetail::getSettleNo, payableSettle.getSettleNo())
+                            .eq(StringUtils.isNotEmpty(merCode), WholesalePayableSettleDetail::getMerCode, merCode)
+            );
             return details.stream().map(detail -> {
                 StoreCodeAndNameDTO storeCodeAndNameDTO = new StoreCodeAndNameDTO();
                 storeCodeAndNameDTO.setStoreCode(detail.getStoreCode());

@@ -126,7 +126,7 @@ public interface WholesalePayableSettletService {
      * @param id
      * @return
      */
-    List<StoreCodeAndNameDTO> storesBySettleId(Long id);
+    List<StoreCodeAndNameDTO> storesBySettleId(Long id, String merCode);
 
     /**
      * 查询结算单下所有的消费客户

@@ -13,6 +13,7 @@ import com.welfare.service.dto.WholesalePaySettleDetailReq;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
@@ -142,8 +143,9 @@ public class WholesalePayableSettleController implements IController {
 
     @GetMapping("/payable/bill/{id}/stores")
     @ApiOperation("(商户应收结算单)查询结算单下所有的消费门店")
-    public R<List<StoreCodeAndNameDTO>> storesBySettleId(@PathVariable("id") Long id) {
-        return success(payableSettletService.storesBySettleId(id));
+    public R<List<StoreCodeAndNameDTO>> storesBySettleId(@PathVariable("id") Long id,
+                                                         @ApiParam(value = "客户编码", required = false)  @RequestParam(value = "customerMerCode", required = false) String customerMerCode) {
+        return success(payableSettletService.storesBySettleId(id, customerMerCode));
     }
 
     @GetMapping("/payable/bill/{id}/customerMers")

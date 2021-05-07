@@ -3,6 +3,7 @@ package com.welfare.service.payment;
 import com.alibaba.excel.util.CollectionUtils;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
@@ -111,9 +112,10 @@ public class WelfareRefundOperator implements IRefundOperator{
                 //已经全额退款的，不再处理退款
                 .filter(paidDetail -> paidDetail.getTransAmount().compareTo(paidDetail.getReversedAmount()) > 0)
                 .collect(Collectors.toMap(AccountDeductionDetail::getMerAccountType, detail -> detail));
+        BizAssert.notEmpty(groupedPaidDetail.entrySet(),ExceptionCode.REFUND_MORE_THAN_PAID);
         BigDecimal refundedAmount = BigDecimal.ZERO;
         BigDecimal remainingRefundAmount = refundRequest.getAmount();
-        AccountBillDetail tmpAccountBillDetail = accountBillDetailDao.getOneByTransNoAndTransType(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code());
+        AccountBillDetail tmpAccountBillDetail = accountBillDetailDao.getOneByTransNoAndTransTypeAndOrderNo(refundRequest.getOriginalTransNo(), WelfareConstant.TransType.CONSUME.code(), refundRequest.getOrderNo());
         Assert.notNull(tmpAccountBillDetail,"未找到正向支付明细");
         //单独处理个人授信的退款逻辑
         AccountAmountType surplusType = accountAmountTypes.stream()
@@ -253,15 +255,8 @@ public class WelfareRefundOperator implements IRefundOperator{
                 refundDeductionDetail.getTransNo(),
                 WelfareConstant.TransType.REFUND.code()
         );
-        BigDecimal currentBalanceOperated = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
-                .filter(detail -> WelfareConstant.MerCreditType.CURRENT_BALANCE.code().equals(detail.getBalanceType()))
-                .map(MerchantBillDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal remainingLimitOperated = merchantAccountOperations.stream().map(MerchantAccountOperation::getMerchantBillDetail)
-                .filter(detail -> WelfareConstant.MerCreditType.REMAINING_LIMIT.code().equals(detail.getBalanceType()))
-                .map(MerchantBillDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        refundDeductionDetail.setMerDeductionAmount(currentBalanceOperated);
-        refundDeductionDetail.setMerDeductionCreditAmount(remainingLimitOperated);
+        refundDeductionDetail.setMerDeductionAmount(MerchantAccountOperation.getCurrentBalanceOperated(merchantAccountOperations));
+        refundDeductionDetail.setMerDeductionCreditAmount(MerchantAccountOperation.getRemainingLimitOperated(merchantAccountOperations));
     }
 
     private void saveDetails(List<RefundOperation> refundOperations,

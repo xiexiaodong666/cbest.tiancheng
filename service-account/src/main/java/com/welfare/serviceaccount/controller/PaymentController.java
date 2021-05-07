@@ -104,6 +104,7 @@ public class PaymentController implements IController {
     @PostMapping("/refund/multi-order")
     @ApiOperation("多订单联合支付退款")
     public R<MultiOrderRefundRequest> newRefundRequest(@RequestBody MultiOrderRefundRequest refundRequest){
+        refundService.multiOrderRefund(refundRequest);
         return success(refundRequest);
     }
 

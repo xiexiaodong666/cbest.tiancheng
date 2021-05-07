@@ -1,11 +1,13 @@
 package com.welfare.service.dto.payment;
 
+import com.welfare.service.dto.RefundRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Description:
@@ -27,4 +29,17 @@ public class MultiOrderRefundRequest {
     private BigDecimal amount;
 
     private List<MultiOrderRefundRequestDetail> multiOrderRefundRequestDetails;
+
+    public List<RefundRequest> toSingleRefundRequests(){
+        return multiOrderRefundRequestDetails.stream().map(detail -> {
+            RefundRequest refundRequest = new RefundRequest();
+            refundRequest.setTransNo(transNo);
+            refundRequest.setOriginalTransNo(originalTransNo);
+            refundRequest.setRefundDate(detail.getRefundDate());
+            refundRequest.setOrderNo(detail.getOrderNo());
+            refundRequest.setRequestId(requestId);
+            refundRequest.setAmount(detail.getAmount());
+            return refundRequest;
+        }).collect(Collectors.toList());
+    }
 }

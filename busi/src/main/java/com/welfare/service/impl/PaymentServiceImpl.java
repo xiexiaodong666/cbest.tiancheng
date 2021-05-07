@@ -284,7 +284,7 @@ public class PaymentServiceImpl implements PaymentService, ApplicationContextAwa
         }
 
         List<WoLifeAccountDeductionRowsRequest> saleRows = paymentRequest.getSaleRows();
-        if (!CollectionUtils.isEmpty(saleRows)) {
+        if (!CollectionUtils.isEmpty(saleRows) && WelfareConstant.PaymentChannel.WO_LIFE.code().equals(paymentRequest.getPaymentChannel())) {
             // 线上沃生活check 订单总金额和商品行金额的和是否相等
             BigDecimal amount = paymentRequest.getAmount();
             BigDecimal rowsAmount = saleRows.stream()

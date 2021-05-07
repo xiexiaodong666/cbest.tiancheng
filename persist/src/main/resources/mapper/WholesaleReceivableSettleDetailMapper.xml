@@ -19,8 +19,8 @@
         ) as unSettleAmount,
         sum(
         case
-        when t1.trans_type = 'consume' then t1.trans_mount
-        when t1.trans_type = 'refund'  then t1.trans_mount * -1
+        when t1.trans_type = 'consume' then t1.trans_amount
+        when t1.trans_type = 'refund'  then t1.trans_amount * -1
         else 0
         end
         ) as totalConsumeAmount

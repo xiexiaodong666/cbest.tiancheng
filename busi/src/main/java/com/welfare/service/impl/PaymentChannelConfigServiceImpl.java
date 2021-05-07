@@ -8,6 +8,7 @@ import com.welfare.persist.dao.MerchantDao;
 import com.welfare.persist.dao.PaymentChannelConfigDao;
 import com.welfare.persist.dto.PayChannelConfigSimple;
 import com.welfare.persist.dto.PaymentChannelConfigDetailDTO;
+import com.welfare.persist.dto.query.PaymentChannelConfigQuery;
 import com.welfare.persist.dto.query.PaymentChannelConfigReqDTO;
 import com.welfare.persist.dto.PaymentChannelSimpleResp;
 import com.welfare.persist.dto.query.PayChannelConfigQuery;
@@ -269,7 +270,28 @@ public class PaymentChannelConfigServiceImpl implements PaymentChannelConfigServ
 
     @Override
     public List<PaymentChannelSimpleResp> intersection(PaymentChannelConfigReqDTO req) {
-        return null;
+        List<PaymentChannelConfigQuery> queryList = new ArrayList<>();
+        req.getMerchants().forEach(merchantReq -> {
+            merchantReq.getStoreCodeAndConsumeTypes().forEach(storeCodeAndConsumeType -> {
+                storeCodeAndConsumeType.getConsumeTypes().forEach(consumeType -> {
+                    PaymentChannelConfigQuery query = new PaymentChannelConfigQuery();
+                    query.setMerCode(merchantReq.getMerCode());
+                    query.setStoreCode(storeCodeAndConsumeType.getStoreCode());
+                    query.setConsumeType(consumeType);
+                    queryList.add(query);
+                });
+            });
+        });
+        List<PaymentChannelSimpleResp> simpleResps = paymentChannelConfigDao.getBaseMapper().queryGroupByPaymentChannelCode(req.getMerchants().size(), queryList);
+        List<PaymentChannelSimpleResp> result = new ArrayList<>();
+        simpleResps.forEach(paymentChannelSimpleResp -> {
+            if (paymentChannelSimpleResp.getPaymentChannelCode().equals(WelfareConstant.PaymentChannel.WELFARE.code())) {
+                result.add(0, paymentChannelSimpleResp);
+            } else {
+                result.add(paymentChannelSimpleResp);
+            }
+        });
+        return result;
     }
 
     private List<PayChannelConfigRowDTO.PaymentChannel> getCompletionOtherPaymentChannel(List<com.welfare.service.dto.PaymentChannelDTO> all,

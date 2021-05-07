@@ -19,8 +19,8 @@
         ) as unSettleAmount,
         sum(
         case
-        when t1.trans_type = 'consume' then t1.mer_wholesale_credit_deduction_amount + t1.mer_deduction_amount
-        when t1.trans_type = 'refund'  then t1.mer_wholesale_credit_deduction_amount * -1
+        when t1.trans_type = 'consume' then t1.trans_amount
+        when t1.trans_type = 'refund'  then t1.trans_amount * -1
         else 0
         end
         ) as totalConsumeAmount
@@ -32,7 +32,7 @@
 
         <include refid="getWelfareSettleSum"/>
         from  merchant t4
-        inner join wholesale_payable_settle_detail t1 on t1.mer_code=t4.mer_code
+        inner join wholesale_receivable_settle_detail t1 on t1.mer_code=t4.mer_code
         inner join supplier_store s on s.store_code = t1.store_code
         inner join merchant supplier on supplier.mer_code = s.mer_code
         <include refid="queryReceivableWhere"/>
@@ -45,7 +45,7 @@
         <include refid="getWelfareSettleSum"/>
 
         from  merchant t4
-        inner join wholesale_payable_settle_detail t1 on t1.mer_code=t4.mer_code
+        inner join wholesale_receivable_settle_detail t1 on t1.mer_code=t4.mer_code
         inner join supplier_store s on s.store_code = t1.store_code
         inner join merchant supplier on supplier.mer_code = s.mer_code
         <include refid="queryReceivableWhere"/>
@@ -139,7 +139,7 @@
             <if test="param.settleNo != null and param.settleNo != ''">
                 and d.settle_no = #{param.settleNo}
             </if>
-            <if test="param.excludeIds != null and param.excludeIds.length !=0">
+            <if test="param.excludeIds != null and param.excludeIds.size !=0">
                 and d.id not in
                 <foreach collection="param.excludeIds" item="item" open="(" close=")" separator=",">
                     #{item}

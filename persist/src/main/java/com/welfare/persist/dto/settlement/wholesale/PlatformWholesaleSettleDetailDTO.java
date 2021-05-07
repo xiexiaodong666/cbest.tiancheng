@@ -76,6 +76,8 @@ public class PlatformWholesaleSettleDetailDTO {
     private BigDecimal revenueAmount;
 
     @ApiModelProperty("结算状态")
-    @ExcelProperty("结算状态")
     private String settleFlag;
+
+    @ExcelProperty("结算状态")
+    private String settleFlagName;
 }

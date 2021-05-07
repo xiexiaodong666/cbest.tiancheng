@@ -91,6 +91,13 @@ public interface WholesalePayableSettletService {
     Page<WholesalePayableSettleResp> payableBillPage(WholesalePayableSettleBillQuery query);
 
     /**
+     * 通过id查询结算单
+     * @param id
+     * @return
+     */
+    WholesalePayableSettleResp payableBillById(Long id);
+
+    /**
      * (商户应收结算单)分页查询某个应付结算单明细列表
      * @param id
      * @param query
@@ -113,4 +120,18 @@ public interface WholesalePayableSettletService {
      * @return
      */
     List<WholesalePayableSettleDetailResp> queryPayableBillDetail(@PathVariable("id") Long id, WholesalePaySettleDetailReq query);
+
+    /**
+     * 查询结算单下所有的消费门店
+     * @param id
+     * @return
+     */
+    List<StoreCodeAndNameDTO> storesBySettleId(Long id);
+
+    /**
+     * 查询结算单下所有的消费客户
+     * @param id
+     * @return
+     */
+    List<MerCodeAndNameDTO> customerMersBySettleId(Long id);
 }

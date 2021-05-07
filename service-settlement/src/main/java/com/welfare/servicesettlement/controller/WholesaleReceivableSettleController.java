@@ -120,7 +120,7 @@ public class WholesaleReceivableSettleController implements IController {
     public R<String> exportReceivableDetails(@RequestBody PlatformWholesaleSettleDetailParam param) throws IOException {
       List<PlatformWholesaleSettleDetailDTO> resultList = wholesaleSettlementService.pageQueryReceivableDetails(param);
 
-      String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleGroupDTO.class, "批发应收结算分组汇总");
+      String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleDetailDTO.class, "批发应收结算分组汇总");
       return R.success(fileUploadService.getFileServerUrl(filePath));
     }
 
@@ -131,7 +131,7 @@ public class WholesaleReceivableSettleController implements IController {
         return success(settle);
     }
 
-    @PatchMapping("/receivable/status")
+    @PostMapping("/receivable/status")
     @ApiOperation("更新应收结算单状态")
     public R<WholesaleReceivableSettle> updateReceivableStatus(@RequestBody WholesaleSettleStatusDTO wholesaleSettleStatusDTO){
         Long settleId = wholesaleSettleStatusDTO.getId();
@@ -150,6 +150,15 @@ public class WholesaleReceivableSettleController implements IController {
 
         return success(wholesaleReceivableSettleRespPageInfo);
     }
+
+    @GetMapping("/receivable/bill/{id}")
+    @ApiOperation("应收明细结算单详情")
+    public R<WholesaleReceivableSettleResp> receivableBillDetail(@PathVariable("id") Long id)
+        throws JsonProcessingException {
+
+        return success(wholesaleSettlementService.receivableBillDetail(id));
+    }
+
 
     @GetMapping("/receivable/bill/{id}/page")
     @ApiOperation("分页查询某个应收结算单明细列表")

@@ -8,6 +8,7 @@ import com.welfare.persist.dto.query.*;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.entity.WholesalePayableSettle;
 import com.welfare.service.WholesalePayableSettletService;
+import com.welfare.service.dto.StoreCodeNameDTO;
 import com.welfare.service.dto.WholesalePaySettleDetailReq;
 import com.welfare.servicesettlement.util.FileUploadServiceUtil;
 import io.swagger.annotations.Api;
@@ -125,11 +126,29 @@ public class WholesalePayableSettleController implements IController {
         return success(payableSettletService.payableBillDetailSummary(id, query));
     }
 
+    @GetMapping("/payable/bill/{id}/detail")
+    @ApiOperation("(商户应收结算单)根据id查询结算单详情")
+    public R<WholesalePayableSettleResp> payableBillById(@PathVariable("id") Long id){
+        return success(payableSettletService.payableBillById(id));
+    }
+
     @GetMapping("/payable/bill/{id}/export")
     @ApiOperation("(商户应收结算单)应付结算明细数据单导出")
     public R<String> payableBillDetailExport(@PathVariable("id") Long id, WholesalePaySettleDetailReq query) throws IOException {
         List<WholesalePayableSettleDetailResp> details = payableSettletService.queryPayableBillDetail(id, query);
         String path = fileUploadService.uploadExcelFile(details, WholesalePayableSettleDetailResp.class, "应付结算单明细");
         return R.success(fileUploadService.getFileServerUrl(path));
+    }
+
+    @GetMapping("/payable/bill/{id}/stores")
+    @ApiOperation("(商户应收结算单)查询结算单下所有的消费门店")
+    public R<List<StoreCodeAndNameDTO>> storesBySettleId(@PathVariable("id") Long id) {
+        return success(payableSettletService.storesBySettleId(id));
+    }
+
+    @GetMapping("/payable/bill/{id}/customerMers")
+    @ApiOperation("(商户应收结算单)查询结算单下所有的消费客户")
+    public R<List<MerCodeAndNameDTO>> customerMersBySettleId(@PathVariable("id") Long id) {
+        return success(payableSettletService.customerMersBySettleId(id));
     }
 }

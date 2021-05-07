@@ -153,8 +153,8 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
             wholesaleReceivableSettle.setMerCode(param.getMerCode());
             wholesaleReceivableSettle.setOrderNum(orderNoSet.size());
             wholesaleReceivableSettle.setSendStatus(WelfareSettleConstant.SettleSendStatusEnum.UNSENDED.code());
-            wholesaleReceivableSettle.setSettleStartTime(param.getTransTimeStart());
-            wholesaleReceivableSettle.setSettleEndTime(param.getTransTimeEnd());
+            wholesaleReceivableSettle.setSettleStartTime(settleDetailDTOList.get(settleDetailDTOList.size() -1).getTransTime());
+            wholesaleReceivableSettle.setSettleEndTime(settleDetailDTOList.get(0).getTransTime());
             wholesaleReceivableSettle.setTransAmount(totalTransAmount);
             wholesaleReceivableSettle.setSettleAmount(totalSettleAmount);
 
@@ -228,9 +228,29 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     @Override
     public Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id,
         WholesaleReceiveSettleDetailPageQuery query) {
+        WholesaleReceivableSettle wholesaleReceivableSettle = wholesaleReceivableSettleDao.getById(id);
+
+        if(wholesaleReceivableSettle == null) {
+            return null;
+        }
+        query.setSettleNo(wholesaleReceivableSettle.getSettleNo());
+
         Page<WholesaleReceivableSettleDetailResp> page = new Page<>(query.getCurrent(), query.getSize());
 
         return wholesaleReceivableSettleMapper.receivableBillDetailPage(page, query);
+    }
+
+    @Override
+    public WholesaleReceivableSettleResp receivableBillDetail(Long id)
+        throws JsonProcessingException {
+
+        WholesaleReceivableSettleResp receivableSettleResp = wholesaleReceivableSettleMapper. receivableBill(id);
+        if(Strings.isNotEmpty(receivableSettleResp.getSettleTaxSalesStatistics())) {
+            List<SettleTaxSalesStatistics> settleTaxSalesStatisticsList = objectMapper.readValue(receivableSettleResp.getSettleTaxSalesStatistics(), new TypeReference<List<SettleTaxSalesStatistics>>() {});
+
+            receivableSettleResp.setSettleTaxSalesStatisticList(settleTaxSalesStatisticsList);
+        }
+        return receivableSettleResp;
     }
 
     @Override
@@ -248,6 +268,12 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     @Override
     public WholesaleReceiveSettleSummaryResp receivableBillDetailSummary(Long id,
         WholesaleReceiveSettleDetailQuery query) {
+        WholesaleReceivableSettle wholesaleReceivableSettle = wholesaleReceivableSettleDao.getById(id);
+
+        if(wholesaleReceivableSettle == null) {
+            return null;
+        }
+        query.setSettleNo(wholesaleReceivableSettle.getSettleNo());
 
         return  wholesaleReceivableSettleMapper.receivableBillDetailSummary(query);
     }

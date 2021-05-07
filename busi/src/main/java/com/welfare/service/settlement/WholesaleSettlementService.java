@@ -119,6 +119,8 @@ public interface WholesaleSettlementService {
      */
     Page<WholesaleReceivableSettleDetailResp> receivableBillDetailPage(Long id, WholesaleReceiveSettleDetailPageQuery query);
 
+    WholesaleReceivableSettleResp receivableBillDetail(Long id) throws JsonProcessingException;
+
     List<WholesaleReceivableSettleDetailResp> receivableBillDetail(Long id, WholesaleReceiveSettleDetailPageQuery query);
 
     /**

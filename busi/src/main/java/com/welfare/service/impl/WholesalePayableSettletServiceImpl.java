@@ -17,10 +17,7 @@ import com.welfare.common.util.UserInfoHolder;
 import com.welfare.persist.dto.*;
 import com.welfare.persist.dto.query.*;
 import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
-import com.welfare.persist.entity.OrderInfoDetail;
-import com.welfare.persist.entity.SettleDetail;
-import com.welfare.persist.entity.WholesalePayableSettle;
-import com.welfare.persist.entity.WholesalePayableSettleDetail;
+import com.welfare.persist.entity.*;
 import com.welfare.persist.mapper.OrderInfoDetailMapper;
 import com.welfare.persist.mapper.WholesalePayableSettleDetailMapper;
 import com.welfare.persist.mapper.WholesalePayableSettleMapper;
@@ -203,6 +200,18 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     }
 
     @Override
+    public WholesalePayableSettleResp payableBillById(Long id) {
+        WholesalePayableSettleBillQuery query = new WholesalePayableSettleBillQuery();
+        query.setId(id);
+        Page<WholesalePayableSettleResp> page = payableBillPage(query);
+        if (CollectionUtils.isNotEmpty(page.getRecords())) {
+            return page.getRecords().get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public Page<WholesalePayableSettleDetailResp> payableBillDetailPage(Long id, WholesalePaySettleDetailPageQuery query) {
         WholesalePaySettleDetailReq wholesalePaySettleDetailReq = new WholesalePaySettleDetailReq();
         BeanUtils.copyProperties(wholesalePaySettleDetailReq, query);
@@ -222,6 +231,40 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     public List<WholesalePayableSettleDetailResp> queryPayableBillDetail(Long id, WholesalePaySettleDetailReq query) {
         WholesalePaySettleDetailQuery paySettleDetailQuery = getWholesalePaySettleDetailQuery(id, query);
         return wholesalePayableSettleDetailMapper.payableBillDetailPage(paySettleDetailQuery);
+    }
+
+    @Override
+    public List<StoreCodeAndNameDTO> storesBySettleId(Long id) {
+        WholesalePayableSettle payableSettle = wholesalePayableSettleMapper.selectById(id);
+        if (Objects.nonNull(payableSettle)) {
+            List<WholesalePayableSettleDetail> details = wholesalePayableSettleDetailMapper.selectList(
+                    Wrappers.<WholesalePayableSettleDetail>lambdaQuery().eq(WholesalePayableSettleDetail::getSettleNo, payableSettle.getSettleNo()));
+            return details.stream().map(detail -> {
+                StoreCodeAndNameDTO storeCodeAndNameDTO = new StoreCodeAndNameDTO();
+                storeCodeAndNameDTO.setStoreCode(detail.getStoreCode());
+                storeCodeAndNameDTO.setStoreName(detail.getStoreName());
+                return storeCodeAndNameDTO;
+            }).collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
+                    new TreeSet<>(Comparator.comparing(StoreCodeAndNameDTO::getStoreCode))), ArrayList::new));
+        }
+        return null;
+    }
+
+    @Override
+    public List<MerCodeAndNameDTO> customerMersBySettleId(Long id) {
+        WholesalePayableSettle payableSettle = wholesalePayableSettleMapper.selectById(id);
+        if (Objects.nonNull(payableSettle)) {
+            List<WholesalePayableSettleDetail> details = wholesalePayableSettleDetailMapper.selectList(
+                    Wrappers.<WholesalePayableSettleDetail>lambdaQuery().eq(WholesalePayableSettleDetail::getSettleNo, payableSettle.getSettleNo()));
+            return details.stream().map(detail -> {
+                MerCodeAndNameDTO merCodeAndNameDTO = new MerCodeAndNameDTO();
+                merCodeAndNameDTO.setMerCode(detail.getMerCode());
+                merCodeAndNameDTO.setMerName(detail.getMerName());
+                return merCodeAndNameDTO;
+            }).collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
+                    new TreeSet<>(Comparator.comparing(MerCodeAndNameDTO::getMerCode))), ArrayList::new));
+        }
+        return null;
     }
 
     private WholesalePaySettleDetailQuery getWholesalePaySettleDetailQuery(Long id, WholesalePaySettleDetailReq query) {

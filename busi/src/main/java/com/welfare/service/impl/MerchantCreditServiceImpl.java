@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.MER_ACCOUNT_TYPE_OPERATE;
 import static com.welfare.common.constants.RedisKeyConstant.RESTORE_REMAINING_LIMIT_REQUEST_ID;
+import static com.welfare.common.constants.RedisKeyConstant.RESTORE_WHOLESALE_CREDIT_LIMIT_REQUEST_ID;
 import static com.welfare.common.constants.WelfareConstant.MerCreditType.*;
 
 /**
@@ -253,6 +254,49 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         } finally {
             DistributedLockUtil.unlock(lock);
         }
+    }
+
+    @Override
+    public void restoreWholesaleCreditLimit(RestoreRemainingLimitReq req) {
+
+        Merchant merchant = merchantService.queryByCode(req.getMerCode());
+        if (Objects.isNull(merchant)) {
+            throw new BizException("商户不存在");
+        }
+        if (req.getAmount() == null) {
+            throw new BizException("额度为空");
+        }
+        List<MerchantBillDetail> details = merchantBillDetailService.findByTransNoAndTransType(
+            req.getTransNo(),MerCreditType.WHOLESALE_CREDIT_LIMIT.code());
+        if (CollectionUtils.isNotEmpty(details)) {
+            log.warn("批发采购该笔结算单已经确认过了,transNo:{}", req.getTransNo());
+            return;
+        }
+        RLock lock = DistributedLockUtil.lockFairly(RESTORE_WHOLESALE_CREDIT_LIMIT_REQUEST_ID + ":" + req.getTransNo());
+        try{
+            details = merchantBillDetailService.findByTransNoAndTransType(
+                req.getTransNo(),
+                MerCreditType.WHOLESALE_CREDIT_LIMIT.code()
+            );
+            if (CollectionUtils.isNotEmpty(details)) {
+                log.warn("批发采购该笔结算单已经确认过了,transNo:{}", req.getTransNo());
+                return;
+            }
+            MerchantCredit merchantCredit = creditService.getByMerCode(req.getMerCode());
+            if (merchantCredit.getWholesaleCredit().add(req.getAmount()).compareTo(merchantCredit.getWholesaleCreditLimit()) > 0) {
+                throw new BizException(String.format("结算金额[%s]超过商户最大信用额度[%s],剩余额度[%s]",
+                                                     req.getAmount(), merchantCredit.getWholesaleCreditLimit(), merchantCredit.getWholesaleCredit()));
+            }
+            // 恢复商户的信用额度
+            increaseAccountType(req.getMerCode(),
+                                MerCreditType.WHOLESALE_CREDIT_LIMIT,
+                                req.getAmount(),
+                                req.getTransNo(),
+                                WelfareConstant.TransType.RESET_INCR.code());
+        } finally {
+            DistributedLockUtil.unlock(lock);
+        }
+
     }
 
     @Override

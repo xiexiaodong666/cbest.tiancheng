@@ -36,11 +36,16 @@ import com.welfare.persist.entity.WholesaleReceivableSettleDetail;
 import com.welfare.persist.mapper.OrderInfoDetailMapper;
 import com.welfare.persist.mapper.WholesaleReceivableSettleDetailMapper;
 import com.welfare.persist.mapper.WholesaleReceivableSettleMapper;
+import com.welfare.service.dto.RestoreRemainingLimitReq;
+import com.welfare.service.remote.MerchantCreditFeign;
+import com.welfare.service.remote.entity.MerchantCreditResp;
 import com.welfare.service.settlement.WholesaleSettlementService;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -58,6 +63,7 @@ import java.util.*;
  * @date 4/26/2021
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class WholesaleSettlementServiceImpl implements WholesaleSettlementService {
     private final WholesaleReceivableSettleMapper wholesaleReceivableSettleMapper;
@@ -67,6 +73,8 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     private final WholesaleReceivableSettleDetailDao wholesaleReceivableSettleDetailDao;
     private final OrderInfoDetailMapper orderInfoDetailMapper;
     private final ObjectMapper objectMapper;
+    @Autowired
+    private MerchantCreditFeign merchantCreditFeign;
     @Override
     public Page<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
         String merName,
@@ -201,6 +209,17 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                             .eq(WholesaleReceivableSettleDetail::getSettleNo, settle.getSettleNo())
                             .set(WholesaleReceivableSettleDetail::getSettleFlag, settleStatus));
             BizAssert.isTrue(update, ExceptionCode.DATA_BASE_ERROR);
+            if(SettleStatusEnum.SETTLED.code().equals(sendStatus)) {
+                RestoreRemainingLimitReq restoreRemainingLimitReq = new RestoreRemainingLimitReq();
+                restoreRemainingLimitReq.setMerCode(settle.getMerCode());
+                restoreRemainingLimitReq.setAmount(settle.getSettleAmount());
+                restoreRemainingLimitReq.setTransNo(settle.getSettleNo());
+                log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
+                MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq, "api");
+                if(merchantCreditResp.getCode()!=1){
+                    throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "恢复商户授信额度失败", null);
+                }
+            }
         }
         wholesaleReceivableSettleDao.updateById(settle);
         return settle;

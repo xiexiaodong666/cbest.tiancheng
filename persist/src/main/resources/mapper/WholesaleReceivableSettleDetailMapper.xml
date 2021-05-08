@@ -127,6 +127,8 @@
         supplier.mer_name as customerMerName,
         d.store_code as storeCode,
         d.store_name as storeName,
+        d.mer_name as merName,
+        d.mer_code as merCode,
         case
         when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.order_wholesale_amount
         when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.order_wholesale_amount*-1

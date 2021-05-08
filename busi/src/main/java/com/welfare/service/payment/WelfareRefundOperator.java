@@ -248,9 +248,15 @@ public class WelfareRefundOperator implements IRefundOperator{
             //用户所属商户和门店的商户是同一个，表示是在自营消费的退款，不操作商家
             return;
         }
+        WelfareConstant.MerCreditType merCreditType;
+        if(refundDeductionDetail.getMerAccountType().equals(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())){
+            merCreditType = WelfareConstant.MerCreditType.WHOLESALE_CREDIT;
+        }else{
+            merCreditType = WelfareConstant.MerCreditType.REMAINING_LIMIT;
+        }
         List<MerchantAccountOperation> merchantAccountOperations = merchantCreditService.increaseAccountType(
                 account.getMerCode(),
-                WelfareConstant.MerCreditType.REMAINING_LIMIT,
+                merCreditType,
                 refundDeductionDetail.getTransAmount(),
                 refundDeductionDetail.getTransNo(),
                 WelfareConstant.TransType.REFUND.code()

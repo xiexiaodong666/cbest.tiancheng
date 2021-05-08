@@ -372,9 +372,17 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
     if(CollectionUtils.isNotEmpty(merchantStoreRelations)) {
       updateBatch = merchantStoreRelationDao.updateBatchById(merchantStoreRelations);
     }
+
     if(CollectionUtils.isNotEmpty(merchantStoreRelationNewList)) {
       saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
+      for (MerchantStoreRelation merchantStoreRelation1:
+      merchantStoreRelationNewList ) {
+        if(ConsumeTypesUtils.isRelationedWholesale(merchantStoreRelation.getConsumType())) {
+          initWholesaleConsume(merchantStoreRelation1.getMerCode(), merchantStoreRelation1.getStoreCode());
+        }
+      }
     }
+
     if(CollectionUtils.isNotEmpty(addStoreConsumeTypes)) {
       // 创建商户门店消费新增事件
       applicationContext.publishEvent(MerStoreConsumeTypeChangeEvt.builder()

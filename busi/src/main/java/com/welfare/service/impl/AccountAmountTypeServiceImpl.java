@@ -1,6 +1,7 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
@@ -144,6 +145,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(deposits.get(0).getMerchantCode());
                 Map<String, MerchantAccountType> merchantAccountTypeMap = merchantAccountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
 
+                List<Long> errorMsg = new ArrayList<>();
                 for (Deposit deposit : deposits) {
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(deposit.getAccountCode());
                     if (Objects.isNull(accountAmountType)) {
@@ -156,8 +158,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     }
                     WelfareConstant.MerAccountTypeCode accountType = WelfareConstant.MerAccountTypeCode.findByCode(deposit.getMerAccountTypeCode());
 
-                    BizAssert.isTrue(accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) >= 0,
-                            ExceptionCode.ILLEGALITY_ARGUMENTS, merchantAccountTypeMap.get(deposit.getMerAccountTypeCode()) + "余额不足");
+                    if (accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) < 0) {
+                        errorMsg.add(accountAmountType.getAccountCode());
+                    }
                     Account account = accountMap.get(deposit.getAccountCode());
                     account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
@@ -173,6 +176,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                             deposit.getTransNo(),
                             WelfareConstant.TransType.DEPOSIT_INCR));
                 }
+                BizAssert.isTrue(CollectionUtils.isEmpty(errorMsg), ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户或福利类型余额不足\r\n" + Joiner.on(",").join(errorMsg));
                 accountChangeEventRecordDao.getBaseMapper().batchInsert(records);
                 accountAmountTypeDao.saveBatch(newAccountAmountTypes);
                 Map<Long, BigDecimal> amountMap = deposits.stream().collect(Collectors.toMap(Deposit::getAccountCode, Deposit::getAmount));

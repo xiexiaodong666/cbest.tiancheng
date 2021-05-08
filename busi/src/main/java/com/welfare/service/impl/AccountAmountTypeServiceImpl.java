@@ -156,7 +156,6 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     } else {
                         accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
                     }
-                    WelfareConstant.MerAccountTypeCode accountType = WelfareConstant.MerAccountTypeCode.findByCode(deposit.getMerAccountTypeCode());
 
                     if (accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) < 0) {
                         errorMsg.add(accountAmountType.getAccountCode());

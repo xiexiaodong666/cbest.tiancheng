@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.constants.WelfareSettleConstant.SettleRecStatusEnum;
 import com.welfare.common.constants.WelfareSettleConstant.SettleStatusEnum;
@@ -73,7 +74,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
     private final WholesaleReceivableSettleDetailDao wholesaleReceivableSettleDetailDao;
     private final OrderInfoDetailMapper orderInfoDetailMapper;
     private final ObjectMapper objectMapper;
-    @Autowired
+    @Autowired(required = false)
     private MerchantCreditFeign merchantCreditFeign;
     @Override
     public Page<PlatformWholesaleSettleGroupDTO> pageQueryReceivable(String merCode,
@@ -214,6 +215,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                 restoreRemainingLimitReq.setMerCode(settle.getMerCode());
                 restoreRemainingLimitReq.setAmount(settle.getSettleAmount());
                 restoreRemainingLimitReq.setTransNo(settle.getSettleNo());
+                restoreRemainingLimitReq.setSettleType(MerCreditType.WHOLESALE_CREDIT_LIMIT.code());
                 log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
                 MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq, "api");
                 if(merchantCreditResp.getCode()!=1){

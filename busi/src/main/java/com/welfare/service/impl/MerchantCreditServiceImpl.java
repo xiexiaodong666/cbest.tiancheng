@@ -17,6 +17,7 @@ import com.welfare.service.MerchantService;
 import com.welfare.service.dto.DecreaseMerchantCredit;
 import com.welfare.service.dto.MerchantExtendDTO;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
+import com.welfare.service.operator.RemainingWholesaleCreditLimitOperator;
 import com.welfare.service.operator.merchant.*;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +43,8 @@ import static com.welfare.common.constants.WelfareConstant.MerCreditType.*;
  * 商户额度信服务接口实现
  *
  * @author Yuxiang Li
- * @since 2021-01-06 13:49:25
  * @description 由 Mybatisplus Code Generator 创建
+ * @since 2021-01-06 13:49:25
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -61,14 +62,16 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     private final MerchantBillDetailDao merchantBillDetailDao;
     private final SelfDepositBalanceOperator selfDepositBalanceOperator;
     private final WholesaleCreditLimitOperator wholesaleCreditLimitOperator;
+    private final RemainingWholesaleCreditLimitOperator remainingWholesaleCreditLimitOperator;
 
 
     @Autowired
-    private  MerchantService merchantService;
+    private MerchantService merchantService;
     private final Map<MerCreditType, AbstractMerAccountTypeOperator> operatorMap = new HashMap<>();
     private final MerchantBillDetailService merchantBillDetailService;
     @Autowired
     private MerchantCreditService creditService;
+
     @Override
     public boolean init(String merCode) {
         //初始化商户额度信
@@ -105,13 +108,12 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     }
 
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<MerchantAccountOperation> decreaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType) {
         AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
         RLock lock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
-        try{
+        try {
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             List<MerchantAccountOperation> operations = doOperateAccount(merchantCredit, amount, transNo, merAccountTypeOperator, transType);
             List<MerchantBillDetail> merchantBillDetails = operations.stream()
@@ -135,7 +137,8 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
                 List<MerchantAccountOperation> operations = new ArrayList<>();
                 // 给所有商户加锁
                 Set<String> merCodeSet = decreaseMerchantCredits.stream().map(DecreaseMerchantCredit::getMerCode)
-                        .collect(Collectors.toSet());;
+                        .collect(Collectors.toSet());
+                ;
                 for (String merCode : merCodeSet) {
                     RLock lock = DistributedLockUtil.lockFairly(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
                     locks.add(lock);
@@ -181,10 +184,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     public List<MerchantAccountOperation> increaseAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo, String transType) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
-        try{
+        try {
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            List<MerchantAccountOperation> increase = merAccountTypeOperator.increase(merchantCredit, amount,transNo, transType);
+            List<MerchantAccountOperation> increase = merAccountTypeOperator.increase(merchantCredit, amount, transNo, transType);
             merchantCreditDao.updateById(merchantCredit);
             List<MerchantBillDetail> merchantBillDetails = increase.stream()
                     .map(MerchantAccountOperation::getMerchantBillDetail)
@@ -200,10 +203,10 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
     public void setAccountType(String merCode, MerCreditType merCreditType, BigDecimal amount, String transNo) {
         RLock lock = redissonClient.getFairLock(MER_ACCOUNT_TYPE_OPERATE + ":" + merCode);
         lock.lock();
-        try{
+        try {
             MerchantCredit merchantCredit = this.getByMerCode(merCode);
             AbstractMerAccountTypeOperator merAccountTypeOperator = operatorMap.get(merCreditType);
-            List<MerchantAccountOperation> increase = merAccountTypeOperator.set(merchantCredit, amount,transNo );
+            List<MerchantAccountOperation> increase = merAccountTypeOperator.set(merchantCredit, amount, transNo);
             merchantCreditDao.updateById(merchantCredit);
             List<MerchantBillDetail> merchantBillDetails = increase.stream()
                     .map(MerchantAccountOperation::getMerchantBillDetail)
@@ -225,13 +228,13 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             throw new BizException("额度为空");
         }
         List<MerchantBillDetail> details = merchantBillDetailService.findByTransNoAndTransType(
-                req.getTransNo(),MerCreditType.REMAINING_LIMIT.code());
+                req.getTransNo(), MerCreditType.REMAINING_LIMIT.code());
         if (CollectionUtils.isNotEmpty(details)) {
             log.warn("该笔结算单已经确认过了,transNo:{}", req.getTransNo());
             return;
         }
         RLock lock = DistributedLockUtil.lockFairly(RESTORE_REMAINING_LIMIT_REQUEST_ID + ":" + req.getTransNo());
-        try{
+        try {
             details = merchantBillDetailService.findByTransNoAndTransType(
                     req.getTransNo(),
                     MerCreditType.REMAINING_LIMIT.code()
@@ -306,8 +309,9 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         operatorMap.put(RECHARGE_LIMIT, rechargeLimitOperator);
         operatorMap.put(REMAINING_LIMIT, remainingLimitOperator);
         operatorMap.put(REBATE_LIMIT, rebateLimitOperator);
-        operatorMap.put(SELF_DEPOSIT,selfDepositBalanceOperator);
+        operatorMap.put(SELF_DEPOSIT, selfDepositBalanceOperator);
         operatorMap.put(WHOLESALE_CREDIT_LIMIT, wholesaleCreditLimitOperator);
+        operatorMap.put(WHOLESALE_CREDIT, remainingWholesaleCreditLimitOperator);
 
     }
 }

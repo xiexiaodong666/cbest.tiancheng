@@ -6,6 +6,8 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.*;
 import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.payment.PaymentRequest;
+import com.welfare.service.operator.RemainingWholesaleCreditLimitOperator;
+import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.PaymentOperation;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WelfarePaymentOperator implements IPaymentOperator {
     private final CurrentBalanceOperator currentBalanceOperator;
+    private final RemainingWholesaleCreditLimitOperator remainingWholesaleCreditLimitOperator;
     private final AsyncService asyncService;
 
     @Override
@@ -125,6 +128,12 @@ public class WelfarePaymentOperator implements IPaymentOperator {
         /**
          * 扣减商户账户
          */
+        AbstractMerAccountTypeOperator merAccountTypeOperator;
+        if(paymentRequest.bizType().equals(WelfareConstant.PaymentBizType.WHOLESALE)){
+            merAccountTypeOperator = remainingWholesaleCreditLimitOperator;
+        }else{
+            merAccountTypeOperator = currentBalanceOperator;
+        }
         AccountDeductionDetail accountDeductionDetail = AccountAmountDO.generateAccountDeductionDetail(
                 paymentRequest,
                 accountAmountType,
@@ -133,7 +142,7 @@ public class WelfarePaymentOperator implements IPaymentOperator {
                 accountAmountDO.getAccount(),
                 supplierStore,
                 merchantCredit,
-                currentBalanceOperator,
+                merAccountTypeOperator,
                 accountAmountTypeGroup
         );
         paymentOperation.setAccountDeductionDetail(accountDeductionDetail);

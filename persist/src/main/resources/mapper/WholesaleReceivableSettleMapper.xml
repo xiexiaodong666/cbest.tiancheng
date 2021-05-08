@@ -26,7 +26,11 @@
           wps.settle_end_time AS settleEndTime,
           wps.rec_status AS recStatus,
           wps.settle_status AS settleStatus,
-          m.mer_cooperation_mode AS merCooperationMode,
+          wps.send_status AS sendStatus,
+          wps.confirm_time as confirmTime,
+          wps.send_time as sendTime,
+
+      m.mer_cooperation_mode AS merCooperationMode,
       case
       when m.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
       when m.mer_cooperation_mode = 'PAYED' then '后付费'
@@ -38,16 +42,16 @@
 
       <where>
         <if test="query.merCode !=null ">
-          wps.mer_code = #{query.merCode}
+          and wps.mer_code = #{query.merCode}
         </if>
         <if test="query.merCooperationMode !=null and query.merCooperationMode!=''">
-          m.mer_cooperation_mode = #{query.merCooperationMode}
+          and m.mer_cooperation_mode = #{query.merCooperationMode}
         </if>
         <if test="query.recStatus !=null and query.recStatus!=''">
-          wps.rec_status = #{query.recStatus}
+          and wps.rec_status = #{query.recStatus}
         </if>
         <if test="query.settleStatus !=null and query.settleStatus!=''">
-          wps.settle_status = #{query.settleStatus}
+          and wps.settle_status = #{query.settleStatus}
         </if>
       </where>
     </select>
@@ -67,6 +71,9 @@
     wps.settle_end_time AS settleEndTime,
     wps.rec_status AS recStatus,
     wps.settle_status AS settleStatus,
+    wps.send_status AS sendStatus,
+    wps.confirm_time as confirmTime,
+    wps.send_time as sendTime,
     m.mer_cooperation_mode AS merCooperationMode,
      case
       when m.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
@@ -185,19 +192,19 @@
   <where>
 
     <if test="query.settleNo !=null and query.settleNo != '' ">
-      t1.settle_no  = #{query.settleNo}
+      and t1.settle_no  = #{query.settleNo}
     </if>
 
     <if test="query.orderNo !=null and query.orderNo != '' ">
-      t1.order_id  = #{query.orderNo}
+      and t1.order_id  = #{query.orderNo}
     </if>
 
 
     <if test="query.transNo !=null ">
-      t1.trans_no = #{query.transNo}
+      and t1.trans_no = #{query.transNo}
     </if>
     <if test="query.supplierCode !=null ">
-      supplier.mer_code = #{query.supplierCode}
+      and supplier.mer_code = #{query.supplierCode}
     </if>
     <if test="query.storeCodes != null and query.storeCodes.size > 0">
       and t1.store_code in
@@ -208,14 +215,14 @@
 
 
     <if test="query.startTime != null">
-      t1.trans_time <![CDATA[>=]]> #{query.startTime}
+      and t1.trans_time <![CDATA[>=]]> #{query.startTime}
     </if>
     <if test="query.endTime != null">
-      t1.trans_time <![CDATA[<]]> #{query.endTime}
+      and t1.trans_time <![CDATA[<]]> #{query.endTime}
     </if>
 
     <if test="query.phone !=null  and query.phone != ''">
-      ac.phone  = #{query.phone}
+      and ac.phone  = #{query.phone}
     </if>
 
   </where>

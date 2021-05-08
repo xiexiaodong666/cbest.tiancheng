@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -107,7 +108,7 @@ public class WholesaleReceivableSettleController implements IController {
 
     @PostMapping("/page-receivable-details")
     @ApiOperation("查询平台应收账单明细")
-    public R<Page<PlatformWholesaleSettleDetailDTO>> queryReceivableDetails(@RequestBody PlatformWholesaleSettleDetailParam param){
+    public R<Page<PlatformWholesaleSettleDetailDTO>> queryReceivableDetails(@RequestBody @Validated PlatformWholesaleSettleDetailParam param){
 
 
        return success(wholesaleSettlementService.queryReceivableDetails(param));
@@ -115,14 +116,14 @@ public class WholesaleReceivableSettleController implements IController {
 
     @PostMapping("/receivable-details-summary")
     @ApiOperation("查询平台应收帐单明细汇总")
-    public R<PlatformWholesaleSettleDetailSummaryDTO> queryReceivableDetailsSummary(@RequestBody PlatformWholesaleSettleDetailParam param){
+    public R<PlatformWholesaleSettleDetailSummaryDTO> queryReceivableDetailsSummary(@RequestBody @Validated PlatformWholesaleSettleDetailParam param){
         PlatformWholesaleSettleDetailSummaryDTO platformWholesaleSettleDetailSummaryDTO = wholesaleSettlementService.queryReceivableDetailsSummary(param);
         return success(platformWholesaleSettleDetailSummaryDTO);
     }
 
     @PostMapping("/export-receivable-details")
     @ApiOperation("导出平台应收账单明细")
-    public R<String> exportReceivableDetails(@RequestBody PlatformWholesaleSettleDetailParam param) throws IOException {
+    public R<String> exportReceivableDetails(@RequestBody @Validated PlatformWholesaleSettleDetailParam param) throws IOException {
       List<PlatformWholesaleSettleDetailDTO> resultList = wholesaleSettlementService.pageQueryReceivableDetails(param);
 
       String filePath = fileUploadService.uploadExcelFile(resultList, PlatformWholesaleSettleDetailDTO.class, "批发应收结算分组汇总");

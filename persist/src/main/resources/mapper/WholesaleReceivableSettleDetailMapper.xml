@@ -76,6 +76,7 @@
         SELECT
         d.id as id,
         d.trans_no as transNo,
+        d.trans_type as transType,
         d.order_id as orderNo,
         d.trans_time as transTime,
         d.account_code as accountCode,
@@ -85,8 +86,16 @@
         supplier.mer_name as customerMerName,
         d.store_code as storeCode,
         d.store_name as storeName,
-        d.trans_amount as saleAmount,
-        d.order_wholesale_amount as settleAmount,
+        case
+        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.order_wholesale_amount
+        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.order_wholesale_amount*-1
+        else 0
+        end as  settleAmount,
+        case
+        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.trans_amount
+        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.trans_amount*-1
+        else 0
+        end as  saleAmount,
         d.settle_flag as settleFlag,
         case when d.settle_flag='unsettled' then '待结算'
         when d.settle_flag='settling' then '结算中'
@@ -103,20 +112,46 @@
     <select id="queryReceivableDetailsSummary"
       resultType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO"
       parameterType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam">
-        select sum(d.trans_amount) as transAmount,
-        sum(d.order_wholesale_amount) as settleAmount,
-        max(d.mer_name) as merName,
-        max(d.mer_code) as merCode
+        select sum(t.saleAmount) as saleAmount, sum(t.settleAmount) as settleAmount, t.merCode
+        ,t.merName from
+        (SELECT
+        d.id as id,
+        d.trans_no as transNo,
+        d.trans_type as transType,
+        d.order_id as orderNo,
+        d.trans_time as transTime,
+        d.account_code as accountCode,
+        d.account_name as accountName,
+        a.phone as phone,
+        supplier.mer_code as customerMerCode,
+        supplier.mer_name as customerMerName,
+        d.store_code as storeCode,
+        d.store_name as storeName,
+        case
+        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.order_wholesale_amount
+        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.order_wholesale_amount*-1
+        else 0
+        end as settleAmount,
+        case
+        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.trans_amount
+        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.trans_amount*-1
+        else 0
+        end as saleAmount,
+        d.settle_flag as settleFlag,
+        case when d.settle_flag='unsettled' then '待结算'
+        when d.settle_flag='settling' then '结算中'
+        when d.settle_flag='settled' then '已结算' end as settleFlagName
         FROM wholesale_receivable_settle_detail d
         INNER JOIN account a ON d.account_code = a.account_code
         inner join supplier_store s on s.store_code = d.store_code
         inner join merchant supplier on s.mer_code = supplier.mer_code
         <include refid="queryReceivableDetailsCondition"/>
+        )t
     </select>
     <sql id="queryReceivableDetailsCondition">
         <where>
             <if test="param.orderNo !=null and param.orderNo!=''">
-                and d.order_no = #{param.orderNo}
+                and d.order_id = #{param.orderNo}
             </if>
             <if test="param.transNo !=null and param.transNo != ''">
                 and d.trans_no = #{param.transNo}

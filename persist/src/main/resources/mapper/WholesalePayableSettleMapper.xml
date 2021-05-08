@@ -35,7 +35,7 @@
             LEFT JOIN merchant_extend me on me.mer_code = supplier.mer_code
         <where>
             <if test="query.merName != null and query.merName != ''">
-                and supplier.mer_name like concat('%', '', '%')
+                and supplier.mer_name like concat('%', #{query.merName}, '%')
             </if>
             <if test="query.merCode != null and query.merCode != ''">
                 and wps.mer_code = #{query.merCode}

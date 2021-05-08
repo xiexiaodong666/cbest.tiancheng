@@ -56,6 +56,12 @@ public class RedisKeyConstant {
   public static final String RESTORE_REMAINING_LIMIT_REQUEST_ID = "e-welfare_restore_remaining_limit_request_id:";
 
   /**
+   * 调用恢复剩余剩余信用额度接口 请求id的key前缀
+   */
+  public static final String RESTORE_WHOLESALE_CREDIT_LIMIT_REQUEST_ID = "e-welfare_restore_wholesale_limit_request_id:";
+
+
+  /**
    * 生产员工授信结算单需要用到的锁key前缀
    */
   public static final String BUILD_EMPLOYEE_SETTLE = "e-welfare_build_employee_settle:";

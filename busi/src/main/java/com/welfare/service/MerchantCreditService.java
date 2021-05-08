@@ -92,4 +92,10 @@ public interface MerchantCreditService {
    */
   void restoreRemainingLimit(RestoreRemainingLimitReq req);
 
+  /**
+   * 恢复批发采购剩余信用额度
+   * @param req
+   */
+  void restoreWholesaleCreditLimit(RestoreRemainingLimitReq req);
+
 }

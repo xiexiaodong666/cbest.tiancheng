@@ -142,7 +142,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
     }
 
     @Override
-    public Integer settleFinish(Long id) {
+        public Integer settleFinish(Long id) {
         //修改账单结算状态为已结算
         WholesalePayableSettle payableSettle = new WholesalePayableSettle();
         payableSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());

@@ -33,7 +33,7 @@ public class PlatformWholesaleSettleDetailParam  extends PageReq {
     @ApiModelProperty("供应商编码")
     private String supplierCode;
     @ApiModelProperty("门店号")
-    private String storeCode;
+    private List<String> storeCodes;
     @ApiModelProperty("交易时间起始")
     private Date transTimeStart;
     @ApiModelProperty("交易时间截至")

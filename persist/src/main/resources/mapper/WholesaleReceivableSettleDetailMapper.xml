@@ -162,11 +162,16 @@
                 and d.settle_flag = #{param.settleFlag}
             </if>
             <if test="param.supplierCode != null and param.supplierCode != ''">
-                and supplier.supplier_code = #{param.supplierCode}
+                and supplier.mer_code = #{param.supplierCode}
             </if>
-            <if test="param.storeCode != null and param.storeCode != ''">
-                and d.store_code = #{param.storeCode}
+
+            <if test="param.storeCodes !=null and param.storeCodes.size() > 0">
+                and  d.store_code in
+                <foreach collection="storeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
+
             <if test="param.transTimeStart != null">
                 and d.trans_time <![CDATA[>=]]> #{param.transTimeStart}
             </if>

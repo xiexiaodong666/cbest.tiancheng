@@ -44,7 +44,7 @@ public class AccountDepositApplyExcelInfo {
    * 充值类型
    */
   @ApiModelProperty("充值类型（批发采购充值：wholesaleCreditLimitApply  福利充值：welfareApply)")
-  @ExcelProperty(value = "充值总金额", index = 3)
+  @ExcelProperty(value = "充值类型", index = 3)
   private String applyType;
 
   /**

@@ -64,7 +64,7 @@ public class CardInfoDTO {
    * 绑定账号
    */
   @ExcelProperty(value ="绑定账号")
-  private Long accountCode;
+  private String accountCode;
 
   @ExcelProperty(value ="启用或禁用 1 启用 0禁用")
   private Integer enabled;

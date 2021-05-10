@@ -136,7 +136,10 @@ public class ConsumeTypesUtils {
     if (consumeTypeMap == null) {
       throw new BizException("消费方法格式错误");
     }
-
-    return consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode());
+    Boolean isRelationedWholesale = consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode());
+    if(isRelationedWholesale == null) {
+      isRelationedWholesale = false;
+    }
+    return isRelationedWholesale;
   }
 }

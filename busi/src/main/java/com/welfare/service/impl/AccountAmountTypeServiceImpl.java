@@ -183,7 +183,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                             deposit.getTransNo(),
                             WelfareConstant.TransType.DEPOSIT_INCR));
                 }
-                BizAssert.isTrue(CollectionUtils.isEmpty(errorMsg), ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户或福利类型余额不足\n" + Joiner.on(",").join(errorMsg));
+                BizAssert.isTrue(CollectionUtils.isEmpty(errorMsg), ExceptionCode.ILLEGALITY_ARGUMENTS, "员工批发采购账户不可充为负\n" + Joiner.on(",").join(errorMsg));
                 accountChangeEventRecordDao.getBaseMapper().batchInsert(records);
                 accountAmountTypeDao.saveBatch(newAccountAmountTypes);
                 Map<Long, BigDecimal> amountMap = deposits.stream().collect(Collectors.toMap(Deposit::getAccountCode, Deposit::getAmount));

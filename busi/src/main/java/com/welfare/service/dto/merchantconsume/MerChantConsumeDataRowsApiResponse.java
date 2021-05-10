@@ -18,6 +18,9 @@ public class MerChantConsumeDataRowsApiResponse {
   @ApiModelProperty("虚拟id")
   private Long id;
 
+  @ApiModelProperty("序号")
+  private Long serialNumber;
+
   @ApiModelProperty("商户代码")
   private String merCode;
 

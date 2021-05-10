@@ -101,7 +101,12 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                         accountAmountType.getAccountBalance(),
                         "sys");
             }
-            account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
+            if (!Lists.newArrayList(
+                    WelfareConstant.MerAccountTypeCode.WHOLESALE.code(),
+                    WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())
+                    .contains(deposit.getMerAccountTypeCode())) {
+                account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
+            }
             AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
             accountChangeEventRecord.setAccountCode(account.getAccountCode());
             accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
@@ -142,7 +147,6 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 List<AccountBillDetail> details = new ArrayList<>();
                 List<OrderTransRelation> relations = new ArrayList<>();
                 List<AccountAmountType> newAccountAmountTypes = new ArrayList<>();
-                List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(deposits.get(0).getMerchantCode());
 
                 List<Long> errorMsg = new ArrayList<>();
                 for (Deposit deposit : deposits) {
@@ -160,7 +164,12 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                         errorMsg.add(accountAmountType.getAccountCode());
                     }
                     Account account = accountMap.get(deposit.getAccountCode());
-                    account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
+                    if (!Lists.newArrayList(
+                            WelfareConstant.MerAccountTypeCode.WHOLESALE.code(),
+                            WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())
+                            .contains(deposit.getMerAccountTypeCode())) {
+                        account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
+                    }
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
                     accountChangeEventRecord.setAccountCode(account.getAccountCode());
                     accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());

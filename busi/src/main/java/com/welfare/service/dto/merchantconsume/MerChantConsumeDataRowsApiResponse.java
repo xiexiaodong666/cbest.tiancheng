@@ -33,6 +33,9 @@ public class MerChantConsumeDataRowsApiResponse {
   @ApiModelProperty("商户余额")
   private String currentBalance;
 
+  @ApiModelProperty("信用额度")
+  private String creditLimit;
+
   @ApiModelProperty("剩余信用额度/信用额度")
   private String remainingLimit;
 
@@ -70,6 +73,15 @@ public class MerChantConsumeDataRowsApiResponse {
   @ApiModelProperty("每笔平均交易额")
   private String avgTransMoney;
 
+  @ApiModelProperty("累计充值额度")
+  private String chargeBalance;
+
+  @ApiModelProperty("在相应时间内访问app的人数")
+  private String visitAppNum;
+
+  @ApiModelProperty("在相应时间内每天访问app的人数")
+  private String avgVisitAppNum;
+
   @ApiModelProperty("消费方式明细集合")
   private List<MerChantConsumeDataDetailApiResponse> consumeTypeDetailList;
 
@@ -78,8 +90,12 @@ public class MerChantConsumeDataRowsApiResponse {
     merChantConsumeDataRowsApiResponse.setMerCode(response.getMerCode());
     merChantConsumeDataRowsApiResponse.setMerName(response.getMerName());
     merChantConsumeDataRowsApiResponse.setUserNum(response.getUserNum());
+    merChantConsumeDataRowsApiResponse.setChargeBalance(response.getChargeBalance());
+    merChantConsumeDataRowsApiResponse.setVisitAppNum(response.getVisitAppNum());
+    merChantConsumeDataRowsApiResponse.setAvgVisitAppNum(response.getAvgVisitAppNum());
     merChantConsumeDataRowsApiResponse.setMerCooperationMode(MerCooperationModeEnum.getByCode(response.getMerCooperationMode()).getDesc());
     merChantConsumeDataRowsApiResponse.setCurrentBalance(response.getCurrentBalance());
+    merChantConsumeDataRowsApiResponse.setCreditLimit(response.getCreditLimit());
     merChantConsumeDataRowsApiResponse.setRemainingLimit(response.getRemainingLimit());
     merChantConsumeDataRowsApiResponse.setSettledMoney(response.getSettledMoney());
     merChantConsumeDataRowsApiResponse.setUnsettledMoney(response.getUnsettledMoney());
@@ -103,11 +119,16 @@ public class MerChantConsumeDataRowsApiResponse {
       merChantConsumeDataRowsApiResponse.setMerCode(response.getMerCode());
       merChantConsumeDataRowsApiResponse.setMerName(response.getMerName());
       merChantConsumeDataRowsApiResponse.setUserNum(response.getUserNum());
+      merChantConsumeDataRowsApiResponse.setChargeBalance(response.getChargeBalance());
+      merChantConsumeDataRowsApiResponse.setVisitAppNum(response.getVisitAppNum());
+      merChantConsumeDataRowsApiResponse.setAvgVisitAppNum(response.getAvgVisitAppNum());
       merChantConsumeDataRowsApiResponse.setMerCooperationMode(MerCooperationModeEnum.getByCode(response.getMerCooperationMode()).getDesc());
       merChantConsumeDataRowsApiResponse.setCurrentBalance(response.getCurrentBalance());
+      merChantConsumeDataRowsApiResponse.setCreditLimit(response.getCreditLimit());
       merChantConsumeDataRowsApiResponse.setRemainingLimit(response.getRemainingLimit());
       merChantConsumeDataRowsApiResponse.setSettledMoney(response.getSettledMoney());
       merChantConsumeDataRowsApiResponse.setUnsettledMoney(response.getUnsettledMoney());
+
     }
     merChantConsumeDataRowsApiResponse.setBusinessType(BusinessTypeEnum.valueOf(response.getBusinessType().toUpperCase()).desc());
     merChantConsumeDataRowsApiResponse.setConsumeMoney(response.getConsumeMoneyCollect());

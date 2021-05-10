@@ -27,7 +27,12 @@ public class WelfareMerChantConsumeDataBaiscResponse {
    */
   private String currentBalance;
   /**
-   * 剩余信用额度/信用额度
+   * 信用额度
+   */
+  private String creditLimit;
+
+  /**
+   * 剩余信用额度
    */
   private String remainingLimit;
   /**
@@ -122,5 +127,18 @@ public class WelfareMerChantConsumeDataBaiscResponse {
 
   private String csConsumeMoney;
 
+  /**
+   * 累计充值额度
+   */
+  private String chargeBalance;
 
+  /**
+   * 在相应时间内访问app的人数
+   */
+  private String visitAppNum;
+
+  /**
+   * 在相应时间内每天访问app的人数
+   */
+  private String avgVisitAppNum;
 }

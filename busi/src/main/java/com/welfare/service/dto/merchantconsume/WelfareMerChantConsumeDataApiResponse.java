@@ -55,7 +55,10 @@ public class WelfareMerChantConsumeDataApiResponse {
     @ApiModelProperty("商户余额")
     private String currentBalance;
 
-    @ApiModelProperty("剩余信用额度/信用额度")
+    @ApiModelProperty("信用额度")
+    private String creditLimit;
+
+    @ApiModelProperty("剩余信用额度")
     private String remainingLimit;
 
     @ApiModelProperty("结算额度")
@@ -91,6 +94,15 @@ public class WelfareMerChantConsumeDataApiResponse {
     @ApiModelProperty("每笔平均交易额")
     private String avgTransMoney;
 
+    @ApiModelProperty("累计充值额度")
+    private String chargeBalance;
+
+    @ApiModelProperty("在相应时间内访问app的人数")
+    private String visitAppNum;
+
+    @ApiModelProperty("在相应时间内每天访问app的人数")
+    private String avgVisitAppNum;
+
     @ApiModelProperty("消费方式明细集合")
     private List<MerChantConsumeDataDetailApiResponse> consumeTypeDetailList;
 
@@ -98,8 +110,12 @@ public class WelfareMerChantConsumeDataApiResponse {
       TableExt tableExt = new TableExt();
       tableExt.setMerName("汇总");
       tableExt.setUserNum(response.getUserNum());
+      tableExt.setChargeBalance(response.getChargeBalance());
+      tableExt.setVisitAppNum(response.getVisitAppNum());
+      tableExt.setAvgVisitAppNum(response.getAvgVisitAppNum());
       tableExt.setMerCooperationMode("-");
       tableExt.setCurrentBalance(response.getCurrentBalance());
+      tableExt.setCreditLimit(response.getCreditLimit());
       tableExt.setRemainingLimit(response.getRemainingLimit());
       tableExt.setSettledMoney(response.getSettledMoney());
       tableExt.setUnsettledMoney(response.getUnsettledMoney());
@@ -122,8 +138,12 @@ public class WelfareMerChantConsumeDataApiResponse {
       if(isFillMerchantAttributes) {
         tableExt.setMerName("汇总");
         tableExt.setUserNum(response.getUserNum());
+        tableExt.setChargeBalance(response.getChargeBalance());
+        tableExt.setVisitAppNum(response.getVisitAppNum());
+        tableExt.setAvgVisitAppNum(response.getAvgVisitAppNum());
         tableExt.setMerCooperationMode("-");
         tableExt.setCurrentBalance(response.getCurrentBalance());
+        tableExt.setCreditLimit(response.getCreditLimit());
         tableExt.setRemainingLimit(response.getRemainingLimit());
         tableExt.setSettledMoney(response.getSettledMoney());
         tableExt.setUnsettledMoney(response.getUnsettledMoney());

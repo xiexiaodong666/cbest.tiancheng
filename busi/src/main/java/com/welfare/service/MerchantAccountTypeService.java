@@ -90,5 +90,5 @@ public interface MerchantAccountTypeService {
      * 新增
      * @param merchantAccountType
      */
-    void saveIfExist(MerchantAccountType merchantAccountType);
+    void saveIfNotExist(MerchantAccountType merchantAccountType);
 }

@@ -239,7 +239,7 @@ public class MerchantServiceImpl implements MerchantService {
         boolean flag2=merchantAddressService.saveOrUpdateBatch(merchant.getAddressList(),Merchant.class.getSimpleName(),update.getId());
         boolean flag4=merchantExtendService.saveOrUpdate(merchant.getExtend(), update.getMerCode());
         if (BooleanUtils.toBooleanDefaultIfNull(merchant.getExtend().getPointMall(), false)) {
-            merchantAccountTypeService.saveIfExist(assemblyMerchantAccountType(update.getMerCode(), 888,
+            merchantAccountTypeService.saveIfNotExist(assemblyMerchantAccountType(update.getMerCode(), 888,
                     WelfareConstant.MerAccountTypeCode.MALL_POINT.code(), WelfareConstant.MerAccountTypeCode.MALL_POINT.desc()));
         }
         //同步商城中台

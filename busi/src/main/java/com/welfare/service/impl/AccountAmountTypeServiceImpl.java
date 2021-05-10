@@ -143,7 +143,6 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 List<OrderTransRelation> relations = new ArrayList<>();
                 List<AccountAmountType> newAccountAmountTypes = new ArrayList<>();
                 List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(deposits.get(0).getMerchantCode());
-                Map<String, MerchantAccountType> merchantAccountTypeMap = merchantAccountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
 
                 List<Long> errorMsg = new ArrayList<>();
                 for (Deposit deposit : deposits) {

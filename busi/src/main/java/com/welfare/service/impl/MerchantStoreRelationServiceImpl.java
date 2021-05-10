@@ -377,7 +377,7 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
       saveBath = merchantStoreRelationDao.saveBatch(merchantStoreRelationNewList);
       for (MerchantStoreRelation merchantStoreRelation1:
       merchantStoreRelationNewList ) {
-        if(ConsumeTypesUtils.isRelationedWholesale(merchantStoreRelation.getConsumType())) {
+        if(ConsumeTypesUtils.isRelationedWholesale(merchantStoreRelation1.getConsumType())) {
           initWholesaleConsume(merchantStoreRelation1.getMerCode(), merchantStoreRelation1.getStoreCode());
         }
       }
@@ -605,4 +605,5 @@ public class MerchantStoreRelationServiceImpl implements MerchantStoreRelationSe
 
     merAccountTypeConsumeSceneConfigDao.save(merAccountTypeConsumeSceneConfig);
   }
+
 }

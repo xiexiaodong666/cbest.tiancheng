@@ -201,6 +201,8 @@ public class MerChantConsumeDataController {
                                                 LinkedHashMap::new, Collectors.toList()
         ));
 
+    Long serialNumber = 0l;
+
     for (Map.Entry<String, List<WelfareMerChantConsumeDataBaiscResponse>> entry : merMap
         .entrySet()) {
 
@@ -220,6 +222,8 @@ public class MerChantConsumeDataController {
         WelfareMerChantConsumeDataBaiscResponse selfResponse = selfDataList.get(0);
         MerChantConsumeDataRowsApiResponse selfOf = MerChantConsumeDataRowsApiResponse.selfOf(
             selfResponse);
+        serialNumber++;
+        selfOf.setSerialNumber(serialNumber);
         List<MerChantConsumeDataDetailApiResponse> selfMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
         selfDataList.forEach(s->{
           MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
@@ -241,7 +245,10 @@ public class MerChantConsumeDataController {
 
         MerChantConsumeDataRowsApiResponse thirdOf = MerChantConsumeDataRowsApiResponse.thirdOf(
             thirdResponse, isFillMerchantAttributes);
-
+        if(isFillMerchantAttributes) {
+          serialNumber++;
+          thirdOf.setSerialNumber(serialNumber);
+        }
         List<MerChantConsumeDataDetailApiResponse> thirdMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
 
         thirdDataList.forEach(t->{

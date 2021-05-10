@@ -119,11 +119,11 @@ public class ConsumeTypesUtils {
   }
 
   /**
-   * 改门店是否包含批发业务
+   * 该门店是否包含批发业务
    */
   public static boolean isRelationedWholesale(String consumeType) {
 
-    Map<String, Boolean> map = transfer(consumeType);
+    Map<String, Boolean> map = JSON.parseObject(consumeType, Map.class);
 
     return map.get(ConsumeTypeEnum.WHOLESALE.getCode());
   }

@@ -723,6 +723,14 @@ public class WelfareConstant {
             this.code = code;
             this.desc = desc;
         }
+        public static AccountDepositApply findByCode(String code) {
+            for (AccountDepositApply type : AccountDepositApply.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的AccountDepositApply类型");
+        }
 
         public String code(){
             return this.code;

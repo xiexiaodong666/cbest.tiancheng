@@ -17,7 +17,7 @@ public class ExportMerChantConsumeData {
   @ApiModelProperty("序号")
   @ExcelProperty(value = "序号")
   @ColumnWidth(5)
-  private Long id;
+  private Long serialNumber;
 
   @ApiModelProperty("商户ID")
   @ExcelProperty(value = "商户ID")
@@ -139,7 +139,7 @@ public class ExportMerChantConsumeData {
 
     ExportMerChantConsumeData exportMerChantConsumeData = new ExportMerChantConsumeData();
 
-    exportMerChantConsumeData.setId(response.getId());
+    exportMerChantConsumeData.setSerialNumber(response.getId());
     exportMerChantConsumeData.setMerCode(response.getMerCode());
     exportMerChantConsumeData.setMerName(response.getMerName());
     exportMerChantConsumeData.setUserNum(response.getUserNum());

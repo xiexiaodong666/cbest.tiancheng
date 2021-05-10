@@ -555,7 +555,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "仅支持对属于[客户]的商户充值", null);
         }
-        
+
     }
 
     private WelfareConstant.AccountDepositApply getApplyTypeByMerAccountAmountType(String accountAmountType) {

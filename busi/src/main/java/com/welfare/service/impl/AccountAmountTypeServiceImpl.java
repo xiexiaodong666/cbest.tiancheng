@@ -103,7 +103,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
             }
             if (!Lists.newArrayList(
                     WelfareConstant.MerAccountTypeCode.WHOLESALE.code(),
-                    WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())
+                    WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code(),
+                    WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code(),
+                    WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
                     .contains(deposit.getMerAccountTypeCode())) {
                 account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
             }
@@ -166,7 +168,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     Account account = accountMap.get(deposit.getAccountCode());
                     if (!Lists.newArrayList(
                             WelfareConstant.MerAccountTypeCode.WHOLESALE.code(),
-                            WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())
+                            WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code(),
+                            WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code(),
+                            WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
                             .contains(deposit.getMerAccountTypeCode())) {
                         account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
                     }

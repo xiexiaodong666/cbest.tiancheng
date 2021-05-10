@@ -236,7 +236,7 @@ public class CardController implements IController {
         cardInfoDTO.setWrittenTime(cardInfo.getWrittenTime());
         cardInfoDTO.setBindTime(cardInfo.getBindTime());
         if (account != null && Strings.isNotEmpty(account.getPhone())) {
-            cardInfoDTO.setAccountCode(Long.valueOf(account.getPhone()));
+            cardInfoDTO.setAccountCode(account.getPhone());
         }
 
         return success(cardInfoDTO);

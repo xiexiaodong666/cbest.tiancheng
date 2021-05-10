@@ -47,31 +47,10 @@ public class MerStoreConsumeTypeChangeListener {
         if (evt.getActionType() == ShoppingActionTypeEnum.ADD) {
             // 在每个场景下配置甜橙卡的支付渠道
             channelConfigService.batchSave(PayChannelConfigDTO.of(evt, WelfareConstant.PaymentChannel.WELFARE));
-            initMerWholesaleAmountTypeIfNecessary(evt);
         } else if (evt.getActionType() == ShoppingActionTypeEnum.DELETE) {
             channelConfigService.batchDel(PayChannelConfigDelDTO.of(evt));
         }
         log.info("处理商户门店消费方式变更事件成功 merCode:{} changeStoreConsumes:{} actionType:{}",
                 evt.getMerCode(), JSON.toJSON(evt.getChangeStoreConsumes()),  evt.getActionType().getDesc());
-    }
-
-    private void initMerWholesaleAmountTypeIfNecessary(MerStoreConsumeTypeChangeEvt evt) {
-        List<MerStoreConsumeTypeChangeEvt.StoreConsumeType> storeConsumeTypes = evt.getChangeStoreConsumes();
-        if (CollectionUtils.isNotEmpty(storeConsumeTypes)) {
-            storeConsumeTypes.forEach(storeConsumeType -> {
-                if (CollectionUtils.isNotEmpty(storeConsumeType.getConsumeType())) {
-                    if (storeConsumeType.getConsumeType().contains(ConsumeTypeEnum.WHOLESALE)) {
-                        MerchantAccountType merchantAccountType = new MerchantAccountType();
-                        merchantAccountType.setMerCode(evt.getMerCode());
-                        merchantAccountType.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.desc());
-                        merchantAccountType.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
-                        merchantAccountType.setDeductionOrder(8999);
-                        merchantAccountType.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
-                        merchantAccountTypeService.saveIfNotExist(merchantAccountType);
-                        return;
-                    }
-                }
-            });
-        }
     }
 }

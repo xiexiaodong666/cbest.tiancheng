@@ -63,7 +63,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     @Override
     public List<MerchantAccountType> listExclusion(MerchantAccountTypeReq req) {
         QueryWrapper q=QueryHelper.getWrapper(req);
-        q.ne(MerchantAccountType.MER_ACCOUNT_TYPE_CODE, MerAccountTypeCode.WHOLESALE_PROCUREMENT);
+        q.ne(MerchantAccountType.MER_ACCOUNT_TYPE_CODE, MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY);
         q.orderByDesc(MerchantAccountType.CREATE_TIME);
         return merchantAccountTypeDao.list(q);
     }

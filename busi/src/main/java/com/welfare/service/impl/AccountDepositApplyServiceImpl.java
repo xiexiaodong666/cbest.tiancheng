@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -418,6 +419,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
             infos.forEach(info -> {
+                if(Strings.isNotEmpty(info.getApplyType())) {
+                    info.setApplyType(WelfareConstant.AccountDepositApply.findByCode(info.getApplyType()).desc());
+                }
+
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
                 if (approvalStatus != null) {
                     info.setApprovalStatus(approvalStatus.getValue());
@@ -553,7 +558,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
         // 批发采购福利类型不能充负
         if(MerAccountTypeCode.WHOLESALE_PROCUREMENT.code().equals(request.getMerAccountTypeCode()) && new BigDecimal(0).compareTo(amount)>= 0) {
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "批发采购福利类型不能充负", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "员工批发采购账户不可充为负", null);
         }
     }
 

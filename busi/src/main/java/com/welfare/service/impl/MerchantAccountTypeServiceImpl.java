@@ -264,7 +264,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public void saveIfExist(MerchantAccountType merchantAccountType) {
+    public void saveIfNotExist(MerchantAccountType merchantAccountType) {
         MerchantAccountType old = merchantAccountTypeDao.queryAllByMerCodeAndType(merchantAccountType.getMerCode(), merchantAccountType.getMerAccountTypeCode());
         if (Objects.isNull(old)) {
             merchantAccountTypeDao.save(merchantAccountType);

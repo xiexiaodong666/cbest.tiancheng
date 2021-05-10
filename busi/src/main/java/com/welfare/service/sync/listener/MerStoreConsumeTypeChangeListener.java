@@ -2,17 +2,24 @@ package com.welfare.service.sync.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.PaymentChannelConfigService;
 import com.welfare.service.dto.paymentChannel.PayChannelConfigDTO;
 import com.welfare.service.dto.paymentChannel.PayChannelConfigDelDTO;
 import com.welfare.service.sync.event.MerStoreConsumeTypeChangeEvt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * @author duanhy
@@ -26,6 +33,8 @@ public class MerStoreConsumeTypeChangeListener {
 
     @Autowired
     private PaymentChannelConfigService channelConfigService;
+    @Autowired
+    private MerchantAccountTypeService merchantAccountTypeService;
 
     @EventListener
     @Transactional(rollbackFor = Exception.class)
@@ -38,10 +47,31 @@ public class MerStoreConsumeTypeChangeListener {
         if (evt.getActionType() == ShoppingActionTypeEnum.ADD) {
             // 在每个场景下配置甜橙卡的支付渠道
             channelConfigService.batchSave(PayChannelConfigDTO.of(evt, WelfareConstant.PaymentChannel.WELFARE));
+            initMerWholesaleAmountTypeIfNecessary(evt);
         } else if (evt.getActionType() == ShoppingActionTypeEnum.DELETE) {
             channelConfigService.batchDel(PayChannelConfigDelDTO.of(evt));
         }
         log.info("处理商户门店消费方式变更事件成功 merCode:{} changeStoreConsumes:{} actionType:{}",
                 evt.getMerCode(), JSON.toJSON(evt.getChangeStoreConsumes()),  evt.getActionType().getDesc());
+    }
+
+    private void initMerWholesaleAmountTypeIfNecessary(MerStoreConsumeTypeChangeEvt evt) {
+        List<MerStoreConsumeTypeChangeEvt.StoreConsumeType> storeConsumeTypes = evt.getChangeStoreConsumes();
+        if (CollectionUtils.isNotEmpty(storeConsumeTypes)) {
+            storeConsumeTypes.forEach(storeConsumeType -> {
+                if (CollectionUtils.isNotEmpty(storeConsumeType.getConsumeType())) {
+                    if (storeConsumeType.getConsumeType().contains(ConsumeTypeEnum.WHOLESALE)) {
+                        MerchantAccountType merchantAccountType = new MerchantAccountType();
+                        merchantAccountType.setMerCode(evt.getMerCode());
+                        merchantAccountType.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.desc());
+                        merchantAccountType.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+                        merchantAccountType.setDeductionOrder(8999);
+                        merchantAccountType.setShowStatus(MerchantAccountTypeShowStatusEnum.SHOW.getCode());
+                        merchantAccountTypeService.saveIfNotExist(merchantAccountType);
+                        return;
+                    }
+                }
+            });
+        }
     }
 }

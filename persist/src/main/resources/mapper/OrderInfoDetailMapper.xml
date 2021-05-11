@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,order_id,product_id,uuid,sku_id,sku_no,sku_name,count,refund_count,wholesale_price,wholesale_amount,wholesale_tax_rate,create_user,create_time,uppdate_user,update_time,deleted,version
+        id,order_id,product_id,uuid,sku_id,sku_no,sku_name,count,refund_count,wholesale_price,wholesale_amount,wholesale_tax_rate,create_user,create_time,update_user,update_time,deleted,version
     </sql>
     <select id="queryGroupByTaxRate" resultType="com.welfare.persist.entity.OrderInfoDetail">
         select

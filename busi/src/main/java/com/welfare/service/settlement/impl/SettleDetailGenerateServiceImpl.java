@@ -35,7 +35,7 @@ public class SettleDetailGenerateServiceImpl implements SettleDetailGenerateServ
         List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao.listByIds(accountDeductionDetailIds);
 
         List<WholesaleDetail> wholesaleDetails = accountDeductionDetails.stream().map(accountDeductionDetail -> {
-            if (!WelfareConstant.MerAccountTypeCode.WHOLESALE.code().equals(accountDeductionDetail.getMerAccountType())) {
+            if (!WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code().equals(accountDeductionDetail.getMerAccountType())) {
                 return null;
             }
             List<WholesaleReceivableSettleDetail> settleDetailsInDb = receivableDetailDao.queryByTransNo(accountDeductionDetail.getTransNo());

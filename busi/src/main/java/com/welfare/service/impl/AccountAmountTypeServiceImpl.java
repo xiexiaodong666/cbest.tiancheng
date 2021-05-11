@@ -151,7 +151,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 List<AccountAmountType> newAccountAmountTypes = new ArrayList<>();
                 List<Account> updateAccounts = new ArrayList<>();
 
-                List<Long> errorMsg = new ArrayList<>();
+                List<String> errorMsg = new ArrayList<>();
                 for (Deposit deposit : deposits) {
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(deposit.getAccountCode());
                     if (Objects.isNull(accountAmountType)) {
@@ -162,11 +162,10 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     } else {
                         accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
                     }
-
-                    if (accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) < 0) {
-                        errorMsg.add(accountAmountType.getAccountCode());
-                    }
                     Account account = accountMap.get(deposit.getAccountCode());
+                    if (accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) < 0) {
+                        errorMsg.add(account.getPhone());
+                    }
                     if (!Lists.newArrayList(
                             WelfareConstant.MerAccountTypeCode.WHOLESALE.code(),
                             WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code(),

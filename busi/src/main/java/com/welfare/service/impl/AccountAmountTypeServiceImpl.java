@@ -199,7 +199,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 }
                 Map<Long, Long> changeEventIdMap = records.stream().collect(Collectors.toMap(AccountChangeEventRecord::getAccountCode,
                         AccountChangeEventRecord::getId));
-                accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(updateAccounts, amountMap, changeEventIdMap));
+                if (!CollectionUtils.isEmpty(updateAccounts)) {
+                    accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(updateAccounts, amountMap, changeEventIdMap));
+                }
 
                 accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());
                 accountBillDetailDao.saveBatch(details, details.size());

@@ -9,10 +9,12 @@ import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.enums.MerIdentityEnum;
+import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDepositApplyDao;
 import com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
@@ -104,6 +106,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
     private final AccountDeductionDetailMapper accountDeductionDetailMapper;
 
+    @Autowired
+    private AccountDao accountDao;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUser) {
@@ -127,6 +132,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             if (account == null) {
                 throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("商户下没有[%s]员工！", request.getInfo().getPhone()), null);
             }
+            List<AccountAmountType> accountAmountType = accountAmountTypeService.batchQueryByAccount(Lists.newArrayList(account.getAccountCode()), request.getMerAccountTypeCode());
+            validationDepositAmountMoreThanAccountBalance(Lists.newArrayList(request.getInfo()), accountAmountType, Lists.newArrayList(account));
             initAccountDepositApply(apply, request, merchant, merchantUser);
             // 设置充值人数
             apply.setRechargeNum(1);
@@ -173,6 +180,12 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
             BigDecimal sumAmount = deposits.stream().map(TempAccountDepositApplyDTO::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             validationParmas(request,merchant,merchantUser,sumAmount);
+            List<Long> accountCodes = deposits.stream().map(TempAccountDepositApplyDTO::getAccountCode).collect(Collectors.toList());
+            List<Account> accounts = accountDao.listByAccountCodes(accountCodes);
+            BizAssert.notEmpty(accounts, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工不存在");
+            List<AccountAmountType> accountAmountType = accountAmountTypeService.batchQueryByAccount(accountCodes, request.getMerAccountTypeCode());
+            validationDepositAmountMoreThanAccountBalance(AccountDepositRequest.of(deposits), accountAmountType, accounts);
+
             apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
             // 设置充值总金额
             apply.setRechargeAmount(sumAmount);
@@ -563,16 +576,31 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         }
     }
 
-    private void validationDepositAmountMoreThanAccountBalance(List<AccountDepositRequest> requests, List<Account> accounts) {
+    private void validationDepositAmountMoreThanAccountBalance(List<AccountDepositRequest> requests,List<AccountAmountType> accountAmountTypes, List<Account> accounts) {
         Map<String, List<AccountDepositRequest>> map = new HashMap<>();
         if (CollectionUtils.isNotEmpty(requests)) {
             map = requests.stream().collect(Collectors.groupingBy(AccountDepositRequest::getPhone));
         }
+        Map<Long, AccountAmountType> accountAmountTypeMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(accountAmountTypes)) {
+            accountAmountTypeMap = accountAmountTypes.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, a -> a,(k1, k2)->k1));
+        }
         if (CollectionUtils.isNotEmpty(accounts)) {
+            Map<String, List<AccountDepositRequest>> finalMap = map;
+            Map<Long, AccountAmountType> finalAccountAmountTypeMap = accountAmountTypeMap;
             accounts.forEach(account -> {
-
+                List<AccountDepositRequest> depositRequests = finalMap.get(account.getPhone());
+                if (CollectionUtils.isNotEmpty(depositRequests)) {
+                    BigDecimal sumAmount = depositRequests.stream().map(AccountDepositRequest::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    if (sumAmount.compareTo(BigDecimal.ZERO) < 0) {
+                        AccountAmountType accountAmountType = finalAccountAmountTypeMap.get(account.getAccountCode());
+                        BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGUMENTS, "账户余额小于回充金额");
+                        if (sumAmount.abs().compareTo(accountAmountType.getAccountBalance()) > 0) {
+                            throw new BizException("账户余额小于回充金额");
+                        }
+                    }
+                }
             });
         }
-
     }
 }

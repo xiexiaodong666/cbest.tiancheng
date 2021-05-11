@@ -6,7 +6,7 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.*;
 import com.welfare.service.async.AsyncService;
 import com.welfare.service.dto.payment.PaymentRequest;
-import com.welfare.service.operator.RemainingWholesaleCreditLimitOperator;
+import com.welfare.service.operator.merchant.RemainingWholesaleCreditLimitOperator;
 import com.welfare.service.operator.merchant.AbstractMerAccountTypeOperator;
 import com.welfare.service.operator.merchant.CurrentBalanceOperator;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;

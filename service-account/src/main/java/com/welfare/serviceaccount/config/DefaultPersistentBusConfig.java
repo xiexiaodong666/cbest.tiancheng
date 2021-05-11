@@ -43,9 +43,9 @@ public class DefaultPersistentBusConfig {
     properties.setProperty("org.killbill.persistent.bus.main.maxReDispatchCount", "500");
     //触发收割线程的周期
     properties.setProperty("org.killbill.persistent.bus.main.reapSchedule", "5m");
-    properties.setProperty("org.killbill.persistent.bus.main.tableName", "bus_events");
+    properties.setProperty("org.killbill.persistent.bus.main.tableName", "bus_events_account");
     properties
-        .setProperty("org.killbill.persistent.bus.main.historyTableName", "bus_events_history");
+        .setProperty("org.killbill.persistent.bus.main.historyTableName", "bus_events_history_account");
     return new DefaultPersistentBus(dataSource, properties);
   }
 

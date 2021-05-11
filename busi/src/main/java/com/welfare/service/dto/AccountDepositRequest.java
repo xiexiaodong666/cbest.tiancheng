@@ -1,14 +1,18 @@
 package com.welfare.service.dto;
 
+import com.welfare.persist.dto.TempAccountDepositApplyDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 账号余额申请请求类
@@ -35,4 +39,17 @@ public class AccountDepositRequest {
   @NotNull(message = "申请充值金额不能为空")
   @DecimalMax(message = "金额超过限制[99999999.99]", value = "99999999.99")
   private BigDecimal rechargeAmount;
+
+  public static List<AccountDepositRequest> of(List<TempAccountDepositApplyDTO> deposits) {
+    List<AccountDepositRequest> list = new ArrayList<>();
+    if (CollectionUtils.isNotEmpty(deposits)) {
+      deposits.forEach(tempAccountDepositApplyDTO -> {
+        AccountDepositRequest depositRequest = new AccountDepositRequest();
+        depositRequest.setPhone(tempAccountDepositApplyDTO.getPhone());
+        depositRequest.setRechargeAmount(tempAccountDepositApplyDTO.getRechargeAmount());
+        list.add(depositRequest);
+      });
+    }
+    return list;
+  }
 }

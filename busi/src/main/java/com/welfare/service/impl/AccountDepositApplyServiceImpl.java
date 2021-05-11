@@ -42,10 +42,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 账户充值申请服务接口实现
@@ -563,5 +561,18 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         } else {
             return WelfareConstant.AccountDepositApply.WELFARE_APPLY;
         }
+    }
+
+    private void validationDepositAmountMoreThanAccountBalance(List<AccountDepositRequest> requests, List<Account> accounts) {
+        Map<String, List<AccountDepositRequest>> map = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(requests)) {
+            map = requests.stream().collect(Collectors.groupingBy(AccountDepositRequest::getPhone));
+        }
+        if (CollectionUtils.isNotEmpty(accounts)) {
+            accounts.forEach(account -> {
+
+            });
+        }
+
     }
 }

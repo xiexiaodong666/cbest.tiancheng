@@ -128,7 +128,7 @@ public class OrderInfoDetail extends Model<OrderInfoDetail> implements Serializa
      */
     @ApiModelProperty("版本")  @Version 
     @TableField(fill = FieldFill.INSERT)
-	private Long version;
+	private Integer version;
 
 //以下为列明常量
 

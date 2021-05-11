@@ -149,6 +149,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 List<AccountBillDetail> details = new ArrayList<>();
                 List<OrderTransRelation> relations = new ArrayList<>();
                 List<AccountAmountType> newAccountAmountTypes = new ArrayList<>();
+                List<Account> updateAccounts = new ArrayList<>();
 
                 List<Long> errorMsg = new ArrayList<>();
                 for (Deposit deposit : deposits) {
@@ -172,6 +173,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                             WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code(),
                             WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
                             .contains(deposit.getMerAccountTypeCode())) {
+                        updateAccounts.add(account);
                         account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
                     }
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
@@ -195,10 +197,9 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     List<AccountAmountType> amountTypes = Lists.newArrayList(accountAmountTypeMap.values());
                     accountAmountTypeMapper.batchSaveOrUpdate(AccountDepositIncreDTO.of(amountTypes, amountMap));
                 }
-                List<Account> accounts = Lists.newArrayList(accountMap.values());
                 Map<Long, Long> changeEventIdMap = records.stream().collect(Collectors.toMap(AccountChangeEventRecord::getAccountCode,
                         AccountChangeEventRecord::getId));
-                accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(accounts, amountMap, changeEventIdMap));
+                accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(updateAccounts, amountMap, changeEventIdMap));
 
                 accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());
                 accountBillDetailDao.saveBatch(details, details.size());

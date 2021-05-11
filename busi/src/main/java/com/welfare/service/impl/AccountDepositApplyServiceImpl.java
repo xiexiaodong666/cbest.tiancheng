@@ -332,7 +332,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         }
         //已经审批过了
         if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-            return apply.getId();
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "操作重复, 请刷新");
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
@@ -340,10 +340,6 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             apply = accountDepositApplyDao.getById(request.getId());
             if (apply == null) {
                 throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("账号存款申请不存在[requestId:%s]", request.getId()), null);
-            }
-            //已经审批过了
-            if (apply.getApprovalStatus().equals(ApprovalStatus.AUDIT_FAILED.getCode())) {
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "充值审核不通过");
             }
             if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
                 return apply.getId();

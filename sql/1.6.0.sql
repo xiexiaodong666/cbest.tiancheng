@@ -192,27 +192,27 @@ CREATE TABLE `wholesale_receivable_settle_detail` (
 ) ENGINE=InnoDB AUTO_INCREMENT=22223 DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-create table order_info_detail(
-                                  id bigint(20) primary key comment 'pk',
-                                  order_id varchar(20) comment '订单id',
-                                  product_id varchar(50) comment '商品id',
-                                  uuid varchar(36) comment '行uuid',
-                                  sku_id varchar(50) comment '商品skuid',
-                                  sku_no varchar(50) comment '商品skuNo',
-                                  sku_name varchar(50) comment '商品sku名称',
-                                  `count` int(8) comment '商品数量',
-                                  refund_count int(8) comment '售后数量',
-                                  wholesale_price decimal(10,2) comment '商品结算单价',
-                                  wholesale_amount decimal(15,2) comment '商品结算总金额',
-                                  wholesale_tax_rate decimal(8,4) comment '税率',
-                                  `create_user` varchar(20)  COMMENT '创建人',
-                                  `create_time` datetime  COMMENT '创建时间',
-                                  `update_user` varchar(20)  COMMENT '更新人',
-                                  `update_time` datetime  COMMENT '更新时间',
-                                  `deleted` tinyint(1) DEFAULT 0 COMMENT '删除标志',
-                                  `version` bigint(20) DEFAULT 0 COMMENT '版本'
-);
+CREATE TABLE `order_info_detail` (
+                                     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'pk',
+                                     `order_id` varchar(20) DEFAULT NULL COMMENT '订单id',
+                                     `product_id` varchar(50) DEFAULT NULL COMMENT '商品id',
+                                     `uuid` varchar(36) DEFAULT NULL COMMENT '行uuid',
+                                     `sku_id` varchar(50) DEFAULT NULL COMMENT '商品skuid',
+                                     `sku_no` varchar(50) DEFAULT NULL COMMENT '商品skuNo',
+                                     `sku_name` varchar(50) DEFAULT NULL COMMENT '商品sku名称',
+                                     `count` int(8) DEFAULT NULL COMMENT '商品数量',
+                                     `refund_count` int(8) DEFAULT NULL COMMENT '售后数量',
+                                     `wholesale_price` decimal(10,2) DEFAULT NULL COMMENT '商品结算单价',
+                                     `wholesale_amount` decimal(15,2) DEFAULT NULL COMMENT '商品结算总金额',
+                                     `wholesale_tax_rate` decimal(8,4) DEFAULT NULL COMMENT '税率',
+                                     `create_user` varchar(20) DEFAULT NULL COMMENT '创建人',
+                                     `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+                                     `update_user` varchar(20) DEFAULT NULL COMMENT '更新人',
+                                     `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+                                     `deleted` tinyint(1) DEFAULT '0' COMMENT '删除标志',
+                                     `version` bigint(20) DEFAULT '0' COMMENT '版本',
+                                     PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 alter table account_bill_detail add column order_no varchar(50) comment '订单号' after trans_no;
 alter table account_deduction_detail add column order_no varchar(50) comment '订单号' after trans_no;

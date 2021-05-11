@@ -61,8 +61,8 @@ public class RemainingWholesaleCreditLimitOperator  extends AbstractMerAccountTy
             return doWhenMoreThan(merchantCredit,add,transNo,transType);
         } else {
             merchantCredit.setWholesaleCredit(remainingWholesaleCreditLimit.add(amount));
-            MerchantAccountOperation remainingLimitOperator = MerchantAccountOperation.of(remainingWholesaleCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo, transType);
-            return Lists.newArrayList(remainingLimitOperator);
+            MerchantAccountOperation operation = MerchantAccountOperation.of(remainingWholesaleCreditType,amount,IncOrDecType.INCREASE, merchantCredit, transNo, transType);
+            return Lists.newArrayList(operation);
         }
     }
 
@@ -76,8 +76,8 @@ public class RemainingWholesaleCreditLimitOperator  extends AbstractMerAccountTy
         BigDecimal wholesaleCreditLimit = merchantCredit.getWholesaleCreditLimit();
         BigDecimal remainingWholesaleCreditLimit = merchantCredit.getWholesaleCredit();
         // 加剩余批发信用额
-        merchantCredit.setRemainingLimit(wholesaleCreditLimit);
-        MerchantAccountOperation remainingLimitOperation = MerchantAccountOperation.of(
+        merchantCredit.setWholesaleCredit(wholesaleCreditLimit);
+        MerchantAccountOperation operation = MerchantAccountOperation.of(
                 remainingWholesaleCreditType,
                 wholesaleCreditLimit.subtract(remainingWholesaleCreditLimit),
                 IncOrDecType.INCREASE,
@@ -85,8 +85,8 @@ public class RemainingWholesaleCreditLimitOperator  extends AbstractMerAccountTy
                 transNo,
                 transType
         );
-        if(remainingLimitOperation.getAmount().compareTo(BigDecimal.ZERO) != 0){
-            operations.add(remainingLimitOperation);
+        if(operation.getAmount().compareTo(BigDecimal.ZERO) != 0){
+            operations.add(operation);
         }
         // 加余额
         List<MerchantAccountOperation> moreOperations = nextOperator.increase(merchantCredit,amountLeftToBeIncrease,transNo, transType);

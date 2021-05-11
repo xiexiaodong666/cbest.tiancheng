@@ -1095,6 +1095,8 @@ public class AccountServiceImpl implements AccountService {
                 accountDetailDTO.setAccountWholesaleCreditLimit(accountAmountType.getAccountBalance());
             }
 
+        } else {
+            accountDetailDTO.setAccountWholesaleCreditLimit(new BigDecimal(0));
         }
 
         return accountDetailDTO;

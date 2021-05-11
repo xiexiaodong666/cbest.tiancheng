@@ -1089,7 +1089,14 @@ public class AccountServiceImpl implements AccountService {
 
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(Long.valueOf(accountDetailDTO.getAccountCode()), WHOLESALE_PROCUREMENT.code());
         if(accountAmountType != null) {
-            accountDetailDTO.setAccountWholesaleCreditLimit(accountAmountType.getAccountBalance());
+            if(accountAmountType.getAccountBalance() == null) {
+                accountDetailDTO.setAccountWholesaleCreditLimit(new BigDecimal(0));
+            } else {
+                accountDetailDTO.setAccountWholesaleCreditLimit(accountAmountType.getAccountBalance());
+            }
+
+        } else {
+            accountDetailDTO.setAccountWholesaleCreditLimit(new BigDecimal(0));
         }
 
         return accountDetailDTO;

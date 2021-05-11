@@ -139,7 +139,7 @@ public class ExportMerChantConsumeData {
 
     ExportMerChantConsumeData exportMerChantConsumeData = new ExportMerChantConsumeData();
 
-    exportMerChantConsumeData.setSerialNumber(response.getId());
+    exportMerChantConsumeData.setSerialNumber(response.getSerialNumber());
     exportMerChantConsumeData.setMerCode(response.getMerCode());
     exportMerChantConsumeData.setMerName(response.getMerName());
     exportMerChantConsumeData.setUserNum(response.getUserNum());

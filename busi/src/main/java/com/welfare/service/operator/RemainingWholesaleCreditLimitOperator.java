@@ -41,7 +41,7 @@ public class RemainingWholesaleCreditLimitOperator  extends AbstractMerAccountTy
         if (subtract.compareTo(BigDecimal.ZERO) < 0) {
             return doWhenNotEnough(merchantCredit,subtract.negate(),currentRemainingWholesaleCredit , transNo, transType);
         } else {
-            merchantCredit.setRemainingLimit(subtract);
+            merchantCredit.setWholesaleCredit(subtract);
             MerchantAccountOperation operation = MerchantAccountOperation.of(
                     remainingWholesaleCreditType,
                     amount,

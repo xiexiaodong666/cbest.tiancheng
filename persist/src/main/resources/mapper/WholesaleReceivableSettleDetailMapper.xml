@@ -12,8 +12,8 @@
     <sql id = "getWelfareSettleSum">
         sum(
         case
-        when t1.settle_flag = 'unsettled' and t1.trans_type='consume' then t1.order_wholesale_amount
-        when t1.settle_flag = 'unsettled' and t1.trans_type='refund' then t1.order_wholesale_amount*-1
+        when t1.settle_flag = 'unsettled' and t1.trans_type='consume' then t1.trans_amount
+        when t1.settle_flag = 'unsettled' and t1.trans_type='refund' then t1.trans_amount*-1
         else 0
         end
         ) as unSettleAmount,
@@ -87,8 +87,8 @@
         d.store_code as storeCode,
         d.store_name as storeName,
         case
-        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.order_wholesale_amount
-        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.order_wholesale_amount*-1
+        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.trans_amount
+        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.trans_amount*-1
         else 0
         end as  settleAmount,
         case
@@ -112,7 +112,7 @@
     <select id="queryReceivableDetailsSummary"
       resultType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO"
       parameterType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam">
-        select sum(t.saleAmount) as saleAmount, sum(t.settleAmount) as settleAmount, t.merCode
+        select sum(t.saleAmount) as transAmount, sum(t.settleAmount) as settleAmount, t.merCode
         ,t.merName from
         (SELECT
         d.id as id,
@@ -130,8 +130,8 @@
         d.mer_name as merName,
         d.mer_code as merCode,
         case
-        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.order_wholesale_amount
-        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.order_wholesale_amount*-1
+        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.trans_amount
+        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.trans_amount*-1
         else 0
         end as settleAmount,
         case

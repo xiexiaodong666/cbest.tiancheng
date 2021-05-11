@@ -342,7 +342,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                 throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("账号存款申请不存在[requestId:%s]", request.getId()), null);
             }
             if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                return apply.getId();
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "操作重复, 请刷新");
             }
             apply.setApprovalStatus(ApprovalStatus.getByCode(request.getApprovalStatus()).getCode());
             apply.setApprovalRemark(request.getApplyRemark());

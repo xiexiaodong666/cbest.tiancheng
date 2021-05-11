@@ -1,4 +1,4 @@
-package com.welfare.service.operator;
+package com.welfare.service.operator.merchant;
 
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.WelfareConstant;

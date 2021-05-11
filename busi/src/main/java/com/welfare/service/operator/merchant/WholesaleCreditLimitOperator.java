@@ -5,7 +5,6 @@ import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.service.enums.IncOrDecType;
-import com.welfare.service.operator.RemainingWholesaleCreditLimitOperator;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

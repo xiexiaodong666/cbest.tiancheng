@@ -58,6 +58,7 @@ public class Deposit {
         deposit.setTransNo(accountDepositApplyDetail.getTransNo());
         deposit.setChannel(accountDepositApply.getChannel());
         deposit.setApplyCode(accountDepositApply.getApplyCode());
+        deposit.setPaymentChannel(WelfareConstant.PaymentChannel.WELFARE.code());
         return deposit;
     }
 

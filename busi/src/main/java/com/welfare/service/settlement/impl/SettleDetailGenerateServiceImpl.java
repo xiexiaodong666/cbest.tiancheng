@@ -33,6 +33,8 @@ public class SettleDetailGenerateServiceImpl implements SettleDetailGenerateServ
     private final WholesalePayableSettleDetailDao payableDetailDao;
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final OrderInfoDao orderInfoDao;
+    private final SupplierStoreDao supplierStoreDao;
+    private final AccountDao accountDao;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void generateWholesaleDetails(List<Long> accountDeductionDetailIds) {
@@ -49,6 +51,12 @@ public class SettleDetailGenerateServiceImpl implements SettleDetailGenerateServ
                         return null;
                     } else if (CollectionUtil.isNotEmpty(settleDetailsInDb) && accountDeductionDetails.size() != settleDetailsInDb.size()) {
                         throw new BizException(ExceptionCode.UNKNOWN_EXCEPTION, "数据库中的结算明细和付款明细数量不一致");
+                    }
+                    Account account = accountDao.queryByAccountCode(accountDeductionDetail.getAccountCode());
+                    SupplierStore store = supplierStoreDao.getOneByCode(accountDeductionDetail.getStoreCode());
+                    if(Objects.equals(account.getMerCode(),store.getMerCode())){
+                        //自营不需要生成结算明细
+                        return null;
                     }
                     List<OrderInfo> orderInfos = orderInfoDao.listByTransNo(accountDeductionDetail.getTransNo());
                     BizAssert.notEmpty(orderInfos, ExceptionCode.DATA_NOT_EXIST, "订单还未同步，抛出异常稍后处理");

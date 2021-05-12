@@ -90,7 +90,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
 
             query.setLimit(WelfareSettleConstant.LIMIT);
             List<WholesalePayableSettleDetail> details;
-            Map<BigDecimal, BigDecimal> taxRateAndSettleAmountMap = new HashMap<>();
+            Map<String, String> taxRateAndSettleAmountMap = new HashMap<>();
             List<OrderInfoDetail> orderInfoDetails = new ArrayList<>();
 
             do {
@@ -113,7 +113,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
                 Map<BigDecimal, List<OrderInfoDetail>> map = orderInfoDetails.stream().collect(Collectors.groupingBy(OrderInfoDetail::getWholesaleTaxRate));
                 map.forEach((taxRate, list) -> {
                     BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getWholesaleAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                    taxRateAndSettleAmountMap.put(taxRate, settleAmount);
+                    taxRateAndSettleAmountMap.put(String.valueOf(taxRate.doubleValue()), settleAmount != null ? String.valueOf(settleAmount.doubleValue()) : 0+"");
                 });
                 payableSettle.setSettleTaxSalesStatistics(JSON.toJSONString(taxRateAndSettleAmountMap));
             }

@@ -8,10 +8,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.math.RoundingMode;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -163,7 +161,11 @@ public class OrderMqInfo implements Serializable {
             detail.setSkuNo(orderDetailMqInfo.getSkuNo());
             detail.setSkuName(orderDetailMqInfo.getSkuName());
             detail.setWholesaleAmount(orderDetailMqInfo.getWholesaleAmount());
-            detail.setWholesaleTaxRate(orderDetailMqInfo.getWholesaleTaxRate());
+            BigDecimal taxRate = orderDetailMqInfo.getWholesaleTaxRate();
+            if(Objects.nonNull(taxRate)){
+                taxRate = taxRate.divide(new BigDecimal("100"), 4,RoundingMode.HALF_UP);
+                detail.setWholesaleTaxRate(taxRate);
+            }
             detail.setWholesalePrice(orderDetailMqInfo.getWholesalePrice());
             return detail;
         }).collect(Collectors.toList());

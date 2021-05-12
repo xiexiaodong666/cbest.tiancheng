@@ -44,7 +44,7 @@ public class RefundServiceImpl implements RefundService {
     private final AccountService accountService;
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @DistributedLock(lockPrefix = "e-welfare-refund::", lockKey = "#refundRequest.originalTransNo")
+    @DistributedLock(lockPrefix = "e-welfare-payment::", lockKey = "#refundRequest.originalTransNo")
     public void handleRefundRequest(RefundRequest refundRequest) {
         String originalTransNo = refundRequest.getOriginalTransNo();
         List<AccountDeductionDetail> paymentDeductionDetailInDb = accountDeductionDetailDao

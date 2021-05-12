@@ -143,7 +143,7 @@ public class WholesaleDetail {
     @ApiModelProperty("自费扣款金额")
     private BigDecimal selfDeductionAmount;
     @ApiModelProperty("商户批发信用扣款金额")
-    private BigDecimal merWholesaleCreditDeductionAmount;
+    private BigDecimal orderWholesaleAmount;
     /**
      * 数据支付类型 welfare-员工卡支付 third-其它三方支付
      */

@@ -147,8 +147,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         }
 
 
-        Map<BigDecimal, BigDecimal> taxRateAndSettleAmountMap = new HashMap<>();
-
+        List<SettleTaxSalesStatistics> settleTaxSalesStatisticsList = new ArrayList<>();
         WholesaleReceivableSettle wholesaleReceivableSettle = new WholesaleReceivableSettle();
 
         if(CollectionUtils.isNotEmpty(settleDetailDTOList)) {
@@ -182,9 +181,12 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                                                                                                         .groupingBy(OrderInfoDetail::getWholesaleTaxRate));
                 map.forEach((taxRate, list) -> {
                     BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getWholesaleAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                    taxRateAndSettleAmountMap.put(taxRate, settleAmount);
+                    SettleTaxSalesStatistics settleTaxSalesStatistics = new SettleTaxSalesStatistics();
+                    settleTaxSalesStatistics.setAmount(settleAmount);
+                    settleTaxSalesStatistics.setTax(taxRate);
+                    settleTaxSalesStatisticsList.add(settleTaxSalesStatistics);
                 });
-                wholesaleReceivableSettle.setSettleTaxSalesStatistics(JSON.toJSONString(taxRateAndSettleAmountMap));
+                wholesaleReceivableSettle.setSettleTaxSalesStatistics(JSON.toJSONString(settleTaxSalesStatisticsList));
             }
 
             wholesaleReceivableSettleMapper.insert(wholesaleReceivableSettle);

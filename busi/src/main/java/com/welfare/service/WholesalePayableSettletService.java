@@ -134,4 +134,19 @@ public interface WholesalePayableSettletService {
      * @return
      */
     List<MerCodeAndNameDTO> customerMersBySettleId(Long id);
+
+    /**
+     * 查询供应商下所有的消费门店
+     * @param supplierMerCode
+     * @param merCode
+     * @return
+     */
+    List<StoreCodeAndNameDTO> storesByMerCode(String supplierMerCode, String merCode);
+
+    /**
+     * 查询供应商下所有的消费客户
+     * @param supplierMerCode
+     * @return
+     */
+    List<MerCodeAndNameDTO> customerMersByMerCode(String supplierMerCode);
 }

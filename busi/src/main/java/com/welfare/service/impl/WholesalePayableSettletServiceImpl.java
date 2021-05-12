@@ -271,6 +271,35 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
         return null;
     }
 
+    @Override
+    public List<StoreCodeAndNameDTO> storesByMerCode(String supplierMerCode, String merCode) {
+        PlatformWholesalePayableDetailQuery detailQuery = new PlatformWholesalePayableDetailQuery();
+        detailQuery.setMerCode(supplierMerCode);
+        detailQuery.setCustomerMerCode(merCode);
+        List<PlatformWholesaleSettleDetailDTO> details = wholesalePayableSettleDetailMapper.queryPagePayableDetails(detailQuery);
+        return details.stream().map(detail -> {
+            StoreCodeAndNameDTO storeCodeAndNameDTO = new StoreCodeAndNameDTO();
+            storeCodeAndNameDTO.setStoreCode(detail.getStoreCode());
+            storeCodeAndNameDTO.setStoreName(detail.getStoreName());
+            return storeCodeAndNameDTO;
+        }).collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
+                new TreeSet<>(Comparator.comparing(StoreCodeAndNameDTO::getStoreCode))), ArrayList::new));
+    }
+
+    @Override
+    public List<MerCodeAndNameDTO> customerMersByMerCode(String supplierMerCode) {
+        PlatformWholesalePayableDetailQuery detailQuery = new PlatformWholesalePayableDetailQuery();
+        detailQuery.setMerCode(supplierMerCode);
+        List<PlatformWholesaleSettleDetailDTO> details = wholesalePayableSettleDetailMapper.queryPagePayableDetails(detailQuery);
+        return details.stream().map(detail -> {
+            MerCodeAndNameDTO merCodeAndNameDTO = new MerCodeAndNameDTO();
+            merCodeAndNameDTO.setMerCode(detail.getCustomerMerCode());
+            merCodeAndNameDTO.setMerName(detail.getCustomerMerName());
+            return merCodeAndNameDTO;
+        }).collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
+                new TreeSet<>(Comparator.comparing(MerCodeAndNameDTO::getMerCode))), ArrayList::new));
+    }
+
     private WholesalePaySettleDetailQuery getWholesalePaySettleDetailQuery(Long id, WholesalePaySettleDetailReq query) {
         WholesalePayableSettle payableSettle = wholesalePayableSettleMapper.selectById(id);
         BizAssert.notNull(payableSettle, ExceptionCode.DATA_NOT_EXIST, "结算单不存在");

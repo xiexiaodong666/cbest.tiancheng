@@ -88,6 +88,20 @@ public class WholesalePayableSettleController implements IController {
         return success(payableSettletService.generatePayableSettle(detailQuery));
     }
 
+    @GetMapping("/payable/{merCode}/storesByMer")
+    @ApiOperation("(平台)查询供应商下所有的消费门店")
+    public R<List<StoreCodeAndNameDTO>> storesByMerCode(@PathVariable("merCode") String merCode,
+                                                        @ApiParam(value = "客户编码")
+                                                        @RequestParam(value = "customerMerCode", required = false) String customerMerCode) {
+        return success(payableSettletService.storesByMerCode(merCode, customerMerCode));
+    }
+
+    @GetMapping("/payable/{merCode}/customerMersByMer")
+    @ApiOperation("(平台)查询供应商下所有的消费客户")
+    public R<List<MerCodeAndNameDTO>> customerMersByMerCode(@PathVariable("merCode") String merCode) {
+        return success(payableSettletService.customerMersByMerCode(merCode));
+    }
+
     @PutMapping("/payable/bill/{id}/send")
     @ApiOperation("(平台)平台发送账单")
     @ApiUser

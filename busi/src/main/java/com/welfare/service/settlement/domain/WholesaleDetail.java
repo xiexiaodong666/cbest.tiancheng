@@ -10,11 +10,13 @@ import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import io.swagger.annotations.ApiModelProperty;
+import jodd.util.StringUtil;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Objects;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Description:
@@ -140,6 +142,8 @@ public class WholesaleDetail {
      */
     @ApiModelProperty("自费扣款金额")
     private BigDecimal selfDeductionAmount;
+    @ApiModelProperty("商户批发信用扣款金额")
+    private BigDecimal merWholesaleCreditDeductionAmount;
     /**
      * 数据支付类型 welfare-员工卡支付 third-其它三方支付
      */
@@ -206,7 +210,7 @@ public class WholesaleDetail {
     @ApiModelProperty("商户余额")
     private BigDecimal merBalance;
 
-    public static WholesaleDetail fromAccountDeductionDetail(AccountDeductionDetail deductionDetail){
+    public static List<WholesaleDetail> fromAccountDeductionDetail(AccountDeductionDetail deductionDetail, List<OrderInfo> orderInfos){
         AccountDao accountDao = SpringBeanUtils.getBean(AccountDao.class);
         MerchantDao merchantDao = SpringBeanUtils.getBean(MerchantDao.class);
         SupplierStoreDao supplierStoreDao = SpringBeanUtils.getBean(SupplierStoreDao.class);
@@ -217,33 +221,35 @@ public class WholesaleDetail {
         MerchantAccountType merchantAccountType = merchantAccountTypeDao
                 .queryAllByMerCodeAndType(account.getMerCode(), deductionDetail.getMerAccountType());
 
-        WholesaleDetail wholesaleDetail = new WholesaleDetail();
-        wholesaleDetail.setAccountCode(account.getAccountCode());
-        wholesaleDetail.setAccountName(account.getAccountName());
-        wholesaleDetail.setCardId(deductionDetail.getCardId());
-        wholesaleDetail.setDataType("e-welfare");
-        wholesaleDetail.setMerAccountType(deductionDetail.getMerAccountType());
-        wholesaleDetail.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
-        wholesaleDetail.setMerBalance(BigDecimal.ZERO);
-        wholesaleDetail.setMerCode(merchant.getMerCode());
-        wholesaleDetail.setMerName(merchant.getMerName());
-        wholesaleDetail.setStoreCode(store.getStoreCode());
-        wholesaleDetail.setStoreName(store.getStoreName());
-        wholesaleDetail.setTransNo(deductionDetail.getTransNo());
-        wholesaleDetail.setTransTime(deductionDetail.getTransTime());
-        wholesaleDetail.setPos(deductionDetail.getPos());
-        wholesaleDetail.setPayCode(deductionDetail.getPayCode());
-        wholesaleDetail.setPayName(WelfareConstant.PayCode.parseByCode(deductionDetail.getPayCode()).name());
-        wholesaleDetail.setTransType(deductionDetail.getTransType());
-        wholesaleDetail.setTransTypeName(WelfareConstant.TransType.parseByCode(deductionDetail.getTransType()).name());
-        wholesaleDetail.setTransAmount(deductionDetail.getTransAmount());
-        wholesaleDetail.setAccountBalance(deductionDetail.getAccountAmountTypeBalance());
-        wholesaleDetail.setMerDeductionAmount(deductionDetail.getMerDeductionAmount());
-        wholesaleDetail.setMerCreditDeductionAmount(deductionDetail.getMerDeductionCreditAmount());
-        wholesaleDetail.setSelfDeductionAmount(deductionDetail.getSelfDeductionAmount());
-        wholesaleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
-        wholesaleDetail.setRebateAmount(BigDecimal.ZERO);
-        return wholesaleDetail;
+        return orderInfos.stream().map(orderInfo -> {
+            WholesaleDetail wholesaleDetail = new WholesaleDetail();
+            wholesaleDetail.setOrderId(orderInfo.getOrderId());
+            wholesaleDetail.setAccountCode(account.getAccountCode());
+            wholesaleDetail.setAccountName(account.getAccountName());
+            wholesaleDetail.setCardId(deductionDetail.getCardId());
+            wholesaleDetail.setDataType("e-welfare");
+            wholesaleDetail.setMerAccountType(deductionDetail.getMerAccountType());
+            wholesaleDetail.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
+            wholesaleDetail.setMerBalance(BigDecimal.ZERO);
+            wholesaleDetail.setMerCode(merchant.getMerCode());
+            wholesaleDetail.setMerName(merchant.getMerName());
+            wholesaleDetail.setStoreCode(store.getStoreCode());
+            wholesaleDetail.setStoreName(store.getStoreName());
+            wholesaleDetail.setTransNo(deductionDetail.getTransNo());
+            wholesaleDetail.setTransTime(deductionDetail.getTransTime());
+            wholesaleDetail.setPos(deductionDetail.getPos());
+            wholesaleDetail.setPayCode(deductionDetail.getPayCode());
+            wholesaleDetail.setPayName(WelfareConstant.PayCode.parseByCode(deductionDetail.getPayCode()).name());
+            wholesaleDetail.setTransType(deductionDetail.getTransType());
+            wholesaleDetail.setTransTypeName(WelfareConstant.TransType.parseByCode(deductionDetail.getTransType()).name());
+            wholesaleDetail.setTransAmount(orderInfo.getOrderAmount());
+            wholesaleDetail.setAccountBalance(deductionDetail.getAccountAmountTypeBalance());
+            wholesaleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
+            wholesaleDetail.setRebateAmount(BigDecimal.ZERO);
+            wholesaleDetail.setMerWholesaleCreditDeductionAmount(orderInfo.getOrderWholesaleAmount());
+            return wholesaleDetail;
+        }).collect(Collectors.toList());
+
     }
 
     public WholesaleReceivableSettleDetail toWholesaleReceivableDetail(){

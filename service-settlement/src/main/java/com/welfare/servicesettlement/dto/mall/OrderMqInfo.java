@@ -135,6 +135,7 @@ public class OrderMqInfo implements Serializable {
         orderInfo.setAccountCode(accountDeductionDetail.getAccountCode());
         orderInfo.setOrderTime(orderMqInfo.getOrderTime());
         orderInfo.setOrderAmount(orderMqInfo.getOrderAmount());
+        orderInfo.setOrderWholesaleAmount(orderMqInfo.getOrderWholesaleAmount());
         orderInfo.setAccountName(account.getAccountName());
         orderInfo.setCardId(accountDeductionDetail.getCardId());
         orderInfo.setStoreCode(orderMqInfo.getStoreCode());

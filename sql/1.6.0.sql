@@ -219,3 +219,4 @@ alter table account_deduction_detail add column order_no varchar(50) comment '�
 alter table account_deduction_detail add column mer_deduction_wholesale_credit_amount decimal(10,2) comment '商户批发额度扣减额度' after self_deduction_amount;
 alter table merchant_bill_detail add column wholesale_limit decimal(10,2) comment  '批发最高额度' after remaining_limit;
 alter table merchant_bill_detail add column wholesale_remaining_limit decimal(10,2) comment '批发剩余额度' after remaining_limit;
+alter table order_info add column order_wholesale_amount decimal(10,2) comment '订单批发结算金额' after order_amount;

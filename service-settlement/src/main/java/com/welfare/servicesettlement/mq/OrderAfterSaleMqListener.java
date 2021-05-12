@@ -62,6 +62,7 @@ public class OrderAfterSaleMqListener implements RocketMQListener<AftersaleOrder
         OrderInfo originalOrder = orderInfoDao.getOneByOrderNo(orderNo, WelfareConstant.TransType.CONSUME.code());
         BizAssert.notNull(originalOrder, ExceptionCode.DATA_NOT_EXIST,"正向订单不存在");
         OrderInfo orderInfo = aftersaleOrderMqInfo.parseFromOriginalOrder(originalOrder);
+        orderInfo.setOrderWholesaleAmount(aftersaleOrderMqInfo.getOrderWholesaleAmount());
         List<OrderInfoDetail> orderInfoDetails = aftersaleOrderMqInfo.parseOrderInfoDetails();
         orderInfoDetailDao.saveBatch(orderInfoDetails);
         orderInfoDao.save(orderInfo);

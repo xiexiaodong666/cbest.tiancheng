@@ -82,4 +82,9 @@ public class WelfareSettleDetailReq{
 
     @ApiModelProperty(value = "商户名称")
     private String merName;
+    /**
+     * 查询数据量限制
+     */
+    private Integer limit;
+
 }

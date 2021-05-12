@@ -127,6 +127,7 @@ public class WelfareSettleController implements IController {
         req.setStartTime(welfareSettleDetailReq2.getStartTime());
         req.setEndTime(welfareSettleDetailReq2.getEndTime());
         req.setMerCooperationMode(welfareSettleDetailReq2.getMerCooperationMode());
+        req.setLimit(5000);
         do {
             welfareSettleDetailRespListTemp = settleDetailService.queryWelfareSettleDetail(req);
             if(!welfareSettleDetailRespListTemp.isEmpty()){

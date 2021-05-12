@@ -154,7 +154,7 @@ public class OrderMqInfo implements Serializable {
         }
         return orderDetails.stream().map(orderDetailMqInfo -> {
             OrderInfoDetail detail = new OrderInfoDetail();
-            detail.setOrderId(orderDetailMqInfo.getOrderId());
+            detail.setOrderId(orgOrderNo.toString());
             detail.setCount(orderDetailMqInfo.getCount());
             detail.setProductId(orderDetailMqInfo.getProductId());
             detail.setRefundCount(orderDetailMqInfo.getRefundCount());

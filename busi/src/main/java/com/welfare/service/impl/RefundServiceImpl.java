@@ -149,6 +149,9 @@ public class RefundServiceImpl implements RefundService {
     @Transactional(rollbackFor = Exception.class)
     public void multiOrderRefund(MultiOrderRefundRequest multiOrderRefundRequest) {
         List<RefundRequest> refundRequests = multiOrderRefundRequest.toSingleRefundRequests();
+        if(CollectionUtils.isEmpty(refundRequests)) {
+            throw BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "多订单联合退款明细为空");
+        }
         for (RefundRequest refundRequest : refundRequests) {
             handleRefundRequest(refundRequest);
         }

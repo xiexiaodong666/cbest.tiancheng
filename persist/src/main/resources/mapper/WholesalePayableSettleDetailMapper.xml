@@ -97,19 +97,19 @@
             ss.store_code AS storeCode,
             ss.store_name AS storeName,
             wpsd.trans_type AS transType,
-            case when wpsd.trans_type='consume' then wpsd.trans_amount
-            when wpsd.trans_type='refund' then -wpsd.trans_amount
+            case when wpsd.trans_type='consume' then IFNULL(wpsd.trans_amount,0)
+            when wpsd.trans_type='refund' then IFNULL(-wpsd.trans_amount,0)
                 end AS saleAmount,
-            case when wpsd.trans_type='consume' then wpsd.order_wholesale_amount
-            when wpsd.trans_type='refund' then -wpsd.order_wholesale_amount
+            case when wpsd.trans_type='consume' then IFNULL(wpsd.order_wholesale_amount,0)
+            when wpsd.trans_type='refund' then IFNULL(-wpsd.order_wholesale_amount,0)
                end  AS settleAmount,
 
-            case when wpsd.trans_type='consume' then wpsd.trans_amount
-            when wpsd.trans_type='refund' then -wpsd.trans_amount
+            case when wpsd.trans_type='consume' then IFNULL(wpsd.trans_amount,0)
+            when wpsd.trans_type='refund' then IFNULL(-wpsd.trans_amount,0)
             end
             -
-            case when wpsd.trans_type='consume' then wpsd.order_wholesale_amount
-            when wpsd.trans_type='refund' then -wpsd.order_wholesale_amount
+            case when wpsd.trans_type='consume' then IFNULL(wpsd.order_wholesale_amount,0)
+            when wpsd.trans_type='refund' then IFNULL(-wpsd.order_wholesale_amount,0)
             end  AS revenueAmount,
 
             wpsd.settle_flag AS settleFlag,
@@ -236,19 +236,19 @@
         a.account_name AS accountName,
         mer.mer_code AS customerMerCode,
         mer.mer_name AS customerMerName,
-        case when wpsd.trans_type='consume' then wpsd.trans_amount
-        when wpsd.trans_type='refund' then -wpsd.trans_amount
+        case when wpsd.trans_type='consume' then IFNULL(wpsd.trans_amount,0)
+        when wpsd.trans_type='refund' then IFNULL(-wpsd.trans_amount,0)
         end AS saleAmount,
-        case when wpsd.trans_type='consume' then wpsd.order_wholesale_amount
-        when wpsd.trans_type='refund' then -wpsd.order_wholesale_amount
+        case when wpsd.trans_type='consume' then IFNULL(wpsd.order_wholesale_amount,0)
+        when wpsd.trans_type='refund' then IFNULL(-wpsd.order_wholesale_amount,0)
         end  AS settleAmount,
 
-        case when wpsd.trans_type='consume' then wpsd.trans_amount
-        when wpsd.trans_type='refund' then -wpsd.trans_amount
+        case when wpsd.trans_type='consume' then IFNULL(wpsd.trans_amount,0)
+        when wpsd.trans_type='refund' then IFNULL(-wpsd.trans_amount,0)
         end
         -
-        case when wpsd.trans_type='consume' then wpsd.order_wholesale_amount
-        when wpsd.trans_type='refund' then -wpsd.order_wholesale_amount
+        case when wpsd.trans_type='consume' then IFNULL(wpsd.order_wholesale_amount,0)
+        when wpsd.trans_type='refund' then IFNULL(-wpsd.order_wholesale_amount,0)
         end  AS revenueAmount
         FROM
         wholesale_payable_settle_detail wpsd

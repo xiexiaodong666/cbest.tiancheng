@@ -12,6 +12,7 @@ import com.welfare.service.settlement.domain.WholesaleDetail;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,7 @@ public class SettleDetailGenerateServiceImpl implements SettleDetailGenerateServ
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final OrderInfoDao orderInfoDao;
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void generateWholesaleDetails(List<Long> accountDeductionDetailIds) {
         List<AccountDeductionDetail> accountDeductionDetails = accountDeductionDetailDao.listByIds(accountDeductionDetailIds);
 

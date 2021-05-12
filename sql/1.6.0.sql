@@ -9,11 +9,12 @@ INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `delet
 INSERT INTO `dict`(`id`, `dict_type`, `dict_code`, `dict_name`, `status`, `deleted`, `sort`) VALUES (114, 'WholesaleCooperationMode', 'distribution', '经销', 1, 0, 2);
 
 
-ALTER TABLE account_deposit_apply ADD COLUMN apply_type VARCHAR(20) DEFAULT NULL;
+ALTER TABLE account_deposit_apply ADD COLUMN apply_type VARCHAR(30) DEFAULT NULL;
 
 UPDATE account_deposit_apply set apply_type = 'welfareApply';
 
 alter table month_settle change  uppdate_user  update_user varchar(20) comment '更新人';
+
 
 
 SET NAMES utf8mb4;
@@ -46,8 +47,9 @@ CREATE TABLE `wholesale_payable_settle` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
   `settle_statistics_info` text COMMENT '账单账户类型统计信息',
+  `settle_tax_sales_statistics` text COMMENT '账单商品税率统计信息',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=383 DEFAULT CHARSET=utf8mb4 COMMENT='批发应付结算账单';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='批发应付结算账单';
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -66,7 +68,7 @@ CREATE TABLE `wholesale_payable_settle_detail` (
   `trans_no` varchar(50) DEFAULT NULL COMMENT '交易流水号',
   `account_code` int(10) DEFAULT NULL COMMENT '账户',
   `account_name` varchar(20) DEFAULT NULL COMMENT '账户名称',
-  `card_id` int(11) DEFAULT NULL COMMENT '卡号',
+  `card_id` varchar(20) DEFAULT NULL COMMENT '卡号',
   `mer_code` varchar(20) DEFAULT NULL COMMENT '商户代码',
   `mer_name` varchar(50) DEFAULT NULL COMMENT '商户名称',
   `store_code` varchar(20) DEFAULT NULL COMMENT '门店编码',
@@ -94,15 +96,15 @@ CREATE TABLE `wholesale_payable_settle_detail` (
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_user` varchar(50) DEFAULT NULL COMMENT '更新人',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `deleted` tinyint(1) DEFAULT NULL,
   `version` int(11) DEFAULT NULL COMMENT '版本',
-  `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
   `rebate_amount` decimal(15,4) DEFAULT NULL COMMENT '返点标志 unrebated未返点 rebated 已返点',
   `mer_credit` decimal(10,2) DEFAULT NULL COMMENT '商户授信额度',
   `mer_balance` decimal(10,2) DEFAULT NULL COMMENT '商户余额',
-  `mer_wholesale_credit` decimal(10,2) DEFAULT NULL COMMENT '商户剩余批发采购额度',
+  `mer_wholesale_credit` decimal(10,2) DEFAULT NULL COMMENT '商户剩余批发额度',
   `order_wholesale_amount` decimal(10,2) DEFAULT NULL COMMENT '结算金额',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22223 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -137,11 +139,11 @@ CREATE TABLE `wholesale_receivable_settle` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `deleted` tinyint(1) DEFAULT NULL COMMENT '删除标志',
   `settle_statistics_info` text COMMENT '账单账户类型统计信息',
+  `settle_tax_sales_statistics` text COMMENT '账单商品税率统计信息',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=383 DEFAULT CHARSET=utf8mb4 COMMENT='批发应收结算账单';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='批发应收结算账单';
 
 SET FOREIGN_KEY_CHECKS = 1;
-
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -157,7 +159,7 @@ CREATE TABLE `wholesale_receivable_settle_detail` (
   `trans_no` varchar(50) DEFAULT NULL COMMENT '交易流水号',
   `account_code` int(10) DEFAULT NULL COMMENT '账户',
   `account_name` varchar(20) DEFAULT NULL COMMENT '账户名称',
-  `card_id` int(11) DEFAULT NULL COMMENT '卡号',
+  `card_id` varchar(20) DEFAULT NULL COMMENT '卡号',
   `mer_code` varchar(20) DEFAULT NULL COMMENT '商户代码',
   `mer_name` varchar(50) DEFAULT NULL COMMENT '商户名称',
   `store_code` varchar(20) DEFAULT NULL COMMENT '门店编码',
@@ -188,10 +190,14 @@ CREATE TABLE `wholesale_receivable_settle_detail` (
   `rebate_amount` decimal(15,4) DEFAULT NULL COMMENT '返点标志 unrebated未返点 rebated 已返点',
   `mer_credit` decimal(10,2) DEFAULT NULL COMMENT '商户授信额度',
   `mer_balance` decimal(10,2) DEFAULT NULL COMMENT '商户余额',
+  `mer_wholesale_credit_deduction_amount` decimal(10,2) DEFAULT NULL COMMENT '商户批发信用扣款金额',
+  `mer_wholesale_credit` decimal(10,2) DEFAULT NULL COMMENT '商户剩余批发额度',
+  `order_wholesale_amount` decimal(10,2) DEFAULT NULL COMMENT '结算金额',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22223 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
 CREATE TABLE `order_info_detail` (
                                      `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'pk',
                                      `order_id` varchar(20) DEFAULT NULL COMMENT '订单id',
@@ -220,3 +226,67 @@ alter table account_deduction_detail add column mer_deduction_wholesale_credit_a
 alter table merchant_bill_detail add column wholesale_limit decimal(10,2) comment  '批发最高额度' after remaining_limit;
 alter table merchant_bill_detail add column wholesale_remaining_limit decimal(10,2) comment '批发剩余额度' after remaining_limit;
 alter table order_info add column order_wholesale_amount decimal(10,2) comment '订单批发结算金额' after order_amount;
+
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for bus_events_account
+-- ----------------------------
+DROP TABLE IF EXISTS `bus_events_account`;
+CREATE TABLE `bus_events_account` (
+  `record_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `class_name` varchar(128) COLLATE utf8_bin NOT NULL,
+  `event_json` mediumtext COLLATE utf8_bin NOT NULL,
+  `user_token` varchar(36) COLLATE utf8_bin DEFAULT NULL,
+  `created_date` datetime NOT NULL,
+  `creating_owner` varchar(50) COLLATE utf8_bin NOT NULL,
+  `processing_owner` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+  `processing_available_date` datetime DEFAULT NULL,
+  `processing_state` varchar(14) COLLATE utf8_bin DEFAULT 'AVAILABLE',
+  `error_count` int(10) unsigned DEFAULT '0',
+  `search_key1` bigint(20) unsigned DEFAULT NULL,
+  `search_key2` bigint(20) unsigned DEFAULT NULL,
+  PRIMARY KEY (`record_id`),
+  UNIQUE KEY `record_id` (`record_id`),
+  KEY `idx_bus_where` (`processing_state`,`processing_owner`,`processing_available_date`),
+  KEY `bus_events_tenant_account_record_id` (`search_key2`,`search_key1`)
+) ENGINE=InnoDB AUTO_INCREMENT=2670 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for bus_events_history_account
+-- ----------------------------
+DROP TABLE IF EXISTS `bus_events_history_account`;
+CREATE TABLE `bus_events_history_account` (
+  `record_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `class_name` varchar(128) COLLATE utf8_bin NOT NULL,
+  `event_json` mediumtext COLLATE utf8_bin NOT NULL,
+  `user_token` varchar(36) COLLATE utf8_bin DEFAULT NULL,
+  `created_date` datetime NOT NULL,
+  `creating_owner` varchar(50) COLLATE utf8_bin NOT NULL,
+  `processing_owner` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+  `processing_available_date` datetime DEFAULT NULL,
+  `processing_state` varchar(14) COLLATE utf8_bin DEFAULT 'AVAILABLE',
+  `error_count` int(10) unsigned DEFAULT '0',
+  `search_key1` bigint(20) unsigned DEFAULT NULL,
+  `search_key2` bigint(20) unsigned DEFAULT NULL,
+  PRIMARY KEY (`record_id`),
+  UNIQUE KEY `record_id` (`record_id`),
+  KEY `bus_events_history_tenant_account_record_id` (`search_key2`,`search_key1`)
+) ENGINE=InnoDB AUTO_INCREMENT=9176 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+alter table merchant_credit add column wholesale_credit_limit decimal(10,2) comment '批发限制授信额度' after rebate_limit;
+
+alter table merchant_credit add column wholesale_credit decimal(10,2) comment '批发授信额度' after rebate_limit;
+
+alter table merchant_extend add column supplier_wholesale_settle_method varchar(20) comment '结算方式' after point_mall;

@@ -18,6 +18,8 @@
         m.mer_name
         WHEN 'deposit_decr' THEN
         m.mer_name
+        WHEN 'deposit_back' THEN
+        m.mer_name
         WHEN 'reset_incr' THEN
         m.mer_name
         WHEN 'reset_decr' THEN

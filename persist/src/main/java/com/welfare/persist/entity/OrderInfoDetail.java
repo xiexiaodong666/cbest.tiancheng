@@ -33,7 +33,7 @@ public class OrderInfoDetail extends Model<OrderInfoDetail> implements Serializa
      * pk
      */
     @ApiModelProperty("pk")   @JsonSerialize(using = ToStringSerializer.class)
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId
 	private Long id;
     /**
      * 订单id

@@ -23,8 +23,8 @@
                  when balance_type='creditLimit' then credit_limit
                  when balance_type='remainingLimit' then remaining_limit
                  when balance_type='rebateLimit' then rebate_limit
-                 when balance_type='wholesaleCreditLimit' then wholesale_credit_limit
-                 when balance_type='wholesaleCredit' then wholesale_credit end as allAmount
+                 when balance_type='wholesaleCreditLimit' then wholesale_remaining_limit
+                 when balance_type='wholesaleCredit' then wholesale_limit end as allAmount
         from merchant_bill_detail
         <where>
             <if test="merCode!=null and merCode!=''">

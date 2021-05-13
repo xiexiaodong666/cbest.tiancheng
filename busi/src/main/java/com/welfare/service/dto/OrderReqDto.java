@@ -53,4 +53,6 @@ public class OrderReqDto implements Serializable {
     private String accountType;
     @ApiModelProperty(value = "支付渠道" , required = false)
     private String paymentChannel;
+    @ApiModelProperty(value = "交易流水号" , required = false)
+    private String transNo;
 }

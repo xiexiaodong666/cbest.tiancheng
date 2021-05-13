@@ -573,7 +573,7 @@
         when "consume" then orderAmount
         else  (-1) * orderAmount
         end
-        as orderAmount, phone from (
+        as orderAmount, phone , tt.transNo from (
         SELECT
         oi.order_id as orderId,
         t.phone as phone,
@@ -594,7 +594,8 @@
         d.department_name ,
         aty.type_code,
         aty.type_name,
-        ab.payment_channel as paymentChannel
+        ab.payment_channel as paymentChannel,
+        ab.trans_no as transNo
         FROM
         (select account_code,sum(trans_amount) as trans_amount , trans_no ,payment_channel,
         max(trans_time) as trans_time ,store_code,trans_type,max(card_id) as card_id
@@ -621,6 +622,9 @@
             </if>
             <if test="orderPageQuery.orderId != null">
                 and oi.order_id = #{orderPageQuery.orderId}
+            </if>
+            <if test="orderPageQuery.transNo != null and orderPageQuery.transNo != ''">
+                and ab.trans_no = #{orderPageQuery.transNo}
             </if>
             <if test="orderPageQuery.paymentChannel != null">
                 and ab.payment_channel = #{orderPageQuery.paymentChannel}

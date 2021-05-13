@@ -85,4 +85,6 @@ public class OrderPageQuery {
      */
     private String paymentChannel;
 
+    private String transNo;
+
 }

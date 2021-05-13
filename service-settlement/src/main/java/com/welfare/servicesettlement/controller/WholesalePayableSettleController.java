@@ -68,7 +68,7 @@ public class WholesalePayableSettleController implements IController {
 
     @PostMapping("/payable-details-summary")
     @ApiOperation("(平台)查询平台应付未结算帐单明细汇总")
-    public R<PlatformWholesalePayableDetailSummaryDTO> queryPayableDetailsSummary(PlatformWholesalePayableDetailQuery query){
+    public R<PlatformWholesalePayableDetailSummaryDTO> queryPayableDetailsSummary(@RequestBody PlatformWholesalePayableDetailQuery query){
         return success(payableSettletService.queryPayableDetailsSummary(query));
     }
 

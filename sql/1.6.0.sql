@@ -290,3 +290,25 @@ alter table merchant_credit add column wholesale_credit_limit decimal(10,2) comm
 alter table merchant_credit add column wholesale_credit decimal(10,2) comment '批发授信额度' after rebate_limit;
 
 alter table merchant_extend add column supplier_wholesale_settle_method varchar(20) comment '结算方式' after point_mall;
+
+
+INSERT INTO merchant_account_type (id, mer_code, mer_account_type_code, mer_account_type_name, deduction_order, deleted, remark, create_user, create_time, update_user, update_time, version, show_status )
+SELECT
+mat.id - 1000000000000000000,
+mat.mer_code,
+'wholesale_procurement',
+'员工批发采购账户',
+9000,
+0,
+NULL,
+'gaorui',
+now(),
+NULL,
+NULL,
+0,
+0
+FROM
+	merchant_account_type mat
+WHERE
+	mat.mer_account_type_code = 'surplus_quota';
+	

@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import org.springframework.data.annotation.Transient;
 
 /**
  * 卡信息(card_info)实体类
@@ -110,6 +111,10 @@ public class CardInfo extends Model<CardInfo> implements Serializable {
      */
     @ApiModelProperty("绑定时间")   
     private Date bindTime;
+
+    @Transient
+    @TableField(exist = false)
+    private String merCode;
 
 //以下为列明常量
 

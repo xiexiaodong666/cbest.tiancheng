@@ -112,13 +112,13 @@ public class ExportMerChantConsumeData {
   @ColumnWidth(20)
   private String currentBalance;
 
-  @ApiModelProperty("信用额度")
-  @ExcelProperty(value = "信用额度")
-  @ColumnWidth(10)
+  @ApiModelProperty("信用额度（元）")
+  @ExcelProperty(value = "信用额度（元）")
+  @ColumnWidth(20)
   private String creditLimit;
 
-  @ApiModelProperty("剩余信用额度/信用额度（元）")
-  @ExcelProperty(value = "剩余信用额度/信用额度（元）")
+  @ApiModelProperty("剩余信用额度（元）")
+  @ExcelProperty(value = "剩余信用额度（元）")
   @ColumnWidth(20)
   private String remainingLimit;
 

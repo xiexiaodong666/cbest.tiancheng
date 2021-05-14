@@ -1,5 +1,8 @@
 package com.welfare.common.constants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author qiang.deng
  * @version 1.0.0
@@ -246,6 +249,32 @@ public class WelfareSettleConstant {
         BusinessTypeEnum(String code, String desc) {
             this.code = code;
             this.desc = desc;
+        }
+
+        public static List<String> getDescList(List<String> codeList) {
+            List<BusinessTypeEnum> businessTypeEnumList = new ArrayList<>();
+
+            for (String code: codeList) {
+                businessTypeEnumList.add(findByCode(code));
+            }
+
+            List<String> list = new ArrayList<>();
+
+            for (BusinessTypeEnum businessTypeEnum:
+                businessTypeEnumList) {
+                list.add(businessTypeEnum.desc);
+            }
+
+            return list;
+        }
+
+        public static BusinessTypeEnum findByCode(String code) {
+            for (BusinessTypeEnum type : BusinessTypeEnum.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的BusinessTypeEnum类型");
         }
 
         public String code(){

@@ -49,6 +49,7 @@
             <if test="endTime!=null">
                 and create_time &lt;=#{endTime,jdbcType=TIMESTAMP}
             </if>
+            order by id desc
         </where>
 
     </select>

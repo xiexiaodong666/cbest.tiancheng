@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
@@ -585,6 +586,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         if (CollectionUtils.isNotEmpty(accountAmountTypes)) {
             accountAmountTypeMap = accountAmountTypes.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, a -> a,(k1, k2)->k1));
         }
+        List<String> errorMsg = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accounts)) {
             Map<String, List<AccountDepositRequest>> finalMap = map;
             Map<Long, AccountAmountType> finalAccountAmountTypeMap = accountAmountTypeMap;
@@ -594,13 +596,13 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
                     BigDecimal sumAmount = depositRequests.stream().map(AccountDepositRequest::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                     if (sumAmount.compareTo(BigDecimal.ZERO) < 0) {
                         AccountAmountType accountAmountType = finalAccountAmountTypeMap.get(account.getAccountCode());
-                        BizAssert.notNull(accountAmountType, ExceptionCode.ILLEGALITY_ARGUMENTS, "账户余额小于回充金额");
-                        if (sumAmount.abs().compareTo(accountAmountType.getAccountBalance()) > 0) {
-                            throw new BizException("账户余额小于回充金额");
+                        if (Objects.isNull(accountAmountType) || sumAmount.abs().compareTo(accountAmountType.getAccountBalance()) > 0) {
+                            errorMsg.add(account.getPhone());
                         }
                     }
                 }
             });
+            BizAssert.isTrue(org.springframework.util.CollectionUtils.isEmpty(errorMsg), ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户不可充为负\n" + Joiner.on(",").join(errorMsg));
         }
     }
 }

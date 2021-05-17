@@ -31,6 +31,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
@@ -249,7 +250,8 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         Account account = accountService.getByAccountCode(accountCode);
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByAccountCode(accountCode);
         Map<String, AccountAmountType> accountTypeMap = accountAmountTypes.stream().collect(Collectors.toMap(AccountAmountType::getMerAccountTypeCode, type -> type));
-          List<AccountAmountTypeResp> resps = new ArrayList<>();
+        List<AccountAmountTypeResp> resps = new ArrayList<>();
+        AtomicReference<AccountAmountTypeResp> wholesaleAmountType = new AtomicReference<>();
         if (Objects.nonNull(account)) {
             List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
             merchantAccountTypes.forEach(merchantAccountType -> {
@@ -261,19 +263,45 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 AccountAmountType accountAmountType = accountTypeMap.get(merchantAccountType.getMerAccountTypeCode());
                 if (Objects.nonNull(accountAmountType)) {
                     if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
-                        resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                        if (account.getCredit() != null && account.getCredit()) {
+                            resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                            resps.add(resp);
+                        }
+                    } else if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())) {
+                        if (account.getCredit() != null && account.getCredit()) {
+                            resp.setBalance(accountAmountType.getAccountBalance() + "");
+                            resps.add(resp);
+                        }
                     } else {
                         resp.setBalance(accountAmountType.getAccountBalance() + "");
+                        if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())) {
+                            wholesaleAmountType.set(resp);
+                        } else {
+                            resps.add(resp);
+                        }
                     }
                 } else {
                     if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
-                        resp.setBalance(BigDecimal.ZERO.toString() + "/" + account.getMaxQuota());
+                        if (account.getCredit() != null && account.getCredit()) {
+                            resp.setBalance(BigDecimal.ZERO.toString() + "/" + account.getMaxQuota());
+                            resps.add(resp);
+                        }
+                    } else if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())) {
+                        if (account.getCredit() != null && account.getCredit()) {
+                            resp.setBalance(BigDecimal.ZERO.toString());
+                            resps.add(resp);
+                        }
                     } else {
-                        resp.setBalance(BigDecimal.ZERO.toString());
+                        if (!merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())) {
+                            resp.setBalance(BigDecimal.ZERO.toString());
+                            resps.add(resp);
+                        }
                     }
                 }
-                resps.add(resp);
             });
+        }
+        if (Objects.nonNull(wholesaleAmountType.get())) {
+            resps.add(wholesaleAmountType.get());
         }
         return resps;
     }

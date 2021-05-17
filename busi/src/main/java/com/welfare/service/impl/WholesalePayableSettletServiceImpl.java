@@ -110,7 +110,14 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
                 }
             } while (true);
             if (CollectionUtils.isNotEmpty(orderInfoDetails)) {
-                Map<BigDecimal, List<OrderInfoDetail>> map = orderInfoDetails.stream().collect(Collectors.groupingBy(OrderInfoDetail::getWholesaleTaxRate));
+                Map<BigDecimal, List<OrderInfoDetail>> map = orderInfoDetails.stream()
+                        .collect(Collectors.groupingBy(orderInfoDetail -> {
+                            if (Objects.isNull(orderInfoDetail.getWholesaleTaxRate())) {
+                                return BigDecimal.ZERO;
+                            } else {
+                                return orderInfoDetail.getWholesaleTaxRate();
+                            }
+                        }));
                 map.forEach((taxRate, list) -> {
                     BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getWholesaleAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                     taxRateAndSettleAmountMap.put(String.valueOf(taxRate.doubleValue()), settleAmount != null ? String.valueOf(settleAmount.doubleValue()) : 0+"");

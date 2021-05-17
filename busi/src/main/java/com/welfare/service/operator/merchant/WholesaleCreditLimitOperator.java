@@ -59,7 +59,7 @@ public class WholesaleCreditLimitOperator extends AbstractMerAccountTypeOperator
         );
         operations.add(wholesaleCreditLimitLimitOperator);
         // 减批发剩余授信额度，不够减就为负数
-        merchantCredit.setRemainingLimit(oldRemainingWholesaleCredit.subtract(amountLeftToBeDecrease));
+        merchantCredit.setWholesaleCredit(oldRemainingWholesaleCredit.subtract(amountLeftToBeDecrease));
         MerchantAccountOperation remainingLimitLimitOperator = MerchantAccountOperation.of(
                 WelfareConstant.MerCreditType.WHOLESALE_CREDIT,
                 amountLeftToBeDecrease,

@@ -48,7 +48,7 @@ public class WholesaleCreditLimitOperator extends AbstractMerAccountTypeOperator
         BigDecimal oldWholesaleCreditLimit = merchantCredit.getWholesaleCreditLimit();
         BigDecimal oldRemainingWholesaleCredit = merchantCredit.getWholesaleCredit();
 
-        merchantCredit.setCreditLimit(oldWholesaleCreditLimit.subtract(amountLeftToBeDecrease));
+        merchantCredit.setWholesaleCreditLimit(oldWholesaleCreditLimit.subtract(amountLeftToBeDecrease));
         MerchantAccountOperation wholesaleCreditLimitLimitOperator = MerchantAccountOperation.of(
                 wholesaleCreditType,
                 amountLeftToBeDecrease,

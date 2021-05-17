@@ -44,6 +44,9 @@
         <if test="query.merCode !=null ">
           and wps.mer_code = #{query.merCode}
         </if>
+        <if test="query.merName != null and query.merName != ''">
+          and m.mer_name like concat('%', #{query.merName}, '%')
+        </if>
         <if test="query.merCooperationMode !=null and query.merCooperationMode!=''">
           and m.mer_cooperation_mode = #{query.merCooperationMode}
         </if>

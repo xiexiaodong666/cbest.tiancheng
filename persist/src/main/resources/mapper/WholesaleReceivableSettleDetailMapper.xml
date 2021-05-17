@@ -176,7 +176,7 @@
                 and d.trans_time <![CDATA[>=]]> #{param.transTimeStart}
             </if>
             <if test="param.transTimeEnd != null">
-                and d.trans_time <![CDATA[<]]> #{param.transTimeEnd}
+                and d.trans_time <![CDATA[<=]]> #{param.transTimeEnd}
             </if>
             <if test="param.phone != null and param.phone != ''">
                 and a.phone = #{param.phone}

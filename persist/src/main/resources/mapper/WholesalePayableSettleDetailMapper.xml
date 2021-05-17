@@ -120,9 +120,10 @@
             wholesale_payable_settle_detail wpsd
                 LEFT JOIN account a ON wpsd.account_code = a.account_code
                 LEFT JOIN merchant mer ON mer.mer_code = wpsd.mer_code
-                LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
                 LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
                 LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+                LEFT JOIN merchant_extend me ON supplier.mer_code = me.mer_code
+
         <where>
             <if test="query.merCode != null and query.merCode != ''">
                 and supplier.mer_code = #{query.merCode}
@@ -180,9 +181,10 @@
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
         LEFT JOIN merchant mer ON mer.mer_code = wpsd.mer_code
-        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        LEFT JOIN merchant_extend me ON supplier.mer_code = me.mer_code
+
         <where>
             <if test="query.merCode != null and query.merCode != ''">
                 and supplier.mer_code = #{query.merCode}
@@ -254,9 +256,10 @@
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
         LEFT JOIN merchant mer ON mer.mer_code = wpsd.mer_code
-        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        LEFT JOIN merchant_extend me ON supplier.mer_code = me.mer_code
+
         <where>
 
             <if test="query.settleNo != null and query.settleNo != ''">
@@ -300,9 +303,10 @@
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
         LEFT JOIN merchant mer ON mer.mer_code = wpsd.mer_code
-        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        LEFT JOIN merchant_extend me ON supplier.mer_code = me.mer_code
+
         <where>
 
             <if test="query.settleNo != null and query.settleNo != ''">
@@ -355,9 +359,10 @@
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
         LEFT JOIN merchant mer ON  mer.mer_code = wpsd.mer_code
-        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        LEFT JOIN merchant_extend me ON supplier.mer_code = me.mer_code
+
         <where>
             wpsd.settle_flag = 'unsettled'
             <if test="query.merCode != null and query.merCode != ''">
@@ -409,9 +414,10 @@
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code
         LEFT JOIN merchant mer ON  mer.mer_code = wpsd.mer_code
-        LEFT JOIN merchant_extend me ON mer.mer_code = me.mer_code
         LEFT JOIN supplier_store ss ON ss.store_code = wpsd.store_code
         LEFT JOIN merchant supplier ON supplier.mer_code = ss.mer_code
+        LEFT JOIN merchant_extend me ON supplier.mer_code = me.mer_code
+
         <where>
             wpsd.settle_flag = 'unsettled'
             <if test="query.merCode != null and query.merCode != ''">

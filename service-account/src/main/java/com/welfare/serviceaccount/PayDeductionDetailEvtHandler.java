@@ -1,5 +1,6 @@
 package com.welfare.serviceaccount;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.welfare.service.sync.event.PayDeductionDetailEvt;
@@ -42,6 +43,7 @@ public class PayDeductionDetailEvtHandler {
     @AllowConcurrentEvents
     @Subscribe
     public void payDeductionDetailEvt(PayDeductionDetailEvt payDeductionDetailEvt){
+        log.info("ready to send msg to mq:{}", JSON.toJSONString(payDeductionDetailEvt));
         Message<List<Long>> message = MessageBuilder.withPayload(payDeductionDetailEvt.getAccountDeductionDetailIds()).build();
         //messageDelayLevel=1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h , 其中3表示延时10s
         rocketMQTemplate.syncSend(topic,message, rocketMQTemplate.getProducer().getSendMsgTimeout(),3);

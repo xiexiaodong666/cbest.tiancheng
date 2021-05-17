@@ -177,9 +177,13 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                 .in(WholesaleReceivableSettleDetail::getId, idList));
 
             if (CollectionUtils.isNotEmpty(groupByTaxRateDetails)) {
+                groupByTaxRateDetails.forEach(c->{
+                    if(null == c.getWholesaleTaxRate())  {
+                        c.setWholesaleTaxRate(BigDecimal.ZERO);
+                    }
+                });
                 Map<BigDecimal, List<OrderInfoDetail>> map = groupByTaxRateDetails.stream().collect(Collectors
                                                                                                         .groupingBy(OrderInfoDetail::getWholesaleTaxRate));
-                map.remove(null);
                 map.forEach((taxRate, list) -> {
                     BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getOriginalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                     SettleTaxSalesStatistics settleTaxSalesStatistics = new SettleTaxSalesStatistics();

@@ -128,7 +128,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         param.setSettleFlag(SettleStatusEnum.UNSETTLED.code());
         List<PlatformWholesaleSettleDetailDTO> settleDetailDTOList = wholesaleReceivableSettleDetailMapper.queryReceivableDetails(param);
         if(CollectionUtils.isEmpty(settleDetailDTOList)){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "构选的消费明细正在结算中或结算已完成。", null);
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "没有可以结算的明细数据", null);
         }
 
         Set<String> orderNoSet = new HashSet<>();
@@ -179,8 +179,9 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
             if (CollectionUtils.isNotEmpty(groupByTaxRateDetails)) {
                 Map<BigDecimal, List<OrderInfoDetail>> map = groupByTaxRateDetails.stream().collect(Collectors
                                                                                                         .groupingBy(OrderInfoDetail::getWholesaleTaxRate));
+                map.remove(null);
                 map.forEach((taxRate, list) -> {
-                    BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getWholesaleAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getOriginalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                     SettleTaxSalesStatistics settleTaxSalesStatistics = new SettleTaxSalesStatistics();
                     settleTaxSalesStatistics.setAmount(settleAmount);
                     settleTaxSalesStatistics.setTax(taxRate);

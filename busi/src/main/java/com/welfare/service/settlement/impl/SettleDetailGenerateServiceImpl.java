@@ -60,6 +60,10 @@ public class SettleDetailGenerateServiceImpl implements SettleDetailGenerateServ
                     }
                     List<OrderInfo> orderInfos = orderInfoDao.listByTransNo(accountDeductionDetail.getTransNo());
                     BizAssert.notEmpty(orderInfos, ExceptionCode.DATA_NOT_EXIST, "订单还未同步，抛出异常稍后处理");
+                    orderInfos = orderInfos.stream()
+                            .filter(orderInfo -> orderInfo.getOrderId().equals(accountDeductionDetail.getOrderNo()))
+                            .collect(Collectors.toList());
+                    BizAssert.notEmpty(orderInfos, ExceptionCode.DATA_NOT_EXIST, "订单不存在");
                     return WholesaleDetail.fromAccountDeductionDetail(accountDeductionDetail, orderInfos);
                 }).filter(CollectionUtils::isNotEmpty)
                 .flatMap(Collection::stream)

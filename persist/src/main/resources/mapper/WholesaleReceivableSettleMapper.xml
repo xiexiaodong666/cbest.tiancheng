@@ -57,6 +57,8 @@
           and wps.settle_status = #{query.settleStatus}
         </if>
       </where>
+
+      order by  wps.id desc
     </select>
 
   <select id="receivableBill"

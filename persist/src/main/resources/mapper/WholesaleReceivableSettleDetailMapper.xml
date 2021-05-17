@@ -37,6 +37,8 @@
         inner join merchant supplier on supplier.mer_code = s.mer_code
         <include refid="queryReceivableWhere"/>
         group by t1.mer_code
+
+        order by t1.id desc
     </select>
 
 

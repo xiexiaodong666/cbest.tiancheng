@@ -57,8 +57,12 @@ public class AccountAmountDO {
 
     public static BigDecimal calculateAccountBalance(List<AccountAmountType> accountTypes) {
         return accountTypes.stream()
-                .filter(accountAmountType -> !(SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())
-                        || SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode())))
+                //排除掉授信额度，溢缴款和批发额度，才是余额
+                .filter(accountAmountType -> !(
+                        SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())
+                                || SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode())
+                                || WHOLESALE_PROCUREMENT.code().equals(accountAmountType.getMerAccountTypeCode())
+                ))
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -84,7 +88,7 @@ public class AccountAmountDO {
         accountBillDetail.setCardId(paymentRequest.getCardNo());
         accountBillDetail.setOrderChannel(paymentRequest.getPaymentScene());
         accountBillDetail.setPaymentChannel(paymentRequest.getPaymentChannel());
-        accountBillDetail.setAccountAmountTypeGroupId(accountAmountTypeGroup == null? null : accountAmountTypeGroup.getId());
+        accountBillDetail.setAccountAmountTypeGroupId(accountAmountTypeGroup == null ? null : accountAmountTypeGroup.getId());
         if (paymentRequest instanceof CardPaymentRequest) {
             accountBillDetail.setPaymentType(PaymentTypeEnum.CARD.getCode());
             accountBillDetail.setPaymentTypeInfo(((CardPaymentRequest) paymentRequest).getCardInsideInfo());

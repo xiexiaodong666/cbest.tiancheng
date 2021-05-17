@@ -7,6 +7,7 @@ import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
+import com.welfare.common.util.SpringBeanUtils;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.entity.*;
 import com.welfare.service.AccountAmountTypeService;
@@ -17,6 +18,7 @@ import com.welfare.service.dto.RefundRequest;
 import com.welfare.service.operator.merchant.domain.MerchantAccountOperation;
 import com.welfare.service.operator.payment.domain.AccountAmountDO;
 import com.welfare.service.operator.payment.domain.RefundOperation;
+import com.welfare.service.sync.event.PayDeductionDetailEvt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -286,6 +288,12 @@ public class WelfareRefundOperator implements IRefundOperator{
         accountBillDetailDao.saveBatch(refundBillDetails);
         accountAmountTypeDao.updateBatchById(accountAmountTypes);
         accountDeductionDetailDao.saveBatch(refundDeductionDetails);
+        List<Long> accountDeductionDetailIds = refundDeductionDetails.stream()
+                .map(AccountDeductionDetail::getId).collect(Collectors.toList());
+        PayDeductionDetailEvt payDeductionDetailEvt = PayDeductionDetailEvt.builder()
+                .accountDeductionDetailIds(accountDeductionDetailIds)
+                .build();
+        SpringBeanUtils.getApplicationContext().publishEvent(payDeductionDetailEvt);
     }
 
 

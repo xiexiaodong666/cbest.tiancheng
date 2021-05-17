@@ -485,6 +485,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             apply.setApprovalRemark(req.getApplyRemark());
             apply.setApprovalUser(req.getApprovalUser());
             apply.setApprovalStatus(req.getApprovalStatus());
+            apply.setApprovalTime(new Date());
             accountDepositApplyDao.updateById(apply);
         }
     }

@@ -141,8 +141,8 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                 totalSettleAmount = totalSettleAmount.add(dto.getSettleAmount());
 
             } else if (WelfareConstant.TransType.REFUND.code().equals(dto.getTransType())) {
-                totalTransAmount = totalTransAmount.add(dto.getSaleAmount().negate());
-                totalSettleAmount = totalSettleAmount.add(dto.getSettleAmount().negate());
+                totalTransAmount = totalTransAmount.add(dto.getSaleAmount());
+                totalSettleAmount = totalSettleAmount.add(dto.getSettleAmount());
                 }
         }
 

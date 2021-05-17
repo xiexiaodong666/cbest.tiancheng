@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
@@ -176,6 +177,7 @@ public class AccountConsumeSceneController implements IController {
   @MerchantUser
   public R<Boolean> editWelfare(@RequestBody List<AccountWelfareConsumeSceneEditReq> consumeSceneEditReqs) {
     try {
+      log.info("编辑福利类型配置, req:{}", JSON.toJSONString(consumeSceneEditReqs));
       return success(accountConsumeSceneService.editWelfare(consumeSceneEditReqs));
     } catch (BizException be) {
       return R.fail(be.getMessage());

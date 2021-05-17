@@ -100,16 +100,17 @@
             case when wpsd.trans_type='consume' then IFNULL(wpsd.trans_amount,0)
             when wpsd.trans_type='refund' then IFNULL(-wpsd.trans_amount,0)
                 end AS saleAmount,
-            case when wpsd.trans_type='consume' then IFNULL(wpsd.order_wholesale_amount,0)
-            when wpsd.trans_type='refund' then IFNULL(-wpsd.order_wholesale_amount,0)
+            case when wpsd.trans_type='consume' and wpsd.settle_flag = 'unsettled' then IFNULL(wpsd.order_wholesale_amount,0)
+            when wpsd.trans_type='refund' and wpsd.settle_flag = 'unsettled'then IFNULL(-wpsd.order_wholesale_amount,0)
+                else 0
                end  AS settleAmount,
 
             case when wpsd.trans_type='consume' then IFNULL(wpsd.trans_amount,0)
             when wpsd.trans_type='refund' then IFNULL(-wpsd.trans_amount,0)
             end
             -
-            case when wpsd.trans_type='consume' then IFNULL(wpsd.order_wholesale_amount,0)
-            when wpsd.trans_type='refund' then IFNULL(-wpsd.order_wholesale_amount,0)
+            case when wpsd.trans_type='consume' and wpsd.settle_flag = 'unsettled' then IFNULL(wpsd.order_wholesale_amount,0)
+            when wpsd.trans_type='refund' and wpsd.settle_flag = 'unsettled' then IFNULL(-wpsd.order_wholesale_amount,0) else 0
             end  AS revenueAmount,
 
             wpsd.settle_flag AS settleFlag,
@@ -171,12 +172,20 @@
 
 
     <select id="queryPayableDetailsSummary" resultType="com.welfare.persist.dto.PlatformWholesalePayableDetailSummaryDTO">
+
         SELECT
         supplier.mer_name as merName,
         me.supplier_wholesale_settle_method as cooperationMode,
         SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) AS saleAmount,
-        SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS unsettledAmount,
-        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) ) - SUM( IF(wpsd.order_wholesale_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.order_wholesale_amount, -wpsd.order_wholesale_amount)) ) AS revenueAmount
+        SUM(
+        CASE WHEN wpsd.trans_type='consume' and wpsd.settle_flag = 'unsettled' THEN IFNULL(wpsd.order_wholesale_amount ,0)
+        WHEN wpsd.trans_type='refund' and wpsd.settle_flag = 'unsettled' THEN IFNULL(-wpsd.order_wholesale_amount ,0) ELSE 0 END) AS unsettledAmount,
+
+        SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) )
+        -
+        SUM(
+        CASE WHEN wpsd.trans_type='consume' and wpsd.settle_flag = 'unsettled' THEN IFNULL(wpsd.order_wholesale_amount ,0)
+        WHEN wpsd.trans_type='refund' and wpsd.settle_flag = 'unsettled' THEN IFNULL(-wpsd.order_wholesale_amount ,0) ELSE 0 END)  AS revenueAmount
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code

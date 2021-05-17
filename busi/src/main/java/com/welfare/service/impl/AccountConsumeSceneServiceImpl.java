@@ -435,7 +435,7 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
               sceneConsumeTypeList) {
                 MerAccountTypeConsumeSceneConfig merAccountTypeConsumeSceneConfig
                     = new  MerAccountTypeConsumeSceneConfig();
-                merAccountTypeConsumeSceneConfig.setMerCode(consumeSceneEditReq.getMerCode());
+                merAccountTypeConsumeSceneConfig.setMerCode(merCode);
                 merAccountTypeConsumeSceneConfig.setMerAccountTypeCode(consumeSceneEditReq.getAccountWelfareCode());
                 merAccountTypeConsumeSceneConfig.setStoreCode(storeRelationEditReq.getStoreCode());
                 merAccountTypeConsumeSceneConfig.setSceneConsumeType(type);

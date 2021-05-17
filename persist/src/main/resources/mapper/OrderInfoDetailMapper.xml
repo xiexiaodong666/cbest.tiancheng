@@ -11,6 +11,7 @@
     <select id="queryGroupByTaxRate" resultType="com.welfare.persist.entity.OrderInfoDetail">
         select
             sum(d.wholesale_amount) as wholesaleAmount,
+            sum(d.trans_amount) as transAmount,
             d.wholesale_tax_rate
         from order_info_detail d where d.order_id in
         <foreach collection="list" item="orderNo" separator="," open="(" close=")">

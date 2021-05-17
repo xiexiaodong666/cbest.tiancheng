@@ -102,6 +102,12 @@ public class WholesalePayableSettleController implements IController {
         return success(payableSettletService.customerMersByMerCode(merCode));
     }
 
+    @GetMapping("/payable/customerMersList")
+    @ApiOperation("(平台)查询产生了批发流水的所有客户")
+    public R<List<MerCodeAndNameDTO>> customerMersList() {
+        return success(payableSettletService.customerMersList());
+    }
+
     @PutMapping("/payable/bill/{id}/send")
     @ApiOperation("(平台)平台发送账单")
     @ApiUser

@@ -149,4 +149,10 @@ public interface WholesalePayableSettletService {
      * @return
      */
     List<MerCodeAndNameDTO> customerMersByMerCode(String supplierMerCode);
+
+    /**
+     * 查询所有产生了批发流水的客户
+     * @return
+     */
+    List<MerCodeAndNameDTO> customerMersList();
 }

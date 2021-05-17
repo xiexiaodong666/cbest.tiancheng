@@ -167,6 +167,7 @@ public class OrderMqInfo implements Serializable {
                 detail.setWholesaleTaxRate(taxRate);
             }
             detail.setWholesalePrice(orderDetailMqInfo.getWholesalePrice());
+            detail.setOriginalAmount(orderDetailMqInfo.getOriginalAmount());
             return detail;
         }).collect(Collectors.toList());
     }

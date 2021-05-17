@@ -208,6 +208,7 @@ CREATE TABLE `order_info_detail` (
                                      `sku_name` varchar(50) DEFAULT NULL COMMENT '商品sku名称',
                                      `count` int(8) DEFAULT NULL COMMENT '商品数量',
                                      `refund_count` int(8) DEFAULT NULL COMMENT '售后数量',
+                                     `original_amount` decimal(10,2) DEFAULT 0 comment '商品原价',
                                      `wholesale_price` decimal(10,2) DEFAULT NULL COMMENT '商品结算单价',
                                      `wholesale_amount` decimal(15,2) DEFAULT NULL COMMENT '商品结算总金额',
                                      `wholesale_tax_rate` decimal(8,4) DEFAULT NULL COMMENT '税率',

@@ -75,6 +75,8 @@ public class OrderInfoDetail extends Model<OrderInfoDetail> implements Serializa
      */
     @ApiModelProperty("售后数量")   
     private Integer refundCount;
+    @ApiModelProperty("商品原价")
+    private BigDecimal originalAmount;
     /**
      * 商品结算单价
      */

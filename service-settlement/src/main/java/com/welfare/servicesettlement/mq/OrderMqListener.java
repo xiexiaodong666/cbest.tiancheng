@@ -69,7 +69,7 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
         Account account = accountDao.queryByAccountCode(firstDetail.getAccountCode());
         Merchant merchant = merchantDao.queryByCode(account.getMerCode());
         OrderInfo orderInfo = OrderMqInfo.parseToOrderInfo(orderDTO,firstDetail,account,merchant);
-        List<OrderInfoDetail> orderInfoDetails = orderDTO.parseOrderInfoDetails();
+        List<OrderInfoDetail> orderInfoDetails = orderDTO.parseOrderInfoDetails(WelfareConstant.TransType.CONSUME);
         orderInfoDetailDao.saveBatch(orderInfoDetails);
         orderInfoDao.save(orderInfo);
         log.info("ready to save orderInfo:{}",JSON.toJSONString(orderInfo));

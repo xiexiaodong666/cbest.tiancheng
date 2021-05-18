@@ -146,7 +146,7 @@ public class OrderMqInfo implements Serializable {
         return orderInfo;
     }
 
-    public List<OrderInfoDetail> parseOrderInfoDetails(){
+    public List<OrderInfoDetail> parseOrderInfoDetails(WelfareConstant.TransType transType){
         if (CollectionUtils.isEmpty(orderDetails)) {
             return Collections.emptyList();
         }
@@ -170,6 +170,7 @@ public class OrderMqInfo implements Serializable {
             detail.setOriginalAmount(orderDetailMqInfo.getOriginalAmount());
             detail.setTransAmount(computeTransAmount(orderDetailMqInfo));
             detail.setTransNo(this.tradeNo);
+            detail.setTransType(transType.code());
             return detail;
         }).collect(Collectors.toList());
     }

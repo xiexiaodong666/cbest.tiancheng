@@ -24,8 +24,8 @@ import java.util.List;
 @Component
 public class AliPayPaymentOperator implements IPaymentOperator,IRefundOperator{
     @Override
-    public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        PaymentOperation paymentOperation = doPay(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit, null);
+    public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> usableAccountAmountDOList, List<AccountAmountDO> allAccountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
+        PaymentOperation paymentOperation = doPay(paymentRequest, account, usableAccountAmountDOList, allAccountAmountDOList, supplierStore, merchantCredit, null);
         return Collections.singletonList(paymentOperation);
     }
 

@@ -23,15 +23,16 @@ public interface IPaymentOperator {
      * @param paymentRequest
      * @param account
      * @param accountAmountDOList
+     * @param allAccountAmountDOList
      * @param supplierStore
      * @param merchantCredit
      * @return
      */
     default List<PaymentOperation> pay(PaymentRequest paymentRequest,
-                               Account account,
-                               List<AccountAmountDO> accountAmountDOList,
-                               SupplierStore supplierStore,
-                               MerchantCredit merchantCredit){
+                                       Account account,
+                                       List<AccountAmountDO> accountAmountDOList,
+                                       List<AccountAmountDO> allAccountAmountDOList, SupplierStore supplierStore,
+                                       MerchantCredit merchantCredit){
         throw new RuntimeException("method not supported");
     }
 
@@ -40,19 +41,21 @@ public interface IPaymentOperator {
      * @param paymentRequest
      * @param account
      * @param accountAmountDOList
+     * @param allAccountAmountDOList
      * @param supplierStore
      * @param merchantCredit
      * @param merAccountTypeOperator
      * @return
      */
     default PaymentOperation doPay(PaymentRequest paymentRequest,
-                                     Account account,
-                                     List<AccountAmountDO> accountAmountDOList,
-                                     SupplierStore supplierStore,
-                                     MerchantCredit merchantCredit,
-                                     AbstractMerAccountTypeOperator merAccountTypeOperator) {
+                                   Account account,
+                                   List<AccountAmountDO> accountAmountDOList,
+                                   List<AccountAmountDO> allAccountAmountDOList,
+                                   SupplierStore supplierStore,
+                                   MerchantCredit merchantCredit,
+                                   AbstractMerAccountTypeOperator merAccountTypeOperator) {
         paymentRequest.setPhone(account.getPhone());
-        List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
+        List<AccountAmountType> accountAmountTypes = allAccountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         PaymentOperation paymentOperation = new PaymentOperation();
         BigDecimal paymentAmount = paymentRequest.getAmount();

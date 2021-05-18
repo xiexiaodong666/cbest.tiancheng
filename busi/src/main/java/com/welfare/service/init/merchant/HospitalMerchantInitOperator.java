@@ -69,8 +69,8 @@ public class HospitalMerchantInitOperator extends AbstractMerchantInitOperator {
     @Override
     public List<MerchantAccountType> initMerchantAccountType(String merCode) {
         MerchantAccountType merchantAccountType2 = new MerchantAccountType();
-        merchantAccountType2.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.WHOLESALE.desc());
-        merchantAccountType2.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE.code());
+        merchantAccountType2.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.desc());
+        merchantAccountType2.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
         merchantAccountType2.setMerCode(merCode);
         merchantAccountType2.setShowStatus(1);
         merchantAccountType2.setDeductionOrder(887);

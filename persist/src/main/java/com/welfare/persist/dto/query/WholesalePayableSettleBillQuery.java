@@ -44,4 +44,7 @@ public class WholesalePayableSettleBillQuery extends PageReq{
     private String merName;
 
     private Long id;
+
+    @ApiModelProperty(value = "发送状态:待发送-unsended 已发送-sended")
+    private String sendStatus;
 }

@@ -55,6 +55,9 @@
             <if test="query.recStatus != null and query.recStatus != ''">
                 and wps.rec_status = #{query.recStatus}
             </if>
+            <if test="query.sendStatus != null and query.sendStatus != ''">
+                and wps.send_status = #{query.sendStatus}
+            </if>
             <if test="query.id != null">
                 and wps.id = #{query.id}
             </if>

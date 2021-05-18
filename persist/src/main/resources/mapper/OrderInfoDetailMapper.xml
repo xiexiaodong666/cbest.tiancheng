@@ -24,17 +24,16 @@
     <select id="queryByOrderIdAndTransNoGroupByTaxRate" resultType="com.welfare.persist.entity.OrderInfoDetail">
         select
         sum(
-        case when o.trans_type = 'consume' then IFNULL(d.wholesale_amount,0)
-        when o.trans_type = 'refund' then IFNULL(-d.wholesale_amount,0)
+        case when d.trans_type = 'consume' then IFNULL(d.wholesale_amount,0)
+        when d.trans_type = 'refund' then IFNULL(-d.wholesale_amount,0)
         ELSE 0 END
         ) as transAmount,
         d.wholesale_tax_rate
         from order_info_detail d
-        LEFT JOIN order_info o on d.order_id = o.order_id
         <where>
             <if test="query != null and query.size > 0">
                 <foreach collection="query" item="item" separator=" or " open="(" close=")">
-                    (d.order_id = #{item.orderId} and o.trans_no = #{item.transNo})
+                    (d.order_id = #{item.orderId} and d.trans_no = #{item.transNo})
                 </foreach>
             </if>
         </where>

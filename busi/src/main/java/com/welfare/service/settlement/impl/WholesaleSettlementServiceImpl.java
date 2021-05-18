@@ -229,7 +229,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                 restoreRemainingLimitReq.setMerCode(settle.getMerCode());
                 restoreRemainingLimitReq.setAmount(settle.getSettleAmount());
                 restoreRemainingLimitReq.setTransNo(settle.getSettleNo());
-                restoreRemainingLimitReq.setSettleType(MerCreditType.WHOLESALE_CREDIT_LIMIT.code());
+                restoreRemainingLimitReq.setSettleType(MerCreditType.WHOLESALE_CREDIT.code());
                 log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
                 MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq, "api");
                 if(merchantCreditResp.getCode()!=1){

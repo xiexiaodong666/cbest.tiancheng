@@ -19,9 +19,10 @@ import java.util.List;
 @Slf4j
 @Repository
 public class WholesaleReceivableSettleDetailDao extends ServiceImpl<WholesaleReceivableSettleDetailMapper, WholesaleReceivableSettleDetail> {
-    public List<WholesaleReceivableSettleDetail> queryByTransNo(String transNo){
+    public List<WholesaleReceivableSettleDetail> queryByTransNoAndOrderNo(String transNo, String orderNo){
         return list(Wrappers.<WholesaleReceivableSettleDetail>lambdaQuery()
-                        .eq(WholesaleReceivableSettleDetail::getTransNo, transNo)
+                .eq(WholesaleReceivableSettleDetail::getTransNo, transNo)
+                .eq(WholesaleReceivableSettleDetail::getOrderId,orderNo)
         );
     }
 }

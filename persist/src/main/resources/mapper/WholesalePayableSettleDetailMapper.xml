@@ -418,7 +418,8 @@
     <select id="getSettleDetailIdAndOrderIdList" resultType="com.welfare.persist.entity.WholesalePayableSettleDetail">
         SELECT
         wpsd.id as id,
-        wpsd.order_id as orderId
+        wpsd.order_id as orderId,
+        wpsd.trans_no as transNo
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code

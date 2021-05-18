@@ -45,7 +45,7 @@ public class SettleDetailGenerateServiceImpl implements SettleDetailGenerateServ
                     if (!WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code().equals(accountDeductionDetail.getMerAccountType())) {
                         return null;
                     }
-                    List<WholesaleReceivableSettleDetail> settleDetailsInDb = receivableDetailDao.queryByTransNo(accountDeductionDetail.getTransNo());
+                    List<WholesaleReceivableSettleDetail> settleDetailsInDb = receivableDetailDao.queryByTransNoAndOrderNo(accountDeductionDetail.getTransNo(), accountDeductionDetail.getOrderNo());
                     if (CollectionUtil.isNotEmpty(settleDetailsInDb) && accountDeductionDetails.size() == settleDetailsInDb.size()) {
                         //已经处理过，则不处理（MQ重试的时候会到这个逻辑）
                         return null;

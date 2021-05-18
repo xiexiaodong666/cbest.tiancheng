@@ -37,7 +37,7 @@ public class MerchantCreditController implements IController {
     @PostMapping("/restore/remainingLimit")
     @ApiOperation("恢复商户剩余信用额度")
     public R<String> save(@Validated @RequestBody RestoreRemainingLimitReq request){
-        if(MerCreditType.WHOLESALE_CREDIT_LIMIT.code().equals(request.getSettleType())) {
+        if(MerCreditType.WHOLESALE_CREDIT.code().equals(request.getSettleType())) {
             merchantCreditService.restoreWholesaleCreditLimit(request);
         } else {
             merchantCreditService.restoreRemainingLimit(request);

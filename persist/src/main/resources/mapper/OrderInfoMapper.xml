@@ -721,6 +721,9 @@
                 <if test="orderPageQuery.orderId != null">
                     and oi.order_id = #{orderPageQuery.orderId}
                 </if>
+                <if test="orderPageQuery.transNo != null and orderPageQuery.transNo != ''">
+                    and ab.trans_no = #{orderPageQuery.transNo}
+                </if>
                 <if test="orderPageQuery.lowPrice != null">
                     and ab.trans_amount &gt;= #{orderPageQuery.lowPrice}
                 </if>

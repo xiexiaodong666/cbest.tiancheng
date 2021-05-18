@@ -169,6 +169,7 @@ public class OrderMqInfo implements Serializable {
             detail.setWholesalePrice(orderDetailMqInfo.getWholesalePrice());
             detail.setOriginalAmount(orderDetailMqInfo.getOriginalAmount());
             detail.setTransAmount(computeTransAmount(orderDetailMqInfo));
+            detail.setTransNo(this.tradeNo);
             return detail;
         }).collect(Collectors.toList());
     }

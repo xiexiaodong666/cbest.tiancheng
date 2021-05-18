@@ -3,6 +3,7 @@ package com.welfare.servicesettlement.dto.mall;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.persist.entity.OrderInfo;
+import com.welfare.persist.entity.OrderInfoDetail;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Description:
@@ -86,5 +88,10 @@ public class AftersaleOrderMqInfo extends OrderMqInfo{
         //需要insert，id置空
         afterSaleOrderInfo.setId(null);
         return afterSaleOrderInfo;
+    }
+
+    @Override
+    public BigDecimal computeTransAmount(OrderDetailMqInfo orderDetailMqInfo){
+        return orderDetailMqInfo.getRefundAmount();
     }
 }

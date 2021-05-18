@@ -47,6 +47,13 @@ public class MerchantAccountTypeController implements IController {
     public R<List<MerchantAccountTypeInfo>> list(@Valid MerchantAccountTypeReq req){
         return R.success(merchantAccountTypeConverter.toD(merchantAccountTypeService.list(req)));
     }
+
+    @GetMapping("/list/exclusion")
+    @ApiOperation("查询商户下的福利类型,排除特殊的福利类型（不分页）")
+    public R<List<MerchantAccountTypeInfo>> listExclusion(@Valid MerchantAccountTypeReq req){
+        return R.success(merchantAccountTypeConverter.toD(merchantAccountTypeService.listExclusion(req)));
+    }
+
     @GetMapping("/detail")
     @ApiOperation("查询商户详情）")
     public R<MerchantAccountTypeDetailDTO> detail(@RequestParam(required = true) @ApiParam("id") Long id){

@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -81,7 +82,8 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
   private final SupplierStoreSyncConverter supplierStoreSyncConverter;
 
   private final DictService dictService;
-  private final AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
+  @Autowired
+  private AccountConsumeSceneStoreRelationService accountConsumeSceneStoreRelationService;
   private final MerchantAddressService merchantAddressService;
 
 
@@ -753,6 +755,7 @@ public class SupplierStoreServiceImpl implements SupplierStoreService {
       }
       
       accountConsumeSceneStoreRelationService.updateStoreConsumeTypeByDTOList(m.getKey(), relationDTOList);
+      accountConsumeSceneStoreRelationService.updateWelfareStoreConsumeTypeByDTOList(m.getKey(), relationDTOList);
     }
       queryWrapper = new QueryWrapper<>();
     queryWrapper.in(MerchantStoreRelation.MER_CODE, mapByMerCode.keySet());

@@ -1,5 +1,7 @@
 package com.welfare.service.impl;
 
+import static com.welfare.common.constants.WelfareConstant.ACCOUNT_WELFARE_TYPE_CACHE_NAME;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -13,6 +15,7 @@ import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.MerchantUserHolder;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
+import com.welfare.persist.dao.MerAccountTypeConsumeSceneConfigDao;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
 import com.welfare.persist.dto.AccountConsumeSceneMapperDTO;
 import com.welfare.persist.dto.AccountConsumeScenePageDTO;
@@ -57,6 +60,8 @@ import java.util.stream.Collectors;
 public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneService {
 
   private final AccountConsumeSceneDao accountConsumeSceneDao;
+  private final MerAccountTypeConsumeSceneConfigDao accountTypeConsumeSceneConfigDao;
+
   private final AccountConsumeSceneCustomizeMapper accountConsumeSceneCustomizeMapper;
   private final AccountConsumeSceneStoreRelationDao accountConsumeSceneStoreRelationDao;
   @Autowired
@@ -286,6 +291,44 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
   }
 
   @Override
+  public List<AccountConsumeSceneResp> findAllAccountWelfareConsumeSceneDTO(String merCode) {
+    List<AccountConsumeSceneResp> resps = new ArrayList<>();
+    List<AccountConsumeStoreInfoDTO> consumeStoreInfoDTOS = accountConsumeSceneCustomizeMapper.findAllAccountWelfareConsumeSceneDTO(merCode);
+    if (CollectionUtils.isNotEmpty(consumeStoreInfoDTOS)) {
+      //按消费id分组
+      consumeStoreInfoDTOS.stream()
+          .collect(Collectors.groupingBy(AccountConsumeStoreInfoDTO::getAccountWelfareCode))
+          .forEach((id, accountConsumeStoreInfoDTOS) -> {
+            AccountConsumeSceneResp resp = new AccountConsumeSceneResp();
+            resp.setId(String.valueOf(id));
+            AccountConsumeStoreInfoDTO storeInfoDTO = accountConsumeStoreInfoDTOS.get(0);
+            resp.setAccountWelfareCode(storeInfoDTO.getAccountWelfareCode());
+            resp.setAccountWelfareName(storeInfoDTO.getAccountWelfareName());
+            resp.setMerCode(storeInfoDTO.getMerCode());
+            resp.setConsumeSceneSupplierDTOS(new ArrayList<>());
+            //按供应商编码分组
+            accountConsumeStoreInfoDTOS.stream()
+                .collect(Collectors.groupingBy(AccountConsumeStoreInfoDTO::getSupplierCode))
+                .forEach((supplierCode, accountConsumeStoreInfos) -> {
+                  AccountConsumeSceneSupplierDTO consumeSceneSupplierDTO = new AccountConsumeSceneSupplierDTO();
+                  consumeSceneSupplierDTO.setSupplierCode(supplierCode);
+                  consumeSceneSupplierDTO.setSupplierName(accountConsumeStoreInfos.get(0).getSupplierName());
+                  consumeSceneSupplierDTO.setConsumeStoreRelationInfos(new ArrayList<>());
+                  // 封装具体的消费门店配置信息
+                  accountConsumeStoreInfos.forEach(accountConsume -> {
+                    AccountConsumeStoreRelationInfo storeRelationInfo = new AccountConsumeStoreRelationInfo();
+                    BeanUtils.copyProperties(accountConsume, storeRelationInfo);
+                    consumeSceneSupplierDTO.getConsumeStoreRelationInfos().add(storeRelationInfo);
+                  });
+                  resp.getConsumeSceneSupplierDTOS().add(consumeSceneSupplierDTO);
+                });
+            resps.add(resp);
+          });
+    }
+    return resps;
+  }
+
+  @Override
   @Transactional(rollbackFor = Exception.class)
   public Boolean edit(List<AccountConsumeSceneEditReq> consumeSceneEditReqs) {
     if (CollectionUtils.isEmpty(consumeSceneEditReqs)) {
@@ -359,5 +402,77 @@ public class AccountConsumeSceneServiceImpl implements AccountConsumeSceneServic
         });
       }
     }
+  }
+
+  @Override
+  public Boolean editWelfare(List<AccountWelfareConsumeSceneEditReq> consumeSceneEditReqs) {
+    if (CollectionUtils.isEmpty(consumeSceneEditReqs)) {
+      throw new BizException("至少配置一个员工类型");
+    }
+    //删除已有配置
+    String merCode = MerchantUserHolder.getMerchantUser().getMerchantCode();
+    List<MerAccountTypeConsumeSceneConfig> oldScenes = accountTypeConsumeSceneConfigDao.getAllByMercode(Lists.newArrayList(merCode));
+
+    try{
+      if (CollectionUtils.isNotEmpty(oldScenes)) {
+        List<Long> oldConsumeSceneIds = oldScenes.stream()
+            .map(MerAccountTypeConsumeSceneConfig::getId).collect(Collectors.toList());
+        accountTypeConsumeSceneConfigDao.getBaseMapper().deleteBatchIds(oldConsumeSceneIds);
+      }
+
+      List<MerAccountTypeConsumeSceneConfig> newScenes = new ArrayList<>();
+      // 保存最新配置
+
+      for (AccountWelfareConsumeSceneEditReq consumeSceneEditReq:
+          consumeSceneEditReqs) {
+        if(CollectionUtils.isNotEmpty(consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs())) {
+          for (AccountConsumeStoreRelationEditReq storeRelationEditReq:
+              consumeSceneEditReq.getAccountConsumeStoreRelationEditReqs() ) {
+            String sceneConsumeType = storeRelationEditReq.getSceneConsumType();
+            if(StringUtils.isNotBlank(sceneConsumeType)) {
+              String[] sceneConsumeTypeList = sceneConsumeType.split(",");
+              for (String type:
+              sceneConsumeTypeList) {
+                MerAccountTypeConsumeSceneConfig merAccountTypeConsumeSceneConfig
+                    = new  MerAccountTypeConsumeSceneConfig();
+                merAccountTypeConsumeSceneConfig.setMerCode(merCode);
+                merAccountTypeConsumeSceneConfig.setMerAccountTypeCode(consumeSceneEditReq.getAccountWelfareCode());
+                merAccountTypeConsumeSceneConfig.setStoreCode(storeRelationEditReq.getStoreCode());
+                merAccountTypeConsumeSceneConfig.setSceneConsumeType(type);
+
+                newScenes.add(merAccountTypeConsumeSceneConfig);
+              }
+            }
+
+          }
+
+        }
+      }
+      accountTypeConsumeSceneConfigDao.saveBatch(newScenes);
+      return true;
+    } finally {
+      if (TransactionSynchronizationManager.isActualTransactionActive()) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+          @Override
+          public void afterCompletion(int status) {
+            if (CollectionUtils.isNotEmpty(oldScenes)) {
+              String cacheName = ACCOUNT_WELFARE_TYPE_CACHE_NAME;
+              Cache cache = cacheManager.getCache(cacheName);
+              if (cache != null) {
+                oldScenes.forEach(scene -> {
+                  String key = scene.getMerAccountTypeCode() + scene.getMerCode();
+                  if (cache.evictIfPresent(key)) {
+                    log.info("删除缓存，name:{} key:{}", cacheName, key);
+                  } else {
+                    log.info("没有缓存，name:{} key:{}", cacheName, key);
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+    }
+
   }
 }

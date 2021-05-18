@@ -1,7 +1,10 @@
 package com.welfare.common.util;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.exception.BizException;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
@@ -116,5 +119,27 @@ public class ConsumeTypesUtils {
       }
     }
     return consumeTypeEnums;
+  }
+
+  /**
+   * 该门店是否包含批发业务
+   */
+  public static boolean isRelationedWholesale(String consumeType) {
+    Map<String, Boolean> consumeTypeMap;
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      consumeTypeMap = mapper.readValue(
+          consumeType, Map.class);
+    }  catch (JsonProcessingException e) {
+      throw new BizException("消费方法格式错误");
+    }
+    if (consumeTypeMap == null) {
+      throw new BizException("消费方法格式错误");
+    }
+    Boolean isRelationedWholesale = consumeTypeMap.get(ConsumeTypeEnum.WHOLESALE.getCode());
+    if(isRelationedWholesale == null) {
+      isRelationedWholesale = false;
+    }
+    return isRelationedWholesale;
   }
 }

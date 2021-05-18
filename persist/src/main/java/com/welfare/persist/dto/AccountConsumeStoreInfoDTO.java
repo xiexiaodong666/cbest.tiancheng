@@ -28,6 +28,18 @@ public class AccountConsumeStoreInfoDTO {
   private String accountTypeName;
 
   /**
+   * 福利类型id
+   */
+  @ApiModelProperty("福利类型Code")
+  private String accountWelfareCode;
+
+  /**
+   * 福利类型名称
+   */
+  @ApiModelProperty("福利类型名称")
+  private String accountWelfareName;
+
+  /**
    * 商户代码
    */
   @ApiModelProperty("商户代码")

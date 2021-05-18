@@ -14,6 +14,11 @@ import lombok.Data;
 @Data
 public class ExportMerChantConsumeData {
 
+  @ApiModelProperty("序号")
+  @ExcelProperty(value = "序号")
+  @ColumnWidth(5)
+  private Long serialNumber;
+
   @ApiModelProperty("商户ID")
   @ExcelProperty(value = "商户ID")
   @ColumnWidth(10)
@@ -23,36 +28,6 @@ public class ExportMerChantConsumeData {
   @ExcelProperty(value = "商户名称")
   @ColumnWidth(30)
   private String merName;
-
-  @ApiModelProperty("员工数（人）")
-  @ExcelProperty(value = "员工数（人）")
-  @ColumnWidth(10)
-  private String userNum;
-
-  @ApiModelProperty("付费类型")
-  @ExcelProperty(value = "付费类型")
-  @ColumnWidth(10)
-  private String merCooperationMode;
-
-  @ApiModelProperty("商户余额（元）")
-  @ExcelProperty(value = "商户余额（元）")
-  @ColumnWidth(20)
-  private String currentBalance;
-
-  @ApiModelProperty("剩余信用额度/信用额度（元）")
-  @ExcelProperty(value = "剩余信用额度/信用额度（元）")
-  @ColumnWidth(20)
-  private String remainingLimit;
-
-  @ApiModelProperty("累计结算金额（元）")
-  @ExcelProperty(value = "累计结算金额（元）")
-  @ColumnWidth(20)
-  private String settledMoney;
-
-  @ApiModelProperty("未结算金额（元）\n (包含待结算及结算中)")
-  @ExcelProperty(value = "未结算金额（元）\n (包含待结算及结算中)")
-  @ColumnWidth(20)
-  private String unsettledMoney;
 
   @ApiModelProperty("业务类型")
   @ExcelProperty(value = "业务类型")
@@ -68,7 +43,6 @@ public class ExportMerChantConsumeData {
   @ExcelProperty(value = "消费总金额（元）")
   @ColumnWidth(15)
   private String consumeMoney;
-
 
   @ApiModelProperty("百货消费总金额（元）")
   @ExcelProperty(value = "百货消费总金额（元）")
@@ -106,15 +80,75 @@ public class ExportMerChantConsumeData {
   @ColumnWidth(15)
   private String avgTransMoney;
 
+
+  @ApiModelProperty("付费类型")
+  @ExcelProperty(value = "付费类型")
+  @ColumnWidth(10)
+  private String merCooperationMode;
+
+  @ApiModelProperty("员工数（人）")
+  @ExcelProperty(value = "员工数（人）")
+  @ColumnWidth(10)
+  private String userNum;
+
+
+  @ApiModelProperty("APP活跃人数")
+  @ExcelProperty(value = "APP活跃人数")
+  @ColumnWidth(10)
+  private String visitAppNum;
+
+  @ApiModelProperty("日均APP活跃人数")
+  @ExcelProperty(value = "日均APP活跃人数")
+  @ColumnWidth(10)
+  private String avgVisitAppNum;
+
+  @ApiModelProperty("累计充值余额（元）")
+  @ExcelProperty(value = "累计充值余额（元）")
+  @ColumnWidth(10)
+  private String chargeBalance;
+
+  @ApiModelProperty("商户余额（元）")
+  @ExcelProperty(value = "商户余额（元）")
+  @ColumnWidth(20)
+  private String currentBalance;
+
+  @ApiModelProperty("信用额度（元）")
+  @ExcelProperty(value = "信用额度（元）")
+  @ColumnWidth(20)
+  private String creditLimit;
+
+  @ApiModelProperty("剩余信用额度（元）")
+  @ExcelProperty(value = "剩余信用额度（元）")
+  @ColumnWidth(20)
+  private String remainingLimit;
+
+  @ApiModelProperty("累计结算金额（元）")
+  @ExcelProperty(value = "累计结算金额（元）")
+  @ColumnWidth(20)
+  private String settledMoney;
+
+  @ApiModelProperty("未结算金额（元）\n (包含待结算及结算中)")
+  @ExcelProperty(value = "未结算金额（元）\n (包含待结算及结算中)")
+  @ColumnWidth(20)
+  private String unsettledMoney;
+
+
+
+
   public static ExportMerChantConsumeData rowsOf(MerChantConsumeDataRowsApiResponse response) {
 
     ExportMerChantConsumeData exportMerChantConsumeData = new ExportMerChantConsumeData();
 
+    exportMerChantConsumeData.setSerialNumber(response.getSerialNumber());
     exportMerChantConsumeData.setMerCode(response.getMerCode());
     exportMerChantConsumeData.setMerName(response.getMerName());
     exportMerChantConsumeData.setUserNum(response.getUserNum());
+    exportMerChantConsumeData.setChargeBalance(response.getChargeBalance());
+    exportMerChantConsumeData.setVisitAppNum(response.getVisitAppNum());
+    exportMerChantConsumeData.setAvgVisitAppNum(response.getAvgVisitAppNum());
     exportMerChantConsumeData.setMerCooperationMode(response.getMerCooperationMode());
     exportMerChantConsumeData.setCurrentBalance(response.getCurrentBalance());
+    exportMerChantConsumeData.setCreditLimit(response.getCreditLimit());
     exportMerChantConsumeData.setRemainingLimit(response.getRemainingLimit());
     exportMerChantConsumeData.setSettledMoney(response.getSettledMoney());
     exportMerChantConsumeData.setUnsettledMoney(response.getUnsettledMoney());
@@ -158,8 +192,12 @@ public class ExportMerChantConsumeData {
     //exportMerChantConsumeData.setMerCode("汇总");
     exportMerChantConsumeData.setMerName(response.getMerName());
     exportMerChantConsumeData.setUserNum(response.getUserNum());
+    exportMerChantConsumeData.setChargeBalance(response.getChargeBalance());
+    exportMerChantConsumeData.setVisitAppNum(response.getVisitAppNum());
+    exportMerChantConsumeData.setAvgVisitAppNum(response.getAvgVisitAppNum());
     exportMerChantConsumeData.setMerCooperationMode(response.getMerCooperationMode());
     exportMerChantConsumeData.setCurrentBalance(response.getCurrentBalance());
+    exportMerChantConsumeData.setCreditLimit(response.getCreditLimit());
     exportMerChantConsumeData.setRemainingLimit(response.getRemainingLimit());
     exportMerChantConsumeData.setSettledMoney(response.getSettledMoney());
     exportMerChantConsumeData.setUnsettledMoney(response.getUnsettledMoney());

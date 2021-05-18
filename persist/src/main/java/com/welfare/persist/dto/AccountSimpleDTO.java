@@ -36,4 +36,6 @@ public class AccountSimpleDTO {
     @ApiModelProperty("是否授信")
     private Boolean credit;
 
+    @ApiModelProperty("批发采购余额")
+    private BigDecimal wholesaleCredit;
 }

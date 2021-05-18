@@ -32,7 +32,7 @@ public class BatchDepositApplyRequest {
    * 福利类型
    */
   @ApiModelProperty("福利类型")
-  @NotEmpty(message = "福利类型为空")
+  @NotEmpty(message = "福利类型为空 (员工批发采购账户:wholesale_procurement)")
   private String merAccountTypeCode;
 
   /**
@@ -53,4 +53,10 @@ public class BatchDepositApplyRequest {
    */
   @ApiModelProperty("文件id")
   private String fileId;
+
+  /**
+   * 充值类型
+   */
+  @ApiModelProperty("充值类型（批发采购充值：wholesaleCreditLimitApply  福利充值：welfareApply)")
+  private String applyType;
 }

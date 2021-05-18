@@ -1,6 +1,7 @@
 package com.welfare.servicesettlement.controller;
 
 import cn.hutool.core.date.StopWatch;
+import com.welfare.common.constants.WelfareSettleConstant.BusinessTypeEnum;
 import com.welfare.common.enums.ConsumeTypeEnum;
 import com.welfare.service.dto.merchantconsume.ExportMerChantConsumeData;
 import com.welfare.service.dto.merchantconsume.MerChantConsumeDataDetailApiResponse;
@@ -134,13 +135,23 @@ public class MerChantConsumeDataController {
     if (CollectionUtils.isNotEmpty(merChantConsumeDataRowsApiResponseList)) {
       for (MerChantConsumeDataRowsApiResponse merChantConsumeDataRowsApiResponse :
           merChantConsumeDataRowsApiResponseList) {
-        exportMerChantConsumeDataList.add(
-            ExportMerChantConsumeData.rowsOf(merChantConsumeDataRowsApiResponse));
-        for (MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse :
-            merChantConsumeDataRowsApiResponse.getConsumeTypeDetailList()) {
-          exportMerChantConsumeDataList.add(
-              ExportMerChantConsumeData.detailOf(merChantConsumeDataDetailApiResponse));
+        ExportMerChantConsumeData exportMerChantConsumeData = ExportMerChantConsumeData.rowsOf(merChantConsumeDataRowsApiResponse);
+        exportMerChantConsumeDataList.add(exportMerChantConsumeData);
+        if(CollectionUtils.isNotEmpty(request.getRowsBusinessType())) {
+          String businessType = merChantConsumeDataRowsApiResponse.getBusinessType();
+          if(BusinessTypeEnum.getDescList(request.getRowsBusinessType()).contains(businessType)) {
+            for (MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse :
+                merChantConsumeDataRowsApiResponse.getConsumeTypeDetailList()) {
+              exportMerChantConsumeDataList.add(
+                  ExportMerChantConsumeData.detailOf(merChantConsumeDataDetailApiResponse));
+            }
+          } else {
+            exportMerChantConsumeData.setConsumeType("");
+          }
+        } else {
+          exportMerChantConsumeData.setConsumeType("");
         }
+
       }
     }
 
@@ -149,13 +160,25 @@ public class MerChantConsumeDataController {
 
       for (TableExt tableExt :
           tableExtList) {
-        exportMerChantConsumeDataList.add(ExportMerChantConsumeData.extOf(tableExt));
+        ExportMerChantConsumeData exportMerChantConsumeData = ExportMerChantConsumeData.extOf(tableExt);
+        exportMerChantConsumeDataList.add(exportMerChantConsumeData);
+        if(CollectionUtils.isNotEmpty(request.getExtBusinessType())) {
+          String businessType = tableExt.getBusinessType();
 
-        for (MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse :
-            tableExt.getConsumeTypeDetailList()) {
-          exportMerChantConsumeDataList.add(
-              ExportMerChantConsumeData.detailOf(merChantConsumeDataDetailApiResponse));
+          if(BusinessTypeEnum.getDescList(request.getExtBusinessType()).contains(businessType)) {
+
+            for (MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse :
+                tableExt.getConsumeTypeDetailList()) {
+              exportMerChantConsumeDataList.add(
+                  ExportMerChantConsumeData.detailOf(merChantConsumeDataDetailApiResponse));
+            }
+          } else {
+            exportMerChantConsumeData.setConsumeType("");
+          }
+        } else {
+          exportMerChantConsumeData.setConsumeType("");
         }
+
       }
     }
 
@@ -201,6 +224,8 @@ public class MerChantConsumeDataController {
                                                 LinkedHashMap::new, Collectors.toList()
         ));
 
+    Long serialNumber = 0l;
+
     for (Map.Entry<String, List<WelfareMerChantConsumeDataBaiscResponse>> entry : merMap
         .entrySet()) {
 
@@ -220,6 +245,8 @@ public class MerChantConsumeDataController {
         WelfareMerChantConsumeDataBaiscResponse selfResponse = selfDataList.get(0);
         MerChantConsumeDataRowsApiResponse selfOf = MerChantConsumeDataRowsApiResponse.selfOf(
             selfResponse);
+        serialNumber++;
+        selfOf.setSerialNumber(serialNumber);
         List<MerChantConsumeDataDetailApiResponse> selfMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
         selfDataList.forEach(s->{
           MerChantConsumeDataDetailApiResponse merChantConsumeDataDetailApiResponse = new MerChantConsumeDataDetailApiResponse();
@@ -241,7 +268,10 @@ public class MerChantConsumeDataController {
 
         MerChantConsumeDataRowsApiResponse thirdOf = MerChantConsumeDataRowsApiResponse.thirdOf(
             thirdResponse, isFillMerchantAttributes);
-
+        if(isFillMerchantAttributes) {
+          serialNumber++;
+          thirdOf.setSerialNumber(serialNumber);
+        }
         List<MerChantConsumeDataDetailApiResponse> thirdMerChantConsumeDataDetailApiResponseList = new ArrayList<>();
 
         thirdDataList.forEach(t->{

@@ -172,7 +172,7 @@ public class EmployeeSettleServiceImpl implements EmployeeSettleService {
                     throw new BizException(String.format("结算单[%s]不能重复结算！", employeeSettle.getSettleNo()));
                 }
                 employeeSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLED.code());
-                employeeSettle.setUppdateUser(MerchantUserHolder.getMerchantUser().getUserCode());
+                employeeSettle.setUpdateUser(MerchantUserHolder.getMerchantUser().getUserCode());
             });
             // 修改结算状态
             boolean flag1 = employeeSettleDao.updateBatchById(employeeSettles);

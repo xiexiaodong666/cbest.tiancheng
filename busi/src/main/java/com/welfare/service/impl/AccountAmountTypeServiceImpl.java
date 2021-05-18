@@ -1,9 +1,15 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.ExceptionCode;
+import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.persist.dao.*;
 import com.welfare.persist.dto.AccountDepositIncreDTO;
@@ -25,6 +31,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
@@ -95,7 +102,14 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                         accountAmountType.getAccountBalance(),
                         "sys");
             }
-            account.setAccountBalance(oldAccountBalance.add(deposit.getAmount()));
+            if (!Lists.newArrayList(
+                    WelfareConstant.MerAccountTypeCode.WHOLESALE.code(),
+                    WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code(),
+                    WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code(),
+                    WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
+                    .contains(deposit.getMerAccountTypeCode())) {
+                account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
+            }
             AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
             accountChangeEventRecord.setAccountCode(account.getAccountCode());
             accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
@@ -130,12 +144,15 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                 List<Long> accountCodes = deposits.stream().map(Deposit::getAccountCode).collect(Collectors.toList());
                 Map<Long, Account> accountMap = accountDao.mapByAccountCodes(accountCodes);
                 Map<Long, AccountAmountType> accountAmountTypeMap = accountAmountTypeDao.mapByAccountCodes(accountCodes, merAccountTypeCode);
+
                 List<AccountDeductionDetail> deductionDetails = new ArrayList<>();
                 List<AccountChangeEventRecord> records = new ArrayList<>();
                 List<AccountBillDetail> details = new ArrayList<>();
                 List<OrderTransRelation> relations = new ArrayList<>();
                 List<AccountAmountType> newAccountAmountTypes = new ArrayList<>();
+                List<Account> updateAccounts = new ArrayList<>();
 
+                List<String> errorMsg = new ArrayList<>();
                 for (Deposit deposit : deposits) {
                     AccountAmountType accountAmountType = accountAmountTypeMap.get(deposit.getAccountCode());
                     if (Objects.isNull(accountAmountType)) {
@@ -147,7 +164,18 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                         accountAmountType.setAccountBalance(accountAmountType.getAccountBalance().add(deposit.getAmount()));
                     }
                     Account account = accountMap.get(deposit.getAccountCode());
-                    account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
+                    if (accountAmountType.getAccountBalance().compareTo(BigDecimal.ZERO) < 0) {
+                        errorMsg.add(account.getPhone());
+                    }
+                    if (!Lists.newArrayList(
+                            WelfareConstant.MerAccountTypeCode.WHOLESALE.code(),
+                            WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code(),
+                            WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code(),
+                            WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())
+                            .contains(deposit.getMerAccountTypeCode())) {
+                        updateAccounts.add(account);
+                        account.setAccountBalance(account.getAccountBalance().add(deposit.getAmount()));
+                    }
                     AccountChangeEventRecord accountChangeEventRecord = new AccountChangeEventRecord();
                     accountChangeEventRecord.setAccountCode(account.getAccountCode());
                     accountChangeEventRecord.setChangeType(AccountChangeType.ACCOUNT_BALANCE_CHANGE.getChangeType());
@@ -161,6 +189,7 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                             deposit.getTransNo(),
                             WelfareConstant.TransType.DEPOSIT_INCR));
                 }
+                BizAssert.isTrue(CollectionUtils.isEmpty(errorMsg), ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户不可充为负\n" + Joiner.on(",").join(errorMsg));
                 accountChangeEventRecordDao.getBaseMapper().batchInsert(records);
                 accountAmountTypeDao.saveBatch(newAccountAmountTypes);
                 Map<Long, BigDecimal> amountMap = deposits.stream().collect(Collectors.toMap(Deposit::getAccountCode, Deposit::getAmount));
@@ -168,10 +197,11 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
                     List<AccountAmountType> amountTypes = Lists.newArrayList(accountAmountTypeMap.values());
                     accountAmountTypeMapper.batchSaveOrUpdate(AccountDepositIncreDTO.of(amountTypes, amountMap));
                 }
-                List<Account> accounts = Lists.newArrayList(accountMap.values());
                 Map<Long, Long> changeEventIdMap = records.stream().collect(Collectors.toMap(AccountChangeEventRecord::getAccountCode,
                         AccountChangeEventRecord::getId));
-                accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(accounts, amountMap, changeEventIdMap));
+                if (!CollectionUtils.isEmpty(updateAccounts)) {
+                    accountDao.getBaseMapper().batchUpdateAccountBalance(AccountDepositIncreDTO.of(updateAccounts, amountMap, changeEventIdMap));
+                }
 
                 accountDeductionDetailDao.saveBatch(deductionDetails, deductionDetails.size());
                 accountBillDetailDao.saveBatch(details, details.size());
@@ -214,41 +244,80 @@ public class AccountAmountTypeServiceImpl implements AccountAmountTypeService {
         return accountAmountTypes;
     }
 
+
     @Override
     public List<AccountAmountTypeResp> list(Long accountCode) {
         Account account = accountService.getByAccountCode(accountCode);
         List<AccountAmountType> accountAmountTypes = accountAmountTypeDao.queryByAccountCode(accountCode);
+        Map<String, AccountAmountType> accountTypeMap = accountAmountTypes.stream().collect(Collectors.toMap(AccountAmountType::getMerAccountTypeCode, type -> type));
         List<AccountAmountTypeResp> resps = new ArrayList<>();
-        if (Objects.nonNull(account) && org.apache.commons.collections4.CollectionUtils.isNotEmpty(accountAmountTypes)) {
+        AtomicReference<AccountAmountTypeResp> wholesaleAmountType = new AtomicReference<>();
+        if (Objects.nonNull(account)) {
             List<MerchantAccountType> merchantAccountTypes = merchantAccountTypeDao.queryAllByMerCode(account.getMerCode());
-            Map<String, MerchantAccountType> merchantAccountTypeMap = merchantAccountTypes.stream().collect(Collectors.toMap(MerchantAccountType::getMerAccountTypeCode, type -> type));
-            accountAmountTypes.forEach(accountAmountType -> {
+            merchantAccountTypes.forEach(merchantAccountType -> {
                 AccountAmountTypeResp resp = new AccountAmountTypeResp();
-                MerchantAccountType merchantAccountType = merchantAccountTypeMap.get(accountAmountType.getMerAccountTypeCode());
                 resp.setAccountCode(accountCode);
                 resp.setShowOrder(merchantAccountType.getDeductionOrder());
-                resp.setMerAccountTypeCode(accountAmountType.getMerAccountTypeCode());
+                resp.setMerAccountTypeCode(merchantAccountType.getMerAccountTypeCode());
                 resp.setMerAccountTypeName(merchantAccountType.getMerAccountTypeName());
-                if (WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())) {
-                    resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                AccountAmountType accountAmountType = accountTypeMap.get(merchantAccountType.getMerAccountTypeCode());
+                if (Objects.nonNull(accountAmountType)) {
+                    if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
+                        if (account.getCredit() != null && account.getCredit()) {
+                            resp.setBalance(accountAmountType.getAccountBalance() + "/" + account.getMaxQuota());
+                            resps.add(resp);
+                        }
+                    } else if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())) {
+                        if (account.getCredit() != null && account.getCredit()) {
+                            resp.setBalance(accountAmountType.getAccountBalance() + "");
+                            resps.add(resp);
+                        }
+                    } else {
+                        resp.setBalance(accountAmountType.getAccountBalance() + "");
+                        if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())) {
+                            wholesaleAmountType.set(resp);
+                        } else {
+                            resps.add(resp);
+                        }
+                    }
                 } else {
-                    resp.setBalance(accountAmountType.getAccountBalance() + "");
+                    if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA.code())) {
+                        if (account.getCredit() != null && account.getCredit()) {
+                            resp.setBalance(BigDecimal.ZERO.toString() + "/" + account.getMaxQuota());
+                            resps.add(resp);
+                        }
+                    } else if (merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY.code())) {
+                        if (account.getCredit() != null && account.getCredit()) {
+                            resp.setBalance(BigDecimal.ZERO.toString());
+                            resps.add(resp);
+                        }
+                    } else {
+                        if (!merchantAccountType.getMerAccountTypeCode().equals(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code())) {
+                            resp.setBalance(BigDecimal.ZERO.toString());
+                            resps.add(resp);
+                        }
+                    }
                 }
             });
         }
+        if (Objects.nonNull(wholesaleAmountType.get())) {
+            resps.add(wholesaleAmountType.get());
+        }
         return resps;
     }
+
 
     private AccountDeductionDetail assemblyAccountDeductionDetail(Deposit deposit, Account account,
                                                                   AccountAmountType accountAmountType) {
         AccountDeductionDetail accountDeductionDetail = new AccountDeductionDetail();
         accountDeductionDetail.setAccountCode(account.getAccountCode());
-        accountDeductionDetail.setAccountDeductionAmount(deposit.getAmount());
+        accountDeductionDetail.setAccountDeductionAmount(deposit.getAmount().abs());
         accountDeductionDetail.setAccountAmountTypeBalance(accountAmountType.getAccountBalance());
         accountDeductionDetail.setMerAccountType(accountAmountType.getMerAccountTypeCode());
         accountDeductionDetail.setTransNo(deposit.getTransNo());
-        accountDeductionDetail.setTransType(WelfareConstant.TransType.DEPOSIT_INCR.code());
-        accountDeductionDetail.setTransAmount(deposit.getAmount());
+        accountDeductionDetail.setTransType(deposit.getAmount().compareTo(BigDecimal.ZERO) < 0 ?
+                WelfareConstant.TransType.DEPOSIT_BACK.code() :  WelfareConstant.TransType.DEPOSIT_INCR.code());
+        accountDeductionDetail.setTransAmount(deposit.getAmount().abs());
         accountDeductionDetail.setReversedAmount(BigDecimal.ZERO);
         accountDeductionDetail.setTransTime(Calendar.getInstance().getTime());
         accountDeductionDetail.setMerDeductionCreditAmount(BigDecimal.ZERO);

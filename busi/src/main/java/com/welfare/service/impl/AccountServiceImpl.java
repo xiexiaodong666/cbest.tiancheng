@@ -80,6 +80,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.welfare.common.constants.RedisKeyConstant.ACCOUNT_AMOUNT_TYPE_OPERATE;
+import static com.welfare.common.constants.WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT;
 
 /**
  * 账户信息服务接口实现
@@ -137,7 +138,8 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private PaymentChannelService paymentChannelService;
     private final PaymentChannelDao paymentChannelDao;
-    private final MerchantCreditService merchantCreditService;
+    @Autowired
+    private MerchantCreditService merchantCreditService;
     private final static Map<String, WelfareConstant.PaymentChannel> PAYMENT_CHANNEL_MAP = Stream
         .of(WelfareConstant.PaymentChannel.values()).collect(Collectors
             .toMap(WelfareConstant.PaymentChannel::code,
@@ -764,6 +766,13 @@ public class AccountServiceImpl implements AccountService {
         Page<AccountBillDetailMapperDTO> page = new Page<>(currentPage, pageSize);
         IPage<AccountBillDetailMapperDTO> iPage = accountCustomizeMapper
             .queryAccountBillDetail(page, accountCode, createTimeStart, createTimeEnd);
+        if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
+            iPage.getRecords().forEach(accountBillDetailMapperDTO -> {
+                if (TransType.DEPOSIT_BACK.code().equals(accountBillDetailMapperDTO.getTransType())) {
+                    accountBillDetailMapperDTO.setTransAmount(accountBillDetailMapperDTO.getTransAmount().abs().negate());
+                }
+            });
+        }
         return accountConverter.toBillDetailPage(iPage);
     }
 
@@ -815,6 +824,10 @@ public class AccountServiceImpl implements AccountService {
             ? surplusQuota.add(surplusQuotaOverpay) : surplusQuota);
         accountSimpleDTO.setSurplusQuotaOverpay(surplusQuotaOverpay);
         accountSimpleDTO.setCredit(account.getCredit());
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, WHOLESALE_PROCUREMENT.code());
+        if (Objects.nonNull(accountAmountType)) {
+            accountSimpleDTO.setWholesaleCredit(accountAmountType.getAccountBalance());
+        }
         return accountSimpleDTO;
     }
 
@@ -828,6 +841,18 @@ public class AccountServiceImpl implements AccountService {
             accountBalanceDTO.setValue(fieldValue);
         }
         return accountBalanceDTO;
+    }
+
+    private AccountBalanceDTO assemblyWholesaleAccountBalance(Long accountCode) {
+        AccountBalanceDTO accountBalanceDTO = new AccountBalanceDTO();
+        accountBalanceDTO.setCode(WHOLESALE_PROCUREMENT.code());
+        accountBalanceDTO.setName("批发采购余额");
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, WHOLESALE_PROCUREMENT.code());
+        accountBalanceDTO.setValue(BigDecimal.ZERO);
+        if (Objects.nonNull(accountAmountType)) {
+            accountBalanceDTO.setValue(accountAmountType.getAccountBalance());
+        }
+        return  accountBalanceDTO;
     }
 
     @Override
@@ -844,6 +869,7 @@ public class AccountServiceImpl implements AccountService {
                     .stream()
                     .map(welfare -> getAccountBalanceValue(welfare, account))
                     .collect(Collectors.toList());
+                balanceList.add(assemblyWholesaleAccountBalance(accountCode));
                 break;
             case WO_LIFE:
                 String phone = account.getPhone();
@@ -1054,6 +1080,25 @@ public class AccountServiceImpl implements AccountService {
         }
         AccountDetailDTO accountDetailDTO = new AccountDetailDTO();
         BeanUtils.copyProperties(accountDetailMapperDTO, accountDetailDTO);
+
+        MerchantCredit merchantCredit = merchantCreditService.getByMerCode(MerchantUserHolder.getMerchantUser().getMerchantCode());
+        if(merchantCredit != null) {
+            accountDetailDTO.setWholesaleCreditLimit(merchantCredit.getWholesaleCreditLimit());
+            accountDetailDTO.setWholesaleCredit(merchantCredit.getWholesaleCredit());
+        }
+
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(Long.valueOf(accountDetailDTO.getAccountCode()), WHOLESALE_PROCUREMENT.code());
+        if(accountAmountType != null) {
+            if(accountAmountType.getAccountBalance() == null) {
+                accountDetailDTO.setAccountWholesaleCreditLimit(new BigDecimal(0));
+            } else {
+                accountDetailDTO.setAccountWholesaleCreditLimit(accountAmountType.getAccountBalance());
+            }
+
+        } else {
+            accountDetailDTO.setAccountWholesaleCreditLimit(new BigDecimal(0));
+        }
+
         return accountDetailDTO;
     }
 

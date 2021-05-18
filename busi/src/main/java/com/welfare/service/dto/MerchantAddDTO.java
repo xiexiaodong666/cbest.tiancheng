@@ -64,4 +64,5 @@ public class MerchantAddDTO {
   @ApiModelProperty("商户扩展信息")
   @NotNull(message = "扩展信息不能为空")
   private MerchantExtendDTO extend;
+
 }

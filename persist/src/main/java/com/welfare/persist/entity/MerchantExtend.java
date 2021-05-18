@@ -48,6 +48,13 @@ public class MerchantExtend extends Model<MerchantExtend> implements Serializabl
      */
     @ApiModelProperty("行业标签")
     private String industryTag;
+
+    /**
+     * 结算方式
+     */
+    @ApiModelProperty("结算方式")
+    private String supplierWholesaleSettleMethod;
+
     /**
      * 积分商城是否开启
      */

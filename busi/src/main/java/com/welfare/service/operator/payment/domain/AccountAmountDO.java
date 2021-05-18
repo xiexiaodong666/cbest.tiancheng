@@ -57,8 +57,12 @@ public class AccountAmountDO {
 
     public static BigDecimal calculateAccountBalance(List<AccountAmountType> accountTypes) {
         return accountTypes.stream()
-                .filter(accountAmountType -> !(SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())
-                        || SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode())))
+                //排除掉授信额度，溢缴款和批发额度，才是余额
+                .filter(accountAmountType -> !(
+                        SURPLUS_QUOTA.code().equals(accountAmountType.getMerAccountTypeCode())
+                                || SURPLUS_QUOTA_OVERPAY.code().equals(accountAmountType.getMerAccountTypeCode())
+                                || WHOLESALE_PROCUREMENT.code().equals(accountAmountType.getMerAccountTypeCode())
+                ))
                 .map(AccountAmountType::getAccountBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -77,13 +81,14 @@ public class AccountAmountDO {
         accountBillDetail.setTransType(WelfareConstant.TransType.CONSUME.code());
         accountBillDetail.setTransTime(paymentRequest.getPaymentDate());
         accountBillDetail.setTransNo(paymentRequest.getTransNo());
+        accountBillDetail.setOrderNo(paymentRequest.getOrderNo());
         accountBillDetail.setPos(paymentRequest.getMachineNo());
         accountBillDetail.setTransAmount(operatedAmount);
         accountBillDetail.setStoreCode(paymentRequest.getStoreNo());
         accountBillDetail.setCardId(paymentRequest.getCardNo());
         accountBillDetail.setOrderChannel(paymentRequest.getPaymentScene());
         accountBillDetail.setPaymentChannel(paymentRequest.getPaymentChannel());
-        accountBillDetail.setAccountAmountTypeGroupId(accountAmountTypeGroup == null? null : accountAmountTypeGroup.getId());
+        accountBillDetail.setAccountAmountTypeGroupId(accountAmountTypeGroup == null ? null : accountAmountTypeGroup.getId());
         if (paymentRequest instanceof CardPaymentRequest) {
             accountBillDetail.setPaymentType(PaymentTypeEnum.CARD.getCode());
             accountBillDetail.setPaymentTypeInfo(((CardPaymentRequest) paymentRequest).getCardInsideInfo());
@@ -118,6 +123,7 @@ public class AccountAmountDO {
         accountDeductionDetail.setAccountCode(paymentRequest.calculateAccountCode());
         accountDeductionDetail.setOrderChannel(paymentRequest.getPaymentScene());
         accountDeductionDetail.setAccountDeductionAmount(operatedAmount);
+        accountDeductionDetail.setOrderNo(paymentRequest.getOrderNo());
         accountDeductionDetail.setAccountAmountTypeBalance(Objects.isNull(accountAmountType) ? BigDecimal.ZERO : accountAmountType.getAccountBalance());
         accountDeductionDetail.setMerAccountType(Objects.isNull(accountAmountType) ? null : accountAmountType.getMerAccountTypeCode());
         accountDeductionDetail.setPos(paymentRequest.getMachineNo());

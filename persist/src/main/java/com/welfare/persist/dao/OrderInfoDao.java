@@ -7,6 +7,8 @@ import com.welfare.persist.mapper.OrderInfoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * (order_info)数据DAO
  *
@@ -30,15 +32,24 @@ public class OrderInfoDao extends ServiceImpl<OrderInfoMapper, OrderInfo> {
         );
     }
 
+    /**
+     * 根据交易单号获取所有订单
+     * @param transNo
+     * @return
+     */
+    public List<OrderInfo> listByTransNo(String transNo){
+        return list(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getTransNo,transNo));
+    }
+
     public OrderInfo getOneByOrderNo(String orderNo, String transType){
         return getOne(
                 Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getOrderId,orderNo).eq(OrderInfo::getTransType,transType).last("limit 1")
         );
     }
 
-    public OrderInfo getOneByTradeNo(String orderNo, String transType){
+    public OrderInfo getOneByTradeNo(String tradeNo, String transType){
         return getOne(
-                Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getOrderId,orderNo).eq(OrderInfo::getTransType,transType).last("limit 1")
+                Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getTransNo,tradeNo).eq(OrderInfo::getTransType,transType).last("limit 1")
         );
     }
 }

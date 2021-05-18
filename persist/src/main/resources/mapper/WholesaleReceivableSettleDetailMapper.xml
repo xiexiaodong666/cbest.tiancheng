@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.WholesaleReceivableSettleDetailMapper">
+    <sql id="tableName">
+        wholesale_receivable_settle_detail
+    </sql>
+
+    <sql id="baseColumn">
+        id,settle_no,order_id,trans_no,account_code,account_name,card_id,mer_code,mer_name,store_code,store_name,trans_time,pos,pay_code,pay_name,trans_type,trans_type_name,trans_amount,mer_account_type,mer_account_type_name,account_amount,account_balance,mer_deduction_amount,mer_credit_deduction_amount,self_deduction_amount,data_type,settle_flag,order_channel,payment_channel,create_user,create_time,update_user,update_time,version,rebate_amount,mer_credit,mer_balance
+    </sql>
+
+    <sql id = "getWelfareSettleSum">
+        sum(
+        case
+        when t1.settle_flag = 'unsettled' and t1.trans_type='consume' then t1.trans_amount
+        when t1.settle_flag = 'unsettled' and t1.trans_type='refund' then t1.trans_amount*-1
+        else 0
+        end
+        ) as unSettleAmount,
+        sum(
+        case
+        when t1.trans_type = 'consume' then t1.trans_amount
+        when t1.trans_type = 'refund'  then t1.trans_amount * -1
+        else 0
+        end
+        ) as totalConsumeAmount
+    </sql>
+    <select id="queryReceivable" resultType="com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO">
+        select
+        t1.mer_code as merCode,
+        t1.mer_name as mer_name,
+
+        <include refid="getWelfareSettleSum"/>
+        from  merchant t4
+        inner join wholesale_receivable_settle_detail t1 on t1.mer_code=t4.mer_code
+        inner join supplier_store s on s.store_code = t1.store_code
+        inner join merchant supplier on supplier.mer_code = s.mer_code
+        <include refid="queryReceivableWhere"/>
+        group by t1.mer_code
+
+        order by t1.id desc
+    </select>
+
+
+    <select id="queryReceivableSummary" resultType="com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleGroupDTO">
+        select
+        <include refid="getWelfareSettleSum"/>
+
+        from  merchant t4
+        inner join wholesale_receivable_settle_detail t1 on t1.mer_code=t4.mer_code
+        inner join supplier_store s on s.store_code = t1.store_code
+        inner join merchant supplier on supplier.mer_code = s.mer_code
+        <include refid="queryReceivableWhere"/>
+
+    </select>
+
+    <sql id="queryReceivableWhere">
+        <where>
+            <if test="merCode != null and merCode != ''">
+                and t1.mer_code = #{merCode}
+            </if>
+            <if test="merName != null and merName != ''">
+                and t1.mer_name like concat('%', #{merName}, '%')
+            </if>
+            <if test="transTimeStart != null ">
+                <![CDATA[AND t1.trans_time >= #{transTimeStart}]]>
+            </if>
+            <if test="transTimeEnd != null  ">
+                <![CDATA[AND t1.trans_time <= #{transTimeEnd}]]>
+            </if>
+            <if test="supplierCode != null and supplierCode != ''">
+                and supplier.mer_code = #{supplierCode}
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryReceivableDetails" resultType="com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO" parameterType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam">
+        SELECT
+        d.id as id,
+        d.trans_no as transNo,
+        d.trans_type as transType,
+        d.order_id as orderNo,
+        d.trans_time as transTime,
+        d.account_code as accountCode,
+        d.account_name as accountName,
+        a.phone as phone,
+        supplier.mer_code as customerMerCode,
+        supplier.mer_name as customerMerName,
+        d.store_code as storeCode,
+        d.store_name as storeName,
+        case
+        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.trans_amount
+        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.trans_amount*-1
+        else 0
+        end as  settleAmount,
+        case
+        when  d.trans_type='consume' then d.trans_amount
+        when  d.trans_type='refund' then d.trans_amount*-1
+        else 0
+        end as  saleAmount,
+        d.settle_flag as settleFlag,
+        case when d.settle_flag='unsettled' then '待结算'
+        when d.settle_flag='settling' then '结算中'
+        when d.settle_flag='settled' then '已结算' end as settleFlagName
+        FROM wholesale_receivable_settle_detail d
+        INNER JOIN account a ON d.account_code = a.account_code
+        inner join supplier_store s on s.store_code = d.store_code
+        inner join merchant supplier on s.mer_code = supplier.mer_code
+
+        <include refid="queryReceivableDetailsCondition"/>
+        order by d.trans_time desc
+    </select>
+
+    <select id="queryReceivableDetailsSummary"
+      resultType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailSummaryDTO"
+      parameterType="com.welfare.persist.dto.settlement.wholesale.param.PlatformWholesaleSettleDetailParam">
+        select sum(t.saleAmount) as transAmount, sum(t.settleAmount) as settleAmount, t.merCode
+        ,t.merName from
+        (SELECT
+        d.id as id,
+        d.trans_no as transNo,
+        d.trans_type as transType,
+        d.order_id as orderNo,
+        d.trans_time as transTime,
+        d.account_code as accountCode,
+        d.account_name as accountName,
+        a.phone as phone,
+        supplier.mer_code as customerMerCode,
+        supplier.mer_name as customerMerName,
+        d.store_code as storeCode,
+        d.store_name as storeName,
+        d.mer_name as merName,
+        d.mer_code as merCode,
+        case
+        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.trans_amount
+        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.trans_amount*-1
+        else 0
+        end as settleAmount,
+        case
+        when d.trans_type='consume' then d.trans_amount
+        when d.trans_type='refund' then d.trans_amount*-1
+        else 0
+        end as saleAmount,
+        d.settle_flag as settleFlag,
+        case when d.settle_flag='unsettled' then '待结算'
+        when d.settle_flag='settling' then '结算中'
+        when d.settle_flag='settled' then '已结算' end as settleFlagName
+        FROM wholesale_receivable_settle_detail d
+        INNER JOIN account a ON d.account_code = a.account_code
+        inner join supplier_store s on s.store_code = d.store_code
+        inner join merchant supplier on s.mer_code = supplier.mer_code
+        <include refid="queryReceivableDetailsCondition"/>
+        )t
+    </select>
+    <sql id="queryReceivableDetailsCondition">
+        <where>
+            <if test="param.orderNo !=null and param.orderNo!=''">
+                and d.order_id = #{param.orderNo}
+            </if>
+            <if test="param.transNo !=null and param.transNo != ''">
+                and d.trans_no = #{param.transNo}
+            </if>
+            <if test="param.settleFlag !=null and param.settleFlag!= ''">
+                and d.settle_flag = #{param.settleFlag}
+            </if>
+            <if test="param.supplierCode != null and param.supplierCode != ''">
+                and supplier.mer_code = #{param.supplierCode}
+            </if>
+
+            <if test="param.storeCodes !=null and param.storeCodes.size() > 0">
+                and  d.store_code in
+                <foreach collection="storeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="param.transTimeStart != null">
+                and d.trans_time <![CDATA[>=]]> #{param.transTimeStart}
+            </if>
+            <if test="param.transTimeEnd != null">
+                and d.trans_time <![CDATA[<=]]> #{param.transTimeEnd}
+            </if>
+            <if test="param.phone != null and param.phone != ''">
+                and a.phone = #{param.phone}
+            </if>
+            <if test = "param.merCode != null and param.merCode != ''">
+                and d.mer_code = #{param.merCode}
+            </if>
+            <if test="param.merName != null and param.merName != ''">
+                and d.mer_name like concat('%', #{param.merName}, '%')
+            </if>
+            <if test="param.settleNo != null and param.settleNo != ''">
+                and d.settle_no = #{param.settleNo}
+            </if>
+            <if test="param.excludeIds != null and param.excludeIds.size !=0">
+                and d.id not in
+                <foreach collection="param.excludeIds" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+</mapper>

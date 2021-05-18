@@ -27,4 +27,7 @@ public class RestoreRemainingLimitReq {
   @ApiModelProperty(value = "本次恢复金额(不能小于0)",required = true)
   @DecimalMin(message = "金额不能小于0",value = "0")
   private BigDecimal amount;
+
+  @ApiModelProperty(value = "结算类型",required = false)
+  private String settleType;
 }

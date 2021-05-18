@@ -3,15 +3,19 @@ package com.welfare.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.welfare.common.constants.RedisKeyConstant;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.enums.MerIdentityEnum;
+import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
+import com.welfare.persist.dao.AccountDao;
 import com.welfare.persist.dao.AccountDepositApplyDao;
 import com.welfare.persist.dao.AccountDepositApplyDetailDao;
 import com.welfare.persist.dto.TempAccountDepositApplyDTO;
@@ -33,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +45,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 账户充值申请服务接口实现
@@ -103,6 +107,9 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
 
     private final AccountDeductionDetailMapper accountDeductionDetailMapper;
 
+    @Autowired
+    private AccountDao accountDao;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUser) {
@@ -126,12 +133,15 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             if (account == null) {
                 throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("商户下没有[%s]员工！", request.getInfo().getPhone()), null);
             }
+            List<AccountAmountType> accountAmountType = accountAmountTypeService.batchQueryByAccount(Lists.newArrayList(account.getAccountCode()), request.getMerAccountTypeCode());
+            validationDepositAmountMoreThanAccountBalance(Lists.newArrayList(request.getInfo()), accountAmountType, Lists.newArrayList(account));
             initAccountDepositApply(apply, request, merchant, merchantUser);
             // 设置充值人数
             apply.setRechargeNum(1);
             // 设置充值总金额
             apply.setRechargeAmount(request.getInfo().getRechargeAmount());
             apply.setApprovalType(ApprovalType.SINGLE.getCode());
+            apply.setApplyType(getApplyTypeByMerAccountAmountType(request.getMerAccountTypeCode()).code());
             // 初始化明细
             AccountDepositApplyDetail detail = assemblyAccountDepositApplyDetailList(apply, request.getInfo());
             accountDepositApplyDao.save(apply);
@@ -171,12 +181,19 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             }
             BigDecimal sumAmount = deposits.stream().map(TempAccountDepositApplyDTO::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             validationParmas(request,merchant,merchantUser,sumAmount);
+            List<Long> accountCodes = deposits.stream().map(TempAccountDepositApplyDTO::getAccountCode).collect(Collectors.toList());
+            List<Account> accounts = accountDao.listByAccountCodes(accountCodes);
+            BizAssert.notEmpty(accounts, ExceptionCode.ILLEGALITY_ARGUMENTS, "员工不存在");
+            List<AccountAmountType> accountAmountType = accountAmountTypeService.batchQueryByAccount(accountCodes, request.getMerAccountTypeCode());
+            validationDepositAmountMoreThanAccountBalance(AccountDepositRequest.of(deposits), accountAmountType, accounts);
+
             apply.setMerAccountTypeCode(request.getMerAccountTypeCode());
             // 设置充值总金额
             apply.setRechargeAmount(sumAmount);
             // 设置充值人数
             apply.setRechargeNum(deposits.size());
             apply.setApprovalType(ApprovalType.BATCH.getCode());
+            apply.setApplyType(getApplyTypeByMerAccountAmountType(request.getMerAccountTypeCode()).code());
             // 初始化明细
             List<AccountDepositApplyDetail> details = assemblyAccountDepositApplyDetailList(apply, deposits);
             accountDepositApplyDetailDao.saveBatch(details);
@@ -327,7 +344,7 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         }
         //已经审批过了
         if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-            return apply.getId();
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "操作重复, 请刷新");
         }
         String lockKey = RedisKeyConstant.buidKey(RedisKeyConstant.ACCOUNT_DEPOSIT_APPLY__ID, request.getId()+"");
         RLock lock = DistributedLockUtil.lockFairly(lockKey);
@@ -336,9 +353,8 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
             if (apply == null) {
                 throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, String.format("账号存款申请不存在[requestId:%s]", request.getId()), null);
             }
-            //已经审批过了
             if (!apply.getApprovalStatus().equals(ApprovalStatus.AUDITING.getCode())) {
-                return apply.getId();
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "操作重复, 请刷新");
             }
             apply.setApprovalStatus(ApprovalStatus.getByCode(request.getApprovalStatus()).getCode());
             apply.setApprovalRemark(request.getApplyRemark());
@@ -414,6 +430,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<AccountDepositApplyExcelInfo> infos = depositApplyConverter.toInfoExcelList(applies);
         if (CollectionUtils.isNotEmpty(infos)) {
             infos.forEach(info -> {
+                if(Strings.isNotEmpty(info.getApplyType())) {
+                    info.setApplyType(WelfareConstant.AccountDepositApply.findByCode(info.getApplyType()).desc());
+                }
+
                 ApprovalStatus approvalStatus = ApprovalStatus.getByCode(info.getApprovalStatus());
                 if (approvalStatus != null) {
                     info.setApprovalStatus(approvalStatus.getValue());
@@ -454,6 +474,20 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     @Override
     public BigDecimal sumDepositDetailAmount(String merCode, String merAccountTypeCode) {
         return accountDeductionDetailMapper.sumDepositDetailAmount(merCode,merAccountTypeCode);
+    }
+
+    @Override
+    public void approvalAndFail(AccountDepositApprovalRequest req) {
+        AccountDepositApply apply = accountDepositApplyDao.getById(req.getId());
+        if (Objects.nonNull(apply)) {
+            apply.setRechargeStatus(RechargeStatus.NO.getCode());
+            apply.setApprovalOpinion(req.getApprovalOpinion());
+            apply.setApprovalRemark(req.getApplyRemark());
+            apply.setApprovalUser(req.getApprovalUser());
+            apply.setApprovalStatus(req.getApprovalStatus());
+            apply.setApprovalTime(new Date());
+            accountDepositApplyDao.updateById(apply);
+        }
     }
 
     private AccountDepositApplyDetail assemblyAccountDepositApplyDetailList(AccountDepositApply apply,AccountDepositRequest accountAmounts) {
@@ -532,6 +566,44 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
         List<String > merIdentityList = Lists.newArrayList(merchant.getMerIdentity().split(","));
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "仅支持对属于[客户]的商户充值", null);
+        }
+
+    }
+
+    private WelfareConstant.AccountDepositApply getApplyTypeByMerAccountAmountType(String accountAmountType) {
+        if (WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code().equals(accountAmountType)) {
+            return WelfareConstant.AccountDepositApply.WHOLESALE_CREDIT_LIMIT_APPLY;
+        } else {
+            return WelfareConstant.AccountDepositApply.WELFARE_APPLY;
+        }
+    }
+
+    private void validationDepositAmountMoreThanAccountBalance(List<AccountDepositRequest> requests,List<AccountAmountType> accountAmountTypes, List<Account> accounts) {
+        Map<String, List<AccountDepositRequest>> map = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(requests)) {
+            map = requests.stream().collect(Collectors.groupingBy(AccountDepositRequest::getPhone));
+        }
+        Map<Long, AccountAmountType> accountAmountTypeMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(accountAmountTypes)) {
+            accountAmountTypeMap = accountAmountTypes.stream().collect(Collectors.toMap(AccountAmountType::getAccountCode, a -> a,(k1, k2)->k1));
+        }
+        List<String> errorMsg = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(accounts)) {
+            Map<String, List<AccountDepositRequest>> finalMap = map;
+            Map<Long, AccountAmountType> finalAccountAmountTypeMap = accountAmountTypeMap;
+            accounts.forEach(account -> {
+                List<AccountDepositRequest> depositRequests = finalMap.get(account.getPhone());
+                if (CollectionUtils.isNotEmpty(depositRequests)) {
+                    BigDecimal sumAmount = depositRequests.stream().map(AccountDepositRequest::getRechargeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    if (sumAmount.compareTo(BigDecimal.ZERO) < 0) {
+                        AccountAmountType accountAmountType = finalAccountAmountTypeMap.get(account.getAccountCode());
+                        if (Objects.isNull(accountAmountType) || sumAmount.abs().compareTo(accountAmountType.getAccountBalance()) > 0) {
+                            errorMsg.add(account.getPhone());
+                        }
+                    }
+                }
+            });
+            BizAssert.isTrue(org.springframework.util.CollectionUtils.isEmpty(errorMsg), ExceptionCode.ILLEGALITY_ARGUMENTS, "员工账户不可充为负\n" + Joiner.on(",").join(errorMsg));
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.annotation.MerchantUser;
@@ -171,12 +172,33 @@ public class AccountConsumeSceneController implements IController {
     }
   }
 
+  @PostMapping("/editWelfare")
+  @ApiOperation("编辑福利类型配置")
+  @MerchantUser
+  public R<Boolean> editWelfare(@RequestBody List<AccountWelfareConsumeSceneEditReq> consumeSceneEditReqs) {
+    try {
+      log.info("编辑福利类型配置, req:{}", JSON.toJSONString(consumeSceneEditReqs));
+      return success(accountConsumeSceneService.editWelfare(consumeSceneEditReqs));
+    } catch (BizException be) {
+      return R.fail(be.getMessage());
+    }
+  }
+
   @GetMapping("/details")
   @ApiOperation("查询商户下所有员工消费配置详情")
   @MerchantUser
   public R<List<AccountConsumeSceneResp>> detail() {
     List<AccountConsumeSceneResp> accountConsumeSceneResps = accountConsumeSceneService
             .findAllAccountConsumeSceneDTO(MerchantUserHolder.getMerchantUser().getMerchantCode());
+    return success(accountConsumeSceneResps);
+  }
+
+  @GetMapping("/welfare/details")
+  @ApiOperation("查询商户下所有福利配置详情")
+  @MerchantUser
+  public R<List<AccountConsumeSceneResp>> welfareDetail() {
+    List<AccountConsumeSceneResp> accountConsumeSceneResps = accountConsumeSceneService
+        .findAllAccountWelfareConsumeSceneDTO(MerchantUserHolder.getMerchantUser().getMerchantCode());
     return success(accountConsumeSceneResps);
   }
 }

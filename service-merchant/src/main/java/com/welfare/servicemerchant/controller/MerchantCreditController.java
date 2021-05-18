@@ -1,5 +1,6 @@
 package com.welfare.servicemerchant.controller;
 
+import com.welfare.common.constants.WelfareConstant.MerCreditType;
 import com.welfare.service.AccountService;
 import com.welfare.service.MerchantCreditService;
 import com.welfare.service.dto.RestoreRemainingLimitReq;
@@ -36,7 +37,11 @@ public class MerchantCreditController implements IController {
     @PostMapping("/restore/remainingLimit")
     @ApiOperation("恢复商户剩余信用额度")
     public R<String> save(@Validated @RequestBody RestoreRemainingLimitReq request){
-        merchantCreditService.restoreRemainingLimit(request);
+        if(MerCreditType.WHOLESALE_CREDIT.code().equals(request.getSettleType())) {
+            merchantCreditService.restoreWholesaleCreditLimit(request);
+        } else {
+            merchantCreditService.restoreRemainingLimit(request);
+        }
         return success();
     }
 }

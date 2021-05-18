@@ -43,6 +43,13 @@ public class PaymentController implements IController {
         return success(paymentRequest);
     }
 
+    @PostMapping("/online/multi-order")
+    @ApiOperation("多订单联合支付")
+    public R<MultiOrderPaymentRequest> newBatchOnlinePaymentRequest(@RequestBody MultiOrderPaymentRequest paymentRequest){
+        paymentService.multiOrderUnionPay(paymentRequest);
+        return success(paymentRequest);
+    }
+
     @PostMapping("/barcode")
     @ApiOperation("条码支付")
     public R<BarcodePaymentRequest> newBarcodePaymentRequest(@RequestBody BarcodePaymentRequest paymentRequest) {
@@ -72,9 +79,10 @@ public class PaymentController implements IController {
 
     @GetMapping
     @ApiOperation("查询支付结果")
-    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
+    public R<PaymentRequest> getPaymentRequest(@RequestParam @ApiParam(value = "重百付支付流水号",required = true) String transNo,
+                                               @RequestParam(value = "订单号",required = false) @ApiParam("订单号") String orderNo) {
         //cardPaymentRequest包含全量信息，所以以CardPaymentRequest查询
-        PaymentRequest paymentRequest = paymentService.queryResult(transNo,CardPaymentRequest.class);
+        PaymentRequest paymentRequest = paymentService.queryResult(transNo,CardPaymentRequest.class, orderNo);
         return success(paymentRequest);
     }
 
@@ -90,6 +98,13 @@ public class PaymentController implements IController {
     @ApiOperation("查询退款结果")
     public R<RefundRequest> getRefundRequest(@RequestParam @ApiParam("重百付支付流水号") String transNo) {
         RefundRequest refundRequest = refundService.queryResult(transNo);
+        return success(refundRequest);
+    }
+
+    @PostMapping("/refund/multi-order")
+    @ApiOperation("多订单联合支付退款")
+    public R<MultiOrderRefundRequest> newRefundRequest(@RequestBody MultiOrderRefundRequest refundRequest){
+        refundService.multiOrderRefund(refundRequest);
         return success(refundRequest);
     }
 

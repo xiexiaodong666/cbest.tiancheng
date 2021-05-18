@@ -92,4 +92,39 @@
         </where>
     </select>
 
+
+    <select id="queryGroupByPaymentChannelCode"  resultType="com.welfare.persist.dto.PaymentChannelSimpleResp" >
+        SELECT
+            payment_channel_code as paymentChannelCode,
+            payment_channel_name as paymentChannelName
+        FROM
+            payment_channel_config
+        <where>
+            deleted = 0
+            <if test="queryList != null and queryList.size()>0 ">
+                and (
+                <foreach item="item" index="index" collection="queryList" open="(" separator="or" close=")">
+                    <if test="item.merCode != null and item.merCode != ''">
+                        mer_code = #{item.merCode}
+                    </if>
+                    <if test="item.storeCode != null and item.storeCode != ''">
+                        AND store_code = #{item.storeCode}
+                    </if>
+                    <if test="item.consumeType != null and item.consumeType != ''">
+                        AND consume_type = #{item.consumeType}
+                    </if>
+                </foreach>
+                )
+            </if>
+        </where>
+        GROUP BY payment_channel_code
+        HAVING count(DISTINCT mer_code) = #{merCount}
+    </select>
+
+
+
+
+
+
+
 </mapper>

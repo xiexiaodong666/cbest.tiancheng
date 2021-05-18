@@ -6,6 +6,8 @@ import com.welfare.common.annotation.ApiUser;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.enums.CardApplyMediumEnum;
 import com.welfare.common.enums.CardApplyTypeEnum;
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
 import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.Account;
@@ -61,9 +63,13 @@ public class CardController implements IController {
     @ApiOperation("根据卡号获取卡信息")
     @ApiUser
     public R<CardInfoApiDTO> queryCardInfo(
-            @PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo) {
+            @PathVariable(value = "cardNo") @ApiParam("卡号") String cardNo,
+        @RequestParam(required = false) String merCode) {
         CardInfo cardInfo = cardInfoService.getByCardNo(cardNo);
         CardApply cardApply = applyService.queryByApplyCode(cardInfo.getApplyCode());
+        if(Strings.isNotEmpty(merCode) && !cardApply.getMerCode().equals(merCode)) {
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "权限不足", null);
+        }
         Merchant merchant = merchantService.queryByCode(cardApply.getMerCode());
         CardInfoApiDTO cardInfoApiDTO = tranferToCardInfoApiDTO(cardInfo, cardApply);
 
@@ -75,9 +81,13 @@ public class CardController implements IController {
     @ApiOperation("根据卡号获取卡信息")
     @ApiUser
     public R<CardInfoApiDTO> queryCardInfoByMagneticStripe(
-            @RequestParam("magneticStripe") @ApiParam("磁条号") String magneticStripe) {
+            @RequestParam("magneticStripe") @ApiParam("磁条号") String magneticStripe,
+        @RequestParam(required = false) String merCode) {
         CardInfo cardInfo = cardInfoService.getByMagneticStripe(magneticStripe);
         CardApply cardApply = applyService.queryByApplyCode(cardInfo.getApplyCode());
+        if(Strings.isNotEmpty(merCode) && !cardApply.getMerCode().equals(merCode)) {
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "权限不足", null);
+        }
         Merchant merchant = merchantService.queryByCode(cardApply.getMerCode());
         CardInfoApiDTO cardInfoApiDTO = tranferToCardInfoApiDTO(cardInfo, cardApply);
 
@@ -236,7 +246,7 @@ public class CardController implements IController {
         cardInfoDTO.setWrittenTime(cardInfo.getWrittenTime());
         cardInfoDTO.setBindTime(cardInfo.getBindTime());
         if (account != null && Strings.isNotEmpty(account.getPhone())) {
-            cardInfoDTO.setAccountCode(Long.valueOf(account.getPhone()));
+            cardInfoDTO.setAccountCode(account.getPhone());
         }
 
         return success(cardInfoDTO);

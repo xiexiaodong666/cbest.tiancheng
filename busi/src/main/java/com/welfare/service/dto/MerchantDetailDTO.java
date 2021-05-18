@@ -101,4 +101,10 @@ public class MerchantDetailDTO {
 
   @ApiModelProperty("商户扩展信息")
   private MerchantExtendDTO extend;
+
+  @ApiModelProperty("批发限制授信额度")
+  private BigDecimal wholesaleCreditLimit;
+
+  @ApiModelProperty("批发授信额度")
+  private BigDecimal wholesaleCredit;
 }

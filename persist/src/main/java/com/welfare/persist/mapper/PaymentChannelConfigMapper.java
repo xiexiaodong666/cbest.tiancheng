@@ -3,8 +3,11 @@ package com.welfare.persist.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.persist.dto.PayChannelConfigSimple;
+import com.welfare.persist.dto.PaymentChannelAndMerCount;
 import com.welfare.persist.dto.PaymentChannelConfigDetailDTO;
+import com.welfare.persist.dto.PaymentChannelSimpleResp;
 import com.welfare.persist.dto.query.PayChannelConfigQuery;
+import com.welfare.persist.dto.query.PaymentChannelConfigQuery;
 import com.welfare.persist.entity.PaymentChannelConfig;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,5 +27,8 @@ public interface PaymentChannelConfigMapper extends BaseMapper<PaymentChannelCon
   Page<PayChannelConfigSimple> simplePage(Page<PayChannelConfigSimple> page, @Param("merName") String merName);
 
   List<PaymentChannelConfigDetailDTO> list(@Param("query") PayChannelConfigQuery query);
+
+  List<PaymentChannelSimpleResp> queryGroupByPaymentChannelCode(@Param("merCount") Integer merCount, @Param("queryList")List<PaymentChannelConfigQuery> queryList);
+
 
 }

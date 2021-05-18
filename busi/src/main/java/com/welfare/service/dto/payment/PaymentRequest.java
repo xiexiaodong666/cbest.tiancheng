@@ -61,6 +61,7 @@ public abstract class PaymentRequest {
     private String bizType;
     private String paymentScene;
     private boolean notification = false;
+    private String orderNo;
 
     @ApiModelProperty("沃生活馆线上支付请求商品行数据,json格式 ["
         + "  {"

@@ -1,18 +1,16 @@
 package com.welfare.servicesettlement.dto.mall;
 
 import com.welfare.common.constants.WelfareConstant;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountDeductionDetail;
-import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.OrderInfo;
+import com.welfare.persist.entity.*;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Description:
@@ -127,12 +125,15 @@ public class OrderMqInfo implements Serializable {
     @ApiModelProperty("重百付交易单号")
     private String tradeNo;
 
+    private List<OrderDetailMqInfo> orderDetails;
+
     public static OrderInfo  parseToOrderInfo(OrderMqInfo orderMqInfo, AccountDeductionDetail accountDeductionDetail, Account account, Merchant merchant){
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setOrderId(orderMqInfo.getOrgOrderNo().toString());
         orderInfo.setAccountCode(accountDeductionDetail.getAccountCode());
         orderInfo.setOrderTime(orderMqInfo.getOrderTime());
         orderInfo.setOrderAmount(orderMqInfo.getOrderAmount());
+        orderInfo.setOrderWholesaleAmount(orderMqInfo.getOrderWholesaleAmount());
         orderInfo.setAccountName(account.getAccountName());
         orderInfo.setCardId(accountDeductionDetail.getCardId());
         orderInfo.setStoreCode(orderMqInfo.getStoreCode());
@@ -144,4 +145,38 @@ public class OrderMqInfo implements Serializable {
         orderInfo.setTransTypeName(WelfareConstant.TransType.CONSUME.desc());
         return orderInfo;
     }
+
+    public List<OrderInfoDetail> parseOrderInfoDetails(WelfareConstant.TransType transType){
+        if (CollectionUtils.isEmpty(orderDetails)) {
+            return Collections.emptyList();
+        }
+        return orderDetails.stream().map(orderDetailMqInfo -> {
+            OrderInfoDetail detail = new OrderInfoDetail();
+            detail.setOrderId(orgOrderNo.toString());
+            detail.setCount(orderDetailMqInfo.getCount());
+            detail.setProductId(orderDetailMqInfo.getProductId());
+            detail.setRefundCount(orderDetailMqInfo.getRefundCount());
+            detail.setUuid(orderDetailMqInfo.getUuid());
+            detail.setSkuId(orderDetailMqInfo.getSkuId());
+            detail.setSkuNo(orderDetailMqInfo.getSkuNo());
+            detail.setSkuName(orderDetailMqInfo.getSkuName());
+            detail.setWholesaleAmount(orderDetailMqInfo.getWholesaleAmount());
+            BigDecimal taxRate = orderDetailMqInfo.getWholesaleTaxRate();
+            if(Objects.nonNull(taxRate)){
+                taxRate = taxRate.divide(new BigDecimal("100"), 4,RoundingMode.HALF_UP);
+                detail.setWholesaleTaxRate(taxRate);
+            }
+            detail.setWholesalePrice(orderDetailMqInfo.getWholesalePrice());
+            detail.setOriginalAmount(orderDetailMqInfo.getOriginalAmount());
+            detail.setTransAmount(computeTransAmount(orderDetailMqInfo));
+            detail.setTransNo(this.tradeNo);
+            detail.setTransType(transType.code());
+            return detail;
+        }).collect(Collectors.toList());
+    }
+
+    public BigDecimal computeTransAmount(OrderDetailMqInfo orderDetailMqInfo){
+        return orderDetailMqInfo.getSaleAmount();
+    }
+
 }

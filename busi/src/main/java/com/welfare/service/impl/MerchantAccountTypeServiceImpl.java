@@ -3,6 +3,7 @@ package com.welfare.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.constants.WelfareConstant.MerAccountTypeCode;
 import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.MoveDirectionEnum;
 import com.welfare.common.exception.BizException;
@@ -55,6 +56,14 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
         QueryWrapper q=QueryHelper.getWrapper(req);
         q.eq(MerchantAccountType.SHOW_STATUS,MerchantAccountTypeShowStatusEnum.SHOW.getCode());
+        q.orderByDesc(MerchantAccountType.CREATE_TIME);
+        return merchantAccountTypeDao.list(q);
+    }
+
+    @Override
+    public List<MerchantAccountType> listExclusion(MerchantAccountTypeReq req) {
+        QueryWrapper q=QueryHelper.getWrapper(req);
+        q.ne(MerchantAccountType.MER_ACCOUNT_TYPE_CODE, MerAccountTypeCode.SURPLUS_QUOTA_OVERPAY);
         q.orderByDesc(MerchantAccountType.CREATE_TIME);
         return merchantAccountTypeDao.list(q);
     }
@@ -234,6 +243,14 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
         merchantAccountType3.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
         initList.add(merchantAccountType3);
 
+        MerchantAccountType merchantAccountType5 = new MerchantAccountType();
+        merchantAccountType5.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.desc());
+        merchantAccountType5.setMerCode(merCode);
+        merchantAccountType5.setMerAccountTypeCode(WelfareConstant.MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+        merchantAccountType5.setDeductionOrder(9001);
+        merchantAccountType5.setShowStatus(MerchantAccountTypeShowStatusEnum.UNSHOW.getCode());
+        initList.add(merchantAccountType5);
+
         if (Objects.nonNull(extend) && BooleanUtils.toBooleanDefaultIfNull(extend.getPointMall(), false)) {
             MerchantAccountType merchantAccountType4 = new MerchantAccountType();
             merchantAccountType4.setMerAccountTypeName(WelfareConstant.MerAccountTypeCode.MALL_POINT.desc());
@@ -247,7 +264,7 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     }
 
     @Override
-    public void saveIfExist(MerchantAccountType merchantAccountType) {
+    public void saveIfNotExist(MerchantAccountType merchantAccountType) {
         MerchantAccountType old = merchantAccountTypeDao.queryAllByMerCodeAndType(merchantAccountType.getMerCode(), merchantAccountType.getMerAccountTypeCode());
         if (Objects.isNull(old)) {
             merchantAccountTypeDao.save(merchantAccountType);

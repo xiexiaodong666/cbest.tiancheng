@@ -14,8 +14,10 @@ import com.welfare.persist.dao.CardInfoDao;
 import com.welfare.persist.dto.CardInfoApiDTO;
 import com.welfare.persist.dto.CardInfoDTO;
 import com.welfare.persist.entity.Account;
+import com.welfare.persist.entity.CardApply;
 import com.welfare.persist.entity.CardInfo;
 import com.welfare.persist.mapper.CardInfoMapper;
+import com.welfare.service.CardApplyService;
 import com.welfare.service.CardInfoService;
 
 import java.util.*;
@@ -23,6 +25,7 @@ import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -44,7 +47,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     private final CardInfoDao cardInfoDao;
     private final CardInfoMapper cardInfoMapper;
     private final AccountDao accountDao;
-
+    private final CardApplyService cardApplyService;
     @Override
     public CardInfo getByCardNo(String cardNo) {
         QueryWrapper<CardInfo> queryWrapper = new QueryWrapper<>();
@@ -71,6 +74,10 @@ public class CardInfoServiceImpl implements CardInfoService {
         cardInfo = cardInfoDao.getById(cardInfo.getId());
         if (cardInfo == null) {
             throw new BizException(ExceptionCode.DATA_BASE_ERROR, "更新错误", null);
+        }
+        CardApply cardApply = cardApplyService.queryByApplyCode(cardInfo.getApplyCode());
+        if(Strings.isNotEmpty(cardInfo.getMerCode()) && !cardApply.getMerCode().equals(cardInfo.getMerCode())) {
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "权限不足", null);
         }
         if (WelfareConstant.CardStatus.NEW.code().equals(cardInfo.getCardStatus())) {
             cardInfo.setCardStatus(WelfareConstant.CardStatus.WRITTEN.code());

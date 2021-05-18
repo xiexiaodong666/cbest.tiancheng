@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.WholesaleReceivableSettleMapper">
+    <sql id="tableName">
+        wholesale_receivable_settle
+    </sql>
+
+    <sql id="baseColumn">
+        id,settle_no,settle_month,mer_code,trans_amount,settle_amount,settle_self_amount,rebate_amount,order_num,rec_status,settle_status,send_status,send_time,confirm_time,settle_start_time,settle_end_time,create_user,create_time,update_user,update_time,deleted,settle_statistics_info,settle_tax_sales_statistics
+    </sql>
+
+
+    <select id="receivableBillPage"
+      resultType="com.welfare.persist.dto.WholesaleReceivableSettleResp"
+      parameterType="com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery">
+       SELECT
+          wps.id,
+          wps.settle_no AS settleNo,
+          wps.mer_code AS merCode,
+          m.mer_name AS merName,
+          wps.settle_amount AS settleAmount,
+          wps.settle_amount AS transAmount,
+          wps.order_num AS orderNum,
+          wps.create_time AS createTime,
+          wps.settle_start_time AS settleStartTime,
+          wps.settle_end_time AS settleEndTime,
+          wps.rec_status AS recStatus,
+          wps.settle_status AS settleStatus,
+          wps.send_status AS sendStatus,
+          wps.confirm_time as confirmTime,
+          wps.send_time as sendTime,
+
+      m.mer_cooperation_mode AS merCooperationMode,
+      case
+      when m.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
+      when m.mer_cooperation_mode = 'PAYED' then '后付费'
+      end as merCooperationModeName,
+          wps.settle_tax_sales_statistics as settleTaxSalesStatistics
+        from
+          wholesale_receivable_settle wps
+          LEFT JOIN merchant m ON m.mer_code = wps.mer_code
+
+      <where>
+        <if test="query.merCode !=null ">
+          and wps.mer_code = #{query.merCode}
+        </if>
+        <if test="query.merName != null and query.merName != ''">
+          and m.mer_name like concat('%', #{query.merName}, '%')
+        </if>
+        <if test="query.merCooperationMode !=null and query.merCooperationMode!=''">
+          and m.mer_cooperation_mode = #{query.merCooperationMode}
+        </if>
+        <if test="query.recStatus !=null and query.recStatus!=''">
+          and wps.rec_status = #{query.recStatus}
+        </if>
+        <if test="query.settleStatus !=null and query.settleStatus!=''">
+          and wps.settle_status = #{query.settleStatus}
+        </if>
+      </where>
+
+      order by  wps.id desc
+    </select>
+
+  <select id="receivableBill"
+    resultType="com.welfare.persist.dto.WholesaleReceivableSettleResp">
+    SELECT
+    wps.id,
+    wps.settle_no AS settleNo,
+    wps.mer_code AS merCode,
+    m.mer_name AS merName,
+    wps.settle_amount AS settleAmount,
+    wps.settle_amount AS transAmount,
+    wps.order_num AS orderNum,
+    wps.create_time AS createTime,
+    wps.settle_start_time AS settleStartTime,
+    wps.settle_end_time AS settleEndTime,
+    wps.rec_status AS recStatus,
+    wps.settle_status AS settleStatus,
+    wps.send_status AS sendStatus,
+    wps.confirm_time as confirmTime,
+    wps.send_time as sendTime,
+    m.mer_cooperation_mode AS merCooperationMode,
+     case
+      when m.mer_cooperation_mode = 'PAY_FIRST' then '先付费'
+      when m.mer_cooperation_mode = 'PAYED' then '后付费'
+      end as merCooperationModeName,
+    wps.settle_tax_sales_statistics as settleTaxSalesStatistics
+    from
+    wholesale_receivable_settle wps
+    LEFT JOIN merchant m ON m.mer_code = wps.mer_code
+
+    where wps.id = #{id}
+  </select>
+
+  <select id="receivableBillDetailSummary"
+    resultType="com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp"
+    parameterType="com.welfare.persist.dto.query.WholesaleReceiveSettleDetailQuery">
+    select sum(saleAmount) as transAmount ,sum(settleAmount) as  settleAmount from (select
+    t1.id,
+    t1.trans_no as transNo,
+    t1.order_id as orderNo,
+    t1.trans_time as transTime,
+    t1.store_code as storeCode,
+    t1.store_name as storeName,
+    ac.account_name as accountName,
+    ac.phone,
+    d.department_name,
+    supplier.mer_name as customerMerName,
+    case
+    when t1.trans_type='consume' then t1.trans_amount
+    when t1.trans_type='refund' then t1.trans_amount*-1 end as saleAmount,
+    case
+    when t1.trans_type='consume' then t1.trans_amount
+    when t1.trans_type='refund' then t1.trans_amount*-1
+    else 0
+    end as settleAmount
+
+    from wholesale_receivable_settle_detail t1
+    inner join account ac on t1.account_code = ac.account_code
+    inner join department d on d.department_code = ac.department
+    left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
+    left join merchant t4 on t1.mer_code=t4.mer_code
+    left join merchant supplier on supplier.mer_code = t3.mer_code
+    left join store_consume_type t5 on t1.store_code = t5.store_code and t1.order_channel = t5.consum_type  and t5.deleted=0
+    <where>
+      <if test="query.settleNo !=null and query.settleNo != '' ">
+        and t1.settle_no  = #{query.settleNo}
+      </if>
+
+      <if test="query.orderNo !=null and query.orderNo != '' ">
+        and  t1.order_id  = #{query.orderNo}
+      </if>
+      <if test="query.transNo !=null ">
+        and t1.trans_no = #{query.transNo}
+      </if>
+      <if test="query.supplierCode !=null ">
+        and  supplier.mer_code = #{query.supplierCode}
+      </if>
+      <if test="query.storeCodes != null and query.storeCodes.size > 0">
+        and t1.store_code in
+        <foreach collection="query.storeCodes" item="item" index="index" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
+
+      <if test="query.startTime != null">
+        and t1.trans_time <![CDATA[>=]]> #{query.startTime}
+      </if>
+      <if test="query.endTime != null">
+        and  t1.trans_time <![CDATA[<]]> #{query.endTime}
+      </if>
+
+      <if test="query.phone !=null  and query.phone != ''">
+        and  ac.phone  = #{query.phone}
+      </if>
+    </where>
+    )t
+
+
+
+  </select>
+
+
+
+  <select id="receivableBillDetailPage"
+    resultType="com.welfare.persist.dto.WholesaleReceivableSettleDetailResp"
+    parameterType="com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery">
+    select
+    t1.id,
+    t1.trans_no as transNo,
+    t1.order_id as orderNo,
+    t1.trans_time as transTime,
+    t1.store_code as storeCode,
+    t1.store_name as storeName,
+    ac.account_name as accountName,
+    ac.phone,
+    d.department_name,
+    supplier.mer_name as customerMerName,
+    case
+    when t1.trans_type='consume' then t1.trans_amount
+    when t1.trans_type='refund' then t1.trans_amount*-1 end as saleAmount,
+    case
+    when t1.trans_type='consume' then t1.trans_amount
+    when t1.trans_type='refund' then t1.trans_amount*-1
+    else 0
+    end as settleAmount
+
+    from wholesale_receivable_settle_detail t1
+    inner join account ac on t1.account_code = ac.account_code
+    inner join department d on d.department_code = ac.department
+    left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
+    left join merchant t4 on t1.mer_code=t4.mer_code
+    left join merchant supplier on supplier.mer_code = t3.mer_code
+    left join store_consume_type t5 on t1.store_code = t5.store_code and t1.order_channel = t5.consum_type  and t5.deleted=0
+
+  <where>
+
+    <if test="query.settleNo !=null and query.settleNo != '' ">
+      and t1.settle_no  = #{query.settleNo}
+    </if>
+
+    <if test="query.orderNo !=null and query.orderNo != '' ">
+      and t1.order_id  = #{query.orderNo}
+    </if>
+
+
+    <if test="query.transNo !=null ">
+      and t1.trans_no = #{query.transNo}
+    </if>
+    <if test="query.supplierCode !=null ">
+      and supplier.mer_code = #{query.supplierCode}
+    </if>
+    <if test="query.storeCodes != null and query.storeCodes.size > 0">
+      and t1.store_code in
+      <foreach collection="query.storeCodes" item="item" index="index" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+
+    <if test="query.startTime != null">
+      and t1.trans_time <![CDATA[>=]]> #{query.startTime}
+    </if>
+    <if test="query.endTime != null">
+      and t1.trans_time <![CDATA[<]]> #{query.endTime}
+    </if>
+
+    <if test="query.phone !=null  and query.phone != ''">
+      and ac.phone  = #{query.phone}
+    </if>
+
+  </where>
+
+  </select>
+</mapper>

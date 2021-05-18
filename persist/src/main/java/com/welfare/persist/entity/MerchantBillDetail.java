@@ -80,6 +80,11 @@ public class MerchantBillDetail extends Model<MerchantBillDetail> implements Ser
      */
     @ApiModelProperty("剩余信用额度")   
     private BigDecimal remainingLimit;
+
+    @ApiModelProperty("批发剩余信用额度")
+    private BigDecimal wholesaleRemainingLimit;
+    @ApiModelProperty("最高批发信用额度")
+    private BigDecimal wholesaleLimit;
     /**
      * 返利额度
      */

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.welfare.persist.mapper.OrderInfoDetailMapper">
+    <sql id="tableName">
+        order_info_detail
+    </sql>
+
+    <sql id="baseColumn">
+        id,order_id,trans_no,trans_type,product_id,uuid,sku_id,sku_no,sku_name,count,refund_count,wholesale_price,wholesale_amount,wholesale_tax_rate,create_user,create_time,update_user,update_time,deleted,version
+    </sql>
+    <select id="queryGroupByTaxRate" resultType="com.welfare.persist.entity.OrderInfoDetail">
+        select
+            sum(d.wholesale_amount) as wholesaleAmount,
+            sum(d.trans_amount) as transAmount,
+            d.wholesale_tax_rate
+        from order_info_detail d where d.order_id in
+        <foreach collection="list" item="orderNo" separator="," open="(" close=")">
+            #{orderNo,jdbcType=VARCHAR}
+        </foreach>
+        group by d.wholesale_tax_rate
+    </select>
+
+
+    <select id="queryByOrderIdAndTransNoGroupByTaxRate" resultType="com.welfare.persist.entity.OrderInfoDetail">
+        select
+        sum(
+        case when d.trans_type = 'consume' then IFNULL(d.trans_amount,0)
+        when d.trans_type = 'refund' then IFNULL(-d.trans_amount,0)
+        ELSE 0 END
+        ) as transAmount,
+        sum(
+        case when d.trans_type = 'consume' then IFNULL(d.wholesale_amount,0)
+        when d.trans_type = 'refund' then IFNULL(-d.wholesale_amount,0)
+        ELSE 0 END
+        ) as wholesaleAmount,
+        d.wholesale_tax_rate
+        from order_info_detail d
+        <where>
+            <if test="query != null and query.size > 0">
+                <foreach collection="query" item="item" separator=" or " open="(" close=")">
+                    (d.order_id = #{item.orderId} and d.trans_no = #{item.transNo})
+                </foreach>
+            </if>
+        </where>
+        group by d.wholesale_tax_rate
+    </select>
+</mapper>

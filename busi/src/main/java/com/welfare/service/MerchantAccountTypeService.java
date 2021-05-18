@@ -23,6 +23,8 @@ public interface MerchantAccountTypeService {
      */
     List<MerchantAccountType>  list(MerchantAccountTypeReq req);
 
+    List<MerchantAccountType>  listExclusion(MerchantAccountTypeReq req);
+
     boolean init(String merCode,  MerchantExtendDTO extend);
 
     /**
@@ -88,5 +90,5 @@ public interface MerchantAccountTypeService {
      * 新增
      * @param merchantAccountType
      */
-    void saveIfExist(MerchantAccountType merchantAccountType);
+    void saveIfNotExist(MerchantAccountType merchantAccountType);
 }

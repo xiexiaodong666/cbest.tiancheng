@@ -1,23 +1,29 @@
 package com.welfare.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.gson.Gson;
 import com.welfare.common.constants.AccountChangeType;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
 import com.welfare.persist.dao.AccountConsumeSceneDao;
 import com.welfare.persist.dao.AccountConsumeSceneStoreRelationDao;
+import com.welfare.persist.dao.MerAccountTypeConsumeSceneConfigDao;
 import com.welfare.persist.entity.Account;
 import com.welfare.persist.entity.AccountChangeEventRecord;
 import com.welfare.persist.entity.AccountConsumeSceneStoreRelation;
+import com.welfare.persist.entity.MerAccountTypeConsumeSceneConfig;
 import com.welfare.persist.mapper.AccountConsumeSceneCustomizeMapper;
 import com.welfare.persist.mapper.AccountConsumeSceneStoreRelationMapper;
 import com.welfare.persist.mapper.AccountCustomizeMapper;
+import com.welfare.persist.mapper.MerAccountTypeConsumeSceneConfigMapper;
 import com.welfare.service.AccountChangeEventRecordService;
 import com.welfare.service.AccountConsumeSceneStoreRelationService;
+import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.dto.ConsumeTypeJson;
 import com.welfare.service.dto.StoreConsumeRelationDTO;
 import com.welfare.service.sync.event.AccountConsumeSceneEvt;
 import com.welfare.service.utils.AccountUtils;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -52,6 +58,14 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
   private final ApplicationContext applicationContext;
   private final AccountConsumeSceneCustomizeMapper accountConsumeSceneCustomizeMapper;
   private final AccountConsumeSceneDao accountConsumeSceneDao;
+
+
+  @Autowired
+  private MerAccountTypeConsumeSceneConfigDao consumeSceneConfigDao;
+
+
+  @Autowired
+  private MerAccountTypeConsumeSceneConfigMapper consumeSceneConfigMapper;
 
   @Override
   public List<AccountConsumeSceneStoreRelation> getListByConsumeSceneId(Long accountConsumeSceneId){
@@ -94,6 +108,54 @@ public class AccountConsumeSceneStoreRelationServiceImpl implements
     applicationContext.publishEvent( AccountConsumeSceneEvt
         .builder().typeEnum(ShoppingActionTypeEnum.ACCOUNT_CONSUME_SCENE_BATCH_DELETE).relationList(allRelations).merCode(merCode).build());
   }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void updateWelfareStoreConsumeTypeByDTOList(String merCode,
+      List<StoreConsumeRelationDTO> relationDTOList) {
+
+    List<String> storeCodeList = relationDTOList.stream().map(storeConsumeRelationDTO -> {
+      return storeConsumeRelationDTO.getStoreCode();
+    }).collect(Collectors.toList());
+
+    List<MerAccountTypeConsumeSceneConfig> consumeSceneConfigList = consumeSceneConfigMapper.selectList(Wrappers.<MerAccountTypeConsumeSceneConfig>lambdaQuery().eq(MerAccountTypeConsumeSceneConfig::getMerCode, merCode).in(MerAccountTypeConsumeSceneConfig::getStoreCode, storeCodeList));
+
+    if(CollectionUtils.isNotEmpty(consumeSceneConfigList)) {
+      List<Long> removeIdList = new ArrayList<>();
+      HashMap<String,String> updateRelationMap = new HashMap<>();
+      relationDTOList.forEach(storeConsumeRelationDTO -> {
+        updateRelationMap.put(storeConsumeRelationDTO.getStoreCode(),storeConsumeRelationDTO.getConsumeType());
+      });
+
+      for (MerAccountTypeConsumeSceneConfig consumeSceneConfig:
+      consumeSceneConfigList) {
+        String consumeType = updateRelationMap.get(consumeSceneConfig.getStoreCode());
+        if(!consumeType.contains(consumeSceneConfig.getSceneConsumeType())) {
+          removeIdList.add(consumeSceneConfig.getId());
+        }
+      }
+
+      if(CollectionUtils.isNotEmpty(removeIdList)) {
+        consumeSceneConfigMapper.deleteBatchIds(removeIdList);
+      }
+    }
+
+
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void deleteWelfareConsumeScene(String merCode, List<String> storeCodeList) {
+    List<MerAccountTypeConsumeSceneConfig> consumeSceneConfigList = consumeSceneConfigMapper.selectList(Wrappers.<MerAccountTypeConsumeSceneConfig>lambdaQuery().eq(MerAccountTypeConsumeSceneConfig::getMerCode, merCode).in(MerAccountTypeConsumeSceneConfig::getStoreCode, storeCodeList));
+
+    if(CollectionUtils.isNotEmpty(consumeSceneConfigList)) {
+      consumeSceneConfigDao.removeByIds(consumeSceneConfigList.stream().map(accountConsumeSceneStoreRelation -> {
+        return accountConsumeSceneStoreRelation.getId();
+      }).collect(Collectors.toList()));
+    }
+
+  }
+
 
   @Override
   @Transactional(rollbackFor = Exception.class)

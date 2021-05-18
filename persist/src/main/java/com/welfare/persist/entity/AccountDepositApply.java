@@ -162,6 +162,12 @@ public class AccountDepositApply extends Model<AccountDepositApply> implements S
     @ApiModelProperty("渠道")   
     private String channel;
 
+    /**
+     * 充值类型
+     */
+    @ApiModelProperty("充值类型（批发采购充值：wholesaleCreditLimitApply  福利充值：welfareApply)")
+    private String applyType;
+
 //以下为列明常量
 
     /**

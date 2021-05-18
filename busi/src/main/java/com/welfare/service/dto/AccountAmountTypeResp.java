@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * @Author: duanhy
  * @Version: 0.0.1
- * @Date: 2021/4/25 5:30 下午
+ * @Date: 2021/4/26 9:58 上午
  */
 @Data
 public class AccountAmountTypeResp {

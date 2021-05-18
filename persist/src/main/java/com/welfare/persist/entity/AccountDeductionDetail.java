@@ -51,6 +51,11 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     @ApiModelProperty("交易流水号")   
     private String transNo;
     /**
+     * 订单号
+     */
+    @ApiModelProperty("订单号")
+    private String orderNo;
+    /**
      * 关联交易单号（退款时使用）
      */
     @ApiModelProperty("关联交易单号（退款时使用）")   
@@ -270,5 +275,7 @@ public class AccountDeductionDetail extends Model<AccountDeductionDetail> implem
     public static final String PAYMENT_CHANNEL = "payment_channel";
 
     public static final String ACCOUNT_AMOUNT_TYPE_GROUP_ID = "account_amount_type_group_id";
+
+    public static final String ORDER_NO = "order_no";
 
 }

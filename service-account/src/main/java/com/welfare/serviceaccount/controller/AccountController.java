@@ -1,6 +1,5 @@
 package com.welfare.serviceaccount.controller;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.welfare.common.annotation.AccountUser;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.util.AccountUserHolder;
@@ -10,6 +9,7 @@ import com.welfare.persist.dto.AccountPasswordFreePageSignDTO;
 import com.welfare.persist.dto.AccountPasswordFreeSignDTO;
 import com.welfare.persist.dto.AccountPaymentChannelDTO;
 import com.welfare.persist.dto.AccountSimpleDTO;
+import com.welfare.service.AccountAmountTypeService;
 import com.welfare.persist.entity.Account;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.AccountService;
@@ -150,7 +150,6 @@ public class AccountController implements IController {
         Long accountCode = AccountUserHolder.getAccountUser().getAccountCode();
         return success(accountService.passwordFreeUnsign(accountCode, paymentChannel));
     }
-
 
     @ApiOperation("员工所有福利类型账号信息")
     @GetMapping("/mer-account_type/list")

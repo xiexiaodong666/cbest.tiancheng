@@ -107,6 +107,12 @@ public class MerchantCredit extends Model<MerchantCredit> implements Serializabl
     @TableField(fill = FieldFill.INSERT)
 	private Integer version;
 
+
+    @ApiModelProperty("批发限制授信额度")
+    private BigDecimal wholesaleCreditLimit;
+
+    @ApiModelProperty("批发授信额度")
+    private BigDecimal wholesaleCredit;
 //以下为列明常量
 
     /**
@@ -165,5 +171,13 @@ public class MerchantCredit extends Model<MerchantCredit> implements Serializabl
     * 版本
     */
     public static final String VERSION = "version";
+    /**
+     * 批发限制授信额度
+     */
+    public static final String WHOLESALE_CREDIT_LIMIT = "wholesale_credit_limit";
+    /**
+     * 批发授信额度
+     */
+    public static final String WHOLESALE_CREDIT = "wholesale_credit";
 
 }

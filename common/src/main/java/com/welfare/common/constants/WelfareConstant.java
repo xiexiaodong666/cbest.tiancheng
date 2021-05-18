@@ -1,5 +1,8 @@
 package com.welfare.common.constants;
 
+import com.welfare.common.exception.BizException;
+import com.welfare.common.exception.ExceptionCode;
+
 /**
  * Description:
  *
@@ -11,6 +14,9 @@ public class WelfareConstant {
     private WelfareConstant() {
 
     }
+
+    public static final String ACCOUNT_WELFARE_TYPE_CACHE_NAME = "getAccountWelfareAndMerCode";
+
 
     public static final String DEFAULT_SALE_UNID = "cbest-offline-default";
     public static final String DEFAULT_SALE_UNNAME = "重百线下消费商品";
@@ -186,7 +192,9 @@ public class WelfareConstant {
         SELF_DEPOSIT("self_deposit","自主充值"),
         CREDIT_LIMIT("creditLimit", "信用额度"),
         REMAINING_LIMIT("remainingLimit", "剩余信用额度"),
-        REBATE_LIMIT("rebateLimit", "返利余额");
+        REBATE_LIMIT("rebateLimit", "返利余额"),
+        WHOLESALE_CREDIT_LIMIT("wholesaleCreditLimit", "批发采购信用额度"),
+        WHOLESALE_CREDIT("wholesaleCredit", "剩余批发采购信用额度");
 
         MerCreditType(String code, String desc) {
             this.code = code;
@@ -235,7 +243,9 @@ public class WelfareConstant {
         MESSAGE_PUSH_CONFIG_CODE("message_push_config_code","商户消息配置编码"),
         ACCOUNT_AMOUNT_TYPE_GROUP_CODE("account_amount_type_group_code","员工福利账号组编码"),
         DEFAULT_PHONE("default_phone","默认手机号"),
-        CONSTRUCTION_BANK_AUTO_INR("construction_bank_auto_inr","建行用户名称自增");
+        CONSTRUCTION_BANK_AUTO_INR("construction_bank_auto_inr","建行用户名称自增"),
+        WHOLESALE_RECEIVABLE_SETTLE_NO("wholesale_receivable_settle_no","批发应收结算单号"),
+        WHOLESALE_PAYABLE_SETTLE_NO("wholesale_payable_settle_no","批发应付结算单号");
 
 
         private final String code;
@@ -265,13 +275,23 @@ public class WelfareConstant {
         SURPLUS_QUOTA("surplus_quota","授信额度"),
         SURPLUS_QUOTA_OVERPAY("surplus_quota_overpay","授信额度溢缴款"),
         MALL_POINT("mall_point","积分账户余额"),
-        WHOLESALE("wholesale","批发采购");
+        WHOLESALE("wholesale","批发采购"),
+        WHOLESALE_PROCUREMENT("wholesale_procurement","员工批发采购账户");
         private final String code;
         private final String desc;
 
         MerAccountTypeCode(String code, String desc) {
             this.code = code;
             this.desc = desc;
+        }
+
+        public static MerAccountTypeCode findByCode(String code) {
+            for (MerAccountTypeCode type : MerAccountTypeCode.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的MerAccountTypeCode类型");
         }
 
         public String code(){
@@ -314,6 +334,15 @@ public class WelfareConstant {
         public String desc(){
             return this.desc;
         }
+
+        public static TransType parseByCode(String code){
+            for (TransType value : TransType.values()) {
+                if(value.code.equals(code)){
+                    return value;
+                }
+            }
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"未知transType:"+code);
+        }
     }
 
     /**
@@ -338,6 +367,16 @@ public class WelfareConstant {
         }
         public String desc(){
             return this.desc;
+        }
+
+        public static PayCode parseByCode(String code){
+            PayCode[] values = PayCode.values();
+            for (PayCode value : values) {
+                if(value.code.equals(code)){
+                    return value;
+                }
+            }
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS,"未知payCode:"+code);
         }
     }
 
@@ -670,4 +709,34 @@ public class WelfareConstant {
         }
     }
 
+    /**
+     * 员工充值类型
+     */
+    public enum AccountDepositApply{
+
+        WHOLESALE_CREDIT_LIMIT_APPLY("wholesaleCreditLimitApply","批发采购充值"),
+        WELFARE_APPLY("welfareApply","福利充值");
+        private final String code;
+        private final String desc;
+
+        AccountDepositApply(String code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public static AccountDepositApply findByCode(String code) {
+            for (AccountDepositApply type : AccountDepositApply.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("不存在的AccountDepositApply类型");
+        }
+
+        public String code(){
+            return this.code;
+        }
+        public String desc(){
+            return this.desc;
+        }
+    }
 }

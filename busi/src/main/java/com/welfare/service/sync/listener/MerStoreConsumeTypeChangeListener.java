@@ -2,17 +2,24 @@ package com.welfare.service.sync.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.welfare.common.constants.WelfareConstant;
+import com.welfare.common.enums.ConsumeTypeEnum;
+import com.welfare.common.enums.MerchantAccountTypeShowStatusEnum;
 import com.welfare.common.enums.ShoppingActionTypeEnum;
+import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.service.MerchantAccountTypeService;
 import com.welfare.service.PaymentChannelConfigService;
 import com.welfare.service.dto.paymentChannel.PayChannelConfigDTO;
 import com.welfare.service.dto.paymentChannel.PayChannelConfigDelDTO;
 import com.welfare.service.sync.event.MerStoreConsumeTypeChangeEvt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * @author duanhy
@@ -26,6 +33,8 @@ public class MerStoreConsumeTypeChangeListener {
 
     @Autowired
     private PaymentChannelConfigService channelConfigService;
+    @Autowired
+    private MerchantAccountTypeService merchantAccountTypeService;
 
     @EventListener
     @Transactional(rollbackFor = Exception.class)

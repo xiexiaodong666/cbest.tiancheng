@@ -32,6 +32,10 @@ public class MerchantExtendDTO {
     @NotNull(message = "积分商城是否开启 不能为空")
     private Boolean pointMall;
 
+
+    @ApiModelProperty("结算方式")
+    private String supplierWholesaleSettleMethod;
+
     public static MerchantExtendDTO of(MerchantExtend merchantExtend) {
         MerchantExtendDTO dto = new MerchantExtendDTO();
         if (Objects.nonNull(merchantExtend)) {

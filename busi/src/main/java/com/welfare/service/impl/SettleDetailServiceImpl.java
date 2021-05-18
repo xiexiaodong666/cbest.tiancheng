@@ -124,7 +124,9 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
         BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
         welfareSettleDetailQuery.setPosOnlines(posOnlines);
-        welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
+        if (welfareSettleDetailQuery.getLimit() == null || welfareSettleDetailQuery.getLimit() == 0) {
+            welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
+        }
         Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
         List<WelfareSettleDetailResp> welfareSettleDetailRespList = settleDetailMapper.getSettleDetailInfo(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
             WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
@@ -252,6 +254,8 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         settleMerInfoResp.setRebateLimit(merchantCredit.getRebateLimit());
         settleMerInfoResp.setRemainingLimit(merchantCredit.getRemainingLimit());
         settleMerInfoResp.setRechargeLimit(merchantCredit.getRechargeLimit());
+        settleMerInfoResp.setWholesaleCredit(merchantCredit.getWholesaleCredit());
+        settleMerInfoResp.setWholesaleCreditLimit(merchantCredit.getWholesaleCreditLimit());
         return settleMerInfoResp;
     }
 

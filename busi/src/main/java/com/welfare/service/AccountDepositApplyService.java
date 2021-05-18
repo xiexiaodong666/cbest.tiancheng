@@ -103,4 +103,6 @@ public interface AccountDepositApplyService {
      * @return 总充值金额
      */
     BigDecimal sumDepositDetailAmount(String merCode, String merAccountTypeCode);
+
+    void approvalAndFail(AccountDepositApprovalRequest req);
 }

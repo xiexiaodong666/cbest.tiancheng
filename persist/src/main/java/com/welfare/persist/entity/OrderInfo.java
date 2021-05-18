@@ -110,6 +110,8 @@ public class OrderInfo extends Model<OrderInfo> implements Serializable {
      */
     @ApiModelProperty("订单金额")   
     private BigDecimal orderAmount;
+    @ApiModelProperty("订单批发结算金额")
+    private BigDecimal orderWholesaleAmount;
     /**
      * 订单时间
      */

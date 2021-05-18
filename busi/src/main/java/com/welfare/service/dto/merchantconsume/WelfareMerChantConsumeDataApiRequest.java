@@ -44,4 +44,18 @@ public class WelfareMerChantConsumeDataApiRequest {
    */
   @ApiModelProperty("商户代码")
   private String merCode;
+
+
+  /**
+   * 需要展开的表格数据类型
+   */
+  @ApiModelProperty("需要展开的表格数据类型")
+  private List<String> rowsBusinessType;
+
+  /**
+   * 需要展开的汇总数据类型
+   */
+  @ApiModelProperty("需要展开的汇总数据类型")
+  private List<String> extBusinessType;
+
 }

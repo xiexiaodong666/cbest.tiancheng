@@ -70,6 +70,9 @@ public class MerchantHandler  {
             }
             listBean.setMerchantCode(merchant.getMerCode());
             listBean.setMerchantName(merchant.getMerName());
+            listBean.setSettlementMode(merchant.getSettlementMode());
+            listBean.setWholesaleEnabled(merchant.getWholesaleEnabled());
+
             if(EmptyChecker.notEmpty(merchant.getMerIdentity())){
                 listBean.setIdTypes(Arrays.asList(merchant.getMerIdentity().split(",")));
             }

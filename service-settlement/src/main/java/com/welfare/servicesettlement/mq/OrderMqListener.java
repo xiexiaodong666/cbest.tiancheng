@@ -5,14 +5,8 @@ import com.welfare.common.annotation.DistributedLock;
 import com.welfare.common.constants.WelfareConstant;
 import com.welfare.common.exception.BizAssert;
 import com.welfare.common.exception.ExceptionCode;
-import com.welfare.persist.dao.AccountDao;
-import com.welfare.persist.dao.AccountDeductionDetailDao;
-import com.welfare.persist.dao.MerchantDao;
-import com.welfare.persist.dao.OrderInfoDao;
-import com.welfare.persist.entity.Account;
-import com.welfare.persist.entity.AccountDeductionDetail;
-import com.welfare.persist.entity.Merchant;
-import com.welfare.persist.entity.OrderInfo;
+import com.welfare.persist.dao.*;
+import com.welfare.persist.entity.*;
 import com.welfare.servicesettlement.dto.mall.OrderMqInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +39,7 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
     private final AccountDeductionDetailDao accountDeductionDetailDao;
     private final AccountDao accountDao;
     private final MerchantDao merchantDao;
+    private final OrderInfoDetailDao orderInfoDetailDao;
     /**
      * 此种类型的pay_type需要忽略（表示老的员工卡支付的）
      */
@@ -74,6 +69,8 @@ public class OrderMqListener implements RocketMQListener<OrderMqInfo> {
         Account account = accountDao.queryByAccountCode(firstDetail.getAccountCode());
         Merchant merchant = merchantDao.queryByCode(account.getMerCode());
         OrderInfo orderInfo = OrderMqInfo.parseToOrderInfo(orderDTO,firstDetail,account,merchant);
+        List<OrderInfoDetail> orderInfoDetails = orderDTO.parseOrderInfoDetails(WelfareConstant.TransType.CONSUME);
+        orderInfoDetailDao.saveBatch(orderInfoDetails);
         orderInfoDao.save(orderInfo);
         log.info("ready to save orderInfo:{}",JSON.toJSONString(orderInfo));
     }

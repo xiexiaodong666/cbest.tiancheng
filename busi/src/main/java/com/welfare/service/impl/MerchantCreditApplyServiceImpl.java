@@ -240,6 +240,7 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         if (!merIdentityList.contains(MerIdentityEnum.customer.getCode())) {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "仅支持[客户]充值", null);
         }
+        WelfareConstant.MerCreditType merCreditType = WelfareConstant.MerCreditType.findByCode(typeStr);
     }
 
     /**
@@ -249,6 +250,8 @@ public class MerchantCreditApplyServiceImpl implements MerchantCreditApplyServic
         if (merCreditType == WelfareConstant.MerCreditType.REBATE_LIMIT) {
             merchantCreditService.decreaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.DEPOSIT_DECR.code());
         } else if (merCreditType == WelfareConstant.MerCreditType.CREDIT_LIMIT) {
+            merchantCreditService.setAccountType(merCode,merCreditType,amount,transNo);
+        } else if (merCreditType == WelfareConstant.MerCreditType.WHOLESALE_CREDIT_LIMIT) {
             merchantCreditService.setAccountType(merCode,merCreditType,amount,transNo);
         } else {
             merchantCreditService.increaseAccountType(merCode,merCreditType,amount,transNo, WelfareConstant.TransType.DEPOSIT_INCR.code());

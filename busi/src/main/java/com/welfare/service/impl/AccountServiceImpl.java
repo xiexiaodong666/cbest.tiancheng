@@ -826,7 +826,10 @@ public class AccountServiceImpl implements AccountService {
         accountSimpleDTO.setCredit(account.getCredit());
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, WHOLESALE_PROCUREMENT.code());
         if (Objects.nonNull(accountAmountType)) {
+            accountSimpleDTO.setWholesale(Boolean.TRUE);
             accountSimpleDTO.setWholesaleCredit(accountAmountType.getAccountBalance());
+        } else {
+            accountSimpleDTO.setWholesale(Boolean.FALSE);
         }
         return accountSimpleDTO;
     }

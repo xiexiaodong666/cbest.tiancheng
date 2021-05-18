@@ -22,7 +22,7 @@ public interface ServiceMirrorFeignClient {
   /**
    * 获取甜橙生活商户消费数据
    */
-  @RequestMapping(value = "/magneto/api/832284686884671488", method = RequestMethod.POST, consumes = "application/json")
+  @RequestMapping(value = "/magneto/api/831586026496593920", method = RequestMethod.POST, consumes = "application/json")
   WelfareMerChantConsumeDataResponse getWelfareMerChantConsumeData(@RequestBody
       WelfareMerChantConsumeDataRequest request);
 }

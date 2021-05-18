@@ -1,5 +1,6 @@
 package com.welfare.servicesettlement.mq;
 
+import com.alibaba.fastjson.JSON;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.service.settlement.SettleDetailGenerateService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class PayDeductionDetailListener implements RocketMQListener<List<Long>> 
 
     @Override
     public void onMessage(List<Long> accountDeductionDetailId) {
+        log.info("ready to consume msg:{}", JSON.toJSONString(accountDeductionDetailId));
         List<RLock> locks = new ArrayList<>();
         RLock multiLock;
         accountDeductionDetailId.forEach(id ->{

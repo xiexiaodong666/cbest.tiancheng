@@ -224,7 +224,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                             .eq(WholesaleReceivableSettleDetail::getSettleNo, settle.getSettleNo())
                             .set(WholesaleReceivableSettleDetail::getSettleFlag, settleStatus));
             BizAssert.isTrue(update, ExceptionCode.DATA_BASE_ERROR);
-            if(SettleStatusEnum.SETTLED.code().equals(sendStatus)) {
+            if(SettleStatusEnum.SETTLED.code().equals(settleStatus)) {
                 RestoreRemainingLimitReq restoreRemainingLimitReq = new RestoreRemainingLimitReq();
                 restoreRemainingLimitReq.setMerCode(settle.getMerCode());
                 restoreRemainingLimitReq.setAmount(settle.getSettleAmount());

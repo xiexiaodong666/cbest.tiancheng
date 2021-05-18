@@ -29,7 +29,7 @@ public interface OrderInfoDetailMapper extends BaseMapper<OrderInfoDetail> {
 
     /**
      * 根据订单号及交易类型查询，根据税率分组统计
-     * @param orderNos 订单号
+     * @param queries 订单号
      * @return 分组后的orderInfoDetail
      */
     List<OrderInfoDetail> queryByOrderIdAndTransNoGroupByTaxRate(@Param("query") List<GroupByTaxRateQuery> queries);

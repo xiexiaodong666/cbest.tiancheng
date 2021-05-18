@@ -23,6 +23,7 @@ import com.welfare.persist.dto.SettleTaxSalesStatistics;
 import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
 import com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp;
+import com.welfare.persist.dto.query.GroupByTaxRateQuery;
 import com.welfare.persist.dto.query.WholesaleReceivableSettleBillQuery;
 import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailPageQuery;
 import com.welfare.persist.dto.query.WholesaleReceiveSettleDetailQuery;
@@ -152,7 +153,8 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
 
         if(CollectionUtils.isNotEmpty(settleDetailDTOList)) {
 
-            List<OrderInfoDetail> groupByTaxRateDetails = orderInfoDetailMapper.queryGroupByTaxRate(new ArrayList<>(orderNoSet));
+            List<OrderInfoDetail> groupByTaxRateDetails = (orderInfoDetailMapper.queryByOrderIdAndTransNoGroupByTaxRate(GroupByTaxRateQuery
+                                                                                                                            .ofRecieve(settleDetailDTOList)));
             Date now = Calendar.getInstance().getTime();
             DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
             String settleNo = param.getMerCode() + dateFormat.format(now);

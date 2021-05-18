@@ -1,5 +1,6 @@
 package com.welfare.persist.dto.query;
 
+import com.welfare.persist.dto.settlement.wholesale.PlatformWholesaleSettleDetailDTO;
 import com.welfare.persist.entity.WholesalePayableSettleDetail;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,6 +27,20 @@ public class GroupByTaxRateQuery {
             details.forEach(wholesalePayableSettleDetail -> {
                 GroupByTaxRateQuery query = new GroupByTaxRateQuery();
                 query.setOrderId(wholesalePayableSettleDetail.getOrderId());
+                query.setTransNo(wholesalePayableSettleDetail.getTransNo());
+                queries.add(query);
+            });
+        }
+        return queries;
+    }
+
+
+    public static List<GroupByTaxRateQuery> ofRecieve(List<PlatformWholesaleSettleDetailDTO> details) {
+        List<GroupByTaxRateQuery> queries = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(details)) {
+            details.forEach(wholesalePayableSettleDetail -> {
+                GroupByTaxRateQuery query = new GroupByTaxRateQuery();
+                query.setOrderId(wholesalePayableSettleDetail.getOrderNo());
                 query.setTransNo(wholesalePayableSettleDetail.getTransNo());
                 queries.add(query);
             });

@@ -94,8 +94,8 @@
         else 0
         end as  settleAmount,
         case
-        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.trans_amount
-        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.trans_amount*-1
+        when  d.trans_type='consume' then d.trans_amount
+        when  d.trans_type='refund' then d.trans_amount*-1
         else 0
         end as  saleAmount,
         d.settle_flag as settleFlag,
@@ -137,8 +137,8 @@
         else 0
         end as settleAmount,
         case
-        when d.settle_flag = 'unsettled' and d.trans_type='consume' then d.trans_amount
-        when d.settle_flag = 'unsettled' and d.trans_type='refund' then d.trans_amount*-1
+        when d.trans_type='consume' then d.trans_amount
+        when d.trans_type='refund' then d.trans_amount*-1
         else 0
         end as saleAmount,
         d.settle_flag as settleFlag,

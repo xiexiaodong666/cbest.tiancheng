@@ -103,8 +103,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
                     wholesalePayableSettleDetailMapper.update(settleDetail, Wrappers.<WholesalePayableSettleDetail>lambdaUpdate()
                             .in(WholesalePayableSettleDetail::getId, idList));
                     // 计算各税点的商品结算金额
-                    List<String> orderList = details.stream().map(WholesalePayableSettleDetail::getOrderId).collect(Collectors.toList());
-                    orderInfoDetails.addAll(orderInfoDetailMapper.queryGroupByTaxRate(orderList));
+                    orderInfoDetails.addAll(orderInfoDetailMapper.queryByOrderIdAndTransNoGroupByTaxRate(GroupByTaxRateQuery.of(details)));
                 } else {
                     break;
                 }
@@ -119,8 +118,8 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
                             }
                         }));
                 map.forEach((taxRate, list) -> {
-                    BigDecimal settleAmount = list.stream().map(OrderInfoDetail::getWholesaleAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                    taxRateAndSettleAmountMap.put(String.valueOf(taxRate.doubleValue()), settleAmount != null ? String.valueOf(settleAmount.doubleValue()) : 0+"");
+                    BigDecimal transAmount = list.stream().map(OrderInfoDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    taxRateAndSettleAmountMap.put(String.valueOf(taxRate.doubleValue()), transAmount != null ? String.valueOf(transAmount.doubleValue()) : 0+"");
                 });
                 payableSettle.setSettleTaxSalesStatistics(JSON.toJSONString(taxRateAndSettleAmountMap));
             }

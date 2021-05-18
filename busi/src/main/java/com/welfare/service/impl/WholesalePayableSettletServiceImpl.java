@@ -103,8 +103,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
                     wholesalePayableSettleDetailMapper.update(settleDetail, Wrappers.<WholesalePayableSettleDetail>lambdaUpdate()
                             .in(WholesalePayableSettleDetail::getId, idList));
                     // 计算各税点的商品结算金额
-                    List<String> orderList = details.stream().map(WholesalePayableSettleDetail::getOrderId).collect(Collectors.toList());
-                    orderInfoDetails.addAll(orderInfoDetailMapper.queryGroupByTaxRate(orderList));
+                    orderInfoDetails.addAll(orderInfoDetailMapper.queryByOrderIdAndTransNoGroupByTaxRate(GroupByTaxRateQuery.of(details)));
                 } else {
                     break;
                 }

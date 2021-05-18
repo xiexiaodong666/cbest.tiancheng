@@ -10,6 +10,7 @@ import com.welfare.common.constants.WelfareSettleConstant;
 import com.welfare.common.domain.MerchantUserInfo;
 import com.welfare.common.domain.UserInfo;
 import com.welfare.common.exception.BizAssert;
+import com.welfare.common.exception.BizException;
 import com.welfare.common.exception.ExceptionCode;
 import com.welfare.common.util.DistributedLockUtil;
 import com.welfare.common.util.MerchantUserHolder;
@@ -87,6 +88,10 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
         try {
             payableSettle = wholesalePayableSettleDetailMapper.buildPayableSettle(query);
             BizAssert.notNull(payableSettle, ExceptionCode.DATA_NOT_EXIST, "没有可以结算的明细数据");
+
+            if(payableSettle.getSettleAmount().compareTo(new BigDecimal(0)) < 0){
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "结算金额为负，无法生成结算单", null);
+            }
 
             query.setLimit(WelfareSettleConstant.LIMIT);
             List<WholesalePayableSettleDetail> details;

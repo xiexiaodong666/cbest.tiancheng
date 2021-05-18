@@ -132,6 +132,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
             throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "没有可以结算的明细数据", null);
         }
 
+
         Set<String> orderNoSet = new HashSet<>();
         BigDecimal totalTransAmount = BigDecimal.ZERO;
         BigDecimal totalSettleAmount = BigDecimal.ZERO;
@@ -147,6 +148,10 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                 }
         }
 
+
+        if(totalTransAmount.compareTo(new BigDecimal(0)) < 0){
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "结算金额为负，无法生成结算单", null);
+        }
 
         List<SettleTaxSalesStatistics> settleTaxSalesStatisticsList = new ArrayList<>();
         WholesaleReceivableSettle wholesaleReceivableSettle = new WholesaleReceivableSettle();

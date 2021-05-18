@@ -27,7 +27,6 @@
         mer.mer_identity LIKE '%SUPPLIER%'
         AND me.supplier_wholesale_settle_method IS NOT NULL
         AND LENGTH( trim( me.supplier_wholesale_settle_method ) ) > 0
-        AND wpsd.settle_flag = 'unsettled'
         <if test="query.supplierMerName != null and query.supplierMerName != '' ">
             and mer.mer_name like concat('%', #{query.supplierMerName}, '%')
         </if>

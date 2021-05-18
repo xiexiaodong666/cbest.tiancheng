@@ -24,10 +24,15 @@
     <select id="queryByOrderIdAndTransNoGroupByTaxRate" resultType="com.welfare.persist.entity.OrderInfoDetail">
         select
         sum(
+        case when d.trans_type = 'consume' then IFNULL(d.trans_amount,0)
+        when d.trans_type = 'refund' then IFNULL(-d.trans_amount,0)
+        ELSE 0 END
+        ) as transAmount,
+        sum(
         case when d.trans_type = 'consume' then IFNULL(d.wholesale_amount,0)
         when d.trans_type = 'refund' then IFNULL(-d.wholesale_amount,0)
         ELSE 0 END
-        ) as transAmount,
+        ) as wholesaleAmount,
         d.wholesale_tax_rate
         from order_info_detail d
         <where>

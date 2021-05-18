@@ -40,6 +40,18 @@ public class OrderInfoDetail extends Model<OrderInfoDetail> implements Serializa
      */
     @ApiModelProperty("订单id")   
     private String orderId;
+
+    /**
+     * 交易流水号
+     */
+    @ApiModelProperty("交易流水号")
+    private String transNo;
+
+    /**
+     * 交易类型
+     */
+    @ApiModelProperty("交易类型")
+    private String transType;
     /**
      * 商品id
      */
@@ -207,5 +219,12 @@ public class OrderInfoDetail extends Model<OrderInfoDetail> implements Serializa
     * 版本
     */
     public static final String VERSION = "version";
-
+    /**
+     * 交易类型
+     */
+    public static final String TRANS_TYPE = "trans_type";
+    /**
+     * 交易流水号
+     */
+    public static final String TRANS_NO = "trans_no";
 }

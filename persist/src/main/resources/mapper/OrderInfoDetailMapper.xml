@@ -6,7 +6,7 @@
     </sql>
 
     <sql id="baseColumn">
-        id,order_id,product_id,uuid,sku_id,sku_no,sku_name,count,refund_count,wholesale_price,wholesale_amount,wholesale_tax_rate,create_user,create_time,update_user,update_time,deleted,version
+        id,order_id,trans_no,trans_type,product_id,uuid,sku_id,sku_no,sku_name,count,refund_count,wholesale_price,wholesale_amount,wholesale_tax_rate,create_user,create_time,update_user,update_time,deleted,version
     </sql>
     <select id="queryGroupByTaxRate" resultType="com.welfare.persist.entity.OrderInfoDetail">
         select
@@ -31,9 +31,13 @@
         d.wholesale_tax_rate
         from order_info_detail d
         LEFT JOIN order_info o on d.order_id = o.order_id
-        <foreach collection="query" item="item" separator=" or " open="(" close=")">
-            (d.order_id = #{item.orderId} and o.trans_no = #{item.transNo})
-        </foreach>
+        <where>
+            <if test="query != null and query.size > 0">
+                <foreach collection="query" item="item" separator=" or " open="(" close=")">
+                    (d.order_id = #{item.orderId} and o.trans_no = #{item.transNo})
+                </foreach>
+            </if>
+        </where>
         group by d.wholesale_tax_rate
     </select>
 </mapper>

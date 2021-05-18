@@ -202,6 +202,8 @@ CREATE TABLE `order_info_detail` (
                                      `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'pk',
                                      `order_id` varchar(20) DEFAULT NULL COMMENT '订单id',
                                      `product_id` varchar(50) DEFAULT NULL COMMENT '商品id',
+                                     `trans_no` varchar(50) DEFAULT NULL COMMENT '交易流水号',
+                                     `trans_type` varchar(20) DEFAULT NULL COMMENT '交易类型',
                                      `uuid` varchar(36) DEFAULT NULL COMMENT '行uuid',
                                      `sku_id` varchar(50) DEFAULT NULL COMMENT '商品skuid',
                                      `sku_no` varchar(50) DEFAULT NULL COMMENT '商品skuNo',

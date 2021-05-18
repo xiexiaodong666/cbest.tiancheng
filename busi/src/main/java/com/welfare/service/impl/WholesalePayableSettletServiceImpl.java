@@ -123,7 +123,7 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
                             }
                         }));
                 map.forEach((taxRate, list) -> {
-                    BigDecimal transAmount = list.stream().map(OrderInfoDetail::getTransAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    BigDecimal transAmount = list.stream().map(OrderInfoDetail::getWholesaleAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
                     taxRateAndSettleAmountMap.put(String.valueOf(taxRate.doubleValue()), transAmount != null ? String.valueOf(transAmount.doubleValue()) : 0+"");
                 });
                 payableSettle.setSettleTaxSalesStatistics(JSON.toJSONString(taxRateAndSettleAmountMap));

@@ -224,12 +224,12 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
                             .eq(WholesaleReceivableSettleDetail::getSettleNo, settle.getSettleNo())
                             .set(WholesaleReceivableSettleDetail::getSettleFlag, settleStatus));
             BizAssert.isTrue(update, ExceptionCode.DATA_BASE_ERROR);
-            if(SettleStatusEnum.SETTLED.code().equals(sendStatus)) {
+            if(SettleStatusEnum.SETTLED.code().equals(settleStatus)) {
                 RestoreRemainingLimitReq restoreRemainingLimitReq = new RestoreRemainingLimitReq();
                 restoreRemainingLimitReq.setMerCode(settle.getMerCode());
                 restoreRemainingLimitReq.setAmount(settle.getSettleAmount());
                 restoreRemainingLimitReq.setTransNo(settle.getSettleNo());
-                restoreRemainingLimitReq.setSettleType(MerCreditType.WHOLESALE_CREDIT_LIMIT.code());
+                restoreRemainingLimitReq.setSettleType(MerCreditType.WHOLESALE_CREDIT.code());
                 log.info("调用商户服务，恢复商户授信额度，请求参数：{}",JSON.toJSONString(restoreRemainingLimitReq));
                 MerchantCreditResp merchantCreditResp = merchantCreditFeign.remainingLimit(restoreRemainingLimitReq, "api");
                 if(merchantCreditResp.getCode()!=1){

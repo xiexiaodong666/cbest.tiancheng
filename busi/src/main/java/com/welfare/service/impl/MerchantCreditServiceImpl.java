@@ -269,7 +269,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             throw new BizException("额度为空");
         }
         List<MerchantBillDetail> details = merchantBillDetailService.findByTransNoAndTransType(
-            req.getTransNo(),MerCreditType.WHOLESALE_CREDIT_LIMIT.code());
+            req.getTransNo(),MerCreditType.WHOLESALE_CREDIT.code());
         if (CollectionUtils.isNotEmpty(details)) {
             log.warn("批发采购该笔结算单已经确认过了,transNo:{}", req.getTransNo());
             return;
@@ -278,7 +278,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
         try{
             details = merchantBillDetailService.findByTransNoAndTransType(
                 req.getTransNo(),
-                MerCreditType.WHOLESALE_CREDIT_LIMIT.code()
+                MerCreditType.WHOLESALE_CREDIT.code()
             );
             if (CollectionUtils.isNotEmpty(details)) {
                 log.warn("批发采购该笔结算单已经确认过了,transNo:{}", req.getTransNo());
@@ -291,7 +291,7 @@ public class MerchantCreditServiceImpl implements MerchantCreditService, Initial
             }
             // 恢复商户的信用额度
             increaseAccountType(req.getMerCode(),
-                                MerCreditType.WHOLESALE_CREDIT_LIMIT,
+                                MerCreditType.WHOLESALE_CREDIT,
                                 req.getAmount(),
                                 req.getTransNo(),
                                 WelfareConstant.TransType.RESET_INCR.code());

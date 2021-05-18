@@ -39,7 +39,7 @@ public class WelfarePaymentOperator implements IPaymentOperator {
     private final AsyncService asyncService;
 
     @Override
-    public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
+    public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, List<AccountAmountDO> allAccountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
         BigDecimal amount = paymentRequest.getAmount();
         Assert.notEmpty(accountAmountDOList, "用户没有可用的福利类型");
         BigDecimal allTypeBalance = accountAmountDOList.stream()
@@ -57,7 +57,9 @@ public class WelfarePaymentOperator implements IPaymentOperator {
         }
         accountAmountDOList.sort(Comparator.comparing(x -> x.getMerchantAccountType().getDeductionOrder()));
         List<PaymentOperation> paymentOperations = new ArrayList<>(4);
-        List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
+        List<AccountAmountType> useableAccountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
+                .collect(Collectors.toList());
+        List<AccountAmountType> allAccountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
                 .collect(Collectors.toList());
         for (AccountAmountDO accountAmountDO : accountAmountDOList) {
             BigDecimal accountBalance = accountAmountDO.getAccountAmountTypeGroup()!=null
@@ -67,7 +69,7 @@ public class WelfarePaymentOperator implements IPaymentOperator {
                 //当前的accountType没钱，则继续下一个账户
                 continue;
             }
-            PaymentOperation currentOperation = decrease(accountAmountDO, amount, paymentRequest, accountAmountTypes, supplierStore, merchantCredit);
+            PaymentOperation currentOperation = decrease(accountAmountDO, amount, paymentRequest, allAccountAmountTypes, supplierStore, merchantCredit);
             amount = amount.subtract(currentOperation.getOperateAmount());
             paymentOperations.add(currentOperation);
             if (currentOperation.isEnough()) {

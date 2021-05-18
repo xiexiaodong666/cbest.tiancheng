@@ -40,7 +40,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -130,15 +129,17 @@ public class PaymentServiceImpl implements PaymentService, ApplicationContextAwa
                 //支付前的校验
                 chargeBeforePay(paymentRequest, account, supplierStore, merStoreRelation, sceneStoreRelations, paymentChannelConfigs);
                 List<AccountAmountDO> accountAmountDOList = accountAmountTypeService.queryAccountAmountDO(account);
-                accountAmountDOList = filterAvailable(accountAmountDOList, merAccountTypeConsumeSceneConfigs, paymentRequest.bizType());
+                //后续需要用该用户所有福利类型来更新account表，所以在过滤前，前保存完整的accountAmountTypes
+                List<AccountAmountType> allAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType).collect(Collectors.toList());
+                List<AccountAmountDO> usableAccountAmountDOList = filterAvailable(accountAmountDOList, merAccountTypeConsumeSceneConfigs, paymentRequest.bizType());
                 IPaymentOperator paymentOperator = getPaymentOperator(paymentRequest.getPaymentChannel());
                 List<PaymentOperation> paymentOperations = paymentOperator.pay(
                         paymentRequest,
                         account,
+                        usableAccountAmountDOList,
                         accountAmountDOList,
                         supplierStore,
-                        merchantCredit
-                );
+                        merchantCredit);
                 List<MerchantBillDetail> merchantBillDetails = paymentOperations.stream()
                         .flatMap(paymentOperation -> paymentOperation.getMerchantAccountOperations().stream())
                         .map(MerchantAccountOperation::getMerchantBillDetail)
@@ -146,11 +147,9 @@ public class PaymentServiceImpl implements PaymentService, ApplicationContextAwa
 
                 //支付成功要将账户的离线模式启用
                 account.setOfflineLock(WelfareConstant.AccountOfflineFlag.ENABLE.code());
-                List<AccountAmountType> accountAmountTypes = accountAmountDOList.stream().map(AccountAmountDO::getAccountAmountType)
-                        .collect(Collectors.toList());
                 //在循环里面已经对merchantCredit进行了金额重新赋值
                 merchantCreditDao.updateById(merchantCredit);
-                saveDetails(paymentOperations, account, accountAmountTypes);
+                saveDetails(paymentOperations, account, allAmountTypes);
                 if (!CollectionUtils.isEmpty(merchantBillDetails)) {
                     merchantBillDetailDao.saveBatch(merchantBillDetails);
                 }

@@ -826,7 +826,10 @@ public class AccountServiceImpl implements AccountService {
         accountSimpleDTO.setCredit(account.getCredit());
         AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, WHOLESALE_PROCUREMENT.code());
         if (Objects.nonNull(accountAmountType)) {
+            accountSimpleDTO.setWholesale(Boolean.TRUE);
             accountSimpleDTO.setWholesaleCredit(accountAmountType.getAccountBalance());
+        } else {
+            accountSimpleDTO.setWholesale(Boolean.FALSE);
         }
         return accountSimpleDTO;
     }
@@ -918,6 +921,12 @@ public class AccountServiceImpl implements AccountService {
         accountOverviewDTO.setBalanceList(balanceList);
         accountOverviewDTO.setPaymentChannelList(paymentChannelList);
         accountOverviewDTO.setQueryErrorMsg(queryErrorMsg);
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, WHOLESALE_PROCUREMENT.code());
+        if (Objects.nonNull(accountAmountType)) {
+            accountOverviewDTO.setWholesale(true);
+        } else {
+            accountOverviewDTO.setWholesale(false);
+        }
         return accountOverviewDTO;
     }
 

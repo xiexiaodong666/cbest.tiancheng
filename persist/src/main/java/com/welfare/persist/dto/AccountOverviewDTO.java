@@ -36,4 +36,7 @@ public class AccountOverviewDTO {
 
     @ApiModelProperty("查询失败错误信息")
     private String queryErrorMsg;
+
+    @ApiModelProperty("是否批发")
+    private Boolean wholesale;
 }

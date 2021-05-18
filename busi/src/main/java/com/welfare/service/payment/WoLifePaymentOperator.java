@@ -42,8 +42,8 @@ public class WoLifePaymentOperator implements IPaymentOperator, IRefundOperator{
 
     @Override
     @DistributedLock(lockPrefix = "wo-life-pay", lockKey = "#paymentRequest.transNo")
-    public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> accountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
-        PaymentOperation paymentOperation = doPay(paymentRequest, account, accountAmountDOList, supplierStore, merchantCredit, remainingLimitOperator);
+    public List<PaymentOperation> pay(PaymentRequest paymentRequest, Account account, List<AccountAmountDO> useableAccountAmountDO, List<AccountAmountDO> allAccountAmountDOList, SupplierStore supplierStore, MerchantCredit merchantCredit) {
+        PaymentOperation paymentOperation = doPay(paymentRequest, account, useableAccountAmountDO, allAccountAmountDOList, supplierStore, merchantCredit, remainingLimitOperator);
 
         ThirdPartyPaymentRequest thirdPartyPaymentRequest = thirdPartyPaymentRequestService.generateHandling(paymentRequest);
         try {

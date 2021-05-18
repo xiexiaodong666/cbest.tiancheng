@@ -86,7 +86,7 @@ public class PaymentServiceImplTest extends BaseTest{
     @Test
     public void testDecreaseAccount() {
         WelfarePaymentOperator paymentService = SpringBeanUtils.getBean(WelfarePaymentOperator.class);
-        List<PaymentOperation> operations =  paymentService.pay(paymentRequest,account,accountAmountDOs,supplierStore,merchantCredit);
+        List<PaymentOperation> operations =  paymentService.pay(paymentRequest,account,accountAmountDOs, accountAmountDOs, supplierStore, merchantCredit);
         List<List<MerchantAccountOperation>> merchantOperations = operations.stream()
                 .map(PaymentOperation::getMerchantAccountOperations).collect(Collectors.toList());
         List<AccountAmountType> accountAmountTypes = operations.stream()

@@ -314,4 +314,17 @@ FROM
 	merchant_account_type mat
 WHERE
 	mat.mer_account_type_code = 'surplus_quota';
-	
+
+
+
+
+ALTER TABLE `wholesale_payable_settle_detail` ADD INDEX idx_trans_time ( `trans_time` ) ;
+ALTER TABLE `wholesale_payable_settle_detail` ADD INDEX idx_mer_code ( `mer_code` ) ;
+ALTER TABLE `wholesale_payable_settle_detail` ADD INDEX idx_trans_no ( `trans_no` ) ;
+ALTER TABLE `wholesale_payable_settle_detail` ADD INDEX idx_settle_flag ( `settle_flag` ) ;
+
+
+ALTER TABLE `wholesale_receivable_settle_detail` ADD INDEX idx_trans_time ( `trans_time` ) ;
+ALTER TABLE `wholesale_receivable_settle_detail` ADD INDEX idx_mer_code ( `mer_code` ) ;
+ALTER TABLE `wholesale_receivable_settle_detail` ADD INDEX idx_trans_no ( `trans_no` ) ;
+ALTER TABLE `wholesale_receivable_settle_detail` ADD INDEX idx_settle_flag ( `settle_flag` ) ;

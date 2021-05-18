@@ -38,4 +38,7 @@ public class AccountSimpleDTO {
 
     @ApiModelProperty("批发采购余额")
     private BigDecimal wholesaleCredit;
+
+    @ApiModelProperty("是否批发")
+    private Boolean wholesale;
 }

@@ -229,7 +229,7 @@ alter table account_deduction_detail add column mer_deduction_wholesale_credit_a
 alter table merchant_bill_detail add column wholesale_limit decimal(10,2) comment  '批发最高额度' after remaining_limit;
 alter table merchant_bill_detail add column wholesale_remaining_limit decimal(10,2) comment '批发剩余额度' after remaining_limit;
 alter table order_info add column order_wholesale_amount decimal(10,2) comment '订单批发结算金额' after order_amount;
-
+alter table order_info_detail add column trans_amount decimal(10,2) comment '交易金额' after refund_count;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;

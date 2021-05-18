@@ -94,6 +94,7 @@
             </if>
             and t1.trans_type in('consume','refund')
             and t1.payment_channel in ('welfare', 'wo_life')
+            and t1.order_channel not in ('WHOLESALE')
         </where>
         order by t1.id
         <if test="limit!=null">

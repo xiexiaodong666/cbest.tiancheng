@@ -485,7 +485,7 @@ public class AccountServiceImpl implements AccountService {
             //批发福利账户
             AccountAmountType accountAmountType = getAccountAmountType(account.getAccountCode(),
                     BigDecimal.ZERO, account.getMerCode(),
-                    MerAccountTypeCode.WHOLESALE.code());
+                    WHOLESALE_PROCUREMENT.code());
             accountAmountTypeMapper.insert(accountAmountType);
             SubAccount subAccount = new SubAccount();
             subAccount.setAccountCode(account.getAccountCode());

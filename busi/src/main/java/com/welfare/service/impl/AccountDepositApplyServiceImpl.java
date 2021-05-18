@@ -113,7 +113,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveOne(DepositApplyRequest request, MerchantUserInfo merchantUser) {
-
+        if (MerAccountTypeCode.WHOLESALE.code().equals(request.getMerAccountTypeCode())) {
+            request.setMerAccountTypeCode(MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+            request.setMerAccountTypeName(MerAccountTypeCode.WHOLESALE_PROCUREMENT.desc());
+        }
         AccountDepositApply apply = getByRequestId(request.getRequestId());
         if (apply != null) {
             return apply.getId();
@@ -158,7 +161,10 @@ public class AccountDepositApplyServiceImpl implements AccountDepositApplyServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveBatch(DepositApplyRequest request, String fileId, MerchantUserInfo merchantUser) {
-
+        if (MerAccountTypeCode.WHOLESALE.code().equals(request.getMerAccountTypeCode())) {
+            request.setMerAccountTypeCode(MerAccountTypeCode.WHOLESALE_PROCUREMENT.code());
+            request.setMerAccountTypeName(MerAccountTypeCode.WHOLESALE_PROCUREMENT.desc());
+        }
         AccountDepositApply apply = getByRequestId(request.getRequestId());
         if (apply != null) {
             return apply.getId();

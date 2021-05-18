@@ -73,8 +73,10 @@ public interface IRefundOperator {
         if(!Objects.equals(account.getMerCode(),supplierStore.getMerCode())){
             //非自营才有退回商户操作,和扣款时保持一致
             List<MerchantAccountOperation> merchantAccountOperations = operateMerchantRefund(refundRequest, account);
-            refundDeductionDetail.setMerDeductionAmount(MerchantAccountOperation.getCurrentBalanceOperated(merchantAccountOperations));
-            refundDeductionDetail.setMerDeductionCreditAmount(MerchantAccountOperation.getRemainingLimitOperated(merchantAccountOperations));
+            if(!CollectionUtils.isEmpty(merchantAccountOperations)){
+                refundDeductionDetail.setMerDeductionAmount(MerchantAccountOperation.getCurrentBalanceOperated(merchantAccountOperations));
+                refundDeductionDetail.setMerDeductionCreditAmount(MerchantAccountOperation.getRemainingLimitOperated(merchantAccountOperations));
+            }
         }
 
         getAccountBillDetailDao().saveOrUpdateBatch(Arrays.asList(refundBillDetail, thePaidBilDetail));

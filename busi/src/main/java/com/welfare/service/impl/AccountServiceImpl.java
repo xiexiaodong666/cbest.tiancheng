@@ -921,6 +921,12 @@ public class AccountServiceImpl implements AccountService {
         accountOverviewDTO.setBalanceList(balanceList);
         accountOverviewDTO.setPaymentChannelList(paymentChannelList);
         accountOverviewDTO.setQueryErrorMsg(queryErrorMsg);
+        AccountAmountType accountAmountType = accountAmountTypeService.queryOne(accountCode, WHOLESALE_PROCUREMENT.code());
+        if (Objects.nonNull(accountAmountType)) {
+            accountOverviewDTO.setWholesale(true);
+        } else {
+            accountOverviewDTO.setWholesale(false);
+        }
         return accountOverviewDTO;
     }
 

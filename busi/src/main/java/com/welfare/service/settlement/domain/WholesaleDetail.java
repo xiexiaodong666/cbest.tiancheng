@@ -247,6 +247,7 @@ public class WholesaleDetail {
             wholesaleDetail.setSettleFlag(WelfareSettleConstant.SettleStatusEnum.UNSETTLED.code());
             wholesaleDetail.setRebateAmount(BigDecimal.ZERO);
             wholesaleDetail.setOrderWholesaleAmount(orderInfo.getOrderWholesaleAmount());
+            wholesaleDetail.setPaymentChannel(deductionDetail.getPaymentChannel());
             return wholesaleDetail;
         }).collect(Collectors.toList());
 

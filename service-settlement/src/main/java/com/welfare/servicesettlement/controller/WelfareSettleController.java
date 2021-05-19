@@ -147,4 +147,49 @@ public class WelfareSettleController implements IController {
         }
         return success(fileUploadService.getFileServerUrl(path));
     }
+
+
+    @PostMapping("/allDetail")
+    @ApiOperation("分页查询商户未结算账单明细列表(包含批发)")
+    public R<Page<WelfareSettleDetailResp>> pageQueryMonthAllSettleDetail(@RequestBody WelfareSettleDetailPageReq welfareSettleDetailPageReq){
+
+        BasePageVo<WelfareSettleDetailResp> welfareSettleDetailRespBasePageVo =  settleDetailService.queryWelfareAllSettleDetailPage(welfareSettleDetailPageReq);
+
+        return success(welfareSettleDetailRespBasePageVo);
+    }
+
+    @PostMapping("/allDetail/export")
+    @ApiOperation("未结算账单明细导出(包含批发)")
+    public Object exportMonthAllSettleDetail(@RequestBody WelfareSettleDetailReq welfareSettleDetailReq, HttpServletResponse response){
+
+
+        List<WelfareSettleDetailResp> welfareSettleDetailRespList = new ArrayList<>();
+        List<WelfareSettleDetailResp> welfareSettleDetailRespListTemp;
+        welfareSettleDetailReq.setMinId(0l);
+        do {
+            welfareSettleDetailRespListTemp = settleDetailService.queryWelfareAllSettleDetail(welfareSettleDetailReq);
+            if(!welfareSettleDetailRespListTemp.isEmpty()){
+                welfareSettleDetailRespList.addAll(welfareSettleDetailRespListTemp);
+                welfareSettleDetailReq.setMinId(welfareSettleDetailRespListTemp.get(welfareSettleDetailRespListTemp.size()-1).getId()+1);
+            }else{
+                break;
+            }
+        }while(true);
+
+        String path = null;
+        try {
+            path = fileUploadService.uploadExcelFile(
+                    welfareSettleDetailRespList, WelfareSettleDetailResp.class, "应付消费明细");
+        } catch (IOException e) {
+            throw new BizException(null, "文件导出异常", null);
+        }
+        return success(fileUploadService.getFileServerUrl(path));
+    }
+
+    @PostMapping("/allDetail/summary")
+    @ApiOperation("查询商户未结算账单明细summary(包含批发)")
+    public R<WelfareSettleSummaryDTO> summaryAllSettleDetail(@RequestBody WelfareSettleDetailReq welfareSettleDetailReq){
+        WelfareSettleSummaryDTO welfareSettleSummaryDTO = settleDetailService.queryWelfareAllSettleDetailSummary(welfareSettleDetailReq);
+        return success(welfareSettleSummaryDTO);
+    }
 }

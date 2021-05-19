@@ -469,4 +469,80 @@ public class SettleDetailServiceImpl implements SettleDetailService {
         }
         return typeTotalAmounts;
     }
+
+
+    @Override
+    public BasePageVo<WelfareSettleDetailResp> queryWelfareAllSettleDetailPage(WelfareSettleDetailPageReq welfareSettleDetailPageReq) {
+        String merCode = welfareSettleDetailPageReq.getMerCode();
+
+        if(StringUtils.isBlank(merCode)){
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "商户编号不能为空", null);
+        }
+
+        WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
+        BeanUtils.copyProperties(welfareSettleDetailPageReq, welfareSettleDetailQuery);
+        welfareSettleDetailQuery.setPosOnlines(posOnlines);
+
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
+        PageInfo<WelfareSettleDetailResp> welfareSettleDetailRespPageInfo = PageHelper.startPage(welfareSettleDetailPageReq.getCurrent(), welfareSettleDetailPageReq.getSize())
+                .doSelectPageInfo(() -> {
+                    settleDetailMapper.getSettleDetailInfo2(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
+                        WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
+                        BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);
+                        if (paymentChannelMap.containsKey(welfareSettleDetailDTO.getPaymentChannel())) {
+                            welfareSettleDetailResp.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                            welfareSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                        }
+                        return welfareSettleDetailResp;
+                    }).collect(Collectors.toList());
+                });
+
+        Map<String, Object> extInfo = queryWelfareSettleDetailExt(welfareSettleDetailPageReq);
+
+        BasePageVo<WelfareSettleDetailResp> welfareSettleDetailRespBasePageVo = new BasePageVo<>(welfareSettleDetailPageReq.getCurrent(), welfareSettleDetailPageReq.getSize(),
+                welfareSettleDetailRespPageInfo.getTotal(), welfareSettleDetailRespPageInfo.getList(), extInfo);
+        return welfareSettleDetailRespBasePageVo;
+    }
+
+    @Override
+    public List<WelfareSettleDetailResp> queryWelfareAllSettleDetail(WelfareSettleDetailReq welfareSettleDetailReq) {
+        WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
+        BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
+        welfareSettleDetailQuery.setPosOnlines(posOnlines);
+        if (welfareSettleDetailQuery.getLimit() == null || welfareSettleDetailQuery.getLimit() == 0) {
+            welfareSettleDetailQuery.setLimit(WelfareSettleConstant.LIMIT);
+        }
+        Map<String, PaymentChannel> paymentChannelMap = paymentChannelDao.allMap();
+        List<WelfareSettleDetailResp> welfareSettleDetailRespList = settleDetailMapper.getSettleDetailInfo2(welfareSettleDetailQuery).stream().map(welfareSettleDetailDTO -> {
+            WelfareSettleDetailResp welfareSettleDetailResp = new WelfareSettleDetailResp();
+            BeanUtils.copyProperties(welfareSettleDetailDTO, welfareSettleDetailResp);
+            if (paymentChannelMap.containsKey(welfareSettleDetailDTO.getPaymentChannel())) {
+                welfareSettleDetailResp.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+                welfareSettleDetailDTO.setPaymentChannel(paymentChannelMap.get(welfareSettleDetailDTO.getPaymentChannel()).getName());
+            }
+            return welfareSettleDetailResp;
+        }).collect(Collectors.toList());
+
+        return welfareSettleDetailRespList;
+    }
+
+    @Override
+    public WelfareSettleSummaryDTO queryWelfareAllSettleDetailSummary(WelfareSettleDetailReq welfareSettleDetailReq) {
+        WelfareSettleDetailQuery welfareSettleDetailQuery = new WelfareSettleDetailQuery();
+        BeanUtils.copyProperties(welfareSettleDetailReq, welfareSettleDetailQuery);
+        WelfareSettleSummaryDTO welfareSettleSummaryDTO = settleDetailMapper.getSettleDetailInfoSummary2(welfareSettleDetailQuery);
+        if(Objects.isNull(welfareSettleSummaryDTO)){
+            welfareSettleSummaryDTO = new WelfareSettleSummaryDTO();
+            Merchant merchant = merchantDao.queryByCode(welfareSettleDetailReq.getMerCode());
+            welfareSettleSummaryDTO.setMerCooperationMode(merchant.getMerCooperationMode());
+            welfareSettleSummaryDTO.setBalanceConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setMerName(welfareSettleDetailReq.getMerCode());
+            welfareSettleSummaryDTO.setOfflineConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setOnlineConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setBalanceConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setTotalConsumeAmount(BigDecimal.ZERO);
+            welfareSettleSummaryDTO.setUnsettledAmount(BigDecimal.ZERO);
+        }
+        return welfareSettleSummaryDTO;
+    }
 }

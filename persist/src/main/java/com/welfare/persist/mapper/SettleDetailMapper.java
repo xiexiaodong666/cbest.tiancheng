@@ -105,4 +105,20 @@ public interface SettleDetailMapper extends BaseMapper<SettleDetail> {
 
     List<StoreCodeName2DTO> allStoresInUnSettleDetail(@Param("merCode") String merCode);
 
+    /**
+     * 查询商户未结算详细信息列表（包含批发）
+     * @param welfareSettleDetailQuery
+     * @return
+     */
+    List<WelfareSettleDetailDTO> getSettleDetailInfo2(WelfareSettleDetailQuery welfareSettleDetailQuery);
+
+
+    /**
+     * 查询商户结算详细信息summary
+     * @param welfareSettleDetailQuery
+     * @return
+     */
+    WelfareSettleSummaryDTO getSettleDetailInfoSummary2(WelfareSettleDetailQuery welfareSettleDetailQuery);
+
+
 }

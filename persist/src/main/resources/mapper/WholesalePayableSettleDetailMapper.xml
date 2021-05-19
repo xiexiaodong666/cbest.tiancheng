@@ -99,8 +99,8 @@
             case when wpsd.trans_type='consume' then IFNULL(wpsd.trans_amount,0)
             when wpsd.trans_type='refund' then IFNULL(-wpsd.trans_amount,0)
                 end AS saleAmount,
-            case when wpsd.trans_type='consume' and wpsd.settle_flag = 'unsettled' then IFNULL(wpsd.order_wholesale_amount,0)
-            when wpsd.trans_type='refund' and wpsd.settle_flag = 'unsettled'then IFNULL(-wpsd.order_wholesale_amount,0)
+            case when wpsd.trans_type='consume'  then IFNULL(wpsd.order_wholesale_amount,0)
+            when wpsd.trans_type='refund'  then IFNULL(-wpsd.order_wholesale_amount,0)
                 else 0
                end  AS settleAmount,
 
@@ -108,8 +108,8 @@
             when wpsd.trans_type='refund' then IFNULL(-wpsd.trans_amount,0)
             end
             -
-            case when wpsd.trans_type='consume' and wpsd.settle_flag = 'unsettled' then IFNULL(wpsd.order_wholesale_amount,0)
-            when wpsd.trans_type='refund' and wpsd.settle_flag = 'unsettled' then IFNULL(-wpsd.order_wholesale_amount,0) else 0
+            case when wpsd.trans_type='consume'  then IFNULL(wpsd.order_wholesale_amount,0)
+            when wpsd.trans_type='refund' then IFNULL(-wpsd.order_wholesale_amount,0) else 0
             end  AS revenueAmount,
 
             wpsd.settle_flag AS settleFlag,

@@ -149,7 +149,7 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         }
 
 
-        if(totalTransAmount.compareTo(new BigDecimal(0)) <= 0){
+        if(totalTransAmount.compareTo(new BigDecimal(0)) < 0){
             throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "结算金额为负或者0，无法生成结算单", null);
         }
 

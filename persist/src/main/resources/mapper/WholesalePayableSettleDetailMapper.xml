@@ -183,8 +183,8 @@
         SUM( IF(wpsd.trans_amount IS NULL,0,if(wpsd.trans_type='consume', wpsd.trans_amount, -wpsd.trans_amount)) )
         -
         SUM(
-        CASE WHEN wpsd.trans_type='consume' and wpsd.settle_flag = 'unsettled' THEN IFNULL(wpsd.order_wholesale_amount ,0)
-        WHEN wpsd.trans_type='refund' and wpsd.settle_flag = 'unsettled' THEN IFNULL(-wpsd.order_wholesale_amount ,0) ELSE 0 END)  AS revenueAmount
+        CASE WHEN wpsd.trans_type='consume'  THEN IFNULL(wpsd.order_wholesale_amount ,0)
+        WHEN wpsd.trans_type='refund'  THEN IFNULL(-wpsd.order_wholesale_amount ,0) ELSE 0 END)  AS revenueAmount
         FROM
         wholesale_payable_settle_detail wpsd
         LEFT JOIN account a ON wpsd.account_code = a.account_code

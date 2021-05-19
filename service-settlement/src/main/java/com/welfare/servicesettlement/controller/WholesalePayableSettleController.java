@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -160,6 +161,21 @@ public class WholesalePayableSettleController implements IController {
         String path = fileUploadService.uploadExcelFile(details, WholesalePayableSettleDetailResp.class, "应付结算单明细");
         return R.success(fileUploadService.getFileServerUrl(path));
     }
+
+    @GetMapping("/merchant/payable/bill/{id}/export")
+    @ApiOperation("(商户应收结算单)应付结算明细数据单导出,去除营收金额")
+    public R<String> merchantPayableBillDetailExport(@PathVariable("id") Long id, WholesalePaySettleDetailReq query) throws IOException {
+        List<WholesalePayableSettleDetailResp> details = payableSettletService.queryPayableBillDetail(id, query);
+        if(CollectionUtils.isNotEmpty(details)) {
+            details.forEach(d -> {
+                d.setRevenueAmount(null);
+            });
+        }
+        String path = fileUploadService.uploadExcelFile(details, MerchantWholesalePayableSettleDetailResp.class, "应付结算单明细");
+        return R.success(fileUploadService.getFileServerUrl(path));
+    }
+
+
 
     @GetMapping("/payable/bill/{id}/stores")
     @ApiOperation("(商户应收结算单)查询结算单下所有的消费门店")

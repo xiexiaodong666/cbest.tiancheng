@@ -3,6 +3,7 @@ package com.welfare.servicesettlement.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageInfo;
+import com.welfare.persist.dto.MerchantWholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleDetailResp;
 import com.welfare.persist.dto.WholesaleReceivableSettleResp;
 import com.welfare.persist.dto.WholesaleReceiveSettleSummaryResp;
@@ -23,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.mica.common.support.IController;
 import net.dreamlu.mica.core.result.R;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -187,5 +189,21 @@ public class WholesaleReceivableSettleController implements IController {
 
       String filePath = fileUploadService.uploadExcelFile(resultList, WholesaleReceivableSettleDetailResp.class, "批发应收结算分组汇总");
       return R.success(fileUploadService.getFileServerUrl(filePath));
+    }
+
+    @GetMapping("/merchant/receivable/bill/{id}/export")
+    @ApiOperation("商户端应收结算明细数据单导出，去除营收金额")
+    public R<String> merchantReceivableBillDetailExport(@PathVariable("id") Long id, WholesaleReceiveSettleDetailPageQuery query)
+        throws IOException {
+        List<WholesaleReceivableSettleDetailResp> resultList = wholesaleSettlementService.receivableBillDetail(id, query);
+
+        if(CollectionUtils.isNotEmpty(resultList)) {
+            resultList.forEach(d -> {
+                d.setRevenueAmount(null);
+            });
+        }
+
+        String filePath = fileUploadService.uploadExcelFile(resultList, MerchantWholesaleReceivableSettleDetailResp.class, "批发应收结算分组汇总");
+        return R.success(fileUploadService.getFileServerUrl(filePath));
     }
 }

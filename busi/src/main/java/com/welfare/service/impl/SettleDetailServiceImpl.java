@@ -213,8 +213,8 @@ public class SettleDetailServiceImpl implements SettleDetailService {
             throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "构选的消费明细正在结算中或结算已完成。", null);
         }
         monthSettle.setSettleStatus(WelfareSettleConstant.SettleStatusEnum.SETTLING.code());
-        if(monthSettle.getSettleAmount().compareTo(new BigDecimal(0)) < 0){
-            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "结算金额为负，无法生成结算单", null);
+        if(monthSettle.getSettleAmount().compareTo(new BigDecimal(0)) <= 0){
+            throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "结算金额为负或者0，无法生成结算单", null);
         }
 
         List<SettleStatisticsInfoDTO> settleStatisticsInfoDTOList = settleDetailMapper.getSettleStatisticsInfoByCondition(welfareSettleDetailQuery);

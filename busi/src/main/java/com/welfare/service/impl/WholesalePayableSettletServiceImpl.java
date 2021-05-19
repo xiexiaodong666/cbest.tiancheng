@@ -89,8 +89,8 @@ public class WholesalePayableSettletServiceImpl implements WholesalePayableSettl
             payableSettle = wholesalePayableSettleDetailMapper.buildPayableSettle(query);
             BizAssert.notNull(payableSettle, ExceptionCode.DATA_NOT_EXIST, "没有可以结算的明细数据");
 
-            if(payableSettle.getSettleAmount().compareTo(new BigDecimal(0)) < 0){
-                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "结算金额为负，无法生成结算单", null);
+            if(payableSettle.getSettleAmount().compareTo(new BigDecimal(0)) <= 0){
+                throw new BizException(ExceptionCode.ILLEGALITY_ARGUMENTS, "结算金额为负或者0，无法生成结算单", null);
             }
 
             query.setLimit(WelfareSettleConstant.LIMIT);

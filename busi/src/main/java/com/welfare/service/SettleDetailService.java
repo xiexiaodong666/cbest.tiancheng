@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.welfare.common.base.BasePageVo;
 import com.welfare.persist.dto.WelfareSettleSumDTO;
 import com.welfare.persist.dto.WelfareSettleSummaryDTO;
+import com.welfare.persist.dto.query.WelfareSettleDetailQuery;
 import com.welfare.persist.dto.query.WelfareSettleQuery;
 import com.welfare.persist.entity.Merchant;
 import com.welfare.persist.entity.MerchantBillDetail;
@@ -11,9 +12,12 @@ import com.welfare.persist.entity.MerchantCredit;
 import com.welfare.persist.entity.SettleDetail;
 import com.welfare.service.dto.*;
 import com.welfare.service.dto.proprietary.ProprietaryConsumePageReq;
+import org.springframework.beans.BeanUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author qiang.deng
@@ -25,6 +29,7 @@ public interface SettleDetailService {
 
     /**
      * 分页查询商户未结算信息
+     *
      * @param welfareSettlePageReq
      * @return
      */
@@ -32,12 +37,15 @@ public interface SettleDetailService {
 
     /**
      * 查询商户结算信息summary
+     *
      * @param welfareSettleQuery
      * @return
      */
     WelfareSettleSumDTO queryWelfareSettleSum(WelfareSettleQuery welfareSettleQuery);
+
     /**
      * 查询商户未结算明细信息列表
+     *
      * @param welfareSettleDetailReq
      * @return
      */
@@ -45,12 +53,15 @@ public interface SettleDetailService {
 
     /**
      * 查询商户结算明细信息summary
+     *
      * @param welfareSettleDetailReq
      * @return
      */
     WelfareSettleSummaryDTO queryWelfareSettleDetailSummary(WelfareSettleDetailReq welfareSettleDetailReq);
+
     /**
      * 分页查询商户未结算明细信息
+     *
      * @param welfareSettleDetailPageReq
      * @return
      */
@@ -58,6 +69,7 @@ public interface SettleDetailService {
 
     /**
      * 分页查询商户未结算明细额外信息
+     *
      * @param welfareSettleDetailPageReq
      * @return
      */
@@ -75,6 +87,7 @@ public interface SettleDetailService {
 
     /**
      * 计算并赋值返点金额
+     *
      * @param merchantCredit
      * @param settleDetails
      * @return
@@ -83,6 +96,7 @@ public interface SettleDetailService {
 
     /**
      * 分页查询商户自营消费明细
+     *
      * @param welfareSettleDetailPageReq
      * @return
      */
@@ -92,8 +106,15 @@ public interface SettleDetailService {
 
     /**
      * 按余额类型为维度统计总金额
+     *
      * @param welfareSettleDetailPageReq
      * @return
      */
     List<WelfareTypeTotalAmountResp> statisticalAmountGroupByWelfareTypeCode(ProprietaryConsumePageReq welfareSettleDetailPageReq);
+
+    BasePageVo<WelfareSettleDetailResp> queryWelfareAllSettleDetailPage(WelfareSettleDetailPageReq welfareSettleDetailPageReq);
+
+    List<WelfareSettleDetailResp> queryWelfareAllSettleDetail(WelfareSettleDetailReq welfareSettleDetailReq);
+
+    WelfareSettleSummaryDTO queryWelfareAllSettleDetailSummary(WelfareSettleDetailReq welfareSettleDetailReq);
 }

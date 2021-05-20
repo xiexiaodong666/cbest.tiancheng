@@ -72,15 +72,12 @@ public class AftersaleOrderMqInfo extends OrderMqInfo{
 
     private BigDecimal refundWholesaleAmount;
 
-    @ApiModelProperty("交易单号")
-    private String tradeNo;
-
     public OrderInfo parseFromOriginalOrder(OrderInfo originalOrderInfo){
         OrderInfo afterSaleOrderInfo = new OrderInfo();
         BeanUtils.copyProperties(originalOrderInfo,afterSaleOrderInfo);
         afterSaleOrderInfo.setOrderId(this.getOrgOrderNo().toString());
         afterSaleOrderInfo.setOrderAmount(this.refundAmount);
-        afterSaleOrderInfo.setTransNo(this.tradeNo);
+        afterSaleOrderInfo.setTransNo(super.getTradeNo());
         afterSaleOrderInfo.setReturnTransNo(originalOrderInfo.getTransNo());
         afterSaleOrderInfo.setOrderTime(this.getOrderTime());
         afterSaleOrderInfo.setTransType(WelfareConstant.TransType.REFUND.code());

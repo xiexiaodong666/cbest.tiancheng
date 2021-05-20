@@ -718,6 +718,21 @@
         left join merchant supplier on supplier.mer_code = t3.mer_code
         left join store_consume_type t5 on t1.store_code = t5.store_code and t1.order_channel = t5.consum_type and t5.deleted=0
     </sql>
+
+    <sql id="queryListTable2">
+       from (
+        SELECT account_code,order_channel,trans_amount,trans_type,mer_account_type_name,mer_name,order_id,store_code,store_name,trans_time,mer_account_type,trans_no,mer_code,id,settle_flag,pos,mer_deduction_amount,mer_credit_deduction_amount,data_type,payment_channel from  settle_detail
+        UNION ALL
+        SELECT account_code,order_channel,trans_amount,trans_type,mer_account_type_name,mer_name,order_id,store_code,store_name,trans_time,mer_account_type,trans_no,mer_code,id,settle_flag,pos,mer_deduction_amount,mer_credit_deduction_amount,data_type,payment_channel  from  wholesale_receivable_settle_detail
+        ) t1
+        inner join account ac on ac.account_code = t1.account_code
+        inner join department de on de.department_code = ac.department
+        left join merchant_store_relation t2 on t1.store_code=t2.store_code and t1.mer_code=t2.mer_code and t2.deleted=0
+        left join supplier_store t3 on t1.store_code = t3.store_code and t3.deleted=0
+        left join merchant t4 on t1.mer_code=t4.mer_code
+        left join merchant supplier on supplier.mer_code = t3.mer_code
+        left join store_consume_type t5 on t1.store_code = t5.store_code and t1.order_channel = t5.consum_type and t5.deleted=0
+    </sql>
     <sql id="queryListCondition">
         <where>
             and t3.mer_code != t1.mer_code
@@ -811,6 +826,99 @@
         </where>
     </sql>
 
+    <sql id="queryListCondition2">
+        <where>
+            and t3.mer_code != t1.mer_code
+            <if test="orderNo!=null and orderNo!=''">
+                and t1.order_id = #{orderNo}
+            </if>
+            <if test="storeName!=null and storeName!=''">
+                and t1.store_name like concat('%',#{storeName},'%')
+            </if>
+            <if test="storeCodes!=null and storeCodes.size()>0">
+                and t1.store_code in
+                <foreach collection="storeCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="startTime!=null">
+                and t1.trans_time &gt;=#{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime!=null">
+                and t1.trans_time &lt;=#{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="welfareTypeCode!=null and welfareTypeCode!=''">
+                and t1.mer_account_type = #{welfareTypeCode}
+            </if>
+            <if test="transNo!=null and transNo!=''">
+                and t1.trans_no=#{transNo}
+            </if>
+            <if test="merCode!=null and merCode!=''">
+                and t1.mer_code = #{merCode}
+            </if>
+            <if test="minId!=null">
+                and t1.id &gt;= #{minId}
+            </if>
+            <choose>
+                <when test="storeType=='self'">
+                    and t3.mer_code = t1.mer_code
+                </when>
+                <when test="storeType=='third_online'">
+                    and t3.mer_code != t1.mer_code and t1.pos = t5.cashier_no
+                </when>
+                <when test="storeType=='third_offline'">
+                    and t3.mer_code != t1.mer_code and (t5.cashier_no is null or t5.cashier_no!=t1.pos)
+                </when>
+            </choose>
+            <if test="phone!=null and phone != ''">
+                and ac.phone = #{phone}
+            </if>
+            <if test="settleFlag!=null and settleFlag != ''">
+                and t1.settle_flag = #{settleFlag}
+            </if>
+            <if test="departmentCodes!=null and departmentCodes.size()>0">
+                and de.department_code in
+                <foreach collection="departmentCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="consumeType!=null">
+                <choose>
+                    <when test="consumeType=='online'">
+                        and t1.pos = t5.cashier_no
+                    </when>
+                    <when test="consumeType=='offline'">
+                        and t1.pos != ifnull(t5.cashier_no,'')
+                    </when>
+                </choose>
+            </if>
+
+            <if test="supplierCode!=null and supplierCode!=''">
+                and supplier.mer_code = #{supplierCode}
+            </if>
+            <if test="merDeductionType!=null and merDeductionType != ''">
+                <choose>
+                    <when test="merDeductionType == 'balance'">
+                        and t1.mer_deduction_amount > 0
+                    </when>
+                    <when test="merDeductionType == 'credit'">
+                        and t1.mer_credit_deduction_amount > 0
+                    </when>
+                </choose>
+            </if>
+            and t1.data_type in ('welfare','e-welfare')
+            <if test="paymentChannel!=null and paymentChannel!=''">
+                and t1.payment_channel = #{paymentChannel}
+            </if>
+            <if test="merCooperationMode!=null and merCooperationMode!=''">
+                and t4.mer_cooperation_mode=#{merCooperationMode}
+            </if>
+            <if test="merName!=null and merName!=''">
+                and t4.mer_name like concat('%',#{merName},'%')
+            </if>
+        </where>
+    </sql>
+
     <select id="allStoresInUnSettleDetail" resultType="com.welfare.persist.dto.StoreCodeName2DTO" >
         select
         t1.store_code as storeCode,
@@ -824,4 +932,146 @@
         </if>
         group by t1.store_code, t1.store_name
     </select>
+
+
+
+
+
+
+
+
+    <select id="getSettleDetailInfo2" resultType="com.welfare.persist.dto.WelfareSettleDetailDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
+        select
+        t1.id as id,
+        t1.trans_no as transNo,
+        t1.order_id as orderNo,
+        t1.trans_time as transTime,
+        t1.store_code as storeCode,
+        t1.store_name as storeName,
+        t1.mer_code as merCode,
+        t1.mer_name as  merName,
+        ac.phone as phone,
+        ac.account_name as accountName,
+        ac.department as departmentCode,
+        de.department_name as departmentName,
+        t1.settle_flag as settleFlag,
+        case when t1.settle_flag = 'unsettled' then '未结算'
+        when t1.settle_flag = 'settling'  then '结算中'
+        when t1.settle_flag = 'settled'  then '已结算'
+        else t1.settle_flag
+        end as settleFlagName,
+        case when t1.pos = t5.cashier_no then '线上消费'
+        else '线下消费' end as type,
+        case when t1.pos = t5.cashier_no then 'online'
+        else 'offline'
+        end as consumeType,
+        case when t1.pos = t5.cashier_no then '线上消费'
+        else '线下消费'
+        end as consumeTypeName,
+        supplier.mer_code as supplierCode,
+        supplier.mer_name as supplierName,
+        t1.mer_account_type as welfareTypeCode,
+        t1.mer_account_type_name as welfareTypeName,
+        case when t1.mer_deduction_amount > 0 then 'balance'
+        when t1.mer_credit_deduction_amount > 0 then 'credit'
+        end as merDeductionType,
+        case when t1.mer_deduction_amount > 0 then '余额'
+        when t1.mer_credit_deduction_amount > 0 then '授信余额'
+        end as merDeductionTypeName,
+        case when t1.mer_deduction_amount > 0 then '余额'
+        when t1.mer_credit_deduction_amount > 0 then '授信余额'
+        end as merDeductionTypeName,
+        case when t1.trans_type='consume' then t1.trans_amount
+        when t1.trans_type='refund' then t1.trans_amount*-1
+        end as payAmount,
+
+        CASE
+        WHEN t3.mer_code != t1.mer_code
+        AND t1.trans_type = 'consume'
+        AND mer_account_type = 'wholesale_procurement'  THEN
+        t1.trans_amount
+        WHEN t3.mer_code != t1.mer_code
+        AND t1.trans_type = 'refund'
+        AND mer_account_type = 'wholesale_procurement'  THEN
+        t1.trans_amount *- 1
+        WHEN t3.mer_code != t1.mer_code
+        AND t1.trans_type = 'consume' THEN
+        t1.mer_credit_deduction_amount
+        WHEN t3.mer_code != t1.mer_code
+        AND t1.trans_type = 'refund' THEN
+        t1.mer_credit_deduction_amount *- 1
+        ELSE
+        0
+        END AS settleAmount,
+
+
+        t1.payment_channel as paymentChannel,
+        case when t1.trans_type='consume' then t1.mer_deduction_amount
+        when t1.trans_type='refund' then t1.mer_deduction_amount*-1
+        end as merDeductionAmount,
+        case when t1.trans_type='consume' then t1.mer_credit_deduction_amount
+        when t1.trans_type='refund' then t1.mer_credit_deduction_amount*-1
+        end as merDeductionCreditAmount
+        <include refid="queryListTable2"></include>
+        <include refid="queryListCondition2"></include>
+
+        <if test="limit!=null and minId!=null">
+            order by t1.id
+            limit #{limit}
+        </if>
+
+        <if test="limit==null and minId==null">
+            order by t1.trans_time desc
+        </if>
+    </select>
+
+
+
+    <select id="getSettleDetailInfoSummary2" resultType="com.welfare.persist.dto.WelfareSettleSummaryDTO" parameterType="com.welfare.persist.dto.query.WelfareSettleDetailQuery">
+        select
+        t4.mer_code as merCode,
+        t4.mer_name as merName,
+        t4.mer_cooperation_mode as merCooperationMode,
+        sum(
+        case
+        when t1.trans_type = 'consume' then t1.trans_amount
+        when t1.trans_type = 'refund'  then (t1.trans_amount) * -1
+        else 0
+        end
+        ) as totalConsumeAmount,
+        sum(
+        case
+        when t1.pos = t5.cashier_no and t1.trans_type = 'consume' then t1.trans_amount
+        when t1.pos = t5.cashier_no and t1.trans_type = 'refund'  then t1.trans_amount * -1
+        else 0
+        end
+        ) as onlineConsumeAmount,
+        sum(
+        case
+        when t1.pos != ifnull(t5.cashier_no,'') and t1.trans_type = 'consume' then t1.trans_amount
+        when t1.pos != ifnull(t5.cashier_no,'') and t1.trans_type = 'refund'  then t1.trans_amount * -1
+        else 0
+        end
+        ) as offlineConsumeAmount,
+        sum(
+        case
+        when t1.trans_type = 'consume' then t1.mer_deduction_amount
+        when t1.trans_type = 'refund' then t1.mer_deduction_amount * -1
+        else 0
+        end
+        ) as balanceConsumeAmount,
+        sum(
+        case
+        WHEN  t1.settle_flag = 'unsettled' AND t1.trans_type = 'consume' AND mer_account_type = 'wholesale_procurement'  THEN t1.trans_amount
+        WHEN  t1.settle_flag = 'unsettled' AND t1.trans_type = 'refund' AND mer_account_type = 'wholesale_procurement'  THEN t1.trans_amount * -1
+        when t1.settle_flag = 'unsettled' and t1.trans_type = 'consume' then t1.mer_credit_deduction_amount
+        when t1.settle_flag = 'unsettled' and t1.trans_type = 'refund' then t1.mer_credit_deduction_amount * -1
+        else 0
+        end
+        ) as unsettledAmount
+
+        <include refid="queryListTable2"/>
+        <include refid="queryListCondition2"/>
+    </select>
+
 </mapper>

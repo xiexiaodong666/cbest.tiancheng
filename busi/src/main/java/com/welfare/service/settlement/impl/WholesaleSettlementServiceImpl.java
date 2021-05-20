@@ -212,9 +212,11 @@ public class WholesaleSettlementServiceImpl implements WholesaleSettlementServic
         WholesaleReceivableSettle settle = wholesaleReceivableSettleDao.getById(settleId);
         BizAssert.isTrue(settle !=null, ExceptionCode.ILLEGALITY_ARGUMENTS);
         if(!StringUtils.isEmpty(sendStatus)){
+            settle.setSendTime(new Date());
             settle.setSendStatus(sendStatus);
         }
         if(!StringUtils.isEmpty(recStatus)){
+            settle.setConfirmTime(new Date());
             settle.setRecStatus(recStatus);
         }
         if(!StringUtils.isEmpty(settleStatus)){

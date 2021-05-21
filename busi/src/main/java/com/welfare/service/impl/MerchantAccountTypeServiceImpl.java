@@ -25,6 +25,7 @@ import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,16 +65,24 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
         q.orderByDesc(MerchantAccountType.CREATE_TIME);
         List<MerchantAccountType> list = merchantAccountTypeDao.list(q);
         // 特殊处理，如果是社区医院，返回批发福利类型
-        MerchantExtend extend = merchantExtendDao.getByMerCode(req.getMerCode());
+        MerchantAccountType wholesale = getWholesaleProcurementIfHospital(req.getMerCode());
+        if (Objects.nonNull(wholesale)) {
+            list.add(wholesale);
+        }
+        return list;
+    }
+
+    private MerchantAccountType getWholesaleProcurementIfHospital(String merCode) {
+        // 特殊处理，如果是社区医院，返回批发福利类型
+        MerchantExtend extend = merchantExtendDao.getByMerCode(merCode);
         if (Objects.nonNull(extend) && !StringUtils.isEmpty(extend.getIndustryTag())
                 && extend.getIndustryTag().contains(WelfareConstant.IndustryTag.COMMUNITY_HOSPITAL.code())) {
             QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq(MerchantAccountType.MER_ACCOUNT_TYPE_CODE, MerAccountTypeCode.WHOLESALE_PROCUREMENT)
-                    .eq(MerchantAccountType.MER_CODE, req.getMerCode());
-            MerchantAccountType merchantAccountType = merchantAccountTypeDao.getOne(queryWrapper);
-            list.add(merchantAccountType);
+                    .eq(MerchantAccountType.MER_CODE, merCode);
+            return  merchantAccountTypeDao.getOne(queryWrapper);
         }
-        return list;
+        return null;
     }
 
     @Override
@@ -102,6 +111,22 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
                 return typeItem;
             }).collect(Collectors.toList());
             detailDTO.setTypeList(itemList);
+        }
+        // 特殊处理，如果是社区医院，返回批发福利类型
+        MerchantAccountType wholesale = getWholesaleProcurementIfHospital(detailDTO.getMerCode());
+        if (Objects.nonNull(wholesale)) {
+            MerchantAccountTypeDetailDTO.TypeItem typeItem = new MerchantAccountTypeDetailDTO.TypeItem();
+            typeItem.setDeductionOrder(wholesale.getDeductionOrder());
+            typeItem.setMerAccountTypeName(wholesale.getMerAccountTypeName());
+            typeItem.setId(wholesale.getId());
+            typeItem.setMerAccountTypeCode(wholesale.getMerAccountTypeCode());
+            if (CollectionUtils.isNotEmpty(detailDTO.getTypeList())) {
+                detailDTO.getTypeList().add(typeItem);
+            } else {
+                List<MerchantAccountTypeDetailDTO.TypeItem> typeItems = new ArrayList<>();
+                typeItems.add(typeItem);
+                detailDTO.setTypeList(typeItems);
+            }
         }
         return detailDTO;
     }

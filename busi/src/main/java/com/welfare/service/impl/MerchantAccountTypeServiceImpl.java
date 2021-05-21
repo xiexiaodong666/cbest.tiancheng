@@ -9,10 +9,12 @@ import com.welfare.common.enums.MoveDirectionEnum;
 import com.welfare.common.exception.BizException;
 import com.welfare.common.util.EmptyChecker;
 import com.welfare.persist.dao.MerchantAccountTypeDao;
+import com.welfare.persist.dao.MerchantExtendDao;
 import com.welfare.persist.dto.MerchantAccountTypeWithMerchantDTO;
 import com.welfare.persist.dto.query.MerchantAccountTypePageReq;
 import com.welfare.persist.entity.AccountAmountType;
 import com.welfare.persist.entity.MerchantAccountType;
+import com.welfare.persist.entity.MerchantExtend;
 import com.welfare.persist.mapper.MerchantAccountTypeExMapper;
 import com.welfare.service.AccountAmountTypeService;
 import com.welfare.service.MerchantAccountTypeService;
@@ -23,10 +25,12 @@ import com.welfare.service.dto.*;
 import com.welfare.service.helper.QueryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,12 +56,33 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
     private final MerchantAccountTypeDetailConverter merchantAccountTypeDetailConverter;
     private final SequenceService sequenceService;
     private final static Long startId = 10000L;
+    @Autowired
+    private MerchantExtendDao merchantExtendDao;
     @Override
     public List<MerchantAccountType> list(MerchantAccountTypeReq req) {
         QueryWrapper q=QueryHelper.getWrapper(req);
         q.eq(MerchantAccountType.SHOW_STATUS,MerchantAccountTypeShowStatusEnum.SHOW.getCode());
         q.orderByDesc(MerchantAccountType.CREATE_TIME);
-        return merchantAccountTypeDao.list(q);
+        List<MerchantAccountType> list = merchantAccountTypeDao.list(q);
+        // 特殊处理，如果是社区医院，返回批发福利类型
+        MerchantAccountType wholesale = getWholesaleProcurementIfHospital(req.getMerCode());
+        if (Objects.nonNull(wholesale)) {
+            list.add(wholesale);
+        }
+        return list;
+    }
+
+    private MerchantAccountType getWholesaleProcurementIfHospital(String merCode) {
+        // 特殊处理，如果是社区医院，返回批发福利类型
+        MerchantExtend extend = merchantExtendDao.getByMerCode(merCode);
+        if (Objects.nonNull(extend) && !StringUtils.isEmpty(extend.getIndustryTag())
+                && extend.getIndustryTag().contains(WelfareConstant.IndustryTag.COMMUNITY_HOSPITAL.code())) {
+            QueryWrapper<MerchantAccountType> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq(MerchantAccountType.MER_ACCOUNT_TYPE_CODE, MerAccountTypeCode.WHOLESALE_PROCUREMENT)
+                    .eq(MerchantAccountType.MER_CODE, merCode);
+            return  merchantAccountTypeDao.getOne(queryWrapper);
+        }
+        return null;
     }
 
     @Override

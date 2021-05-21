@@ -112,22 +112,6 @@ public class MerchantAccountTypeServiceImpl implements MerchantAccountTypeServic
             }).collect(Collectors.toList());
             detailDTO.setTypeList(itemList);
         }
-        // 特殊处理，如果是社区医院，返回批发福利类型
-        MerchantAccountType wholesale = getWholesaleProcurementIfHospital(detailDTO.getMerCode());
-        if (Objects.nonNull(wholesale)) {
-            MerchantAccountTypeDetailDTO.TypeItem typeItem = new MerchantAccountTypeDetailDTO.TypeItem();
-            typeItem.setDeductionOrder(wholesale.getDeductionOrder());
-            typeItem.setMerAccountTypeName(wholesale.getMerAccountTypeName());
-            typeItem.setId(wholesale.getId());
-            typeItem.setMerAccountTypeCode(wholesale.getMerAccountTypeCode());
-            if (CollectionUtils.isNotEmpty(detailDTO.getTypeList())) {
-                detailDTO.getTypeList().add(typeItem);
-            } else {
-                List<MerchantAccountTypeDetailDTO.TypeItem> typeItems = new ArrayList<>();
-                typeItems.add(typeItem);
-                detailDTO.setTypeList(typeItems);
-            }
-        }
         return detailDTO;
     }
 
